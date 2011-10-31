@@ -17,6 +17,7 @@ public class Packet {
         String constructorBody = "";
         String javatypearglist = "";
         String constructorBodyJ = "";
+        String constructorBodyStream = "";
         String encodeFields = "";
         String encodeFieldsLen = "";
         if (fields.length > 0) {
@@ -31,6 +32,8 @@ public class Packet {
                 javatypearglist += field.getJType() + " " + field.getVariableName() + ", ";
                 encodeFields += "\t\t" + field.getVariableName() + ".encodeTo(to);\n";
                 encodeFieldsLen += "\t\t\t+ " + field.getVariableName() + ".encodedLength()\n";
+                constructorBodyStream += "\t\t" + "this." + field.getVariableName() + " = " +
+                        "new " + field.getType() + "(from);\n";
             }
             arglist = arglist.substring(0, arglist.length() - 2);
             javatypearglist = javatypearglist.substring(0, javatypearglist.length() - 2);
@@ -40,6 +43,7 @@ public class Packet {
 
         return "package org.freeciv.packet;\n" +
                 "\n" +
+                "import java.io.DataInput;\n" +
                 "import java.io.DataOutputStream;\n" +
                 "import java.io.IOException;" + "\n" +
                 "\n" +
@@ -57,6 +61,27 @@ public class Packet {
                         constructorBodyJ +
                         "\t" + "}" + "\n" :
                         "") +
+                "\n" +
+                "\t/***\n" +
+                "\t * Construct an object from a DataInput\n" +
+                "\t * @param from data stream that is at the start of the package body  \n" +
+                "\t * @param headerLen length from header package\n" +
+                "\t * @param packet the number of the packet specified in the header\n" +
+                "\t * @throws IOException if the DataInput has a problem\n" +
+                "\t */" + "\n" +
+                "\t" + "public " + name + "(DataInput from, int headerLen, int packet) throws IOException {\n" +
+                constructorBodyStream +
+                "\t\t" + "if (getNumber() != packet) {\n" +
+                "\t\t\t" + "throw new IOException(\"Tried to create package " +
+                name + " but packet number was \" + packet);\n" +
+                "\t\t" + "}" + "\n" +
+                "\n" +
+                "\t\t" + "if (getEncodedSize() != headerLen) {\n" +
+                "\t\t\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \"" +
+                " + headerLen\n" +
+                "\t\t\t" + "+ \" Packet: \" + getEncodedSize());\n" +
+                "\t\t" + "}" + "\n" +
+                "\t" + "}" + "\n" +
                 "\n" +
                 "\t" + "public short getNumber() {\n" +
                 "\t" + "\treturn number;\n" +
