@@ -20,6 +20,7 @@ public class Packet {
         String constructorBodyStream = "";
         String encodeFields = "";
         String encodeFieldsLen = "";
+        String getFields = "";
         String getFieldValues = "";
         if (fields.length > 0) {
         encodeFields = "\n" +
@@ -39,6 +40,11 @@ public class Packet {
                         + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
                         + "Value() {" + "\n" +
                         "\t\t" + "return " + field.getVariableName() + ".getValue();" + "\n" +
+                        "\t" + "}" + "\n";
+                getFields += "\n" + "\t" + "public " + field.getType() + " get"
+                        + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
+                        + "() {" + "\n" +
+                        "\t\t" + "return " + field.getVariableName() + ";" + "\n" +
                         "\t" + "}" + "\n";
             }
             arglist = arglist.substring(0, arglist.length() - 2);
@@ -105,6 +111,7 @@ public class Packet {
                 "\tpublic int getEncodedSize() {\n" +
                 "\t\treturn 3" + encodeFieldsLen + ";\n" +
                 "\t}\n" +
+                getFields +
                 getFieldValues +
                 "}";
     }

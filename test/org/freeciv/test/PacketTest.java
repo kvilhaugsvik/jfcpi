@@ -129,4 +129,28 @@ public class PacketTest {
                         48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
         SERVER_JOIN_REQ packet = new SERVER_JOIN_REQ(inputStream, 62, 4);
     }
+
+    @Test public void testPacketGetFields() {
+        STRING username = new STRING("FreecivJava");
+        STRING capability = new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ");
+        STRING version_label = new STRING("-dev");
+        UINT32 major_version = new UINT32(2L);
+        UINT32 minor_version = new UINT32(3L);
+        UINT32 patch_version = new UINT32(99L);
+        SERVER_JOIN_REQ packet =
+                new SERVER_JOIN_REQ(
+                        username,
+                        capability,
+                        version_label,
+                        major_version,
+                        minor_version,
+                        patch_version);
+
+        assertEquals(username.getValue(), packet.getUsername().getValue());
+        assertEquals(capability.getValue(), packet.getCapability().getValue());
+        assertEquals(version_label.getValue(), packet.getVersion_label().getValue());
+        assertEquals(major_version.getValue(), packet.getMajor_version().getValue());
+        assertEquals(minor_version.getValue(), packet.getMinor_version().getValue());
+        assertEquals(patch_version.getValue(), packet.getPatch_version().getValue());
+    }
 }
