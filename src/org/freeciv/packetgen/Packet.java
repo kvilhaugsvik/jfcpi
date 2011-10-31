@@ -20,6 +20,7 @@ public class Packet {
         String constructorBodyStream = "";
         String encodeFields = "";
         String encodeFieldsLen = "";
+        String getFieldValues = "";
         if (fields.length > 0) {
         encodeFields = "\n" +
                 "\t\t// body\n";
@@ -34,6 +35,11 @@ public class Packet {
                 encodeFieldsLen += "\t\t\t+ " + field.getVariableName() + ".encodedLength()\n";
                 constructorBodyStream += "\t\t" + "this." + field.getVariableName() + " = " +
                         "new " + field.getType() + "(from);\n";
+                getFieldValues += "\n" + "\t" + "public " + field.getJType() + " get"
+                        + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
+                        + "Value() {" + "\n" +
+                        "\t\t" + "return " + field.getVariableName() + ".getValue();" + "\n" +
+                        "\t" + "}" + "\n";
             }
             arglist = arglist.substring(0, arglist.length() - 2);
             javatypearglist = javatypearglist.substring(0, javatypearglist.length() - 2);
@@ -99,6 +105,7 @@ public class Packet {
                 "\tpublic int getEncodedSize() {\n" +
                 "\t\treturn 3" + encodeFieldsLen + ";\n" +
                 "\t}\n" +
+                getFieldValues +
                 "}";
     }
 }
