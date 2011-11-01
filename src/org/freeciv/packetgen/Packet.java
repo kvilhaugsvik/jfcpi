@@ -11,6 +11,10 @@ public class Packet {
         this.fields = fields;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String toString() {
         String declarations = "";
         String arglist = "";
