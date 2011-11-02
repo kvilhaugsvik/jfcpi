@@ -15,6 +15,10 @@ public class Packet {
         return name;
     }
 
+    public int getNumber() {
+        return number;
+    }
+
     public String toString() {
         String declarations = "";
         String arglist = "";
