@@ -14,7 +14,7 @@ public class Connect {
 
     public Connect(String address, int port) throws IOException {
 
-        Socket server = new Socket(address, port);
+        server = new Socket(address, port);
         in = new DataInputStream(server.getInputStream());
 
         out = server.getOutputStream();
