@@ -55,8 +55,8 @@ public class Packet {
                         + "() {" + "\n" +
                         "\t\t" + "return " + field.getVariableName() + ";" + "\n" +
                         "\t" + "}" + "\n";
-                getToString += "\t\t" + "out += \"" + field.getVariableName() +
-                        " = \" + " + field.getVariableName() + ";" + "\n";
+                getToString += "\t\t" + "out += \"\\n\\t" + field.getVariableName() +
+                        " = \" + " + field.getVariableName() + ".getValue();" + "\n";
             }
             arglist = arglist.substring(0, arglist.length() - 2);
             javatypearglist = javatypearglist.substring(0, javatypearglist.length() - 2);
@@ -124,8 +124,8 @@ public class Packet {
                 "\t}\n" +
                 "\tpublic String toString() {\n" +
                 "\t\t" + "String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n" +
-                getToString +
-                "\t\t" + "return out;" + "\n" +
+                getToString + "\n" +
+                "\t\t" + "return out + \"\\n\";" + "\n" +
                 "\t}\n" +
                 getFields +
                 getFieldValues +
