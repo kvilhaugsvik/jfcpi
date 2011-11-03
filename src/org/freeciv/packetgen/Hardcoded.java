@@ -19,6 +19,16 @@ public class Hardcoded {
                                 "\t\tvalue = buf.toString();",
                         "to.writeBytes(" + "value" + ");\n" +
                             "\t\t" + "to.writeByte(0);" + "\n",
-                        "return " + "value" + ".length() + 1;\n")
+                        "return " + "value" + ".length() + 1;\n"),
+                new JavaSrc("bool8(bool)",
+                        "Boolean",
+                        "value = from.readBoolean();" + "\n",
+                        "to.writeBoolean(value);" + "\n",
+                        "return 1;"),
+                new JavaSrc("sint16(int)",
+                        "Short",
+                        "value = from.readShort();" + "\n",
+                        "to.writeShort(value);" + "\n",
+                        "return 2;")
         };
 }
