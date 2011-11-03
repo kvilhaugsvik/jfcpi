@@ -14,11 +14,11 @@ public class SignInAndWait {
 
             con.toSend(new SERVER_JOIN_REQ("FreecivJava", "+Freeciv.Devel-2.4-2011.Aug.02 ", "-dev", 2L, 3L, 99L));
 
-            con.printpackage();
+            System.out.println(con.getPacket());
 
             con.toSend(new CONN_PONG());
 
-            con.printpackage();
+            System.out.println(con.getPacket());
 
             Thread.sleep(10000L);
         } catch (IOException e) {
