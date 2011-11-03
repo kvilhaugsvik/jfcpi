@@ -30,6 +30,7 @@ public class Packet {
         String encodeFieldsLen = "";
         String getFields = "";
         String getFieldValues = "";
+        String getToString = "";
         if (fields.length > 0) {
         encodeFields = "\n" +
                 "\t\t// body\n";
@@ -54,6 +55,8 @@ public class Packet {
                         + "() {" + "\n" +
                         "\t\t" + "return " + field.getVariableName() + ";" + "\n" +
                         "\t" + "}" + "\n";
+                getToString += "\t\t" + "out += \"" + field.getVariableName() +
+                        " = \" + " + field.getVariableName() + ";" + "\n";
             }
             arglist = arglist.substring(0, arglist.length() - 2);
             javatypearglist = javatypearglist.substring(0, javatypearglist.length() - 2);
@@ -118,6 +121,11 @@ public class Packet {
                 "\n" +
                 "\tpublic int getEncodedSize() {\n" +
                 "\t\treturn 3" + encodeFieldsLen + ";\n" +
+                "\t}\n" +
+                "\tpublic String toString() {\n" +
+                "\t\t" + "String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n" +
+                getToString +
+                "\t\t" + "return out;" + "\n" +
                 "\t}\n" +
                 getFields +
                 getFieldValues +
