@@ -1,6 +1,7 @@
 package org.freeciv.packetgen
 
 import util.parsing.combinator._
+import util.parsing.input.Reader
 
 class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
   def fieldType = regex("""[A-Z](\w|_)*""".r)
@@ -13,4 +14,5 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
   def expr: Parser[Any] = fieldTypeAssign
 
   def parsePacketsDef(input: String) = parseAll(rep(expr), input)
+  def parsePacketsDef(input: Reader[Char]) = parseAll(rep(expr), input)
 }
