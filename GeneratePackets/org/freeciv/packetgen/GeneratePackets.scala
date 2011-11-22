@@ -8,8 +8,8 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean) {
 
   def this(packetsDefPath: String, devMode: Boolean) = this(new File(packetsDefPath), devMode)
 
-  private def storage = new PacketsStore(devMode)
-  private def Parser = new ParsePacketsDef(storage)
+  private val storage = new PacketsStore(devMode)
+  private val Parser = new ParsePacketsDef(storage)
 
   if (!packetsDefPath.exists()) {
     throw new IOException(packetsDefPath.getAbsolutePath + " doesn't exist.")
