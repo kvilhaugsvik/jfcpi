@@ -17,8 +17,7 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean) {
     throw new IOException("Can't read " + packetsDefPath.getAbsolutePath)
   }
 
-  val toReadFrom: StreamReader = StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))
-  Parser.parsePacketsDef(toReadFrom)
+  Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath))))
 }
 
 object GeneratePackets {
