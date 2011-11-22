@@ -30,4 +30,12 @@ public class PacketsStore {
     public boolean hasTypeAlias(String name) {
         return types.containsKey(name);
     }
+
+    public HashMap<String, String> getJavaCode() {
+        HashMap<String, String> out = new HashMap<String, String>();
+        for (String name: types.keySet()) {
+            out.put(name, types.get(name).toString(name));
+        }
+        return out;
+    }
 }
