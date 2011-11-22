@@ -1,6 +1,8 @@
 JAVA ?= java
 JAVAC ?= javac
 JAR ?= jar
+SCALA ?= scala
+SCALAC ?= scalac
 JUNIT ?= /usr/share/java/junit4.jar
 
 PROTOOUT ?= out/Protocol
@@ -19,6 +21,7 @@ protocol:
 generator:
 	mkdir -p ${PACKETGENOUT}
 	${JAVAC} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.java
+	${SCALAC} -classpath ${PACKETGENOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/GeneratePackets.scala
 	touch generator
 
 generated: generator protocol
@@ -36,8 +39,10 @@ protojar: generated
 tests: generated
 	mkdir -p ${TESTOUT}
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT} test/org/freeciv/test/*.java
+	${SCALAC} -d ${TESTOUT} -classpath ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} test/org/freeciv/test/*.scala
 	${JAVA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.PacketTest
 	${JAVA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.PacketsStoreTest
+	${SCALA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.ParseTest
 	touch tests
 
 clean:
