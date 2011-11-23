@@ -52,7 +52,9 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
     case theType~alias~is~aliased => storage.registerTypeAlias(alias, aliased)
   }
 
-  def expr: Parser[Any] = fieldTypeAssign
+  def comment = regex("""/\*(.|[\n\r])*?\*/""".r) | regex("""//[^\n\r]*""".r) | regex("""#[^\n\r]*""".r)
+
+  def expr: Parser[Any] = fieldTypeAssign | comment
 
   def parsePacketsDef(input: String) = parseAll(rep(expr), input)
   def parsePacketsDef(input: Reader[Char]) = parseAll(rep(expr), input)
