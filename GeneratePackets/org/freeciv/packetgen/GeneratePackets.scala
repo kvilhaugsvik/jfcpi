@@ -18,7 +18,9 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean) {
     throw new IOException("Can't read " + packetsDefPath.getAbsolutePath)
   }
 
-  Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath))))
+  if (!Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))).successful) {
+    throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
+  }
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
