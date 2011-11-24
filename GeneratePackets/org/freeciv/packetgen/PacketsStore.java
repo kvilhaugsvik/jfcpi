@@ -74,6 +74,9 @@ public class PacketsStore {
         for (String name: types.keySet()) {
             out.put(name, types.get(name).toString(name));
         }
+        for (String name: packets.keySet()) {
+            out.put(name, packets.get(name).toString());
+        }
         return out;
     }
 }
