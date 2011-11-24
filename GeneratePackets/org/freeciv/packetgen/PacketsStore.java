@@ -36,11 +36,25 @@ public class PacketsStore {
         return types.containsKey(name);
     }
 
-    public void registerPacket(Packet packet) throws PacketCollisionException {
+    public void registerPacket(Packet packet) throws PacketCollisionException, UndefinedException {
         if (packets.containsKey(packet.getName())) {
             throw new PacketCollisionException("Packet name " + packet.getName() + " already in use");
         } else if (packetsByNumber.containsKey(packet.getNumber())) {
             throw new PacketCollisionException("Packet number " + packet.getNumber() + " already in use");
+        }
+
+        for (Field fieldType: packet.getFields()) {
+            if (!types.containsKey(fieldType.getType())) {
+                String errorMessage = "Field type" + fieldType.getType() +
+                        " not declared before use in packet " + packet.getName() + ".";
+                if (devMode) {
+                    System.err.println(errorMessage);
+                    System.err.println("Skipping packet since in development mode...");
+                    return;
+                } else {
+                    throw new UndefinedException(errorMessage);
+                }
+            }
         }
 
         packets.put(packet.getName(), packet);
