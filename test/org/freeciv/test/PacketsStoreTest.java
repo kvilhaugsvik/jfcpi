@@ -1,5 +1,7 @@
 package org.freeciv.test;
 
+import org.freeciv.packetgen.Packet;
+import org.freeciv.packetgen.PacketCollisionException;
 import org.freeciv.packetgen.PacketsStore;
 import org.freeciv.packetgen.UndefinedException;
 import org.junit.Test;
@@ -48,5 +50,27 @@ public class PacketsStoreTest {
         assertTrue(results.containsKey("UINT32"));
         assertTrue(results.containsKey("UNSIGNEDINT32"));
         assertNotNull(results.get("UINT32"));
+    }
+
+    @Test public void registerPacketWithoutFields() throws UndefinedException, PacketCollisionException {
+        PacketsStore storage = new PacketsStore(false);
+        storage.registerPacket(new Packet("PACKET_HELLO", 25));
+
+        assertTrue(storage.hasPacket(25));
+        assertTrue(storage.hasPacket("PACKET_HELLO"));
+    }
+
+    @Test(expected = PacketCollisionException.class)
+    public void registerTwoPacketsWithTheSameNumber() throws PacketCollisionException {
+        PacketsStore storage = new PacketsStore(false);
+        storage.registerPacket(new Packet("PACKET_HELLO", 25));
+        storage.registerPacket(new Packet("PACKET_HI", 25));
+    }
+
+    @Test(expected = PacketCollisionException.class)
+    public void registerTwoPacketsWithTheSameName() throws PacketCollisionException {
+        PacketsStore storage = new PacketsStore(false);
+        storage.registerPacket(new Packet("PACKET_HELLO", 25));
+        storage.registerPacket(new Packet("PACKET_HELLO", 50));
     }
 }
