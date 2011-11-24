@@ -192,4 +192,29 @@ class ParseTest {
     assertTrue(parser.parsePacketsDef("# comment").successful)
     assertFalse(storage.hasTypeAlias("BOOL"))
   }
+
+  @Test def parsePackageWithoutFields() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    assertTrue(parser.parsePacketsDef("""PACKET_CONN_PING = 88;
+                                      end""").successful)
+    assertTrue(storage.hasPacket(88))
+  }
+
+  @Test def parsePackageNoName() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    assertFalse(parser.parsePacketsDef("""PACKET_ = 5;
+                                      end""").successful)
+  }
+
+  @Test def parsePackageNoNumber() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    assertFalse(parser.parsePacketsDef("""PACKET_CONN_PING = ;
+                                      end""").successful)
+  }
 }

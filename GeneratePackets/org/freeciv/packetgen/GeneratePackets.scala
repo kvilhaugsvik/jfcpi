@@ -54,7 +54,14 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
 
   def comment = regex("""/\*(.|[\n\r])*?\*/""".r) | regex("""//[^\n\r]*""".r) | regex("""#[^\n\r]*""".r)
 
-  def expr: Parser[Any] = fieldTypeAssign | comment
+  def packetName = regex("""PACKET_[A-Za-z0-9_]+""".r)
+
+  def packet = packetName ~ "=" ~ regex("""[0-9]+""".r) ~ ";" ~
+  "end" ^^ {
+    case name~has~number~endOfHeader~end => storage.registerPacket(new Packet(name, Integer.parseInt(number)))
+  };
+
+  def expr: Parser[Any] = fieldTypeAssign | comment | packet
 
   def parsePacketsDef(input: String) = parseAll(rep(expr), input)
   def parsePacketsDef(input: Reader[Char]) = parseAll(rep(expr), input)
