@@ -56,9 +56,14 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
 
   def packetName = regex("""PACKET_[A-Za-z0-9_]+""".r)
 
+  def field = fieldType ~ regex("""\w+""".r) ~ ";"
+
+  def fieldList = rep(field)
+
   def packet = packetName ~ "=" ~ regex("""[0-9]+""".r) ~ ";" ~
+  fieldList ~
   "end" ^^ {
-    case name~has~number~endOfHeader~end => storage.registerPacket(new Packet(name, Integer.parseInt(number)))
+    case name~has~number~endOfHeader~fields~end => storage.registerPacket(new Packet(name, Integer.parseInt(number)))
   };
 
   def expr: Parser[Any] = fieldTypeAssign | comment | packet

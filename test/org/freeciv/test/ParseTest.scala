@@ -217,4 +217,23 @@ class ParseTest {
     assertFalse(parser.parsePacketsDef("""PACKET_CONN_PING = ;
                                       end""").successful)
   }
+
+  @Test def parsePackageWithFieldCanParse() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HI = 57;
+                                           BOOL friendly;
+                                         end""").successful)
+  }
+
+  @Test def parsePackageWithFieldsCanParse() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly;
+                                           BOOL inVoice;
+                                         end""").successful)
+  }
 }
