@@ -69,6 +69,10 @@ public class PacketsStore {
         return packetsByNumber.containsKey(number);
     }
 
+    public Packet getPacket(String name) {
+        return packets.get(name);
+    }
+
     public HashMap<String, String> getJavaCode() {
         HashMap<String, String> out = new HashMap<String, String>();
         for (String name: types.keySet()) {

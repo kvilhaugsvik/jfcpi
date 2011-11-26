@@ -81,6 +81,25 @@ public class PacketsStoreTest {
         assertTrue(storage.hasPacket("PACKET_HELLO"));
     }
 
+    @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
+        PacketsStore storage = new PacketsStore(false);
+        Field field = new Field("myNameIs", "STRING", "String");
+
+        storage.registerTypeAlias("STRING", "string(char)");
+        storage.registerPacket(new Packet("PACKET_HELLO", 25, field));
+
+        assertTrue(storage.hasPacket("PACKET_HELLO"));
+        assertTrue(storage.getPacket("PACKET_HELLO").getFields().contains(field));
+    }
+
+    @Test public void registerPacketWithoutFieldsHasNoFields() throws PacketCollisionException, UndefinedException {
+        PacketsStore storage = new PacketsStore(false);
+        storage.registerPacket(new Packet("PACKET_HELLO", 25));
+
+        assertTrue(storage.hasPacket("PACKET_HELLO"));
+        assertTrue(storage.getPacket("PACKET_HELLO").getFields().isEmpty());
+    }
+
     @Test public void registerPacketWithUndefinedFieldsDevMode() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = new PacketsStore(true);
         storage.registerPacket(new Packet("PACKET_HELLO", 25, new Field("myNameIs", "STRING", "String")));

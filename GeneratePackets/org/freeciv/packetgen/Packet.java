@@ -1,6 +1,7 @@
 package org.freeciv.packetgen;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Packet {
     private String name;
@@ -134,7 +135,7 @@ public class Packet {
                 "}";
     }
 
-    public Iterable<? extends Field> getFields() {
+    public List<? extends Field> getFields() {
         return Arrays.asList(fields);
     }
 }
