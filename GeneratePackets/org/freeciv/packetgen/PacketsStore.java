@@ -1,6 +1,8 @@
 package org.freeciv.packetgen;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedList;
 
 public class PacketsStore {
     private boolean devMode;
@@ -36,17 +38,22 @@ public class PacketsStore {
         return types.containsKey(name);
     }
 
-    public void registerPacket(Packet packet) throws PacketCollisionException, UndefinedException {
-        if (packets.containsKey(packet.getName())) {
-            throw new PacketCollisionException("Packet name " + packet.getName() + " already in use");
-        } else if (packetsByNumber.containsKey(packet.getNumber())) {
-            throw new PacketCollisionException("Packet number " + packet.getNumber() + " already in use");
+    public void registerPacket(String name, int number) throws PacketCollisionException, UndefinedException {
+        registerPacket(name, number, new LinkedList<String[]>());
+    }
+
+    public void registerPacket(String name, int number, List<String[]> fields) throws PacketCollisionException, UndefinedException {
+        if (packets.containsKey(name)) {
+            throw new PacketCollisionException("Packet name " + name + " already in use");
+        } else if (packetsByNumber.containsKey(number)) {
+            throw new PacketCollisionException("Packet number " + number + " already in use");
         }
 
-        for (Field fieldType: packet.getFields()) {
-            if (!types.containsKey(fieldType.getType())) {
-                String errorMessage = "Field type" + fieldType.getType() +
-                        " not declared before use in packet " + packet.getName() + ".";
+        List<Field> fieldList = new LinkedList<Field>();
+        for (String[] fieldType: fields) {
+            if (!types.containsKey(fieldType[0])) {
+                String errorMessage = "Field type" + fieldType[0] +
+                        " not declared before use in packet " + name + ".";
                 if (devMode) {
                     System.err.println(errorMessage);
                     System.err.println("Skipping packet since in development mode...");
@@ -55,10 +62,11 @@ public class PacketsStore {
                     throw new UndefinedException(errorMessage);
                 }
             }
+            fieldList.add(new Field(fieldType[1], fieldType[0], types.get(fieldType[0]).getJavaType()));
         }
 
-        packets.put(packet.getName(), packet);
-        packetsByNumber.put(packet.getNumber(), packet.getName());
+        packets.put(name, new Packet(name, number, fieldList.toArray(new Field[0])));
+        packetsByNumber.put(number, name);
     }
 
     public boolean hasPacket(String name) {

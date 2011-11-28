@@ -4,6 +4,7 @@ import org.freeciv.packetgen.*;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import static org.junit.Assert.*;
 
@@ -51,7 +52,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithoutFields() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = new PacketsStore(false);
-        storage.registerPacket(new Packet("PACKET_HELLO", 25));
+        storage.registerPacket("PACKET_HELLO", 25);
 
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
@@ -60,21 +61,24 @@ public class PacketsStoreTest {
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameNumber() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = new PacketsStore(false);
-        storage.registerPacket(new Packet("PACKET_HELLO", 25));
-        storage.registerPacket(new Packet("PACKET_HI", 25));
+        storage.registerPacket("PACKET_HELLO", 25);
+        storage.registerPacket("PACKET_HI", 25);
     }
 
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameName() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = new PacketsStore(false);
-        storage.registerPacket(new Packet("PACKET_HELLO", 25));
-        storage.registerPacket(new Packet("PACKET_HELLO", 50));
+        storage.registerPacket("PACKET_HELLO", 25);
+        storage.registerPacket("PACKET_HELLO", 50);
     }
 
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = new PacketsStore(false);
         storage.registerTypeAlias("STRING", "string(char)");
-        storage.registerPacket(new Packet("PACKET_HELLO", 25, new Field("myNameIs", "STRING", "String")));
+        String[] field1 = {"STRING", "myNameIs"};
+        LinkedList<String[]> fields = new LinkedList<String[]>();
+        fields.add(field1);
+        storage.registerPacket("PACKET_HELLO", 25, fields);
 
         assertTrue(storage.hasTypeAlias("STRING"));
         assertTrue(storage.hasPacket(25));
@@ -83,18 +87,21 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = new PacketsStore(false);
-        Field field = new Field("myNameIs", "STRING", "String");
+        String[] field1 = {"STRING", "myNameIs"};
+        LinkedList<String[]> fields = new LinkedList<String[]>();
+        fields.add(field1);
 
         storage.registerTypeAlias("STRING", "string(char)");
-        storage.registerPacket(new Packet("PACKET_HELLO", 25, field));
+        storage.registerPacket("PACKET_HELLO", 25, fields);
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
-        assertTrue(storage.getPacket("PACKET_HELLO").getFields().contains(field));
+        assertEquals("myNameIs", storage.getPacket("PACKET_HELLO").getFields().get(0).getVariableName());
+        assertEquals("STRING", storage.getPacket("PACKET_HELLO").getFields().get(0).getType());
     }
 
     @Test public void registerPacketWithoutFieldsHasNoFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = new PacketsStore(false);
-        storage.registerPacket(new Packet("PACKET_HELLO", 25));
+        storage.registerPacket("PACKET_HELLO", 25);
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
         assertTrue(storage.getPacket("PACKET_HELLO").getFields().isEmpty());
@@ -102,7 +109,11 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithUndefinedFieldsDevMode() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = new PacketsStore(true);
-        storage.registerPacket(new Packet("PACKET_HELLO", 25, new Field("myNameIs", "STRING", "String")));
+        String[] field1 = {"STRING", "myNameIs"};
+        LinkedList<String[]> fields = new LinkedList<String[]>();
+        fields.add(field1);
+
+        storage.registerPacket("PACKET_HELLO", 25, fields);
 
         assertFalse(storage.hasPacket(25));
         assertFalse(storage.hasPacket("PACKET_HELLO"));
@@ -111,6 +122,10 @@ public class PacketsStoreTest {
     @Test(expected = UndefinedException.class)
     public void registerPacketWithUndefinedFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = new PacketsStore(false);
-        storage.registerPacket(new Packet("PACKET_HELLO", 25, new Field("myNameIs", "STRING", "String")));
+        String[] field1 = {"STRING", "myNameIs"};
+        LinkedList<String[]> fields = new LinkedList<String[]>();
+        fields.add(field1);
+
+        storage.registerPacket("PACKET_HELLO", 25, fields);
     }
 }

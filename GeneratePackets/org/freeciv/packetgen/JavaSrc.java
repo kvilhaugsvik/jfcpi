@@ -18,6 +18,10 @@ public class JavaSrc {
         return CSrc;
     }
 
+    public String getJavaType() {
+        return JavaType;
+    }
+
     public String toString(String name) {
         return "package org.freeciv.packet;" + "\n" +
                 "\n" +

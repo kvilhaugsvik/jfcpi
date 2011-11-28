@@ -222,6 +222,8 @@ class ParseTest {
     val storage = new PacketsStore(false)
     val parser = new ParsePacketsDef(storage)
 
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
     assertTrue(parser.parsePacketsDef("""PACKET_HI = 57;
                                            BOOL friendly;
                                          end""").successful)
@@ -230,6 +232,8 @@ class ParseTest {
   @Test def parsePackageWithFieldsCanParse() {
     val storage = new PacketsStore(false)
     val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly;
