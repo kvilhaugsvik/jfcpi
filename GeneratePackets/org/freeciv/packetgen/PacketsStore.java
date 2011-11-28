@@ -91,4 +91,13 @@ public class PacketsStore {
         }
         return out;
     }
+
+    public String getPacketList() {
+        String out = "";
+
+        for (int number: packetsByNumber.keySet()) {
+            out += number + "\t" + "org.freeciv.packet." + packetsByNumber.get(number) + "\n";
+        }
+        return out;
+    }
 }

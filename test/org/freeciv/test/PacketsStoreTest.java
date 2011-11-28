@@ -134,4 +134,33 @@ public class PacketsStoreTest {
 
         storage.registerPacket("PACKET_HELLO", 25, fields);
     }
+
+    @Test public void noPacketsAreListedWhenNoPacketsAreRegistered() {
+        PacketsStore storage = new PacketsStore(false);
+
+        assertEquals("", storage.getPacketList());
+    }
+
+    @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
+        PacketsStore storage = new PacketsStore(false);
+        storage.registerPacket("PACKET_HELLO", 25);
+
+        String[] packetList = storage.getPacketList().split("[\\t\\r\\n]");
+        assertEquals("25", packetList[0]);
+        assertEquals("org.freeciv.packet.PACKET_HELLO", packetList[1]);
+    }
+
+    @Test public void packetsAreListed() throws PacketCollisionException, UndefinedException {
+        PacketsStore storage = new PacketsStore(false);
+        storage.registerPacket("PACKET_HELLO", 25);
+        storage.registerPacket("PACKET_HI", 26);
+
+        String[] packetList = storage.getPacketList().split("[\\r\\n]");
+        assertTrue(
+                (packetList[0].matches("25\\t+org.freeciv.packet.PACKET_HELLO") &&
+                        packetList[1].matches("26\\t+org.freeciv.packet.PACKET_HI")) ||
+                (packetList[0].matches("26\\t+org.freeciv.packet.PACKET_HI") &&
+                        packetList[1].matches("25\\t+org.freeciv.packet.PACKET_HELLO"))
+        );
+    }
 }

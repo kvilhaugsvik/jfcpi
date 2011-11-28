@@ -34,6 +34,12 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean) {
       classWriter.write(code)
       classWriter.close()
     })
+
+    val manifest = new File(path + "/org/freeciv/packet/" + "packets.txt")
+    manifest.createNewFile
+    val manifestWriter = new FileWriter(manifest)
+    manifestWriter.write(storage.getPacketList)
+    manifestWriter.close()
   }
 }
 
