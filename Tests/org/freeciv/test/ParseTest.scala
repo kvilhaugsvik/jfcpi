@@ -240,4 +240,35 @@ class ParseTest {
                                            BOOL inVoice;
                                          end""").successful)
   }
+
+  @Test def parsePackageWithFlagCanParse() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    assertTrue(parser.parsePacketsDef("""PACKET_CONN_PING = 88; sc
+                                      end""").successful)
+  }
+
+  @Test def parsePackageWithFlagsCanParse() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    assertTrue(parser.parsePacketsDef("""PACKET_CONN_PONG = 89; cs, handle-per-conn
+                                         end""").successful)
+  }
+
+  @Test def parsePackageWithFlagThatTakesAnArgumentCanParse() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+    parser.parsePacketsDef("""PACKET_HI = 57; cs
+                                           BOOL friendly;
+                                         end""")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5; cs, cancel(PACKET_HI), handle-per-conn
+                                           BOOL friendly;
+                                           BOOL inVoice;
+                                         end""").successful)
+  }
 }

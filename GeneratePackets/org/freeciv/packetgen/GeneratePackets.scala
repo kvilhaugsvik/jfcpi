@@ -62,6 +62,25 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
 
   def packetName = regex("""PACKET_[A-Za-z0-9_]+""".r)
 
+  def packetFlag = "is-info" |
+    "is-game-info" |
+    "force" |
+    """cancel(""" ~ packetName ~ """)""" |
+    "pre-send" |
+    "post-recv" |
+    "post-send" |
+    "no-delta" |
+    "no-packet" |
+    "no-handle" |
+    "handle-via-packet" |
+    "handle-per-conn" |
+    "dsend" |
+    "lsend" |
+    "cs" |
+    "sc"
+
+  def packetFlags = opt(packetFlag ~ rep("," ~> packetFlag))
+
   def field = fieldType ~ regex("""\w+""".r) <~ ";" ^^ {
     case alias~aliased =>Array(alias, aliased)
   }
@@ -69,9 +88,10 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
   def fieldList = rep(field)
 
   def packet = packetName ~ "=" ~ regex("""[0-9]+""".r) ~ ";" ~
+  packetFlags ~
   fieldList ~
   "end" ^^ {
-    case name~has~number~endOfHeader~fields~end => storage.registerPacket(name, Integer.parseInt(number), fields)
+    case name~has~number~endOfHeader~flags~fields~end => storage.registerPacket(name, Integer.parseInt(number), fields)
   };
 
   def expr: Parser[Any] = fieldTypeAssign | comment | packet
