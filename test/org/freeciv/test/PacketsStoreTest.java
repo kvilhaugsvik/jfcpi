@@ -37,6 +37,12 @@ public class PacketsStoreTest {
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "UINT32");
     }
 
+    @Test(expected = UndefinedException.class)
+    public void registerTypeBasicTypeNotExisting() throws UndefinedException {
+        PacketsStore storage = new PacketsStore(false);
+        storage.registerTypeAlias("THISSHOULDNOTEXIST", "notexisting128(void)");
+    }
+
     @Test public void codeIsThere() throws UndefinedException {
         PacketsStore storage = new PacketsStore(false);
 
