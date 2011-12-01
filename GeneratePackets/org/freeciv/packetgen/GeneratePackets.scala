@@ -92,8 +92,14 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
 
   def fieldFlags = opt(fieldFlag ~ rep("," ~> fieldFlag))
 
-  def field = fieldType ~ regex("""\w+""".r) ~ ";" ~ fieldFlags ^^ {
-    case alias~aliased~end~flags => Array(alias, aliased)
+  def arrayFullSize = regex("""[0-9a-zA-Z_\+\*-/]+""".r)
+
+  def elementsToTransfer = regex("""[0-9a-zA-Z_\+\*-/]+""".r)
+
+  def fieldArrayDeclaration = rep("[" ~ arrayFullSize ~ opt(":" ~ elementsToTransfer) ~ "]")
+
+  def field = fieldType ~ regex("""\w+""".r) ~ fieldArrayDeclaration ~ ";" ~ fieldFlags ^^ {
+    case alias~aliased~arrayDec~end~flags => Array(alias, aliased)
   }
 
   def fieldList = rep(field)

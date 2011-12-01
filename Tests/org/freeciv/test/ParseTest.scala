@@ -316,4 +316,59 @@ class ParseTest {
                                            BOOL friendly; add-cap(attitude)
                                          end""").successful)
   }
+
+  @Test def parseFieldWithOneArrayDeclaration() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly[1];
+                                         end""").successful)
+  }
+
+  @Test def parseFieldWithTwoArrayDeclarations() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly[1][5];
+                                         end""").successful)
+  }
+
+  @Test def parseFieldWithArrayDeclarationWithConstant() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly[PLAYERS];
+                                         end""").successful)
+  }
+
+  @Test def parseFieldWithArrayDeclarationWithElementsToTransfer() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly[20:3];
+                                         end""").successful)
+  }
+
+  @Test def parseFieldWithArrayDeclarationWithOperatorInConstant() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly[PLAYERS+1:3];
+                                         end""").successful)
+  }
 }
