@@ -9,6 +9,16 @@ public class Hardcoded {
 
     private Hardcoded() {
         for (JavaSrc src: new JavaSrc[]{
+            new JavaSrc("uint8(int)",
+                    "Integer",
+                    "value = from.readUnsignedByte();" + "\n",
+                    "to.writeByte(value);" + "\n",
+                    "return 1;"),
+            new JavaSrc("uint16(int)",
+                    "Integer",
+                    "value = (int) from.readChar();" + "\n",
+                    "to.writeChar(value);" + "\n",
+                    "return 2;"),
             new JavaSrc("uint32(int)",
                     "Long",
                     DataIO.readUIntCode(4, "Long", "value"),
@@ -31,11 +41,21 @@ public class Hardcoded {
                     "value = from.readBoolean();" + "\n",
                     "to.writeBoolean(value);" + "\n",
                     "return 1;"),
+            new JavaSrc("sint8(int)",
+                    "Byte",
+                    "value = from.readByte();" + "\n",
+                    "to.writeByte(value);" + "\n",
+                    "return 2;"),
             new JavaSrc("sint16(int)",
                     "Short",
                     "value = from.readShort();" + "\n",
                     "to.writeShort(value);" + "\n",
-                    "return 2;")
+                    "return 2;"),
+            new JavaSrc("sint32(int)",
+                    "Integer",
+                    "value = from.readInt();" + "\n",
+                    "to.writeInt(value);" + "\n",
+                    "return 4;")
         }) {
             data.put(src.getCSrc(), src);
         }
