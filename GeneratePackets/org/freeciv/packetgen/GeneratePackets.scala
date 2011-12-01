@@ -81,8 +81,19 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
 
   def packetFlags = opt(packetFlag ~ rep("," ~> packetFlag))
 
-  def field = fieldType ~ regex("""\w+""".r) <~ ";" ^^ {
-    case alias~aliased =>Array(alias, aliased)
+  def capability = regex("""[A-Za-z0-9_-]+""".r)
+
+  def fieldFlag = (
+    "key" |
+    "add-cap(" ~ capability ~ ")" |
+    "diff" |
+    "remove-cap(" ~ capability ~ ")"
+    )
+
+  def fieldFlags = opt(fieldFlag ~ rep("," ~> fieldFlag))
+
+  def field = fieldType ~ regex("""\w+""".r) ~ ";" ~ fieldFlags ^^ {
+    case alias~aliased~end~flags => Array(alias, aliased)
   }
 
   def fieldList = rep(field)

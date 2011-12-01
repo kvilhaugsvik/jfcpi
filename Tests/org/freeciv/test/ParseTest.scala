@@ -271,4 +271,49 @@ class ParseTest {
                                            BOOL inVoice;
                                          end""").successful)
   }
+
+  @Test def parsePackageWithFlagOnField() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly; key
+                                         end""").successful)
+  }
+
+  @Test def parsePackageWithFlagsOnField() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly; key, diff
+                                         end""").successful)
+  }
+
+  @Test def parsePackageWithFlagOnFieldAndFieldAfter() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly; key
+                                           BOOL inVoice;
+                                         end""").successful)
+  }
+
+  @Test def parsePackageWithArgumentUsingFlagOnField() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly; add-cap(attitude)
+                                         end""").successful)
+  }
 }
