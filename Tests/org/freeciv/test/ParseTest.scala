@@ -193,6 +193,45 @@ class ParseTest {
     assertFalse(storage.hasTypeAlias("BOOL"))
   }
 
+  @Test def parsesCommentPythonStyleAmongFieldsInPacket() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly; key
+                                           # comment in the line
+                                           BOOL inVoice; # Voice or text?
+                                         end""").successful)
+  }
+
+  @Test def parsesTwoCommentsInARowAmongFieldsInPacket() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly; key
+                                           # comment in the line
+                                           # This is on another line and will be seen as seperate
+                                           BOOL inVoice;
+                                         end""").successful)
+  }
+
+  @Test def parsesCommentPythonStyleBeforeFieldsInPacket() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           # comment in the line
+                                           BOOL inVoice;
+                                         end""").successful)
+  }
+
   @Test def parsePackageWithoutFields() {
     val storage = new PacketsStore(false)
     val parser = new ParsePacketsDef(storage)

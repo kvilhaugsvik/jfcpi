@@ -102,7 +102,7 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
     case alias~aliased~arrayDec~end~flags => Array(alias, aliased)
   }
 
-  def fieldList = rep(field)
+  def fieldList = rep(comment) ~> rep((field <~ rep(comment)))
 
   def packet = packetName ~ "=" ~ regex("""[0-9]+""".r) ~ ";" ~
   packetFlags ~
