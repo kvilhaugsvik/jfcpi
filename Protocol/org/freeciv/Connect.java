@@ -73,11 +73,11 @@ public class Connect {
             try {
                 return (Packet)packetMakers.get(kind).newInstance(in, size, kind);
             } catch (InstantiationException e) {
-                throw new IOException("Internal error while trying to read packet from network");
+                throw new IOException("Internal error while trying to read packet from network", e);
             } catch (IllegalAccessException e) {
-                throw new IOException("Internal error while trying to read packet from network");
+                throw new IOException("Internal error while trying to read packet from network", e);
             } catch (InvocationTargetException e) {
-                throw new IOException("Internal error while trying to read packet from network");
+                throw new IOException("Internal error while trying to read packet from network", e);
             }
         } else {
             return new RawPacket(in, size, kind);
