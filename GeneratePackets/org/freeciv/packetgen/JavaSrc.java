@@ -66,6 +66,10 @@ public class JavaSrc {
                 "\t" + "public " + JavaType + " getValue() {" + "\n" +
                 "\t" + "\t" + "return value;" + "\n" +
                 "\t" + "}" + "\n" +
+                "\n" +
+                "\t" + "public " + "String" + " toString() {" + "\n" +
+                "\t" + "\t" + "return value.toString();" + "\n" +
+                "\t" + "}" + "\n" +
                 "}";
     }
 }
