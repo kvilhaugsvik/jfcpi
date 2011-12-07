@@ -66,7 +66,7 @@ public class PacketsStore {
         List<Field> fieldList = new LinkedList<Field>();
         for (String[] fieldType: fields) {
             if (!types.containsKey(fieldType[0])) {
-                String errorMessage = "Field type" + fieldType[0] +
+                String errorMessage = "Field type " + fieldType[0] +
                         " not declared before use in packet " + name + ".";
                 if (devMode) {
                     System.err.println(errorMessage);
