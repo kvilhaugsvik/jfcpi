@@ -116,8 +116,8 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
     case varName ~ arrayDec => (varName, arrayDec)
   }
 
-  def field = fieldType ~ fieldVar ~ ";" ~ fieldFlags ^^ {
-    case kind~variable~end~flags => Array(kind, variable._1)
+  def field = fieldType ~ fieldVar ~ rep("," ~> fieldVar) ~ ";" ~ fieldFlags ^^ {
+    case kind~variable~moreVars~end~flags => (variable :: moreVars).map((vari) => Array(kind, vari._1))
   }
 
   def fieldList = rep(comment) ~> rep((field <~ rep(comment)))
@@ -126,7 +126,12 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
   packetFlags ~
   fieldList ~
   "end" ^^ {
-    case name~has~number~endOfHeader~flags~fields~end => storage.registerPacket(name, Integer.parseInt(number), fields)
+    case name~has~number~endOfHeader~flags~fields~end =>
+      val flattenFields = fields.flatten
+      storage.registerPacket(
+        name,
+        Integer.parseInt(number),
+        flattenFields)
   };
 
   def expr: Parser[Any] = fieldTypeAssign | comment | packet

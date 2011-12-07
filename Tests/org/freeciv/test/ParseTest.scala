@@ -19,6 +19,7 @@ package org.freeciv.test
 import org.junit.Test
 import junit.framework.Assert._
 import org.freeciv.packetgen.{PacketsStore, ParsePacketsDef}
+import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
 
 class ParseTest {
@@ -425,5 +426,60 @@ class ParseTest {
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly[PLAYERS+1:3];
                                          end""").successful)
+  }
+
+  @Test def parseTwoFieldsInOneDefine() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly, inVoice;
+                                         end""").successful)
+  }
+
+  @Test def parseManyFieldsInOneDefine() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL a, b, c;
+                                         end""").successful)
+  }
+
+  @Test def storesTwoFieldsInOneDefine() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL friendly, inVoice;
+                                         end""").successful)
+    assertTrue(storage.hasPacket(5))
+
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getVariableName)
+    assertTrue(storedFields.contains("friendly"))
+    assertTrue(storedFields.contains("inVoice"))
+  }
+
+  @Test def storesManyFieldsInOneDefine() {
+    val storage = new PacketsStore(false)
+    val parser = new ParsePacketsDef(storage)
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL a, b, c;
+                                         end""").successful)
+    assertTrue(storage.hasPacket(5))
+
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getVariableName)
+    assertTrue(storedFields.contains("a"))
+    assertTrue(storedFields.contains("b"))
+    assertTrue(storedFields.contains("c"))
   }
 }
