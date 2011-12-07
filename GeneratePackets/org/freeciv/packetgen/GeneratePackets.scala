@@ -28,7 +28,7 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean) {
 
   if (!packetsDefPath.exists()) {
     throw new IOException(packetsDefPath.getAbsolutePath + " doesn't exist.")
-  } else if (!packetsDefPath.canRead()) {
+  } else if (!packetsDefPath.canRead) {
     throw new IOException("Can't read " + packetsDefPath.getAbsolutePath)
   }
 
