@@ -123,7 +123,7 @@ public class Packet {
                 "\t\t" + "}" + "\n" +
                 "\t" + "}" + "\n" +
                 "\n" +
-                "\t" + "public short getNumber() {\n" +
+                "\t" + "public int getNumber() {\n" +
                 "\t" + "\treturn number;\n" +
                 "\t" + "}" + "\n" +
                 "\n" +

@@ -20,17 +20,17 @@ import java.io.IOException;
 
 public class RawPacket implements Packet {
     int size;
-    short kind;
+    int kind;
     byte[] content;
 
     public RawPacket(DataInput in, int size, int kind) throws IOException {
         this.size = size;
-        this.kind = (short)kind;
+        this.kind = kind;
         content = new byte[size - 3];
         in.readFully(content);
     }
 
-    public short getNumber() {
+    public int getNumber() {
         return kind;
     }
 

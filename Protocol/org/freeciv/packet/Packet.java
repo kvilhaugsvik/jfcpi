@@ -18,7 +18,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public abstract interface Packet {
-    public abstract short getNumber();
+    public abstract int getNumber();
 
     /***
      * serialize the packet to the format on the line
