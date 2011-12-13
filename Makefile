@@ -10,6 +10,7 @@ GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.jav
 PROTOOUT ?= out/Protocol
 PACKETGENOUT ?= out/GeneratePackages
 TESTOUT ?= out/Tests
+DEVMODE ?= true
 
 PROTOJAR = FreecivProto.jar
 
@@ -24,6 +25,7 @@ generatordefaults:
 	echo "package org.freeciv.packetgen;" >> ${GENERATORDEFAULTS}
 	echo "public class GeneratorDefaults {" >> ${GENERATORDEFAULTS}
 	echo "  public static final String GENERATEDOUT = \"${GENERATEDOUT}\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final boolean DEVMODE = ${DEVMODE};" >> ${GENERATORDEFAULTS}
 	echo "}" >>${GENERATORDEFAULTS}
 	touch generatordefaults
 

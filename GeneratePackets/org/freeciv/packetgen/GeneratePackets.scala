@@ -60,7 +60,7 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean, hasTwoBytePacketNu
 
 object GeneratePackets {
   def main(args: Array[String]) {
-    val self = new GeneratePackets(args(0), true, true)
+    val self = new GeneratePackets(args(0), GeneratorDefaults.DEVMODE, true)
     self.writeToDir(GeneratorDefaults.GENERATEDOUT)
   }
 }
