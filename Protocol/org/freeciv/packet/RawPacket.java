@@ -15,7 +15,7 @@
 package org.freeciv.packet;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.IOException;
 
 public class RawPacket implements Packet {
@@ -34,7 +34,7 @@ public class RawPacket implements Packet {
         return kind;
     }
 
-    public void encodeTo(DataOutputStream to) throws IOException {
+    public void encodeTo(DataOutput to) throws IOException {
         // header
         // length is 2 unsigned bytes
         to.writeChar(getEncodedSize());

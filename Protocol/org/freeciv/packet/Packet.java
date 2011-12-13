@@ -14,7 +14,7 @@
 
 package org.freeciv.packet;
 
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.IOException;
 
 public abstract interface Packet {
@@ -25,7 +25,7 @@ public abstract interface Packet {
      * @param to The output to write the packet to
      * @throws IOException when problem writing
      */
-    public abstract void encodeTo(DataOutputStream to) throws IOException;
+    public abstract void encodeTo(DataOutput to) throws IOException;
 
     public abstract int getEncodedSize();
 }

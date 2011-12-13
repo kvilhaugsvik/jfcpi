@@ -84,7 +84,7 @@ public class Packet {
         return "package org.freeciv.packet;\n" +
                 "\n" +
                 "import java.io.DataInput;\n" +
-                "import java.io.DataOutputStream;\n" +
+                "import java.io.DataOutput;\n" +
                 "import java.io.IOException;" + "\n" +
                 "\n" +
                 "// This code was auto generated from Freeciv's protocol definition" + "\n" +
@@ -127,7 +127,7 @@ public class Packet {
                 "\t" + "\treturn number;\n" +
                 "\t" + "}" + "\n" +
                 "\n" +
-                "\t" + "public void encodeTo(DataOutputStream to) throws IOException {\n" +
+                "\t" + "public void encodeTo(DataOutput to) throws IOException {\n" +
                 "\t\t// header\n" +
                 "\t\t// length is 2 unsigned bytes\n" +
                 "\t\tto.writeChar(getEncodedSize());\n" +
