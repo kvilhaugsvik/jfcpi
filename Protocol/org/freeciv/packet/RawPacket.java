@@ -19,19 +19,30 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class RawPacket implements Packet {
+    boolean hasTwoBytePacketNumber;
     int size;
     int kind;
     byte[] content;
 
-    public RawPacket(DataInput in, int size, int kind) throws IOException {
+    public RawPacket(DataInput in, int size, int kind, boolean hasTwoBytePacketNumber) throws IOException {
+        this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
         this.size = size;
         this.kind = kind;
-        content = new byte[size - 3];
+        content = new byte[size - (hasTwoBytePacketNumber ? 4 : 3)];
         in.readFully(content);
+    }
+
+    public RawPacket(DataInput in, int size, int kind) throws IOException {
+        this(in, size, kind, true);
     }
 
     public int getNumber() {
         return kind;
+    }
+
+    @Override
+    public boolean hasTwoBytePacketNumber() {
+        return hasTwoBytePacketNumber;
     }
 
     public void encodeTo(DataOutput to) throws IOException {
@@ -39,7 +50,7 @@ public class RawPacket implements Packet {
         // length is 2 unsigned bytes
         to.writeChar(getEncodedSize());
         // type
-        to.writeByte(kind);
+        if (hasTwoBytePacketNumber) to.writeChar(kind); else to.writeByte(kind);
 
         to.write(content);
     }

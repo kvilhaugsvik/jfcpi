@@ -27,12 +27,18 @@ import java.util.HashMap;
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
 public class Connect {
+    private static boolean hasTwoBytePacketNumber;
     OutputStream out;
     DataInputStream in;
     Socket server;
     HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
 
     public Connect(String address, int port) throws IOException {
+        this(address, port, true);
+    }
+
+    public Connect(String address, int port, boolean hasTwoBytePacketNumber) throws IOException {
+        this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
 
         server = new Socket(address, port);
         in = new DataInputStream(server.getInputStream());
@@ -68,7 +74,7 @@ public class Connect {
 
     public Packet getPacket() throws IOException {
         int size = in.readChar();
-        int kind = in.readUnsignedByte();
+        int kind = hasTwoBytePacketNumber ? in.readUnsignedShort() : in.readUnsignedByte();
         if (packetMakers.containsKey(kind)) {
             try {
                 return (Packet)packetMakers.get(kind).newInstance(in, size, kind);
@@ -80,7 +86,7 @@ public class Connect {
                 throw new IOException("Internal error while trying to read packet from network", e);
             }
         } else {
-            return new RawPacket(in, size, kind);
+            return new RawPacket(in, size, kind, hasTwoBytePacketNumber);
         }
     }
 

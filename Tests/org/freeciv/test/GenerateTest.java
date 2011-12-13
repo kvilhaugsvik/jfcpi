@@ -38,6 +38,7 @@ public class GenerateTest {
         writeFieldType("CONNECTION", "sint16(int)");
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
+                false,
                 new Field("username", "STRING", "String"),
                 new Field("capability", "STRING", "String"),
                 new Field("version_label", "STRING", "String"),
@@ -46,13 +47,23 @@ public class GenerateTest {
                 new Field("patch_version", "UINT32", "Long")));
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
+                false,
                 new Field("you_can_join", "BOOL", "boolean"),
                 new Field("message", "STRING", "String"),
                 new Field("capability", "STRING", "String"),
                 new Field("challenge_file", "STRING", "String"),
                 new Field("conn_id", "CONNECTION", "Short")));
-        writePacket(new Packet("CONN_PING", 88));
-        writePacket(new Packet("CONN_PONG", 89));
+        writePacket(new Packet("CONN_PING", 88, false));
+        writePacket(new Packet("CONN_PONG", 89, false));
+        writePacket(new Packet("SERVER_JOIN_REQ2ByteKind",
+                4,
+                true,
+                new Field("username", "STRING", "String"),
+                new Field("capability", "STRING", "String"),
+                new Field("version_label", "STRING", "String"),
+                new Field("major_version", "UINT32", "Long"),
+                new Field("minor_version", "UINT32", "Long"),
+                new Field("patch_version", "UINT32", "Long")));
 
         FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + "/" + "org/freeciv/packet/" + "packets.txt");
         for (String packet: writtenPackets) {

@@ -21,11 +21,13 @@ public class Packet {
     private String name;
     private int number;
     private Field[] fields;
+    private boolean hasTwoBytePacketNumber;
 
-    public Packet(String name, int number, Field... fields) {
+    public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
         this.name = name;
         this.number = number;
         this.fields = fields;
+        this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
     }
 
     public String getName() {
@@ -90,6 +92,7 @@ public class Packet {
                 "// This code was auto generated from Freeciv's protocol definition" + "\n" +
                 "public class " + name + " implements Packet {" + "\n" +
                 "\t" + "private static final int number = " + number + ";" + "\n" +
+                "\t" + "private boolean hasTwoBytePacketNumber = " + hasTwoBytePacketNumber + ";" + "\n" +
                 "\n" +
                 declarations +
                 "\t" + "public " + name + "(" + arglist + ") {\n" +
@@ -127,17 +130,21 @@ public class Packet {
                 "\t" + "\treturn number;\n" +
                 "\t" + "}" + "\n" +
                 "\n" +
+                "\t" + "public boolean hasTwoBytePacketNumber() {" + "\n" +
+                "\t\t" + "return hasTwoBytePacketNumber;" + "\n" +
+                "\t" + "}" +
+                "\n" +
                 "\t" + "public void encodeTo(DataOutput to) throws IOException {\n" +
                 "\t\t// header\n" +
                 "\t\t// length is 2 unsigned bytes\n" +
                 "\t\tto.writeChar(getEncodedSize());\n" +
                 "\t\t// type\n" +
-                "\t\tto.writeByte(number);\n" +
+                "\t\t" + (hasTwoBytePacketNumber ? "to.writeChar(number);" : "to.writeByte(number);") + "\n" +
                 encodeFields +
                 "\t}" + "\n" +
                 "\n" +
                 "\tpublic int getEncodedSize() {\n" +
-                "\t\treturn 3" + encodeFieldsLen + ";\n" +
+                "\t\treturn " + (hasTwoBytePacketNumber ? "4" : "3") + encodeFieldsLen + ";\n" +
                 "\t}\n" +
                 "\tpublic String toString() {\n" +
                 "\t\t" + "String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n" +

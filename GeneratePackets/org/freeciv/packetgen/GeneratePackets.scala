@@ -19,11 +19,12 @@ import util.parsing.input.{StreamReader, Reader}
 import collection.JavaConversions._
 import java.io._
 
-class GeneratePackets(packetsDefPath: File, devMode: Boolean) {
+class GeneratePackets(packetsDefPath: File, devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
 
-  def this(packetsDefPath: String, devMode: Boolean) = this(new File(packetsDefPath), devMode)
+  def this(packetsDefPath: String, devMode: Boolean, hasTwoBytePacketNumber: Boolean) =
+    this(new File(packetsDefPath), devMode, hasTwoBytePacketNumber)
 
-  private val storage = new PacketsStore(devMode)
+  private val storage = new PacketsStore(devMode, hasTwoBytePacketNumber)
   private val Parser = new ParsePacketsDef(storage)
 
   if (!packetsDefPath.exists()) {
@@ -59,7 +60,7 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean) {
 
 object GeneratePackets {
   def main(args: Array[String]) {
-    val self = new GeneratePackets(args(0), true)
+    val self = new GeneratePackets(args(0), true, true)
     self.writeToDir(GeneratorDefaults.GENERATEDOUT)
   }
 }

@@ -24,11 +24,11 @@ import static org.junit.Assert.*;
 
 public class PacketsStoreTest {
     private static PacketsStore dev() {
-        return new PacketsStore(true);
+        return new PacketsStore(true, true);
     }
 
     private static PacketsStore noDev() {
-        return new PacketsStore(false);
+        return new PacketsStore(false, true);
     }
 
     @Test public void registerType() throws UndefinedException {

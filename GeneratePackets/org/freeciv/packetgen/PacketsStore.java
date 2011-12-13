@@ -20,6 +20,7 @@ import java.util.LinkedList;
 
 public class PacketsStore {
     private boolean devMode;
+    private boolean hasTwoBytePacketNumber;
 
     private HashMap<String, JavaSrc> types = new HashMap<String, JavaSrc>();
 
@@ -28,8 +29,9 @@ public class PacketsStore {
     private HashMap<String, Packet> packets = new HashMap<String, Packet>();
     private HashMap<Integer, String> packetsByNumber = new HashMap<Integer, String>();
 
-    public PacketsStore(boolean devMode) {
+    public PacketsStore(boolean devMode, boolean hasTwoBytePacketNumber) {
         this.devMode = devMode;
+        this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
     }
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
@@ -79,7 +81,7 @@ public class PacketsStore {
             fieldList.add(new Field(fieldType[1], fieldType[0], types.get(fieldType[0]).getJavaType()));
         }
 
-        packets.put(name, new Packet(name, number, fieldList.toArray(new Field[0])));
+        packets.put(name, new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0])));
         packetsByNumber.put(number, name);
     }
 

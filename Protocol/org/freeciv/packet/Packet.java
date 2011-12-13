@@ -20,6 +20,12 @@ import java.io.IOException;
 public abstract interface Packet {
     public abstract int getNumber();
 
+    /**
+     * Is the packet number two bytes long?
+     * @return true if the packet number is two bytes long
+     */
+    public abstract boolean hasTwoBytePacketNumber();
+
     /***
      * serialize the packet to the format on the line
      * @param to The output to write the packet to
