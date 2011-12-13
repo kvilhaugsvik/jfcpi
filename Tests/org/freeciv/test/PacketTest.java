@@ -17,12 +17,9 @@ package org.freeciv.test;
 import org.freeciv.packet.*;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class PacketTest {
     @Test
@@ -174,5 +171,39 @@ public class PacketTest {
 
         assertEquals(64, packet.getEncodedSize());
         assertEquals(4, packet.getNumber());
+    }
+
+    @Test public void testRawPacketSerializesCorrectly() throws IOException {
+        DataInput inputStream = new DataInputStream(new ByteArrayInputStream(
+                new byte[]{/*0, 64, 4, */70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
+                        105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
+                        48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
+        RawPacket packet = new RawPacket(inputStream, 64, 4);
+
+        ByteArrayOutputStream serialized = new ByteArrayOutputStream();
+        packet.encodeTo(new DataOutputStream(serialized));
+
+        assertArrayEquals("Packet don't serialize correctly (missing header?)",
+            new byte[]{0, 64, 4, 70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
+                105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
+                48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99},
+            serialized.toByteArray());
+    }
+
+    @Test public void testGeneratedPacketSerializesCorrectly() throws IOException {
+        DataInput inputStream = new DataInputStream(new ByteArrayInputStream(
+                new byte[]{/*0, 64, 4, */70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
+                        105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
+                        48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
+        SERVER_JOIN_REQ packet = new SERVER_JOIN_REQ(inputStream, 64, 4);
+
+        ByteArrayOutputStream serialized = new ByteArrayOutputStream();
+        packet.encodeTo(new DataOutputStream(serialized));
+
+        assertArrayEquals("Packet don't serialize  (missing header?)",
+                new byte[]{0, 64, 4, 70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
+                        105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
+                        48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99},
+                serialized.toByteArray());
     }
 }

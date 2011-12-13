@@ -35,6 +35,12 @@ public class RawPacket implements Packet {
     }
 
     public void encodeTo(DataOutputStream to) throws IOException {
+        // header
+        // length is 2 unsigned bytes
+        to.writeChar(getEncodedSize());
+        // type
+        to.writeByte(kind);
+
         to.write(content);
     }
 

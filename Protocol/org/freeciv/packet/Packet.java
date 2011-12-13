@@ -19,6 +19,13 @@ import java.io.IOException;
 
 public abstract interface Packet {
     public abstract short getNumber();
+
+    /***
+     * serialize the packet to the format on the line
+     * @param to The output to write the packet to
+     * @throws IOException when problem writing
+     */
     public abstract void encodeTo(DataOutputStream to) throws IOException;
+
     public abstract int getEncodedSize();
 }
