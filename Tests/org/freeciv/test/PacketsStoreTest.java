@@ -23,15 +23,23 @@ import java.util.LinkedList;
 import static org.junit.Assert.*;
 
 public class PacketsStoreTest {
+    private static PacketsStore dev() {
+        return new PacketsStore(true);
+    }
+
+    private static PacketsStore noDev() {
+        return new PacketsStore(false);
+    }
+
     @Test public void registerType() throws UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerTypeAlias("UINT32", "uint32(int)");
 
         assertTrue(storage.hasTypeAlias("UINT32"));
     }
 
     @Test public void registerTypeAlias() throws UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerTypeAlias("UINT32", "uint32(int)");
         storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
 
@@ -39,7 +47,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerTypeNotExistingDevMode() throws UndefinedException {
-        PacketsStore storage = new PacketsStore(true);
+        PacketsStore storage = dev();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "UINT32");
 
         assertFalse(storage.hasTypeAlias("THISSHOULDNOTEXIST"));
@@ -47,18 +55,18 @@ public class PacketsStoreTest {
 
     @Test(expected = UndefinedException.class)
     public void registerTypeNotExisting() throws UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "UINT32");
     }
 
     @Test(expected = UndefinedException.class)
     public void registerTypeBasicTypeNotExisting() throws UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "notexisting128(void)");
     }
 
     @Test public void codeIsThere() throws UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
 
         storage.registerTypeAlias("UINT32", "uint32(int)");
         storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
@@ -71,7 +79,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerPacketWithoutFields() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerPacket("PACKET_HELLO", 25);
 
         assertTrue(storage.hasPacket(25));
@@ -80,20 +88,20 @@ public class PacketsStoreTest {
 
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameNumber() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerPacket("PACKET_HELLO", 25);
         storage.registerPacket("PACKET_HI", 25);
     }
 
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameName() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerPacket("PACKET_HELLO", 25);
         storage.registerPacket("PACKET_HELLO", 50);
     }
 
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerTypeAlias("STRING", "string(char)");
         String[] field1 = {"STRING", "myNameIs"};
         LinkedList<String[]> fields = new LinkedList<String[]>();
@@ -106,7 +114,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         String[] field1 = {"STRING", "myNameIs"};
         LinkedList<String[]> fields = new LinkedList<String[]>();
         fields.add(field1);
@@ -120,7 +128,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerPacketWithoutFieldsHasNoFields() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerPacket("PACKET_HELLO", 25);
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
@@ -128,7 +136,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerPacketWithUndefinedFieldsDevMode() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = new PacketsStore(true);
+        PacketsStore storage = dev();
         String[] field1 = {"STRING", "myNameIs"};
         LinkedList<String[]> fields = new LinkedList<String[]>();
         fields.add(field1);
@@ -141,7 +149,7 @@ public class PacketsStoreTest {
 
     @Test(expected = UndefinedException.class)
     public void registerPacketWithUndefinedFields() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         String[] field1 = {"STRING", "myNameIs"};
         LinkedList<String[]> fields = new LinkedList<String[]>();
         fields.add(field1);
@@ -150,13 +158,13 @@ public class PacketsStoreTest {
     }
 
     @Test public void noPacketsAreListedWhenNoPacketsAreRegistered() {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
 
         assertEquals("", storage.getPacketList());
     }
 
     @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerPacket("PACKET_HELLO", 25);
 
         String[] packetList = storage.getPacketList().split("[\\t\\r\\n]");
@@ -165,7 +173,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void packetsAreListed() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = new PacketsStore(false);
+        PacketsStore storage = noDev();
         storage.registerPacket("PACKET_HELLO", 25);
         storage.registerPacket("PACKET_HI", 26);
 
