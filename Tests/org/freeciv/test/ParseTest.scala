@@ -94,6 +94,60 @@ class ParseTest {
     assertTrue(storage.hasTypeAlias("BOOL"))
   }
 
+  @Test def parsesCommentCStyleExtraStarsOnBothSidesOfTextNoSpace() {
+    val (storage, parser) = storePars
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("""/***Text***/
+
+    type BOOL               = bool8(bool)""").successful)
+    assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
+  }
+
+  @Test def parsesCommentCStyleExtraStarsOnBothSidesOfTextSpace() {
+    val (storage, parser) = storePars
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("""/*** Text ***/
+
+    type BOOL               = bool8(bool)""").successful)
+    assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
+  }
+
+  @Test def parsesCommentCStyleExtraStarsOnLeftSideOfTextNoSpace() {
+    val (storage, parser) = storePars
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("""/***Text*/
+
+    type BOOL               = bool8(bool)""").successful)
+    assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
+  }
+
+  @Test def parsesCommentCStyleExtraStarsOnLeftSideOfTextSpace() {
+    val (storage, parser) = storePars
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("""/*** Text */
+
+    type BOOL               = bool8(bool)""").successful)
+    assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
+  }
+
+  @Test def parsesCommentCStyleExtraStarsOnRightSideOfTextNoSpace() {
+    val (storage, parser) = storePars
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("""/*Text***/
+
+    type BOOL               = bool8(bool)""").successful)
+    assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
+  }
+
+  @Test def parsesCommentCStyleExtraStarsOnRightSideOfTextSpace() {
+    val (storage, parser) = storePars
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("""/* Text ***/
+
+    type BOOL               = bool8(bool)""").successful)
+    assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
+  }
+
   @Test def parsesCommentCStyleCommentOut() {
     val (storage, parser) = storePars
 
