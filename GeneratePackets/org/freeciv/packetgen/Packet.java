@@ -85,6 +85,8 @@ public class Packet {
 
         return "package org.freeciv.packet;\n" +
                 "\n" +
+                "import org.freeciv.packet.fieldtype.*;" + "\n" +
+                "\n" +
                 "import java.io.DataInput;\n" +
                 "import java.io.DataOutput;\n" +
                 "import java.io.IOException;" + "\n" +

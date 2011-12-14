@@ -18,7 +18,8 @@ all: protojar
 
 protocol:
 	mkdir -p ${PROTOOUT}
-	${JAVAC} -d ${PROTOOUT} Protocol/org/freeciv/*.java Protocol/org/freeciv/packet/*.java
+	${JAVAC} -d ${PROTOOUT} Protocol/org/freeciv/*.java Protocol/org/freeciv/packet/*.java \
+	                        Protocol/org/freeciv/*.java Protocol/org/freeciv/packet/*/*.java
 	touch protocol
 
 generatordefaults:
@@ -43,7 +44,8 @@ testpackets:
 
 # since the parser isn't finished use GenerateTest as generator
 generated: generator protocol testpackets
-	${JAVAC} -d ${PROTOOUT} -cp ${PROTOOUT} ${GENERATEDOUT}/org/freeciv/packet/*.java
+	${JAVAC} -d ${PROTOOUT} -cp ${PROTOOUT} ${GENERATEDOUT}/org/freeciv/packet/*.java \
+	                                        ${GENERATEDOUT}/org/freeciv/packet/*/*.java
 	cp ${GENERATEDOUT}/org/freeciv/packet/packets.txt ${PROTOOUT}/org/freeciv/packet/
 	touch generated
 

@@ -37,7 +37,7 @@ public class JavaSrc {
     }
 
     public String toString(String name) {
-        return "package org.freeciv.packet;" + "\n" +
+        return "package " + "org.freeciv.packet.fieldtype" + ";" + "\n" +
                 "\n" +
                 "import java.io.DataInput;" + "\n" +
                 "import java.io.DataOutput;" + "\n" +

@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packet;
+package org.freeciv.packet.fieldtype;
 
 import java.io.DataOutput;
 import java.io.IOException;

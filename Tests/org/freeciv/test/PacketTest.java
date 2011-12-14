@@ -15,6 +15,7 @@
 package org.freeciv.test;
 
 import org.freeciv.packet.*;
+import org.freeciv.packet.fieldtype.*;
 import org.junit.Test;
 
 import java.io.*;

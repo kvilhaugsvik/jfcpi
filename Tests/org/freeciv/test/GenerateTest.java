@@ -30,7 +30,7 @@ public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
     public static void main(String[] args) throws IOException {
-        (new File(GeneratorDefaults.GENERATEDOUT + "/org/freeciv/packet/")).mkdirs();
+        (new File(GeneratorDefaults.GENERATEDOUT + "/org/freeciv/packet/" + "fieldtype")).mkdirs();
 
         writeFieldType("UINT32", "uint32(int)");
         writeFieldType("STRING", "string(char)");
@@ -83,7 +83,8 @@ public class GenerateTest {
     }
 
     private static void writeJavaFile(String javaclass, String content) throws IOException {
-        File classFile = new File(GeneratorDefaults.GENERATEDOUT + "/org/freeciv/packet/" + javaclass + ".java");
+        String packagePath = content.split(" |;")[1].replaceAll("\\.", "/");
+        File classFile = new File(GeneratorDefaults.GENERATEDOUT + "/" + packagePath + "/" + javaclass + ".java");
         classFile.createNewFile();
         FileWriter toClass = new FileWriter(classFile);
         toClass.write(content);
