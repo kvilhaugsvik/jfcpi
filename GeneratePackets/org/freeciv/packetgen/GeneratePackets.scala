@@ -74,7 +74,7 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
     case theType~alias~is~aliased => storage.registerTypeAlias(alias, aliased)
   }
 
-  def comment = """/\*\**""".r ~ rep("""([^*\n\r]|\*+[^/*])+""".r) ~ """\**\*/""".r |
+  def comment = """/\*+""".r ~ rep("""([^*\n\r]|\*+[^/*])+""".r) ~ """\*+/""".r |
     regex("""/\*+\*/""".r) |
     regex("""//[^\n\r]*""".r) |
     regex("""#[^\n\r]*""".r)
