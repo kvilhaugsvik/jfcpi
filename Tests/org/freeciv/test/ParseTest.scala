@@ -196,6 +196,18 @@ class ParseTest {
     assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
   }
 
+  @Test def parsesCommentCStyleBeginEnd() {
+    val (storage, parser) = storePars
+
+    assertTrue(parser.parsePacketsDef("/**/").successful)
+  }
+
+  @Test def parsesCommentCStyleBeginStarsEnd() {
+    val (storage, parser) = storePars
+
+    assertTrue(parser.parsePacketsDef("/*****/").successful)
+  }
+
   @Test def parsesCommentCStyleCommentOut() {
     val (storage, parser) = storePars
 

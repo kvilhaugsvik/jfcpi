@@ -75,6 +75,7 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
   }
 
   def comment = """/\*\**""".r ~ rep("""([^*\n\r]|\*+[^/*])+""".r) ~ """\**\*/""".r |
+    regex("""/\*+\*/""".r) |
     regex("""//[^\n\r]*""".r) |
     regex("""#[^\n\r]*""".r)
 
