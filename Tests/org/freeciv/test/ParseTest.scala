@@ -29,6 +29,19 @@ class ParseTest {
     (storage, parser)
   }
 
+  def testBooleanFieldsFriendlyAndInvoiceInPacket(fieldDec: String) {
+    val (storage, parser) = storePars
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("PACKET_HELLO = 5;\n" + fieldDec + "\nend").successful)
+    assertTrue("Didn't store packet", storage.hasPacket(5))
+
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getVariableName)
+    assertTrue("Didn't add field to packet", storedFields.contains("inVoice"))
+    assertTrue("Didn't add field to packet", storedFields.contains("friendly"))
+  }
+
   @Test def parsesTypeDefSrc() {
     val (storage, parser) = storePars
 
@@ -153,6 +166,46 @@ class ParseTest {
 
     assertTrue(parser.parsePacketsDef("/*type BOOL               = bool8(bool)*/").successful)
     assertFalse(storage.hasTypeAlias("BOOL"))
+  }
+
+  @Test def parsesCommentCStyleAmongFieldsInPacket() {
+    testBooleanFieldsFriendlyAndInvoiceInPacket("""
+                                                   BOOL friendly;
+                                                   /* comment for commenting */
+                                                   BOOL inVoice;
+                                                   """)
+  }
+
+  @Test def parsesCommentCStyleBeforeFieldsInPacket() {
+    testBooleanFieldsFriendlyAndInvoiceInPacket("""
+                                                   /* comment for commenting */
+                                                   BOOL friendly;
+                                                   BOOL inVoice;
+                                                   """)
+  }
+
+  @Test def parsesCommentCStyleAfterFieldsInPacket() {
+    testBooleanFieldsFriendlyAndInvoiceInPacket("""
+                                                   BOOL friendly;
+                                                   BOOL inVoice;
+                                                   /* comment for commenting */
+                                                   """)
+  }
+
+  @Test def parsesCommentCStyleBeforeAndAfterFieldsInPacket() {
+    testBooleanFieldsFriendlyAndInvoiceInPacket("""
+                                                   /* comment for commenting */
+                                                   BOOL friendly;
+                                                   BOOL inVoice;
+                                                   /* comment for commenting */
+                                                   """)
+  }
+
+  @Test def parsesCommentCStyleOnSameLineAsAFieldInPacket() {
+    testBooleanFieldsFriendlyAndInvoiceInPacket("""
+                                                   BOOL friendly; /* comment for commenting */
+                                                   BOOL inVoice;
+                                                   """)
   }
 
   @Test def parsesCommentCxxStyleBefore() {
