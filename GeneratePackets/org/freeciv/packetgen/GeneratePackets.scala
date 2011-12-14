@@ -74,7 +74,9 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
     case theType~alias~is~aliased => storage.registerTypeAlias(alias, aliased)
   }
 
-  def comment = regex("""/\*(.|[\n\r])*?\*/""".r) | regex("""//[^\n\r]*""".r) | regex("""#[^\n\r]*""".r)
+  def comment = regex("""/\*(.|[\n\r])*?\*/""".r) |
+    regex("""//[^\n\r]*""".r) |
+    regex("""#[^\n\r]*""".r)
 
   def packetName = regex("""PACKET_[A-Za-z0-9_]+""".r)
 
