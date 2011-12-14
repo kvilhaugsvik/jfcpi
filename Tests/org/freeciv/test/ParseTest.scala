@@ -184,6 +184,18 @@ class ParseTest {
     assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
   }
 
+  @Test def parsesCommentCStyleTwoExtraStarsInARowAmongText() {
+    val (storage, parser) = storePars
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("""
+     /* Text
+      ** More text
+      */
+
+    type BOOL               = bool8(bool)""").successful)
+    assertTrue("Didn't store type", storage.hasTypeAlias("BOOL"))
+  }
+
   @Test def parsesCommentCStyleCommentOut() {
     val (storage, parser) = storePars
 
