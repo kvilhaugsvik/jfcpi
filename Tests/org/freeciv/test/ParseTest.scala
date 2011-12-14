@@ -231,6 +231,15 @@ class ParseTest {
                                                    """)
   }
 
+  @Test def parsesCommentCStyleOnlyCommentInPacket() {
+    val (storage, parser) = storePars
+
+    assertTrue("Couldn't parse", parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                         /* comment for commenting */
+                                         end""").successful)
+    assertTrue("Didn't store packet", storage.hasPacket(5))
+  }
+
   @Test def parsesCommentCxxStyleBefore() {
     val (storage, parser) = storePars
 
