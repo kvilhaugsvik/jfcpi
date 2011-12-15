@@ -64,16 +64,14 @@ public class Packet {
                 encodeFieldsLen += "\t\t\t+ " + field.getVariableName() + ".encodedLength()\n";
                 constructorBodyStream += "\t\t" + "this." + field.getVariableName() + " = " +
                         "new " + field.getType() + "(from);\n";
-                getFieldValues += "\n" + "\t" + "public " + field.getJType() + " get"
+                getFieldValues += "\n" +
+                        DataIO.publicReadObjectState(null, field.getJType(), "get"
                         + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
-                        + "Value() {" + "\n" +
-                        "\t\t" + "return " + field.getVariableName() + ".getValue();" + "\n" +
-                        "\t" + "}" + "\n";
-                getFields += "\n" + "\t" + "public " + field.getType() + " get"
-                        + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
-                        + "() {" + "\n" +
-                        "\t\t" + "return " + field.getVariableName() + ";" + "\n" +
-                        "\t" + "}" + "\n";
+                        + "Value",
+                        "return " + field.getVariableName() + ".getValue();");
+                getFields += "\n" + DataIO.publicReadObjectState(null, field.getType(), "get"
+                        + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
+                        "return " + field.getVariableName() + ";");
                 getToString += "\t\t" + "out += \"\\n\\t" + field.getVariableName() +
                         " = \" + " + field.getVariableName() + ".getValue();" + "\n";
             }
@@ -128,14 +126,10 @@ public class Packet {
                 "\t\t" + "}" + "\n" +
                 "\t" + "}" + "\n" +
                 "\n" +
-                "\t" + "public int getNumber() {\n" +
-                "\t" + "\treturn number;\n" +
-                "\t" + "}" + "\n" +
+                DataIO.publicReadObjectState(null, "int", "getNumber", "return number;") +
                 "\n" +
-                "\t" + "public boolean hasTwoBytePacketNumber() {" + "\n" +
-                "\t\t" + "return hasTwoBytePacketNumber;" + "\n" +
-                "\t" + "}" +
-                "\n" +
+                DataIO.publicReadObjectState(null, "boolean", "hasTwoBytePacketNumber",
+                        "return hasTwoBytePacketNumber;") +
                 "\t" + "public void encodeTo(DataOutput to) throws IOException {\n" +
                 "\t\t// header\n" +
                 "\t\t// length is 2 unsigned bytes\n" +
@@ -145,9 +139,8 @@ public class Packet {
                 encodeFields +
                 "\t}" + "\n" +
                 "\n" +
-                "\tpublic int getEncodedSize() {\n" +
-                "\t\treturn " + (hasTwoBytePacketNumber ? "4" : "3") + encodeFieldsLen + ";\n" +
-                "\t}\n" +
+                DataIO.publicReadObjectState(null, "int", "getEncodedSize",
+                        "return " + (hasTwoBytePacketNumber ? "4" : "3") + encodeFieldsLen + ";") +
                 "\tpublic String toString() {\n" +
                 "\t\t" + "String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n" +
                 getToString + "\n" +
