@@ -35,4 +35,60 @@ public class DataIO {
 
         return out;
     }
+
+    public static String publicConstructor(String comment,
+                                           String name,
+                                           String paramList,
+                                           String exceptionList,
+                                           String... body) {
+        return fullMethod(comment, "public", null, null, name, paramList, exceptionList, body);
+    }
+
+    public static String publicConstructorNoExceptions(String comment,
+                                           String name,
+                                           String paramList,
+                                           String... body) {
+        return publicConstructor(comment, name, paramList, null, body);
+    }
+
+    public static String publicReadObjectState(String comment,
+                                    String type,
+                                    String name,
+                                    String... body) {
+        return fullMethod(comment, "public", null, type, name, null, null, body);
+    }
+
+    public static String fullMethod(String comment,
+                                       String access,
+                                       String place,
+                                       String type,
+                                       String name,
+                                       String paramList,
+                                       String exceptionList,
+                                       String... body) {
+        String out = (null == comment? "" : indent(comment) + "\n");
+        out += ifIs("\t", access, " ") + ifIs(place, " ") + ifIs(type, " ") +
+                name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ") + "{" + "\n";
+        for (String line: body) {
+            out += (line != ""? "\t" + "\t" + line : "") + "\n";
+        }
+        out += "\t" + "}" + "\n";
+        return out;
+    }
+
+    private static String indent(String code) {
+        return "\t" + code.replace("\n", "\n\t");
+    }
+
+    private static String ifIs(String element) {
+        return ifIs("", element, "");
+    }
+
+    private static String ifIs(String element, String after) {
+        return ifIs("", element, after);
+    }
+
+    private static String ifIs(String before, String element, String after) {
+        return (null == element? "" : before + element + after);
+    }
 }
