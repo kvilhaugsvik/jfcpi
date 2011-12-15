@@ -47,9 +47,7 @@ public class JavaSrc {
                 "public class " + name + " implements FieldType<" + JavaType + "> {" + "\n" +
                 "\t" + "private " + JavaType + " value;" + "\n" +
                 "\n" +
-                "\t" + "public " + name + "(" + JavaType + " value) {" + "\n" +
-                "\t" + "\t" + "this.value = value;" + "\n" +
-                "\t" + "}" + "\n" +
+                DataIO.publicConstructorNoExceptions(null, name, JavaType + " value", "this.value = value;") +
                 "\n" +
                 "\t" + "public " + name + "(DataInput from) throws IOException {" + "\n" +
                 "\t" + "\t" + Decode +
@@ -63,13 +61,9 @@ public class JavaSrc {
                 "\t" + "\t" + EncodedSize +
                 "\t" + "}" + "\n" +
                 "\n" +
-                "\t" + "public " + JavaType + " getValue() {" + "\n" +
-                "\t" + "\t" + "return value;" + "\n" +
-                "\t" + "}" + "\n" +
+                DataIO.publicReadObjectState(null, JavaType, "getValue", "return value;") +
                 "\n" +
-                "\t" + "public " + "String" + " toString() {" + "\n" +
-                "\t" + "\t" + "return value.toString();" + "\n" +
-                "\t" + "}" + "\n" +
+                DataIO.publicReadObjectState(null, "String", "toString", "return value.toString();") +
                 "}";
     }
 }
