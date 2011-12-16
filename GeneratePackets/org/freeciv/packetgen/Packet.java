@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import java.util.LinkedList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,9 +42,9 @@ public class Packet {
     public String toString() {
         String declarations = "";
         String arglist = "";
-        String constructorBody = "";
+        LinkedList<String> constructorBody = new LinkedList<String>();
         String javatypearglist = "";
-        String constructorBodyJ = "";
+        LinkedList<String> constructorBodyJ = new LinkedList<String>();
         String constructorBodyStream = "";
         String encodeFields = "";
         String encodeFieldsLen = "";
@@ -55,9 +56,9 @@ public class Packet {
                 "\t\t// body\n";
             for (Field field: fields) {
                 declarations += "\t" + field.getType() + " " + field.getVariableName() + ";\n";
-                constructorBody += "\t\t" + "this." + field.getVariableName() + " = " + field.getVariableName() + ";\n";
-                constructorBodyJ += "\t\t" + "this." + field.getVariableName() + " = " +
-                        "new " + field.getType() + "(" + field.getVariableName() + ")" + ";\n";
+                constructorBody.add("this." + field.getVariableName() + " = " + field.getVariableName() + ";");
+                constructorBodyJ.add("this." + field.getVariableName() + " = " +
+                        "new " + field.getType() + "(" + field.getVariableName() + ")" + ";");
                 arglist += field.getType() + " " + field.getVariableName() + ", ";
                 javatypearglist += field.getJType() + " " + field.getVariableName() + ", ";
                 encodeFields += "\t\t" + field.getVariableName() + ".encodeTo(to);\n";
@@ -95,15 +96,9 @@ public class Packet {
                 "\t" + "private boolean hasTwoBytePacketNumber = " + hasTwoBytePacketNumber + ";" + "\n" +
                 "\n" +
                 declarations +
-                "\t" + "public " + name + "(" + arglist + ") {\n" +
-                constructorBody +
-                "\t" + "}" + "\n" +
-                ((fields.length > 0) ?
-                        "\n" +
-                        "\t" + "public " + name + "(" + javatypearglist + ") {\n" +
-                        constructorBodyJ +
-                        "\t" + "}" + "\n" :
-                        "") +
+                DataIO.publicConstructorNoExceptions(null, name, arglist, constructorBody.toArray(new String[0])) +
+                ((fields.length > 0) ? "\n" + DataIO.publicConstructorNoExceptions(null, name, javatypearglist,
+                                constructorBodyJ.toArray(new String[0])) : "") +
                 "\n" +
                 "\t/***\n" +
                 "\t * Construct an object from a DataInput\n" +
