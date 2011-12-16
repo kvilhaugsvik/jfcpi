@@ -25,13 +25,13 @@ public class Hardcoded {
         for (JavaSrc src: new JavaSrc[]{
             new JavaSrc("uint8(int)",
                     "Integer",
-                    "value = from.readUnsignedByte();" + "\n",
-                    "to.writeByte(value);" + "\n",
+                    "value = from.readUnsignedByte();",
+                    "to.writeByte(value);",
                     "return 1;"),
             new JavaSrc("uint16(int)",
                     "Integer",
-                    "value = (int) from.readChar();" + "\n",
-                    "to.writeChar(value);" + "\n",
+                    "value = (int) from.readChar();",
+                    "to.writeChar(value);",
                     "return 2;"),
             new JavaSrc("uint32(int)",
                     "Long",
@@ -40,35 +40,35 @@ public class Hardcoded {
                     "return 4;"),
             new JavaSrc("string(char)",
                     "String",
-                    "StringBuffer buf = new StringBuffer();\n" +
-                            "\t\tbyte letter = from.readByte();\n" +
-                            "\t\twhile (letter != 0) {\n" +
-                            "\t\t\tbuf.append((char)letter);\n" +
-                            "\t\t\tletter = from.readByte();\n" +
-                            "\t\t}\n" +
-                            "\t\tvalue = buf.toString();",
+                    "StringBuffer buf = new StringBuffer();" + "\n" +
+                            "byte letter = from.readByte();" + "\n" +
+                            "while (letter != 0) {" + "\n" +
+                            "\t" + "buf.append((char)letter);" + "\n" +
+                            "\t" + "letter = from.readByte();" + "\n" +
+                            "}" + "\n" +
+                            "value = buf.toString();",
                     "to.writeBytes(" + "value" + ");\n" +
-                        "\t\t" + "to.writeByte(0);" + "\n",
-                    "return " + "value" + ".length() + 1;\n"),
+                        "to.writeByte(0);",
+                    "return " + "value" + ".length() + 1;"),
             new JavaSrc("bool8(bool)",
                     "Boolean",
-                    "value = from.readBoolean();" + "\n",
-                    "to.writeBoolean(value);" + "\n",
+                    "value = from.readBoolean();",
+                    "to.writeBoolean(value);",
                     "return 1;"),
             new JavaSrc("sint8(int)",
                     "Byte",
-                    "value = from.readByte();" + "\n",
-                    "to.writeByte(value);" + "\n",
+                    "value = from.readByte();",
+                    "to.writeByte(value);",
                     "return 2;"),
             new JavaSrc("sint16(int)",
                     "Short",
-                    "value = from.readShort();" + "\n",
-                    "to.writeShort(value);" + "\n",
+                    "value = from.readShort();",
+                    "to.writeShort(value);",
                     "return 2;"),
             new JavaSrc("sint32(int)",
                     "Integer",
-                    "value = from.readInt();" + "\n",
-                    "to.writeInt(value);" + "\n",
+                    "value = from.readInt();",
+                    "to.writeInt(value);",
                     "return 4;")
         }) {
             data.put(src.getCSrc(), src);

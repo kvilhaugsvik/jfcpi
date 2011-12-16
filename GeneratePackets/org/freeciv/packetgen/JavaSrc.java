@@ -17,15 +17,15 @@ package org.freeciv.packetgen;
 public class JavaSrc {
     String CSrc;
     String JavaType;
-    String Decode;
-    String encode, EncodedSize;
+    String[] Decode;
+    String[] encode, EncodedSize;
 
     public JavaSrc(String CSrc, String javaType, String decode, String encode, String encodedSize) {
         this.CSrc = CSrc;
         JavaType = javaType;
-        Decode = decode;
-        this.encode = encode;
-        EncodedSize = encodedSize;
+        Decode = decode.split("\n");
+        this.encode = encode.split("\n");
+        EncodedSize = encodedSize.split("\n");
     }
 
     public String getCSrc() {
@@ -49,17 +49,11 @@ public class JavaSrc {
                 "\n" +
                 DataIO.publicConstructorNoExceptions(null, name, JavaType + " value", "this.value = value;") +
                 "\n" +
-                "\t" + "public " + name + "(DataInput from) throws IOException {" + "\n" +
-                "\t" + "\t" + Decode +
-                "\t" + "}" + "\n" +
+                DataIO.publicConstructor(null, name, "DataInput from", "IOException", Decode) +
                 "\n" +
-                "\t" + "public void encodeTo(DataOutput to) throws IOException {" + "\n" +
-                "\t" + "\t" + encode +
-                "\t" + "}" + "\n" +
+                DataIO.publicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode) +
                 "\n" +
-                "\t" + "public int encodedLength() {" + "\n" +
-                "\t" + "\t" + EncodedSize +
-                "\t" + "}" + "\n" +
+                DataIO.publicReadObjectState(null, "int", "encodedLength", EncodedSize) +
                 "\n" +
                 DataIO.publicReadObjectState(null, JavaType, "getValue", "return value;") +
                 "\n" +

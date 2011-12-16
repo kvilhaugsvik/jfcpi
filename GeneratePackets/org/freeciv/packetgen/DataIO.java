@@ -18,7 +18,7 @@ public class DataIO {
     public static String writeWriteUInt(int bytenumber) {
         String out = "";
         while (bytenumber >= 1) {
-            out += "\t\t" + "to.writeByte((int) ((value >>> ((" + bytenumber + " - 1) * 8)) & 0xFF));\n";
+            out += "to.writeByte((int) ((value >>> ((" + bytenumber + " - 1) * 8)) & 0xFF));" + "\n";
             bytenumber--;
         }
         return out;
@@ -28,7 +28,7 @@ public class DataIO {
         String out = var + " = ";
         out += "(" + Javatype.toLowerCase() + ")";
         while (bytenumber >= 1) {
-            out += "\t\t" + "(from.readUnsignedByte() << 8 * (" + bytenumber + " - 1)) " +
+            out += "(from.readUnsignedByte() << 8 * (" + bytenumber + " - 1)) " +
                     (bytenumber > 1 ? "+" : ";") + "\n";
             bytenumber--;
         }
@@ -41,7 +41,7 @@ public class DataIO {
                                            String paramList,
                                            String exceptionList,
                                            String... body) {
-        return fullMethod(comment, "public", null, null, name, paramList, exceptionList, body);
+        return publicDynamicMethod(comment, null, name, paramList, exceptionList, body);
     }
 
     public static String publicConstructorNoExceptions(String comment,
@@ -55,7 +55,16 @@ public class DataIO {
                                     String type,
                                     String name,
                                     String... body) {
-        return fullMethod(comment, "public", null, type, name, null, null, body);
+        return publicDynamicMethod(comment, type, name, null, null, body);
+    }
+
+    public static String publicDynamicMethod(String comment,
+                                             String type,
+                                             String name,
+                                             String paramList,
+                                             String exceptionList,
+                                             String... body) {
+        return fullMethod(comment, "public", null, type, name, paramList, exceptionList, body);
     }
 
     public static String fullMethod(String comment,
