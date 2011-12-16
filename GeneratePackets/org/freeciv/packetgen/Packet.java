@@ -82,7 +82,7 @@ public class Packet {
             declarations += "\n";
         }
 
-        return "package org.freeciv.packet;\n" +
+        String out = "package org.freeciv.packet;\n" +
                 "\n" +
                 "import org.freeciv.packet.fieldtype.*;" + "\n" +
                 "\n" +
@@ -91,16 +91,16 @@ public class Packet {
                 "import java.io.IOException;" + "\n" +
                 "\n" +
                 "// This code was auto generated from Freeciv's protocol definition" + "\n" +
-                "public class " + name + " implements Packet {" + "\n" +
-                "\t" + "private static final int number = " + number + ";" + "\n" +
-                "\t" + "private boolean hasTwoBytePacketNumber = " + hasTwoBytePacketNumber + ";" + "\n" +
-                "\n" +
-                declarations +
-                DataIO.publicConstructorNoExceptions(null, name, arglist, constructorBody.toArray(new String[0])) +
-                ((fields.length > 0) ? "\n" + DataIO.publicConstructorNoExceptions(null, name, javatypearglist,
-                                constructorBodyJ.toArray(new String[0])) : "") +
-                "\n" +
-                "\t/***\n" +
+                "public class " + name + " implements Packet {" + "\n";
+        out += "\t" + "private static final int number = " + number + ";" + "\n";
+        out += "\t" + "private boolean hasTwoBytePacketNumber = " + hasTwoBytePacketNumber + ";" + "\n";
+        out += "\n";
+        out += declarations;
+        out += DataIO.publicConstructorNoExceptions(null, name, arglist, constructorBody.toArray(new String[0]));
+        out += ((fields.length > 0) ? "\n" + DataIO.publicConstructorNoExceptions(null, name, javatypearglist,
+                                constructorBodyJ.toArray(new String[0])) : "");
+        out += "\n";
+        out += "\t/***\n" +
                 "\t * Construct an object from a DataInput\n" +
                 "\t * @param from data stream that is at the start of the package body  \n" +
                 "\t * @param headerLen length from header package\n" +
@@ -119,31 +119,32 @@ public class Packet {
                 " + headerLen\n" +
                 "\t\t\t" + "+ \" Packet: \" + getEncodedSize());\n" +
                 "\t\t" + "}" + "\n" +
-                "\t" + "}" + "\n" +
-                "\n" +
-                DataIO.publicReadObjectState(null, "int", "getNumber", "return number;") +
-                "\n" +
-                DataIO.publicReadObjectState(null, "boolean", "hasTwoBytePacketNumber",
-                        "return hasTwoBytePacketNumber;") +
-                "\t" + "public void encodeTo(DataOutput to) throws IOException {\n" +
+                "\t" + "}" + "\n";
+        out += "\n";
+        out += DataIO.publicReadObjectState(null, "int", "getNumber", "return number;");
+        out += "\n";
+        out += DataIO.publicReadObjectState(null, "boolean", "hasTwoBytePacketNumber",
+                        "return hasTwoBytePacketNumber;");
+        out += "\t" + "public void encodeTo(DataOutput to) throws IOException {\n" +
                 "\t\t// header\n" +
                 "\t\t// length is 2 unsigned bytes\n" +
                 "\t\tto.writeChar(getEncodedSize());\n" +
                 "\t\t// type\n" +
                 "\t\t" + (hasTwoBytePacketNumber ? "to.writeChar(number);" : "to.writeByte(number);") + "\n" +
                 encodeFields +
-                "\t}" + "\n" +
-                "\n" +
-                DataIO.publicReadObjectState(null, "int", "getEncodedSize",
-                        "return " + (hasTwoBytePacketNumber ? "4" : "3") + encodeFieldsLen + ";") +
-                "\tpublic String toString() {\n" +
+                "\t}" + "\n";
+        out += "\n";
+        out += DataIO.publicReadObjectState(null, "int", "getEncodedSize",
+                        "return " + (hasTwoBytePacketNumber ? "4" : "3") + encodeFieldsLen + ";");
+        out += "\tpublic String toString() {\n" +
                 "\t\t" + "String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n" +
                 getToString + "\n" +
                 "\t\t" + "return out + \"\\n\";" + "\n" +
-                "\t}\n" +
-                getFields +
-                getFieldValues +
-                "}";
+                "\t}\n";
+        out += getFields;
+        out += getFieldValues;
+        out += "}";
+        return out;
     }
 
     public List<? extends Field> getFields() {
