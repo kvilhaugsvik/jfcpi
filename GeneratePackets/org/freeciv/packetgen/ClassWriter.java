@@ -144,7 +144,7 @@ public class ClassWriter {
         return out;
     }
 
-    public static String publicConstructor(String comment,
+    static String publicConstructor(String comment,
                                            String name,
                                            String paramList,
                                            String exceptionList,
@@ -152,21 +152,21 @@ public class ClassWriter {
         return publicDynamicMethod(comment, null, name, paramList, exceptionList, body);
     }
 
-    public static String publicConstructorNoExceptions(String comment,
+    static String publicConstructorNoExceptions(String comment,
                                                        String name,
                                                        String paramList,
                                                        String... body) {
         return publicConstructor(comment, name, paramList, null, body);
     }
 
-    public static String publicReadObjectState(String comment,
+    static String publicReadObjectState(String comment,
                                                String type,
                                                String name,
                                                String... body) {
         return publicDynamicMethod(comment, type, name, null, null, body);
     }
 
-    public static String publicDynamicMethod(String comment,
+    static String publicDynamicMethod(String comment,
                                              String type,
                                              String name,
                                              String paramList,
@@ -175,7 +175,7 @@ public class ClassWriter {
         return fullMethod(comment, "public", null, type, name, paramList, exceptionList, body);
     }
 
-    public static String fullMethod(String comment,
+    static String fullMethod(String comment,
                                     String access,
                                     String place,
                                     String type,
