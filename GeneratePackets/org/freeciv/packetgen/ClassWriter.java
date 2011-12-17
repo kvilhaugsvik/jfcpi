@@ -209,7 +209,7 @@ public class ClassWriter {
         return (null == element? "" : before + element + after);
     }
 
-    private class Method {
+    static class Method {
         String comment;
         Visibility visibility;
         Scope scope;
@@ -219,7 +219,7 @@ public class ClassWriter {
         String exceptionList;
         String[] body;
 
-        private Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList, String exceptionList, String[] body) {
+        public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList, String exceptionList, String... body) {
             this.comment = comment;
             this.visibility = visibility;
             this.scope = scope;

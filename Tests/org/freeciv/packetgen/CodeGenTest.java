@@ -20,11 +20,12 @@ package org.freeciv.packetgen;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.freeciv.packetgen.ClassWriter.*;
 
 public class CodeGenTest {
-    @Test public void testFullMethodEverything() {
-        String result = ClassWriter.fullMethod("// comment", "public", "static", "int", "testMethod", "String a",
-                "Throwable", "return 5;");
+    @Test public void testMethodEverything() {
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
+                "Throwable", "return 5;")).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
@@ -34,9 +35,9 @@ public class CodeGenTest {
                 result);
     }
 
-    @Test public void testFullMethodNoComment() {
-        String result = ClassWriter.fullMethod(null, "public", "static", "int", "testMethod", "String a", "Throwable",
-                "return 5;");
+    @Test public void testMethodNoComment() {
+        String result = (new Method(null, Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a", "Throwable",
+                "return 5;")).toString();
 
         assertEquals("Generated source not as expected",
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
@@ -45,9 +46,9 @@ public class CodeGenTest {
                 result);
     }
 
-    @Test public void testFullMethodNoParams() {
-        String result = ClassWriter.fullMethod("// comment", "public", "static", "int", "testMethod", null,
-                "Throwable", "return 5;");
+    @Test public void testMethodNoParams() {
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null,
+                "Throwable", "return 5;")).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
@@ -57,9 +58,9 @@ public class CodeGenTest {
                 result);
     }
 
-    @Test public void testFullMethodEverythingTwoLineComment() {
-        String result = ClassWriter.fullMethod("/** comment\n * more comment\n */", "public", "static", "int", "testMethod",
-                "String a", "Throwable", "return 5;");
+    @Test public void testMethodEverythingTwoLineComment() {
+        String result = (new Method("/** comment\n * more comment\n */",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod",
+                "String a", "Throwable", "return 5;")).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/** comment" + "\n" +
@@ -71,9 +72,9 @@ public class CodeGenTest {
                 result);
     }
 
-    @Test public void testFullMethodEverythingBodyWithBlanks() {
-        String result = ClassWriter.fullMethod("// comment", "public", "static", "int", "testMethod", "String a",
-                "Throwable", "int a = 5;", "", "return a;");
+    @Test public void testMethodEverythingBodyWithBlanks() {
+        String result = (new Method("// comment",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
+                "Throwable", "int a = 5;", "", "return a;")).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
