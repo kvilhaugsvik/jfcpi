@@ -55,6 +55,7 @@ protojar: generated
 
 testout:
 	mkdir -p ${TESTOUT}
+	touch testout
 
 generatortestcompile: testout
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT} Tests/org/freeciv/packetgen/*.java
