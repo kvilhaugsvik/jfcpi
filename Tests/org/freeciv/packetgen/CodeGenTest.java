@@ -86,6 +86,24 @@ public class CodeGenTest {
                 result);
     }
 
+    @Test public void testConstantDeclaration() {
+        assertEquals("Generated source not as expected",
+                "private static final int integer = 25;",
+                (new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, "int", "integer", "25")).toString());
+    }
+
+    @Test public void testObjectConstantDeclaration() {
+        assertEquals("Generated source not as expected",
+                "private final int integer;",
+                (new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, "int", "integer", null)).toString());
+    }
+
+    @Test public void testStateVarDeclaration() {
+        assertEquals("Generated source not as expected",
+                "private int integer;",
+                (new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES, "int", "integer", null)).toString());
+    }
+
     // Tests based on real examples
 
     @Test public void testPublicConstructorNoExceptions() {

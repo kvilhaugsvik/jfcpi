@@ -107,7 +107,7 @@ public class ClassWriter {
         String out = "";
 
         for (VariableDeclaration variable: variables) {
-            out += "\t" + variable + ";" + "\n";
+            out += "\t" + variable + "\n";
         }
         if (!variables.isEmpty()) out += "\n";
 
@@ -236,7 +236,7 @@ public class ClassWriter {
         }
     }
 
-    private class VariableDeclaration {
+    static class VariableDeclaration {
         Visibility visibility;
         Scope scope;
         Modifiable modifiable;
@@ -244,7 +244,7 @@ public class ClassWriter {
         String name;
         String value;
 
-        private VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
+        public VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
                                     String type, String name, String value) {
             this.visibility = visibility;
             this.scope = scope;
@@ -258,7 +258,7 @@ public class ClassWriter {
             return ifIs(visibility.toString(), " ") +
                     ifIs(scope.toString(), " ") +
                     ifIs(modifiable.toString(), " ") +
-                    type + " " + name + ifIs(" = ", value, ";");
+                    type + " " + name + ifIs(" = ", value, "") + ";";
         }
     }
 
