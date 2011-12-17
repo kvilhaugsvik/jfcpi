@@ -66,11 +66,11 @@ public class Packet {
                 constructorBodyStream += "\t\t" + "this." + field.getVariableName() + " = " +
                         "new " + field.getType() + "(from);\n";
                 getFieldValues += "\n" +
-                        DataIO.publicReadObjectState(null, field.getJType(), "get"
+                        ClassWriter.publicReadObjectState(null, field.getJType(), "get"
                         + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
                         + "Value",
                         "return " + field.getVariableName() + ".getValue();");
-                getFields += "\n" + DataIO.publicReadObjectState(null, field.getType(), "get"
+                getFields += "\n" + ClassWriter.publicReadObjectState(null, field.getType(), "get"
                         + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
                         "return " + field.getVariableName() + ";");
                 getToString += "\t\t" + "out += \"\\n\\t" + field.getVariableName() +
@@ -96,8 +96,8 @@ public class Packet {
         out += "\t" + "private boolean hasTwoBytePacketNumber = " + hasTwoBytePacketNumber + ";" + "\n";
         out += "\n";
         out += declarations;
-        out += DataIO.publicConstructorNoExceptions(null, name, arglist, constructorBody.toArray(new String[0]));
-        out += ((fields.length > 0) ? "\n" + DataIO.publicConstructorNoExceptions(null, name, javatypearglist,
+        out += ClassWriter.publicConstructorNoExceptions(null, name, arglist, constructorBody.toArray(new String[0]));
+        out += ((fields.length > 0) ? "\n" + ClassWriter.publicConstructorNoExceptions(null, name, javatypearglist,
                                 constructorBodyJ.toArray(new String[0])) : "");
         out += "\n";
         out += "\t/***\n" +
@@ -121,9 +121,9 @@ public class Packet {
                 "\t\t" + "}" + "\n" +
                 "\t" + "}" + "\n";
         out += "\n";
-        out += DataIO.publicReadObjectState(null, "int", "getNumber", "return number;");
+        out += ClassWriter.publicReadObjectState(null, "int", "getNumber", "return number;");
         out += "\n";
-        out += DataIO.publicReadObjectState(null, "boolean", "hasTwoBytePacketNumber",
+        out += ClassWriter.publicReadObjectState(null, "boolean", "hasTwoBytePacketNumber",
                         "return hasTwoBytePacketNumber;");
         out += "\t" + "public void encodeTo(DataOutput to) throws IOException {\n" +
                 "\t\t// header\n" +
@@ -134,7 +134,7 @@ public class Packet {
                 encodeFields +
                 "\t}" + "\n";
         out += "\n";
-        out += DataIO.publicReadObjectState(null, "int", "getEncodedSize",
+        out += ClassWriter.publicReadObjectState(null, "int", "getEncodedSize",
                         "return " + (hasTwoBytePacketNumber ? "4" : "3") + encodeFieldsLen + ";");
         out += "\tpublic String toString() {\n" +
                 "\t\t" + "String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n" +

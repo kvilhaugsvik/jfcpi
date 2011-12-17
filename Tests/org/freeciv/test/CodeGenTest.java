@@ -17,14 +17,14 @@
 
 package org.freeciv.test;
 
-import org.freeciv.packetgen.DataIO;
+import org.freeciv.packetgen.ClassWriter;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class CodeGenTest {
     @Test public void testFullMethodEverything() {
-        String result = DataIO.fullMethod("// comment", "public", "static", "int", "testMethod", "String a",
+        String result = ClassWriter.fullMethod("// comment", "public", "static", "int", "testMethod", "String a",
                 "Throwable", "return 5;");
 
         assertEquals("Generated source not as expected",
@@ -36,7 +36,7 @@ public class CodeGenTest {
     }
 
     @Test public void testFullMethodNoComment() {
-        String result = DataIO.fullMethod(null, "public", "static", "int", "testMethod", "String a", "Throwable",
+        String result = ClassWriter.fullMethod(null, "public", "static", "int", "testMethod", "String a", "Throwable",
                 "return 5;");
 
         assertEquals("Generated source not as expected",
@@ -47,7 +47,7 @@ public class CodeGenTest {
     }
 
     @Test public void testFullMethodNoParams() {
-        String result = DataIO.fullMethod("// comment", "public", "static", "int", "testMethod", null,
+        String result = ClassWriter.fullMethod("// comment", "public", "static", "int", "testMethod", null,
                 "Throwable", "return 5;");
 
         assertEquals("Generated source not as expected",
@@ -59,7 +59,7 @@ public class CodeGenTest {
     }
 
     @Test public void testFullMethodEverythingTwoLineComment() {
-        String result = DataIO.fullMethod("/** comment\n * more comment\n */", "public", "static", "int", "testMethod",
+        String result = ClassWriter.fullMethod("/** comment\n * more comment\n */", "public", "static", "int", "testMethod",
                 "String a", "Throwable", "return 5;");
 
         assertEquals("Generated source not as expected",
@@ -73,7 +73,7 @@ public class CodeGenTest {
     }
 
     @Test public void testFullMethodEverythingBodyWithBlanks() {
-        String result = DataIO.fullMethod("// comment", "public", "static", "int", "testMethod", "String a",
+        String result = ClassWriter.fullMethod("// comment", "public", "static", "int", "testMethod", "String a",
                 "Throwable", "int a = 5;", "", "return a;");
 
         assertEquals("Generated source not as expected",
@@ -89,7 +89,7 @@ public class CodeGenTest {
     // Tests based on real examples
 
     @Test public void testPublicConstructorNoExceptions() {
-        String result = DataIO.publicConstructorNoExceptions(null,
+        String result = ClassWriter.publicConstructorNoExceptions(null,
                 "PACKET_CITY_NAME_SUGGESTION_REQ", "Integer unit_id",
                 "this.unit_id = new UNIT(unit_id);");
 
@@ -101,7 +101,7 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicConstructor() {
-        String result = DataIO.publicConstructor("/***" + "\n" +
+        String result = ClassWriter.publicConstructor("/***" + "\n" +
                 " * Construct an object from a DataInput" + "\n" +
                 " * @param from data stream that is at the start of the package body" + "\n" +
                 " * @param headerLen length from header package" + "\n" +
@@ -142,7 +142,7 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicReadObjectState() {
-        String result = DataIO.publicReadObjectState(null, "String", "toString", "return value.toString();");
+        String result = ClassWriter.publicReadObjectState(null, "String", "toString", "return value.toString();");
 
         assertEquals("Generated source not as expected",
                 "\tpublic String toString() {\n" +
