@@ -53,10 +53,21 @@ protojar: generated
 	${JAR} cf ${PROTOJAR} ${PACKETGENOUT}
 	touch protojar
 
-testcode: generated
+testout:
 	mkdir -p ${TESTOUT}
+
+generatortestcompile: testout
+	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT} Tests/org/freeciv/packetgen/*.java
+	${SCALAC} -d ${TESTOUT} -classpath ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} Tests/org/freeciv/packetgen/*.scala
+	touch generatortestcompile
+
+generatortest: generatortestcompile
+	${JAVA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
+	${SCALA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packetgen.ParseTest
+	touch generatortest
+
+testcode: generated testout
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT} Tests/org/freeciv/test/*.java
-	${SCALAC} -d ${TESTOUT} -classpath ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} Tests/org/freeciv/test/*.scala
 	touch testcode
 
 # not included in tests since it needs a running Freeciv server
@@ -64,10 +75,8 @@ testsignintoserver: testcode
 	${JAVA} -cp ${PROTOOUT}:${TESTOUT} org.freeciv.test.SignInAndWait
 	touch testsignintoserver
 
-tests: testcode
+tests: testcode generatortest
 	${JAVA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.PacketTest
-	${JAVA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.PacketsStoreTest
-	${SCALA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.ParseTest
 	touch tests
 
 clean:

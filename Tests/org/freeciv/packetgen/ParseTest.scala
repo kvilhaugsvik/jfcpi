@@ -14,11 +14,10 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.test
+package org.freeciv.packetgen
 
 import org.junit.Test
 import junit.framework.Assert._
-import org.freeciv.packetgen.{PacketsStore, ParsePacketsDef}
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
 
