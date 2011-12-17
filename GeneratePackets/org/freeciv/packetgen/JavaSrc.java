@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.packet.fieldtype.FieldType;
+
 public class JavaSrc {
     String CSrc;
     String JavaType;
@@ -37,27 +39,19 @@ public class JavaSrc {
     }
 
     public String toString(String name) {
-        return "package " + "org.freeciv.packet.fieldtype" + ";" + "\n" +
-                "\n" +
-                "import java.io.DataInput;" + "\n" +
-                "import java.io.DataOutput;" + "\n" +
-                "import java.io.IOException;" + "\n" +
-                "\n" +
-                "// This code was auto generated from Freeciv's protocol definition" + "\n" +
-                "public class " + name + " implements FieldType<" + JavaType + "> {" + "\n" +
-                "\t" + "private " + JavaType + " value;" + "\n" +
-                "\n" +
-                DataIO.publicConstructorNoExceptions(null, name, JavaType + " value", "this.value = value;") +
-                "\n" +
-                DataIO.publicConstructor(null, name, "DataInput from", "IOException", Decode) +
-                "\n" +
-                DataIO.publicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode) +
-                "\n" +
-                DataIO.publicReadObjectState(null, "int", "encodedLength", EncodedSize) +
-                "\n" +
-                DataIO.publicReadObjectState(null, JavaType, "getValue", "return value;") +
-                "\n" +
-                DataIO.publicReadObjectState(null, "String", "toString", "return value.toString();") +
-                "}";
+        ClassWriter out = new ClassWriter(FieldType.class.getPackage(),
+                new String[]{"java.io.DataInput", "java.io.DataOutput", "java.io.IOException"},
+                "Freeciv's protocol definition",
+                name,
+                "FieldType<" + JavaType + ">");
+        out.addStateVar(JavaType, "value");
+        out.addPublicConstructor(null, name, JavaType + " value", "this.value = value;");
+        out.addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
+        out.addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
+        out.addPublicReadObjectState(null, "int", "encodedLength", EncodedSize);
+        out.addPublicReadObjectState(null, JavaType, "getValue", "return value;");
+        out.addPublicReadObjectState(null, "String", "toString", "return value.toString();");
+
+        return out.toString();
     }
 }

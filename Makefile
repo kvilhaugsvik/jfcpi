@@ -30,16 +30,16 @@ generatordefaults:
 	echo "}" >>${GENERATORDEFAULTS}
 	touch generatordefaults
 
-generator: generatordefaults
+generator: generatordefaults protocol
 	mkdir -p ${PACKETGENOUT}
-	${JAVAC} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.java
+	${JAVAC} -cp ${PROTOOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.java
 	${SCALAC} -classpath ${PACKETGENOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/GeneratePackets.scala
 	touch generator
 
-testpackets:
+testpackets: protocol
 	mkdir -p ${TESTOUT}
-	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT} Tests/org/freeciv/test/GenerateTest.java
-	${JAVA} -cp ${TESTOUT}:${PACKETGENOUT} org.freeciv.test.GenerateTest
+	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT} Tests/org/freeciv/test/GenerateTest.java
+	${JAVA} -cp ${TESTOUT}:${PACKETGENOUT}:${PROTOOUT} org.freeciv.test.GenerateTest
 	touch testpackets
 
 # since the parser isn't finished use GenerateTest as generator
