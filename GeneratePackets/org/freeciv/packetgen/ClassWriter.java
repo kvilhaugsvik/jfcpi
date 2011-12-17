@@ -125,7 +125,7 @@ public class ClassWriter {
     }
 
     public String toString() {
-        String out = "package " + where.getName() + ";" + "\n" +
+        String out = packageDeclaration(where) + "\n" +
                 "\n";
 
         out += formatImports()
@@ -142,6 +142,10 @@ public class ClassWriter {
         out += "}";
 
         return out;
+    }
+
+    static String packageDeclaration(Package inPackage) {
+        return "package " + inPackage.getName() + ";";
     }
 
     static String publicConstructor(String comment,

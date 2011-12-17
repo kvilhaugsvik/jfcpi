@@ -104,6 +104,12 @@ public class CodeGenTest {
                 (new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES, "int", "integer", null)).toString());
     }
 
+    @Test public void testPackageDeclaration() {
+        assertEquals("Generated source not as expected",
+            "package org.freeciv.packetgen;",
+            ClassWriter.packageDeclaration(Package.getPackage("org.freeciv.packetgen")));
+    }
+
     // Tests based on real examples
 
     @Test public void testPublicConstructorNoExceptions() {
