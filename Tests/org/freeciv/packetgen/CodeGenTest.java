@@ -89,9 +89,10 @@ public class CodeGenTest {
     // Tests based on real examples
 
     @Test public void testPublicConstructorNoExceptions() {
-        String result = ClassWriter.publicConstructorNoExceptions(null,
-                "PACKET_CITY_NAME_SUGGESTION_REQ", "Integer unit_id",
-                "this.unit_id = new UNIT(unit_id);");
+        String result = (new Method(null,
+                Visibility.PUBLIC, Scope.OBJECT, null,
+                "PACKET_CITY_NAME_SUGGESTION_REQ", "Integer unit_id", null,
+                "this.unit_id = new UNIT(unit_id);")).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "public PACKET_CITY_NAME_SUGGESTION_REQ(Integer unit_id) {" + "\n" +
@@ -101,13 +102,14 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicConstructor() {
-        String result = ClassWriter.publicConstructor("/***" + "\n" +
+        String result = (new Method("/***" + "\n" +
                 " * Construct an object from a DataInput" + "\n" +
                 " * @param from data stream that is at the start of the package body" + "\n" +
                 " * @param headerLen length from header package" + "\n" +
                 " * @param packet the number of the packet specified in the header" + "\n" +
                 " * @throws IOException if the DataInput has a problem" + "\n" +
                 " */",
+                Visibility.PUBLIC, Scope.OBJECT, null,
                 "PACKET_CITY_NAME_SUGGESTION_REQ", "DataInput from, int headerLen, int packet", "IOException",
                 "this.unit_id = new UNIT(from);",
                 "if (getNumber() != packet) {",
@@ -117,7 +119,7 @@ public class CodeGenTest {
                 "if (getEncodedSize() != headerLen) {",
                 "\tthrow new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen",
                 "\t+ \" Packet: \" + getEncodedSize());",
-                "}");
+                "}")).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/***" + "\n" +
@@ -142,7 +144,7 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicReadObjectState() {
-        String result = ClassWriter.publicReadObjectState(null, "String", "toString", "return value.toString();");
+        String result = (new Method(null, Visibility.PUBLIC, Scope.OBJECT, "String", "toString", null, null, "return value.toString();")).toString();
 
         assertEquals("Generated source not as expected",
                 "\tpublic String toString() {\n" +
