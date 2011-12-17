@@ -69,14 +69,14 @@ public class ClassWriter {
                                        String paramList,
                                        String exceptionList,
                                        String... body) {
-        addMethod(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
+        methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, body));
     }
 
     public void addPublicReadObjectState(String comment,
                                          String type,
                                          String name,
                                          String... body) {
-        addPublicDynamicMethod(comment, type, name, null, null, body);
+        methods.add(Method.newPublicReadObjectState(comment, type, name, body));
     }
 
     public void addPublicConstructorWithExceptions(String comment,
@@ -84,14 +84,14 @@ public class ClassWriter {
                                String paramList,
                                String exceptionList,
                                String... body) {
-        addPublicDynamicMethod(comment, null, name, paramList, exceptionList, body);
+        methods.add(Method.newPublicConstructorWithException(comment, name, paramList, exceptionList, body));
     }
 
     public void addPublicConstructor(String comment,
                                      String name,
                                      String paramList,
                                      String... body) {
-        addPublicConstructorWithExceptions(comment, name, paramList, null, body);
+        methods.add(Method.newPublicConstructor(comment, name, paramList, body));
     }
 
     private String formatImports() {
@@ -248,6 +248,37 @@ public class ClassWriter {
         @Override
         public String toString() {
             return fullMethod(comment, visibility.toString(), scope.toString(), type, name, paramList, exceptionList, body);
+        }
+
+        static Method newPublicConstructorWithException(String comment,
+                                                        String name,
+                                                        String paramList,
+                                                        String exceptionList,
+                                                        String... body) {
+            return newPublicDynamicMethod(comment, null, name, paramList, exceptionList, body);
+        }
+
+        static Method newPublicConstructor(String comment,
+                                                    String name,
+                                                    String paramList,
+                                                    String... body) {
+            return newPublicConstructorWithException(comment, name, paramList, null, body);
+        }
+
+        static Method newPublicReadObjectState(String comment,
+                                            String type,
+                                            String name,
+                                            String... body) {
+            return newPublicDynamicMethod(comment, type, name, null, null, body);
+        }
+
+        static Method newPublicDynamicMethod(String comment,
+                                             String type,
+                                             String name,
+                                             String paramList,
+                                             String exceptionList,
+                                             String... body) {
+            return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
         }
     }
 
