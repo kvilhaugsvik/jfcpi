@@ -33,7 +33,7 @@ generatordefaults:
 generator: generatordefaults protocol
 	mkdir -p ${PACKETGENOUT}
 	${JAVAC} -cp ${PROTOOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.java
-	${SCALAC} -classpath ${PACKETGENOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/GeneratePackets.scala
+	${SCALAC} -classpath ${PACKETGENOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.scala
 	touch generator
 
 testpackets: protocol
