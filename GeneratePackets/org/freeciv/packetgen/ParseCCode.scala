@@ -14,8 +14,9 @@
 
 package org.freeciv.packetgen
 
-class ParseCCode(storage: PacketsStore) extends ParseShared(storage) {
-  def enumDefname = regex("""[A-Za-z]\w*""".r)
+class ParseCCode(storage: PacketsStore, lookFor: List[String]) extends ParseShared(storage) {
+  def enumDefname: Parser[Any] =
+    lookFor.foldRight[Parser[Any]](failure("Nothing found"))((prefer: String, ifNot: Parser[Any]) => (prefer | ifNot))
 
   def enumValue = regex("""[0-9]+""".r)
 

@@ -36,12 +36,16 @@ class CParserTest {
 
   @inline private def storageAndParser = {
     val storage = new PacketsStore(false, true)
-    val parser = new ParseCCode(storage)
+    val parser = new ParseCCode(storage, List("test"))
     (storage, parser)
   }
 
   @inline private def parsesCorrectly(expression: String, parser: ParseShared) =
     assertTrue("Unable to parse expression " + expression, parser.parseAll(parser.exprs, expression).successful)
+
+  @inline private def willNotParse(expression: String, parser: ParseShared) =
+    assertFalse("No failure on " + expression, parser.parseAll(parser.exprs, expression).successful)
+
 
   @Test def test1ElementNoAssign = parsesCorrectly(oneElementNoAssign, storageAndParser._2)
   @Test def test1ElementAssign  = parsesCorrectly(oneElementAssign, storageAndParser._2)
@@ -52,4 +56,6 @@ class CParserTest {
   @Test def test1CommentCxxAfter = parsesCorrectly(oneElementNoAssign + commentCxxOneLine, storageAndParser._2)
   @Test def test1CommentCBefore = parsesCorrectly(commentCOneLine + oneElementNoAssign, storageAndParser._2)
   @Test def test1CommentCAfter = parsesCorrectly(oneElementNoAssign + commentCOneLine, storageAndParser._2)
+
+  @Test def testEnumNotLookedFor = willNotParse(threeElementsNoAssign.replace("test", "notTest"), storageAndParser._2)
 }
