@@ -44,7 +44,7 @@ public class JavaSrc {
                 "Freeciv's protocol definition",
                 name,
                 "FieldType<" + JavaType + ">");
-        out.addStateVar(JavaType, "value");
+        out.addObjectConstant(JavaType, "value");
         out.addPublicConstructor(null, name, JavaType + " value", "this.value = value;");
         out.addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
         out.addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode);

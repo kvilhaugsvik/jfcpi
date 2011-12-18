@@ -48,8 +48,8 @@ public class ClassWriter {
         constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
-    public void addStateVar(String type, String name) {
-        stateVars.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES, type, name, null));
+    public void addObjectConstant(String type, String name) {
+        stateVars.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addMethod(String comment,

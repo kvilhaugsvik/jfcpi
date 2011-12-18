@@ -56,7 +56,7 @@ public class Packet {
         code.addConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
 
         for (Field field: fields) {
-            code.addStateVar(field.getType(), field.getVariableName());
+            code.addObjectConstant(field.getType(), field.getVariableName());
         }
 
         LinkedList<String> constructorBody = new LinkedList<String>();
