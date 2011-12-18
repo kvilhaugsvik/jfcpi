@@ -202,7 +202,7 @@ public class ClassWriter {
         out += ifIs("\t", access, " ") + ifIs(place, " ") + ifIs(type, " ") +
                 name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ") + "{" + "\n";
         for (String line: body) {
-            out += (line != ""? "\t" + "\t" + line : "") + "\n";
+            out += (!line.equals("")? "\t" + "\t" + line : "") + "\n";
         }
         out += "\t" + "}" + "\n";
         return out;
