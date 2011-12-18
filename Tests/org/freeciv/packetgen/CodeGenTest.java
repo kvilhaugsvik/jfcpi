@@ -86,6 +86,15 @@ public class CodeGenTest {
                 result);
     }
 
+    @Test public void testMethodClassStateReader() {
+        Method toTest = Method.newReadClassState(null, "boolean", "isTrue", "return true;");
+        assertEquals("Generated Class state reader source code not as espected",
+                "\t" + "public static boolean isTrue() {" + "\n" +
+                        "\t\t" + "return true;" + "\n" +
+                        "\t" + "}" + "\n",
+                toTest.toString());
+    }
+
     @Test public void testConstantDeclaration() {
         assertEquals("Generated source not as expected",
                 "private static final int integer = 25;",

@@ -63,6 +63,13 @@ public class ClassWriter {
         methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList, body));
     }
 
+    public void addReadClassState(String comment,
+                                  String type,
+                                  String name,
+                                  String... body) {
+        methods.add(Method.newReadClassState(comment, type, name, body));
+    }
+
     public void addPublicDynamicMethod(String comment,
                                        String type,
                                        String name,
@@ -245,6 +252,10 @@ public class ClassWriter {
                                              String exceptionList,
                                              String... body) {
             return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
+        }
+
+        public static Method newReadClassState(String comment, String type, String name, String... body) {
+            return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
         }
     }
 
