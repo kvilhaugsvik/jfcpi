@@ -14,11 +14,10 @@
 
 package org.freeciv.packetgen
 
-import util.parsing.combinator._
 import util.parsing.input.Reader
 import collection.JavaConversions._
 
-class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
+class ParsePacketsDef(storage: PacketsStore) extends ParseShared(storage) {
   def fieldType = regex("""[A-Z](\w|_)*""".r)
   def fieldTypeDef = fieldType | regex("""\w*\((\w|\s)*\)""".r)
 
@@ -26,9 +25,7 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
     case theType~alias~is~aliased => storage.registerTypeAlias(alias, aliased)
   }
 
-  def comment = """/\*+""".r ~ rep("""([^*\n\r]|\*+[^/*])+""".r) ~ """\*+/""".r |
-    regex("""/\*+\*/""".r) |
-    regex("""//[^\n\r]*""".r) |
+  def comment = CComment |
     regex("""#[^\n\r]*""".r)
 
   def packetName = regex("""PACKET_[A-Za-z0-9_]+""".r)
@@ -93,6 +90,6 @@ class ParsePacketsDef(storage: PacketsStore) extends RegexParsers {
 
   def expr: Parser[Any] = fieldTypeAssign | comment | packet
 
-  def parsePacketsDef(input: String) = parseAll(rep(expr), input)
-  def parsePacketsDef(input: Reader[Char]) = parseAll(rep(expr), input)
+  def parsePacketsDef(input: String) = parseAll(exprs, input)
+  def parsePacketsDef(input: Reader[Char]) = parseAll(exprs, input)
 }
