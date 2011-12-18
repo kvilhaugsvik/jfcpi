@@ -98,7 +98,9 @@ public class ClassWriter {
         String out = "";
 
         for (String anImport: imports) {
-            out += declareImport(anImport) + "\n";
+            if ((null != anImport) && !anImport.equals(""))
+                out += declareImport(anImport);
+            out += "\n";
         }
         if (0 < imports.length) out += "\n";
 

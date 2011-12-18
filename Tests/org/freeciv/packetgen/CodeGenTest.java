@@ -205,6 +205,54 @@ public class CodeGenTest {
                 "Packet");
     }
 
+    @Test public void testClassWriterEmptyTwoBlocksOfImports() {
+        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
+                new String[]{
+                        "org.freeciv.packet.Packet",
+                        null,
+                        "java.util.List"
+                },
+                "nothing",
+                "NameOfClass",
+                "Packet");
+
+        assertEquals("Generated source not as expected",
+                "package org.freeciv.packetgen;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
+                        "import java.util.List;" + "\n" +
+                        "\n" +
+                        "// This code was auto generated from nothing" + "\n" +
+                        "public class NameOfClass implements Packet {" + "\n" +
+                        "}",
+                toWrite.toString());
+    }
+
+    @Test public void testClassWriterEmptyTwoBlocksOfImportsSeparatedByEmpthy() {
+        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
+                new String[]{
+                        "org.freeciv.packet.Packet",
+                        "",
+                        "java.util.List"
+                },
+                "nothing",
+                "NameOfClass",
+                "Packet");
+
+        assertEquals("Generated source not as expected",
+                "package org.freeciv.packetgen;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
+                        "import java.util.List;" + "\n" +
+                        "\n" +
+                        "// This code was auto generated from nothing" + "\n" +
+                        "public class NameOfClass implements Packet {" + "\n" +
+                        "}",
+                toWrite.toString());
+    }
+
     // Tests based on real examples
 
     @Test public void testPublicConstructorNoExceptions() {
