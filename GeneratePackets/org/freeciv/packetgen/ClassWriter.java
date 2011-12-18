@@ -49,7 +49,7 @@ public class ClassWriter {
     }
 
     public void addStateVar(String type, String name) {
-        constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES, type, name, null));
+        stateVars.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES, type, name, null));
     }
 
     public void addMethod(String comment,
