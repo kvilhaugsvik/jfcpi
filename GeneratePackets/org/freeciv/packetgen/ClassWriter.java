@@ -144,7 +144,9 @@ public class ClassWriter {
 
         out += formatMethods(methods);
 
-        out += "}";
+        out = removeBlankLine(out);
+
+        out += "}" + "\n";
 
         return out;
     }
@@ -224,6 +226,10 @@ public class ClassWriter {
 
     private static String ifIs(String before, String element, String after) {
         return (null == element? "" : before + element + after);
+    }
+
+    private String removeBlankLine(String out) {
+        return out.substring(0, out.length() - 1);
     }
 
     static class Method {

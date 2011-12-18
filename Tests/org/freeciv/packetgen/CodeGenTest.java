@@ -128,8 +128,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
-                        "public class NameOfClass implements Packet {" + "\n" +
-                        "}",
+                        "public class NameOfClass implements Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -143,8 +142,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
-                        "public class NameOfClass implements Packet {" + "\n" +
-                        "}",
+                        "public class NameOfClass implements Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -158,8 +156,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
-                        "public class NameOfClass implements Packet {" + "\n" +
-                        "}",
+                        "public class NameOfClass implements Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -174,8 +171,7 @@ public class CodeGenTest {
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
-                        "public class NameOfClass implements Packet {" + "\n" +
-                        "}",
+                        "public class NameOfClass implements Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -191,8 +187,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
-                        "public class NameOfClass {" + "\n" +
-                        "}",
+                        "public class NameOfClass {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -224,8 +219,7 @@ public class CodeGenTest {
                         "import java.util.List;" + "\n" +
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
-                        "public class NameOfClass implements Packet {" + "\n" +
-                        "}",
+                        "public class NameOfClass implements Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -248,10 +242,35 @@ public class CodeGenTest {
                         "import java.util.List;" + "\n" +
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
-                        "public class NameOfClass implements Packet {" + "\n" +
-                        "}",
+                        "public class NameOfClass implements Packet {" + "}" + "\n",
                 toWrite.toString());
     }
+
+    @Test public void testClassWriterStyleConstantNoBlankLineAtTheEndOfTheClassScope() {
+        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
+                new String[]{"java.util.List"},
+                "nothing",
+                "NameOfClass",
+                "Packet");
+        toWrite.addConstant("int", "five", "5");
+
+        String[] lines = toWrite.toString().split("\n");
+
+        assertTrue("Generated source not as expected " + lines[lines.length - 1].trim(),
+                lines[lines.length - 1].trim().endsWith("}"));
+        assertTrue("Class has blank line before end " + lines[lines.length - 2].trim(),
+                !lines[lines.length - 2].trim().equals(""));
+    }
+
+    @Test public void testClassWriterStyleAlwaysEndWithNewLine() {
+        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
+            new String[]{"java.util.List"},
+            "nothing",
+            "NameOfClass",
+            "Packet");
+
+        assertTrue("File should end with line break", toWrite.toString().endsWith("\n"));
+}
 
     // Tests based on real examples
 
