@@ -163,55 +163,6 @@ public class ClassWriter {
         return "import " + toImport + ";";
     }
 
-    static String publicConstructor(String comment,
-                                           String name,
-                                           String paramList,
-                                           String exceptionList,
-                                           String... body) {
-        return publicDynamicMethod(comment, null, name, paramList, exceptionList, body);
-    }
-
-    static String publicConstructorNoExceptions(String comment,
-                                                       String name,
-                                                       String paramList,
-                                                       String... body) {
-        return publicConstructor(comment, name, paramList, null, body);
-    }
-
-    static String publicReadObjectState(String comment,
-                                               String type,
-                                               String name,
-                                               String... body) {
-        return publicDynamicMethod(comment, type, name, null, null, body);
-    }
-
-    static String publicDynamicMethod(String comment,
-                                             String type,
-                                             String name,
-                                             String paramList,
-                                             String exceptionList,
-                                             String... body) {
-        return fullMethod(comment, "public", null, type, name, paramList, exceptionList, body);
-    }
-
-    static String fullMethod(String comment,
-                                    String access,
-                                    String place,
-                                    String type,
-                                    String name,
-                                    String paramList,
-                                    String exceptionList,
-                                    String... body) {
-        String out = (null == comment? "" : indent(comment) + "\n");
-        out += ifIs("\t", access, " ") + ifIs(place, " ") + ifIs(type, " ") +
-                name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ") + "{" + "\n";
-        for (String line: body) {
-            out += (!line.equals("")? "\t" + "\t" + line : "") + "\n";
-        }
-        out += "\t" + "}" + "\n";
-        return out;
-    }
-
     private static String indent(String code) {
         return "\t" + code.replace("\n", "\n\t");
     }
@@ -255,7 +206,14 @@ public class ClassWriter {
 
         @Override
         public String toString() {
-            return fullMethod(comment, visibility.toString(), scope.toString(), type, name, paramList, exceptionList, body);
+            String out = (null == comment ? "" : indent(comment) + "\n");
+            out += ifIs("\t", visibility.toString(), " ") + ifIs(scope.toString(), " ") + ifIs(type, " ") +
+                    name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ") + "{" + "\n";
+            for (String line: body) {
+                out += (!line.equals("")? "\t" + "\t" + line : "") + "\n";
+            }
+            out += "\t" + "}" + "\n";
+            return out;
         }
 
         static Method newPublicConstructorWithException(String comment,

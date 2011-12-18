@@ -40,7 +40,6 @@ public class Packet {
     }
 
     public String toString() {
-        String declarations = "";
         String arglist = "";
         LinkedList<String> constructorBody = new LinkedList<String>();
         String javatypearglist = "";
@@ -48,103 +47,107 @@ public class Packet {
         String constructorBodyStream = "";
         String encodeFields = "";
         String encodeFieldsLen = "";
-        String getFields = "";
-        String getFieldValues = "";
         String getToString = "";
         if (fields.length > 0) {
         encodeFields = "\n" +
-                "\t\t// body\n";
+                "// body\n";
             for (Field field: fields) {
-                declarations += "\t" + field.getType() + " " + field.getVariableName() + ";\n";
                 constructorBody.add("this." + field.getVariableName() + " = " + field.getVariableName() + ";");
                 constructorBodyJ.add("this." + field.getVariableName() + " = " +
                         "new " + field.getType() + "(" + field.getVariableName() + ")" + ";");
                 arglist += field.getType() + " " + field.getVariableName() + ", ";
                 javatypearglist += field.getJType() + " " + field.getVariableName() + ", ";
-                encodeFields += "\t\t" + field.getVariableName() + ".encodeTo(to);\n";
+                encodeFields += field.getVariableName() + ".encodeTo(to);\n";
                 encodeFieldsLen += "\t\t\t+ " + field.getVariableName() + ".encodedLength()\n";
-                constructorBodyStream += "\t\t" + "this." + field.getVariableName() + " = " +
+                constructorBodyStream += "this." + field.getVariableName() + " = " +
                         "new " + field.getType() + "(from);\n";
-                getFieldValues += "\n" +
-                        ClassWriter.publicReadObjectState(null, field.getJType(), "get"
-                        + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
-                        + "Value",
-                        "return " + field.getVariableName() + ".getValue();");
-                getFields += "\n" + ClassWriter.publicReadObjectState(null, field.getType(), "get"
-                        + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
-                        "return " + field.getVariableName() + ";");
-                getToString += "\t\t" + "out += \"\\n\\t" + field.getVariableName() +
+                getToString += "out += \"\\n\\t" + field.getVariableName() +
                         " = \" + " + field.getVariableName() + ".getValue();" + "\n";
             }
             arglist = arglist.substring(0, arglist.length() - 2);
             javatypearglist = javatypearglist.substring(0, javatypearglist.length() - 2);
             encodeFieldsLen = "\n\t\t\t" + encodeFieldsLen.trim();
-            declarations += "\n";
         }
 
-        String out = "package org.freeciv.packet;\n" +
+        ClassWriter code = new ClassWriter(org.freeciv.packet.Packet.class.getPackage(),
+                new String[]{
+                        "org.freeciv.packet.fieldtype.*",
+                        null,
+                        "java.io.DataInput",
+                        "java.io.DataOutput",
+                        "java.io.IOException"
+                },
+                "Freeciv's protocol definition",
+                name,
+                "Packet");
+
+        code.addConstant("int", "number", number + "");
+        code.addConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
+
+        for (Field field: fields) {
+            code.addStateVar(field.getType(), field.getVariableName());
+        }
+
+        code.addPublicConstructor(null, name, arglist, constructorBody.toArray(new String[0]));
+
+        if (fields.length > 0)
+            code.addPublicConstructor(null, name, javatypearglist, constructorBodyJ.toArray(new String[0]));
+
+        code.addPublicConstructorWithExceptions("/***\n" +
+                " * Construct an object from a DataInput\n" +
+                " * @param from data stream that is at the start of the package body  \n" +
+                " * @param headerLen length from header package\n" +
+                " * @param packet the number of the packet specified in the header\n" +
+                " * @throws IOException if the DataInput has a problem\n" +
+                " */",
+                name,
+                "DataInput from, int headerLen, int packet",
+                "IOException",
+                (constructorBodyStream +
+                "if (getNumber() != packet) {\n" +
+                "\t" + "throw new IOException(\"Tried to create package " +
+                        name + " but packet number was \" + packet);\n" +
+                "}" + "\n" +
                 "\n" +
-                "import org.freeciv.packet.fieldtype.*;" + "\n" +
-                "\n" +
-                "import java.io.DataInput;\n" +
-                "import java.io.DataOutput;\n" +
-                "import java.io.IOException;" + "\n" +
-                "\n" +
-                "// This code was auto generated from Freeciv's protocol definition" + "\n" +
-                "public class " + name + " implements Packet {" + "\n";
-        out += "\t" + "private static final int number = " + number + ";" + "\n";
-        out += "\t" + "private boolean hasTwoBytePacketNumber = " + hasTwoBytePacketNumber + ";" + "\n";
-        out += "\n";
-        out += declarations;
-        out += ClassWriter.publicConstructorNoExceptions(null, name, arglist, constructorBody.toArray(new String[0]));
-        out += ((fields.length > 0) ? "\n" + ClassWriter.publicConstructorNoExceptions(null, name, javatypearglist,
-                                constructorBodyJ.toArray(new String[0])) : "");
-        out += "\n";
-        out += "\t/***\n" +
-                "\t * Construct an object from a DataInput\n" +
-                "\t * @param from data stream that is at the start of the package body  \n" +
-                "\t * @param headerLen length from header package\n" +
-                "\t * @param packet the number of the packet specified in the header\n" +
-                "\t * @throws IOException if the DataInput has a problem\n" +
-                "\t */" + "\n" +
-                "\t" + "public " + name + "(DataInput from, int headerLen, int packet) throws IOException {\n" +
-                constructorBodyStream +
-                "\t\t" + "if (getNumber() != packet) {\n" +
-                "\t\t\t" + "throw new IOException(\"Tried to create package " +
-                name + " but packet number was \" + packet);\n" +
-                "\t\t" + "}" + "\n" +
-                "\n" +
-                "\t\t" + "if (getEncodedSize() != headerLen) {\n" +
-                "\t\t\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \"" +
-                " + headerLen\n" +
-                "\t\t\t" + "+ \" Packet: \" + getEncodedSize());\n" +
-                "\t\t" + "}" + "\n" +
-                "\t" + "}" + "\n";
-        out += "\n";
-        out += ClassWriter.publicReadObjectState(null, "int", "getNumber", "return number;");
-        out += "\n";
-        out += ClassWriter.publicReadObjectState(null, "boolean", "hasTwoBytePacketNumber",
-                        "return hasTwoBytePacketNumber;");
-        out += "\t" + "public void encodeTo(DataOutput to) throws IOException {\n" +
-                "\t\t// header\n" +
-                "\t\t// length is 2 unsigned bytes\n" +
-                "\t\tto.writeChar(getEncodedSize());\n" +
-                "\t\t// type\n" +
-                "\t\t" + (hasTwoBytePacketNumber ? "to.writeChar(number);" : "to.writeByte(number);") + "\n" +
-                encodeFields +
-                "\t}" + "\n";
-        out += "\n";
-        out += ClassWriter.publicReadObjectState(null, "int", "getEncodedSize",
-                        "return " + (hasTwoBytePacketNumber ? "4" : "3") + encodeFieldsLen + ";");
-        out += "\tpublic String toString() {\n" +
-                "\t\t" + "String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n" +
+                "if (getEncodedSize() != headerLen) {\n" +
+                "\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \"" +
+                        " + headerLen\n" +
+                "\t" + "+ \" Packet: \" + getEncodedSize());\n" +
+                "}").split("\n"));
+
+        code.addPublicReadObjectState(null, "int", "getNumber", "return number;");
+        code.addPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
+
+        code.addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", (
+                "// header\n" +
+                "// length is 2 unsigned bytes\n" +
+                "to.writeChar(getEncodedSize());\n" +
+                "// type\n" +
+                (hasTwoBytePacketNumber ? "to.writeChar(number);" : "to.writeByte(number);") + "\n" +
+                encodeFields).split("\n"));
+
+        code.addPublicReadObjectState(null, "int", "getEncodedSize",
+                "return " + (hasTwoBytePacketNumber ? "4" : "3") + encodeFieldsLen + ";");
+
+        code.addPublicReadObjectState(null, "String", "toString",
+                ("String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n" +
                 getToString + "\n" +
-                "\t\t" + "return out + \"\\n\";" + "\n" +
-                "\t}\n";
-        out += getFields;
-        out += getFieldValues;
-        out += "}";
-        return out;
+                "return out + \"\\n\";").split("\n"));
+
+        for (Field field: fields) {
+            code.addPublicReadObjectState(null, field.getType(), "get"
+                + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
+                "return " + field.getVariableName() + ";");
+        }
+
+        for (Field field: fields) {
+            code.addPublicReadObjectState(null, field.getJType(), "get"
+                    + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
+                    + "Value",
+                    "return " + field.getVariableName() + ".getValue();");
+        }
+
+        return code.toString();
     }
 
     public List<? extends Field> getFields() {
