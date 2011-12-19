@@ -32,7 +32,7 @@ public class ClassWriter {
     LinkedList<Method> methods = new LinkedList<Method>();
 
     public ClassWriter(Package where, String[] imports, String madeFrom, String name, String implementsInterface) {
-        if (null == name) throw new MissingParameterError("No name for class to be generated");
+        if (null == name) throw new IllegalArgumentException("No name for class to be generated");
 
         this.where = where;
         this.imports = imports;

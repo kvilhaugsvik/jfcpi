@@ -200,7 +200,7 @@ public class CodeGenTest {
                 toWrite.toString());
     }
 
-    @Test(expected = MissingParameterError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testClassWriterEmptyNoNameGiven() {
         ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
                 new String[]{"org.freeciv.packet.Packet"},
