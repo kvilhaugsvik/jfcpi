@@ -105,7 +105,7 @@ public class ClassWriter {
         String out = "";
 
         for (String anImport: imports) {
-            if ((null != anImport) && !anImport.equals(""))
+            if ((null != anImport) && !anImport.isEmpty())
                 out += declareImport(anImport);
             out += "\n";
         }
@@ -217,7 +217,7 @@ public class ClassWriter {
             out += ifIs("\t", visibility.toString(), " ") + ifIs(scope.toString(), " ") + ifIs(type, " ") +
                     name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ") + "{" + "\n";
             for (String line: body) {
-                out += (!line.equals("")? "\t" + "\t" + line : "") + "\n";
+                out += (!line.isEmpty()? "\t" + "\t" + line : "") + "\n";
             }
             out += "\t" + "}" + "\n";
             return out;

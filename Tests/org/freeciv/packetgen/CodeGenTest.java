@@ -268,7 +268,7 @@ public class CodeGenTest {
         assertTrue("Generated source not as expected " + lines[lines.length - 1].trim(),
                 lines[lines.length - 1].trim().endsWith("}"));
         assertTrue("Class has blank line before end " + lines[lines.length - 2].trim(),
-                !lines[lines.length - 2].trim().equals(""));
+                !lines[lines.length - 2].trim().isEmpty());
     }
 
     @Test public void testClassWriterStyleAlwaysEndWithNewLine() {
