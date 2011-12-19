@@ -19,15 +19,15 @@ import java.util.List;
 import java.util.LinkedList;
 
 public class PacketsStore {
-    private boolean devMode;
-    private boolean hasTwoBytePacketNumber;
+    private final boolean devMode;
+    private final boolean hasTwoBytePacketNumber;
 
-    private HashMap<String, JavaSrc> types = new HashMap<String, JavaSrc>();
+    private final HashMap<String, JavaSrc> types = new HashMap<String, JavaSrc>();
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
     // Idea from http://stackoverflow.com/q/822701
-    private HashMap<String, Packet> packets = new HashMap<String, Packet>();
-    private HashMap<Integer, String> packetsByNumber = new HashMap<Integer, String>();
+    private final HashMap<String, Packet> packets = new HashMap<String, Packet>();
+    private final HashMap<Integer, String> packetsByNumber = new HashMap<Integer, String>();
 
     public PacketsStore(boolean devMode, boolean hasTwoBytePacketNumber) {
         this.devMode = devMode;

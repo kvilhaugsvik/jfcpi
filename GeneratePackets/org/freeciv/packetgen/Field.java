@@ -15,9 +15,9 @@
 package org.freeciv.packetgen;
 
 public class Field {
-    private String variableName;
-    private String type;
-    private String javatype;
+    private final String variableName;
+    private final String type;
+    private final String javatype;
 
     public Field(String variableName, String type, String javatype) {
         this.variableName = variableName;

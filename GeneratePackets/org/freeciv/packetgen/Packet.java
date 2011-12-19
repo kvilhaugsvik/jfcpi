@@ -19,10 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Packet {
-    private String name;
-    private int number;
-    private Field[] fields;
-    private boolean hasTwoBytePacketNumber;
+    private final String name;
+    private final int number;
+    private final Field[] fields;
+    private final boolean hasTwoBytePacketNumber;
 
     public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
         this.name = name;

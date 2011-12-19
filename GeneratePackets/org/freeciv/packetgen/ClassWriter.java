@@ -291,7 +291,7 @@ public class ClassWriter {
         PROTECTED,
         PRIVATE;
 
-        private String code;
+        private final String code;
 
         Visibility() {
             this.code = name().toLowerCase();
@@ -311,7 +311,7 @@ public class ClassWriter {
         CLASS ("static"),
         OBJECT (null);
 
-        private String code;
+        private final String code;
 
         Scope(String code) {
             this.code = code;
@@ -327,7 +327,7 @@ public class ClassWriter {
         YES (null),
         NO ("final");
 
-        private String code;
+        private final String code;
 
         Modifiable(String code) {
             this.code = code;
@@ -342,7 +342,7 @@ public class ClassWriter {
     public enum ClassKind {
         CLASS, ENUM, INTERFACE;
 
-        private String code;
+        private final String code;
 
         ClassKind() {
             this.code = name().toLowerCase();

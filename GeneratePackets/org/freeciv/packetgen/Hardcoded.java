@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 //TODO: Move data to file
 public class Hardcoded {
-    private HashMap<String, JavaSrc> data = new HashMap<String, JavaSrc>();
+    private final HashMap<String, JavaSrc> data = new HashMap<String, JavaSrc>();
     private static Hardcoded instance;
 
     private Hardcoded() {
