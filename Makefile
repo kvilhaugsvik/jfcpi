@@ -88,9 +88,13 @@ clean:
 	rm -rf ${PACKETGENOUT} generator
 	rm -rf generated
 	rm -rf testcode
-	rm -rf tests ${TESTOUT}
+	rm -rf generatortestcompile
+	rm -rf generatortest
+	rm -rf tests
+	rm -rf testout ${TESTOUT}
 	rm -rf ${GENERATEDOUT}/* testpackets
 	rm -f ${PROTOJAR} protojar
+	rm -f all
 	rm -rf testsignintoserver
 
 distclean: clean
