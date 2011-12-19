@@ -3,6 +3,7 @@ package org.freeciv.packetgen
 import org.junit.Test
 import org.junit.Assert._
 import scala.inline
+import util.parsing.combinator.Parsers
 
 class CParserTest {
   private def oneElementNoAssign = """enum test {
@@ -40,8 +41,18 @@ class CParserTest {
     (storage, parser)
   }
 
-  @inline private def parsesCorrectly(expression: String, parser: ParseShared) =
-    assertTrue("Unable to parse expression " + expression, parser.parseAll(parser.exprs, expression).successful)
+  @inline private def parsesCorrectly(expression: String, parser: ParseShared) {
+    val parsed = parser.parseAll(parser.exprs, expression)
+    if (!parsed.successful) {
+      val notParsed = parsed.asInstanceOf[Parsers#NoSuccess]
+      val lineBreakAfter = expression.indexOf("\n", notParsed.next.offset)
+      val startAndFailed = expression.substring(0, lineBreakAfter)
+      fail(notParsed.msg + "\n" +
+        startAndFailed + "\n" +
+        (" " * (notParsed.next.offset - (startAndFailed.lastIndexOf("\n") + 1))) + "^" +
+        expression.substring(lineBreakAfter))
+    }
+  }
 
   @inline private def willNotParse(expression: String, parser: ParseShared) =
     assertFalse("No failure on " + expression, parser.parseAll(parser.exprs, expression).successful)
