@@ -96,6 +96,7 @@ clean:
 	rm -f ${PROTOJAR} protojar
 	rm -f all
 	rm -rf testsignintoserver
+	rm -rf ${PROTOJAR}
 
 distclean: clean
 	rm -rf out ${GENERATEDOUT}
