@@ -114,7 +114,7 @@ public class ClassWriter {
         return out;
     }
 
-    private String formatVariableDeclarations(List<VariableDeclaration> variables) {
+    private static String formatVariableDeclarations(List<VariableDeclaration> variables) {
         String out = "";
 
         for (VariableDeclaration variable: variables) {
@@ -125,7 +125,7 @@ public class ClassWriter {
         return out;
     }
 
-    private String formatMethods(List<Method> methods) {
+    private static String formatMethods(List<Method> methods) {
         String out = "";
 
         for (Method method: methods) {
@@ -186,7 +186,7 @@ public class ClassWriter {
         return (null == element? "" : before + element + after);
     }
 
-    private String removeBlankLine(String out) {
+    private static String removeBlankLine(String out) {
         return out.substring(0, out.length() - 1);
     }
 
