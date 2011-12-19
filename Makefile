@@ -37,7 +37,7 @@ generator: generatordefaults protocol
 	${SCALAC} -classpath ${PACKETGENOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.scala
 	touch generator
 
-testpackets: protocol
+testpackets: protocol generator
 	mkdir -p ${TESTOUT}
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT} Tests/org/freeciv/test/GenerateTest.java
 	${JAVA} -cp ${TESTOUT}:${PACKETGENOUT}:${PROTOOUT} org.freeciv.test.GenerateTest
@@ -58,7 +58,7 @@ testout:
 	mkdir -p ${TESTOUT}
 	touch testout
 
-generatortestcompile: testout
+generatortestcompile: testout generator
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT} Tests/org/freeciv/packetgen/*.java
 	${SCALAC} -d ${TESTOUT} -classpath ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} Tests/org/freeciv/packetgen/*.scala
 	touch generatortestcompile
