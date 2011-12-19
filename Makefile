@@ -15,6 +15,7 @@ DEVMODE ?= true
 PROTOJAR = FreecivProto.jar
 
 all: protojar
+	touch all
 
 protocol:
 	mkdir -p ${PROTOOUT}
