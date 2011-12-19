@@ -18,10 +18,9 @@ import java.util.HashMap;
 
 //TODO: Move data to file
 public class Hardcoded {
-    private final HashMap<String, JavaSrc> data = new HashMap<String, JavaSrc>();
-    private static Hardcoded instance;
+    private static final HashMap<String, JavaSrc> data = new HashMap<String, JavaSrc>();
 
-    private Hardcoded() {
+    static {
         for (JavaSrc src: new JavaSrc[]{
             new JavaSrc("uint8(int)",
                     "Integer",
@@ -76,9 +75,6 @@ public class Hardcoded {
     }
 
     public static JavaSrc getJTypeFor(String src) {
-        if (null == instance) {
-            instance = new Hardcoded();
-        }
-        return instance.data.get(src);
+        return data.get(src);
     }
 }
