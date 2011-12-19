@@ -61,7 +61,7 @@ public class Packet {
 
         LinkedList<String> constructorBody = new LinkedList<String>();
         String arglist = "";
-        if (fields.length > 0) {
+        if (0 < fields.length) {
             for (Field field: fields) {
                 arglist += field.getType() + " " + field.getVariableName() + ", ";
                 constructorBody.add("this." + field.getVariableName() + " = " + field.getVariableName() + ";");
@@ -72,7 +72,7 @@ public class Packet {
 
         String javatypearglist = "";
         LinkedList<String> constructorBodyJ = new LinkedList<String>();
-        if (fields.length > 0) {
+        if (0 < fields.length) {
             for (Field field: fields) {
                 javatypearglist += field.getJType() + " " + field.getVariableName() + ", ";
                 constructorBodyJ.add("this." + field.getVariableName() + " = " +

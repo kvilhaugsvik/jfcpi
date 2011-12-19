@@ -17,7 +17,7 @@ package org.freeciv.packetgen;
 public class DataIO {
     public static String writeWriteUInt(int bytenumber) {
         String out = "";
-        while (bytenumber >= 1) {
+        while (1 <= bytenumber) {
             out += "to.writeByte((int) ((value >>> ((" + bytenumber + " - 1) * 8)) & 0xFF));" + "\n";
             bytenumber--;
         }
@@ -27,9 +27,9 @@ public class DataIO {
     public static String readUIntCode(int bytenumber, String Javatype, String var) {
         String out = var + " = ";
         out += "(" + Javatype.toLowerCase() + ")";
-        while (bytenumber >= 1) {
+        while (1 <= bytenumber) {
             out += "(from.readUnsignedByte() << 8 * (" + bytenumber + " - 1)) " +
-                    (bytenumber > 1 ? "+" : ";") + "\n";
+                    (1 < bytenumber ? "+" : ";") + "\n";
             bytenumber--;
         }
 

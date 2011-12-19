@@ -56,7 +56,7 @@ public class Connect {
 
         BufferedReader packets = new BufferedReader(new InputStreamReader(packetList.openStream()));
         String packetMetaData;
-        while((packetMetaData = packets.readLine()) != null) {
+        while(null != (packetMetaData = packets.readLine())) {
             try {
                 String[] packet = packetMetaData.split("\t");
                 this.packetMakers.put(Integer.parseInt(packet[0]),
