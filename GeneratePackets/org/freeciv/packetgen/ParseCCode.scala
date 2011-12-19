@@ -18,6 +18,21 @@ class ParseCCode(storage: PacketsStore, lookFor: List[String]) extends ParseShar
   def enumDefname: Parser[Any] =
     lookFor.foldRight[Parser[Any]](failure("Nothing found"))((prefer: String, ifNot: Parser[Any]) => (prefer | ifNot))
 
+  @inline private def se(kind: String) = "#define" ~ regex(("SPECENUM_" + kind).r)
+
+  def specEnum(kind: String) = se(kind) ~ regex("[a-zA-Z]\\w+".r)
+  def specEnumOrName(kind: String) = se(kind + "NAME") ~ regex(""""[^\n\r\"]*?"""".r) | specEnum(kind)
+
+  def specEnumDef = se("NAME") ~ enumDefname ~
+    rep(
+      specEnumOrName("VALUE\\d+") |
+        specEnumOrName("ZERO") |
+        specEnumOrName("COUNT") |
+        specEnum("INVALID") |
+        se("BITWISE")
+    ) ~
+    "#include" ~ "\"specenum_gen.h\""
+
   def enumValue = regex("""[0-9]+""".r)
 
   def cEnum = regex("""[A-Za-z]\w*""".r) ~ opt("=" ~> enumValue)
@@ -25,5 +40,6 @@ class ParseCCode(storage: PacketsStore, lookFor: List[String]) extends ParseShar
   def cEnumDef = "enum" ~ enumDefname ~ "{" ~ repsep(cEnum, ",") ~ "}"
 
   def expr = cEnumDef |
+    specEnumDef |
     CComment
 }
