@@ -154,11 +154,7 @@ class CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Common helper methods
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline private def storageAndParser = {
-    val storage = new PacketsStore(false, true)
-    val parser = new ParseCCode(storage, List("test"))
-    (storage, parser)
-  }
+  @inline private def parseTest = new ParseCCode(List("test"))
 
   @inline private def parsesCorrectly(expression: String, parser: ParseShared) {
     val parsed = parser.parseAll(parser.exprs, expression)
@@ -180,43 +176,43 @@ class CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of enums declared with the enum name {element, element} syntax
   --------------------------------------------------------------------------------------------------------------------*/
-  @Test def testCEnum1ElementNoAssign = parsesCorrectly(oneElementNoAssign, storageAndParser._2)
-  @Test def testCEnum1ElementAssign  = parsesCorrectly(oneElementAssign, storageAndParser._2)
-  @Test def testCEnum3ElementsNoAssign = parsesCorrectly(threeElementsNoAssign, storageAndParser._2)
-  @Test def testCEnum3ElementsAssignAll = parsesCorrectly(threeElementsAssignAll, storageAndParser._2)
-  @Test def testCEnum3ElementsFirstAndLastTheSame = parsesCorrectly( threeElementsFirstAndLastTheSame, storageAndParser._2)
-  @Test def testCEnum1CommentCxxBefore = parsesCorrectly(commentCxxOneLine + oneElementNoAssign, storageAndParser._2)
-  @Test def testCEnum1CommentCxxAfter = parsesCorrectly(oneElementNoAssign + commentCxxOneLine, storageAndParser._2)
-  @Test def testCEnum1CommentCBefore = parsesCorrectly(commentCOneLine + oneElementNoAssign, storageAndParser._2)
-  @Test def testCEnum1CommentCAfter = parsesCorrectly(oneElementNoAssign + commentCOneLine, storageAndParser._2)
-  @Test def testCEnumCommentInside = parsesCorrectly(threeElementsCommentInside, storageAndParser._2)
-  @Test def testCEnumCommentInsideBefore = parsesCorrectly(threeElementsCommentInsideBefore, storageAndParser._2)
-  @Test def testCEnumCommentInsideAfter = parsesCorrectly(threeElementsCommentInsideAfter, storageAndParser._2)
+  @Test def testCEnum1ElementNoAssign = parsesCorrectly(oneElementNoAssign, parseTest)
+  @Test def testCEnum1ElementAssign  = parsesCorrectly(oneElementAssign, parseTest)
+  @Test def testCEnum3ElementsNoAssign = parsesCorrectly(threeElementsNoAssign, parseTest)
+  @Test def testCEnum3ElementsAssignAll = parsesCorrectly(threeElementsAssignAll, parseTest)
+  @Test def testCEnum3ElementsFirstAndLastTheSame = parsesCorrectly( threeElementsFirstAndLastTheSame, parseTest)
+  @Test def testCEnum1CommentCxxBefore = parsesCorrectly(commentCxxOneLine + oneElementNoAssign, parseTest)
+  @Test def testCEnum1CommentCxxAfter = parsesCorrectly(oneElementNoAssign + commentCxxOneLine, parseTest)
+  @Test def testCEnum1CommentCBefore = parsesCorrectly(commentCOneLine + oneElementNoAssign, parseTest)
+  @Test def testCEnum1CommentCAfter = parsesCorrectly(oneElementNoAssign + commentCOneLine, parseTest)
+  @Test def testCEnumCommentInside = parsesCorrectly(threeElementsCommentInside, parseTest)
+  @Test def testCEnumCommentInsideBefore = parsesCorrectly(threeElementsCommentInsideBefore, parseTest)
+  @Test def testCEnumCommentInsideAfter = parsesCorrectly(threeElementsCommentInsideAfter, parseTest)
 
-  @Test def testCEnumNotLookedFor = willNotParse(threeElementsNoAssign.replace("test", "notTest"), storageAndParser._2)
+  @Test def testCEnumNotLookedFor = willNotParse(threeElementsNoAssign.replace("test", "notTest"), parseTest)
 
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of enums declared with the enum name {element, element} syntax
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def testSpecEnumTwoElements =
-    parsesCorrectly(specEnumTwoElements, storageAndParser._2)
+    parsesCorrectly(specEnumTwoElements, parseTest)
   @Test def testSpecEnumTwoNamedElements =
-    parsesCorrectly(specEnumTwoNamedElements, storageAndParser._2)
+    parsesCorrectly(specEnumTwoNamedElements, parseTest)
   @Test def testSpecEnumTwoElementsBitwise =
-    parsesCorrectly(specEnumTwoElementsBitwise, storageAndParser._2)
+    parsesCorrectly(specEnumTwoElementsBitwise, parseTest)
   @Test def testSpecEnumTwoElementsBitwiseZero =
-    parsesCorrectly(specEnumTwoElementsBitwiseZero, storageAndParser._2)
+    parsesCorrectly(specEnumTwoElementsBitwiseZero, parseTest)
   @Test def testSpecEnumTwoElementsBitwiseNamedZero =
-    parsesCorrectly(specEnumTwoElementsBitwiseNamedZero, storageAndParser._2)
+    parsesCorrectly(specEnumTwoElementsBitwiseNamedZero, parseTest)
   @Test def testSpecEnumTwoElementsCount =
-    parsesCorrectly(specEnumTwoElementsCount, storageAndParser._2)
+    parsesCorrectly(specEnumTwoElementsCount, parseTest)
   @Test def testSpecEnumTwoElementsNamedCount =
-    parsesCorrectly(specEnumTwoElementsNamedCount, storageAndParser._2)
+    parsesCorrectly(specEnumTwoElementsNamedCount, parseTest)
   @Test def testSpecEnumTwoElementsInvalid =
-    parsesCorrectly(specEnumTwoElementsInvalid, storageAndParser._2)
+    parsesCorrectly(specEnumTwoElementsInvalid, parseTest)
   @Test def testSpecEnumCommentInDef =
-    parsesCorrectly(specEnumTwoNamedElementsWithComments, storageAndParser._2)
+    parsesCorrectly(specEnumTwoNamedElementsWithComments, parseTest)
   @Test def testSpecEnumCommentBeforeAndAfterDef =
-    parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, storageAndParser._2)
+    parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, parseTest)
 }

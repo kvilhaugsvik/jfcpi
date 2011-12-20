@@ -17,7 +17,7 @@ package org.freeciv.packetgen
 import util.parsing.input.Reader
 import collection.JavaConversions._
 
-class ParsePacketsDef(storage: PacketsStore) extends ParseShared(storage) {
+class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldType = regex("""[A-Z](\w|_)*""".r)
   def fieldTypeDef = fieldType | regex("""\w*\((\w|\s)*\)""".r)
 

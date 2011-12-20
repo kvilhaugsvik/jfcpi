@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen
 
-class ParseCCode(storage: PacketsStore, lookFor: List[String]) extends ParseShared(storage) {
+class ParseCCode(lookFor: List[String]) extends ParseShared {
   def enumDefname: Parser[Any] =
     lookFor.foldRight[Parser[Any]](failure("Nothing found"))((prefer: String, ifNot: Parser[Any]) => (prefer | ifNot))
 

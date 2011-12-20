@@ -16,7 +16,7 @@ package org.freeciv.packetgen
 
 import util.parsing.combinator._
 
-abstract class ParseShared(storage: PacketsStore) extends RegexParsers {
+abstract class ParseShared extends RegexParsers {
   def expr: Parser[Any]
 
   def exprs: Parser[Any] = rep(expr)
