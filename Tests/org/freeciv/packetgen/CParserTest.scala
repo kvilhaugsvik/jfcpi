@@ -28,6 +28,12 @@ class CParserTest {
     three = 3
   }"""
 
+  private def threeElementsFirstNumbered = """enum test {
+    two = 2,
+    three,
+    four
+  }"""
+
   private def threeElementsFirstAndLastTheSame = """enum test {
     zero,
     one,
@@ -180,6 +186,7 @@ class CParserTest {
   @Test def testCEnum1ElementAssign  = parsesCorrectly(oneElementAssign, parseTest)
   @Test def testCEnum3ElementsNoAssign = parsesCorrectly(threeElementsNoAssign, parseTest)
   @Test def testCEnum3ElementsAssignAll = parsesCorrectly(threeElementsAssignAll, parseTest)
+  @Test def testCEnum3ElementsFirstNumbered = parsesCorrectly(threeElementsFirstNumbered, parseTest)
   @Test def testCEnum3ElementsFirstAndLastTheSame = parsesCorrectly( threeElementsFirstAndLastTheSame, parseTest)
   @Test def testCEnum1CommentCxxBefore = parsesCorrectly(commentCxxOneLine + oneElementNoAssign, parseTest)
   @Test def testCEnum1CommentCxxAfter = parsesCorrectly(oneElementNoAssign + commentCxxOneLine, parseTest)
