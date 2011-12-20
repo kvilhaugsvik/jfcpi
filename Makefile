@@ -20,7 +20,7 @@ all: protojar
 protocol:
 	mkdir -p ${PROTOOUT}
 	${JAVAC} -d ${PROTOOUT} Protocol/org/freeciv/*.java Protocol/org/freeciv/packet/*.java \
-	                        Protocol/org/freeciv/*.java Protocol/org/freeciv/packet/*/*.java
+	                        Protocol/org/freeciv/types/*.java Protocol/org/freeciv/packet/*/*.java
 	touch protocol
 
 generatordefaults:
