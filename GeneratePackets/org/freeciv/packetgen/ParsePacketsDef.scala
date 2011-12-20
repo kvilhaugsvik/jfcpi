@@ -21,8 +21,8 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldType = regex("""[A-Z](\w|_)*""".r)
   def fieldTypeDef = fieldType | regex("""\w*\((\w|\s)*\)""".r)
 
-  def fieldTypeAssign: Parser[Any] = "type" ~ fieldType ~ "=" ~ fieldTypeDef ^^ {
-    case theType~alias~is~aliased => storage.registerTypeAlias(alias, aliased)
+  def fieldTypeAssign: Parser[Any] = "type" ~> fieldType ~ ("=" ~> fieldTypeDef) ^^ {
+    case alias~aliased => storage.registerTypeAlias(alias, aliased)
   }
 
   def comment = CComment |
@@ -47,8 +47,6 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
     "cs" |
     "sc"
 
-  def packetFlags = opt(packetFlag ~ rep("," ~> packetFlag))
-
   def capability = regex("""[A-Za-z0-9_-]+""".r)
 
   def fieldFlag = (
@@ -58,34 +56,30 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
     "remove-cap(" ~ capability ~ ")"
     )
 
-  def fieldFlags = opt(fieldFlag ~ rep("," ~> fieldFlag))
-
   def arrayFullSize = regex("""[0-9a-zA-Z_\+\*-/]+""".r)
 
   def elementsToTransfer = regex("""[0-9a-zA-Z_\+\*-/]+""".r)
 
-  def fieldArrayDeclaration = rep("[" ~ arrayFullSize ~ opt(":" ~ elementsToTransfer) ~ "]")
+  def fieldArrayDeclaration = rep("[" ~> arrayFullSize ~ opt(":" ~> elementsToTransfer) <~ "]")
 
   def fieldVar = (regex("""\w+""".r) ~ fieldArrayDeclaration) ^^ {
     case varName ~ arrayDec => (varName, arrayDec)
   }
 
-  def field = fieldType ~ fieldVar ~ rep("," ~> fieldVar) ~ ";" ~ fieldFlags ^^ {
-    case kind~variable~moreVars~end~flags => (variable :: moreVars).map((vari) => Array(kind, vari._1))
+  def field = (fieldType ~ repsep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
+    case kind~variables~flags => variables.map((vari) => Array(kind, vari._1))
   }
 
-  def fieldList = rep(comment) ~> rep((field <~ rep(comment)))
+  def fieldList: Parser[List[Array[String]]] = rep(comment) ~> rep((field <~ rep(comment))) ^^ {_.flatten}
 
-  def packet = packetName ~ "=" ~ regex("""[0-9]+""".r) ~ ";" ~
-  packetFlags ~
-  fieldList ~
+  def packet = packetName ~ ("=" ~> regex("""[0-9]+""".r) <~ ";") ~ repsep(packetFlag, ",") ~
+  fieldList <~
   "end" ^^ {
-    case name~has~number~endOfHeader~flags~fields~end =>
-      val flattenFields = fields.flatten
+    case name~number~flags~fields =>
       storage.registerPacket(
         name,
         Integer.parseInt(number),
-        flattenFields)
+        fields)
   };
 
   def expr: Parser[Any] = fieldTypeAssign | comment | packet
