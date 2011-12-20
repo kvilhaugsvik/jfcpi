@@ -21,7 +21,7 @@ abstract class ParseShared extends RegexParsers {
 
   def exprs: Parser[Any] = rep(expr)
 
-  def CComment = """/\*+""".r ~ rep("""([^*\n\r]|\*+[^/*])+""".r) ~ """\*+/""".r |
-    regex("""/\*+\*/""".r) |
-    regex("""//[^\n\r]*""".r)
+  def CComment: Parser[List[String]] = """/\*+""".r ~> rep("""([^*\n\r]|\*+[^/*])+""".r) <~ """\*+/""".r |
+    regex("""/\*+\*/""".r) ^^^ null |
+    "//" ~> regex("""[^\n\r]*""".r) ^^ {List(_)}
 }

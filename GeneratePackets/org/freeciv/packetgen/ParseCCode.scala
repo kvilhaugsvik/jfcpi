@@ -18,27 +18,31 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
   def enumDefname: Parser[Any] =
     lookFor.foldRight[Parser[Any]](failure("Nothing found"))((prefer: String, ifNot: Parser[Any]) => (prefer | ifNot))
 
-  @inline private def se(kind: String) = "#define" ~ regex(("SPECENUM_" + kind).r)
+  def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
-  def specEnum(kind: String) = se(kind) ~ regex("[a-zA-Z]\\w+".r)
+  @inline private def se(kind: String) = "#define" ~> regex(("SPECENUM_" + kind).r) ^^ {_.substring(9)}
+
+  def specEnum(kind: String) = se(kind) ~ enumElemCode
+
   def specEnumOrName(kind: String) = se(kind + "NAME") ~ regex(""""[^\n\r\"]*?"""".r) | specEnum(kind)
 
-  def specEnumDef = se("NAME") ~ enumDefname ~
-    rep(
-      specEnumOrName("VALUE\\d+") |
-        specEnumOrName("ZERO") |
-        specEnumOrName("COUNT") |
-        specEnum("INVALID") |
-        CComment |
-        se("BITWISE")
-    ) ~
+  def specEnumDef = se("NAME") ~> enumDefname ~
+    (rep(specEnumOrName("VALUE\\d+") ^^ {parsed => (parsed._1.substring(5) -> parsed._2)} |
+        (specEnumOrName("ZERO") |
+          specEnumOrName("COUNT") |
+          specEnum("INVALID")) ^^ {
+          parsed => (parsed._1 -> parsed._2)
+        } |
+        CComment ^^ {comment => "comment" -> comment} |
+        se("BITWISE") ^^ {bitwise => bitwise -> true}
+    ) ^^ {_.toMap}) <~
     "#include" ~ "\"specenum_gen.h\""
 
   def enumValue = regex("""[0-9]+""".r)
 
-  def cEnum = opt(CComment) ~> regex("""[A-Za-z]\w*""".r) ~ opt("=" ~> enumValue) <~ opt(CComment)
+  def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment)
 
-  def cEnumDef = "enum" ~ enumDefname ~ "{" ~ repsep(cEnum, ",") ~ "}"
+  def cEnumDef = "enum" ~> enumDefname ~ ("{" ~> repsep(cEnum, ",") <~ "}")
 
   def expr = cEnumDef |
     specEnumDef |
