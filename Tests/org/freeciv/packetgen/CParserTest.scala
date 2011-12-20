@@ -29,9 +29,9 @@ class CParserTest {
   }"""
 
   private def threeElementsFirstAndLastTheSame = """enum test {
-    null = 0,
     zero,
-    one
+    one,
+    null = 0
   }"""
 
   private def threeElementsCommentInside = """enum test {
