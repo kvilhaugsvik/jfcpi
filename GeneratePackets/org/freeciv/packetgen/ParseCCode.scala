@@ -29,13 +29,14 @@ class ParseCCode(storage: PacketsStore, lookFor: List[String]) extends ParseShar
         specEnumOrName("ZERO") |
         specEnumOrName("COUNT") |
         specEnum("INVALID") |
+        CComment |
         se("BITWISE")
     ) ~
     "#include" ~ "\"specenum_gen.h\""
 
   def enumValue = regex("""[0-9]+""".r)
 
-  def cEnum = regex("""[A-Za-z]\w*""".r) ~ opt("=" ~> enumValue)
+  def cEnum = opt(CComment) ~> regex("""[A-Za-z]\w*""".r) ~ opt("=" ~> enumValue) <~ opt(CComment)
 
   def cEnumDef = "enum" ~ enumDefname ~ "{" ~ repsep(cEnum, ",") ~ "}"
 

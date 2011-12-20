@@ -34,6 +34,27 @@ class CParserTest {
     one
   }"""
 
+  private def threeElementsCommentInside = """enum test {
+    one,
+    /* comment */
+    two,
+    three
+  }"""
+
+  private def threeElementsCommentInsideBefore = """enum test {
+    /* comment */
+    one,
+    two,
+    three
+  }"""
+
+  private def threeElementsCommentInsideAfter = """enum test {
+    one,
+    two,
+    three
+    /* comment */
+  }"""
+
   private def commentCxxOneLine = "// A comment" + "\n"
   private def commentCOneLine = "/* A comment */" + "\n"
 
@@ -109,6 +130,26 @@ class CParserTest {
   #include "specenum_gen.h"
   """
 
+  private def specEnumTwoNamedElementsWithComments = """
+  #define SPECENUM_NAME test
+  #define SPECENUM_VALUE0 ZERO // C++ style comment
+  #define SPECENUM_VALUE0NAME "nothing"
+  #define SPECENUM_VALUE1 ONE /* C style comment */
+  #define SPECENUM_VALUE1NAME "something"
+  #include "specenum_gen.h"
+  """
+
+  private def specEnumTwoNamedElementsWithCommentBeforeAndAfter = """
+  #define SPECENUM_NAME test
+  // C++ style comment
+  #define SPECENUM_VALUE0 ZERO
+  #define SPECENUM_VALUE0NAME "nothing"
+  #define SPECENUM_VALUE1 ONE
+  #define SPECENUM_VALUE1NAME "something"
+  /* C style comment */
+  #include "specenum_gen.h"
+  """
+
 
   /*--------------------------------------------------------------------------------------------------------------------
   Common helper methods
@@ -148,6 +189,9 @@ class CParserTest {
   @Test def testCEnum1CommentCxxAfter = parsesCorrectly(oneElementNoAssign + commentCxxOneLine, storageAndParser._2)
   @Test def testCEnum1CommentCBefore = parsesCorrectly(commentCOneLine + oneElementNoAssign, storageAndParser._2)
   @Test def testCEnum1CommentCAfter = parsesCorrectly(oneElementNoAssign + commentCOneLine, storageAndParser._2)
+  @Test def testCEnumCommentInside = parsesCorrectly(threeElementsCommentInside, storageAndParser._2)
+  @Test def testCEnumCommentInsideBefore = parsesCorrectly(threeElementsCommentInsideBefore, storageAndParser._2)
+  @Test def testCEnumCommentInsideAfter = parsesCorrectly(threeElementsCommentInsideAfter, storageAndParser._2)
 
   @Test def testCEnumNotLookedFor = willNotParse(threeElementsNoAssign.replace("test", "notTest"), storageAndParser._2)
 
@@ -171,4 +215,8 @@ class CParserTest {
     parsesCorrectly(specEnumTwoElementsNamedCount, storageAndParser._2)
   @Test def testSpecEnumTwoElementsInvalid =
     parsesCorrectly(specEnumTwoElementsInvalid, storageAndParser._2)
+  @Test def testSpecEnumCommentInDef =
+    parsesCorrectly(specEnumTwoNamedElementsWithComments, storageAndParser._2)
+  @Test def testSpecEnumCommentBeforeAndAfterDef =
+    parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, storageAndParser._2)
 }
