@@ -84,20 +84,22 @@ object CParserTest {
   #include "specenum_gen.h"
   """
 
-  def specEnum2ElementsBitwise = """
+  def specEnum3ElementsBitwise = """
   #define SPECENUM_NAME test
   #define SPECENUM_BITWISE
   #define SPECENUM_VALUE0 ONE
   #define SPECENUM_VALUE1 TWO
+  #define SPECENUM_VALUE2 THREE
   #include "specenum_gen.h"
   """
 
-  def specEnum2ElementsBitwiseZero = """
+  def specEnum4ElementsBitwiseZero = """
   #define SPECENUM_NAME test
   #define SPECENUM_BITWISE
   #define SPECENUM_ZERO ZERO
   #define SPECENUM_VALUE0 ONE
   #define SPECENUM_VALUE1 TWO
+  #define SPECENUM_VALUE2 THREE
   #include "specenum_gen.h"
   """
 
@@ -216,10 +218,10 @@ class CParserSyntaxTest {
     parsesCorrectly(specEnum2Elements, parseTest)
   @Test def testSpecEnumTwoNamedElements =
     parsesCorrectly(specEnumTwoNamedElements, parseTest)
-  @Test def testSpecEnum2ElementsBitwise =
-    parsesCorrectly(specEnum2ElementsBitwise, parseTest)
-  @Test def testSpecEnum2ElementsBitwiseZero =
-    parsesCorrectly(specEnum2ElementsBitwiseZero, parseTest)
+  @Test def testSpecEnum3ElementsBitwise =
+    parsesCorrectly(specEnum3ElementsBitwise, parseTest)
+  @Test def testSpecEnum4ElementsBitwiseZero =
+    parsesCorrectly(specEnum4ElementsBitwiseZero, parseTest)
   @Test def testSpecEnum2ElementsBitwiseNamedZero =
     parsesCorrectly(specEnum2ElementsBitwiseNamedZero, parseTest)
   @Test def testSpecEnum2ElementsCount =
