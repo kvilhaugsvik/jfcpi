@@ -210,7 +210,7 @@ class CParserSyntaxTest {
 
 
   /*--------------------------------------------------------------------------------------------------------------------
-  Test pure parsing of enums declared with the enum name {element, element} syntax
+  Test pure parsing of enums declared with SPECENUM
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def testSpecEnum2Elements =
     parsesCorrectly(specEnum2Elements, parseTest)
