@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class ClassWriter {
     LinkedList<VariableDeclaration> stateVars = new LinkedList<VariableDeclaration>();
 
     LinkedList<Method> methods = new LinkedList<Method>();
-    private LinkedList<EnumElement> enums = new LinkedList<EnumElement>();
+    protected final HashMap<String, EnumElement> enums = new HashMap<String, ClassWriter.EnumElement>();
 
     public ClassWriter(ClassKind kind, Package where, String[] imports, String madeFrom, String name, String implementsInterface) {
         if (null == name) throw new IllegalArgumentException("No name for class to be generated");
@@ -113,7 +114,11 @@ public class ClassWriter {
                               String toStringName) {
         assert kind.equals(ClassKind.ENUM);
 
-        enums.add(new EnumElement(comment, enumName, number, toStringName));
+        addEnumerated(new EnumElement(comment, enumName, number, toStringName));
+    }
+
+    protected void addEnumerated(EnumElement element) {
+        enums.put(element.getEnumValueName(), element);
     }
 
     private String formatImports() {
@@ -132,7 +137,7 @@ public class ClassWriter {
     private String formatEnumeratedElements() {
         String out = "";
 
-        for (EnumElement element: enums) {
+        for (EnumElement element: enums.values()) {
             out += "\t" + element + "," + "\n";
         }
         if (!enums.isEmpty())
@@ -316,10 +321,10 @@ public class ClassWriter {
     }
 
     static class EnumElement {
-        String comment;
-        String elementName;
-        int number;
-        String toStringName;
+        private final String comment;
+        private final String elementName;
+        private final int number;
+        private final String toStringName;
 
         EnumElement(String comment, String elementName, int number, String toStringName) {
             if (null == elementName)
@@ -333,6 +338,18 @@ public class ClassWriter {
             this.elementName = elementName;
             this.number = number;
             this.toStringName = toStringName;
+        }
+
+        public int getNumber() {
+            return number;
+        }
+
+        public String getEnumValueName() {
+            return elementName;
+        }
+
+        public String getToStringName() {
+            return toStringName;
         }
 
         public String toString() {
