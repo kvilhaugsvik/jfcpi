@@ -15,7 +15,7 @@
 package org.freeciv.packetgen
 
 class ParseCCode(lookFor: List[String]) extends ParseShared {
-  def enumDefname: Parser[Any] =
+  def enumDefname =
     lookFor.foldRight[Parser[Any]](failure("Nothing found"))((prefer: String, ifNot: Parser[Any]) => (prefer | ifNot))
 
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
@@ -27,15 +27,13 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
   def specEnumOrName(kind: String) = se(kind + "NAME") ~ regex(""""[^\n\r\"]*?"""".r) | specEnum(kind)
 
   def specEnumDef = se("NAME") ~> enumDefname ~
-    (rep(specEnumOrName("VALUE\\d+") ^^ {parsed => (parsed._1.substring(5) -> parsed._2)} |
-        (specEnumOrName("ZERO") |
-          specEnumOrName("COUNT") |
-          specEnum("INVALID")) ^^ {
-          parsed => (parsed._1 -> parsed._2)
-        } |
+    (rep((specEnumOrName("VALUE\\d+") |
+      specEnumOrName("ZERO") |
+      specEnumOrName("COUNT") |
+      specEnum("INVALID")) ^^ {parsed => (parsed._1 -> parsed._2)} |
         CComment ^^ {comment => "comment" -> comment} |
-        se("BITWISE") ^^ {bitwise => bitwise -> true}
-    ) ^^ {_.toMap}) <~
+        se("BITWISE") ^^ {bitwise => bitwise -> bitwise}
+    ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
 
   def enumValue = regex("""[0-9]+""".r)
