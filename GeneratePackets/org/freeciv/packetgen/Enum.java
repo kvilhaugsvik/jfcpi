@@ -65,12 +65,4 @@ public class Enum extends ClassWriter {
     ClassWriter.EnumElement getEnumValue(String named) {
         return enums.get(named);
     }
-
-    static ClassWriter.EnumElement newEnumValue(String enumValueName, int number) {
-        return newEnumValue(enumValueName, number, '"' + enumValueName +  '"');
-    }
-
-    static ClassWriter.EnumElement newEnumValue(String enumValueName, int number, String toStringName) {
-        return new ClassWriter.EnumElement(null, enumValueName, number, toStringName);
-    }
 }

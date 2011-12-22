@@ -15,6 +15,7 @@
 package org.freeciv.packetgen
 
 import collection.mutable.ListBuffer
+import ClassWriter.EnumElement.newEnumValue
 
 class ParseCCode(lookFor: List[String]) extends ParseShared {
   def enumDefname =
@@ -48,9 +49,9 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
     val outEnumValues = new ListBuffer[ClassWriter.EnumElement]()
     if (enumerations.contains("ZERO"))
       if (enumerations.contains("ZERO" + "NAME"))
-        outEnumValues += Enum.newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + "NAME").get)
+        outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + "NAME").get)
     else
-        outEnumValues += Enum.newEnumValue(enumerations.get("ZERO").get, 0)
+        outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
     val Recognizer = "(VALUE)(\\d+)".r
     enumerations.keys.foreach({
       case Recognizer(value: String, number: String) =>
@@ -60,9 +61,9 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
         else
           Integer.decode(number)
         if (enumerations.contains(value + number + "NAME"))
-          outEnumValues += Enum.newEnumValue(nameInCode, num, enumerations.get(value + number + "NAME").get)
+          outEnumValues += newEnumValue(nameInCode, num, enumerations.get(value + number + "NAME").get)
         else
-          outEnumValues += Enum.newEnumValue(nameInCode, num)
+          outEnumValues += newEnumValue(nameInCode, num)
       case _ =>
     })
     new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues: _*)
@@ -83,7 +84,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
           globalNumbers = Integer.decode(elem._2.get)
         val number = globalNumbers
         globalNumbers += 1
-        Enum.newEnumValue(elem._1, number)
+        newEnumValue(elem._1, number)
       }): _*)
   }
 

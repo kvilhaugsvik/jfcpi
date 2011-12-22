@@ -128,27 +128,33 @@ public class CodeGenTest {
     @Test public void testEnumElement() {
         assertEquals("Generated source not as expected",
                 "ONE (1, \"one\")",
-                (new EnumElement(null, "ONE", 1, "\"one\"")).toString());
+                EnumElement.newEnumValue("ONE", 1, "\"one\"").toString());
+    }
+
+    @Test public void testEnumElementNoToStringButOkEntryPoint() {
+        assertEquals("Generated source not as expected",
+                "ONE (1, \"ONE\")",
+                EnumElement.newEnumValue("ONE", 1).toString());
     }
 
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
                 "ONE (1, \"one\") /* An integer */",
-                (new EnumElement("An integer", "ONE", 1, "\"one\"")).toString());
+                EnumElement.newEnumValue("An integer", "ONE", 1, "\"one\"").toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEnumElementNoName() {
         assertEquals("Generated source not as expected",
                 "ONE (1, \"one\")",
-                (new EnumElement(null, null, 1, "\"one\"")).toString());
+                EnumElement.newEnumValue(null, 1, "\"one\"").toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEnumElementNoToString() {
         assertEquals("Generated source not as expected",
                 "ONE (1, \"one\")",
-                (new EnumElement(null, "ONE", 1, null)).toString());
+                EnumElement.newEnumValue("ONE", 1, null).toString());
     }
 
     @Test public void testClassWriterEmptyClass() {

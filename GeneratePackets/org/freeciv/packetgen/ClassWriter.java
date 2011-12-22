@@ -114,7 +114,7 @@ public class ClassWriter {
                               String toStringName) {
         assert kind.equals(ClassKind.ENUM);
 
-        addEnumerated(new EnumElement(comment, enumName, number, toStringName));
+        addEnumerated(EnumElement.newEnumValue(comment, enumName, number, toStringName));
     }
 
     protected void addEnumerated(EnumElement element) {
@@ -354,6 +354,18 @@ public class ClassWriter {
 
         public String toString() {
             return elementName + " (" + number + ", " + toStringName + ")" + ifIs(" /* ", comment, " */");
+        }
+
+        static EnumElement newEnumValue(String enumValueName, int number) {
+            return newEnumValue(enumValueName, number, '"' + enumValueName +  '"');
+        }
+
+        static EnumElement newEnumValue(String enumValueName, int number, String toStringName) {
+            return newEnumValue(null, enumValueName, number, toStringName);
+        }
+
+        static EnumElement newEnumValue(String comment, String enumValueName, int number, String toStringName) {
+            return new EnumElement(comment, enumValueName, number, toStringName);
         }
     }
 

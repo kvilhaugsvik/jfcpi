@@ -17,53 +17,54 @@ package org.freeciv.packetgen;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.freeciv.packetgen.ClassWriter.EnumElement.*;
 
 public class EnumTest {
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber3() {
         new Enum("test", true,
-                Enum.newEnumValue("TWO", 2),
-                Enum.newEnumValue("THREE", 3));
+                newEnumValue("TWO", 2),
+                newEnumValue("THREE", 3));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber18() {
         new Enum("test", true,
-                Enum.newEnumValue("TWO", 2),
-                Enum.newEnumValue("NOT2EXP", 18));
+                newEnumValue("TWO", 2),
+                newEnumValue("NOT2EXP", 18));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber15() {
         new Enum("test", true,
-                Enum.newEnumValue("TWO", 2),
-                Enum.newEnumValue("NOT2EXP", 15));
+                newEnumValue("TWO", 2),
+                newEnumValue("NOT2EXP", 15));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber17() {
         new Enum("test", true,
-                Enum.newEnumValue("TWO", 2),
-                Enum.newEnumValue("NOT2EXP", 17));
+                newEnumValue("TWO", 2),
+                newEnumValue("NOT2EXP", 17));
     }
 
     @Test public void testBitWiseHasANumber16() {
         new Enum("test", true,
-                Enum.newEnumValue("TWO", 2),
-                Enum.newEnumValue("NOT2EXP", 16));
+                newEnumValue("TWO", 2),
+                newEnumValue("NOT2EXP", 16));
     }
 
     @Test public void testBitWiseIsBitWise() {
         Enum result = new Enum("test", true,
-                Enum.newEnumValue("TWO", 2));
+                newEnumValue("TWO", 2));
         assertTrue("A bitwise Enum should report to be bitwise", result.isBitwise());
     }
 
     private Enum enumWithValues() {
         return new Enum("test", false,
-                Enum.newEnumValue("ZERO", 0, "\"nothing\""),
-                Enum.newEnumValue("ONE", 1),
-                Enum.newEnumValue("TWO", 2));
+                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ONE", 1),
+                newEnumValue("TWO", 2));
     }
 
     @Test public void testNotBitWiseIsNotBitWise() {
