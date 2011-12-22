@@ -46,7 +46,19 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
     @inline def enumerations: Map[String, String] = asStructures._2
     val bitwise = enumerations.contains("BITWISE")
 
-    val outEnumValues = new ListBuffer[ClassWriter.EnumElement]()
+    val outEnumValues: ListBuffer[ClassWriter.EnumElement] = ListBuffer[ClassWriter.EnumElement](
+      enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
+        @inline def key = element._1
+        @inline def nameInCode = enumerations.get(key).get
+        @inline def specenumnumber = Integer.decode(key.substring(5))
+        val inCodeNumber: Int = if (bitwise)
+          Integer.rotateLeft(2, specenumnumber - 1)
+        else
+          specenumnumber
+        if (enumerations.contains(key + "NAME"))
+          newEnumValue(nameInCode, inCodeNumber, enumerations.get(key + "NAME").get)
+        else
+          newEnumValue(nameInCode, inCodeNumber)}).toSeq : _*)
     if (enumerations.contains("ZERO"))
       if (enumerations.contains("ZERO" + "NAME"))
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + "NAME").get)
@@ -54,20 +66,6 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
     if (enumerations.contains("INVALID"))
       outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
-    val Recognizer = "(VALUE)(\\d+)".r
-    enumerations.keys.foreach({
-      case Recognizer(value: String, number: String) =>
-        val nameInCode: String = enumerations.get(value + number).get
-        val num: Int = if (bitwise)
-          Integer.rotateLeft(2, Integer.decode(number) - 1)
-        else
-          Integer.decode(number)
-        if (enumerations.contains(value + number + "NAME"))
-          outEnumValues += newEnumValue(nameInCode, num, enumerations.get(value + number + "NAME").get)
-        else
-          outEnumValues += newEnumValue(nameInCode, num)
-      case _ =>
-    })
     if (enumerations.contains("COUNT"))
       if (enumerations.contains("COUNT"+"NAME"))
         new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
