@@ -33,7 +33,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
-      specEnum("INVALID")) ^^ {parsed => (parsed._1 -> parsed._2)} |
+      se("INVALID") ~ sInteger) ^^ {parsed => (parsed._1 -> parsed._2)} |
         CComment ^^ {comment => "comment" -> comment} |
         se("BITWISE") ^^ {bitwise => bitwise -> bitwise}
     ) ^^ {_.toMap[String, String]}) <~

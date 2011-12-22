@@ -132,7 +132,7 @@ object CParserTest {
 
   def specEnum2ElementsInvalid = """
   #define SPECENUM_NAME test
-  #define SPECENUM_INVALID FAIL
+  #define SPECENUM_INVALID -2
   #define SPECENUM_VALUE0 ONE
   #define SPECENUM_VALUE1 TWO
   #include "specenum_gen.h"

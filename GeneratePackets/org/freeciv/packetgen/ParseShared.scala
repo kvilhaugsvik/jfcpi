@@ -24,4 +24,6 @@ abstract class ParseShared extends RegexParsers {
   def CComment: Parser[String] = ("""/\*+""".r ~> rep("""([^*\n\r]|\*+[^/*])+""".r) <~ """\*+/""".r) ^^ {_.reduce(_+_)} |
     regex("""/\*+\*/""".r) ^^^ null |
     "//" ~> regex("""[^\n\r]*""".r)
+
+  def sInteger = """[+|-]*[0-9]+""".r
 }
