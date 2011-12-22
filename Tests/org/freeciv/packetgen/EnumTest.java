@@ -20,6 +20,21 @@ import static org.junit.Assert.*;
 import static org.freeciv.packetgen.ClassWriter.EnumElement.*;
 
 public class EnumTest {
+    @Test public void testBitWiseHasANumber0() {
+        new Enum("test", true,
+                newEnumValue("NOT2EXP", 0));
+    }
+
+    @Test public void testBitWiseHasANumber1() {
+        new Enum("test", true,
+                newEnumValue("NOT2EXP", 1));
+    }
+
+    @Test public void testBitWiseHasANumber2() {
+        new Enum("test", true,
+                newEnumValue("NOT2EXP", 2));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber3() {
         new Enum("test", true,
@@ -27,11 +42,9 @@ public class EnumTest {
                 newEnumValue("THREE", 3));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testBitWiseHasNoNumber18() {
+    @Test public void testBitWiseHasANumber4() {
         new Enum("test", true,
-                newEnumValue("TWO", 2),
-                newEnumValue("NOT2EXP", 18));
+                newEnumValue("NOT2EXP", 4));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -41,6 +54,12 @@ public class EnumTest {
                 newEnumValue("NOT2EXP", 15));
     }
 
+    @Test public void testBitWiseHasANumber16() {
+        new Enum("test", true,
+                newEnumValue("TWO", 2),
+                newEnumValue("NOT2EXP", 16));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber17() {
         new Enum("test", true,
@@ -48,10 +67,11 @@ public class EnumTest {
                 newEnumValue("NOT2EXP", 17));
     }
 
-    @Test public void testBitWiseHasANumber16() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testBitWiseHasNoNumber18() {
         new Enum("test", true,
                 newEnumValue("TWO", 2),
-                newEnumValue("NOT2EXP", 16));
+                newEnumValue("NOT2EXP", 18));
     }
 
     @Test public void testBitWiseIsBitWise() {
