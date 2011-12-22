@@ -235,3 +235,130 @@ class CParserSyntaxTest {
   @Test def testSpecEnumCommentBeforeAndAfterDef =
     parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, parseTest)
 }
+
+class CParserSemanticTest {
+  import CParserTest._
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Common helper methods
+  --------------------------------------------------------------------------------------------------------------------*/
+  @inline private def checkElement(element: ClassWriter.EnumElement, nameInCode: String, number: Int, toStringName: String) {
+    assertNotNull("Element " + nameInCode + " don't exist", element)
+    assertEquals("Wrong name in code for element " + nameInCode, nameInCode, element.getEnumValueName)
+    assertEquals("Wrong number for element " + nameInCode, number, element.getNumber)
+    assertEquals("Wrong toString() value for element " + nameInCode, toStringName, element.getToStringName)
+  }
+
+  @inline def parseEnumCorrectly(expression: String,
+                                     parser: ParseShared,
+                                     converter: ParseShared#Parser[Enum],
+                                     isBitWise: Boolean,
+                                     values: (String, Int,  String)*): Enum = {
+    val result = parsesCorrectly(expression, parser, converter).get
+
+    assertEquals("Wrong name for enumeration class", "test", result.getEnumClassName)
+    assertTrue("Wrong bitwise for enumeration class", result.isBitwise == isBitWise)
+
+    values.foreach({
+      case (nameInCode: String, number: Int, toStringName: String) =>
+        val element = result.getEnumValue(nameInCode)
+        checkElement(element, nameInCode, number, toStringName)
+      case _ => throw new IllegalArgumentException("Method signature updated without fixing element testing?")
+    })
+
+    return result
+  }
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test semantics of enums declared with the enum name {element, element} syntax
+  --------------------------------------------------------------------------------------------------------------------*/
+  @inline def parsesCEnumCorrectly(expression: String, parser: ParseCCode, values: (String, Int,  String)*): Enum  = {
+    return parseEnumCorrectly(expression, parser, parser.cEnumDefConverted, false, values: _*)
+  }
+
+  @Test def testCEnum1ElementNoAssign: Unit = {
+    parsesCEnumCorrectly(cEnum1ElementNoAssign, parseTest, ("one", 0, "\"one\""))
+  }
+
+  @Test def testCEnum1ElementAssign: Unit  = {
+    parsesCEnumCorrectly(cEnum1ElementAssign, parseTest, ("one", 1, "\"one\""))
+  }
+
+  @Test def testCEnum3ElementsNoAssign: Unit = {
+    parsesCEnumCorrectly(cEnum3ElementsNoAssign, parseTest,
+      ("one", 0, "\"one\""),
+      ("two", 1, "\"two\""),
+      ("three", 2, "\"three\""))
+  }
+
+  @Test def testCEnum3ElementsAssignAll: Unit = {
+    parsesCEnumCorrectly(cEnum3ElementsAssignAll, parseTest,
+      ("one", 1, "\"one\""),
+      ("two", 2, "\"two\""),
+      ("three", 3, "\"three\""))
+  }
+
+  @Test def testCEnum3ElementsFirstNumbered: Unit = {
+    parsesCEnumCorrectly(cEnum3ElementsFirstNumbered, parseTest,
+      ("two", 2, "\"two\""),
+      ("three", 3, "\"three\""),
+      ("four", 4, "\"four\""))
+  }
+
+  @Test def testCEnum3ElementsFirstAndLastTheSame: Unit = {
+    parsesCEnumCorrectly(cEnum3ElementsFirstAndLastTheSame, parseTest,
+      ("zero", 0, "\"zero\""),
+      ("one", 1, "\"one\""),
+      ("null", 0, "\"null\""))
+  }
+
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test semantics of enums declared with SPECENUM
+  --------------------------------------------------------------------------------------------------------------------*/
+  @inline def parsesSpecEnumCorrectly(expression: String, parser: ParseCCode, isBitWise: Boolean, values: (String, Int,  String)*): Enum  = {
+    return parseEnumCorrectly(expression, parser, parser.specEnumDefConverted, isBitWise, values: _*)
+  }
+
+  @Test(expected = classOf[UndefinedException])
+  def testSpecEnumEmpty: Unit = {
+    parsesSpecEnumCorrectly("""
+  #define SPECENUM_NAME test
+  #include "specenum_gen.h"
+  """, parseTest, false)
+  }
+
+  @Test def testSpecEnum2Elements: Unit = {
+    parsesSpecEnumCorrectly(specEnum2Elements, parseTest, false,
+      ("ZERO", 0, "\"ZERO\""),
+      ("ONE", 1, "\"ONE\""))
+  }
+
+  @Test def testSpecEnum2NamedElements: Unit = {
+    parsesSpecEnumCorrectly(specEnumTwoNamedElements, parseTest, false,
+      ("ZERO", 0, "\"nothing\""),
+      ("ONE", 1, "\"something\""))
+  }
+
+  @Test def testSpecEnum3ElementsBitwise: Unit = {
+    parsesSpecEnumCorrectly(specEnum3ElementsBitwise, parseTest, true,
+      ("ONE", 1, "\"ONE\""),
+      ("TWO", 2, "\"TWO\""),
+      ("THREE", 4, "\"THREE\""))
+  }
+
+  @Test def testSpecEnum4ElementsBitwiseZero: Unit = {
+    parsesSpecEnumCorrectly(specEnum4ElementsBitwiseZero, parseTest, true,
+      ("ZERO", 0, "\"ZERO\""),
+      ("ONE", 1, "\"ONE\""),
+      ("TWO", 2, "\"TWO\""),
+      ("THREE", 4, "\"THREE\""))
+  }
+
+  @Test def testSpecEnum3ElementsBitwiseNamedZero: Unit = {
+    parsesSpecEnumCorrectly(specEnum2ElementsBitwiseNamedZero, parseTest, true,
+      ("ZERO", 0, "\"nothing\""),
+      ("ONE", 1, "\"ONE\""),
+      ("TWO", 2, "\"TWO\""))
+  }
+}

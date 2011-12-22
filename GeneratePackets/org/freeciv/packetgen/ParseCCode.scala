@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen
 
+import collection.mutable.ListBuffer
+
 class ParseCCode(lookFor: List[String]) extends ParseShared {
   def enumDefname =
     lookFor.foldRight[Parser[Any]](failure("Nothing found"))((prefer: String, ifNot: Parser[Any]) => (prefer | ifNot))
@@ -36,11 +38,54 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
     ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
 
+  def specEnumDefConverted = specEnumDef ^^ {asStructures =>
+    if (asStructures._2.isEmpty)
+      throw new UndefinedException("No point in porting over an empty enum...")
+
+    @inline def enumerations: Map[String, String] = asStructures._2
+    val bitwise = enumerations.contains("BITWISE")
+
+    val outEnumValues = new ListBuffer[ClassWriter.EnumElement]()
+    if (enumerations.contains("ZERO"))
+      if (enumerations.contains("ZERO" + "NAME"))
+        outEnumValues += Enum.newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + "NAME").get)
+    else
+        outEnumValues += Enum.newEnumValue(enumerations.get("ZERO").get, 0)
+    val Recognizer = "(VALUE)(\\d+)".r
+    enumerations.keys.foreach({
+      case Recognizer(value: String, number: String) =>
+        val nameInCode: String = enumerations.get(value + number).get
+        val num: Int = if (bitwise)
+          Integer.rotateLeft(2, Integer.decode(number) - 1)
+        else
+          Integer.decode(number)
+        if (enumerations.contains(value + number + "NAME"))
+          outEnumValues += Enum.newEnumValue(nameInCode, num, enumerations.get(value + number + "NAME").get)
+        else
+          outEnumValues += Enum.newEnumValue(nameInCode, num)
+      case _ =>
+    })
+    new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues: _*)
+  }
+
   def enumValue = regex("""[0-9]+""".r)
 
   def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment)
 
   def cEnumDef = "enum" ~> enumDefname ~ ("{" ~> repsep(cEnum, ",") <~ "}")
+
+  def cEnumDefConverted = cEnumDef ^^ {asStructures =>
+    var globalNumbers: Int = 0
+    new Enum(asStructures._1.asInstanceOf[String],
+      false,
+      asStructures._2.map(elem => {
+        if (!elem._2.isEmpty)
+          globalNumbers = Integer.decode(elem._2.get)
+        val number = globalNumbers
+        globalNumbers += 1
+        Enum.newEnumValue(elem._1, number)
+      }): _*)
+  }
 
   def expr = cEnumDef |
     specEnumDef |
