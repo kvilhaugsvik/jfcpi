@@ -38,7 +38,7 @@ public class Enum extends ClassWriter {
         if (enums.containsKey("INVALID")) {
             this.invalidDefault = enums.get("INVALID");
         } else {
-            this.invalidDefault = EnumElement.newInvalidEnum("INVALID", "\"INVALID\"", -1);
+            this.invalidDefault = EnumElement.newInvalidEnum(-1);
             this.addEnumerated(this.invalidDefault);
         }
 

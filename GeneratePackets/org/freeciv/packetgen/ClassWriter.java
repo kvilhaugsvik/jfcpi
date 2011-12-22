@@ -375,8 +375,8 @@ public class ClassWriter {
             return new EnumElement(comment, enumValueName, number, toStringName, true);
         }
 
-        public static EnumElement newInvalidEnum(String nameInCode, String toStringName, int value) {
-            return new EnumElement(null, nameInCode, value, toStringName, false);
+        public static EnumElement newInvalidEnum(int value) {
+            return new EnumElement(null, "INVALID", value,  "\"INVALID\"", false);
         }
     }
 

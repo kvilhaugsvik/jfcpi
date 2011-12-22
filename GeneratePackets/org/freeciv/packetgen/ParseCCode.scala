@@ -53,7 +53,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
     else
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
     if (enumerations.contains("INVALID"))
-      outEnumValues += newInvalidEnum("INVALID", "\"INVALID\"", Integer.parseInt(enumerations.get("INVALID").get))
+      outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
     val Recognizer = "(VALUE)(\\d+)".r
     enumerations.keys.foreach({
       case Recognizer(value: String, number: String) =>
