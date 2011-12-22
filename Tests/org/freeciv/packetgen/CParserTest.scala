@@ -247,6 +247,7 @@ class CParserSemanticTest {
     assertEquals("Wrong name in code for element " + nameInCode, nameInCode, element.getEnumValueName)
     assertEquals("Wrong number for element " + nameInCode, number, element.getNumber)
     assertEquals("Wrong toString() value for element " + nameInCode, toStringName, element.getToStringName)
+    assertTrue("Element " + nameInCode + " should be valid", element.isValid)
   }
 
   @inline def parseEnumCorrectly(expression: String,
@@ -360,5 +361,15 @@ class CParserSemanticTest {
       ("ZERO", 0, "\"nothing\""),
       ("ONE", 1, "\"ONE\""),
       ("TWO", 2, "\"TWO\""))
+  }
+
+  @Test def testSpecEnum2ElementsInvalid: Unit = {
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsInvalid, parseTest, false,
+      ("ONE", 0, "\"ONE\""),
+      ("TWO", 1, "\"TWO\""))
+    @inline val invalid = enum.getInvalidDefault
+    assertNotNull("No invalid element found", invalid)
+    assertFalse("The invalid element should be invalid", invalid.isValid)
+    assertEquals("Wrong invalid number", -2, invalid.getNumber)
   }
 }

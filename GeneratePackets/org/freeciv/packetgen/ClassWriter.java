@@ -325,8 +325,9 @@ public class ClassWriter {
         private final String elementName;
         private final int number;
         private final String toStringName;
+        private final boolean valid;
 
-        EnumElement(String comment, String elementName, int number, String toStringName) {
+        EnumElement(String comment, String elementName, int number, String toStringName, boolean valid) {
             if (null == elementName)
                 throw new IllegalArgumentException("All elements of enums must have names");
 
@@ -338,6 +339,7 @@ public class ClassWriter {
             this.elementName = elementName;
             this.number = number;
             this.toStringName = toStringName;
+            this.valid = valid;
         }
 
         public int getNumber() {
@@ -352,8 +354,13 @@ public class ClassWriter {
             return toStringName;
         }
 
+        public boolean isValid() {
+            return valid;
+        }
+
         public String toString() {
-            return elementName + " (" + number + ", " + toStringName + ")" + ifIs(" /* ", comment, " */");
+            return elementName + " (" + number + ", " + toStringName +
+                    (!valid?", " + valid : "") + ")" + ifIs(" /* ", comment, " */");
         }
 
         static EnumElement newEnumValue(String enumValueName, int number) {
@@ -365,7 +372,11 @@ public class ClassWriter {
         }
 
         static EnumElement newEnumValue(String comment, String enumValueName, int number, String toStringName) {
-            return new EnumElement(comment, enumValueName, number, toStringName);
+            return new EnumElement(comment, enumValueName, number, toStringName, true);
+        }
+
+        public static EnumElement newInvalidEnum(String nameInCode, String toStringName, int value) {
+            return new EnumElement(null, nameInCode, value, toStringName, false);
         }
     }
 

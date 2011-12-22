@@ -137,6 +137,18 @@ public class CodeGenTest {
                 EnumElement.newEnumValue("ONE", 1).toString());
     }
 
+    @Test public void testEnumElementInvalid() {
+        assertEquals("Generated source not as expected",
+                "INVALID (-1, \"INVALID\", false)",
+                EnumElement.newInvalidEnum("INVALID", "\"INVALID\"", -1).toString());
+    }
+
+    @Test public void testEnumElementInvalidNonDefaultNumber() {
+        assertEquals("Generated source not as expected",
+                "INVALID (64, \"INVALID\", false)",
+                EnumElement.newInvalidEnum("INVALID", "\"INVALID\"", 64).toString());
+    }
+
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
                 "ONE (1, \"one\") /* An integer */",

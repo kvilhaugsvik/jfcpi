@@ -19,6 +19,7 @@ import org.freeciv.types.FCEnum;
 public class Enum extends ClassWriter {
     private String enumClassName;
     private boolean bitwise = false;
+    private EnumElement invalidDefault;
 
     public Enum(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
         super(ClassKind.ENUM, FCEnum.class.getPackage(), null, "Freeciv C code", enumName, "FCEnum");
@@ -34,16 +35,29 @@ public class Enum extends ClassWriter {
                         throw new IllegalArgumentException("Claims to be bitwise but is not.");
                 }
         }
+        if (enums.containsKey("INVALID")) {
+            this.invalidDefault = enums.get("INVALID");
+        } else {
+            this.invalidDefault = EnumElement.newInvalidEnum("INVALID", "\"INVALID\"", -1);
+            this.addEnumerated(this.invalidDefault);
+        }
 
         addObjectConstant("int", "number");
+        addObjectConstant("boolean", "valid");
         addObjectConstant("String", "toStringName");
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName, "int number, String toStringName", null,
+                "this(number, toStringName, false);");
+        addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName,
+                "int number, String toStringName, boolean valid",
+                null,
                 "this.number = number;",
-                "this.toStringName = toStringName;");
+                "this.toStringName = toStringName;",
+                "this.valid = valid;");
 
         addPublicReadObjectState(null, "int", "getNumber", "return number;");
+        addPublicReadObjectState(null, "boolean", "isValid", "return valid;");
         addPublicReadObjectState(null, "String", "toString", "return toStringName;");
 
         addReadClassState("/**" + "\n" +
@@ -60,6 +74,10 @@ public class Enum extends ClassWriter {
 
     public boolean isBitwise() {
         return bitwise;
+    }
+
+    public ClassWriter.EnumElement getInvalidDefault() {
+        return invalidDefault;
     }
 
     ClassWriter.EnumElement getEnumValue(String named) {

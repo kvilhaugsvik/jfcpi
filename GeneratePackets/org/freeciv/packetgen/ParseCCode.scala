@@ -15,7 +15,7 @@
 package org.freeciv.packetgen
 
 import collection.mutable.ListBuffer
-import ClassWriter.EnumElement.newEnumValue
+import ClassWriter.EnumElement.{newEnumValue, newInvalidEnum}
 
 class ParseCCode(lookFor: List[String]) extends ParseShared {
   def enumDefname =
@@ -52,6 +52,8 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + "NAME").get)
     else
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
+    if (enumerations.contains("INVALID"))
+      outEnumValues += newInvalidEnum("INVALID", "\"INVALID\"", Integer.parseInt(enumerations.get("INVALID").get))
     val Recognizer = "(VALUE)(\\d+)".r
     enumerations.keys.foreach({
       case Recognizer(value: String, number: String) =>
