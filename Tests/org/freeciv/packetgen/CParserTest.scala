@@ -372,4 +372,49 @@ class CParserSemanticTest {
     assertFalse("The invalid element should be invalid", invalid.isValid)
     assertEquals("Wrong invalid number", -2, invalid.getNumber)
   }
+
+  @Test def testSpecEnum2ElementsCount: Unit = {
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsCount, parseTest, false,
+      ("ONE", 0, "\"ONE\""),
+      ("TWO", 1, "\"TWO\""))
+    assertNotNull("No count element found", enum.getCount)
+    assertEquals("Wrong name in code for count element", "NUMBER_OF", enum.getCount.getEnumValueName)
+    assertEquals("Wrong number for count element", 2, enum.getCount.getNumber)
+    assertEquals("Wrong toString() value for count element", "\"NUMBER_OF\"", enum.getCount.getToStringName)
+    assertFalse("The count element should be invalid", enum.getCount.isValid)
+  }
+
+  @Test def testSpecEnum2ElementsNamedCount: Unit = {
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsNamedCount, parseTest, false,
+      ("ONE", 0, "\"ONE\""),
+      ("TWO", 1, "\"TWO\""))
+    assertNotNull("No count element found", enum.getCount)
+    assertEquals("Wrong name in code for count element", "NUMBER_OF", enum.getCount.getEnumValueName)
+    assertEquals("Wrong number for count element", 2, enum.getCount.getNumber)
+    assertEquals("Wrong toString() value for count element", "\"last\"", enum.getCount.getToStringName)
+    assertFalse("The count element should be invalid", enum.getCount.isValid)
+  }
+
+  @Test def testSpecEnum2ElementsCountInvalid: Unit = {
+    val enum = parsesSpecEnumCorrectly("""
+  #define SPECENUM_NAME test
+  #define SPECENUM_INVALID -2
+  #define SPECENUM_VALUE0 ONE
+  #define SPECENUM_VALUE1 TWO
+  #define SPECENUM_COUNT ELEMENTS
+  #include "specenum_gen.h"
+  """, parseTest, false,
+      ("ONE", 0, "\"ONE\""),
+      ("TWO", 1, "\"TWO\""))
+
+    assertNotNull("No invalid element found", enum.getInvalidDefault)
+    assertFalse("The invalid element should be invalid", enum.getInvalidDefault.isValid)
+    assertEquals("Wrong invalid number", -2, enum.getInvalidDefault.getNumber)
+
+    assertNotNull("No count element found", enum.getCount)
+    assertEquals("Wrong name in code for count element", "ELEMENTS", enum.getCount.getEnumValueName)
+    assertEquals("Wrong number for count element,", 2, enum.getCount.getNumber)
+    assertEquals("Wrong toString() value for count element", "\"ELEMENTS\"", enum.getCount.getToStringName)
+    assertFalse("The count element should be invalid", enum.getCount.isValid)
+  }
 }

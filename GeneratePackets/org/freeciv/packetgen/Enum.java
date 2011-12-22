@@ -20,20 +20,44 @@ public class Enum extends ClassWriter {
     private String enumClassName;
     private boolean bitwise = false;
     private EnumElement invalidDefault;
+    private EnumElement countElement;
 
     public Enum(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
+        this(enumName, bitwise, null, null, values);
+    }
+
+    public Enum(String enumName, String cntCode, ClassWriter.EnumElement... values) {
+        this(enumName, cntCode, null, values);
+    }
+
+    public Enum(String enumName, String cntCode, String cntString, ClassWriter.EnumElement... values) {
+        this(enumName, false, cntCode, cntString, values);
+    }
+
+    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, ClassWriter.EnumElement... values) {
         super(ClassKind.ENUM, FCEnum.class.getPackage(), null, "Freeciv C code", enumName, "FCEnum");
 
         this.bitwise = bitwise;
         this.enumClassName = enumName;
 
+        int numberOfElements = 0;
         for (ClassWriter.EnumElement value: values) {
             this.addEnumerated(value);
+
+            if (value.isValid()) numberOfElements++;
+
             if (bitwise && (0 != value.getNumber()))
                 for (int testAgainst = 1; testAgainst < value.getNumber() * 2; testAgainst = testAgainst * 2) {
                     if (value.getNumber() < testAgainst)
                         throw new IllegalArgumentException("Claims to be bitwise but is not.");
                 }
+        }
+        if (null != cntCode) {
+            if (bitwise) throw new IllegalArgumentException("");
+            this.countElement = EnumElement.newInvalidEnum(cntCode,
+                    (null == cntString? '"' + cntCode + '"': cntString),
+                    numberOfElements);
+            this.addEnumerated(this.countElement);
         }
         if (enums.containsKey("INVALID")) {
             this.invalidDefault = enums.get("INVALID");
@@ -78,6 +102,10 @@ public class Enum extends ClassWriter {
 
     public ClassWriter.EnumElement getInvalidDefault() {
         return invalidDefault;
+    }
+
+    public ClassWriter.EnumElement getCount() {
+        return countElement;
     }
 
     ClassWriter.EnumElement getEnumValue(String named) {

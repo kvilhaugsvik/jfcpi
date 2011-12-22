@@ -378,6 +378,10 @@ public class ClassWriter {
         public static EnumElement newInvalidEnum(int value) {
             return new EnumElement(null, "INVALID", value,  "\"INVALID\"", false);
         }
+
+        public static EnumElement newInvalidEnum(String nameInCode, String toStringName, int value) {
+            return new EnumElement(null, nameInCode, value, toStringName, false);
+        }
     }
 
     public enum Visibility {

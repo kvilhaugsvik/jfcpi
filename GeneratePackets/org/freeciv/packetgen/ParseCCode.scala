@@ -68,7 +68,14 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
           outEnumValues += newEnumValue(nameInCode, num)
       case _ =>
     })
-    new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues: _*)
+    if (enumerations.contains("COUNT"))
+      if (enumerations.contains("COUNT"+"NAME"))
+        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
+          enumerations.get("COUNT"+"NAME").get, outEnumValues: _*)
+      else
+        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, outEnumValues: _*)
+    else
+      new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues: _*)
   }
 
   def enumValue = regex("""[0-9]+""".r)

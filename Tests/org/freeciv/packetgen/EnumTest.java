@@ -16,6 +16,8 @@ package org.freeciv.packetgen;
 
 import org.junit.Test;
 
+import java.security.InvalidParameterException;
+
 import static org.junit.Assert.*;
 import static org.freeciv.packetgen.ClassWriter.EnumElement.*;
 
@@ -130,5 +132,50 @@ public class EnumTest {
     @Test public void enumValueGetToStringFrom() {
         Enum result = enumWithValues();
         assertEquals("Enum element code name not found", "\"TWO\"", result.getEnumValue("TWO").getToStringName());
+    }
+
+    @Test public void enumCountNotSpecified() {
+        Enum result = enumWithValues();
+        assertNull("Counting element should not be added when unspecified", result.getCount());
+    }
+
+    @Test public void enumCount() {
+        Enum result = new Enum("test", "ELEMENTS",
+                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ONE", 1),
+                newEnumValue("TWO", 2));
+        assertNotNull("Counting element not added", result.getCount());
+        assertFalse("Counting element should be invalid", result.getCount().isValid());
+        assertEquals("Counting element has wrong name", "ELEMENTS", result.getCount().getEnumValueName());
+        assertEquals("Counting element has wrong toStringName", "\"ELEMENTS\"", result.getCount().getToStringName());
+        assertEquals("Counting element don't count elements correctly", 3, result.getCount().getNumber());
+    }
+
+    @Test public void enumCount2Elements() {
+        Enum result = new Enum("test", "ELEMENTS",
+                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ONE", 1));
+        assertNotNull("Counting element not added", result.getCount());
+        assertFalse("Counting element should be invalid", result.getCount().isValid());
+        assertEquals("Counting element has wrong name", "ELEMENTS", result.getCount().getEnumValueName());
+        assertEquals("Counting element has wrong toStringName", "\"ELEMENTS\"", result.getCount().getToStringName());
+        assertEquals("Counting element don't count elements correctly", 2, result.getCount().getNumber());
+    }
+
+    @Test public void enumCountNamed() {
+        Enum result = new Enum("test", "ELEMENTS", "\"the elements\"",
+                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ONE", 1));
+        assertNotNull("Counting element not added", result.getCount());
+        assertFalse("Counting element should be invalid", result.getCount().isValid());
+        assertEquals("Counting element has wrong name", "ELEMENTS", result.getCount().getEnumValueName());
+        assertEquals("Counting element has wrong toStringName", "\"the elements\"", result.getCount().getToStringName());
+        assertEquals("Counting element don't count elements correctly", 2, result.getCount().getNumber());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void enumCountBitwiseSpecified() {
+        Enum result = new Enum("test", true, "ELEMENTS", "\"the elements\"",
+                newEnumValue("ONE", 1));
     }
 }

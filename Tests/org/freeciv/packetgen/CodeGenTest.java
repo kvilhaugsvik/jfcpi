@@ -149,6 +149,12 @@ public class CodeGenTest {
                 EnumElement.newInvalidEnum(64).toString());
     }
 
+    @Test public void testEnumElementCount() {
+        assertEquals("Generated source not as expected",
+                "NUMBEROFF (64, \"number off\", false)",
+                EnumElement.newInvalidEnum("NUMBEROFF", "\"number off\"", 64).toString());
+    }
+
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
                 "ONE (1, \"one\") /* An integer */",
