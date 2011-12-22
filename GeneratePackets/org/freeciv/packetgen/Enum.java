@@ -46,7 +46,7 @@ public class Enum extends ClassWriter {
 
             if (value.isValid()) numberOfElements++;
 
-            if (bitwise && (0 != value.getNumber()))
+            if (bitwise && (0 < value.getNumber()))
                 for (int testAgainst = 1; testAgainst < value.getNumber() * 2; testAgainst = testAgainst * 2) {
                     if (value.getNumber() < testAgainst)
                         throw new IllegalArgumentException("Claims to be bitwise but is not.");

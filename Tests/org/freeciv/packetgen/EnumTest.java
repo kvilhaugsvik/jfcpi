@@ -178,4 +178,17 @@ public class EnumTest {
         Enum result = new Enum("test", true, "ELEMENTS", "\"the elements\"",
                 newEnumValue("ONE", 1));
     }
+
+    @Test public void enumInvalidBitwise() {
+        Enum result = new Enum("test", true,
+                newInvalidEnum(-2),
+                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ONE", 1),
+                newEnumValue("TWO", 2));
+        assertNotNull("Invalid element not added", result.getInvalidDefault());
+        assertFalse("Invalid element should be invalid", result.getInvalidDefault().isValid());
+        assertEquals("Invalid element has wrong name", "INVALID", result.getInvalidDefault().getEnumValueName());
+        assertEquals("Invalid element has wrong toStringName", "\"INVALID\"", result.getInvalidDefault().getToStringName());
+        assertEquals("Invalid element has wrong number", -2, result.getInvalidDefault().getNumber());
+    }
 }
