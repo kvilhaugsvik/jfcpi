@@ -14,8 +14,6 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.packet.fieldtype.FieldType;
-
 public class JavaSrc {
     String CSrc;
     String JavaType;
@@ -38,20 +36,31 @@ public class JavaSrc {
         return JavaType;
     }
 
-    public String toString(String name) {
-        ClassWriter out = new ClassWriter(FieldType.class.getPackage(),
-                new String[]{"java.io.DataInput", "java.io.DataOutput", "java.io.IOException"},
-                "Freeciv's protocol definition",
-                name,
-                "FieldType<" + JavaType + ">");
-        out.addObjectConstant(JavaType, "value");
-        out.addPublicConstructor(null, name, JavaType + " value", "this.value = value;");
-        out.addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
-        out.addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
-        out.addPublicReadObjectState(null, "int", "encodedLength", EncodedSize);
-        out.addPublicReadObjectState(null, JavaType, "getValue", "return value;");
-        out.addPublicReadObjectState(null, "String", "toString", "return value.toString();");
+    public FieldTypeAlias createFieldType(String name) {
+        return new FieldTypeAlias(name, this);
+    }
 
-        return out.toString();
+    public class FieldTypeAlias extends ClassWriter {
+        private JavaSrc basicType;
+
+        private FieldTypeAlias(String name, JavaSrc basicType) {
+            super(org.freeciv.packet.fieldtype.FieldType.class.getPackage(),
+                    new String[]{"java.io.DataInput", "java.io.DataOutput", "java.io.IOException"},
+                    "Freeciv's protocol definition",
+                    name,
+                    "FieldType<" + JavaType + ">");
+
+            addObjectConstant(JavaType, "value");
+            addPublicConstructor(null, name, JavaType + " value", "this.value = value;");
+            addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
+            addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
+            addPublicReadObjectState(null, "int", "encodedLength", EncodedSize);
+            addPublicReadObjectState(null, JavaType, "getValue", "return value;");
+            addPublicReadObjectState(null, "String", "toString", "return value.toString();");
+        }
+
+        public JavaSrc getBasicType() {
+            return basicType;
+        }
     }
 }

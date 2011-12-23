@@ -100,7 +100,7 @@ public class PacketsStore {
     public HashMap<String, String> getJavaCode() {
         HashMap<String, String> out = new HashMap<String, String>();
         for (String name: types.keySet()) {
-            out.put(name, types.get(name).toString(name));
+            out.put(name, types.get(name).createFieldType(name).toString());
         }
         for (String name: packets.keySet()) {
             out.put(name, packets.get(name).toString());

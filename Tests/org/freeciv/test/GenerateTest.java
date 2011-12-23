@@ -78,7 +78,7 @@ public class GenerateTest {
     }
 
     private static void writeFieldType(String fieldType, String ioType) throws IOException {
-        String content = Hardcoded.getJTypeFor(ioType).toString(fieldType);
+        String content = Hardcoded.getJTypeFor(ioType).createFieldType(fieldType).toString();
         writeJavaFile(fieldType, content);
     }
 
