@@ -92,7 +92,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
 
   def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment)
 
-  def cEnumDef = regex(startOfCEnum.r) ~> regex(enumDefName.r) ~ ("{" ~> repsep(cEnum, ",") <~ "}")
+  def cEnumDef = regex(startOfCEnum.r) ~> regex(enumDefName.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
 
   def cEnumDefConverted = cEnumDef ^^ {asStructures =>
     var globalNumbers: Int = 0

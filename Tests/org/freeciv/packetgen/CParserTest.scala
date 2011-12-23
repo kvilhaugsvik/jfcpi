@@ -207,6 +207,7 @@ class CParserSyntaxTest {
   @Test def testCEnumCommentInside = parsesCorrectly(cEnum3ElementsCommentInside, parseTest)
   @Test def testCEnumCommentInsideBefore = parsesCorrectly(cEnum3ElementsCommentInsideBefore, parseTest)
   @Test def testCEnumCommentInsideAfter = parsesCorrectly(cEnum3ElementsCommentInsideAfter, parseTest)
+  @Test def testCEnumCommaAfterLast = parsesCorrectly("enum test {element, iEndInAComma,}", parseTest)
 
   @Test def testCEnumNotLookedFor = willNotParse(cEnum3ElementsNoAssign.replace("test", "notTest"), parseTest)
 
