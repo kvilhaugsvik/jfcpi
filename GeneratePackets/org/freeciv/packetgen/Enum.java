@@ -17,7 +17,6 @@ package org.freeciv.packetgen;
 import org.freeciv.types.FCEnum;
 
 public class Enum extends ClassWriter {
-    private String enumClassName;
     private boolean bitwise = false;
     private EnumElement invalidDefault;
     private EnumElement countElement;
@@ -38,7 +37,6 @@ public class Enum extends ClassWriter {
         super(ClassKind.ENUM, FCEnum.class.getPackage(), null, "Freeciv C code", enumName, "FCEnum");
 
         this.bitwise = bitwise;
-        this.enumClassName = enumName;
 
         int numberOfElements = 0;
         for (ClassWriter.EnumElement value: values) {
@@ -90,10 +88,6 @@ public class Enum extends ClassWriter {
                 " * @return true if the enum is bitwise" + "\n" +
                 " */",
                 "boolean", "isBitWise", "return " + bitwise + ";");
-    }
-
-    public String getEnumClassName() {
-        return enumClassName;
     }
 
     public boolean isBitwise() {

@@ -257,7 +257,7 @@ class CParserSemanticTest {
                                      values: (String, Int,  String)*): Enum = {
     val result = parsesCorrectly(expression, parser, converter).get
 
-    assertEquals("Wrong name for enumeration class", "test", result.getEnumClassName)
+    assertEquals("Wrong name for enumeration class", "test", result.getName)
     assertTrue("Wrong bitwise for enumeration class", result.isBitwise == isBitWise)
 
     values.foreach({
@@ -459,7 +459,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsAsMap = enums.map(_.getEnumClassName)
+    val enumsAsMap = enums.map(_.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
@@ -503,7 +503,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsAsMap = enums.map(_.getEnumClassName)
+    val enumsAsMap = enums.map(_.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
@@ -542,7 +542,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsNames = enums.map(_.getEnumClassName)
+    val enumsNames = enums.map(_.getName)
     assertTrue("Specenum test1 not found", enumsNames.contains("test1"))
     assertTrue("C style enum test2 not found", enumsNames.contains("test2"))
     assertTrue("C style enum test3 not found", enumsNames.contains("test3"))

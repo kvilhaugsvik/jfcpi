@@ -16,8 +16,6 @@ package org.freeciv.packetgen;
 
 import org.junit.Test;
 
-import java.security.InvalidParameterException;
-
 import static org.junit.Assert.*;
 import static org.freeciv.packetgen.ClassWriter.EnumElement.*;
 
@@ -96,7 +94,7 @@ public class EnumTest {
 
     @Test public void testNameIsCorrect() {
         Enum result = enumWithValues();
-        assertEquals("Wrong name", "test", result.getEnumClassName());
+        assertEquals("Wrong name", "test", result.getName());
     }
 
     @Test public void testGetEnumValueLast() {
