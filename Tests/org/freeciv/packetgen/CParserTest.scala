@@ -508,4 +508,43 @@ enum test3 {
     assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
   }
+
+  private final val test123EnumsUsed = """
+#define SPECENUM_NAME test1
+#define SPECENUM_VALUE0 ZERO
+#define SPECENUM_VALUE1 ONE
+#include "specenum_gen.h"
+
+enum test1 randomVariableInTheVay = 1;
+
+enum test2 {
+  nothing,
+  one,
+  two,
+  three
+};
+
+typedef enum test2 Of3;
+
+enum test3 {
+  toBe,
+  notToBe
+};
+"""
+
+  @Test def findsPositionsEnumsUsed {
+    val positions = new FromCExtractor(List("test1", "test2", "test3")).findPossibleStartPositions(test123EnumsUsed)
+    assertNotNull("Positions don't exist", positions)
+  }
+
+  @Test def findsEnumsEnumsUsed {
+    val enums = new FromCExtractor(List("test1", "test2", "test3")).extract(test123EnumsUsed)
+    assertNotNull("Enums not found", enums)
+    assertFalse("Enums not found", enums.isEmpty)
+
+    val enumsNames = enums.map(_.getEnumClassName)
+    assertTrue("Specenum test1 not found", enumsNames.contains("test1"))
+    assertTrue("C style enum test2 not found", enumsNames.contains("test2"))
+    assertTrue("C style enum test3 not found", enumsNames.contains("test3"))
+  }
 }

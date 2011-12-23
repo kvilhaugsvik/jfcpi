@@ -128,6 +128,7 @@ class FromCExtractor(toLookFor: List[String]) {
     val positions = findPossibleStartPositions(lookIn)
     val lookInAsReader = new CharArrayReader(lookIn.toArray)
 
-    positions.map(positions => parser.parse(parser.exprConverted, lookInAsReader.drop(positions)).get)
+    positions.map(positions => parser.parse(parser.exprConverted, lookInAsReader.drop(positions)))
+      .filter(!_.isEmpty).map(_.get)
   }
 }
