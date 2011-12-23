@@ -14,15 +14,15 @@
 
 package org.freeciv.packetgen;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.LinkedList;
+import java.util.*;
+
+import org.freeciv.packetgen.FieldTypeBasic.FieldTypeAlias;
 
 public class PacketsStore {
     private final boolean devMode;
     private final boolean hasTwoBytePacketNumber;
 
-    private final HashMap<String, FieldTypeBasic> types = new HashMap<String, FieldTypeBasic>();
+    private final HashMap<String, FieldTypeAlias> types = new HashMap<String, FieldTypeAlias>();
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
     // Idea from http://stackoverflow.com/q/822701
@@ -36,9 +36,9 @@ public class PacketsStore {
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
         if (null != Hardcoded.getBasicFieldType(aliased)) {
-            types.put(alias, Hardcoded.getBasicFieldType(aliased));
+            types.put(alias, Hardcoded.getBasicFieldType(aliased).createFieldType(alias));
         } else if (types.containsKey(aliased)) {
-            types.put(alias, types.get(aliased));
+            types.put(alias, types.get(aliased).getBasicType().createFieldType(alias));
         } else {
             String errorMessage = aliased + " not declared before used in " + alias + ".";
             if (devMode) {
@@ -78,7 +78,7 @@ public class PacketsStore {
                     throw new UndefinedException(errorMessage);
                 }
             }
-            fieldList.add(new Field(fieldType[1], fieldType[0], types.get(fieldType[0]).getJavaType()));
+            fieldList.add(new Field(fieldType[1], types.get(fieldType[0])));
         }
 
         packets.put(name, new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0])));
@@ -97,14 +97,9 @@ public class PacketsStore {
         return packets.get(name);
     }
 
-    public HashMap<String, String> getJavaCode() {
-        HashMap<String, String> out = new HashMap<String, String>();
-        for (String name: types.keySet()) {
-            out.put(name, types.get(name).createFieldType(name).toString());
-        }
-        for (String name: packets.keySet()) {
-            out.put(name, packets.get(name).toString());
-        }
+    public Collection<ClassWriter> getJavaCode() {
+        ArrayList<ClassWriter> out = new ArrayList<ClassWriter>(types.values());
+        out.addAll(packets.values());
         return out;
     }
 
@@ -112,7 +107,8 @@ public class PacketsStore {
         String out = "";
 
         for (int number: packetsByNumber.keySet()) {
-            out += number + "\t" + "org.freeciv.packet." + packetsByNumber.get(number) + "\n";
+            Packet packet = packets.get(packetsByNumber.get(number));
+            out += packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName() + "\n";
         }
         return out;
     }

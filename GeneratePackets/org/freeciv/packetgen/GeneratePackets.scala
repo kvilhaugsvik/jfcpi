@@ -39,14 +39,13 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean, hasTwoBytePacketNu
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
   def writeToDir(path: File) {
-    val files = storage.getJavaCode
     (new File(path + "/org/freeciv/packet/fieldtype")).mkdirs()
-    files.foreach({case (name, code) =>
-      val packagePath = code.split(" |;")(1).replaceAll("""\.""", "/")
-      val classFile = new File(path + "/" + packagePath + "/" + name + ".java")
+    storage.getJavaCode.foreach((code) => {
+      val packagePath = code.getPackage.replaceAll("""\.""", "/")
+      val classFile = new File(path + "/" + packagePath + "/" + code.getName + ".java")
       classFile.createNewFile
       val classWriter = new FileWriter(classFile)
-      classWriter.write(code)
+      classWriter.write(code.toString)
       classWriter.close()
     })
 

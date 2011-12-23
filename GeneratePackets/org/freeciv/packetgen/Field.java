@@ -25,6 +25,12 @@ public class Field {
         this.javatype = javatype;
     }
 
+    public Field(String variableName, FieldTypeBasic.FieldTypeAlias typeAlias) {
+        this.variableName = variableName;
+        this.type = typeAlias.getName();
+        this.javatype = typeAlias.getJavaType();
+    }
+
     public String getVariableName() {
         return variableName;
     }

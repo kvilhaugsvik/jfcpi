@@ -32,10 +32,6 @@ public class FieldTypeBasic {
         return CSrc;
     }
 
-    public String getJavaType() {
-        return JavaType;
-    }
-
     public FieldTypeAlias createFieldType(String name) {
         return new FieldTypeAlias(name, this);
     }
@@ -63,6 +59,10 @@ public class FieldTypeBasic {
 
         public FieldTypeBasic getBasicType() {
             return basicType;
+        }
+
+        public String getJavaType() {
+            return JavaType;
         }
     }
 }

@@ -16,6 +16,7 @@ package org.freeciv.packetgen;
 
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -70,11 +71,17 @@ public class PacketsStoreTest {
         storage.registerTypeAlias("UINT32", "uint32(int)");
         storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
 
-        HashMap results = storage.getJavaCode();
+        Collection<ClassWriter> results = storage.getJavaCode();
 
-        assertTrue(results.containsKey("UINT32"));
-        assertTrue(results.containsKey("UNSIGNEDINT32"));
-        assertNotNull(results.get("UINT32"));
+        boolean hasUINT32 = false;
+        boolean hasUNSIGNEDINT32 = false;
+        for (ClassWriter result: results) {
+            assertNotNull("Java code should not be null", result);
+            if ("UINT32".equals(result.getName())) hasUINT32 = true;
+            if ("UNSIGNEDINT32".equals(result.getName())) hasUNSIGNEDINT32 = true;
+        }
+        if (!hasUINT32) fail("UINT32 should have been registered");
+        if (!hasUNSIGNEDINT32) fail("UNSIGNEDINT32 should have been registered");
     }
 
     @Test public void registerPacketWithoutFields() throws UndefinedException, PacketCollisionException {
