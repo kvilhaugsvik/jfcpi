@@ -26,13 +26,16 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
   private final val SPECENUM: String = "SPECENUM_"
   private final val NAME: String = "NAME"
 
+  def startOfSpecEnum: String = DEFINE + "\\s+" + SPECENUM + NAME
+  def startOfCEnum: String = "enum"
+
   @inline private def se(kind: String) = DEFINE ~> regex((SPECENUM + kind).r) ^^ {_.substring(9)}
 
   def specEnum(kind: String) = se(kind) ~ enumElemCode
 
   def specEnumOrName(kind: String) = se(kind + NAME) ~ regex(""""[^\n\r\"]*?"""".r) | specEnum(kind)
 
-  def specEnumDef = se(NAME) ~> regex(enumDefName.r) ~
+  def specEnumDef = regex(startOfSpecEnum.r) ~> regex(enumDefName.r) ~
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
@@ -83,7 +86,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
 
   def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment)
 
-  def cEnumDef = "enum" ~> regex(enumDefName.r) ~ ("{" ~> repsep(cEnum, ",") <~ "}")
+  def cEnumDef = regex(startOfCEnum.r) ~> regex(enumDefName.r) ~ ("{" ~> repsep(cEnum, ",") <~ "}")
 
   def cEnumDefConverted = cEnumDef ^^ {asStructures =>
     var globalNumbers: Int = 0
