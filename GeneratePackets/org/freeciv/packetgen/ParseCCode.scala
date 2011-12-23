@@ -18,8 +18,7 @@ import collection.mutable.ListBuffer
 import ClassWriter.EnumElement.{newEnumValue, newInvalidEnum}
 
 class ParseCCode(lookFor: List[String]) extends ParseShared {
-  def enumDefname =
-    lookFor.foldRight[Parser[Any]](failure("Nothing found"))((prefer: String, ifNot: Parser[Any]) => (prefer | ifNot))
+  def enumDefName: String = "(" + lookFor.reduce(_ + "|" + _) + ")"
 
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
@@ -29,7 +28,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
 
   def specEnumOrName(kind: String) = se(kind + "NAME") ~ regex(""""[^\n\r\"]*?"""".r) | specEnum(kind)
 
-  def specEnumDef = se("NAME") ~> enumDefname ~
+  def specEnumDef = se("NAME") ~> regex(enumDefName.r) ~
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
@@ -80,7 +79,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
 
   def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment)
 
-  def cEnumDef = "enum" ~> enumDefname ~ ("{" ~> repsep(cEnum, ",") <~ "}")
+  def cEnumDef = "enum" ~> regex(enumDefName.r) ~ ("{" ~> repsep(cEnum, ",") <~ "}")
 
   def cEnumDefConverted = cEnumDef ^^ {asStructures =>
     var globalNumbers: Int = 0
