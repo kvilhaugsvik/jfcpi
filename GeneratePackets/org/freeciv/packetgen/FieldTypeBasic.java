@@ -50,6 +50,8 @@ public class FieldTypeBasic {
                     name,
                     "FieldType<" + JavaType + ">");
 
+            this.basicType = basicType;
+
             addObjectConstant(JavaType, "value");
             addPublicConstructor(null, name, JavaType + " value", "this.value = value;");
             addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
