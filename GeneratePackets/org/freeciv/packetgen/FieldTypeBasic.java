@@ -14,13 +14,13 @@
 
 package org.freeciv.packetgen;
 
-public class JavaSrc {
+public class FieldTypeBasic {
     String CSrc;
     String JavaType;
     String[] Decode;
     String[] encode, EncodedSize;
 
-    public JavaSrc(String CSrc, String javaType, String decode, String encode, String encodedSize) {
+    public FieldTypeBasic(String CSrc, String javaType, String decode, String encode, String encodedSize) {
         this.CSrc = CSrc;
         JavaType = javaType;
         Decode = decode.split("\n");
@@ -41,9 +41,9 @@ public class JavaSrc {
     }
 
     public class FieldTypeAlias extends ClassWriter {
-        private JavaSrc basicType;
+        private FieldTypeBasic basicType;
 
-        private FieldTypeAlias(String name, JavaSrc basicType) {
+        private FieldTypeAlias(String name, FieldTypeBasic basicType) {
             super(org.freeciv.packet.fieldtype.FieldType.class.getPackage(),
                     new String[]{"java.io.DataInput", "java.io.DataOutput", "java.io.IOException"},
                     "Freeciv's protocol definition",
@@ -59,7 +59,7 @@ public class JavaSrc {
             addPublicReadObjectState(null, "String", "toString", "return value.toString();");
         }
 
-        public JavaSrc getBasicType() {
+        public FieldTypeBasic getBasicType() {
             return basicType;
         }
     }

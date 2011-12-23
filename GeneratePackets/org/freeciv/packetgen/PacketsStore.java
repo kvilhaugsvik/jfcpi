@@ -22,7 +22,7 @@ public class PacketsStore {
     private final boolean devMode;
     private final boolean hasTwoBytePacketNumber;
 
-    private final HashMap<String, JavaSrc> types = new HashMap<String, JavaSrc>();
+    private final HashMap<String, FieldTypeBasic> types = new HashMap<String, FieldTypeBasic>();
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
     // Idea from http://stackoverflow.com/q/822701
@@ -35,8 +35,8 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
-        if (null != Hardcoded.getJTypeFor(aliased)) {
-            types.put(alias, Hardcoded.getJTypeFor(aliased));
+        if (null != Hardcoded.getBasicFieldType(aliased)) {
+            types.put(alias, Hardcoded.getBasicFieldType(aliased));
         } else if (types.containsKey(aliased)) {
             types.put(alias, types.get(aliased));
         } else {

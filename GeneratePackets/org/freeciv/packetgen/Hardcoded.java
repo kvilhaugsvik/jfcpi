@@ -18,26 +18,26 @@ import java.util.HashMap;
 
 //TODO: Move data to file
 public class Hardcoded {
-    private static final HashMap<String, JavaSrc> data = new HashMap<String, JavaSrc>();
+    private static final HashMap<String, FieldTypeBasic> data = new HashMap<String, FieldTypeBasic>();
 
     static {
-        for (JavaSrc src: new JavaSrc[]{
-            new JavaSrc("uint8(int)",
+        for (FieldTypeBasic src: new FieldTypeBasic[]{
+            new FieldTypeBasic("uint8(int)",
                     "Integer",
                     "value = from.readUnsignedByte();",
                     "to.writeByte(value);",
                     "return 1;"),
-            new JavaSrc("uint16(int)",
+            new FieldTypeBasic("uint16(int)",
                     "Integer",
                     "value = (int) from.readChar();",
                     "to.writeChar(value);",
                     "return 2;"),
-            new JavaSrc("uint32(int)",
+            new FieldTypeBasic("uint32(int)",
                     "Long",
                     DataIO.readUIntCode(4, "Long", "value"),
                     DataIO.writeWriteUInt(4),
                     "return 4;"),
-            new JavaSrc("string(char)",
+            new FieldTypeBasic("string(char)",
                     "String",
                     "StringBuffer buf = new StringBuffer();" + "\n" +
                             "byte letter = from.readByte();" + "\n" +
@@ -49,22 +49,22 @@ public class Hardcoded {
                     "to.writeBytes(" + "value" + ");\n" +
                         "to.writeByte(0);",
                     "return " + "value" + ".length() + 1;"),
-            new JavaSrc("bool8(bool)",
+            new FieldTypeBasic("bool8(bool)",
                     "Boolean",
                     "value = from.readBoolean();",
                     "to.writeBoolean(value);",
                     "return 1;"),
-            new JavaSrc("sint8(int)",
+            new FieldTypeBasic("sint8(int)",
                     "Byte",
                     "value = from.readByte();",
                     "to.writeByte(value);",
                     "return 2;"),
-            new JavaSrc("sint16(int)",
+            new FieldTypeBasic("sint16(int)",
                     "Short",
                     "value = from.readShort();",
                     "to.writeShort(value);",
                     "return 2;"),
-            new JavaSrc("sint32(int)",
+            new FieldTypeBasic("sint32(int)",
                     "Integer",
                     "value = from.readInt();",
                     "to.writeInt(value);",
@@ -74,7 +74,7 @@ public class Hardcoded {
         }
     }
 
-    public static JavaSrc getJTypeFor(String src) {
+    public static FieldTypeBasic getBasicFieldType(String src) {
         return data.get(src);
     }
 }
