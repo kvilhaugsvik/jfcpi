@@ -19,18 +19,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ClassWriter {
-    Package where;
-    String[] imports;
-    Visibility visibility;
-    ClassKind kind;
-    String madeFrom;
-    String name;
-    String implementsInterface;
+    private final Package where;
+    private final String[] imports;
+    private final Visibility visibility;
+    private final ClassKind kind;
+    private final String madeFrom;
+    private final String name;
+    private final String implementsInterface;
 
-    LinkedList<VariableDeclaration> constants = new LinkedList<VariableDeclaration>();
-    LinkedList<VariableDeclaration> stateVars = new LinkedList<VariableDeclaration>();
+    private final LinkedList<VariableDeclaration> constants = new LinkedList<VariableDeclaration>();
+    private final LinkedList<VariableDeclaration> stateVars = new LinkedList<VariableDeclaration>();
 
-    LinkedList<Method> methods = new LinkedList<Method>();
+    private final LinkedList<Method> methods = new LinkedList<Method>();
     protected final HashMap<String, EnumElement> enums = new HashMap<String, ClassWriter.EnumElement>();
 
     public ClassWriter(ClassKind kind, Package where, String[] imports, String madeFrom, String name, String implementsInterface) {
@@ -234,14 +234,14 @@ public class ClassWriter {
     }
 
     static class Method {
-        String comment;
-        Visibility visibility;
-        Scope scope;
-        String type;
-        String name;
-        String paramList;
-        String exceptionList;
-        String[] body;
+        private final String comment;
+        private final Visibility visibility;
+        private final Scope scope;
+        private final String type;
+        private final String name;
+        private final String paramList;
+        private final String exceptionList;
+        private final String[] body;
 
         public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList, String exceptionList, String... body) {
             this.comment = comment;
@@ -303,12 +303,12 @@ public class ClassWriter {
     }
 
     static class VariableDeclaration {
-        Visibility visibility;
-        Scope scope;
-        Modifiable modifiable;
-        String type;
-        String name;
-        String value;
+        private final Visibility visibility;
+        private final Scope scope;
+        private final Modifiable modifiable;
+        private final String type;
+        private final String name;
+        private final String value;
 
         public VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
                                     String type, String name, String value) {

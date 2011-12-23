@@ -17,9 +17,9 @@ package org.freeciv.packetgen;
 import org.freeciv.types.FCEnum;
 
 public class Enum extends ClassWriter {
-    private boolean bitwise = false;
-    private EnumElement invalidDefault;
-    private EnumElement countElement;
+    private final boolean bitwise;
+    private final EnumElement invalidDefault;
+    private final EnumElement countElement;
 
     public Enum(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
         this(enumName, bitwise, null, null, values);
@@ -56,6 +56,8 @@ public class Enum extends ClassWriter {
                     (null == cntString? '"' + cntCode + '"': cntString),
                     numberOfElements);
             this.addEnumerated(this.countElement);
+        } else {
+            this.countElement = null;
         }
         if (enums.containsKey("INVALID")) {
             this.invalidDefault = enums.get("INVALID");

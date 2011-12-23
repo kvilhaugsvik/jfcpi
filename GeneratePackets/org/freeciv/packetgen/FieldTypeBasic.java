@@ -15,10 +15,10 @@
 package org.freeciv.packetgen;
 
 public class FieldTypeBasic {
-    String CSrc;
-    String JavaType;
-    String[] Decode;
-    String[] encode, EncodedSize;
+    private final String CSrc;
+    private final String JavaType;
+    private final String[] Decode;
+    private final String[] encode, EncodedSize;
 
     public FieldTypeBasic(String CSrc, String javaType, String decode, String encode, String encodedSize) {
         this.CSrc = CSrc;
