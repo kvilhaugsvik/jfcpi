@@ -18,29 +18,12 @@ import java.util.LinkedList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Packet {
-    private final String name;
+public class Packet extends ClassWriter {
     private final int number;
     private final Field[] fields;
-    private final boolean hasTwoBytePacketNumber;
 
     public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
-        this.name = name;
-        this.number = number;
-        this.fields = fields;
-        this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public String toString() {
-        ClassWriter code = new ClassWriter(org.freeciv.packet.Packet.class.getPackage(),
+        super(org.freeciv.packet.Packet.class.getPackage(),
                 new String[]{
                         "org.freeciv.packet.fieldtype.*",
                         null,
@@ -52,11 +35,14 @@ public class Packet {
                 name,
                 "Packet");
 
-        code.addConstant("int", "number", number + "");
-        code.addConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
+        this.number = number;
+        this.fields = fields;
+
+        addConstant("int", "number", number + "");
+        addConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
 
         for (Field field: fields) {
-            code.addObjectConstant(field.getType(), field.getVariableName());
+            addObjectConstant(field.getType(), field.getVariableName());
         }
 
         LinkedList<String> constructorBody = new LinkedList<String>();
@@ -68,7 +54,7 @@ public class Packet {
             }
             arglist = trimArgList(arglist);
         }
-        code.addPublicConstructor(null, name, arglist, constructorBody.toArray(new String[0]));
+        addPublicConstructor(null, name, arglist, constructorBody.toArray(new String[0]));
 
         String javatypearglist = "";
         LinkedList<String> constructorBodyJ = new LinkedList<String>();
@@ -80,7 +66,7 @@ public class Packet {
             }
             javatypearglist = trimArgList(javatypearglist);
 
-            code.addPublicConstructor(null, name, javatypearglist, constructorBodyJ.toArray(new String[0]));
+            addPublicConstructor(null, name, javatypearglist, constructorBodyJ.toArray(new String[0]));
         }
 
         String constructorBodyStream = "";
@@ -98,7 +84,7 @@ public class Packet {
                 " + headerLen\n" +
                 "\t" + "+ \" Packet: \" + getEncodedSize());\n" +
                 "}";
-        code.addPublicConstructorWithExceptions("/***\n" +
+        addPublicConstructorWithExceptions("/***\n" +
                 " * Construct an object from a DataInput\n" +
                 " * @param from data stream that is at the start of the package body  \n" +
                 " * @param headerLen length from header package\n" +
@@ -110,18 +96,18 @@ public class Packet {
                 "IOException",
                 constructorBodyStream.split("\n"));
 
-        code.addPublicReadObjectState(null, "int", "getNumber", "return number;");
-        code.addPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
+        addPublicReadObjectState(null, "int", "getNumber", "return number;");
+        addPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
 
         String encodeFields = "// header\n" +
-                        "// length is 2 unsigned bytes\n" +
-                        "to.writeChar(getEncodedSize());\n" +
-                        "// type\n" +
-                        (hasTwoBytePacketNumber ? "to.writeChar(number);" : "to.writeByte(number);") + "\n";
+                "// length is 2 unsigned bytes\n" +
+                "to.writeChar(getEncodedSize());\n" +
+                "// type\n" +
+                (hasTwoBytePacketNumber ? "to.writeChar(number);" : "to.writeByte(number);") + "\n";
         if (0 < fields.length) encodeFields += "\n" +
                 "// body" + "\n";
         for (Field field: fields) encodeFields += field.getVariableName() + ".encodeTo(to);" + "\n";
-        code.addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encodeFields.split("\n"));
+        addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encodeFields.split("\n"));
 
         String encodeFieldsLen = "return " + (hasTwoBytePacketNumber ? "4" : "3");
         if (0 < fields.length) {
@@ -131,7 +117,7 @@ public class Packet {
             encodeFieldsLen = encodeFieldsLen.trim();
         }
         encodeFieldsLen += ";";
-        code.addPublicReadObjectState(null, "int", "getEncodedSize", encodeFieldsLen.split("\n"));
+        addPublicReadObjectState(null, "int", "getEncodedSize", encodeFieldsLen.split("\n"));
 
         String getToString = "String out = \"" + name + "\" + \"(\" + number + \")\";" + "\n";
         for (Field field: fields)
@@ -139,22 +125,24 @@ public class Packet {
                     " = \" + " + field.getVariableName() + ".getValue();" + "\n";
         getToString += "\n";
         getToString += "return out + \"\\n\";";
-        code.addPublicReadObjectState(null, "String", "toString", getToString.split("\n"));
+        addPublicReadObjectState(null, "String", "toString", getToString.split("\n"));
 
         for (Field field: fields) {
-            code.addPublicReadObjectState(null, field.getType(), "get"
-                + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
-                "return " + field.getVariableName() + ";");
+            addPublicReadObjectState(null, field.getType(), "get"
+                    + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
+                    "return " + field.getVariableName() + ";");
         }
 
         for (Field field: fields) {
-            code.addPublicReadObjectState(null, field.getJType(), "get"
+            addPublicReadObjectState(null, field.getJType(), "get"
                     + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
                     + "Value",
                     "return " + field.getVariableName() + ".getValue();");
         }
+    }
 
-        return code.toString();
+    public int getNumber() {
+        return number;
     }
 
     private static String trimArgList(String arglist) {
