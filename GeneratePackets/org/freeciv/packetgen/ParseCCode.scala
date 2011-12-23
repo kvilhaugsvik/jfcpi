@@ -22,13 +22,17 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
 
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
-  @inline private def se(kind: String) = "#define" ~> regex(("SPECENUM_" + kind).r) ^^ {_.substring(9)}
+  private final val DEFINE: String = "#define"
+  private final val SPECENUM: String = "SPECENUM_"
+  private final val NAME: String = "NAME"
+
+  @inline private def se(kind: String) = DEFINE ~> regex((SPECENUM + kind).r) ^^ {_.substring(9)}
 
   def specEnum(kind: String) = se(kind) ~ enumElemCode
 
-  def specEnumOrName(kind: String) = se(kind + "NAME") ~ regex(""""[^\n\r\"]*?"""".r) | specEnum(kind)
+  def specEnumOrName(kind: String) = se(kind + NAME) ~ regex(""""[^\n\r\"]*?"""".r) | specEnum(kind)
 
-  def specEnumDef = se("NAME") ~> regex(enumDefName.r) ~
+  def specEnumDef = se(NAME) ~> regex(enumDefName.r) ~
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
@@ -54,21 +58,21 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
           Integer.rotateLeft(2, specenumnumber - 1)
         else
           specenumnumber
-        if (enumerations.contains(key + "NAME"))
-          newEnumValue(nameInCode, inCodeNumber, enumerations.get(key + "NAME").get)
+        if (enumerations.contains(key + NAME))
+          newEnumValue(nameInCode, inCodeNumber, enumerations.get(key + NAME).get)
         else
           newEnumValue(nameInCode, inCodeNumber)}).toSeq : _*)
     if (enumerations.contains("ZERO"))
-      if (enumerations.contains("ZERO" + "NAME"))
-        outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + "NAME").get)
+      if (enumerations.contains("ZERO" + NAME))
+        outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + NAME).get)
     else
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
     if (enumerations.contains("INVALID"))
       outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
     if (enumerations.contains("COUNT"))
-      if (enumerations.contains("COUNT"+"NAME"))
+      if (enumerations.contains("COUNT"+NAME))
         new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
-          enumerations.get("COUNT"+"NAME").get, outEnumValues: _*)
+          enumerations.get("COUNT"+NAME).get, outEnumValues: _*)
       else
         new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, outEnumValues: _*)
     else
