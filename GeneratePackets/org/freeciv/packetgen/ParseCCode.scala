@@ -131,4 +131,12 @@ class FromCExtractor(toLookFor: List[String]) {
     positions.map(positions => parser.parse(parser.exprConverted, lookInAsReader.drop(positions)))
       .filter(!_.isEmpty).map(_.get)
   }
+
+  case class Validated(extracted: List[ClassWriter], missing: List[String])
+  def extractAndReportMissing(lookIn: String) = {
+    val extracted = extract(lookIn)
+    val notFound = toLookFor.filter(!extracted.contains(_))
+
+    new Validated(extracted, notFound)
+  }
 }

@@ -465,6 +465,30 @@ enum test3 {
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
   }
 
+  @Test def findsEnumsOneMissingExtract {
+    val enums = new FromCExtractor(List("test1", "test2", "test3", "test4")).extract(test123NotingElse)
+    assertNotNull("Enums not found", enums)
+    assertFalse("Enums not found", enums.isEmpty)
+
+    val enumsAsMap = enums.map(_.getName)
+    assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
+    assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
+    assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
+  }
+
+  @Test def findsEnumsOneMissingFindOutWho {
+    val results = new FromCExtractor(List("test1", "test2", "test3", "test4")).extractAndReportMissing(test123NotingElse)
+    assertNotNull("Enums not found", results)
+    assertFalse("Enums not found", results.extracted.isEmpty)
+    assertNotNull("Should figure out what is missing", results.missing)
+    assertTrue("Should figure out what is missing", results.missing.contains("test4"))
+
+    val enumsAsMap = results.extracted.map(_.getName)
+    assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
+    assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
+    assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
+  }
+
   private final val test123OtherCodeAsWell = """
 #define SPECENUM_NAME test1
 #define SPECENUM_VALUE0 ZERO
