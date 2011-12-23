@@ -27,11 +27,11 @@ import java.util.HashMap;
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
 public class Connect {
-    private static boolean hasTwoBytePacketNumber;
-    OutputStream out;
-    DataInputStream in;
-    Socket server;
-    HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
+    private final boolean hasTwoBytePacketNumber;
+    private final OutputStream out;
+    private final DataInputStream in;
+    private final Socket server;
+    private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
 
     public Connect(String address, int port) throws IOException {
         this(address, port, true);

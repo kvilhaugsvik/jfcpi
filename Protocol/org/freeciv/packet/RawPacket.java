@@ -19,10 +19,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class RawPacket implements Packet {
-    boolean hasTwoBytePacketNumber;
-    int size;
-    int kind;
-    byte[] content;
+    private final boolean hasTwoBytePacketNumber;
+    private final int size;
+    private final int kind;
+    private final byte[] content;
 
     public RawPacket(DataInput in, int size, int kind, boolean hasTwoBytePacketNumber) throws IOException {
         this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
