@@ -97,6 +97,11 @@ public class EnumTest {
         assertEquals("Wrong name", "test", result.getName());
     }
 
+    @Test public void testPackageIsCorrect() {
+        Enum result = enumWithValues();
+        assertEquals("Wrong name", "org.freeciv.types", result.getPackage());
+    }
+
     @Test public void testGetEnumValueLast() {
         Enum result = enumWithValues();
         assertNotNull("Enum element not found", result.getEnumValue("TWO"));
