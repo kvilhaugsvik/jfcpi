@@ -39,7 +39,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
 
   def specEnum(kind: String) = se(kind) ~ enumElemCode
 
-  def specEnumOrName(kind: String) = se(kind + NAME) ~ regex(""""[^\n\r\"]*?"""".r) | specEnum(kind)
+  def specEnumOrName(kind: String) = se(kind + NAME) ~ regex(""""[^\n\r\"]*?"""".r) ||| specEnum(kind)
 
   def specEnumDef = regex(startOfSpecEnum.r) ~> regex(enumDefName.r) ~
     (rep((specEnumOrName("VALUE\\d+") |
