@@ -16,6 +16,7 @@ package org.freeciv.packetgen
 
 import collection.mutable.ListBuffer
 import ClassWriter.EnumElement.{newEnumValue, newInvalidEnum}
+import util.parsing.input.CharArrayReader
 
 class ParseCCode(lookFor: List[String]) extends ParseShared {
   def enumDefName: String = "(" + lookFor.reduce(_ + "|" + _) + ")"
@@ -28,6 +29,11 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
 
   def startOfSpecEnum: String = DEFINE + "\\s+" + SPECENUM + NAME
   def startOfCEnum: String = "enum"
+
+  def startsOfExtractable = List(
+    startOfCEnum + "\\s+" + enumDefName,
+    startOfSpecEnum + "\\s+" + enumDefName
+  )
 
   @inline private def se(kind: String) = DEFINE ~> regex((SPECENUM + kind).r) ^^ {_.substring(9)}
 
@@ -101,7 +107,27 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
       }): _*)
   }
 
+  def exprConverted = cEnumDefConverted | specEnumDefConverted
+
   def expr = cEnumDef |
     specEnumDef |
     CComment
+}
+
+class FromCExtractor(toLookFor: List[String]) {
+  if (Nil.eq(toLookFor))
+    throw new IllegalArgumentException("Nothing looked for so nothing to extract")
+
+  private val parser = new ParseCCode(toLookFor)
+  private val lookFor = parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _).r
+
+  def findPossibleStartPositions(lookIn: String): List[Int] =
+    lookFor.findAllIn(lookIn).matchData.map(_.start).toList
+
+  def extract(lookIn: String) = {
+    val positions = findPossibleStartPositions(lookIn)
+    val lookInAsReader = new CharArrayReader(lookIn.toArray)
+
+    positions.map(positions => parser.parse(parser.exprConverted, lookInAsReader.drop(positions)).get)
+  }
 }

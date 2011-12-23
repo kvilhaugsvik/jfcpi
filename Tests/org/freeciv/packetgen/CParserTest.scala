@@ -418,3 +418,94 @@ class CParserSemanticTest {
     assertFalse("The count element should be invalid", enum.getCount.isValid)
   }
 }
+
+class FromCExtractorTest {
+  @Test def initialize {
+    val extractor = new FromCExtractor(List("test1", "test2", "test3"))
+  }
+
+  @Test(expected = classOf[IllegalArgumentException])
+  def initializeNotLooking {
+    val extractor = new FromCExtractor(Nil)
+  }
+
+  private final val test123NotingElse = """
+#define SPECENUM_NAME test1
+#define SPECENUM_VALUE0 ZERO
+#define SPECENUM_VALUE1 ONE
+#include "specenum_gen.h"
+
+enum test2 {
+  nothing,
+  one,
+  two,
+  three
+}
+
+enum test3 {
+  toBe,
+  notToBe
+}
+"""
+
+  @Test def findsPositionsAllExist {
+    val positions = new FromCExtractor(List("test1", "test2", "test3")).findPossibleStartPositions(test123NotingElse)
+    assertNotNull("Positions don't exist", positions)
+    assertArrayEquals("Wrong positions given", Array(1, 113, 162), positions.toArray)
+  }
+
+  @Test def findsEnumsAllExist {
+    val enums = new FromCExtractor(List("test1", "test2", "test3")).extract(test123NotingElse)
+    assertNotNull("Enums not found", enums)
+    assertFalse("Enums not found", enums.isEmpty)
+
+    val enumsAsMap = enums.map(_.getEnumClassName)
+    assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
+    assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
+    assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
+  }
+
+  private final val test123OtherCodeAsWell = """
+#define SPECENUM_NAME test1
+#define SPECENUM_VALUE0 ZERO
+#define SPECENUM_VALUE1 ONE
+#include "specenum_gen.h"
+
+int randomVariableInTheVay = 5;
+
+enum test2 {
+  nothing,
+  one,
+  two,
+  three
+}
+
+enum thisIsNotLookedFor {
+  irrelevant,
+  notRelevant
+}
+
+enum test3 {
+  toBe,
+  notToBe
+}
+"""
+
+  @Test def findsPositionsOtherCodeAsWell {
+    val positions = new FromCExtractor(List("test1", "test2", "test3")).findPossibleStartPositions(test123OtherCodeAsWell)
+    assertNotNull("Positions don't exist", positions)
+
+    assertArrayEquals("Wrong positions given", Array(1, 146, 252), positions.toArray)
+  }
+
+  @Test def findsEnumsOtherCodeAsWell {
+    val enums = new FromCExtractor(List("test1", "test2", "test3")).extract(test123OtherCodeAsWell)
+    assertNotNull("Enums not found", enums)
+    assertFalse("Enums not found", enums.isEmpty)
+
+    val enumsAsMap = enums.map(_.getEnumClassName)
+    assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
+    assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
+    assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
+  }
+}
