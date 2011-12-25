@@ -84,6 +84,7 @@ testsignintoserver: testcode
 
 tests: testcode generatortest
 	${JAVA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.PacketTest
+	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.GeneratedPacketTest
 	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
 	touch tests
 
