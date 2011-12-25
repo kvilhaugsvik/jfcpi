@@ -23,6 +23,7 @@ public class PacketsStore {
     private final boolean hasTwoBytePacketNumber;
 
     private final HashMap<String, FieldTypeAlias> types = new HashMap<String, FieldTypeAlias>();
+    private final Hardcoded hardcoded = new Hardcoded();
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
     // Idea from http://stackoverflow.com/q/822701
@@ -35,7 +36,7 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
-        final FieldTypeBasic basicFieldType = Hardcoded.getBasicFieldType(aliased);
+        final FieldTypeBasic basicFieldType = hardcoded.getBasicFieldType(aliased);
         if (null != basicFieldType) {
             if (basicFieldType.hasRequired())
                 types.put(alias, basicFieldType.createFieldType(alias));
