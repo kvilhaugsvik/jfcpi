@@ -72,7 +72,7 @@ public class Enum extends ClassWriter {
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName, "int number, String toStringName", null,
-                "this(number, toStringName, false);");
+                "this(number, toStringName, true);");
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName,
                 "int number, String toStringName, boolean valid",
                 null,
