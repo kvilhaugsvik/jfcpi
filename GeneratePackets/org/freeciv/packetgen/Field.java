@@ -16,19 +16,11 @@ package org.freeciv.packetgen;
 
 public class Field {
     private final String variableName;
-    private final String type;
-    private final String javatype;
-
-    public Field(String variableName, String type, String javatype) {
-        this.variableName = variableName;
-        this.type = type;
-        this.javatype = javatype;
-    }
+    private final FieldTypeBasic.FieldTypeAlias type;
 
     public Field(String variableName, FieldTypeBasic.FieldTypeAlias typeAlias) {
         this.variableName = variableName;
-        this.type = typeAlias.getName();
-        this.javatype = typeAlias.getJavaType();
+        this.type = typeAlias;
     }
 
     public String getVariableName() {
@@ -36,10 +28,10 @@ public class Field {
     }
 
     public String getType() {
-        return type;
+        return type.getName();
     }
 
     public String getJType() {
-        return javatype;
+        return type.getJavaType();
     }
 }

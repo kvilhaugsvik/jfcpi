@@ -30,38 +30,47 @@ public class GenerateTest {
         (new File(GeneratorDefaults.GENERATEDOUT + "/" +
                 org.freeciv.packet.fieldtype.FieldType.class.getPackage().getName().replace('.', '/'))).mkdirs();
 
-        writeFieldType("UINT32", "uint32(int)");
-        writeFieldType("STRING", "string(char)");
-        writeFieldType("BOOL", "bool8(bool)");
-        writeFieldType("CONNECTION", "sint16(int)");
+        FieldTypeBasic.FieldTypeAlias uint32 =
+                Hardcoded.getBasicFieldType("uint32(int)").createFieldType("UINT32");
+        FieldTypeBasic.FieldTypeAlias string =
+                Hardcoded.getBasicFieldType("string(char)").createFieldType("STRING");
+        FieldTypeBasic.FieldTypeAlias bool =
+                Hardcoded.getBasicFieldType("bool8(bool)").createFieldType("BOOL");
+        FieldTypeBasic.FieldTypeAlias connection =
+                Hardcoded.getBasicFieldType("sint16(int)").createFieldType("CONNECTION");
+
+        writeJavaFile(uint32);
+        writeJavaFile(string);
+        writeJavaFile(bool);
+        writeJavaFile(connection);
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
                 false,
-                new Field("username", "STRING", "String"),
-                new Field("capability", "STRING", "String"),
-                new Field("version_label", "STRING", "String"),
-                new Field("major_version", "UINT32", "Long"),
-                new Field("minor_version", "UINT32", "Long"),
-                new Field("patch_version", "UINT32", "Long")));
+                new Field("username", string),
+                new Field("capability", string),
+                new Field("version_label", string),
+                new Field("major_version", uint32),
+                new Field("minor_version", uint32),
+                new Field("patch_version", uint32)));
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
                 false,
-                new Field("you_can_join", "BOOL", "boolean"),
-                new Field("message", "STRING", "String"),
-                new Field("capability", "STRING", "String"),
-                new Field("challenge_file", "STRING", "String"),
-                new Field("conn_id", "CONNECTION", "Short")));
+                new Field("you_can_join", bool),
+                new Field("message", string),
+                new Field("capability", string),
+                new Field("challenge_file", string),
+                new Field("conn_id", connection)));
         writePacket(new Packet("CONN_PING", 88, false));
         writePacket(new Packet("CONN_PONG", 89, false));
         writePacket(new Packet("SERVER_JOIN_REQ2ByteKind",
                 4,
                 true,
-                new Field("username", "STRING", "String"),
-                new Field("capability", "STRING", "String"),
-                new Field("version_label", "STRING", "String"),
-                new Field("major_version", "UINT32", "Long"),
-                new Field("minor_version", "UINT32", "Long"),
-                new Field("patch_version", "UINT32", "Long")));
+                new Field("username", string),
+                new Field("capability", string),
+                new Field("version_label", string),
+                new Field("major_version", uint32),
+                new Field("minor_version", uint32),
+                new Field("patch_version", uint32)));
 
         FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + "/" +
                 org.freeciv.packet.Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt");
@@ -74,10 +83,6 @@ public class GenerateTest {
     private static void writePacket(Packet packet) throws IOException {
         writeJavaFile(packet);
         writtenPackets.add((packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName()));
-    }
-
-    private static void writeFieldType(String fieldType, String ioType) throws IOException {
-        writeJavaFile(Hardcoded.getBasicFieldType(ioType).createFieldType(fieldType));
     }
 
     private static void writeJavaFile(ClassWriter content) throws IOException {
