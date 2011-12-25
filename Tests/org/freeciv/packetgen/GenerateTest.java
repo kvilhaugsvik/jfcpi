@@ -37,8 +37,13 @@ public class GenerateTest {
                 ClassWriter.EnumElement.newEnumValue("two", 2, "\"2nd\""),
                 ClassWriter.EnumElement.newEnumValue("three", 3),
                 ClassWriter.EnumElement.newInvalidEnum(-3));
+        Enum testDefaultInvalid = new Enum("testDefaultInvalid", false,
+                ClassWriter.EnumElement.newEnumValue("one", 1),
+                ClassWriter.EnumElement.newEnumValue("two", 2, "\"2nd\""),
+                ClassWriter.EnumElement.newEnumValue("three", 3));
 
         writeJavaFile(test);
+        writeJavaFile(testDefaultInvalid);
 
         FieldTypeBasic.FieldTypeAlias uint32 =
                 Hardcoded.getBasicFieldType("uint32(int)").createFieldType("UINT32");

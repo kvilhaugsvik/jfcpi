@@ -15,6 +15,7 @@
 package org.freeciv.test;
 
 import org.freeciv.types.test;
+import org.freeciv.types.testDefaultInvalid;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -34,6 +35,10 @@ public class GeneratedEnumTest {
 
     @Test public void getNumberInvalidIsMinus3() {
         assertEquals("Wrong number for enum constant", -3, test.INVALID.getNumber());
+    }
+
+    @Test public void invalidOnEnumWithNoInvalidValueIsMinusOne() {
+        assertEquals("Wrong number for enum constant", -1, testDefaultInvalid.INVALID.getNumber());
     }
 
     @Test public void isValidOneIsValid() {
