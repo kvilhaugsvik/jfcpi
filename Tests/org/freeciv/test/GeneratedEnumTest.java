@@ -40,6 +40,10 @@ public class GeneratedEnumTest {
         assertEquals("Wrong number for enum constant", -1, testDefaultInvalid.INVALID.getNumber());
     }
 
+    @Test public void getNumberCount() {
+        assertEquals("Wrong number for enum constant", 4, testCount.COUNT.getNumber());
+    }
+
     @Test public void isValidOneIsValid() {
         assertTrue("Wrong valid value for enum constant", test.one.isValid());
     }
@@ -48,12 +52,20 @@ public class GeneratedEnumTest {
         assertFalse("Wrong valid value for enum constant", test.INVALID.isValid());
     }
 
+    @Test public void isValidCountIsInvalid() {
+        assertFalse("Wrong valid value for enum constant", testCount.COUNT.isValid());
+    }
+
     @Test public void toStringOneIsOne() {
         assertEquals("Wrong String conversion for enum constant", "one", test.one.toString());
     }
 
     @Test public void toStringTwoIs2n() {
         assertEquals("Wrong String conversion for enum constant", "2nd", test.two.toString());
+    }
+
+    @Test public void toStringCount() {
+        assertEquals("Wrong String conversion for enum constant", "numbers listed", testCount.COUNT.toString());
     }
 
     @Test public void isBitwiseGivesCorrectValue() {
