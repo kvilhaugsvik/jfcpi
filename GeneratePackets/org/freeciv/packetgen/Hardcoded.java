@@ -78,7 +78,29 @@ public class Hardcoded {
                         "to.writeInt(value);",
                         "return 4;",
                         false),
-                getUInt8Enum("unit_activity")
+                getUInt8Enum("unit_activity"),
+                getUInt8Enum("airlifting_style"),
+                getUInt8Enum("authentication_type"),
+                getUInt8Enum("base_gui_type"),
+                getUInt8Enum("borders_mode"),
+                getUInt8Enum("clause_type"),
+                getUInt8Enum("cmdlevel"),
+                getUInt8Enum("diplomacy_mode"),
+                getUInt8Enum("diplomat_actions"),
+                getUInt8Enum("direction8"),
+                getUInt8Enum("effect_type"),
+                getUInt8Enum("gui_type"),
+                getUInt8Enum("impr_genus_id"),
+                getUInt8Enum("known_type"),
+                getUInt8Enum("unit_orders"),
+                getUInt8Enum("phase_mode_types"),
+                getUInt8Enum("spaceship_place_type"),
+                getUInt8Enum("report_type"),
+                getUInt8Enum("req_range"),
+                getUInt8Enum("universals_n"),
+                getUInt8Enum("special_river_move"),
+                getUInt8Enum("sset_class"),
+                getUInt8Enum("sset_type")
         }) {
             data.put(src.getFieldTypeBasic(), src);
         }
