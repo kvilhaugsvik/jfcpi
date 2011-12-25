@@ -16,10 +16,7 @@
 
 package org.freeciv.test;
 
-import org.freeciv.packetgen.Packet;
-import org.freeciv.packetgen.Field;
-import org.freeciv.packetgen.Hardcoded;
-import org.freeciv.packetgen.GeneratorDefaults;
+import org.freeciv.packetgen.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -30,7 +27,8 @@ public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
     public static void main(String[] args) throws IOException {
-        (new File(GeneratorDefaults.GENERATEDOUT + "/org/freeciv/packet/" + "fieldtype")).mkdirs();
+        (new File(GeneratorDefaults.GENERATEDOUT + "/" +
+                org.freeciv.packet.fieldtype.FieldType.class.getPackage().getName().replace('.', '/'))).mkdirs();
 
         writeFieldType("UINT32", "uint32(int)");
         writeFieldType("STRING", "string(char)");
@@ -65,7 +63,8 @@ public class GenerateTest {
                 new Field("minor_version", "UINT32", "Long"),
                 new Field("patch_version", "UINT32", "Long")));
 
-        FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + "/" + "org/freeciv/packet/" + "packets.txt");
+        FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + "/" +
+                org.freeciv.packet.Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt");
         for (String packet: writtenPackets) {
             packetList.write(packet + "\n");
         }
@@ -73,21 +72,22 @@ public class GenerateTest {
     }
 
     private static void writePacket(Packet packet) throws IOException {
-        writeJavaFile(packet.getName(), packet.toString());
-        writtenPackets.add((packet.getNumber() + "\t" + "org/freeciv/packet/" + packet.getName()).replace('/', '.'));
+        writeJavaFile(packet);
+        writtenPackets.add((packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName()));
     }
 
     private static void writeFieldType(String fieldType, String ioType) throws IOException {
-        String content = Hardcoded.getBasicFieldType(ioType).createFieldType(fieldType).toString();
-        writeJavaFile(fieldType, content);
+        writeJavaFile(Hardcoded.getBasicFieldType(ioType).createFieldType(fieldType));
     }
 
-    private static void writeJavaFile(String javaclass, String content) throws IOException {
-        String packagePath = content.split(" |;")[1].replaceAll("\\.", "/");
-        File classFile = new File(GeneratorDefaults.GENERATEDOUT + "/" + packagePath + "/" + javaclass + ".java");
+    private static void writeJavaFile(ClassWriter content) throws IOException {
+        String packagePath = content.getPackage().replace('.', '/');
+        File classFile = new File(GeneratorDefaults.GENERATEDOUT +
+                "/" + packagePath + "/" + content.getName() + ".java");
+        System.out.println(classFile.getAbsolutePath());
         classFile.createNewFile();
         FileWriter toClass = new FileWriter(classFile);
-        toClass.write(content);
+        toClass.write(content.toString());
         toClass.close();
     }
 }
