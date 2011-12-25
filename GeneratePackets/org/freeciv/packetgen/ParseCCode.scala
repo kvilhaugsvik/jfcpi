@@ -139,4 +139,6 @@ class FromCExtractor(toLookFor: List[String]) {
 
     new Validated(extracted, notFound)
   }
+
+  override def toString = "Extracts(" + parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _) + ")"
 }
