@@ -26,6 +26,7 @@ public class Packet extends ClassWriter {
         super(org.freeciv.packet.Packet.class.getPackage(),
                 new String[]{
                         "org.freeciv.packet.fieldtype.*",
+                        org.freeciv.types.FCEnum.class.getPackage().getName() + ".*",
                         null,
                         "java.io.DataInput",
                         "java.io.DataOutput",
