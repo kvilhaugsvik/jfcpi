@@ -100,7 +100,13 @@ public class Hardcoded {
                 getUInt8Enum("universals_n"),
                 getUInt8Enum("special_river_move"),
                 getUInt8Enum("sset_class"),
-                getUInt8Enum("sset_type")
+                getUInt8Enum("sset_type"),
+                new FieldTypeBasic("sint16", "enum event_type",
+                        "event_type",
+                        "value = event_type.valueOf(from.readShort());",
+                        "to.writeShort(value.getNumber());",
+                        "return 2;",
+                        true)
         }) {
             data.put(src.getFieldTypeBasic(), src);
         }
