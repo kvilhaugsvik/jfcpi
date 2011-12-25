@@ -18,18 +18,40 @@ import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 
-class GeneratePackets(packetsDefPath: File, devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
+class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
 
-  def this(packetsDefPath: String, devMode: Boolean, hasTwoBytePacketNumber: Boolean) =
-    this(new File(packetsDefPath), devMode, hasTwoBytePacketNumber)
+  def this(packetsDefPathString: String, cPathsString: List[String], devMode: Boolean, hasTwoBytePacketNumber: Boolean) = {
+    this(new File(packetsDefPathString), cPathsString.map(new File(_)), devMode, hasTwoBytePacketNumber)
+  }
 
   private val storage = new PacketsStore(devMode, hasTwoBytePacketNumber)
   private val Parser = new ParsePacketsDef(storage)
 
-  if (!packetsDefPath.exists()) {
-    throw new IOException(packetsDefPath.getAbsolutePath + " doesn't exist.")
-  } else if (!packetsDefPath.canRead) {
-    throw new IOException("Can't read " + packetsDefPath.getAbsolutePath)
+  (packetsDefPath :: cPaths).foreach((fileToValidate: File) => {
+    if (!fileToValidate.exists()) {
+      throw new IOException(fileToValidate.getAbsolutePath + " doesn't exist.")
+    } else if (!fileToValidate.canRead) {
+      throw new IOException("Can't read " + fileToValidate.getAbsolutePath)
+    }
+  })
+
+  private val toLookFor = (new Hardcoded).values().filter(!_.hasRequired).map(_.getPublicType).map(requirement => {
+    val req = requirement.split("\\s")
+    if ("enum".equals(req(0))) {
+      req(1) -> requirement
+    } else {
+      throw new UnsupportedOperationException("No support for generating " + req(0) + " one the fly")
+    }
+  }: (String, String)).toMap
+  if ((null != toLookFor) && !Nil.equals(toLookFor)) {
+    val extractor = new FromCExtractor(toLookFor.keys.toList)
+    cPaths.map(code => {
+      val codeFile = new FileReader(code)
+      val content = StreamReader(codeFile).source.toString
+      codeFile.close()
+      extractor.extract(content).foreach((requirement) =>
+        storage.addRequirement(toLookFor(requirement.getName), requirement))
+    })
   }
 
   if (!Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))).successful) {
@@ -39,10 +61,10 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean, hasTwoBytePacketNu
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
   def writeToDir(path: File) {
-    (new File(path + "/org/freeciv/packet/fieldtype")).mkdirs()
     storage.getJavaCode.foreach((code) => {
       val packagePath = code.getPackage.replaceAll("""\.""", "/")
       val classFile = new File(path + "/" + packagePath + "/" + code.getName + ".java")
+      classFile.getParentFile.mkdirs()
       classFile.createNewFile
       val classWriter = new FileWriter(classFile)
       classWriter.write(code.toString)
@@ -59,7 +81,7 @@ class GeneratePackets(packetsDefPath: File, devMode: Boolean, hasTwoBytePacketNu
 
 object GeneratePackets {
   def main(args: Array[String]) {
-    val self = new GeneratePackets(args(0), GeneratorDefaults.DEVMODE, true)
+    val self = new GeneratePackets(args(0), args.tail.toList, GeneratorDefaults.DEVMODE, true)
     self.writeToDir(GeneratorDefaults.GENERATEDOUT)
   }
 }
