@@ -45,8 +45,8 @@ testpackets: protocol generator
 
 # since the parser isn't finished use GenerateTest as generator
 generated: generator protocol testpackets
-	${JAVAC} -d ${PROTOOUT} -cp ${PROTOOUT} ${GENERATEDOUT}/org/freeciv/packet/*.java \
-	                                        ${GENERATEDOUT}/org/freeciv/packet/*/*.java
+	${JAVAC} -d ${PROTOOUT} -cp ${PROTOOUT} ${GENERATEDOUT}/org/freeciv/*/*.java \
+	                                        ${GENERATEDOUT}/org/freeciv/*/*/*.java
 	cp ${GENERATEDOUT}/org/freeciv/packet/packets.txt ${PROTOOUT}/org/freeciv/packet/
 	touch generated
 
@@ -84,6 +84,7 @@ testsignintoserver: testcode
 
 tests: testcode generatortest
 	${JAVA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.PacketTest
+	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
 	touch tests
 
 clean:

@@ -28,7 +28,17 @@ public class GenerateTest {
 
     public static void main(String[] args) throws IOException {
         (new File(GeneratorDefaults.GENERATEDOUT + "/" +
+                org.freeciv.types.FCEnum.class.getPackage().getName().replace('.', '/'))).mkdirs();
+        (new File(GeneratorDefaults.GENERATEDOUT + "/" +
                 org.freeciv.packet.fieldtype.FieldType.class.getPackage().getName().replace('.', '/'))).mkdirs();
+
+        Enum test = new Enum("test", false,
+                ClassWriter.EnumElement.newEnumValue("one", 1),
+                ClassWriter.EnumElement.newEnumValue("two", 2, "\"2nd\""),
+                ClassWriter.EnumElement.newEnumValue("three", 3),
+                ClassWriter.EnumElement.newInvalidEnum(-3));
+
+        writeJavaFile(test);
 
         FieldTypeBasic.FieldTypeAlias uint32 =
                 Hardcoded.getBasicFieldType("uint32(int)").createFieldType("UINT32");
