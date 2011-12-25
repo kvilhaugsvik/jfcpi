@@ -63,7 +63,11 @@ public class FieldTypeBasic {
 
         private FieldTypeAlias(String name, FieldTypeBasic basicType) {
             super(org.freeciv.packet.fieldtype.FieldType.class.getPackage(),
-                    new String[]{"java.io.DataInput", "java.io.DataOutput", "java.io.IOException"},
+                    new String[]{
+                            "java.io.DataInput", "java.io.DataOutput", "java.io.IOException",
+                            null,
+                            org.freeciv.types.FCEnum.class.getPackage().getName() + ".*"
+                    },
                     "Freeciv's protocol definition",
                     name,
                     "FieldType<" + JavaType + ">");
