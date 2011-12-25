@@ -14,8 +14,7 @@
 
 package org.freeciv.test;
 
-import org.freeciv.types.test;
-import org.freeciv.types.testDefaultInvalid;
+import org.freeciv.types.*;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -59,6 +58,10 @@ public class GeneratedEnumTest {
 
     @Test public void isBitwiseGivesCorrectValue() {
         assertFalse("Generated enum test should not be bitwise", test.isBitWise());
+    }
+
+    @Test public void isBitwiseGivesCorrectValueForBitwise() {
+        assertTrue("Generated enum bitwise should be bitwise", bitwise.isBitWise());
     }
 
     @Test public void getValueIntGetsTheCorrectEnumForOne() {
