@@ -15,21 +15,22 @@
 package org.freeciv.packetgen;
 
 public class FieldTypeBasic {
-    private final String CSrc;
+    private final String fieldTypeBasic;
     private final String JavaType;
     private final String[] Decode;
     private final String[] encode, EncodedSize;
 
-    public FieldTypeBasic(String CSrc, String javaType, String decode, String encode, String encodedSize) {
-        this.CSrc = CSrc;
+    public FieldTypeBasic(String dataIOType, String publicType, String javaType,
+                          String decode, String encode, String encodedSize) {
+        this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         JavaType = javaType;
         Decode = decode.split("\n");
         this.encode = encode.split("\n");
         EncodedSize = encodedSize.split("\n");
     }
 
-    public String getCSrc() {
-        return CSrc;
+    public String getFieldTypeBasic() {
+        return fieldTypeBasic;
     }
 
     public FieldTypeAlias createFieldType(String name) {
