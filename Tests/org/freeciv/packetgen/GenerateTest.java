@@ -16,8 +16,6 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.packetgen.*;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,10 +25,13 @@ public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
     public static void main(String[] args) throws IOException {
-        (new File(GeneratorDefaults.GENERATEDOUT + "/" +
-                org.freeciv.types.FCEnum.class.getPackage().getName().replace('.', '/'))).mkdirs();
-        (new File(GeneratorDefaults.GENERATEDOUT + "/" +
-                org.freeciv.packet.fieldtype.FieldType.class.getPackage().getName().replace('.', '/'))).mkdirs();
+        for (Package pack: new Package[]{
+                org.freeciv.types.FCEnum.class.getPackage(),
+                org.freeciv.packet.Packet.class.getPackage(),
+                org.freeciv.packet.fieldtype.FieldType.class.getPackage()
+        }) {
+            (new File(GeneratorDefaults.GENERATEDOUT + "/" + pack.getName().replace('.', '/'))).mkdirs();
+        }
 
         Enum test = new Enum("test", false,
                 ClassWriter.EnumElement.newEnumValue("one", 1),
