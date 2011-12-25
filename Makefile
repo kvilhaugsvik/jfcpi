@@ -82,14 +82,22 @@ testsignintoserver: testcode
 	${JAVA} -cp ${PROTOOUT}:${TESTOUT} org.freeciv.test.SignInAndWait
 	touch testsignintoserver
 
-tests: testcode generatortest
-	${JAVA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.PacketTest
+packettestcompile: testout protocol
+	${JAVAC} -d ${TESTOUT} -cp ${PROTOOUT}:${JUNIT} Tests/org/freeciv/packet/*.java
+	touch packettestcompile
+
+packettest: packettestcompile
+	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packet.PacketTest
+	touch packettest
+
+tests: testcode generatortest packettest
 	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.GeneratedPacketTest
 	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
 	touch tests
 
 clean:
 	rm -rf ${PROTOOUT} protocol
+	rm -rf packettest packettestcompile
 	rm -rf ${PACKETGENOUT} generator
 	rm -rf generated
 	rm -rf testcode
