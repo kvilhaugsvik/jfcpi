@@ -78,12 +78,7 @@ public class Hardcoded {
                         "to.writeInt(value);",
                         "return 4;",
                         false),
-                new FieldTypeBasic("uint8", "enum unit_activity",
-                        "unit_activity",
-                        "value = unit_activity.valueOf(from.readUnsignedByte());",
-                        "to.writeByte(value.getNumber());",
-                        "return 1;",
-                        true)
+                getUInt8Enum("unit_activity")
         }) {
             data.put(src.getFieldTypeBasic(), src);
         }
@@ -95,5 +90,14 @@ public class Hardcoded {
 
     public Collection<FieldTypeBasic> values() {
         return data.values();
+    }
+
+    private static FieldTypeBasic getUInt8Enum(String named) {
+        return new FieldTypeBasic("uint8", "enum " + named,
+                named,
+                "value = " + named + ".valueOf(from.readUnsignedByte());",
+                "to.writeByte(value.getNumber());",
+                "return 1;",
+                true);
     }
 }
