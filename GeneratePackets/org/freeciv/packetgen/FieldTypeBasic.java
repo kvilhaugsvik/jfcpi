@@ -16,21 +16,42 @@ package org.freeciv.packetgen;
 
 public class FieldTypeBasic {
     private final String fieldTypeBasic;
+    private final String publicType;
     private final String JavaType;
     private final String[] Decode;
     private final String[] encode, EncodedSize;
 
+    private boolean hasReq;
+
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
-                          String decode, String encode, String encodedSize) {
+                          String decode, String encode, String encodedSize, boolean needsType) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
+        this.publicType = publicType;
         JavaType = javaType;
         Decode = decode.split("\n");
         this.encode = encode.split("\n");
         EncodedSize = encodedSize.split("\n");
+
+        if (needsType)
+            hasReq = false;
+        else
+            hasReq = true;
     }
 
     public String getFieldTypeBasic() {
         return fieldTypeBasic;
+    }
+
+    public boolean hasRequired() {
+        return hasReq;
+    }
+
+    public void requirementsFound() {
+        this.hasReq = true;
+    }
+
+    public String getPublicType() {
+        return publicType;
     }
 
     public FieldTypeAlias createFieldType(String name) {

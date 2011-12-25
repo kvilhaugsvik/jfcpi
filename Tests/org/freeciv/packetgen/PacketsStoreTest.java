@@ -46,6 +46,13 @@ public class PacketsStoreTest {
         assertTrue(storage.hasTypeAlias("UNSIGNEDINT32"));
     }
 
+    @Test public void registerTypeRequiredNotExistingDevMode() throws UndefinedException {
+        PacketsStore storage = dev();
+        storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
+
+        assertFalse("Filed type alias should have been skipped", storage.hasTypeAlias("ACTIVITY"));
+    }
+
     @Test public void registerTypeNotExistingDevMode() throws UndefinedException {
         PacketsStore storage = dev();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "UINT32");
@@ -63,6 +70,12 @@ public class PacketsStoreTest {
     public void registerTypeBasicTypeNotExisting() throws UndefinedException {
         PacketsStore storage = noDev();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "notexisting128(void)");
+    }
+
+    @Test(expected = UndefinedException.class)
+    public void registerTypeRequiredNotExisting() throws UndefinedException {
+        PacketsStore storage = noDev();
+        storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
     }
 
     @Test public void codeIsThere() throws UndefinedException {

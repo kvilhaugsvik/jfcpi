@@ -35,18 +35,25 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
-        if (null != Hardcoded.getBasicFieldType(aliased)) {
-            types.put(alias, Hardcoded.getBasicFieldType(aliased).createFieldType(alias));
+        final FieldTypeBasic basicFieldType = Hardcoded.getBasicFieldType(aliased);
+        if (null != basicFieldType) {
+            if (basicFieldType.hasRequired())
+                types.put(alias, basicFieldType.createFieldType(alias));
+            else
+                skipOrCrash("Required type " + basicFieldType.getPublicType() + " used in " + aliased + " not found.");
         } else if (types.containsKey(aliased)) {
             types.put(alias, types.get(aliased).getBasicType().createFieldType(alias));
         } else {
-            String errorMessage = aliased + " not declared before used in " + alias + ".";
-            if (devMode) {
-                System.err.println(errorMessage);
-                System.err.println("Continuing since in development mode...");
-            } else {
-                throw new UndefinedException(errorMessage);
-            }
+            skipOrCrash(aliased + " not declared before used in " + alias + ".");
+        }
+    }
+
+    private void skipOrCrash(String errorMessage) throws UndefinedException {
+        if (devMode) {
+            System.err.println(errorMessage);
+            System.err.println("Skipping since in development mode...");
+        } else {
+            throw new UndefinedException(errorMessage);
         }
     }
 
@@ -68,15 +75,8 @@ public class PacketsStore {
         List<Field> fieldList = new LinkedList<Field>();
         for (String[] fieldType: fields) {
             if (!types.containsKey(fieldType[0])) {
-                String errorMessage = "Field type " + fieldType[0] +
-                        " not declared before use in packet " + name + ".";
-                if (devMode) {
-                    System.err.println(errorMessage);
-                    System.err.println("Skipping packet since in development mode...");
-                    return;
-                } else {
-                    throw new UndefinedException(errorMessage);
-                }
+                skipOrCrash("Field type " + fieldType[0] + " not declared before use in packet " + name + ".");
+                return;
             }
             fieldList.add(new Field(fieldType[1], types.get(fieldType[0])));
         }
