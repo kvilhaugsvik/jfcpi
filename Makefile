@@ -39,8 +39,8 @@ generator: generatordefaults protocol
 
 testpackets: protocol generator
 	mkdir -p ${TESTOUT}
-	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT} Tests/org/freeciv/test/GenerateTest.java
-	${JAVA} -cp ${TESTOUT}:${PACKETGENOUT}:${PROTOOUT} org.freeciv.test.GenerateTest
+	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT} Tests/org/freeciv/packetgen/GenerateTest.java
+	${JAVA} -cp ${TESTOUT}:${PACKETGENOUT}:${PROTOOUT} org.freeciv.packetgen.GenerateTest
 	touch testpackets
 
 # since the parser isn't finished use GenerateTest as generator

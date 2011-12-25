@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.test;
+package org.freeciv.packetgen;
 
 import org.freeciv.packetgen.*;
 
