@@ -55,4 +55,16 @@ public class GeneratedEnumTest {
     @Test public void isBitwiseGivesCorrectValue() {
         assertFalse("Generated enum test should not be bitwise", test.isBitWise());
     }
+
+    @Test public void getValueIntGetsTheCorrectEnumForOne() {
+        assertEquals("Failed to retrieve enum by number", test.one, test.valueOf(1));
+    }
+
+    @Test public void getValueIntGetsTheCorrectEnumForThree() {
+        assertEquals("Failed to retrieve enum by number", test.three, test.valueOf(3));
+    }
+
+    @Test public void getValueIntGetsINVALIDForUnused() {
+        assertEquals("Failed to retrieve enum by number", test.INVALID, test.valueOf(98));
+    }
 }

@@ -90,6 +90,14 @@ public class Enum extends ClassWriter {
                 " * @return true if the enum is bitwise" + "\n" +
                 " */",
                 "boolean", "isBitWise", "return " + bitwise + ";");
+
+        addMethod("", Visibility.PUBLIC, Scope.CLASS, this.getName(), "valueOf", "int number", null,
+                "for (" + this.getName() + " element: values()) {",
+                "\t" + "if (element.getNumber() == number) {",
+                "\t" + "\t" + "return element;",
+                "\t" + "}",
+                "}",
+                "return INVALID;");
     }
 
     public boolean isBitwise() {
