@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 //TODO: Move data to file
@@ -90,5 +91,9 @@ public class Hardcoded {
 
     public FieldTypeBasic getBasicFieldType(String src) {
         return data.get(src);
+    }
+
+    public Collection<FieldTypeBasic> values() {
+        return data.values();
     }
 }

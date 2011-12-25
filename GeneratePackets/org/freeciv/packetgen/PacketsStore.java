@@ -23,6 +23,7 @@ public class PacketsStore {
     private final boolean hasTwoBytePacketNumber;
 
     private final HashMap<String, FieldTypeAlias> types = new HashMap<String, FieldTypeAlias>();
+    private final HashMap<String, ClassWriter> requirements = new HashMap<String, ClassWriter>();
     private final Hardcoded hardcoded = new Hardcoded();
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
@@ -100,6 +101,7 @@ public class PacketsStore {
 
     public Collection<ClassWriter> getJavaCode() {
         ArrayList<ClassWriter> out = new ArrayList<ClassWriter>(types.values());
+        out.addAll(requirements.values());
         out.addAll(packets.values());
         return out;
     }
@@ -112,5 +114,12 @@ public class PacketsStore {
             out += packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName() + "\n";
         }
         return out;
+    }
+
+    public void addRequirement(String publicType, ClassWriter requirement) {
+        requirements.put(publicType, requirement);
+        for (FieldTypeBasic basicType: hardcoded.values()) {
+            if (basicType.getPublicType().equals(publicType)) basicType.requirementsFound();
+        }
     }
 }

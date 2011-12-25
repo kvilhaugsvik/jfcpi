@@ -78,6 +78,14 @@ public class PacketsStoreTest {
         storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
     }
 
+    @Test public void registerTypeRequired() throws UndefinedException {
+        PacketsStore storage = noDev();
+        storage.addRequirement("enum unit_activity", new Enum("unit_activity", false));
+        storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
+
+        assertTrue("Type alias should have been added since requirement registered", storage.hasTypeAlias("ACTIVITY"));
+    }
+
     @Test public void codeIsThere() throws UndefinedException {
         PacketsStore storage = noDev();
 
