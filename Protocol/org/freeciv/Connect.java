@@ -79,15 +79,19 @@ public class Connect {
             try {
                 return (Packet)packetMakers.get(kind).newInstance(in, size, kind);
             } catch (InstantiationException e) {
-                throw new IOException("Internal error while trying to read packet from network", e);
+                throw packetReadingError(kind, e);
             } catch (IllegalAccessException e) {
-                throw new IOException("Internal error while trying to read packet from network", e);
+                throw packetReadingError(kind, e);
             } catch (InvocationTargetException e) {
-                throw new IOException("Internal error while trying to read packet from network", e);
+                throw packetReadingError(kind, e);
             }
         } else {
             return new RawPacket(in, size, kind, hasTwoBytePacketNumber);
         }
+    }
+
+    private static IOException packetReadingError(int kind, Exception exception) {
+        return new IOException("Internal error while trying to read packet numbered " + kind + " from network", exception);
     }
 
     public void toSend(Packet toSend) throws IOException {
