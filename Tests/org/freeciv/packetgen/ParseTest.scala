@@ -17,7 +17,7 @@
 package org.freeciv.packetgen
 
 import org.junit.Test
-import junit.framework.Assert._
+import org.junit.Assert._
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
 
@@ -604,5 +604,38 @@ class ParseTest {
     assertTrue(storedFields.contains("a"))
     assertTrue(storedFields.contains("b"))
     assertTrue(storedFields.contains("c"))
+  }
+
+  private val manyFieldsInOneDefineSomeWithArrayDeclarations = """
+  UINT8 maxB;
+  UINT8 a, b[7], c[8:maxB], d[7][8:maxB];"""
+
+  private def assertStringArrayEquals(message: String, expecteds: Array[String], actuals: Array[String]) {
+    assertArrayEquals(message, expecteds.toArray[AnyRef], actuals.toArray[AnyRef])
+  }
+
+  @Test def formatsManyFieldsInOneDefineSomeWithArrayDeclarations() {
+    val (storage, parser) = storePars
+
+    val result = parser.parseAll(parser.fieldList, manyFieldsInOneDefineSomeWithArrayDeclarations)
+    assertTrue(result.toString, result.successful)
+
+    val results: List[Array[String]] = result.get
+    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "maxB"), results(0))
+    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "a"), results(1))
+    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "b", "7", null), results(2))
+    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "c", "8", "maxB"), results(3))
+    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "d", "7", null, "8", "maxB"), results(4))
+  }
+
+  @Test def parsesManyFieldsInOneDefineSomeWithArrayDeclarations() {
+    val (storage, parser) = storePars
+
+    storage.registerTypeAlias("UINT8", "uint8(int)")
+
+    val result = parser.parsePacketsDef("PACKET_TEST = 42;\n" +
+      manyFieldsInOneDefineSomeWithArrayDeclarations +
+      "end")
+    assertTrue(result.toString, result.successful)
   }
 }

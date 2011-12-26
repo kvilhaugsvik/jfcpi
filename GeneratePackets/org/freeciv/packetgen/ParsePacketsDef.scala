@@ -62,11 +62,13 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
 
   def fieldName = regex("""\w+""".r)
 
-  def fieldVar = fieldName ~ rep("[" ~> arrayFullSize ~ opt(":" ~> elementsToTransfer) <~ "]")
+  def fieldVar = (fieldName ~ rep("[" ~> arrayFullSize ~ opt(":" ~> elementsToTransfer) <~ "]")) ^^ {
+    case name~dimensions =>
+      name :: dimensions.map({
+        case maxSize ~ toTransferThisTime => List(maxSize, toTransferThisTime.getOrElse(null))}).flatten}
 
   def fields = (fieldType ~ repsep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
-    case kind~variables~flags => variables.map((vari) => Array(kind, vari._1))
-  }
+    case kind~variables~flags => variables.map(variable => (kind :: variable).toArray)}
 
   def fieldList: Parser[List[Array[String]]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
 
