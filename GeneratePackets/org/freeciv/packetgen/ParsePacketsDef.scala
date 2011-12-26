@@ -60,17 +60,15 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
 
   def elementsToTransfer = regex("""[0-9a-zA-Z_\+\*-/]+""".r)
 
-  def fieldArrayDeclaration = rep("[" ~> arrayFullSize ~ opt(":" ~> elementsToTransfer) <~ "]")
+  def fieldName = regex("""\w+""".r)
 
-  def fieldVar = (regex("""\w+""".r) ~ fieldArrayDeclaration) ^^ {
-    case varName ~ arrayDec => (varName, arrayDec)
-  }
+  def fieldVar = fieldName ~ rep("[" ~> arrayFullSize ~ opt(":" ~> elementsToTransfer) <~ "]")
 
-  def field = (fieldType ~ repsep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
+  def fields = (fieldType ~ repsep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
     case kind~variables~flags => variables.map((vari) => Array(kind, vari._1))
   }
 
-  def fieldList: Parser[List[Array[String]]] = rep(comment) ~> rep((field <~ rep(comment))) ^^ {_.flatten}
+  def fieldList: Parser[List[Array[String]]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
 
   def packet = packetName ~ ("=" ~> regex("""[0-9]+""".r) <~ ";") ~ repsep(packetFlag, ",") ~
   fieldList <~
