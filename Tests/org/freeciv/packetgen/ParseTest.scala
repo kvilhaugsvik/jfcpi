@@ -436,6 +436,14 @@ class ParseTest {
                                          end""").successful)
   }
 
+  @Test def parseAFieldIsNotANumber() {
+    val (storage, parser) = storePars
+
+    assertFalse(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           BOOL 1;
+                                         end""").successful)
+  }
+
   @Test def parsePackageWithFlagCanParse() {
     val (storage, parser) = storePars
 
@@ -539,8 +547,20 @@ class ParseTest {
     val (storage, parser) = storePars
 
     storage.registerTypeAlias("BOOL", "bool8(bool)")
+    storage.registerTypeAlias("UINT8", "uint8(int)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
+                                           UINT8 waysToBeFriendly;
+                                           BOOL friendly[20:waysToBeFriendly];
+                                         end""").successful)
+  }
+
+  @Test def parseElementsToTransferIsNotANumber() {
+    val (storage, parser) = storePars
+
+    storage.registerTypeAlias("BOOL", "bool8(bool)")
+
+    assertFalse(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly[20:3];
                                          end""").successful)
   }
@@ -549,9 +569,11 @@ class ParseTest {
     val (storage, parser) = storePars
 
     storage.registerTypeAlias("BOOL", "bool8(bool)")
+    storage.registerTypeAlias("UINT8", "uint8(int)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
-                                           BOOL friendly[PLAYERS+1:3];
+                                           UINT8 waysToBeFriendly;
+                                           BOOL friendly[PLAYERS+1:waysToBeFriendly];
                                          end""").successful)
   }
 
