@@ -130,7 +130,7 @@ public class PacketsStoreTest {
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = noDev();
         storage.registerTypeAlias("STRING", "string(char)");
-        String[] field1 = {"STRING", "myNameIs"};
+        String[] field1 = {"STRING", "myNameIs", "50", null};
         LinkedList<String[]> fields = new LinkedList<String[]>();
         fields.add(field1);
         storage.registerPacket("PACKET_HELLO", 25, fields);
@@ -142,7 +142,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = noDev();
-        String[] field1 = {"STRING", "myNameIs"};
+        String[] field1 = {"STRING", "myNameIs", "50", null};
         LinkedList<String[]> fields = new LinkedList<String[]>();
         fields.add(field1);
 
