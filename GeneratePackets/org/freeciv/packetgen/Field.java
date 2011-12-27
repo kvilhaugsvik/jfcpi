@@ -20,6 +20,9 @@ public class Field {
     private final ArrayDeclaration[] declarations;
 
     public Field(String variableName, FieldTypeBasic.FieldTypeAlias typeAlias, ArrayDeclaration... declarations) {
+        if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
+            throw new IllegalArgumentException("Array eaters needs array declarations");
+
         this.variableName = variableName;
         this.type = typeAlias;
         this.declarations = declarations;
