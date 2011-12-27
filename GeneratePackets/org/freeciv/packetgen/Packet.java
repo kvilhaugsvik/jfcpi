@@ -52,6 +52,7 @@ public class Packet extends ClassWriter {
         if (0 < fields.length) {
             for (Field field: fields) {
                 arglist += field.getType() + field.getArrayDeclaration() + " " + field.getVariableName() + ", ";
+                if (field.hasDeclarations()) constructorBody.addAll(Arrays.asList(field.validate(".getValue()", this.getName())));
                 constructorBody.add("this." + field.getVariableName() + " = " + field.getVariableName() + ";");
             }
             arglist = trimArgList(arglist);
@@ -63,11 +64,15 @@ public class Packet extends ClassWriter {
         if (0 < fields.length) {
             for (Field field: fields) {
                 javatypearglist += field.getJType() + field.getArrayDeclaration() + " " + field.getVariableName() + ", ";
-                constructorBodyJ.addAll(field.hasDeclarations()?
-                        Arrays.asList(forElementsInField(field,
-                                "this." + field.getVariableName() + " = new " + field.getType() + field.getNewCreation("") + ";",
-                                "this." + field.getVariableName() + "[i] = new " + field.getType() + "(" + field.getVariableName() + "[i]);",
-                                "")):
+                if (field.hasDeclarations()) {
+                    constructorBodyJ.addAll(Arrays.asList(field.validate("", this.getName())));
+                    constructorBodyJ.addAll(
+                            Arrays.asList(forElementsInField(field,
+                                    "this." + field.getVariableName() + " = new " + field.getType() + field.getNewCreation("") + ";",
+                                    "this." + field.getVariableName() + "[i] = new " + field.getType() + "(" + field.getVariableName() + "[i]);",
+                                    "")));
+                } else
+                    constructorBodyJ.addAll(
                         Arrays.asList(new String[]{"this." + field.getVariableName() + " = " +
                                 "new " + field.getType() + "(" + field.getVariableName() + ")" + ";"}));
             }
@@ -171,9 +176,10 @@ public class Packet extends ClassWriter {
                     + "Value",
                     (field.hasDeclarations())?
                             forElementsInField(field,
-                                    "LinkedList<" + field.getJType() + "> out = new LinkedList<" + field.getJType() + ">();",
-                                    "out.add(" + field.getVariableName() + "[i].getValue());",
-                                    "return out.toArray(new " + field.getJType() + field.getNewCreation(".getValue()") + ");"):
+                                    field.getJType() + field.getArrayDeclaration() + " out = new " +
+                                            field.getJType() + field.getNewCreation(".getValue()") + ";",
+                                    "out[i] = " + field.getVariableName() + "[i].getValue();",
+                                    "return out;"):
                             new String[]{"return " + field.getVariableName() + ".getValue();"}
             );
         }
@@ -192,7 +198,9 @@ public class Packet extends ClassWriter {
         String[] wrappedInFor = new String[1 + level * 2];
         String replaceWith = "";
         for (int counter = 0; counter < level; counter++) {
-            wrappedInFor[counter] = "for(int " + getCounterNumber(counter) + " = 0; " + getCounterNumber(counter) + " < " + field.getVariableName() + ".length; " + getCounterNumber(counter) + "++) {";
+            wrappedInFor[counter] = "for(int " + getCounterNumber(counter) + " = 0; " +
+                    getCounterNumber(counter) + " < " + field.getVariableName() + replaceWith + ".length; " +
+                    getCounterNumber(counter) + "++) {";
             wrappedInFor[1 + counter + level] = "}";
             replaceWith += "[" + getCounterNumber(counter) + "]";
         }

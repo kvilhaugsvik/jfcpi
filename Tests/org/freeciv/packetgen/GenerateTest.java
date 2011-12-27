@@ -60,6 +60,8 @@ public class GenerateTest {
         writeJavaFile(bitwise);
         writeJavaFile(testCount);
 
+        FieldTypeBasic.FieldTypeAlias uint8 =
+                hardcoded.getBasicFieldType("uint8(int)").createFieldType("UINT8");
         FieldTypeBasic.FieldTypeAlias uint32 =
                 hardcoded.getBasicFieldType("uint32(int)").createFieldType("UINT32");
         FieldTypeBasic.FieldTypeAlias string =
@@ -69,6 +71,7 @@ public class GenerateTest {
         FieldTypeBasic.FieldTypeAlias connection =
                 hardcoded.getBasicFieldType("sint16(int)").createFieldType("CONNECTION");
 
+        writeJavaFile(uint8);
         writeJavaFile(uint32);
         writeJavaFile(string);
         writeJavaFile(bool);
@@ -101,6 +104,31 @@ public class GenerateTest {
                 new Field("major_version", uint32),
                 new Field("minor_version", uint32),
                 new Field("patch_version", uint32)));
+        writePacket(new Packet("TestArray",
+                926,
+                true,
+                new Field("theArray", uint32,
+                        new Field.ArrayDeclaration("2", null))));
+        writePacket(new Packet("TestArrayTransfer",
+                927,
+                true,
+                new Field("toTransfer", uint8),
+                new Field("theArray", uint32,
+                        new Field.ArrayDeclaration("4", "toTransfer"))));
+        writePacket(new Packet("TestArrayDouble",
+                928,
+                true,
+                new Field("theArray", uint32,
+                        new Field.ArrayDeclaration("2", null),
+                        new Field.ArrayDeclaration("3", null))));
+        writePacket(new Packet("TestArrayDoubleTransfer",
+                929,
+                true,
+                new Field("toTransfer", uint8),
+                new Field("toTransfer2", uint8),
+                new Field("theArray", uint32,
+                        new Field.ArrayDeclaration("4", "toTransfer"),
+                        new Field.ArrayDeclaration("5", "toTransfer2"))));
 
         FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + "/" +
                 org.freeciv.packet.Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt");

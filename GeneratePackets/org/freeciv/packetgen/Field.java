@@ -56,9 +56,29 @@ public class Field {
     String getNewCreation(String callOnElementsToTransfer) {
         String out = "";
         for (ArrayDeclaration element: declarations) {
-            out += element.getNewCreation(callOnElementsToTransfer);
+            out += "[" + element.getSize(callOnElementsToTransfer) + "]";
         }
         return out;
+    }
+
+    private String getLegalSize(String callOnElementsToTransfer) {
+        String out = "";
+        String arrayLevel = "";
+        for (ArrayDeclaration element: declarations) {
+            if (null != element.elementsToTransfer)
+                out += "(" + element.maxSize + " <= " + element.elementsToTransfer + callOnElementsToTransfer + ")" + "||";
+            out += "(" + this.getVariableName() + arrayLevel + ".length != " + element.getSize(callOnElementsToTransfer) + ")";
+            out += "||";
+            arrayLevel += "[0]";
+        }
+        return out.substring(0, out.length() - 2);
+    }
+
+    String[] validate(String callOnElementsToTransfer, String name) {
+        return new String[]{
+                "if " + "(" + this.getLegalSize(callOnElementsToTransfer) + ")",
+                "\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
+                        " constructed with value out of scope in packet " + name + "\");"};
     }
 
     public static class ArrayDeclaration {
@@ -69,8 +89,8 @@ public class Field {
             this.elementsToTransfer = elementsToTransfer;
         }
 
-        private String getNewCreation(String callOnElementsToTransfer) {
-            return "[" + (null == elementsToTransfer? maxSize: elementsToTransfer + callOnElementsToTransfer) + "]";
+        private String getSize(String callOnElementsToTransfer) {
+            return (null == elementsToTransfer? maxSize: elementsToTransfer + callOnElementsToTransfer);
         }
     }
 }
