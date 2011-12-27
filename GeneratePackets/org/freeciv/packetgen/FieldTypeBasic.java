@@ -87,6 +87,12 @@ public class FieldTypeBasic {
             addPublicReadObjectState(null, "int", "encodedLength", EncodedSize);
             addPublicReadObjectState(null, JavaType, "getValue", "return value;");
             addPublicReadObjectState(null, "String", "toString", "return value.toString();");
+            addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
+                "if (other instanceof " + name + ") {",
+                    "return this.value == ((" + name + ")other).getValue();",
+                "} else {",
+                    "return false;",
+                "}");
         }
 
         public FieldTypeBasic getBasicType() {
