@@ -93,9 +93,9 @@ public class Enum extends ClassWriter {
 
         addMethod("", Visibility.PUBLIC, Scope.CLASS, this.getName(), "valueOf", "int number", null,
                 "for (" + this.getName() + " element: values()) {",
-                "\t" + "if (element.getNumber() == number) {",
-                "\t" + "\t" + "return element;",
-                "\t" + "}",
+                "if (element.getNumber() == number) {",
+                "return element;",
+                "}",
                 "}",
                 "return INVALID;");
     }

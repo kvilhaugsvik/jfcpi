@@ -46,8 +46,8 @@ public class Hardcoded {
                         "StringBuffer buf = new StringBuffer();" + "\n" +
                                 "byte letter = from.readByte();" + "\n" +
                                 "while (0 != letter) {" + "\n" +
-                                "\t" + "buf.append((char)letter);" + "\n" +
-                                "\t" + "letter = from.readByte();" + "\n" +
+                                "buf.append((char)letter);" + "\n" +
+                                "letter = from.readByte();" + "\n" +
                                 "}" + "\n" +
                                 "value = buf.toString();",
                         "to.writeBytes(" + "value" + ");\n" +

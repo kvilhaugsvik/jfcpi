@@ -89,15 +89,15 @@ public class Packet extends ClassWriter {
                             " = " + "new " + field.getType() + "(from);"}));
         }
         constructorBodyStream.add("if (getNumber() != packet) {");
-        constructorBodyStream.add("\t" + "throw new IOException(\"Tried to create package " +
+        constructorBodyStream.add("throw new IOException(\"Tried to create package " +
                 name + " but packet number was \" + packet);");
         constructorBodyStream.add("}");
         constructorBodyStream.add("");
         constructorBodyStream.add("if (getEncodedSize() != headerLen) {");
-        constructorBodyStream.add("\t" +
+        constructorBodyStream.add(
                 "throw new IOException(\"Package size in header and Java packet not the same. Header: \"" +
                 " + headerLen");
-        constructorBodyStream.add("\t" + "+ \" Packet: \" + getEncodedSize());");
+        constructorBodyStream.add("+ \" Packet: \" + getEncodedSize());");
         constructorBodyStream.add("}");
         addPublicConstructorWithExceptions("/***\n" +
                 " * Construct an object from a DataInput\n" +

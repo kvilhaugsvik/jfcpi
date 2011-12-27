@@ -58,6 +58,82 @@ public class CodeGenTest {
                 result);
     }
 
+    @Test public void testMethodManyLevelsOfIndention() {
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
+                "while(true) {",
+                "while(true) {",
+                "while(true) {",
+                "while(true) {",
+                "return 5;",
+                "}",
+                "}",
+                "}",
+                "}")).toString();
+
+        assertEquals("Generated source not as expected",
+                "\t" + "// comment" + "\n" +
+                        "\t" + "public static int testMethod() {" + "\n" +
+                        "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "\t" + "\t" + "return 5;\n" +
+                        "\t" + "\t" + "\t" + "\t" + "\t" + "}" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "}" + "\n" +
+                        "\t" + "\t" + "\t" + "}" + "\n" +
+                        "\t" + "\t" + "}" + "\n" +
+                        "\t" + "}" + "\n",
+                result);
+    }
+
+    @Test public void testMethodManyLevelsOfIndentionScopeEndTogether() {
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
+                "while(true) {",
+                "while(true) {",
+                "while(true) {",
+                "while(true) {",
+                "return 5;",
+                "}}}}")).toString();
+
+        assertEquals("Generated source not as expected",
+                "\t" + "// comment" + "\n" +
+                        "\t" + "public static int testMethod() {" + "\n" +
+                        "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "\t" + "\t" + "return 5;\n" +
+                        "\t" + "\t" + "}}}}" + "\n" +
+                        "\t" + "}" + "\n",
+                result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void methodShouldNotEscapeToClassScope() {
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
+                "while(true) {",
+                "return 5;",
+                "}",
+                "}")).toString();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void methodShouldNotEscapeToClassScopeEvenIfTextBeforeIt() {
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
+                "int i = 0;",
+                "while(i < 10) {",
+                "i = i + 1;",
+                "}",
+                "return(i);}")).toString();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void methodShouldFinishScope() {
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
+                "while(true) {",
+                "return 5;")).toString();
+    }
+
     @Test public void testMethodEverythingTwoLineComment() {
         String result = (new Method("/** comment\n * more comment\n */",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod",
                 "String a", "Throwable", "return 5;")).toString();
@@ -72,9 +148,23 @@ public class CodeGenTest {
                 result);
     }
 
-    @Test public void testMethodEverythingBodyWithBlanks() {
+    @Test public void testMethodEverythingBodyWithBlankSymbolEmptyString() {
         String result = (new Method("// comment",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
                 "Throwable", "int a = 5;", "", "return a;")).toString();
+
+        assertEquals("Generated source not as expected",
+                "\t" + "// comment" + "\n" +
+                        "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
+                        "\t" + "\t" + "int a = 5;" + "\n" +
+                        "\n" +
+                        "\t" + "\t" + "return a;" + "\n" +
+                        "\t" + "}" + "\n",
+                result);
+    }
+
+    @Test public void testMethodEverythingBodyWithBlankSymbolNull() {
+        String result = (new Method("// comment",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
+                "Throwable", "int a = 5;", null, "return a;")).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
@@ -451,12 +541,12 @@ public class CodeGenTest {
                 "PACKET_CITY_NAME_SUGGESTION_REQ", "DataInput from, int headerLen, int packet", "IOException",
                 "this.unit_id = new UNIT(from);",
                 "if (getNumber() != packet) {",
-                "\tthrow new IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet);",
+                "throw new IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet);",
                 "}",
                 "",
                 "if (getEncodedSize() != headerLen) {",
-                "\tthrow new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen",
-                "\t+ \" Packet: \" + getEncodedSize());",
+                "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen",
+                "+ \" Packet: \" + getEncodedSize());",
                 "}").toString();
 
         assertEquals("Generated source not as expected",

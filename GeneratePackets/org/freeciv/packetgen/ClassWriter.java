@@ -14,9 +14,12 @@
 
 package org.freeciv.packetgen;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ClassWriter {
     private final Package where;
@@ -217,6 +220,48 @@ public class ClassWriter {
         return "\t" + code.replace("\n", "\n\t");
     }
 
+    private static final Pattern scopeEndFirst = Pattern.compile("\\A\\}+");
+    private static String indent(String[] lines, String startAt) {
+        String out = "";
+        int extraIndention = 0;
+        for (String line: lines) {
+            if (null != line) {
+                char[] addIndention;
+                Matcher scopeEndFirstInLine = scopeEndFirst.matcher(line);
+                if (scopeEndFirstInLine.find()) {
+                    final int numberOfScopes = extraIndention - scopeEndFirstInLine.end();
+                    if (0 > numberOfScopes) throw endOfScopeNotBegan(line);
+                    addIndention = new char[numberOfScopes];
+                }
+                else
+                    addIndention = new char[extraIndention];
+                extraIndention = updateIndention(extraIndention, line);
+                Arrays.fill(addIndention, '\t');
+                out += !line.isEmpty()? (startAt + new String(addIndention) + line) : "";
+            }
+            out += "\n";
+            if (0 > extraIndention)
+                throw endOfScopeNotBegan(line);
+        }
+        if (0 < extraIndention)
+            throw new IllegalArgumentException("Code to be indented don't end it's scope");
+        return out;
+    }
+
+    private static IllegalArgumentException endOfScopeNotBegan(String offendingCode) {
+        return new IllegalArgumentException("Code to be indented ends scope it didn't define: " + offendingCode);
+    }
+
+    private static int updateIndention(int extraIndention, String line) {
+        for (int position = 0; position < line.length(); position++) {
+            switch (line.charAt(position)) {
+                case '{': extraIndention++; break;
+                case '}': extraIndention--; break;
+            }
+        }
+        return extraIndention;
+    }
+
     private static String ifIs(String element) {
         return ifIs("", element, "");
     }
@@ -257,11 +302,9 @@ public class ClassWriter {
         @Override
         public String toString() {
             String out = (null == comment ? "" : indent(comment) + "\n");
-            out += ifIs("\t", visibility.toString(), " ") + ifIs(scope.toString(), " ") + ifIs(type, " ") +
+            out += "\t" + ifIs("", visibility.toString(), " ") + ifIs(scope.toString(), " ") + ifIs(type, " ") +
                     name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ") + "{" + "\n";
-            for (String line: body) {
-                out += (!line.isEmpty()? "\t" + "\t" + line : "") + "\n";
-            }
+            out += indent(body, "\t" + "\t");
             out += "\t" + "}" + "\n";
             return out;
         }
