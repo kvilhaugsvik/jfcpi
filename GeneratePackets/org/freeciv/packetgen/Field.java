@@ -38,16 +38,16 @@ public class Field {
     }
 
     boolean hasDeclarations() {
-        return (0 < declarations.length);
+        return (0 < getNumberOfDeclarations());
     }
 
     int getNumberOfDeclarations() {
-        return declarations.length;
+        return (type.getBasicType().isArrayEater())? declarations.length - 1: declarations.length;
     }
 
     String getArrayDeclaration() {
         String out = "";
-        for (ArrayDeclaration element: declarations) {
+        for (int i = 0; i < getNumberOfDeclarations(); i++) {
             out += "[]";
         }
         return out;
@@ -55,8 +55,8 @@ public class Field {
 
     String getNewCreation(String callOnElementsToTransfer) {
         String out = "";
-        for (ArrayDeclaration element: declarations) {
-            out += "[" + element.getSize(callOnElementsToTransfer) + "]";
+        for (int i = 0; i < getNumberOfDeclarations(); i++) {
+            out += "[" + declarations[i].getSize(callOnElementsToTransfer) + "]";
         }
         return out;
     }
@@ -64,7 +64,8 @@ public class Field {
     private String getLegalSize(String callOnElementsToTransfer) {
         String out = "";
         String arrayLevel = "";
-        for (ArrayDeclaration element: declarations) {
+        for (int i = 0; i < getNumberOfDeclarations(); i++) {
+            final ArrayDeclaration element = declarations[i];
             if (null != element.elementsToTransfer)
                 out += "(" + element.maxSize + " <= " + element.elementsToTransfer + callOnElementsToTransfer + ")" + "||";
             out += "(" + this.getVariableName() + arrayLevel + ".length != " + element.getSize(callOnElementsToTransfer) + ")";

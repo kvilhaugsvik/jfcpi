@@ -20,17 +20,19 @@ public class FieldTypeBasic {
     private final String JavaType;
     private final String[] Decode;
     private final String[] encode, EncodedSize;
+    private final boolean arrayEater;
 
     private boolean hasReq;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
-                          String decode, String encode, String encodedSize, boolean needsType) {
+                          String decode, String encode, String encodedSize, boolean needsType, boolean arrayEater) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         JavaType = javaType;
         Decode = decode.split("\n");
         this.encode = encode.split("\n");
         EncodedSize = encodedSize.split("\n");
+        this.arrayEater = arrayEater;
 
         if (needsType)
             hasReq = false;
@@ -56,6 +58,10 @@ public class FieldTypeBasic {
 
     public FieldTypeAlias createFieldType(String name) {
         return new FieldTypeAlias(name, this);
+    }
+
+    public boolean isArrayEater() {
+        return arrayEater;
     }
 
     public class FieldTypeAlias extends ClassWriter {

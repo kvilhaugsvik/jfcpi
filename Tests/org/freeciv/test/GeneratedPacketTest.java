@@ -376,4 +376,14 @@ public class GeneratedPacketTest {
                 {11L, 12L, 17L, 18L, 19L, 30L}};
         TestArrayDoubleTransfer packet = new TestArrayDoubleTransfer(2, 6, array);
     }
+
+    @Test public void generatedPacketWithStringAndArrayOfString() {
+        StringArray packet = new StringArray("Not an Array",
+                new String[]{"Element 1", "Element 2", "Element 3"});
+
+        assertEquals("Plain string different", "Not an Array", packet.getNotAnArrayValue());
+        assertArrayEquals("Array different ",
+                new String[]{"Element 1", "Element 2", "Element 3"},
+                packet.getTheArrayValue());
+    }
 }

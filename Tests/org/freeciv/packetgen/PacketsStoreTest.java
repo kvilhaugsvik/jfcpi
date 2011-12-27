@@ -184,6 +184,18 @@ public class PacketsStoreTest {
         storage.registerPacket("PACKET_HELLO", 25, fields);
     }
 
+    @Test(expected = AssertionError.class)
+    public void registerPacketWithWronglyFormatedField() throws UndefinedException, PacketCollisionException {
+        PacketsStore storage = noDev();
+
+        storage.registerTypeAlias("STRING", "string(char)");
+
+        LinkedList<String[]> fields = new LinkedList<String[]>();
+        fields.add(new String[]{"STRING", "myNameIs", "50"});
+
+        storage.registerPacket("PACKET_HELLO", 25, fields);
+    }
+
     @Test public void noPacketsAreListedWhenNoPacketsAreRegistered() {
         PacketsStore storage = noDev();
 

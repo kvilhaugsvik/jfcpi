@@ -79,9 +79,12 @@ public class GenerateTest {
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
                 false,
-                new Field("username", string),
-                new Field("capability", string),
-                new Field("version_label", string),
+                new Field("username", string,
+                        new Field.ArrayDeclaration("1000", null)),
+                new Field("capability", string,
+                        new Field.ArrayDeclaration("1000", null)),
+                new Field("version_label", string,
+                        new Field.ArrayDeclaration("1000", null)),
                 new Field("major_version", uint32),
                 new Field("minor_version", uint32),
                 new Field("patch_version", uint32)));
@@ -89,18 +92,24 @@ public class GenerateTest {
                 5,
                 false,
                 new Field("you_can_join", bool),
-                new Field("message", string),
-                new Field("capability", string),
-                new Field("challenge_file", string),
+                new Field("message", string,
+                        new Field.ArrayDeclaration("1000", null)),
+                new Field("capability", string,
+                        new Field.ArrayDeclaration("1000", null)),
+                new Field("challenge_file", string,
+                        new Field.ArrayDeclaration("1000", null)),
                 new Field("conn_id", connection)));
         writePacket(new Packet("CONN_PING", 88, false));
         writePacket(new Packet("CONN_PONG", 89, false));
         writePacket(new Packet("SERVER_JOIN_REQ2ByteKind",
                 4,
                 true,
-                new Field("username", string),
-                new Field("capability", string),
-                new Field("version_label", string),
+                new Field("username", string,
+                        new Field.ArrayDeclaration("1000", null)),
+                new Field("capability", string,
+                        new Field.ArrayDeclaration("1000", null)),
+                new Field("version_label", string,
+                        new Field.ArrayDeclaration("1000", null)),
                 new Field("major_version", uint32),
                 new Field("minor_version", uint32),
                 new Field("patch_version", uint32)));
@@ -129,6 +138,14 @@ public class GenerateTest {
                 new Field("theArray", uint32,
                         new Field.ArrayDeclaration("4", "toTransfer"),
                         new Field.ArrayDeclaration("5", "toTransfer2"))));
+        writePacket(new Packet("StringArray",
+                930,
+                true,
+                new Field("notAnArray", string,
+                        new Field.ArrayDeclaration("50", null)),
+                new Field("theArray", string,
+                        new Field.ArrayDeclaration("3", null),
+                        new Field.ArrayDeclaration("50", null))));
 
         FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + "/" +
                 org.freeciv.packet.Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt");

@@ -76,11 +76,17 @@ public class PacketsStore {
 
         List<Field> fieldList = new LinkedList<Field>();
         for (String[] fieldType: fields) {
+            assert (1 != (fieldType.length % 2));
             if (!types.containsKey(fieldType[0])) {
                 skipOrCrash("Field type " + fieldType[0] + " not declared before use in packet " + name + ".");
                 return;
             }
-            fieldList.add(new Field(fieldType[1], types.get(fieldType[0])));
+            LinkedList<Field.ArrayDeclaration> declarations = new LinkedList<Field.ArrayDeclaration>();
+            for (int i = 2; i < fieldType.length; i += 2) {
+                declarations.add(new Field.ArrayDeclaration(fieldType[i], fieldType[i + 1]));
+            }
+            fieldList.add(new Field(fieldType[1], types.get(fieldType[0]),
+                    declarations.toArray(new Field.ArrayDeclaration[0])));
         }
 
         packets.put(name, new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0])));
