@@ -410,6 +410,34 @@ public class CodeGenTest {
                 toWrite.toString());
     }
 
+    @Test public void testClassWriterEnumWithFiveElementsSomeNegative() {
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
+                this.getClass().getPackage(),
+                new String[]{"org.freeciv.packet.Packet"},
+                "nothing",
+                "NameOfClass",
+                "Packet");
+        toWrite.addEnumerated(null, "INVALID", -1, "\"invalid\"");
+        toWrite.addEnumerated(null, "ONE", 1, "\"one\"");
+        toWrite.addEnumerated(null, "TWO", 2, "\"two\"");
+        toWrite.addEnumerated(null, "THREE", 3, "\"three\"");
+        toWrite.addEnumerated(null, "SMALLEST", -2, "\"minus two\"");
+        assertEquals("Generated source not as expected",
+                "package org.freeciv.packetgen;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
+                        "// This code was auto generated from nothing" + "\n" +
+                        "public enum NameOfClass implements Packet {" + "\n" +
+                        "\t" + "ONE (1, \"one\")," + "\n" +
+                        "\t" + "TWO (2, \"two\")," + "\n" +
+                        "\t" + "THREE (3, \"three\")," + "\n" +
+                        "\t" + "SMALLEST (-2, \"minus two\")," + "\n" +
+                        "\t" + "INVALID (-1, \"invalid\");" + "\n" +
+                        "}" + "\n",
+                toWrite.toString());
+    }
+
     @Test public void testClassWriterEnumWithThreeElementsOneIsCommented() {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
                 this.getClass().getPackage(),

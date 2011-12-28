@@ -14,10 +14,7 @@
 
 package org.freeciv.packetgen;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -140,7 +137,7 @@ public class ClassWriter {
     private String formatEnumeratedElements() {
         String out = "";
 
-        for (EnumElement element: enums.values()) {
+        for (EnumElement element: new TreeSet<EnumElement>(enums.values())) {
             out += "\t" + element + "," + "\n";
         }
         if (!enums.isEmpty())
@@ -371,7 +368,7 @@ public class ClassWriter {
         }
     }
 
-    static class EnumElement {
+    static class EnumElement implements Comparable<EnumElement> {
         private final String comment;
         private final String elementName;
         private final int number;
@@ -407,6 +404,17 @@ public class ClassWriter {
 
         public boolean isValid() {
             return valid;
+        }
+
+        @Override
+        public int compareTo(EnumElement other) {
+            if (other.getNumber() == this.getNumber())
+                return 0;
+            if (0 <= this.getNumber() && 0 > other.getNumber())
+                return -1;
+            if (0 > this.getNumber() && 0 <= other.getNumber())
+                return 1;
+            return (this.getNumber() < other.getNumber())? -1: 1;
         }
 
         public String toString() {
