@@ -36,10 +36,7 @@ public class FieldTypeBasic {
         this.arrayEater = arrayEater;
         this.fromJavaType = fromJavaType;
 
-        if (needsType)
-            hasReq = false;
-        else
-            hasReq = true;
+        hasReq = needsType ? false : true;
     }
 
     public String getFieldTypeBasic() {
