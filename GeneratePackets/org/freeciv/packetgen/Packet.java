@@ -74,7 +74,7 @@ public class Packet extends ClassWriter {
         String arglist = "";
         if (0 < fields.length) {
             for (Field field: fields) {
-                arglist += field.getType() + field.getArrayDeclaration() + " " + field.getVariableName() + ", ";
+                arglist += buildArgumentList(field.getType(), field);
                 if (field.hasDeclarations()) constructorBody.addAll(Arrays.asList(field.validate(".getValue()", this.getName())));
                 constructorBody.add("this." + field.getVariableName() + " = " + field.getVariableName() + ";");
             }
@@ -88,7 +88,7 @@ public class Packet extends ClassWriter {
         LinkedList<String> constructorBodyJ = new LinkedList<String>();
         if (0 < fields.length) {
             for (Field field: fields) {
-                javatypearglist += field.getJType() + field.getArrayDeclaration() + " " + field.getVariableName() + ", ";
+                javatypearglist += buildArgumentList(field.getJType(), field);
                 if (field.hasDeclarations())
                     constructorBodyJ.addAll(Arrays.asList(field.validate("", this.getName())));
                 constructorBodyJ.addAll(
@@ -245,6 +245,10 @@ public class Packet extends ClassWriter {
 
     public int getNumber() {
         return number;
+    }
+
+    private static String buildArgumentList(String kind, Field field) {
+        return kind + field.getArrayDeclaration() + " " + field.getVariableName() + ", ";
     }
 
     private static String trimArgList(String arglist) {
