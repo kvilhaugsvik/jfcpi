@@ -25,27 +25,37 @@ public class Hardcoded {
         for (FieldTypeBasic src: new FieldTypeBasic[]{
                 new FieldTypeBasic("uint8", "int",
                         "Integer",
+                        new String[]{"this.value = value;"},
                         "value = from.readUnsignedByte();",
                         "to.writeByte(value);",
                         "return 1;",
                         false, false),
                 new FieldTypeBasic("uint16", "int",
                         "Integer",
+                        new String[]{"this.value = value;"},
                         "value = (int) from.readChar();",
                         "to.writeChar(value);",
                         "return 2;",
                         false, false),
                 new FieldTypeBasic("uint32", "int",
                         "Long",
+                        new String[]{"this.value = value;"},
                         DataIO.readUIntCode(4, "Long", "value"),
                         DataIO.writeWriteUInt(4),
                         "return 4;",
                         false, false),
                 new FieldTypeBasic("string", "char",
                         "String",
+                        new String[]{
+                                arrayEaterScopeCheck("arraySize < value.length()"),
+                                "this.value = value;"
+                        },
                         "StringBuffer buf = new StringBuffer();" + "\n" +
                                 "byte letter = from.readByte();" + "\n" +
+                                "int read = 0;" + "\n" +
                                 "while (0 != letter) {" + "\n" +
+                                "read++;" + "\n" +
+                                arrayEaterScopeCheck("arraySize < read") +
                                 "buf.append((char)letter);" + "\n" +
                                 "letter = from.readByte();" + "\n" +
                                 "}" + "\n" +
@@ -56,24 +66,28 @@ public class Hardcoded {
                         false, true),
                 new FieldTypeBasic("bool8", "bool",
                         "Boolean",
+                        new String[]{"this.value = value;"},
                         "value = from.readBoolean();",
                         "to.writeBoolean(value);",
                         "return 1;",
                         false, false),
                 new FieldTypeBasic("sint8", "int",
                         "Byte",
+                        new String[]{"this.value = value;"},
                         "value = from.readByte();",
                         "to.writeByte(value);",
                         "return 2;",
                         false, false),
                 new FieldTypeBasic("sint16", "int",
                         "Short",
+                        new String[]{"this.value = value;"},
                         "value = from.readShort();",
                         "to.writeShort(value);",
                         "return 2;",
                         false, false),
                 new FieldTypeBasic("sint32", "int",
                         "Integer",
+                        new String[]{"this.value = value;"},
                         "value = from.readInt();",
                         "to.writeInt(value);",
                         "return 4;",
@@ -103,6 +117,7 @@ public class Hardcoded {
                 getUInt8Enum("sset_type"),
                 new FieldTypeBasic("sint16", "enum event_type",
                         "event_type",
+                        new String[]{"this.value = value;"},
                         "value = event_type.valueOf(from.readShort());",
                         "to.writeShort(value.getNumber());",
                         "return 2;",
@@ -110,6 +125,11 @@ public class Hardcoded {
         }) {
             data.put(src.getFieldTypeBasic(), src);
         }
+    }
+
+    public static String arrayEaterScopeCheck(String check) {
+        return "if (" + check + ") " +
+                "throw new IllegalArgumentException(\"Value out of scope\");" + "\n";
     }
 
     public FieldTypeBasic getBasicFieldType(String src) {
@@ -123,6 +143,7 @@ public class Hardcoded {
     private static FieldTypeBasic getUInt8Enum(String named) {
         return new FieldTypeBasic("uint8", "enum " + named,
                 named,
+                new String[]{"this.value = value;"},
                 "value = " + named + ".valueOf(from.readUnsignedByte());",
                 "to.writeByte(value.getNumber());",
                 "return 1;",

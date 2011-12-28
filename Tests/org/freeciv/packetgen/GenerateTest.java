@@ -142,10 +142,10 @@ public class GenerateTest {
                 930,
                 true,
                 new Field("notAnArray", string,
-                        new Field.ArrayDeclaration("50", null)),
+                        new Field.ArrayDeclaration("15", null)),
                 new Field("theArray", string,
                         new Field.ArrayDeclaration("3", null),
-                        new Field.ArrayDeclaration("50", null))));
+                        new Field.ArrayDeclaration("10", null))));
 
         FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + "/" +
                 org.freeciv.packet.Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt");

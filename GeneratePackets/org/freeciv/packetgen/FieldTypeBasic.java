@@ -18,13 +18,14 @@ public class FieldTypeBasic {
     private final String fieldTypeBasic;
     private final String publicType;
     private final String JavaType;
+    private final String[] fromJavaType;
     private final String[] Decode;
     private final String[] encode, EncodedSize;
     private final boolean arrayEater;
 
     private boolean hasReq;
 
-    public FieldTypeBasic(String dataIOType, String publicType, String javaType,
+    public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
                           String decode, String encode, String encodedSize, boolean needsType, boolean arrayEater) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
@@ -33,6 +34,7 @@ public class FieldTypeBasic {
         this.encode = encode.split("\n");
         EncodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;
+        this.fromJavaType = fromJavaType;
 
         if (needsType)
             hasReq = false;
@@ -82,10 +84,10 @@ public class FieldTypeBasic {
 
             addObjectConstant(JavaType, "value");
             if (arrayEater) {
-                addPublicConstructor(null, name, JavaType + " value" + ", int arraySize", "this.value = value;");
+                addPublicConstructor(null, name, JavaType + " value" + ", int arraySize", fromJavaType);
                 addPublicConstructorWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException", Decode);
             } else {
-                addPublicConstructor(null, name, JavaType + " value", "this.value = value;");
+                addPublicConstructor(null, name, JavaType + " value", fromJavaType);
                 addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
             }
             addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
