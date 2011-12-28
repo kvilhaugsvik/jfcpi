@@ -64,17 +64,13 @@ public class Packet extends ClassWriter {
         if (0 < fields.length) {
             for (Field field: fields) {
                 javatypearglist += field.getJType() + field.getArrayDeclaration() + " " + field.getVariableName() + ", ";
-                if (field.hasDeclarations()) {
+                if (field.hasDeclarations())
                     constructorBodyJ.addAll(Arrays.asList(field.validate("", this.getName())));
-                    constructorBodyJ.addAll(
-                            Arrays.asList(forElementsInField(field,
-                                    "this." + field.getVariableName() + " = new " + field.getType() + field.getNewCreation("") + ";",
-                                    "this." + field.getVariableName() + "[i] = new " + field.getType() + "(" + field.getVariableName() + "[i]);",
-                                    "")));
-                } else
-                    constructorBodyJ.addAll(
-                        Arrays.asList(new String[]{"this." + field.getVariableName() + " = " +
-                                "new " + field.getType() + "(" + field.getVariableName() + ")" + ";"}));
+                constructorBodyJ.addAll(
+                        Arrays.asList(forElementsInField(field,
+                                "this." + field.getVariableName() + " = new " + field.getType() + field.getNewCreation("") + ";",
+                                "this." + field.getVariableName() + "[i] = new " + field.getType() + "(" + field.getVariableName() + "[i]);",
+                                "")));
             }
             javatypearglist = trimArgList(javatypearglist);
 
@@ -83,15 +79,12 @@ public class Packet extends ClassWriter {
 
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
         for (Field field: fields) {
-            constructorBodyStream.addAll((field.hasDeclarations())?
+            constructorBodyStream.addAll(
                     Arrays.asList(forElementsInField(field, "this." + field.getVariableName() +
                             " = new " + field.getType() +
                             field.getNewCreation(".getValue()") + ";",
                             "this." + field.getVariableName() + "[i] = " + "new " + field.getType() + "(from);",
-                            ""))
-                    :
-                    Arrays.asList(new String[]{"this." + field.getVariableName() +
-                            " = " + "new " + field.getType() + "(from);"}));
+                            "")));
         }
         constructorBodyStream.add("if (getNumber() != packet) {");
         constructorBodyStream.add("throw new IOException(\"Tried to create package " +
@@ -191,7 +184,7 @@ public class Packet extends ClassWriter {
         LinkedList<String> out = new LinkedList<String>();
         final int level = field.getNumberOfDeclarations();
 
-        if (null != before && !before.isEmpty()) {
+        if (0 < level && null != before && !before.isEmpty()) {
             out.add(before);
         }
 
@@ -208,7 +201,7 @@ public class Packet extends ClassWriter {
 
         out.addAll(Arrays.asList(wrappedInFor));
 
-        if (null != after && !after.isEmpty()) {
+        if (0 < level && null != after && !after.isEmpty()) {
             out.add(after);
         }
 
