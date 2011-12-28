@@ -47,6 +47,30 @@ public class Packet extends ClassWriter {
             addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getVariableName());
         }
 
+        addConstructorFromFields(name, fields);
+
+        addConstructorFromJavaTypes(name, fields);
+
+        addConstructorFromDataInput(name, fields);
+
+        addPublicReadObjectState(null, "int", "getNumber", "return number;");
+        addPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
+
+        addEncoder(hasTwoBytePacketNumber, fields);
+        addEncodedSize(hasTwoBytePacketNumber, fields);
+
+        addToString(name, fields);
+
+        for (Field field: fields) {
+            addGetAsField(field);
+        }
+
+        for (Field field: fields) {
+            addJavaGetter(field);
+        }
+    }
+
+    private void addConstructorFromFields(String name, Field[] fields) {
         LinkedList<String> constructorBody = new LinkedList<String>();
         String arglist = "";
         if (0 < fields.length) {
@@ -58,7 +82,9 @@ public class Packet extends ClassWriter {
             arglist = trimArgList(arglist);
         }
         addPublicConstructor(null, name, arglist, constructorBody.toArray(new String[0]));
+    }
 
+    private void addConstructorFromJavaTypes(String name, Field[] fields) {
         String javatypearglist = "";
         LinkedList<String> constructorBodyJ = new LinkedList<String>();
         if (0 < fields.length) {
@@ -76,7 +102,9 @@ public class Packet extends ClassWriter {
 
             addPublicConstructor(null, name, javatypearglist, constructorBodyJ.toArray(new String[0]));
         }
+    }
 
+    private void addConstructorFromDataInput(String name, Field[] fields) {
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
         final String streamName = "from";
         for (Field field: fields) {
@@ -109,10 +137,9 @@ public class Packet extends ClassWriter {
                 "DataInput " + streamName + ", int headerLen, int packet",
                 "IOException",
                 constructorBodyStream.toArray(new String[0]));
+    }
 
-        addPublicReadObjectState(null, "int", "getNumber", "return number;");
-        addPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
-
+    private void addEncoder(boolean hasTwoBytePacketNumber, Field[] fields) {
         LinkedList<String> encodeFields = new LinkedList<String>();
         encodeFields.add("// header");
         encodeFields.add("// length is 2 unsigned bytes");
@@ -127,7 +154,9 @@ public class Packet extends ClassWriter {
                         field.getVariableName() + "[i].encodeTo(to);", "")));
         }
         addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encodeFields.toArray(new String[0]));
+    }
 
+    private void addEncodedSize(boolean hasTwoBytePacketNumber, Field[] fields) {
         LinkedList<String> encodeFieldsLen = new LinkedList<String>();
         for (Field field: fields)
             if (field.hasDeclarations())
@@ -144,7 +173,9 @@ public class Packet extends ClassWriter {
         }
         encodeFieldsLen.add(encodeFieldsLen.removeLast() + ";");
         addPublicReadObjectState(null, "int", "getEncodedSize", encodeFieldsLen.toArray(new String[0]));
+    }
 
+    private void addToString(String name, Field[] fields) {
         LinkedList<String> getToString = new LinkedList<String>();
         getToString.add("String out = \"" + name + "\" + \"(\" + number + \")\";");
         for (Field field: fields)
@@ -157,26 +188,26 @@ public class Packet extends ClassWriter {
         getToString.add("");
         getToString.add("return out + \"\\n\";");
         addPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
+    }
 
-        for (Field field: fields) {
-            addPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
-                    + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
-                    "return " + field.getVariableName() + ";");
-        }
+    private void addGetAsField(Field field) {
+        addPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
+                + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
+                "return " + field.getVariableName() + ";");
+    }
 
-        for (Field field: fields) {
-            addPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
-                    + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
-                    + "Value",
-                    (field.hasDeclarations())?
-                            forElementsInField(field,
-                                    field.getJType() + field.getArrayDeclaration() + " out = new " +
-                                            field.getJType() + field.getNewCreation(".getValue()") + ";",
-                                    "out[i] = " + field.getVariableName() + "[i].getValue();",
-                                    "return out;"):
-                            new String[]{"return " + field.getVariableName() + ".getValue();"}
-            );
-        }
+    private void addJavaGetter(Field field) {
+        addPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
+                + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
+                + "Value",
+                (field.hasDeclarations())?
+                        forElementsInField(field,
+                                field.getJType() + field.getArrayDeclaration() + " out = new " +
+                                        field.getJType() + field.getNewCreation(".getValue()") + ";",
+                                "out[i] = " + field.getVariableName() + "[i].getValue();",
+                                "return out;"):
+                        new String[]{"return " + field.getVariableName() + ".getValue();"}
+        );
     }
 
     private String[] forElementsInField(Field field, String before, String in, String after) {
