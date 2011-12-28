@@ -28,7 +28,6 @@ public class Packet extends ClassWriter {
                         "org.freeciv.packet.fieldtype.*",
                         org.freeciv.types.FCEnum.class.getPackage().getName() + ".*",
                         null,
-                        "java.util.LinkedList",
                         "java.io.DataInput",
                         "java.io.DataOutput",
                         "java.io.IOException"
