@@ -57,9 +57,9 @@ public class GeneratedPacketTest {
     public void testPacketWithFieldsFromFields() throws IOException {
         SERVER_JOIN_REQ packet =
                 new SERVER_JOIN_REQ(
-                        new STRING("FreecivJava"),
-                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 "),
-                        new STRING("-dev"),
+                        new STRING("FreecivJava", 100),
+                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", 100),
+                        new STRING("-dev", 100),
                         new UINT32(2L),
                         new UINT32(3L),
                         new UINT32(99L));
@@ -72,9 +72,9 @@ public class GeneratedPacketTest {
     public void testPacketWithFieldValuesFromFields() throws IOException {
         SERVER_JOIN_REQ packet =
                 new SERVER_JOIN_REQ(
-                        new STRING("FreecivJava"),
-                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 "),
-                        new STRING("-dev"),
+                        new STRING("FreecivJava", 100),
+                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", 100),
+                        new STRING("-dev", 100),
                         new UINT32(2L),
                         new UINT32(3L),
                         new UINT32(99L));
@@ -140,9 +140,9 @@ public class GeneratedPacketTest {
     }
 
     @Test public void testPacketGetFields() {
-        STRING username = new STRING("FreecivJava");
-        STRING capability = new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ");
-        STRING version_label = new STRING("-dev");
+        STRING username = new STRING("FreecivJava", 100);
+        STRING capability = new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", 100);
+        STRING version_label = new STRING("-dev", 100);
         UINT32 major_version = new UINT32(2L);
         UINT32 minor_version = new UINT32(3L);
         UINT32 patch_version = new UINT32(99L);

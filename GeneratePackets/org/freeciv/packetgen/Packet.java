@@ -69,7 +69,7 @@ public class Packet extends ClassWriter {
                 constructorBodyJ.addAll(
                         Arrays.asList(forElementsInField(field,
                                 "this." + field.getVariableName() + " = new " + field.getType() + field.getNewCreation("") + ";",
-                                "this." + field.getVariableName() + "[i] = new " + field.getType() + "(" + field.getVariableName() + "[i]);",
+                                "this." + field.getVariableName() + "[i] = " + field.getNewFromJavaType(),
                                 "")));
             }
             javatypearglist = trimArgList(javatypearglist);
@@ -78,12 +78,13 @@ public class Packet extends ClassWriter {
         }
 
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
+        final String streamName = "from";
         for (Field field: fields) {
             constructorBodyStream.addAll(
                     Arrays.asList(forElementsInField(field, "this." + field.getVariableName() +
                             " = new " + field.getType() +
                             field.getNewCreation(".getValue()") + ";",
-                            "this." + field.getVariableName() + "[i] = " + "new " + field.getType() + "(from);",
+                            "this." + field.getVariableName() + "[i] = " + field.getNewFromDataStream(streamName),
                             "")));
         }
         constructorBodyStream.add("if (getNumber() != packet) {");
@@ -99,13 +100,13 @@ public class Packet extends ClassWriter {
         constructorBodyStream.add("}");
         addPublicConstructorWithExceptions("/***\n" +
                 " * Construct an object from a DataInput\n" +
-                " * @param from data stream that is at the start of the package body  \n" +
+                " * @param " + streamName + " data stream that is at the start of the package body  \n" +
                 " * @param headerLen length from header package\n" +
                 " * @param packet the number of the packet specified in the header\n" +
                 " * @throws IOException if the DataInput has a problem\n" +
                 " */",
                 name,
-                "DataInput from, int headerLen, int packet",
+                "DataInput " + streamName + ", int headerLen, int packet",
                 "IOException",
                 constructorBodyStream.toArray(new String[0]));
 

@@ -81,8 +81,13 @@ public class FieldTypeBasic {
             this.basicType = basicType;
 
             addObjectConstant(JavaType, "value");
-            addPublicConstructor(null, name, JavaType + " value", "this.value = value;");
-            addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
+            if (arrayEater) {
+                addPublicConstructor(null, name, JavaType + " value" + ", int arraySize", "this.value = value;");
+                addPublicConstructorWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException", Decode);
+            } else {
+                addPublicConstructor(null, name, JavaType + " value", "this.value = value;");
+                addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
+            }
             addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
             addPublicReadObjectState(null, "int", "encodedLength", EncodedSize);
             addPublicReadObjectState(null, JavaType, "getValue", "return value;");

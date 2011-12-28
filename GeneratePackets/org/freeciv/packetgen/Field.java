@@ -64,6 +64,18 @@ public class Field {
         return out;
     }
 
+    String getNewFromDataStream(String streamName) {
+        return "new " + this.getType() + "(" + streamName +
+                (type.getBasicType().isArrayEater()?
+                        ", " + declarations[declarations.length -1].getSize(".getValue()"): "") + ");";
+    }
+
+    String getNewFromJavaType() {
+        return "new " + this.getType() + "(" + this.getVariableName() + "[i]" +
+                (type.getBasicType().isArrayEater()?
+                        ", " + declarations[declarations.length -1].getSize(".getValue()"): "") + ");";
+    }
+
     private String getLegalSize(String callOnElementsToTransfer) {
         String out = "";
         String arrayLevel = "";
