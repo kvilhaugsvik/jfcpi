@@ -137,7 +137,9 @@ public class ClassWriter {
     private String formatEnumeratedElements() {
         String out = "";
 
-        for (EnumElement element: new TreeSet<EnumElement>(enums.values())) {
+        LinkedList<EnumElement> elements = new LinkedList<EnumElement>(enums.values());
+        Collections.sort(elements);
+        for (EnumElement element: elements) {
             out += "\t" + element + "," + "\n";
         }
         if (!enums.isEmpty())

@@ -462,6 +462,30 @@ public class CodeGenTest {
                 toWrite.toString());
     }
 
+    @Test public void testClassWriterEnumWithThreeElementsTwoAreTheSame() {
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
+                this.getClass().getPackage(),
+                new String[]{"org.freeciv.packet.Packet"},
+                "nothing",
+                "NameOfClass",
+                "Packet");
+        toWrite.addEnumerated(null, "ONE", 1, "\"one\"");
+        toWrite.addEnumerated(null, "2nd", 2, "\"2nd\"");
+        toWrite.addEnumerated(null, "TWO", 2, "\"two\"");
+        assertEquals("Generated source not as expected",
+                "package org.freeciv.packetgen;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
+                        "// This code was auto generated from nothing" + "\n" +
+                        "public enum NameOfClass implements Packet {" + "\n" +
+                        "\t" + "ONE (1, \"one\")," + "\n" +
+                        "\t" + "2nd (2, \"2nd\")," + "\n" +
+                        "\t" + "TWO (2, \"two\");" + "\n" +
+                        "}" + "\n",
+                toWrite.toString());
+    }
+
     @Test(expected = AssertionError.class)
     public void testNotEnumAddsEnumerated() {
         ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
