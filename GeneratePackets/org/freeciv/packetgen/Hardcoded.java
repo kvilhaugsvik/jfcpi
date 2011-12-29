@@ -40,8 +40,8 @@ public class Hardcoded {
                 new FieldTypeBasic("uint32", "int",
                         "Long",
                         new String[]{"this.value = value;"},
-                        DataIO.readUIntCode(4, "Long", "value"),
-                        DataIO.writeWriteUInt(4),
+                        readUIntCode(4, "Long", "value"),
+                        writeWriteUInt(4),
                         "return 4;",
                         false, false),
                 getFloat("100"),
@@ -169,5 +169,26 @@ public class Hardcoded {
                 "to.writeByte(value.getNumber());",
                 "return 1;",
                 true, false);
+    }
+
+    public static String writeWriteUInt(int bytenumber) {
+        String out = "";
+        while (1 <= bytenumber) {
+            out += "to.writeByte((int) ((value >>> ((" + bytenumber + " - 1) * 8)) & 0xFF));" + "\n";
+            bytenumber--;
+        }
+        return out;
+    }
+
+    public static String readUIntCode(int bytenumber, String Javatype, String var) {
+        String out = var + " = ";
+        out += "(" + Javatype.toLowerCase() + ")";
+        while (1 <= bytenumber) {
+            out += "(from.readUnsignedByte() << 8 * (" + bytenumber + " - 1)) " +
+                    (1 < bytenumber ? "+" : ";") + "\n";
+            bytenumber--;
+        }
+
+        return out;
     }
 }
