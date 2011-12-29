@@ -17,6 +17,7 @@ package org.freeciv.packetgen
 import collection.mutable.ListBuffer
 import ClassWriter.EnumElement.{newEnumValue, newInvalidEnum}
 import util.parsing.input.CharArrayReader
+import java.util.HashMap
 
 class ParseCCode(lookFor: List[String]) extends ParseShared {
   def enumDefName: String = "(" + lookFor.reduce(_ + "|" + _) + ")"
@@ -88,24 +89,35 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
       new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues: _*)
   }
 
-  def enumValue = regex("""[0-9]+""".r)
+  def enumValue = regex("\\w+".r)
 
-  def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment)
+  def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment) ^^ {
+    case element~value => (element -> value)
+  }
 
   def cEnumDef = regex(startOfCEnum.r) ~> regex(enumDefName.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
 
   def cEnumDefConverted = cEnumDef ^^ {asStructures =>
     var globalNumbers: Int = 0
+    val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
     new Enum(asStructures._1.asInstanceOf[String],
       false,
       asStructures._2.map(elem => {
         if (!elem._2.isEmpty)
-          globalNumbers = Integer.decode(elem._2.get)
+          globalNumbers = parseEnumValue(elem._1, elem._2.get, alreadyRead)
         val number = globalNumbers
         globalNumbers += 1
-        newEnumValue(elem._1, number)
+        val enumVal = newEnumValue(elem._1, number)
+        alreadyRead.put(elem._1, enumVal)
+        enumVal
       }): _*)
   }
+
+  def parseEnumValue(name: String, value: String, from: HashMap[String, ClassWriter.EnumElement]): Int =
+    if (from.containsKey(value))
+      from.get(value).getNumber
+    else
+      Integer.decode(value)
 
   def exprConverted = cEnumDefConverted | specEnumDefConverted
 

@@ -314,6 +314,13 @@ class CParserSemanticTest {
       ("null", 0, "\"null\""))
   }
 
+  @Test def testCDefineElementAsEqualPreviouslyDefined: Unit = {
+    parsesCEnumCorrectly("enum test {zero, one, null = zero}", parseTest,
+      ("zero", 0, "\"zero\""),
+      ("one", 1, "\"one\""),
+      ("null", 0, "\"null\""))
+  }
+
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test semantics of enums declared with SPECENUM
