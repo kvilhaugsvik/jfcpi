@@ -44,6 +44,9 @@ public class Hardcoded {
                         DataIO.writeWriteUInt(4),
                         "return 4;",
                         false, false),
+                getFloat("100"),
+                getFloat("10000"),
+                getFloat("1000000"),
                 new FieldTypeBasic("string", "char",
                         "String",
                         new String[]{
@@ -129,6 +132,7 @@ public class Hardcoded {
                         "to.writeShort(value.getNumber());",
                         "return 2;",
                         true, false)
+
         }) {
             data.put(src.getFieldTypeBasic(), src);
         }
@@ -145,6 +149,16 @@ public class Hardcoded {
 
     public Collection<FieldTypeBasic> values() {
         return data.values();
+    }
+
+    private static FieldTypeBasic getFloat(String times) {
+        return new FieldTypeBasic("float" + times, "float",
+                "Float",
+                new String[]{"this.value = value;"},
+                "value = from.readFloat() / " + times + ";",
+                "to.writeFloat(value * " + times + ");",
+                "return 4;",
+                false, false);
     }
 
     private static FieldTypeBasic getUInt8Enum(String named) {
