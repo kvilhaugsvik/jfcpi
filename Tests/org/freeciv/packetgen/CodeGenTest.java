@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011. Sveinung Kvilhaugsvik
  * Portions are data from Freeciv's common/packets.def. Copyright
- * to those (if copyrightable) belong to their respective copyright
+ * of those (if copyrightable) belong to their respective copyright
  * holders.
  *
  * This program is free software; you can redistribute it and/or
