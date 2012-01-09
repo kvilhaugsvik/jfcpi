@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Sveinung Kvilhaugsvik
+ * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,12 +25,12 @@ public class Packet extends ClassWriter {
     public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
         super(org.freeciv.packet.Packet.class.getPackage(),
                 new String[]{
-                        "org.freeciv.packet.fieldtype.*",
-                        org.freeciv.types.FCEnum.class.getPackage().getName() + ".*",
+                        allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
+                        allInPackageOf(org.freeciv.types.FCEnum.class),
                         null,
-                        "java.io.DataInput",
-                        "java.io.DataOutput",
-                        "java.io.IOException"
+                        java.io.DataInput.class.getCanonicalName(),
+                        java.io.DataOutput.class.getCanonicalName(),
+                        java.io.IOException.class.getCanonicalName()
                 },
                 "Freeciv's protocol definition",
                 name,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Sveinung Kvilhaugsvik
+ * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -213,6 +213,10 @@ public class ClassWriter {
 
     static String declareImport(String toImport) {
         return "import " + toImport + ";";
+    }
+
+    static String allInPackageOf(Class thisClass) {
+        return thisClass.getPackage().getName() + ".*";
     }
 
     private static String indent(String code) {
