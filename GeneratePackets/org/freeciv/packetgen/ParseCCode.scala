@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Sveinung Kvilhaugsvik
+ * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -63,7 +63,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
       enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
         @inline def key = element._1
         @inline def nameInCode = enumerations.get(key).get
-        @inline def specenumnumber = Integer.decode(key.substring(5))
+        @inline def specenumnumber = key.substring(5).toInt
         val inCodeNumber: Int = if (bitwise)
           Integer.rotateLeft(2, specenumnumber - 1)
         else
@@ -117,7 +117,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
     if (from.containsKey(value))
       from.get(value).getNumber
     else
-      Integer.decode(value)
+      value.toInt
 
   def exprConverted = cEnumDefConverted | specEnumDefConverted
 
