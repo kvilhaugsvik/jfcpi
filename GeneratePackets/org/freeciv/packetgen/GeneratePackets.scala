@@ -17,6 +17,7 @@ package org.freeciv.packetgen
 import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
+import org.freeciv.Connect
 
 class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
 
@@ -71,7 +72,7 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
       classWriter.close()
     })
 
-    val manifest = new File(path + "/org/freeciv/packet/" + "packets.txt")
+    val manifest = new File(path + Connect.packetsList)
     manifest.createNewFile
     val manifestWriter = new FileWriter(manifest)
     manifestWriter.write(storage.getPacketList)

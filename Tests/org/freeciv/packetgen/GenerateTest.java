@@ -17,6 +17,8 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.Connect;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -148,8 +150,7 @@ public class GenerateTest {
                         new Field.ArrayDeclaration("3", null),
                         new Field.ArrayDeclaration("10", null))));
 
-        FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + "/" +
-                org.freeciv.packet.Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt");
+        FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + Connect.packetsList);
         for (String packet: writtenPackets) {
             packetList.write(packet + "\n");
         }

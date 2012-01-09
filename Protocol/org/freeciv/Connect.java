@@ -27,6 +27,9 @@ import java.util.HashMap;
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
 public class Connect {
+    public static final String packetsList =
+            "/" + Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt";
+
     private final boolean hasTwoBytePacketNumber;
     private final OutputStream out;
     private final DataInputStream in;
@@ -49,7 +52,7 @@ public class Connect {
     }
 
     private void loadPacketClasses() throws IOException {
-        URL packetList = this.getClass().getResource("/org/freeciv/packet/" + "packets.txt");
+        URL packetList = this.getClass().getResource(packetsList);
         if (null == packetList) {
             throw new IOException("No packet list found");
         }
@@ -62,7 +65,7 @@ public class Connect {
                 this.packetMakers.put(Integer.parseInt(packet[0]),
                         Class.forName(packet[1].trim()).getConstructor(DataInput.class, Integer.TYPE, Integer.TYPE));
             } catch (ClassNotFoundException e) {
-                throw new IOException("packets.txt" + " claims that " +
+                throw new IOException("List of packets claims that " +
                         packetMetaData + " is generated but it was not found.");
             } catch (NoSuchMethodException e) {
                 throw new IOException(packetMetaData + " is not compatible.\n" +
