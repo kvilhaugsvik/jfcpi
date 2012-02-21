@@ -555,7 +555,7 @@ public class CodeGenTest {
                 "nothing",
                 "NameOfClass",
                 "Packet");
-        toWrite.addConstant("int", "five", "5");
+        toWrite.addClassConstant("int", "five", "5");
 
         String[] lines = toWrite.toString().split("\n");
 

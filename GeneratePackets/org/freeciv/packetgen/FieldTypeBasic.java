@@ -83,16 +83,16 @@ public class FieldTypeBasic {
 
             addObjectConstant(JavaType, "value");
             if (arrayEater) {
-                addPublicConstructor(null, name, JavaType + " value" + ", int arraySize", fromJavaType);
-                addPublicConstructorWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException", Decode);
+                addConstructorPublic(null, name, JavaType + " value" + ", int arraySize", fromJavaType);
+                addConstructorPublicWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException", Decode);
             } else {
-                addPublicConstructor(null, name, JavaType + " value", fromJavaType);
-                addPublicConstructorWithExceptions(null, name, "DataInput from", "IOException", Decode);
+                addConstructorPublic(null, name, JavaType + " value", fromJavaType);
+                addConstructorPublicWithExceptions(null, name, "DataInput from", "IOException", Decode);
             }
-            addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
-            addPublicReadObjectState(null, "int", "encodedLength", EncodedSize);
-            addPublicReadObjectState(null, JavaType, "getValue", "return value;");
-            addPublicReadObjectState(null, "String", "toString", "return value.toString();");
+            addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
+            addMethodPublicReadObjectState(null, "int", "encodedLength", EncodedSize);
+            addMethodPublicReadObjectState(null, JavaType, "getValue", "return value;");
+            addMethodPublicReadObjectState(null, "String", "toString", "return value.toString();");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
                 "if (other instanceof " + name + ") {",
                     "return this.value == ((" + name + ")other).getValue();",

@@ -39,8 +39,8 @@ public class Packet extends ClassWriter {
         this.number = number;
         this.fields = fields;
 
-        addConstant("int", "number", number + "");
-        addConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
+        addClassConstant("int", "number", number + "");
+        addClassConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
 
         for (Field field: fields) {
             addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getVariableName());
@@ -52,8 +52,8 @@ public class Packet extends ClassWriter {
 
         addConstructorFromDataInput(name, fields);
 
-        addPublicReadObjectState(null, "int", "getNumber", "return number;");
-        addPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
+        addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
+        addMethodPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
 
         addEncoder(hasTwoBytePacketNumber, fields);
         addEncodedSize(hasTwoBytePacketNumber, fields);
@@ -80,7 +80,7 @@ public class Packet extends ClassWriter {
             }
             arglist = trimArgList(arglist);
         }
-        addPublicConstructor(null, name, arglist, constructorBody.toArray(new String[0]));
+        addConstructorPublic(null, name, arglist, constructorBody.toArray(new String[0]));
     }
 
     private void addConstructorFromJavaTypes(String name, Field[] fields) {
@@ -99,7 +99,7 @@ public class Packet extends ClassWriter {
             }
             javatypearglist = trimArgList(javatypearglist);
 
-            addPublicConstructor(null, name, javatypearglist, constructorBodyJ.toArray(new String[0]));
+            addConstructorPublic(null, name, javatypearglist, constructorBodyJ.toArray(new String[0]));
         }
     }
 
@@ -125,7 +125,7 @@ public class Packet extends ClassWriter {
                 " + headerLen");
         constructorBodyStream.add("+ \" Packet: \" + getEncodedSize());");
         constructorBodyStream.add("}");
-        addPublicConstructorWithExceptions("/***\n" +
+        addConstructorPublicWithExceptions("/***\n" +
                 " * Construct an object from a DataInput\n" +
                 " * @param " + streamName + " data stream that is at the start of the package body  \n" +
                 " * @param headerLen length from header package\n" +
@@ -152,7 +152,7 @@ public class Packet extends ClassWriter {
                 encodeFields.addAll(Arrays.asList(forElementsInField(field, "",
                         field.getVariableName() + "[i].encodeTo(to);", "")));
         }
-        addPublicDynamicMethod(null, "void", "encodeTo", "DataOutput to", "IOException", encodeFields.toArray(new String[0]));
+        addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encodeFields.toArray(new String[0]));
     }
 
     private void addEncodedSize(boolean hasTwoBytePacketNumber, Field[] fields) {
@@ -171,7 +171,7 @@ public class Packet extends ClassWriter {
                         field.getVariableName() + ".encodedLength()"));
         }
         encodeFieldsLen.add(encodeFieldsLen.removeLast() + ";");
-        addPublicReadObjectState(null, "int", "getEncodedSize", encodeFieldsLen.toArray(new String[0]));
+        addMethodPublicReadObjectState(null, "int", "getEncodedSize", encodeFieldsLen.toArray(new String[0]));
     }
 
     private void addToString(String name, Field[] fields) {
@@ -186,25 +186,25 @@ public class Packet extends ClassWriter {
                         " = \" + " + field.getVariableName() + ".getValue();");
         getToString.add("");
         getToString.add("return out + \"\\n\";");
-        addPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
+        addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
     }
 
     private void addGetAsField(Field field) {
-        addPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
+        addMethodPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
                 + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
                 "return " + field.getVariableName() + ";");
     }
 
     private void addJavaGetter(Field field) {
-        addPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
+        addMethodPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
                 + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
                 + "Value",
-                (field.hasDeclarations())?
+                (field.hasDeclarations()) ?
                         forElementsInField(field,
                                 field.getJType() + field.getArrayDeclaration() + " out = new " +
                                         field.getJType() + field.getNewCreation(".getValue()") + ";",
                                 "out[i] = " + field.getVariableName() + "[i].getValue();",
-                                "return out;"):
+                                "return out;") :
                         new String[]{"return " + field.getVariableName() + ".getValue();"}
         );
     }

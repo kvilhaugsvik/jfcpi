@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Sveinung Kvilhaugsvik
+ * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -80,11 +80,11 @@ public class Enum extends ClassWriter {
                 "this.toStringName = toStringName;",
                 "this.valid = valid;");
 
-        addPublicReadObjectState(null, "int", "getNumber", "return number;");
-        addPublicReadObjectState(null, "boolean", "isValid", "return valid;");
-        addPublicReadObjectState(null, "String", "toString", "return toStringName;");
+        addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
+        addMethodPublicReadObjectState(null, "boolean", "isValid", "return valid;");
+        addMethodPublicReadObjectState(null, "String", "toString", "return toStringName;");
 
-        addReadClassState("/**" + "\n" +
+        addMethodReadClassState("/**" + "\n" +
                 " * Is the enum bitwise? An enum is bitwise if it's number increase by two's" + "\n" +
                 " * exponent." + "\n" +
                 " * @return true if the enum is bitwise" + "\n" +

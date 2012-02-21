@@ -51,7 +51,7 @@ public class ClassWriter {
     }
 
 
-    public void addConstant(String type, String name, String value) {
+    public void addClassConstant(String type, String name, String value) {
         constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
@@ -70,14 +70,14 @@ public class ClassWriter {
         methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList, body));
     }
 
-    public void addReadClassState(String comment,
-                                  String type,
-                                  String name,
-                                  String... body) {
+    public void addMethodReadClassState(String comment,
+                                        String type,
+                                        String name,
+                                        String... body) {
         methods.add(Method.newReadClassState(comment, type, name, body));
     }
 
-    public void addPublicDynamicMethod(String comment,
+    public void addMethodPublicDynamic(String comment,
                                        String type,
                                        String name,
                                        String paramList,
@@ -86,22 +86,22 @@ public class ClassWriter {
         methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, body));
     }
 
-    public void addPublicReadObjectState(String comment,
-                                         String type,
-                                         String name,
-                                         String... body) {
+    public void addMethodPublicReadObjectState(String comment,
+                                               String type,
+                                               String name,
+                                               String... body) {
         methods.add(Method.newPublicReadObjectState(comment, type, name, body));
     }
 
-    public void addPublicConstructorWithExceptions(String comment,
-                               String name,
-                               String paramList,
-                               String exceptionList,
-                               String... body) {
+    public void addConstructorPublicWithExceptions(String comment,
+                                                   String name,
+                                                   String paramList,
+                                                   String exceptionList,
+                                                   String... body) {
         methods.add(Method.newPublicConstructorWithException(comment, name, paramList, exceptionList, body));
     }
 
-    public void addPublicConstructor(String comment,
+    public void addConstructorPublic(String comment,
                                      String name,
                                      String paramList,
                                      String... body) {
