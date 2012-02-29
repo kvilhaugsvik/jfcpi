@@ -22,8 +22,7 @@ public class FieldTypeBasic {
     private final String[] Decode;
     private final String[] encode, EncodedSize;
     private final boolean arrayEater;
-
-    private boolean hasReq;
+    private final Requirement requirement;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
                           String decode, String encode, String encodedSize, boolean needsType, boolean arrayEater) {
@@ -36,7 +35,7 @@ public class FieldTypeBasic {
         this.arrayEater = arrayEater;
         this.fromJavaType = fromJavaType;
 
-        hasReq = needsType ? false : true;
+        requirement = (needsType? new Requirement(publicType, Requirement.Kind.ENUM): null);
     }
 
     public String getFieldTypeBasic() {
@@ -44,11 +43,11 @@ public class FieldTypeBasic {
     }
 
     public boolean hasRequired() {
-        return hasReq;
+        return (null == requirement) || (requirement.isFulfilled());
     }
 
     public void requirementsFound() {
-        this.hasReq = true;
+        this.requirement.setFulfilled();
     }
 
     public String getPublicType() {
