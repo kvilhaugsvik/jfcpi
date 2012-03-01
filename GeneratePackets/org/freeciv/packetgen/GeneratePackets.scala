@@ -28,13 +28,7 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
   private val storage = new PacketsStore(devMode, hasTwoBytePacketNumber)
   private val Parser = new ParsePacketsDef(storage)
 
-  (packetsDefPath :: cPaths).foreach((fileToValidate: File) => {
-    if (!fileToValidate.exists()) {
-      throw new IOException(fileToValidate.getAbsolutePath + " doesn't exist.")
-    } else if (!fileToValidate.canRead) {
-      throw new IOException("Can't read " + fileToValidate.getAbsolutePath)
-    }
-  })
+  GeneratePackets.checkFilesCanRead(packetsDefPath :: cPaths)
 
   private val toLookFor = (new Hardcoded).values().filter(!_.hasRequired).map(_.getPublicType).map(requirement => {
     val req = requirement.split("\\s")
@@ -84,5 +78,15 @@ object GeneratePackets {
   def main(args: Array[String]) {
     val self = new GeneratePackets(args(0), args.tail.toList, GeneratorDefaults.DEVMODE, true)
     self.writeToDir(GeneratorDefaults.GENERATEDOUT)
+  }
+
+  def checkFilesCanRead(files: List[File]) {
+    files.foreach((fileToValidate: File) => {
+      if (!fileToValidate.exists()) {
+        throw new IOException(fileToValidate.getAbsolutePath + " doesn't exist.")
+      } else if (!fileToValidate.canRead) {
+        throw new IOException("Can't read " + fileToValidate.getAbsolutePath)
+      }
+    })
   }
 }
