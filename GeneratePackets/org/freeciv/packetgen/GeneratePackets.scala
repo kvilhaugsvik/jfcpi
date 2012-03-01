@@ -41,10 +41,7 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
   if ((null != toLookFor) && !Nil.equals(toLookFor)) {
     val extractor = new FromCExtractor(toLookFor.keys.toList)
     cPaths.map(code => {
-      val codeFile = new FileReader(code)
-      val content = StreamReader(codeFile).source.toString
-      codeFile.close()
-      extractor.extract(content).foreach((requirement) =>
+      extractor.extract(GeneratePackets.readFileAsString(code)).foreach((requirement) =>
         storage.addRequirement(toLookFor(requirement.getName), requirement))
     })
   }
@@ -88,5 +85,12 @@ object GeneratePackets {
         throw new IOException("Can't read " + fileToValidate.getAbsolutePath)
       }
     })
+  }
+
+  def readFileAsString(code: File): String = {
+    val codeFile = new FileReader(code)
+    val content = StreamReader(codeFile).source.toString
+    codeFile.close()
+    return content
   }
 }
