@@ -41,6 +41,20 @@ public class Requirement {
         return name;
     }
 
+    @Override
+    public boolean equals(Object that) {
+        if (that instanceof Requirement)
+            return name.equals(((Requirement)that).getName()) &&
+                    kind.equals(((Requirement)that).getKind());
+        else
+            return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode() + kind.ordinal();
+    }
+
     public enum Kind {
         ENUM,
         FIELD_TYPE
