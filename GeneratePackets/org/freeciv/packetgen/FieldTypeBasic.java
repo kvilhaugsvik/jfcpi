@@ -19,10 +19,10 @@ import java.util.*;
 public class FieldTypeBasic {
     private final String fieldTypeBasic;
     private final String publicType;
-    private final String JavaType;
+    private final String javaType;
     private final String[] fromJavaType;
-    private final String[] Decode;
-    private final String[] encode, EncodedSize;
+    private final String[] decode;
+    private final String[] encode, encodedSize;
     private final boolean arrayEater;
 
     private final Collection<Requirement> requirement;
@@ -32,10 +32,10 @@ public class FieldTypeBasic {
                           String decode, String encode, String encodedSize, boolean arrayEater) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
-        JavaType = javaType;
-        Decode = decode.split("\n");
+        this.javaType = javaType;
+        this.decode = decode.split("\n");
         this.encode = encode.split("\n");
-        EncodedSize = encodedSize.split("\n");
+        this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;
         this.fromJavaType = fromJavaType;
 
@@ -75,19 +75,19 @@ public class FieldTypeBasic {
                     },
                     "Freeciv's protocol definition",
                     name,
-                    "FieldType<" + JavaType + ">");
+                    "FieldType<" + javaType + ">");
 
-            addObjectConstant(JavaType, "value");
+            addObjectConstant(javaType, "value");
             if (arrayEater) {
-                addConstructorPublic(null, name, JavaType + " value" + ", int arraySize", fromJavaType);
-                addConstructorPublicWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException", Decode);
+                addConstructorPublic(null, name, javaType + " value" + ", int arraySize", fromJavaType);
+                addConstructorPublicWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException", decode);
             } else {
-                addConstructorPublic(null, name, JavaType + " value", fromJavaType);
-                addConstructorPublicWithExceptions(null, name, "DataInput from", "IOException", Decode);
+                addConstructorPublic(null, name, javaType + " value", fromJavaType);
+                addConstructorPublicWithExceptions(null, name, "DataInput from", "IOException", decode);
             }
             addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
-            addMethodPublicReadObjectState(null, "int", "encodedLength", EncodedSize);
-            addMethodPublicReadObjectState(null, JavaType, "getValue", "return value;");
+            addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
+            addMethodPublicReadObjectState(null, javaType, "getValue", "return value;");
             addMethodPublicReadObjectState(null, "String", "toString", "return value.toString();");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
                 "if (other instanceof " + name + ") {",
@@ -102,7 +102,7 @@ public class FieldTypeBasic {
         }
 
         public String getJavaType() {
-            return JavaType;
+            return javaType;
         }
 
         @Override
