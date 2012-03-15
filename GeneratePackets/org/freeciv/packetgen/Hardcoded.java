@@ -29,21 +29,21 @@ public class Hardcoded {
                         "value = from.readUnsignedByte();",
                         "to.writeByte(value);",
                         "return 1;",
-                        false, false),
+                        false),
                 new FieldTypeBasic("uint16", "int",
                         "Integer",
                         new String[]{"this.value = value;"},
                         "value = (int) from.readChar();",
                         "to.writeChar(value);",
                         "return 2;",
-                        false, false),
+                        false),
                 new FieldTypeBasic("uint32", "int",
                         "Long",
                         new String[]{"this.value = value;"},
                         readUIntCode(4, "Long", "value"),
                         writeWriteUInt(4),
                         "return 4;",
-                        false, false),
+                        false),
                 getFloat("100"),
                 getFloat("10000"),
                 getFloat("1000000"),
@@ -66,35 +66,35 @@ public class Hardcoded {
                         "to.writeBytes(" + "value" + ");\n" +
                                 "to.writeByte(0);",
                         "return " + "value" + ".length() + 1;",
-                        false, true),
+                        true),
                 new FieldTypeBasic("bool8", "bool",
                         "Boolean",
                         new String[]{"this.value = value;"},
                         "value = from.readBoolean();",
                         "to.writeBoolean(value);",
                         "return 1;",
-                        false, false),
+                        false),
                 new FieldTypeBasic("sint8", "int",
                         "Byte",
                         new String[]{"this.value = value;"},
                         "value = from.readByte();",
                         "to.writeByte(value);",
                         "return 2;",
-                        false, false),
+                        false),
                 new FieldTypeBasic("sint16", "int",
                         "Short",
                         new String[]{"this.value = value;"},
                         "value = from.readShort();",
                         "to.writeShort(value);",
                         "return 2;",
-                        false, false),
+                        false),
                 new FieldTypeBasic("sint32", "int",
                         "Integer",
                         new String[]{"this.value = value;"},
                         "value = from.readInt();",
                         "to.writeInt(value);",
                         "return 4;",
-                        false, false),
+                        false),
                 getUInt8Enum("unit_activity"),
                 getUInt8Enum("airlifting_style"),
                 getUInt8Enum("authentication_type"),
@@ -124,14 +124,14 @@ public class Hardcoded {
                         "value = tile_special_type.valueOf((int) from.readChar());",
                         "to.writeChar(value.getNumber());",
                         "return 2;",
-                        true, false),
+                        false),
                 new FieldTypeBasic("sint16", "enum event_type",
                         "event_type",
                         new String[]{"this.value = value;"},
                         "value = event_type.valueOf(from.readShort());",
                         "to.writeShort(value.getNumber());",
                         "return 2;",
-                        true, false)
+                        false)
 
         }) {
             data.put(src.getFieldTypeBasic(), src);
@@ -158,7 +158,7 @@ public class Hardcoded {
                 "value = from.readFloat() / " + times + ";",
                 "to.writeFloat(value * " + times + ");",
                 "return 4;",
-                false, false);
+                false);
     }
 
     private static FieldTypeBasic getUInt8Enum(String named) {
@@ -168,7 +168,7 @@ public class Hardcoded {
                 "value = " + named + ".valueOf(from.readUnsignedByte());",
                 "to.writeByte(value.getNumber());",
                 "return 1;",
-                true, false);
+                false);
     }
 
     public static String writeWriteUInt(int bytenumber) {

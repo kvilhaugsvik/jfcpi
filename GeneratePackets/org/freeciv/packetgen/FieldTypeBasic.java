@@ -29,7 +29,7 @@ public class FieldTypeBasic {
     private final FieldTypeBasic basicType = this;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
-                          String decode, String encode, String encodedSize, boolean needsType, boolean arrayEater) {
+                          String decode, String encode, String encodedSize, boolean arrayEater) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         JavaType = javaType;
@@ -40,8 +40,10 @@ public class FieldTypeBasic {
         this.fromJavaType = fromJavaType;
 
         requirement = new ArrayList<Requirement>();
-        if (needsType)
-            requirement.add(new Requirement(publicType.split("\\s")[1], Requirement.Kind.ENUM));
+        String[] publicTypeParts = publicType.split("\\s");
+        if ("enum".equals(publicTypeParts[0])) {
+            requirement.add(new Requirement(publicTypeParts[1], Requirement.Kind.ENUM));
+        }
     }
 
     public String getFieldTypeBasic() {
