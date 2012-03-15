@@ -25,25 +25,16 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
     this(new File(packetsDefPathString), cPathsString.map(new File(_)), devMode, hasTwoBytePacketNumber)
   }
 
-  private val storage = new PacketsStore(devMode, hasTwoBytePacketNumber)
+  private val storage = new PacketsStore(hasTwoBytePacketNumber)
   private val Parser = new ParsePacketsDef(storage)
 
   GeneratePackets.checkFilesCanRead(packetsDefPath :: cPaths)
 
-  private val toLookFor = (new Hardcoded).values().filter(!_.hasRequired).map(_.getPublicType).map(requirement => {
-    val req = requirement.split("\\s")
-    if ("enum".equals(req(0))) {
-      req(1) -> requirement
-    } else {
-      throw new UnsupportedOperationException("No support for generating " + req(0) + " one the fly")
-    }
-  }: (String, String)).toMap
+  private val toLookFor = (new Hardcoded).values().map(_.getRequirements).flatten.toList
   if ((null != toLookFor) && !Nil.equals(toLookFor)) {
-    val extractor = new FromCExtractor(toLookFor.keys.toList)
-    cPaths.map(code => {
-      extractor.extract(GeneratePackets.readFileAsString(code)).foreach((requirement) =>
-        storage.addRequirement(toLookFor(requirement.getName), requirement))
-    })
+    val extractor = new FromCExtractor(toLookFor.map(_.getName))
+    cPaths.map(code => extractor.extract(GeneratePackets.readFileAsString(code))).flatten
+      .foreach(storage.addDependency(_))
   }
 
   if (!Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))).successful) {
@@ -53,6 +44,14 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
   def writeToDir(path: File) {
+    val notFound = storage.getUnsolvedRequirements
+    if (!notFound.isEmpty) {
+      if (devMode) {
+        println("Some packets where not generated because of missing dependencies. Please add the following: " + notFound)
+      } else {
+        throw new UndefinedException("Missing dependencies: " + notFound)
+      }
+    }
     storage.getJavaCode.foreach((code) => {
       val packagePath = code.getPackage.replaceAll("""\.""", "/")
       val classFile = new File(path + "/" + packagePath + "/" + code.getName + ".java")

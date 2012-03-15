@@ -18,19 +18,9 @@ public class Requirement {
     private final String name;
     private final Kind kind;
 
-    private boolean fulfilled;
-
     public Requirement(String name, Kind kind) {
         this.name = name;
         this.kind = kind;
-    }
-
-    public void setFulfilled() {
-        fulfilled = true;
-    }
-
-    public boolean isFulfilled() {
-        return fulfilled;
     }
 
     public Kind getKind() {

@@ -17,18 +17,20 @@ package org.freeciv.packetgen;
 import org.junit.Test;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import static org.junit.Assert.*;
 
 public class PacketsStoreTest {
-    private static PacketsStore dev() {
-        return new PacketsStore(true, true);
+    private static PacketsStore noDev() {
+        return new PacketsStore(true);
     }
 
-    private static PacketsStore noDev() {
-        return new PacketsStore(false, true);
+    private static void assertLooksForButNoCodeYet(PacketsStore storage, Requirement looksFor, String noCodeNamed) {
+        assertTrue(storage.getUnsolvedRequirements().contains(looksFor));
+        for (ClassWriter code : storage.getJavaCode())
+            assertFalse("Should have been skipped since requirement missing", code.getName().equals(noCodeNamed));
     }
 
     @Test public void registerType() throws UndefinedException {
@@ -46,51 +48,65 @@ public class PacketsStoreTest {
         assertTrue(storage.hasTypeAlias("UNSIGNEDINT32"));
     }
 
-    @Test public void registerTypeRequiredNotExistingDevMode() throws UndefinedException {
-        PacketsStore storage = dev();
+    private static void registerPacketToPullInnFieldtype(PacketsStore storage, String fieldTypeName, int time)
+            throws PacketCollisionException, UndefinedException {
+        LinkedList<String[]> fields = new LinkedList<String[]>();
+        fields.add(new String[]{fieldTypeName, "DragInnDep"});
+        storage.registerPacket("DragInnDep" + time, 42 + time, fields);
+    }
+
+    @Test public void registerTypeRequiredNotExisting() throws UndefinedException, PacketCollisionException {
+        PacketsStore storage = noDev();
         storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
 
-        assertFalse("Filed type alias should have been skipped", storage.hasTypeAlias("ACTIVITY"));
+        registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
+
+        assertLooksForButNoCodeYet(storage, new Requirement("unit_activity", Requirement.Kind.ENUM), "ACTIVITY");
     }
 
-    @Test public void registerTypeNotExistingDevMode() throws UndefinedException {
-        PacketsStore storage = dev();
-        storage.registerTypeAlias("THISSHOULDNOTEXIST", "UINT32");
-
-        assertFalse(storage.hasTypeAlias("THISSHOULDNOTEXIST"));
-    }
-
-    @Test(expected = UndefinedException.class)
-    public void registerTypeNotExisting() throws UndefinedException {
+    @Test public void registerTypeNotExisting() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = noDev();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "UINT32");
+
+        registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
+
+        assertLooksForButNoCodeYet(storage, new Requirement("UINT32", Requirement.Kind.FIELD_TYPE),
+                "THISSHOULDNOTEXIST");
     }
 
-    @Test(expected = UndefinedException.class)
-    public void registerTypeBasicTypeNotExisting() throws UndefinedException {
+    @Test public void registerTypeBasicTypeNotExisting() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = noDev();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "notexisting128(void)");
+
+        registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
+
+        assertLooksForButNoCodeYet(storage, new Requirement("notexisting128(void)", Requirement.Kind.FIELD_TYPE),
+                "THISSHOULDNOTEXIST");
     }
 
-    @Test(expected = UndefinedException.class)
-    public void registerTypeRequiredNotExisting() throws UndefinedException {
+    @Test public void registerTypeRequired() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = noDev();
-        storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
-    }
-
-    @Test public void registerTypeRequired() throws UndefinedException {
-        PacketsStore storage = noDev();
-        storage.addRequirement("enum unit_activity", new Enum("unit_activity", false));
+        storage.addDependency(new Enum("unit_activity", false));
         storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
 
-        assertTrue("Type alias should have been added since requirement registered", storage.hasTypeAlias("ACTIVITY"));
+        registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
+
+        HashSet<String> allCode = new HashSet<String>();
+        for (ClassWriter code : storage.getJavaCode()) {
+            allCode.add(code.getName());
+        }
+        assertTrue("Should contain field type since used by packet", allCode.contains("ACTIVITY"));
+        assertTrue("Should contain enum since used by field type used by packet", allCode.contains("unit_activity"));
     }
 
-    @Test public void codeIsThere() throws UndefinedException {
+    @Test public void codeIsThere() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = noDev();
 
         storage.registerTypeAlias("UINT32", "uint32(int)");
         storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
+
+        registerPacketToPullInnFieldtype(storage, "UINT32", 0);
+        registerPacketToPullInnFieldtype(storage, "UNSIGNEDINT32", 1);
 
         Collection<ClassWriter> results = storage.getJavaCode();
 
@@ -111,6 +127,7 @@ public class PacketsStoreTest {
 
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
+        assertTrue("PACKET_HELLO".equals(storage.getJavaCode().iterator().next().getName()));
     }
 
     @Test(expected = PacketCollisionException.class)
@@ -138,6 +155,13 @@ public class PacketsStoreTest {
         assertTrue(storage.hasTypeAlias("STRING"));
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
+
+        HashSet<String> allCode = new HashSet<String>();
+        for (ClassWriter code : storage.getJavaCode()) {
+            allCode.add(code.getName());
+        }
+        assertTrue("Should contain packet since all field types it uses are there", allCode.contains("PACKET_HELLO"));
+        assertTrue("Should contain field type since used by packet", allCode.contains("STRING"));
     }
 
     @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
@@ -162,8 +186,8 @@ public class PacketsStoreTest {
         assertTrue(storage.getPacket("PACKET_HELLO").getFields().isEmpty());
     }
 
-    @Test public void registerPacketWithUndefinedFieldsDevMode() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = dev();
+    @Test public void registerPacketWithUndefinedFields() throws PacketCollisionException, UndefinedException {
+        PacketsStore storage = noDev();
         String[] field1 = {"STRING", "myNameIs"};
         LinkedList<String[]> fields = new LinkedList<String[]>();
         fields.add(field1);
@@ -172,16 +196,7 @@ public class PacketsStoreTest {
 
         assertFalse(storage.hasPacket(25));
         assertFalse(storage.hasPacket("PACKET_HELLO"));
-    }
-
-    @Test(expected = UndefinedException.class)
-    public void registerPacketWithUndefinedFields() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
-        String[] field1 = {"STRING", "myNameIs"};
-        LinkedList<String[]> fields = new LinkedList<String[]>();
-        fields.add(field1);
-
-        storage.registerPacket("PACKET_HELLO", 25, fields);
+        assertLooksForButNoCodeYet(storage, new Requirement("STRING", Requirement.Kind.FIELD_TYPE), "STRING");
     }
 
     @Test(expected = AssertionError.class)

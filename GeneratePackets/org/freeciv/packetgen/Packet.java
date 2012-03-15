@@ -14,13 +14,14 @@
 
 package org.freeciv.packetgen;
 
-import java.util.LinkedList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class Packet extends ClassWriter {
+public class Packet extends ClassWriter implements IDependency {
     private final int number;
     private final Field[] fields;
+
+    private final Requirement iFulfill;
+    private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
     public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
         super(org.freeciv.packet.Packet.class.getPackage(),
@@ -67,6 +68,12 @@ public class Packet extends ClassWriter {
         for (Field field: fields) {
             addJavaGetter(field);
         }
+
+        for (Field field: fields) {
+            requirements.add(new Requirement(field.getType(), Requirement.Kind.FIELD_TYPE));
+        }
+
+        iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
     }
 
     private void addConstructorFromFields(String name, Field[] fields) {
@@ -257,5 +264,15 @@ public class Packet extends ClassWriter {
 
     public List<? extends Field> getFields() {
         return Arrays.asList(fields);
+    }
+
+    @Override
+    public Collection<Requirement> getReqs() {
+        return Collections.unmodifiableSet(requirements);
+    }
+
+    @Override
+    public Requirement getIFulfillReq() {
+        return iFulfill;
     }
 }

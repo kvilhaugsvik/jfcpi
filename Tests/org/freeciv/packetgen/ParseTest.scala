@@ -24,7 +24,7 @@ import util.parsing.input.CharArrayReader
 
 class ParseTest {
   @inline def storePars = {
-    val storage = new PacketsStore(false, true)
+    val storage = new PacketsStore(true)
     val parser = new ParsePacketsDef(storage)
     (storage, parser)
   }

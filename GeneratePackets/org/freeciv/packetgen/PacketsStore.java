@@ -19,11 +19,10 @@ import java.util.*;
 import org.freeciv.packetgen.FieldTypeBasic.FieldTypeAlias;
 
 public class PacketsStore {
-    private final boolean devMode;
     private final boolean hasTwoBytePacketNumber;
 
-    private final HashMap<String, FieldTypeAlias> types = new HashMap<String, FieldTypeAlias>();
-    private final HashMap<String, ClassWriter> requirements = new HashMap<String, ClassWriter>();
+    private final HashSet<Requirement> notFoundWhenNeeded = new HashSet<Requirement>();
+    private final DependencyStore requirements = new DependencyStore();
     private final Hardcoded hardcoded = new Hardcoded();
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
@@ -31,36 +30,25 @@ public class PacketsStore {
     private final HashMap<String, Packet> packets = new HashMap<String, Packet>();
     private final HashMap<Integer, String> packetsByNumber = new HashMap<Integer, String>();
 
-    public PacketsStore(boolean devMode, boolean hasTwoBytePacketNumber) {
-        this.devMode = devMode;
+    public PacketsStore(boolean hasTwoBytePacketNumber) {
         this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
     }
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
         final FieldTypeBasic basicFieldType = hardcoded.getBasicFieldType(aliased);
+        Requirement req = new Requirement(aliased, Requirement.Kind.FIELD_TYPE);
         if (null != basicFieldType) {
-            if (basicFieldType.hasRequired())
-                types.put(alias, basicFieldType.createFieldType(alias));
-            else
-                skipOrCrash("Required type " + basicFieldType.getPublicType() + " used in " + aliased + " not found.");
-        } else if (types.containsKey(aliased)) {
-            types.put(alias, types.get(aliased).getBasicType().createFieldType(alias));
+            requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));
+        } else if (requirements.isAwareOfPotentialProvider(req)) {
+            requirements.addPossibleRequirement(((FieldTypeAlias)requirements.getPotentialProvider(req))
+                    .getBasicType().createFieldType(alias));
         } else {
-            skipOrCrash(aliased + " not declared before used in " + alias + ".");
-        }
-    }
-
-    private void skipOrCrash(String errorMessage) throws UndefinedException {
-        if (devMode) {
-            System.err.println(errorMessage);
-            System.err.println("Skipping since in development mode...");
-        } else {
-            throw new UndefinedException(errorMessage);
+            notFoundWhenNeeded.add(req);
         }
     }
 
     public boolean hasTypeAlias(String name) {
-        return types.containsKey(name);
+        return requirements.isAwareOfPotentialProvider(new Requirement(name, Requirement.Kind.FIELD_TYPE));
     }
 
     public void registerPacket(String name, int number, List<String[]> fields) throws PacketCollisionException, UndefinedException {
@@ -73,19 +61,22 @@ public class PacketsStore {
         List<Field> fieldList = new LinkedList<Field>();
         for (String[] fieldType: fields) {
             assert (1 != (fieldType.length % 2));
-            if (!types.containsKey(fieldType[0])) {
-                skipOrCrash("Field type " + fieldType[0] + " not declared before use in packet " + name + ".");
+            Requirement req = new Requirement(fieldType[0], Requirement.Kind.FIELD_TYPE);
+            if (!requirements.isAwareOfPotentialProvider(req)) {
+                notFoundWhenNeeded.add(req);
                 return;
             }
             LinkedList<Field.ArrayDeclaration> declarations = new LinkedList<Field.ArrayDeclaration>();
             for (int i = 2; i < fieldType.length; i += 2) {
                 declarations.add(new Field.ArrayDeclaration(fieldType[i], fieldType[i + 1]));
             }
-            fieldList.add(new Field(fieldType[1], types.get(fieldType[0]),
+            fieldList.add(new Field(fieldType[1], ((FieldTypeAlias)requirements.getPotentialProvider(req)),
                     declarations.toArray(new Field.ArrayDeclaration[0])));
         }
 
-        packets.put(name, new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0])));
+        Packet packet = new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0]));
+        requirements.addWanted(packet);
+        packets.put(name, packet);
         packetsByNumber.put(number, name);
     }
 
@@ -102,9 +93,15 @@ public class PacketsStore {
     }
 
     public Collection<ClassWriter> getJavaCode() {
-        ArrayList<ClassWriter> out = new ArrayList<ClassWriter>(types.values());
-        out.addAll(requirements.values());
-        out.addAll(packets.values());
+        HashSet<ClassWriter> out = new HashSet<ClassWriter>();
+        for (IDependency dep : requirements.getResolved())
+            out.add((ClassWriter) dep);
+        return out;
+    }
+
+    public Collection<Requirement> getUnsolvedRequirements() {
+        HashSet<Requirement> out = new HashSet<Requirement>(requirements.getMissingRequirements());
+        out.addAll(notFoundWhenNeeded);
         return out;
     }
 
@@ -118,10 +115,7 @@ public class PacketsStore {
         return out;
     }
 
-    public void addRequirement(String publicType, ClassWriter requirement) {
-        requirements.put(publicType, requirement);
-        for (FieldTypeBasic basicType: hardcoded.values()) {
-            if (basicType.getPublicType().equals(publicType)) basicType.requirementsFound();
-        }
+    public void addDependency(IDependency fulfillment) {
+        requirements.addPossibleRequirement(fulfillment);
     }
 }

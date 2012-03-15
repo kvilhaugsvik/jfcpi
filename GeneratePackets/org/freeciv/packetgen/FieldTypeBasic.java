@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen;
 
+import java.util.*;
+
 public class FieldTypeBasic {
     private final String fieldTypeBasic;
     private final String publicType;
@@ -22,7 +24,7 @@ public class FieldTypeBasic {
     private final String[] Decode;
     private final String[] encode, EncodedSize;
     private final boolean arrayEater;
-    private final Requirement requirement;
+    private final Collection<Requirement> requirement;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
                           String decode, String encode, String encodedSize, boolean needsType, boolean arrayEater) {
@@ -35,19 +37,17 @@ public class FieldTypeBasic {
         this.arrayEater = arrayEater;
         this.fromJavaType = fromJavaType;
 
-        requirement = (needsType? new Requirement(publicType, Requirement.Kind.ENUM): null);
+        requirement = new ArrayList<Requirement>();
+        if (needsType)
+            requirement.add(new Requirement(publicType.split("\\s")[1], Requirement.Kind.ENUM));
     }
 
     public String getFieldTypeBasic() {
         return fieldTypeBasic;
     }
 
-    public boolean hasRequired() {
-        return (null == requirement) || (requirement.isFulfilled());
-    }
-
-    public void requirementsFound() {
-        this.requirement.setFulfilled();
+    public Collection<Requirement> getRequirements() {
+        return requirement;
     }
 
     public String getPublicType() {
@@ -62,7 +62,7 @@ public class FieldTypeBasic {
         return arrayEater;
     }
 
-    public class FieldTypeAlias extends ClassWriter {
+    public class FieldTypeAlias extends ClassWriter implements IDependency {
         private FieldTypeBasic basicType;
 
         private FieldTypeAlias(String name, FieldTypeBasic basicType) {
@@ -106,6 +106,16 @@ public class FieldTypeBasic {
 
         public String getJavaType() {
             return JavaType;
+        }
+
+        @Override
+        public Collection<Requirement> getReqs() {
+            return requirement;
+        }
+
+        @Override
+        public Requirement getIFulfillReq() {
+            return new Requirement(getName(), Requirement.Kind.FIELD_TYPE);
         }
     }
 }
