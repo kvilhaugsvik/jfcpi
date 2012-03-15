@@ -1,9 +1,9 @@
 package org.freeciv.packetgen;
 
-import java.util.Set;
+import java.util.Collection;
 
 public interface IDependency {
-    public Set<Requirement> getReqs();
+    public Collection<Requirement> getReqs();
     public Requirement getIFulfillReq();
 
 }
