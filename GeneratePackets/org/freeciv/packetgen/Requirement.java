@@ -57,6 +57,7 @@ public class Requirement {
 
     public enum Kind {
         ENUM,
-        FIELD_TYPE
+        FIELD_TYPE,
+        PACKET
     }
 }
