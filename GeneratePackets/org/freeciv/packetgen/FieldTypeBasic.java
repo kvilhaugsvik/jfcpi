@@ -48,10 +48,6 @@ public class FieldTypeBasic {
         return fieldTypeBasic;
     }
 
-    public Collection<Requirement> getRequirements() {
-        return requirement;
-    }
-
     public String getPublicType() {
         return publicType;
     }
