@@ -55,6 +55,11 @@ public class Requirement {
         return name.hashCode() + kind.ordinal();
     }
 
+    @Override
+    public String toString() {
+        return name + " (a " + kind + ")";
+    }
+
     public enum Kind {
         ENUM,
         FIELD_TYPE,
