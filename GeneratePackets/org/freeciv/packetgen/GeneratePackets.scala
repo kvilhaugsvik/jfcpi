@@ -30,15 +30,16 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
 
   GeneratePackets.checkFilesCanRead(packetsDefPath :: cPaths)
 
-  private val toLookFor = (new Hardcoded).values().map(_.getRequirements).flatten.toList
-  if ((null != toLookFor) && !Nil.equals(toLookFor)) {
-    val extractor = new FromCExtractor(toLookFor.map(_.getName))
-    cPaths.map(code => extractor.extract(GeneratePackets.readFileAsString(code))).flatten
-      .foreach(storage.addDependency(_))
-  }
-
   if (!Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))).successful) {
     throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
+  }
+
+  private val toLookFor = storage.getUnsolvedRequirements.filter(want => Requirement.Kind.ENUM.equals(want.getKind))
+    .map(want => want.getName)
+  if ((null != toLookFor) && !Nil.equals(toLookFor)) {
+    val extractor = new FromCExtractor(toLookFor.toList)
+    cPaths.map(code => extractor.extract(GeneratePackets.readFileAsString(code))).flatten
+      .foreach(storage.addDependency(_))
   }
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
