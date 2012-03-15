@@ -14,8 +14,7 @@
 
 package org.freeciv.packetgen;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 //TODO: Move data to file
 public class Hardcoded {
@@ -148,7 +147,7 @@ public class Hardcoded {
     }
 
     public static Collection<FieldTypeBasic> values() {
-        return data.values();
+        return Collections.unmodifiableCollection(data.values());
     }
 
     private static FieldTypeBasic getFloat(String times) {
