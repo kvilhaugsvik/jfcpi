@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import static org.junit.Assert.*;
 
 public class PacketsStoreTest {
-    private static PacketsStore noDev() {
+    private static PacketsStore defaultStorage() {
         return new PacketsStore(true);
     }
 
@@ -34,14 +34,14 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerType() throws UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("UINT32", "uint32(int)");
 
         assertTrue(storage.hasTypeAlias("UINT32"));
     }
 
     @Test public void registerTypeAlias() throws UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("UINT32", "uint32(int)");
         storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
 
@@ -56,7 +56,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerTypeRequiredNotExisting() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
 
         registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
@@ -65,7 +65,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerTypeNotExisting() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "UINT32");
 
         registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
@@ -75,7 +75,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerTypeBasicTypeNotExisting() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("THISSHOULDNOTEXIST", "notexisting128(void)");
 
         registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
@@ -85,7 +85,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerTypeRequired() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.addDependency(new Enum("unit_activity", false));
         storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
 
@@ -100,7 +100,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void codeIsThere() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
 
         storage.registerTypeAlias("UINT32", "uint32(int)");
         storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
@@ -122,7 +122,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerPacketWithoutFields() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
 
         assertTrue(storage.hasPacket(25));
@@ -132,20 +132,20 @@ public class PacketsStoreTest {
 
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameNumber() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
         storage.registerPacket("PACKET_HI", 25, new LinkedList<String[]>());
     }
 
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameName() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
         storage.registerPacket("PACKET_HELLO", 50, new LinkedList<String[]>());
     }
 
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("STRING", "string(char)");
         String[] field1 = {"STRING", "myNameIs", "50", null};
         LinkedList<String[]> fields = new LinkedList<String[]>();
@@ -165,7 +165,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         String[] field1 = {"STRING", "myNameIs", "50", null};
         LinkedList<String[]> fields = new LinkedList<String[]>();
         fields.add(field1);
@@ -179,7 +179,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerPacketWithoutFieldsHasNoFields() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
@@ -187,7 +187,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void registerPacketWithUndefinedFields() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         String[] field1 = {"STRING", "myNameIs"};
         LinkedList<String[]> fields = new LinkedList<String[]>();
         fields.add(field1);
@@ -201,7 +201,7 @@ public class PacketsStoreTest {
 
     @Test(expected = AssertionError.class)
     public void registerPacketWithWronglyFormatedField() throws UndefinedException, PacketCollisionException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
 
         storage.registerTypeAlias("STRING", "string(char)");
 
@@ -212,13 +212,13 @@ public class PacketsStoreTest {
     }
 
     @Test public void noPacketsAreListedWhenNoPacketsAreRegistered() {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
 
         assertEquals("", storage.getPacketList());
     }
 
     @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
 
         String[] packetList = storage.getPacketList().split("[\\t\\r\\n]");
@@ -227,7 +227,7 @@ public class PacketsStoreTest {
     }
 
     @Test public void packetsAreListed() throws PacketCollisionException, UndefinedException {
-        PacketsStore storage = noDev();
+        PacketsStore storage = defaultStorage();
         storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
         storage.registerPacket("PACKET_HI", 26, new LinkedList<String[]>());
 
