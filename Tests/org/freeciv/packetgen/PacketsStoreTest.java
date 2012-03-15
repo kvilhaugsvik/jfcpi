@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Sveinung Kvilhaugsvik
+ * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -107,7 +107,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithoutFields() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = noDev();
-        storage.registerPacket("PACKET_HELLO", 25);
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
 
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
@@ -116,15 +116,15 @@ public class PacketsStoreTest {
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameNumber() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = noDev();
-        storage.registerPacket("PACKET_HELLO", 25);
-        storage.registerPacket("PACKET_HI", 25);
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
+        storage.registerPacket("PACKET_HI", 25, new LinkedList<String[]>());
     }
 
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameName() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = noDev();
-        storage.registerPacket("PACKET_HELLO", 25);
-        storage.registerPacket("PACKET_HELLO", 50);
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
+        storage.registerPacket("PACKET_HELLO", 50, new LinkedList<String[]>());
     }
 
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
@@ -156,7 +156,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithoutFieldsHasNoFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = noDev();
-        storage.registerPacket("PACKET_HELLO", 25);
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
         assertTrue(storage.getPacket("PACKET_HELLO").getFields().isEmpty());
@@ -204,7 +204,7 @@ public class PacketsStoreTest {
 
     @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = noDev();
-        storage.registerPacket("PACKET_HELLO", 25);
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
 
         String[] packetList = storage.getPacketList().split("[\\t\\r\\n]");
         assertEquals("25", packetList[0]);
@@ -213,8 +213,8 @@ public class PacketsStoreTest {
 
     @Test public void packetsAreListed() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = noDev();
-        storage.registerPacket("PACKET_HELLO", 25);
-        storage.registerPacket("PACKET_HI", 26);
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<String[]>());
+        storage.registerPacket("PACKET_HI", 26, new LinkedList<String[]>());
 
         String[] packetList = storage.getPacketList().split("[\\r\\n]");
         assertTrue(

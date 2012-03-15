@@ -63,10 +63,6 @@ public class PacketsStore {
         return types.containsKey(name);
     }
 
-    public void registerPacket(String name, int number) throws PacketCollisionException, UndefinedException {
-        registerPacket(name, number, new LinkedList<String[]>());
-    }
-
     public void registerPacket(String name, int number, List<String[]> fields) throws PacketCollisionException, UndefinedException {
         if (packets.containsKey(name)) {
             throw new PacketCollisionException("Packet name " + name + " already in use");
