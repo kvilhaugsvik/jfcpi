@@ -23,7 +23,6 @@ public class PacketsStore {
 
     private final HashSet<Requirement> notFoundWhenNeeded = new HashSet<Requirement>();
     private final DependencyStore requirements = new DependencyStore();
-    private final Hardcoded hardcoded = new Hardcoded();
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
     // Idea from http://stackoverflow.com/q/822701
@@ -35,7 +34,7 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
-        final FieldTypeBasic basicFieldType = hardcoded.getBasicFieldType(aliased);
+        final FieldTypeBasic basicFieldType = Hardcoded.getBasicFieldType(aliased);
         Requirement req = new Requirement(aliased, Requirement.Kind.FIELD_TYPE);
         if (null != basicFieldType) {
             requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));

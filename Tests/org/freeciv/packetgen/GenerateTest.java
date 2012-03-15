@@ -28,8 +28,6 @@ public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
     public static void main(String[] args) throws IOException {
-        final Hardcoded hardcoded = new Hardcoded();
-
         for (Package pack: new Package[]{
                 org.freeciv.types.FCEnum.class.getPackage(),
                 org.freeciv.packet.Packet.class.getPackage(),
@@ -64,15 +62,15 @@ public class GenerateTest {
         writeJavaFile(testCount);
 
         FieldTypeBasic.FieldTypeAlias uint8 =
-                hardcoded.getBasicFieldType("uint8(int)").createFieldType("UINT8");
+                Hardcoded.getBasicFieldType("uint8(int)").createFieldType("UINT8");
         FieldTypeBasic.FieldTypeAlias uint32 =
-                hardcoded.getBasicFieldType("uint32(int)").createFieldType("UINT32");
+                Hardcoded.getBasicFieldType("uint32(int)").createFieldType("UINT32");
         FieldTypeBasic.FieldTypeAlias string =
-                hardcoded.getBasicFieldType("string(char)").createFieldType("STRING");
+                Hardcoded.getBasicFieldType("string(char)").createFieldType("STRING");
         FieldTypeBasic.FieldTypeAlias bool =
-                hardcoded.getBasicFieldType("bool8(bool)").createFieldType("BOOL");
+                Hardcoded.getBasicFieldType("bool8(bool)").createFieldType("BOOL");
         FieldTypeBasic.FieldTypeAlias connection =
-                hardcoded.getBasicFieldType("sint16(int)").createFieldType("CONNECTION");
+                Hardcoded.getBasicFieldType("sint16(int)").createFieldType("CONNECTION");
 
         writeJavaFile(uint8);
         writeJavaFile(uint32);

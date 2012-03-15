@@ -19,9 +19,9 @@ import java.util.HashMap;
 
 //TODO: Move data to file
 public class Hardcoded {
-    private final HashMap<String, FieldTypeBasic> data = new HashMap<String, FieldTypeBasic>();
+    private static final HashMap<String, FieldTypeBasic> data = new HashMap<String, FieldTypeBasic>();
 
-    Hardcoded() {
+    static {
         for (FieldTypeBasic src: new FieldTypeBasic[]{
                 new FieldTypeBasic("uint8", "int",
                         "Integer",
@@ -143,11 +143,11 @@ public class Hardcoded {
                 "throw new IllegalArgumentException(\"Value out of scope\");" + "\n";
     }
 
-    public FieldTypeBasic getBasicFieldType(String src) {
+    public static FieldTypeBasic getBasicFieldType(String src) {
         return data.get(src);
     }
 
-    public Collection<FieldTypeBasic> values() {
+    public static Collection<FieldTypeBasic> values() {
         return data.values();
     }
 
