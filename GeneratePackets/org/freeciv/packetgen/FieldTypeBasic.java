@@ -24,7 +24,9 @@ public class FieldTypeBasic {
     private final String[] Decode;
     private final String[] encode, EncodedSize;
     private final boolean arrayEater;
+
     private final Collection<Requirement> requirement;
+    private final FieldTypeBasic basicType = this;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
                           String decode, String encode, String encodedSize, boolean needsType, boolean arrayEater) {
@@ -55,7 +57,7 @@ public class FieldTypeBasic {
     }
 
     public FieldTypeAlias createFieldType(String name) {
-        return new FieldTypeAlias(name, this);
+        return new FieldTypeAlias(name);
     }
 
     public boolean isArrayEater() {
@@ -63,9 +65,8 @@ public class FieldTypeBasic {
     }
 
     public class FieldTypeAlias extends ClassWriter implements IDependency {
-        private FieldTypeBasic basicType;
 
-        private FieldTypeAlias(String name, FieldTypeBasic basicType) {
+        private FieldTypeAlias(String name) {
             super(org.freeciv.packet.fieldtype.FieldType.class.getPackage(),
                     new String[]{
                             java.io.DataInput.class.getCanonicalName(),
@@ -77,8 +78,6 @@ public class FieldTypeBasic {
                     "Freeciv's protocol definition",
                     name,
                     "FieldType<" + JavaType + ">");
-
-            this.basicType = basicType;
 
             addObjectConstant(JavaType, "value");
             if (arrayEater) {
