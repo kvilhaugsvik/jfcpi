@@ -32,6 +32,14 @@ public final class DependencyStore {
         return resolved.values();
     }
 
+    public boolean isAwareOfPotentialProvider(Requirement item) {
+        return existing.containsKey(item);
+    }
+
+    public IDependency getPotentialProvider(Requirement item) {
+        return existing.get(item);
+    }
+
     private boolean declareFulfilled(IDependency item) {
         dependenciesFulfilled.put(item.getIFulfillReq(), item);
         return true;
