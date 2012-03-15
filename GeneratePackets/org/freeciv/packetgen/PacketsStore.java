@@ -51,9 +51,9 @@ public class PacketsStore {
     }
 
     public void registerPacket(String name, int number, List<String[]> fields) throws PacketCollisionException, UndefinedException {
-        if (packets.containsKey(name)) {
+        if (hasPacket(name)) {
             throw new PacketCollisionException("Packet name " + name + " already in use");
-        } else if (packetsByNumber.containsKey(number)) {
+        } else if (hasPacket(number)) {
             throw new PacketCollisionException("Packet number " + number + " already in use");
         }
 
