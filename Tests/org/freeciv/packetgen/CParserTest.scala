@@ -192,7 +192,11 @@ object CParserTest {
     val parsed = parser.parseAll(toTest.asInstanceOf[parser.Parser[Returns]], expression)
     if (!parsed.successful) {
       val notParsed = parsed.asInstanceOf[Parsers#NoSuccess]
-      val lineBreakAfter = expression.indexOf("\n", notParsed.next.offset)
+      val lineBreakAfterIfExist = expression.indexOf("\n", notParsed.next.offset)
+      val lineBreakAfter = if (-1 < lineBreakAfterIfExist)
+        lineBreakAfterIfExist
+      else
+        expression.length()
       val startAndFailed = expression.substring(0, lineBreakAfter)
       fail(notParsed.msg + "\n" +
         startAndFailed + "\n" +
