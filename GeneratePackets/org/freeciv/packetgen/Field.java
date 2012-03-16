@@ -14,6 +14,10 @@
 
 package org.freeciv.packetgen;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.regex.Pattern;
+
 public class Field {
     private final String variableName;
     private final FieldTypeBasic.FieldTypeAlias type;
@@ -95,6 +99,18 @@ public class Field {
                 "if " + "(" + this.getLegalSize(callOnElementsToTransfer) + ")",
                 "\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
                         " constructed with value out of scope in packet " + name + "\");"};
+    }
+
+    private static final Pattern aConstant = Pattern.compile("\\D\\w*");
+    public Collection<Requirement> getReqs() {
+        HashSet<Requirement> reqs = new HashSet<Requirement>();
+        reqs.add(new Requirement(getType(), Requirement.Kind.FIELD_TYPE));
+
+        for (ArrayDeclaration declaration : declarations) {
+            if (aConstant.matcher(declaration.maxSize).matches())
+                reqs.add(new Requirement(declaration.maxSize, Requirement.Kind.VALUE));
+        }
+        return reqs;
     }
 
     public static class ArrayDeclaration {

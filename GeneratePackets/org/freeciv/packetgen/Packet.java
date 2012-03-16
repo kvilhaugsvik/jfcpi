@@ -70,7 +70,7 @@ public class Packet extends ClassWriter implements IDependency {
         }
 
         for (Field field: fields) {
-            requirements.add(new Requirement(field.getType(), Requirement.Kind.FIELD_TYPE));
+            requirements.addAll(field.getReqs());
         }
 
         iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
