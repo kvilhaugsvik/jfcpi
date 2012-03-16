@@ -123,7 +123,9 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     else
       value.toInt
 
-  def constantValueDef = DEFINE ~ valueDefName.r ~ sInteger
+  def constantValueDef = DEFINE ~> valueDefName.r ~ sInteger
+
+  def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
   def exprConverted = cEnumDefConverted | specEnumDefConverted
 

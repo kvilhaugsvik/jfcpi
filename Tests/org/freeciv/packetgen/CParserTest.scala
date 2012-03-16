@@ -455,6 +455,17 @@ class CParserSemanticTest {
     assertEquals("Wrong toString() value for count element", "\"ELEMENTS\"", enum.getCount.getToStringName)
     assertFalse("The count element should be invalid", enum.getCount.isValid)
   }
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test semantics of constants
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def constantDefinedSimpleNumber {
+    val toParse = "#define SIMPLE 5"
+    val parser = new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil)
+    val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
+    assertEquals("Wrong name", "SIMPLE", result.get.getName)
+    assertEquals("Wrong value generation expression", "5", result.get.getExpression)
+  }
 }
 
 class FromCExtractorTest {
