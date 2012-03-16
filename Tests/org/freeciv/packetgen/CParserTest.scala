@@ -18,6 +18,7 @@ import org.junit.Test
 import org.junit.Assert._
 import scala.inline
 import util.parsing.combinator.Parsers
+import org.freeciv.packetgen.Requirement.Kind
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
@@ -176,7 +177,10 @@ object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Common helper methods
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline def parseTest = new ParseCCode(List("test"))
+  @inline def lookForEnumsNamed(enums: Iterable[String]): Iterable[Requirement] =
+    enums.map(find => new Requirement(find, Requirement.Kind.ENUM))
+
+  @inline def parseTest = new ParseCCode(lookForEnumsNamed(List("test")))
 
   @inline def parsesCorrectly(expression: String, parser: ParseShared) {
     parsesCorrectly(expression, parser, parser.exprs)
@@ -443,7 +447,7 @@ class CParserSemanticTest {
 
 class FromCExtractorTest {
   @Test def initialize {
-    val extractor = new FromCExtractor(List("test1", "test2", "test3"))
+    val extractor = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
   }
 
   @Test(expected = classOf[IllegalArgumentException])
@@ -471,13 +475,15 @@ enum test3 {
 """
 
   @Test def findsPositionsAllExist {
-    val positions = new FromCExtractor(List("test1", "test2", "test3")).findPossibleStartPositions(test123NotingElse)
+    val positions = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+      .findPossibleStartPositions(test123NotingElse)
     assertNotNull("Positions don't exist", positions)
     assertArrayEquals("Wrong positions given", Array(1, 113, 162), positions.toArray)
   }
 
   @Test def findsEnumsAllExist {
-    val enums = new FromCExtractor(List("test1", "test2", "test3")).extract(test123NotingElse)
+    val enums = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+      .extract(test123NotingElse)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -488,7 +494,8 @@ enum test3 {
   }
 
   @Test def findsEnumsOneMissingExtract {
-    val enums = new FromCExtractor(List("test1", "test2", "test3", "test4")).extract(test123NotingElse)
+    val enums = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3", "test4")))
+      .extract(test123NotingElse)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -499,11 +506,13 @@ enum test3 {
   }
 
   @Test def findsEnumsOneMissingFindOutWho {
-    val results = new FromCExtractor(List("test1", "test2", "test3", "test4")).extractAndReportMissing(test123NotingElse)
+    val results = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3", "test4")))
+      .extractAndReportMissing(test123NotingElse)
     assertNotNull("Enums not found", results)
     assertFalse("Enums not found", results.extracted.isEmpty)
     assertNotNull("Should figure out what is missing", results.missing)
-    assertTrue("Should figure out what is missing", results.missing.contains("test4"))
+    assertTrue("Should figure out what is missing", results.missing
+      .toList.contains(new Requirement("test4", Requirement.Kind.ENUM)))
 
     val enumsAsMap = results.extracted.map(_.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
@@ -538,14 +547,15 @@ enum test3 {
 """
 
   @Test def findsPositionsOtherCodeAsWell {
-    val positions = new FromCExtractor(List("test1", "test2", "test3")).findPossibleStartPositions(test123OtherCodeAsWell)
+    val positions = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+      .findPossibleStartPositions(test123OtherCodeAsWell)
     assertNotNull("Positions don't exist", positions)
 
     assertArrayEquals("Wrong positions given", Array(1, 146, 252), positions.toArray)
   }
 
   @Test def findsEnumsOtherCodeAsWell {
-    val enums = new FromCExtractor(List("test1", "test2", "test3")).extract(test123OtherCodeAsWell)
+    val enums = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3"))).extract(test123OtherCodeAsWell)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -579,12 +589,14 @@ enum test3 {
 """
 
   @Test def findsPositionsEnumsUsed {
-    val positions = new FromCExtractor(List("test1", "test2", "test3")).findPossibleStartPositions(test123EnumsUsed)
+    val positions = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+      .findPossibleStartPositions(test123EnumsUsed)
     assertNotNull("Positions don't exist", positions)
   }
 
   @Test def findsEnumsEnumsUsed {
-    val enums = new FromCExtractor(List("test1", "test2", "test3")).extract(test123EnumsUsed)
+    val enums = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+      .extract(test123EnumsUsed)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 

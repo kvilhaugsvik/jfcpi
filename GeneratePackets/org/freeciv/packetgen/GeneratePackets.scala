@@ -34,10 +34,9 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
     throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
   }
 
-  private val toLookFor = storage.getUnsolvedRequirements.filter(want => Requirement.Kind.ENUM.equals(want.getKind))
-    .map(want => want.getName)
+  private val toLookFor = storage.getUnsolvedRequirements
   if ((null != toLookFor) && !Nil.equals(toLookFor)) {
-    val extractor = new FromCExtractor(toLookFor.toList)
+    val extractor = new FromCExtractor(toLookFor)
     cPaths.map(code => extractor.extract(GeneratePackets.readFileAsString(code))).flatten
       .foreach(storage.addDependency(_))
   }

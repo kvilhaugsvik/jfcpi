@@ -19,8 +19,9 @@ import ClassWriter.EnumElement.{newEnumValue, newInvalidEnum}
 import util.parsing.input.CharArrayReader
 import java.util.HashMap
 
-class ParseCCode(lookFor: List[String]) extends ParseShared {
-  def enumDefName: String = "(" + lookFor.reduce(_ + "|" + _) + ")"
+class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
+  def enumDefName: String =
+    "(" + lookFor.filter(want => Requirement.Kind.ENUM.equals(want.getKind)).map(_.getName).reduce(_ + "|" + _) + ")"
 
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
@@ -126,7 +127,7 @@ class ParseCCode(lookFor: List[String]) extends ParseShared {
     CComment
 }
 
-class FromCExtractor(toLookFor: List[String]) {
+class FromCExtractor(toLookFor: Iterable[Requirement]) {
   if (Nil.eq(toLookFor))
     throw new IllegalArgumentException("Nothing looked for so nothing to extract")
 
@@ -144,7 +145,7 @@ class FromCExtractor(toLookFor: List[String]) {
       .filter(!_.isEmpty).map(_.get)
   }
 
-  case class Validated(extracted: List[ClassWriter], missing: List[String])
+  case class Validated(extracted: List[ClassWriter], missing: Iterable[Requirement])
   def extractAndReportMissing(lookIn: String) = {
     val extracted = extract(lookIn)
     val notFound = toLookFor.filter(!extracted.contains(_))
