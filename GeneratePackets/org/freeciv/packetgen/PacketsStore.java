@@ -109,7 +109,8 @@ public class PacketsStore {
 
         for (int number: packetsByNumber.keySet()) {
             Packet packet = packets.get(packetsByNumber.get(number));
-            out += packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName() + "\n";
+            if (requirements.dependenciesFound(packet))
+                out += packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName() + "\n";
         }
         return out;
     }

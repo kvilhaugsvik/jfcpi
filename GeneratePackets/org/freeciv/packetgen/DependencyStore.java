@@ -59,7 +59,7 @@ public final class DependencyStore {
         return true;
     }
 
-    private boolean dependenciesFound(IDependency item) {
+    public boolean dependenciesFound(IDependency item) {
         assert (null != item) : nullNotAllowed;
         if (dependenciesFulfilled.containsKey(item.getIFulfillReq())) {
             return true;
