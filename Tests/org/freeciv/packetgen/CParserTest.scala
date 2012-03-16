@@ -257,6 +257,14 @@ class CParserSyntaxTest {
     parsesCorrectly(specEnumTwoNamedElementsWithComments, parseEnumTest)
   @Test def testSpecEnumCommentBeforeAndAfterDef =
     parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, parseEnumTest)
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test pure parsing of constants
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def constantDefinedSimleNumber =
+    parsesCorrectly("#define SIMPLE 5", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+  @Test def constantDefinedSimleNumberWhitspaceDifferent =
+    parsesCorrectly("#define  SIMPLE  5\n", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
 }
 
 class CParserSemanticTest {

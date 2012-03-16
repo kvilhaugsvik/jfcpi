@@ -23,6 +23,9 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
   def enumDefName: String =
     "(" + lookFor.filter(want => Requirement.Kind.ENUM.equals(want.getKind)).map(_.getName).reduce(_ + "|" + _) + ")"
 
+  def valueDefName: String =
+    "(" + lookFor.filter(want => Requirement.Kind.VALUE.equals(want.getKind)).map(_.getName).reduce(_ + "|" + _) + ")"
+
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
   private final val DEFINE: String = "#define"
@@ -120,10 +123,13 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     else
       value.toInt
 
+  def constantValueDef = DEFINE ~ valueDefName.r ~ sInteger
+
   def exprConverted = cEnumDefConverted | specEnumDefConverted
 
   def expr = cEnumDef |
     specEnumDef |
+    constantValueDef |
     CComment
 }
 
