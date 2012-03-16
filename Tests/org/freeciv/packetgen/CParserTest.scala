@@ -180,7 +180,7 @@ object CParserTest {
   @inline def lookForEnumsNamed(enums: Iterable[String]): Iterable[Requirement] =
     enums.map(find => new Requirement(find, Requirement.Kind.ENUM))
 
-  @inline def parseTest = new ParseCCode(lookForEnumsNamed(List("test")))
+  @inline def parseEnumTest = new ParseCCode(lookForEnumsNamed(List("test")))
 
   @inline def parsesCorrectly(expression: String, parser: ParseShared) {
     parsesCorrectly(expression, parser, parser.exprs)
@@ -212,47 +212,47 @@ class CParserSyntaxTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of enums declared with the enum name {element, element} syntax
   --------------------------------------------------------------------------------------------------------------------*/
-  @Test def testCEnum1ElementNoAssign = parsesCorrectly(cEnum1ElementNoAssign, parseTest)
-  @Test def testCEnum1ElementAssign  = parsesCorrectly(cEnum1ElementAssign, parseTest)
-  @Test def testCEnum3ElementsNoAssign = parsesCorrectly(cEnum3ElementsNoAssign, parseTest)
-  @Test def testCEnum3ElementsAssignAll = parsesCorrectly(cEnum3ElementsAssignAll, parseTest)
-  @Test def testCEnum3ElementsFirstNumbered = parsesCorrectly(cEnum3ElementsFirstNumbered, parseTest)
-  @Test def testCEnum3ElementsFirstAndLastTheSame = parsesCorrectly( cEnum3ElementsFirstAndLastTheSame, parseTest)
-  @Test def testCEnum1CommentCxxBefore = parsesCorrectly(commentCxxOneLine + cEnum1ElementNoAssign, parseTest)
-  @Test def testCEnum1CommentCxxAfter = parsesCorrectly(cEnum1ElementNoAssign + commentCxxOneLine, parseTest)
-  @Test def testCEnum1CommentCBefore = parsesCorrectly(commentCOneLine + cEnum1ElementNoAssign, parseTest)
-  @Test def testCEnum1CommentCAfter = parsesCorrectly(cEnum1ElementNoAssign + commentCOneLine, parseTest)
-  @Test def testCEnumCommentInside = parsesCorrectly(cEnum3ElementsCommentInside, parseTest)
-  @Test def testCEnumCommentInsideBefore = parsesCorrectly(cEnum3ElementsCommentInsideBefore, parseTest)
-  @Test def testCEnumCommentInsideAfter = parsesCorrectly(cEnum3ElementsCommentInsideAfter, parseTest)
-  @Test def testCEnumCommaAfterLast = parsesCorrectly("enum test {element, iEndInAComma,}", parseTest)
+  @Test def testCEnum1ElementNoAssign = parsesCorrectly(cEnum1ElementNoAssign, parseEnumTest)
+  @Test def testCEnum1ElementAssign  = parsesCorrectly(cEnum1ElementAssign, parseEnumTest)
+  @Test def testCEnum3ElementsNoAssign = parsesCorrectly(cEnum3ElementsNoAssign, parseEnumTest)
+  @Test def testCEnum3ElementsAssignAll = parsesCorrectly(cEnum3ElementsAssignAll, parseEnumTest)
+  @Test def testCEnum3ElementsFirstNumbered = parsesCorrectly(cEnum3ElementsFirstNumbered, parseEnumTest)
+  @Test def testCEnum3ElementsFirstAndLastTheSame = parsesCorrectly( cEnum3ElementsFirstAndLastTheSame, parseEnumTest)
+  @Test def testCEnum1CommentCxxBefore = parsesCorrectly(commentCxxOneLine + cEnum1ElementNoAssign, parseEnumTest)
+  @Test def testCEnum1CommentCxxAfter = parsesCorrectly(cEnum1ElementNoAssign + commentCxxOneLine, parseEnumTest)
+  @Test def testCEnum1CommentCBefore = parsesCorrectly(commentCOneLine + cEnum1ElementNoAssign, parseEnumTest)
+  @Test def testCEnum1CommentCAfter = parsesCorrectly(cEnum1ElementNoAssign + commentCOneLine, parseEnumTest)
+  @Test def testCEnumCommentInside = parsesCorrectly(cEnum3ElementsCommentInside, parseEnumTest)
+  @Test def testCEnumCommentInsideBefore = parsesCorrectly(cEnum3ElementsCommentInsideBefore, parseEnumTest)
+  @Test def testCEnumCommentInsideAfter = parsesCorrectly(cEnum3ElementsCommentInsideAfter, parseEnumTest)
+  @Test def testCEnumCommaAfterLast = parsesCorrectly("enum test {element, iEndInAComma,}", parseEnumTest)
 
-  @Test def testCEnumNotLookedFor = willNotParse(cEnum3ElementsNoAssign.replace("test", "notTest"), parseTest)
+  @Test def testCEnumNotLookedFor = willNotParse(cEnum3ElementsNoAssign.replace("test", "notTest"), parseEnumTest)
 
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of enums declared with SPECENUM
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def testSpecEnum2Elements =
-    parsesCorrectly(specEnum2Elements, parseTest)
+    parsesCorrectly(specEnum2Elements, parseEnumTest)
   @Test def testSpecEnumTwoNamedElements =
-    parsesCorrectly(specEnumTwoNamedElements, parseTest)
+    parsesCorrectly(specEnumTwoNamedElements, parseEnumTest)
   @Test def testSpecEnum3ElementsBitwise =
-    parsesCorrectly(specEnum3ElementsBitwise, parseTest)
+    parsesCorrectly(specEnum3ElementsBitwise, parseEnumTest)
   @Test def testSpecEnum4ElementsBitwiseZero =
-    parsesCorrectly(specEnum4ElementsBitwiseZero, parseTest)
+    parsesCorrectly(specEnum4ElementsBitwiseZero, parseEnumTest)
   @Test def testSpecEnum2ElementsBitwiseNamedZero =
-    parsesCorrectly(specEnum2ElementsBitwiseNamedZero, parseTest)
+    parsesCorrectly(specEnum2ElementsBitwiseNamedZero, parseEnumTest)
   @Test def testSpecEnum2ElementsCount =
-    parsesCorrectly(specEnum2ElementsCount, parseTest)
+    parsesCorrectly(specEnum2ElementsCount, parseEnumTest)
   @Test def testSpecEnum2ElementsNamedCount =
-    parsesCorrectly(specEnum2ElementsNamedCount, parseTest)
+    parsesCorrectly(specEnum2ElementsNamedCount, parseEnumTest)
   @Test def testSpecEnum2ElementsInvalid =
-    parsesCorrectly(specEnum2ElementsInvalid, parseTest)
+    parsesCorrectly(specEnum2ElementsInvalid, parseEnumTest)
   @Test def testSpecEnumCommentInDef =
-    parsesCorrectly(specEnumTwoNamedElementsWithComments, parseTest)
+    parsesCorrectly(specEnumTwoNamedElementsWithComments, parseEnumTest)
   @Test def testSpecEnumCommentBeforeAndAfterDef =
-    parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, parseTest)
+    parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, parseEnumTest)
 }
 
 class CParserSemanticTest {
@@ -297,43 +297,43 @@ class CParserSemanticTest {
   }
 
   @Test def testCEnum1ElementNoAssign: Unit = {
-    parsesCEnumCorrectly(cEnum1ElementNoAssign, parseTest, ("one", 0, "\"one\""))
+    parsesCEnumCorrectly(cEnum1ElementNoAssign, parseEnumTest, ("one", 0, "\"one\""))
   }
 
   @Test def testCEnum1ElementAssign: Unit  = {
-    parsesCEnumCorrectly(cEnum1ElementAssign, parseTest, ("one", 1, "\"one\""))
+    parsesCEnumCorrectly(cEnum1ElementAssign, parseEnumTest, ("one", 1, "\"one\""))
   }
 
   @Test def testCEnum3ElementsNoAssign: Unit = {
-    parsesCEnumCorrectly(cEnum3ElementsNoAssign, parseTest,
+    parsesCEnumCorrectly(cEnum3ElementsNoAssign, parseEnumTest,
       ("one", 0, "\"one\""),
       ("two", 1, "\"two\""),
       ("three", 2, "\"three\""))
   }
 
   @Test def testCEnum3ElementsAssignAll: Unit = {
-    parsesCEnumCorrectly(cEnum3ElementsAssignAll, parseTest,
+    parsesCEnumCorrectly(cEnum3ElementsAssignAll, parseEnumTest,
       ("one", 1, "\"one\""),
       ("two", 2, "\"two\""),
       ("three", 3, "\"three\""))
   }
 
   @Test def testCEnum3ElementsFirstNumbered: Unit = {
-    parsesCEnumCorrectly(cEnum3ElementsFirstNumbered, parseTest,
+    parsesCEnumCorrectly(cEnum3ElementsFirstNumbered, parseEnumTest,
       ("two", 2, "\"two\""),
       ("three", 3, "\"three\""),
       ("four", 4, "\"four\""))
   }
 
   @Test def testCEnum3ElementsFirstAndLastTheSame: Unit = {
-    parsesCEnumCorrectly(cEnum3ElementsFirstAndLastTheSame, parseTest,
+    parsesCEnumCorrectly(cEnum3ElementsFirstAndLastTheSame, parseEnumTest,
       ("zero", 0, "\"zero\""),
       ("one", 1, "\"one\""),
       ("null", 0, "\"null\""))
   }
 
   @Test def testCDefineElementAsEqualPreviouslyDefined: Unit = {
-    parsesCEnumCorrectly("enum test {zero, one, null = zero}", parseTest,
+    parsesCEnumCorrectly("enum test {zero, one, null = zero}", parseEnumTest,
       ("zero", 0, "\"zero\""),
       ("one", 1, "\"one\""),
       ("null", 0, "\"null\""))
@@ -352,30 +352,30 @@ class CParserSemanticTest {
     parsesSpecEnumCorrectly("""
   #define SPECENUM_NAME test
   #include "specenum_gen.h"
-  """, parseTest, false)
+  """, parseEnumTest, false)
   }
 
   @Test def testSpecEnum2Elements: Unit = {
-    parsesSpecEnumCorrectly(specEnum2Elements, parseTest, false,
+    parsesSpecEnumCorrectly(specEnum2Elements, parseEnumTest, false,
       ("ZERO", 0, "\"ZERO\""),
       ("ONE", 1, "\"ONE\""))
   }
 
   @Test def testSpecEnum2NamedElements: Unit = {
-    parsesSpecEnumCorrectly(specEnumTwoNamedElements, parseTest, false,
+    parsesSpecEnumCorrectly(specEnumTwoNamedElements, parseEnumTest, false,
       ("ZERO", 0, "\"nothing\""),
       ("ONE", 1, "\"something\""))
   }
 
   @Test def testSpecEnum3ElementsBitwise: Unit = {
-    parsesSpecEnumCorrectly(specEnum3ElementsBitwise, parseTest, true,
+    parsesSpecEnumCorrectly(specEnum3ElementsBitwise, parseEnumTest, true,
       ("ONE", 1, "\"ONE\""),
       ("TWO", 2, "\"TWO\""),
       ("THREE", 4, "\"THREE\""))
   }
 
   @Test def testSpecEnum4ElementsBitwiseZero: Unit = {
-    parsesSpecEnumCorrectly(specEnum4ElementsBitwiseZero, parseTest, true,
+    parsesSpecEnumCorrectly(specEnum4ElementsBitwiseZero, parseEnumTest, true,
       ("ZERO", 0, "\"ZERO\""),
       ("ONE", 1, "\"ONE\""),
       ("TWO", 2, "\"TWO\""),
@@ -383,14 +383,14 @@ class CParserSemanticTest {
   }
 
   @Test def testSpecEnum3ElementsBitwiseNamedZero: Unit = {
-    parsesSpecEnumCorrectly(specEnum2ElementsBitwiseNamedZero, parseTest, true,
+    parsesSpecEnumCorrectly(specEnum2ElementsBitwiseNamedZero, parseEnumTest, true,
       ("ZERO", 0, "\"nothing\""),
       ("ONE", 1, "\"ONE\""),
       ("TWO", 2, "\"TWO\""))
   }
 
   @Test def testSpecEnum2ElementsInvalid: Unit = {
-    val enum = parsesSpecEnumCorrectly(specEnum2ElementsInvalid, parseTest, false,
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsInvalid, parseEnumTest, false,
       ("ONE", 0, "\"ONE\""),
       ("TWO", 1, "\"TWO\""))
     @inline val invalid = enum.getInvalidDefault
@@ -400,7 +400,7 @@ class CParserSemanticTest {
   }
 
   @Test def testSpecEnum2ElementsCount: Unit = {
-    val enum = parsesSpecEnumCorrectly(specEnum2ElementsCount, parseTest, false,
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsCount, parseEnumTest, false,
       ("ONE", 0, "\"ONE\""),
       ("TWO", 1, "\"TWO\""))
     assertNotNull("No count element found", enum.getCount)
@@ -411,7 +411,7 @@ class CParserSemanticTest {
   }
 
   @Test def testSpecEnum2ElementsNamedCount: Unit = {
-    val enum = parsesSpecEnumCorrectly(specEnum2ElementsNamedCount, parseTest, false,
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsNamedCount, parseEnumTest, false,
       ("ONE", 0, "\"ONE\""),
       ("TWO", 1, "\"TWO\""))
     assertNotNull("No count element found", enum.getCount)
@@ -429,7 +429,7 @@ class CParserSemanticTest {
   #define SPECENUM_VALUE1 TWO
   #define SPECENUM_COUNT ELEMENTS
   #include "specenum_gen.h"
-  """, parseTest, false,
+  """, parseEnumTest, false,
       ("ONE", 0, "\"ONE\""),
       ("TWO", 1, "\"TWO\""))
 
