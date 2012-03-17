@@ -29,6 +29,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
   private final val DEFINE: String = "#define"
+  private final val ENDDEFINE: String = """(?m)$""" //TODO: Don't match backslash newline
   private final val SPECENUM: String = "SPECENUM_"
   private final val NAME: String = "NAME"
 
@@ -123,7 +124,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     else
       value.toInt
 
-  def constantValueDef = DEFINE ~> valueDefName.r ~ sInteger
+  def constantValueDef = DEFINE ~> valueDefName.r ~ sInteger <~ ENDDEFINE.r
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 

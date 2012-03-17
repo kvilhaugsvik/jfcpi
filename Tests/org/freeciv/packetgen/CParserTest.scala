@@ -265,6 +265,8 @@ class CParserSyntaxTest {
     parsesCorrectly("#define SIMPLE 5", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
   @Test def constantDefinedSimleNumberWhitspaceDifferent =
     parsesCorrectly("#define  SIMPLE  5\n", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+  @Test def constantWrongValueFails =
+    assertPrefixWillNotParse("#define WRONG 5 +\n10\n", new ParseCCode(new Requirement("WRONG", Kind.VALUE) :: Nil))
 }
 
 class CParserSemanticTest {
