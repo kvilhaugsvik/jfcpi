@@ -206,8 +206,8 @@ object CParserTest {
     return parsed
   }
 
-  @inline def willNotParse(expression: String, parser: ParseShared) =
-    assertFalse("No failure on " + expression, parser.parseAll(parser.exprs, expression).successful)
+  @inline def assertPrefixWillNotParse(expression: String, parser: ParseShared) =
+    assertFalse("No failure on " + expression, parser.parse(parser.expr, expression).successful)
 }
 
 class CParserSyntaxTest {
@@ -231,7 +231,7 @@ class CParserSyntaxTest {
   @Test def testCEnumCommentInsideAfter = parsesCorrectly(cEnum3ElementsCommentInsideAfter, parseEnumTest)
   @Test def testCEnumCommaAfterLast = parsesCorrectly("enum test {element, iEndInAComma,}", parseEnumTest)
 
-  @Test def testCEnumNotLookedFor = willNotParse(cEnum3ElementsNoAssign.replace("test", "notTest"), parseEnumTest)
+  @Test def testCEnumNotLookedFor = assertPrefixWillNotParse(cEnum3ElementsNoAssign.replace("test", "notTest"), parseEnumTest)
 
 
   /*--------------------------------------------------------------------------------------------------------------------
