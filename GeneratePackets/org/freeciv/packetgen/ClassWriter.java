@@ -55,6 +55,10 @@ public class ClassWriter {
         constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
+    public void addClassConstant(Visibility visibility, String type, String name, String value) {
+        constants.add(new VariableDeclaration(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
+    }
+
     public void addObjectConstant(String type, String name) {
         stateVars.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
