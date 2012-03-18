@@ -20,11 +20,19 @@ import util.parsing.input.CharArrayReader
 import java.util.HashMap
 
 class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
-  def enumDefName: String =
-    "(" + lookFor.filter(want => Requirement.Kind.ENUM.equals(want.getKind)).map(_.getName).reduce(_ + "|" + _) + ")"
+  def enumDefName: String = lookForTheNameOfAll(Requirement.Kind.ENUM)
 
-  def valueDefName: String =
-    "(" + lookFor.filter(want => Requirement.Kind.VALUE.equals(want.getKind)).map(_.getName).reduce(_ + "|" + _) + ")"
+  def valueDefName: String = lookForTheNameOfAll(Requirement.Kind.VALUE)
+
+  private def lookForTheNameOfAll(ofKind: Requirement.Kind): String = {
+    val valuesLookedFor = lookFor.filter(want => ofKind.equals(want.getKind))
+    if (valuesLookedFor.isEmpty)
+      """.\A""" // should be unmatchable.
+      // Idea from http://stackoverflow.com/questions/940822/regular-expression-syntax-for-match-nothing/940934#940934
+      //TODO: optimize by never hitting this code
+    else
+      "(" + valuesLookedFor.map(_.getName).reduce(_ + "|" + _) + ")"
+  }
 
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
