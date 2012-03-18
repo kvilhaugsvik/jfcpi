@@ -92,9 +92,23 @@ public class PacketsStore {
     }
 
     public Collection<ClassWriter> getJavaCode() {
+        Collection<IDependency> inn = requirements.getResolved();
         HashSet<ClassWriter> out = new HashSet<ClassWriter>();
-        for (IDependency dep : requirements.getResolved())
-            out.add((ClassWriter) dep);
+
+        ClassWriter constants =
+                new ClassWriter(org.freeciv.packet.Packet.class.getPackage(), new String[0],
+                        "Freeciv C code", "Constants", null);
+
+        for (IDependency dep : inn)
+            if (dep instanceof ClassWriter)
+                out.add((ClassWriter) dep);
+            else if (dep instanceof Constant)
+                constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "int",
+                        ((Constant) dep).getName(), ((Constant) dep).getExpression());
+
+        if (out.size() < inn.size())
+            out.add(constants);
+
         return out;
     }
 

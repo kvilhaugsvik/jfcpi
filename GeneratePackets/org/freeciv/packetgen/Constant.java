@@ -14,9 +14,12 @@
 
 package org.freeciv.packetgen;
 
-public class Constant {
+import java.util.*;
+
+public class Constant implements IDependency {
     private final String name;
     private final String expression;
+    private final HashSet<Requirement> reqs = new HashSet<Requirement>();
 
     public Constant(String name, String expression) {
         this.name = name;
@@ -29,5 +32,15 @@ public class Constant {
 
     public String getExpression() {
         return expression;
+    }
+
+    @Override
+    public Collection<Requirement> getReqs() {
+        return Collections.unmodifiableCollection(reqs);
+    }
+
+    @Override
+    public Requirement getIFulfillReq() {
+        return new Requirement(name, Requirement.Kind.VALUE);
     }
 }

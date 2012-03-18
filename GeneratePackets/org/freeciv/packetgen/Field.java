@@ -86,7 +86,7 @@ public class Field {
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
             if (null != element.elementsToTransfer)
-                out += "(" + element.maxSize + " <= " + element.elementsToTransfer + callOnElementsToTransfer + ")" + "||";
+                out += "(" + element.getMaxSize() + " <= " + element.elementsToTransfer + callOnElementsToTransfer + ")" + "||";
             out += "(" + this.getVariableName() + arrayLevel + ".length != " + element.getSize(callOnElementsToTransfer) + ")";
             out += "||";
             arrayLevel += "[0]";
@@ -121,8 +121,15 @@ public class Field {
             this.elementsToTransfer = elementsToTransfer;
         }
 
+        public String getMaxSize() {
+            if (aConstant.matcher(maxSize).matches())
+                return "Constants." + maxSize;
+            else
+                return maxSize;
+        }
+
         private String getSize(String callOnElementsToTransfer) {
-            return (null == elementsToTransfer? maxSize: elementsToTransfer + callOnElementsToTransfer);
+            return (null == elementsToTransfer? getMaxSize(): elementsToTransfer + callOnElementsToTransfer);
         }
     }
 }
