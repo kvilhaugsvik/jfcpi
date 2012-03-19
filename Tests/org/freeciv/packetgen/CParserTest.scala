@@ -271,6 +271,10 @@ class CParserSyntaxTest {
     parsesCorrectly("#define SIMPLE 5\n#define OTHER 7",
       new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) ::
         new Requirement("OTHER", Kind.VALUE) :: Nil))
+  @Test def constantDefinedTwoSimpleNumbersComments =
+    parsesCorrectly("#define SIMPLE 5//comment C++ style\n#define OTHER /* Comment C style */ 7",
+      new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) ::
+        new Requirement("OTHER", Kind.VALUE) :: Nil))
 }
 
 class CParserSemanticTest {
