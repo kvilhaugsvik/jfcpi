@@ -192,7 +192,7 @@ class FromCExtractor(toLookFor: Iterable[Requirement]) {
       .filter(!_.isEmpty).map(_.get)
   }
 
-  case class Validated(extracted: List[ClassWriter], missing: Iterable[Requirement])
+  case class Validated(extracted: List[IDependency], missing: Iterable[Requirement])
   def extractAndReportMissing(lookIn: String) = {
     val extracted = extract(lookIn)
     val notFound = toLookFor.filter(!extracted.contains(_))

@@ -516,7 +516,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsAsMap = enums.map(_.getName)
+    val enumsAsMap = enums.map(_.getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
@@ -528,7 +528,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsAsMap = enums.map(_.getName)
+    val enumsAsMap = enums.map(_.getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
@@ -543,7 +543,7 @@ enum test3 {
     assertTrue("Should figure out what is missing", results.missing
       .toList.contains(new Requirement("test4", Requirement.Kind.ENUM)))
 
-    val enumsAsMap = results.extracted.map(_.getName)
+    val enumsAsMap = results.extracted.map(_.getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
@@ -588,7 +588,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsAsMap = enums.map(_.getName)
+    val enumsAsMap = enums.map(_.getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
@@ -629,7 +629,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsNames = enums.map(_.getName)
+    val enumsNames = enums.map(_.getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsNames.contains("test1"))
     assertTrue("C style enum test2 not found", enumsNames.contains("test2"))
     assertTrue("C style enum test3 not found", enumsNames.contains("test3"))
