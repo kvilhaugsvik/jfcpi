@@ -47,7 +47,8 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
     val notFound = storage.getUnsolvedRequirements
     if (!notFound.isEmpty) {
       if (devMode) {
-        println("Some packets where not generated because of missing dependencies. Please add the following: " + notFound)
+        println("Some packets were not generated. These were missing or had missing dependencies:")
+        notFound.foreach(println(_))
       } else {
         throw new UndefinedException("Missing dependencies: " + notFound)
       }

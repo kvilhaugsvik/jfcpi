@@ -47,7 +47,7 @@ public class Requirement {
 
     @Override
     public String toString() {
-        return name + " (a " + kind + ")";
+        return "The " + kind + " " + name;
     }
 
     public enum Kind {
