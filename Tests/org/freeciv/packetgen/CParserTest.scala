@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Sveinung Kvilhaugsvik
+ * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -267,6 +267,10 @@ class CParserSyntaxTest {
     parsesCorrectly("#define  SIMPLE  5\n", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
   @Test def constantWrongValueFails =
     assertPrefixWillNotParse("#define WRONG 5 +\n10\n", new ParseCCode(new Requirement("WRONG", Kind.VALUE) :: Nil))
+  @Test def constantDefinedTwoSimleNumbers =
+    parsesCorrectly("#define SIMPLE 5\n#define OTHER 7",
+      new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) ::
+        new Requirement("OTHER", Kind.VALUE) :: Nil))
 }
 
 class CParserSemanticTest {

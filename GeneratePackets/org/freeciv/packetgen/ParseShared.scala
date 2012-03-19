@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Sveinung Kvilhaugsvik
+ * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,6 +24,12 @@ abstract class ParseShared extends RegexParsers {
   def CComment: Parser[String] = ("""/\*+""".r ~> rep("""([^*\n\r]|\*+[^/*])+""".r) <~ """\*+/""".r) ^^ {_.reduce(_+_)} |
     regex("""/\*+\*/""".r) ^^^ null |
     "//" ~> regex("""[^\n\r]*""".r)
+
+  protected val cXXStyleComment = """//[^\n\r]*"""
+  protected val cStyleComment = "(" + """/\*+\*/""" + "|" + """/\*+""" + """([^*\n\r]|\*+[^/*])+""" + """\*+/""" + ")"
+  protected val spaceBetweenWords = """[\t ]"""
+
+  protected def regExOr(arg: String*): String = "(" + arg.reduce(_ + "|" + _) + ")"
 
   def sInteger = """[+|-]*[0-9]+""".r
 }

@@ -37,7 +37,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
   private final val DEFINE: String = "#define"
-  private final val ENDDEFINE: String = """(?m)$""" //TODO: Don't match backslash newline
+  private final val ENDDEFINE = """(\n|\r|\z)+""".r //TODO: Don't match backslash newline
   private final val SPECENUM: String = "SPECENUM_"
   private final val NAME: String = "NAME"
 
@@ -55,13 +55,13 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
 
   def specEnumOrName(kind: String) = se(kind + NAME) ~ regex(""""[^\n\r\"]*?"""".r) ||| specEnum(kind)
 
-  def specEnumDef = regex(startOfSpecEnum.r) ~> regex(enumDefName.r) ~
-    (rep((specEnumOrName("VALUE\\d+") |
+  def specEnumDef = (regex(startOfSpecEnum.r) ~> regex(enumDefName.r) <~ ENDDEFINE) ~
+    (rep(((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
-      se("INVALID") ~ sInteger) ^^ {parsed => (parsed._1 -> parsed._2)} |
+      se("INVALID") ~ sInteger) <~ ENDDEFINE) ^^ {parsed => (parsed._1 -> parsed._2)} |
         CComment ^^ {comment => "comment" -> comment} |
-        se("BITWISE") ^^ {bitwise => bitwise -> bitwise}
+        (se("BITWISE") <~ ENDDEFINE) ^^ {bitwise => bitwise -> bitwise}
     ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
 
@@ -132,7 +132,37 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     else
       value.toInt
 
-  def constantValueDef = DEFINE ~> valueDefName.r ~ sInteger <~ ENDDEFINE.r
+  private val caresAboutNewline = (spaceBetweenWords+"*" + DEFINE).r
+  private def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = {
+    val seekLineStart = ENDDEFINE.findAllIn(source.subSequence(0, offset))
+      .matchData.map(_.start).filter(_ < offset).toList
+    val lineStartOffset = if (seekLineStart.isEmpty)
+      0
+    else
+      seekLineStart.last + 1
+
+    return caresAboutNewline.findPrefixMatchOf(source.subSequence(lineStartOffset, offset)).isEmpty
+  }
+
+  private val spaceOrComment =
+    regExOr(regExOr(spaceBetweenWords, cStyleComment)+"+" + "("+cXXStyleComment+")?", cXXStyleComment).r
+  override protected def handleWhiteSpace(source: CharSequence, offset: Int): Int = {
+    if (0 == source.length())
+      offset
+
+    if (isNewLineIgnored(source, offset))
+      super.handleWhiteSpace(source, offset)
+    else {
+      val found = spaceOrComment
+        .findPrefixMatchOf(source.subSequence(offset, source.length()))
+      if (found.isEmpty)
+        return offset
+      else
+        return offset + found.get.end
+    }
+  }
+
+  def constantValueDef = DEFINE ~> valueDefName.r ~ sInteger <~ ENDDEFINE
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
