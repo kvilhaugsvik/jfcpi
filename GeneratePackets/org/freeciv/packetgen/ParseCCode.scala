@@ -43,8 +43,10 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
 
   def startOfSpecEnum: String = DEFINE + "\\s+" + SPECENUM + NAME
   def startOfCEnum: String = "enum"
+  def startOfConstant: String = DEFINE
 
   def startsOfExtractable = List(
+    startOfConstant + "\\s+" + valueDefName,
     startOfCEnum + "\\s+" + enumDefName,
     startOfSpecEnum + "\\s+" + enumDefName
   )
@@ -162,11 +164,11 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     }
   }
 
-  def constantValueDef = DEFINE ~> valueDefName.r ~ sInteger <~ ENDDEFINE
+  def constantValueDef = startOfConstant ~> valueDefName.r ~ sInteger <~ ENDDEFINE
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
-  def exprConverted = cEnumDefConverted | specEnumDefConverted
+  def exprConverted = cEnumDefConverted | specEnumDefConverted | constantValueDefConverted
 
   def expr = cEnumDef |
     specEnumDef |
