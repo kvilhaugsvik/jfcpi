@@ -22,7 +22,7 @@ import org.junit.Assert._
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
 
-class ParseTest {
+class PacketsDefParseTest {
   @inline def storePars = {
     val storage = new PacketsStore(true)
     val parser = new ParsePacketsDef(storage)
