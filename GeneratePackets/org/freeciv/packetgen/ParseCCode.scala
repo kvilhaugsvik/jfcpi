@@ -164,7 +164,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     }
   }
 
-  def constantValueDef = startOfConstant ~> valueDefName.r ~ sInteger <~ ENDDEFINE
+  def constantValueDef = startOfConstant ~> valueDefName.r ~ intExpr <~ ENDDEFINE
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
@@ -188,7 +188,7 @@ class FromCExtractor(toLookFor: Iterable[Requirement]) {
 
   def extract(lookIn: String) = {
     val positions = findPossibleStartPositions(lookIn)
-    val lookInAsReader = new CharArrayReader(lookIn.toArray)
+    val lookInAsReader = new parser.PackratReader(new CharArrayReader(lookIn.toArray))
 
     positions.map(positions => parser.parse(parser.exprConverted, lookInAsReader.drop(positions)))
       .filter(!_.isEmpty).map(_.get)

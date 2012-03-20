@@ -1,14 +1,26 @@
 package org.freeciv.packetgen;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+
 public class IntExpression {
     private final String operatorOrValue;
     private final IntExpression lhs;
     private final IntExpression rhs;
+    private final HashSet reqs;
 
-    private IntExpression(String operatorOrValue, IntExpression lhs, IntExpression rhs) {
+    private IntExpression(String operatorOrValue, IntExpression lhs, IntExpression rhs, boolean iDemand) {
         this.operatorOrValue = operatorOrValue;
         this.lhs = lhs;
         this.rhs = rhs;
+        this.reqs = new HashSet();
+        if (iDemand)
+            reqs.add(new Requirement(operatorOrValue, Requirement.Kind.VALUE));
+        if (null != lhs)
+            reqs.addAll(lhs.getReqs());
+        if (null != rhs)
+            reqs.addAll(rhs.getReqs());
     }
 
     private boolean isValue() {
@@ -32,22 +44,26 @@ public class IntExpression {
     }
 
     public static IntExpression binary(String operator, IntExpression lhs, IntExpression rhs) {
-        return new IntExpression(operator, lhs, rhs);
+        return new IntExpression(operator, lhs, rhs, false);
     }
 
     public static IntExpression unary(String operator, IntExpression rhs) {
-        return new IntExpression(operator, null, rhs);
+        return new IntExpression(operator, null, rhs, false);
     }
 
     public static IntExpression suf(IntExpression lhs, String operator) {
-        return new IntExpression(operator, lhs, null);
+        return new IntExpression(operator, lhs, null, false);
     }
 
     public static IntExpression integer(String value) {
-        return new IntExpression(value, null, null);
+        return new IntExpression(value, null, null, false);
     }
 
     public static IntExpression variable(String name) {
-        return new IntExpression(name, null, null);
+        return new IntExpression(name, null, null, true);
+    }
+
+    public Collection<Requirement> getReqs() {
+        return Collections.unmodifiableCollection(reqs);
     }
 }

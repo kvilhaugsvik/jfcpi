@@ -18,12 +18,13 @@ import java.util.*;
 
 public class Constant implements IDependency {
     private final String name;
-    private final String expression;
+    private final IntExpression expression;
     private final HashSet<Requirement> reqs = new HashSet<Requirement>();
 
-    public Constant(String name, String expression) {
+    public Constant(String name, IntExpression expression) {
         this.name = name;
         this.expression = expression;
+        reqs.addAll(expression.getReqs());
     }
 
     public String getName() {
@@ -31,7 +32,7 @@ public class Constant implements IDependency {
     }
 
     public String getExpression() {
-        return expression;
+        return expression.toString();
     }
 
     @Override

@@ -19,6 +19,8 @@ import org.junit.Assert._
 import scala.inline
 import util.parsing.combinator.Parsers
 import org.freeciv.packetgen.Requirement.Kind
+import util.parsing.input.CharArrayReader
+import java.util.Collection
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
@@ -207,7 +209,8 @@ object CParserTest {
   }
 
   @inline def assertPrefixWillNotParse(expression: String, parser: ParseShared) =
-    assertFalse("No failure on " + expression, parser.parse(parser.expr, expression).successful)
+    assertFalse("No failure on " + expression,
+      parser.parse(parser.expr, new parser.PackratReader(new CharArrayReader(expression.toArray))).successful)
 }
 
 class CParserSyntaxTest {
@@ -275,6 +278,14 @@ class CParserSyntaxTest {
     parsesCorrectly("#define SIMPLE 5//comment C++ style\n#define OTHER /* Comment C style */ 7",
       new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) ::
         new Requirement("OTHER", Kind.VALUE) :: Nil))
+  @Test def constantDefinedAddition =
+    parsesCorrectly("#define SIMPLE 2 + 5", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+  @Test def constantDefinedOther =
+    parsesCorrectly("#define SIMPLE WRONG", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+  @Test def constantDefinedOtherTimes =
+    parsesCorrectly("#define SIMPLE WRONG * 2", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+  @Test def constantDefinedManyParts =
+    parsesCorrectly("#define COMPLEX WRONG * 2 + SIMPLE", new ParseCCode(new Requirement("COMPLEX", Kind.VALUE) :: Nil))
 }
 
 class CParserSemanticTest {
@@ -475,6 +486,48 @@ class CParserSemanticTest {
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
     assertEquals("Wrong value generation expression", "5", result.get.getExpression)
+  }
+
+  @Test def constantDefinedOther {
+    val toParse = "#define SIMPLE WRONG"
+    val parser = new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil)
+    val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
+
+    assertEquals("Wrong name", "SIMPLE", result.get.getName)
+    assertEquals("Wrong value generation expression", "WRONG", result.get.getExpression)
+
+    val reqs: Collection[Requirement] = result.get.getReqs
+    assertNotNull("Didn't even generate requirements...", reqs)
+    assertFalse("Should depend on WRONG", reqs.isEmpty)
+    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("WRONG", Requirement.Kind.VALUE)))
+  }
+
+  @Test def constantDefinedAddition {
+    val toParse = "#define SIMPLE 2 + 5"
+    val parser = new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil)
+    val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
+
+    assertEquals("Wrong name", "SIMPLE", result.get.getName)
+    assertEquals("Wrong value generation expression", "2 + 5", result.get.getExpression)
+
+    val reqs: Collection[Requirement] = result.get.getReqs
+    assertNotNull("Didn't even generate requirements...", reqs)
+    assertTrue("Numbers and operators should not be required", reqs.isEmpty)
+  }
+
+  @Test def constantDefinedManyParts {
+    val toParse = "#define COMPLEX WRONG * 2 + SIMPLE"
+    val parser = new ParseCCode(new Requirement("COMPLEX", Kind.VALUE) :: Nil)
+    val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
+
+    assertEquals("Wrong name", "COMPLEX", result.get.getName)
+    assertEquals("Wrong value generation expression", "(WRONG * 2) + SIMPLE", result.get.getExpression)
+
+    val reqs: Collection[Requirement] = result.get.getReqs
+    assertNotNull("Didn't even generate requirements...", reqs)
+    assertFalse("Should depend on two other values", reqs.isEmpty)
+    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("WRONG", Requirement.Kind.VALUE)))
+    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("SIMPLE", Requirement.Kind.VALUE)))
   }
 }
 
