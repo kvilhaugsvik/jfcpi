@@ -30,6 +30,7 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
 
   GeneratePackets.checkFilesCanRead(packetsDefPath :: cPaths)
 
+  println("Extracting from protocol definition")
   if (!Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))).successful) {
     throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
   }
@@ -42,10 +43,12 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
     while (!(toLookFor.containsAll(oldLook) && oldLook.containsAll(toLookFor))) {
       val extractor = new FromCExtractor(toLookFor)
       cPaths.map(code => extractor.extract(GeneratePackets.readFileAsString(code))).flatten
-        .foreach(storage.addDependency(_))
+        .foreach(dep => {storage.addDependency(dep); print(".")})
       oldLook = toLookFor
       toLookFor = storage.getUnsolvedRequirements
+      print(" ")
     }
+  println()
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
