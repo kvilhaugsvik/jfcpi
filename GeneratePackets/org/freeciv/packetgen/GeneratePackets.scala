@@ -34,12 +34,18 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
     throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
   }
 
-  private val toLookFor = storage.getUnsolvedRequirements
-  if ((null != toLookFor) && !Nil.equals(toLookFor)) {
-    val extractor = new FromCExtractor(toLookFor)
-    cPaths.map(code => extractor.extract(GeneratePackets.readFileAsString(code))).flatten
-      .foreach(storage.addDependency(_))
-  }
+
+  private var toLookFor = storage.getUnsolvedRequirements
+  private var oldLook: Collection[Requirement] = Nil
+  if ((null != toLookFor) && !Nil.equals(toLookFor))
+    print("Extracting from provided C code")
+    while (!(toLookFor.containsAll(oldLook) && oldLook.containsAll(toLookFor))) {
+      val extractor = new FromCExtractor(toLookFor)
+      cPaths.map(code => extractor.extract(GeneratePackets.readFileAsString(code))).flatten
+        .foreach(storage.addDependency(_))
+      oldLook = toLookFor
+      toLookFor = storage.getUnsolvedRequirements
+    }
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
