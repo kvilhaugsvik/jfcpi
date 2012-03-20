@@ -106,6 +106,6 @@ public final class DependencyStore {
         for (IDependency toAdd: wantsOut) {
             addToResolvedIfPossible(toAdd);
         }
-        wantsOut.removeAll(resolved.keySet());
+        wantsOut.removeAll(resolved.values());
     }
 }
