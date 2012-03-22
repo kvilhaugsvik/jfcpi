@@ -16,6 +16,8 @@ package org.freeciv.packetgen;
 
 import org.junit.Test;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.*;
 import static org.freeciv.packetgen.ClassWriter.EnumElement.*;
 
@@ -193,5 +195,27 @@ public class EnumTest {
         assertEquals("Invalid element has wrong name", "INVALID", result.getInvalidDefault().getEnumValueName());
         assertEquals("Invalid element has wrong toStringName", "\"INVALID\"", result.getInvalidDefault().getToStringName());
         assertEquals("Invalid element has wrong number", -2, result.getInvalidDefault().getNumber());
+    }
+
+    @Test public void enumProvidesValues() {
+        HashMap<String, Constant> constants = new HashMap<String, Constant>();
+        Enum hasValues = new Enum("Count", false,
+                newEnumValue("ONE", 1),
+                newEnumValue("TWO", 2));
+
+        for (IDependency constant: hasValues.getEnumConstants())
+            constants.put(((Constant)constant).getName(), (Constant)constant);
+
+        assertTrue("ONE is missing", constants.containsKey("ONE"));
+        assertTrue("ONE don't require it's enum", constants.get("ONE").getReqs()
+                .contains(new Requirement("Count", Requirement.Kind.ENUM)));
+        assertEquals("ONE has wrong value", "org.freeciv.types.Count.ONE.getNumber()",
+                constants.get("ONE").getExpression());
+
+        assertTrue("TWO is missing", constants.containsKey("TWO"));
+        assertTrue("TWO don't require it's enum", constants.get("TWO").getReqs()
+                .contains(new Requirement("Count", Requirement.Kind.ENUM)));
+        assertEquals("TWO has wrong value", "org.freeciv.types.Count.TWO.getNumber()",
+                constants.get("TWO").getExpression());
     }
 }

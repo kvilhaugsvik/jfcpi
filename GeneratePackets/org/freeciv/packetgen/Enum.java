@@ -18,6 +18,7 @@ import org.freeciv.types.FCEnum;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 
 public class Enum extends ClassWriter implements IDependency {
     private final boolean bitwise;
@@ -117,6 +118,15 @@ public class Enum extends ClassWriter implements IDependency {
 
     ClassWriter.EnumElement getEnumValue(String named) {
         return enums.get(named);
+    }
+
+    Collection<IDependency> getEnumConstants() {
+        Collection<IDependency> out = new LinkedList<IDependency>();
+        for (String valueName : enums.keySet()) {
+            out.add(new Constant(valueName, IntExpression.readFromOther(this,
+                    this.getPackage() + "." + this.getName() + "." + valueName + ".getNumber()")));
+        }
+        return out;
     }
 
     @Override

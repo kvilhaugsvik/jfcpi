@@ -130,6 +130,9 @@ public class PacketsStore {
     }
 
     public void addDependency(IDependency fulfillment) {
+        if (fulfillment instanceof Enum)
+            for (IDependency constant : ((Enum) fulfillment).getEnumConstants())
+                requirements.addPossibleRequirement(constant);
         requirements.addPossibleRequirement(fulfillment);
     }
 }

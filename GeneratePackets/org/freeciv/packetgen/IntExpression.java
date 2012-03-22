@@ -59,6 +59,10 @@ public class IntExpression {
         return new IntExpression(value, null, null);
     }
 
+    public static IntExpression readFromOther(IDependency other, String readStatement) {
+        return new IntExpression(readStatement, null, null, other.getIFulfillReq());
+    }
+
     public static IntExpression variable(String name) {
         return new IntExpression(name, null, null, new Requirement(name, Requirement.Kind.VALUE));
     }
