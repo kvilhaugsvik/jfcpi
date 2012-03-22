@@ -135,7 +135,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
       value.toInt
 
   private val caresAboutNewline = (spaceBetweenWords+"*" + DEFINE).r
-  private def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = {
+  protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = {
     val seekLineStart = ENDDEFINE.findAllIn(source.subSequence(0, offset))
       .matchData.map(_.start).filter(_ < offset).toList
     val lineStartOffset = if (seekLineStart.isEmpty)
@@ -146,23 +146,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     return caresAboutNewline.findPrefixMatchOf(source.subSequence(lineStartOffset, offset)).isEmpty
   }
 
-  private val spaceOrComment =
-    regExOr(regExOr(spaceBetweenWords, cStyleComment)+"+" + "("+cXXStyleComment+")?", cXXStyleComment).r
-  override protected def handleWhiteSpace(source: CharSequence, offset: Int): Int = {
-    if (0 == source.length())
-      offset
 
-    if (isNewLineIgnored(source, offset))
-      super.handleWhiteSpace(source, offset)
-    else {
-      val found = spaceOrComment
-        .findPrefixMatchOf(source.subSequence(offset, source.length()))
-      if (found.isEmpty)
-        return offset
-      else
-        return offset + found.get.end
-    }
-  }
 
   def constantValueDef = startOfConstant ~> valueDefName.r ~ intExpr <~ ENDDEFINE
 

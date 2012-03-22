@@ -60,4 +60,24 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     intExpr
 
   val intExpr: Parser[IntExpression] = intExprLevelBinAdd
+
+  protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean
+
+  private val spaceOrComment =
+    regExOr(regExOr(spaceBetweenWords, cStyleComment)+"+" + "("+cXXStyleComment+")?", cXXStyleComment).r
+  override protected def handleWhiteSpace(source: CharSequence, offset: Int): Int = {
+    if (0 == source.length())
+      offset
+
+    if (isNewLineIgnored(source, offset))
+      super.handleWhiteSpace(source, offset)
+    else {
+      val found = spaceOrComment
+        .findPrefixMatchOf(source.subSequence(offset, source.length()))
+      if (found.isEmpty)
+        return offset
+      else
+        return offset + found.get.end
+    }
+  }
 }

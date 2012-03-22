@@ -20,6 +20,8 @@ import org.junit.Test
 class ParseSharedTest {
   def parserShared = new ParseShared {
     def expr = null
+
+    protected def isNewLineIgnored(source: CharSequence, offset: Int) = false
   }
 
   /*--------------------------------------------------------------------------------------------------------------------
