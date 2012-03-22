@@ -19,7 +19,7 @@ import java.util.*;
 public final class DependencyStore {
     private static final String nullNotAllowed = "null is not an allowed argument here";
 
-    private final HashMap<Requirement, IDependency> resolved = new HashMap<Requirement, IDependency>();
+    private final LinkedHashMap<Requirement, IDependency> resolved = new LinkedHashMap<Requirement, IDependency>();
     private final HashMap<Requirement, IDependency> existing = new HashMap<Requirement, IDependency>();
     private final HashMap<Requirement, IDependency> dependenciesFulfilled = new HashMap<Requirement, IDependency>();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
@@ -41,9 +41,13 @@ public final class DependencyStore {
         return Collections.unmodifiableSet(dependenciesUnfulfilled);
     }
 
-    public Collection<IDependency> getResolved() {
+    /**
+     * Get the wanted items that has their dependencies in order and their dependencies
+     * @return the items sorted so no item comes before its requirements
+     */
+    public List<IDependency> getResolved() {
         resolve();
-        return resolved.values();
+        return new LinkedList<IDependency>(resolved.values());
     }
 
     public boolean isAwareOfPotentialProvider(Requirement item) {
@@ -88,10 +92,10 @@ public final class DependencyStore {
         assert (null != item) : nullNotAllowed;
         assert (dependenciesFulfilled.containsKey(item.getIFulfillReq())) : "Missing dependency";
         if (!resolved.containsKey(item.getIFulfillReq())) {
-            resolved.put(item.getIFulfillReq(), item);
             for (Requirement dependOn: item.getReqs()) {
                 addWillCrashUnlessAlreadyChecked(dependenciesFulfilled.get(dependOn));
             }
+            resolved.put(item.getIFulfillReq(), item);
         }
     }
 
