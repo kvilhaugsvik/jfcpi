@@ -188,10 +188,7 @@ object CParserTest {
     parsesCorrectly(expression, parser, parser.exprs)
   }
 
-  def parsesCorrectly[Returns](expression: String,
-                               parser: ParseShared,
-                               toTest: ParseShared#Parser[Returns]): ParseShared#ParseResult[Returns] = {
-    val parsed = parser.parseAll(toTest.asInstanceOf[parser.Parser[Returns]], expression)
+  def assertParesSuccess[Returns](expression: String, parsed: ParseShared#ParseResult[Returns]) = {
     if (!parsed.successful) {
       val notParsed = parsed.asInstanceOf[Parsers#NoSuccess]
       val lineBreakAfterIfExist = expression.indexOf("\n", notParsed.next.offset)
@@ -205,6 +202,13 @@ object CParserTest {
         (" " * (notParsed.next.offset - (startAndFailed.lastIndexOf("\n") + 1))) + "^" +
         expression.substring(lineBreakAfter))
     }
+  }
+
+  def parsesCorrectly[Returns](expression: String,
+                               parser: ParseShared,
+                               toTest: ParseShared#Parser[Returns]): ParseShared#ParseResult[Returns] = {
+    val parsed = parser.parseAll(toTest.asInstanceOf[parser.Parser[Returns]], expression)
+    assertParesSuccess(expression, parsed)
     return parsed
   }
 
