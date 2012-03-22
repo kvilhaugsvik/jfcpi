@@ -51,8 +51,17 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     startOfSpecEnum + "\\s+" + enumDefName
   )
 
-  def defineLine[Ret](start: String, followedBy: Parser[Ret]): Parser[Ret] =
-    start.r ~> followedBy <~ ENDDEFINE
+  def defineLine[Ret](start: String, followedBy: Parser[Ret]): Parser[Ret] = {
+    val me = opt(ENDDEFINE) ~ start.r ~> followedBy <~ ENDDEFINE
+    new Parser[Ret]{
+      def apply(in: ParseCCode.this.type#Input): ParseResult[Ret] = {
+        ignoreNewLinesFlag = false
+        val result = me(in)
+        ignoreNewLinesFlag = true
+        return result
+      }
+    }
+  }
 
   @inline private def se(kind: String) =
     defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
@@ -139,17 +148,8 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     else
       value.toInt
 
-  private val caresAboutNewline = (spaceBetweenWords+"*" + DEFINE).r
-  protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = {
-    val seekLineStart = ENDDEFINE.findAllIn(source.subSequence(0, offset))
-      .matchData.map(_.start).filter(_ < offset).toList
-    val lineStartOffset = if (seekLineStart.isEmpty)
-      0
-    else
-      seekLineStart.last + 1
-
-    return caresAboutNewline.findPrefixMatchOf(source.subSequence(lineStartOffset, offset)).isEmpty
-  }
+  private var ignoreNewLinesFlag = true
+  protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
 
 
 

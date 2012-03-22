@@ -290,6 +290,15 @@ class CParserSyntaxTest {
     parsesCorrectly("#define SIMPLE WRONG * 2", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
   @Test def constantDefinedManyParts =
     parsesCorrectly("#define COMPLEX WRONG * 2 + SIMPLE", new ParseCCode(new Requirement("COMPLEX", Kind.VALUE) :: Nil))
+  @Test def constantAfterTwoNewLinesWithFollowingItem {
+    val parser = new ParseCCode(new Requirement("CONS", Kind.VALUE) :: Nil)
+    val input = """
+
+#define CONS 5
+#define NotLookedFor
+"""
+    assertParesSuccess(input, parser.parse(parser.expr, new parser.PackratReader(new CharArrayReader(input.toArray))))
+  }
 }
 
 class CParserSemanticTest {
@@ -694,5 +703,21 @@ enum test3 {
     assertTrue("Specenum test1 not found", enumsNames.contains("test1"))
     assertTrue("C style enum test2 not found", enumsNames.contains("test2"))
     assertTrue("C style enum test3 not found", enumsNames.contains("test3"))
+  }
+
+  @Test def findConstantAfterTwoNewLinesWithFollowingUnusedConstant {
+    val extractor = new FromCExtractor(new Requirement("CONS", Kind.VALUE) :: Nil)
+    val input = """
+
+#define CONS 5
+#define NotLookedFor
+"""
+    val found = extractor.extract(input)
+
+    assertNotNull("CONS not found", found)
+    assertFalse("CONS not found", found.isEmpty)
+
+    val foundNames = found.map(_.getIFulfillReq.getName)
+    assertTrue("CONS not found but found something else", foundNames.contains("CONS"))
   }
 }
