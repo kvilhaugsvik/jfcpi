@@ -51,19 +51,24 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     startOfSpecEnum + "\\s+" + enumDefName
   )
 
-  @inline private def se(kind: String) = DEFINE ~> regex((SPECENUM + kind).r) ^^ {_.substring(9)}
+  def defineLine[Ret](start: String, followedBy: Parser[Ret]): Parser[Ret] =
+    start.r ~> followedBy <~ ENDDEFINE
 
-  def specEnum(kind: String) = se(kind) ~ enumElemCode
+  @inline private def se(kind: String) =
+    defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
+  //TODO: join the se above and the one below. Only difference is taking followBy as a parameter and use it
+  @inline private def se[Ret](kind: String, followedBy: Parser[Ret]) =
+    defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}) ~ followedBy)
 
-  def specEnumOrName(kind: String) = se(kind + NAME) ~ regex(""""[^\n\r\"]*?"""".r) ||| specEnum(kind)
+  def specEnumOrName(kind: String) = se(kind + NAME, regex(""""[^\n\r\"]*?"""".r)) ||| se(kind, enumElemCode)
 
-  def specEnumDef = (regex(startOfSpecEnum.r) ~> regex(enumDefName.r) <~ ENDDEFINE) ~
-    (rep(((specEnumOrName("VALUE\\d+") |
+  def specEnumDef = defineLine(startOfSpecEnum, regex(enumDefName.r)) ~
+    (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
-      se("INVALID") ~ sInteger) <~ ENDDEFINE) ^^ {parsed => (parsed._1 -> parsed._2)} |
+      se("INVALID", sInteger)) ^^ {parsed => (parsed._1 -> parsed._2)} |
         CComment ^^ {comment => "comment" -> comment} |
-        (se("BITWISE") <~ ENDDEFINE) ^^ {bitwise => bitwise -> bitwise}
+        se("BITWISE") ^^ {bitwise => bitwise -> bitwise}
     ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
 
@@ -148,7 +153,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
 
 
 
-  def constantValueDef = startOfConstant ~> valueDefName.r ~ intExpr <~ ENDDEFINE
+  def constantValueDef = defineLine(startOfConstant, valueDefName.r ~ intExpr)
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
