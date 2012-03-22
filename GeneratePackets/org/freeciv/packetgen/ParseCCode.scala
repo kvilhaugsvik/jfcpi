@@ -190,7 +190,7 @@ class FromCExtractor(toLookFor: Iterable[Requirement]) {
     val positions = findPossibleStartPositions(lookIn)
     val lookInAsReader = new parser.PackratReader(new CharArrayReader(lookIn.toArray))
 
-    positions.map(positions => parser.parse(parser.exprConverted, lookInAsReader.drop(positions)))
+    positions.map(position => parser.parse(parser.exprConverted, lookInAsReader.drop(position)))
       .filter(!_.isEmpty).map(_.get)
   }
 
