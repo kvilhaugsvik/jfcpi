@@ -19,21 +19,7 @@ import ClassWriter.EnumElement.{newEnumValue, newInvalidEnum}
 import util.parsing.input.CharArrayReader
 import java.util.HashMap
 
-class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
-  def enumDefName: String = lookForTheNameOfAll(Requirement.Kind.ENUM)
-
-  def valueDefName: String = lookForTheNameOfAll(Requirement.Kind.VALUE)
-
-  private def lookForTheNameOfAll(ofKind: Requirement.Kind): String = {
-    val valuesLookedFor = lookFor.filter(want => ofKind.equals(want.getKind))
-    if (valuesLookedFor.isEmpty)
-      """.\A""" // should be unmatchable.
-      // Idea from http://stackoverflow.com/questions/940822/regular-expression-syntax-for-match-nothing/940934#940934
-      //TODO: optimize by never hitting this code
-    else
-      "(" + valuesLookedFor.map(_.getName).reduce(_ + "|" + _) + ")"
-  }
-
+class ParseCCode extends ParseShared {
   def enumElemCode = regex("""[A-Za-z]\w*""".r)
 
   private final val DEFINE: String = "#define"
@@ -46,9 +32,9 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
   def startOfConstant: String = DEFINE
 
   def startsOfExtractable = List(
-    startOfConstant + "\\s+" + valueDefName,
-    startOfCEnum + "\\s+" + enumDefName,
-    startOfSpecEnum + "\\s+" + enumDefName
+    startOfConstant + "\\s+" + identifier,
+    startOfCEnum + "\\s+" + identifier,
+    startOfSpecEnum + "\\s+" + identifier
   )
 
   def defineLine[Ret](start: String, followedBy: Parser[Ret]): Parser[Ret] = {
@@ -71,7 +57,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
 
   def specEnumOrName(kind: String) = se(kind + NAME, regex(""""[^\n\r\"]*?"""".r)) ||| se(kind, enumElemCode)
 
-  def specEnumDef = defineLine(startOfSpecEnum, regex(enumDefName.r)) ~
+  def specEnumDef = defineLine(startOfSpecEnum, regex(identifier.r)) ~
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
@@ -124,7 +110,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     case element~value => (element -> value)
   }
 
-  def cEnumDef = regex(startOfCEnum.r) ~> regex(enumDefName.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
+  def cEnumDef = regex(startOfCEnum.r) ~> regex(identifier.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
 
   def cEnumDefConverted = cEnumDef ^^ {asStructures =>
     var globalNumbers: Int = 0
@@ -153,7 +139,7 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
 
 
 
-  def constantValueDef = defineLine(startOfConstant, valueDefName.r ~ intExpr)
+  def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
@@ -165,11 +151,9 @@ class ParseCCode(lookFor: Iterable[Requirement]) extends ParseShared {
     CComment
 }
 
-class FromCExtractor(toLookFor: Iterable[Requirement]) {
-  if (Nil.eq(toLookFor))
-    throw new IllegalArgumentException("Nothing looked for so nothing to extract")
-
-  private val parser = new ParseCCode(toLookFor)
+class FromCExtractor() {
+  def this(toLookFor: Iterable[Requirement]) = this()
+  private val parser = new ParseCCode()
   private val lookFor = parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _).r
 
   def findPossibleStartPositions(lookIn: String): List[Int] =

@@ -33,6 +33,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   def sInteger = """[+|-]*[0-9]+""".r
   def variableName = """[A-Za-z]\w*""".r
+  def identifier = """[A-Za-z]\w*"""
 
   private def binOpLev(operators: Parser[String]): PackratParser[(IntExpression,  IntExpression) => IntExpression] =
     operators ^^ {operator => (lhs: IntExpression, rhs: IntExpression) => IntExpression.binary(operator, lhs, rhs)}

@@ -18,7 +18,6 @@ import org.junit.Test
 import org.junit.Assert._
 import scala.inline
 import util.parsing.combinator.Parsers
-import org.freeciv.packetgen.Requirement.Kind
 import util.parsing.input.CharArrayReader
 import java.util.Collection
 
@@ -179,10 +178,7 @@ object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Common helper methods
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline def lookForEnumsNamed(enums: Iterable[String]): Iterable[Requirement] =
-    enums.map(find => new Requirement(find, Requirement.Kind.ENUM))
-
-  @inline def parseEnumTest = new ParseCCode(lookForEnumsNamed(List("test")))
+  @inline def parseEnumTest = new ParseCCode()
 
   @inline def parsesCorrectly(expression: String, parser: ParseShared) {
     parsesCorrectly(expression, parser, parser.exprs)
@@ -238,8 +234,6 @@ class CParserSyntaxTest {
   @Test def testCEnumCommentInsideAfter = parsesCorrectly(cEnum3ElementsCommentInsideAfter, parseEnumTest)
   @Test def testCEnumCommaAfterLast = parsesCorrectly("enum test {element, iEndInAComma,}", parseEnumTest)
 
-  @Test def testCEnumNotLookedFor = assertPrefixWillNotParse(cEnum3ElementsNoAssign.replace("test", "notTest"), parseEnumTest)
-
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of enums declared with SPECENUM
@@ -269,29 +263,27 @@ class CParserSyntaxTest {
   Test pure parsing of constants
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def constantDefinedSimleNumber =
-    parsesCorrectly("#define SIMPLE 5", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+    parsesCorrectly("#define SIMPLE 5", new ParseCCode())
   @Test def constantDefinedSimleNumberWhitspaceDifferent =
-    parsesCorrectly("#define  SIMPLE  5\n", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+    parsesCorrectly("#define  SIMPLE  5\n", new ParseCCode())
   @Test def constantWrongValueFails =
-    assertPrefixWillNotParse("#define WRONG 5 +\n10\n", new ParseCCode(new Requirement("WRONG", Kind.VALUE) :: Nil))
+    assertPrefixWillNotParse("#define WRONG 5 +\n10\n", new ParseCCode())
   @Test def constantDefinedTwoSimleNumbers =
     parsesCorrectly("#define SIMPLE 5\n#define OTHER 7",
-      new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) ::
-        new Requirement("OTHER", Kind.VALUE) :: Nil))
+      new ParseCCode())
   @Test def constantDefinedTwoSimpleNumbersComments =
     parsesCorrectly("#define SIMPLE 5//comment C++ style\n#define OTHER /* Comment C style */ 7",
-      new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) ::
-        new Requirement("OTHER", Kind.VALUE) :: Nil))
+      new ParseCCode())
   @Test def constantDefinedAddition =
-    parsesCorrectly("#define SIMPLE 2 + 5", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+    parsesCorrectly("#define SIMPLE 2 + 5", new ParseCCode())
   @Test def constantDefinedOther =
-    parsesCorrectly("#define SIMPLE WRONG", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+    parsesCorrectly("#define SIMPLE WRONG", new ParseCCode())
   @Test def constantDefinedOtherTimes =
-    parsesCorrectly("#define SIMPLE WRONG * 2", new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil))
+    parsesCorrectly("#define SIMPLE WRONG * 2", new ParseCCode())
   @Test def constantDefinedManyParts =
-    parsesCorrectly("#define COMPLEX WRONG * 2 + SIMPLE", new ParseCCode(new Requirement("COMPLEX", Kind.VALUE) :: Nil))
+    parsesCorrectly("#define COMPLEX WRONG * 2 + SIMPLE", new ParseCCode())
   @Test def constantAfterTwoNewLinesWithFollowingItem {
-    val parser = new ParseCCode(new Requirement("CONS", Kind.VALUE) :: Nil)
+    val parser = new ParseCCode()
     val input = """
 
 #define CONS 5
@@ -495,7 +487,7 @@ class CParserSemanticTest {
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def constantDefinedSimpleNumber {
     val toParse = "#define SIMPLE 5"
-    val parser = new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil)
+    val parser = new ParseCCode()
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
     assertEquals("Wrong value generation expression", "5", result.get.getExpression)
@@ -503,7 +495,7 @@ class CParserSemanticTest {
 
   @Test def constantDefinedOther {
     val toParse = "#define SIMPLE WRONG"
-    val parser = new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil)
+    val parser = new ParseCCode()
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
@@ -517,7 +509,7 @@ class CParserSemanticTest {
 
   @Test def constantDefinedAddition {
     val toParse = "#define SIMPLE 2 + 5"
-    val parser = new ParseCCode(new Requirement("SIMPLE", Kind.VALUE) :: Nil)
+    val parser = new ParseCCode()
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
@@ -530,7 +522,7 @@ class CParserSemanticTest {
 
   @Test def constantDefinedManyParts {
     val toParse = "#define COMPLEX WRONG * 2 + SIMPLE"
-    val parser = new ParseCCode(new Requirement("COMPLEX", Kind.VALUE) :: Nil)
+    val parser = new ParseCCode()
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "COMPLEX", result.get.getName)
@@ -546,12 +538,7 @@ class CParserSemanticTest {
 
 class FromCExtractorTest {
   @Test def initialize {
-    val extractor = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
-  }
-
-  @Test(expected = classOf[IllegalArgumentException])
-  def initializeNotLooking {
-    val extractor = new FromCExtractor(Nil)
+    val extractor = new FromCExtractor()
   }
 
   private final val test123NotingElse = """
@@ -574,14 +561,16 @@ enum test3 {
 """
 
   @Test def findsPositionsAllExist {
-    val positions = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+    val positions = new FromCExtractor()
       .findPossibleStartPositions(test123NotingElse)
     assertNotNull("Positions don't exist", positions)
-    assertArrayEquals("Wrong positions given", Array(1, 113, 162), positions.toArray)
+    assertTrue("Position missing", positions.contains(1))
+    assertTrue("Position missing", positions.contains(113))
+    assertTrue("Position missing", positions.contains(162))
   }
 
   @Test def findsEnumsAllExist {
-    val enums = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+    val enums = new FromCExtractor()
       .extract(test123NotingElse)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
@@ -593,7 +582,7 @@ enum test3 {
   }
 
   @Test def findsEnumsOneMissingExtract {
-    val enums = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3", "test4")))
+    val enums = new FromCExtractor()
       .extract(test123NotingElse)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
@@ -631,15 +620,17 @@ enum test3 {
 """
 
   @Test def findsPositionsOtherCodeAsWell {
-    val positions = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+    val positions = new FromCExtractor()
       .findPossibleStartPositions(test123OtherCodeAsWell)
     assertNotNull("Positions don't exist", positions)
 
-    assertArrayEquals("Wrong positions given", Array(1, 146, 252), positions.toArray)
+    assertTrue("Position missing", positions.contains(1))
+    assertTrue("Position missing", positions.contains(146))
+    assertTrue("Position missing", positions.contains(252))
   }
 
   @Test def findsEnumsOtherCodeAsWell {
-    val enums = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3"))).extract(test123OtherCodeAsWell)
+    val enums = new FromCExtractor().extract(test123OtherCodeAsWell)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -673,13 +664,13 @@ enum test3 {
 """
 
   @Test def findsPositionsEnumsUsed {
-    val positions = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+    val positions = new FromCExtractor()
       .findPossibleStartPositions(test123EnumsUsed)
     assertNotNull("Positions don't exist", positions)
   }
 
   @Test def findsEnumsEnumsUsed {
-    val enums = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3")))
+    val enums = new FromCExtractor()
       .extract(test123EnumsUsed)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
@@ -691,7 +682,7 @@ enum test3 {
   }
 
   @Test def findConstantAfterTwoNewLinesWithFollowingUnusedConstant {
-    val extractor = new FromCExtractor(new Requirement("CONS", Kind.VALUE) :: Nil)
+    val extractor = new FromCExtractor()
     val input = """
 
 #define CONS 5
