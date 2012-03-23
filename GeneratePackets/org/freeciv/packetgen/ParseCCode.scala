@@ -183,13 +183,5 @@ class FromCExtractor(toLookFor: Iterable[Requirement]) {
       .filter(!_.isEmpty).map(_.get)
   }
 
-  case class Validated(extracted: List[IDependency], missing: Iterable[Requirement])
-  def extractAndReportMissing(lookIn: String) = {
-    val extracted = extract(lookIn)
-    val notFound = toLookFor.filter(!extracted.contains(_))
-
-    new Validated(extracted, notFound)
-  }
-
   override def toString = "Extracts(" + parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _) + ")"
 }

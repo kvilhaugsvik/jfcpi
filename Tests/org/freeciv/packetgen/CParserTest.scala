@@ -604,21 +604,6 @@ enum test3 {
     assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
   }
 
-  @Test def findsEnumsOneMissingFindOutWho {
-    val results = new FromCExtractor(CParserTest.lookForEnumsNamed(List("test1", "test2", "test3", "test4")))
-      .extractAndReportMissing(test123NotingElse)
-    assertNotNull("Enums not found", results)
-    assertFalse("Enums not found", results.extracted.isEmpty)
-    assertNotNull("Should figure out what is missing", results.missing)
-    assertTrue("Should figure out what is missing", results.missing
-      .toList.contains(new Requirement("test4", Requirement.Kind.ENUM)))
-
-    val enumsAsMap = results.extracted.map(_.getIFulfillReq.getName)
-    assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
-    assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
-    assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
-  }
-
   private final val test123OtherCodeAsWell = """
 #define SPECENUM_NAME test1
 #define SPECENUM_VALUE0 ZERO
