@@ -20,7 +20,7 @@ import util.parsing.input.CharArrayReader
 import java.util.HashMap
 
 class ParseCCode extends ParseShared {
-  def enumElemCode = regex("""[A-Za-z]\w*""".r)
+  def enumElemCode = identifierRegEx
 
   private final val DEFINE: String = "#define"
   private final val ENDDEFINE = """(\n|\r|\z)+""".r //TODO: Don't match backslash newline

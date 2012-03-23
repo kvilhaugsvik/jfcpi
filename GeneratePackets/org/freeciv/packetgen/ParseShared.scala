@@ -32,8 +32,8 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   protected def regExOr(arg: String*): String = "(" + arg.reduce(_ + "|" + _) + ")"
 
   def sInteger = """[+|-]*[0-9]+""".r
-  def variableName = """[A-Za-z]\w*""".r
   def identifier = """[A-Za-z]\w*"""
+  val identifierRegEx = identifier.r
 
   private def binOpLev(operators: Parser[String]): PackratParser[(IntExpression,  IntExpression) => IntExpression] =
     operators ^^ {operator => (lhs: IntExpression, rhs: IntExpression) => IntExpression.binary(operator, lhs, rhs)}
@@ -56,7 +56,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   private val intExprBasic: Parser[IntExpression] =
     """[0-9]+""".r ^^ {IntExpression.integer(_)} |
-    variableName ^^ {IntExpression.variable(_)} |
+    identifierRegEx ^^ {IntExpression.variable(_)} |
     "(" ~> intExpr <~ ")" |
     intExpr
 

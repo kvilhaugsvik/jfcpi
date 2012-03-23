@@ -47,7 +47,7 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
     "cs" |
     "sc"
 
-  def capability = regex("""[A-Za-z0-9_-]+""".r)
+  def capability = identifierRegEx
 
   def fieldFlag = (
     "key" |
@@ -58,7 +58,7 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
 
   def arrayFullSize = regex("""[0-9a-zA-Z_\+\*-/]+""".r)
 
-  def fieldName = regex("""[a-zA-Z]\w*""".r)
+  def fieldName = regex(identifierRegEx)
 
   def fieldVar = (fieldName ~ rep("[" ~> arrayFullSize ~ opt(":" ~> fieldName) <~ "]")) ^^ {
     case name~dimensions =>
