@@ -90,19 +90,25 @@ public class PacketsStore {
         Collection<IDependency> inn = requirements.getResolved();
         HashSet<ClassWriter> out = new HashSet<ClassWriter>();
 
-        ClassWriter constants =
-                new ClassWriter(org.freeciv.packet.Packet.class.getPackage(), new String[0],
-                        "Freeciv C code", "Constants", null);
+        TreeSet<Constant> sortedConstants =
+                new TreeSet<Constant>(new IDependency.TotalOrderNoCircles(inn));
 
         for (IDependency dep : inn)
             if (dep instanceof ClassWriter)
                 out.add((ClassWriter) dep);
             else if (dep instanceof Constant)
-                constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "int",
-                        ((Constant) dep).getName(), ((Constant) dep).getExpression());
+                sortedConstants.add((Constant) dep);
 
-        if (out.size() < inn.size())
+        if (out.size() < inn.size()) {
+            ClassWriter constants =
+                    new ClassWriter(org.freeciv.packet.Packet.class.getPackage(), new String[0],
+                            "Freeciv C code", "Constants", null);
+
+            for (Constant dep : sortedConstants)
+                constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "int", dep.getName(), dep.getExpression());
+
             out.add(constants);
+        }
 
         return out;
     }
