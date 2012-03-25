@@ -37,8 +37,8 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
 
     print("Extracting from provided C code")
       val extractor = new FromCExtractor()
-      cPaths.map(code => extractor.extract(GeneratePackets.readFileAsString(code))).flatten
-        .foreach(dep => {storage.addDependency(dep); print(".")})
+      cPaths.map(code => {print("."); extractor.extract(GeneratePackets.readFileAsString(code))}).flatten
+        .foreach(storage.addDependency(_))
   println()
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
