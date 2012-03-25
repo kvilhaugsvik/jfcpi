@@ -35,10 +35,10 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
     throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
   }
 
-    print("Extracting from provided C code")
-      val extractor = new FromCExtractor()
-      cPaths.map(code => {print("."); extractor.extract(GeneratePackets.readFileAsString(code))}).flatten
-        .foreach(storage.addDependency(_))
+  print("Extracting from provided C code")
+  val extractor = new FromCExtractor()
+  cPaths.map(code => {print("."); extractor.extract(GeneratePackets.readFileAsString(code))}).flatten
+    .foreach(storage.addDependency(_))
   println()
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
