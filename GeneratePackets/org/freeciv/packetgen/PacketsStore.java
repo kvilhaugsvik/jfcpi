@@ -108,7 +108,7 @@ public class PacketsStore {
     }
 
     public Collection<Requirement> getUnsolvedRequirements() {
-        HashSet<Requirement> out = new HashSet<Requirement>(requirements.getMissingRequirements());
+        TreeSet<Requirement> out = new TreeSet<Requirement>(requirements.getMissingRequirements());
         out.addAll(notFoundWhenNeeded);
         return out;
     }
