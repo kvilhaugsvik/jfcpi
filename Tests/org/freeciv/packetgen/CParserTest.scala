@@ -499,7 +499,7 @@ class CParserSemanticTest {
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
-    assertEquals("Wrong value generation expression", "WRONG", result.get.getExpression)
+    assertEquals("Wrong value generation expression", "Constants.WRONG", result.get.getExpression)
 
     val reqs: Collection[Requirement] = result.get.getReqs
     assertNotNull("Didn't even generate requirements...", reqs)
@@ -526,7 +526,7 @@ class CParserSemanticTest {
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "COMPLEX", result.get.getName)
-    assertEquals("Wrong value generation expression", "(WRONG * 2) + SIMPLE", result.get.getExpression)
+    assertEquals("Wrong value generation expression", "(Constants.WRONG * 2) + Constants.SIMPLE", result.get.getExpression)
 
     val reqs: Collection[Requirement] = result.get.getReqs
     assertNotNull("Didn't even generate requirements...", reqs)

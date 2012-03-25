@@ -50,7 +50,7 @@ public class PacketsStore {
         return requirements.isAwareOfPotentialProvider(new Requirement(name, Requirement.Kind.FIELD_TYPE));
     }
 
-    public void registerPacket(String name, int number, List<String[]> fields) throws PacketCollisionException, UndefinedException {
+    public void registerPacket(String name, int number, List<Field.WeakField> fields) throws PacketCollisionException, UndefinedException {
         if (hasPacket(name)) {
             throw new PacketCollisionException("Packet name " + name + " already in use");
         } else if (hasPacket(number)) {
@@ -58,19 +58,14 @@ public class PacketsStore {
         }
 
         List<Field> fieldList = new LinkedList<Field>();
-        for (String[] fieldType: fields) {
-            assert (1 != (fieldType.length % 2));
-            Requirement req = new Requirement(fieldType[0], Requirement.Kind.FIELD_TYPE);
+        for (Field.WeakField fieldType: fields) {
+            Requirement req = new Requirement(fieldType.getType(), Requirement.Kind.FIELD_TYPE);
             if (!requirements.isAwareOfPotentialProvider(req)) {
                 notFoundWhenNeeded.add(req);
                 return;
             }
-            LinkedList<Field.ArrayDeclaration> declarations = new LinkedList<Field.ArrayDeclaration>();
-            for (int i = 2; i < fieldType.length; i += 2) {
-                declarations.add(new Field.ArrayDeclaration(fieldType[i], fieldType[i + 1]));
-            }
-            fieldList.add(new Field(fieldType[1], ((FieldTypeAlias)requirements.getPotentialProvider(req)),
-                    declarations.toArray(new Field.ArrayDeclaration[0])));
+            fieldList.add(new Field(fieldType.getName(), ((FieldTypeAlias)requirements.getPotentialProvider(req)),
+                    fieldType.getDeclarations()));
         }
 
         Packet packet = new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0]));

@@ -629,13 +629,24 @@ class PacketsDefParseTest {
     assertTrue(storedFields.contains("c"))
   }
 
+  private def assertWeakFieldIs(message: String, expected: Array[String], actual: Field.WeakField) {
+    assertEquals(message, expected(0), actual.getType)
+    assertEquals(message, expected(1), actual.getName)
+    assertEquals(message, (expected.size - 2) / 2, actual.getDeclarations.size)
+
+    val decs: Array[Field.ArrayDeclaration] = actual.getDeclarations
+    var decNum = 0
+    while (decNum < decs.size) {
+      val declaration = decs(decNum)
+      assertEquals(message, expected(2 + decNum * 2), declaration.getMaxSize)
+      assertEquals(message, expected(1 + 2 + decNum * 2), declaration.getElementsToTransfer)
+      decNum += 1
+    }
+  }
+
   private val manyFieldsInOneDefineSomeWithArrayDeclarations = """
   UINT8 maxB;
   UINT8 a, b[7], c[8:maxB], d[7][8:maxB];"""
-
-  private def assertStringArrayEquals(message: String, expecteds: Array[String], actuals: Array[String]) {
-    assertArrayEquals(message, expecteds.toArray[AnyRef], actuals.toArray[AnyRef])
-  }
 
   @Test def formatsManyFieldsInOneDefineSomeWithArrayDeclarations() {
     val (storage, parser) = storePars
@@ -643,12 +654,13 @@ class PacketsDefParseTest {
     val result = parser.parseAll(parser.fieldList, manyFieldsInOneDefineSomeWithArrayDeclarations)
     assertTrue(result.toString, result.successful)
 
-    val results: List[Array[String]] = result.get
-    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "maxB"), results(0))
-    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "a"), results(1))
-    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "b", "7", null), results(2))
-    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "c", "8", "maxB"), results(3))
-    assertStringArrayEquals("Field parsed in wrong format", Array("UINT8", "d", "7", null, "8", "maxB"), results(4))
+    val results: List[Field.WeakField] = result.get
+
+    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "maxB"), results(0))
+    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "a"), results(1))
+    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "b", "7", null), results(2))
+    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "c", "8", "maxB"), results(3))
+    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "d", "7", null, "8", "maxB"), results(4))
   }
 
   @Test def parsesManyFieldsInOneDefineSomeWithArrayDeclarations() {

@@ -64,7 +64,7 @@ public class IntExpression {
     }
 
     public static IntExpression variable(String name) {
-        return new IntExpression(name, null, null, new Requirement(name, Requirement.Kind.VALUE));
+        return new IntExpression("Constants" + "." + name, null, null, new Requirement(name, Requirement.Kind.VALUE));
     }
 
     public Collection<Requirement> getReqs() {

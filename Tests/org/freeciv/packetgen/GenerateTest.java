@@ -81,11 +81,11 @@ public class GenerateTest {
                 4,
                 false,
                 new Field("username", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("version_label", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("major_version", uint32),
                 new Field("minor_version", uint32),
                 new Field("patch_version", uint32)));
@@ -94,11 +94,11 @@ public class GenerateTest {
                 false,
                 new Field("you_can_join", bool),
                 new Field("message", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("challenge_file", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("conn_id", connection)));
         writePacket(new Packet("CONN_PING", 88, false));
         writePacket(new Packet("CONN_PONG", 89, false));
@@ -106,11 +106,11 @@ public class GenerateTest {
                 4,
                 true,
                 new Field("username", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("version_label", string,
-                        new Field.ArrayDeclaration("1000", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("major_version", uint32),
                 new Field("minor_version", uint32),
                 new Field("patch_version", uint32)));
@@ -118,35 +118,35 @@ public class GenerateTest {
                 926,
                 true,
                 new Field("theArray", uint32,
-                        new Field.ArrayDeclaration("2", null))));
+                        new Field.ArrayDeclaration(IntExpression.integer("2"), null))));
         writePacket(new Packet("TestArrayTransfer",
                 927,
                 true,
                 new Field("toTransfer", uint8),
                 new Field("theArray", uint32,
-                        new Field.ArrayDeclaration("4", "toTransfer"))));
+                        new Field.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))));
         writePacket(new Packet("TestArrayDouble",
                 928,
                 true,
                 new Field("theArray", uint32,
-                        new Field.ArrayDeclaration("2", null),
-                        new Field.ArrayDeclaration("3", null))));
+                        new Field.ArrayDeclaration(IntExpression.integer("2"), null),
+                        new Field.ArrayDeclaration(IntExpression.integer("3"), null))));
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
                 true,
                 new Field("toTransfer", uint8),
                 new Field("toTransfer2", uint8),
                 new Field("theArray", uint32,
-                        new Field.ArrayDeclaration("4", "toTransfer"),
-                        new Field.ArrayDeclaration("5", "toTransfer2"))));
+                        new Field.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"),
+                        new Field.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))));
         writePacket(new Packet("StringArray",
                 930,
                 true,
                 new Field("notAnArray", string,
-                        new Field.ArrayDeclaration("15", null)),
+                        new Field.ArrayDeclaration(IntExpression.integer("15"), null)),
                 new Field("theArray", string,
-                        new Field.ArrayDeclaration("3", null),
-                        new Field.ArrayDeclaration("10", null))));
+                        new Field.ArrayDeclaration(IntExpression.integer("3"), null),
+                        new Field.ArrayDeclaration(IntExpression.integer("10"), null))));
 
         FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + Connect.packetsList);
         for (String packet: writtenPackets) {

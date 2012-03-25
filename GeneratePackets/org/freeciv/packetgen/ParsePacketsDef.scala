@@ -56,19 +56,21 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
     "remove-cap(" ~ capability ~ ")"
     )
 
-  def arrayFullSize = regex("""[0-9a-zA-Z_\+\*-/]+""".r)
+  def arrayFullSize = intExpr
 
   def fieldName = regex(identifierRegEx)
 
-  def fieldVar = (fieldName ~ rep("[" ~> arrayFullSize ~ opt(":" ~> fieldName) <~ "]")) ^^ {
+  def fieldVar: Parser[(String, List[Field.ArrayDeclaration])] =
+    (fieldName ~ rep("[" ~> arrayFullSize ~ opt(":" ~> fieldName) <~ "]")) ^^ {
     case name~dimensions =>
-      name :: dimensions.map({
-        case maxSize ~ toTransferThisTime => List(maxSize, toTransferThisTime.getOrElse(null))}).flatten}
+      name -> dimensions.map({
+        case maxSize ~ toTransferThisTime =>
+          new Field.ArrayDeclaration(maxSize, toTransferThisTime.getOrElse(null))})}
 
   def fields = (fieldType ~ rep1sep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
-    case kind~variables~flags => variables.map(variable => (kind :: variable).toArray)}
+    case kind~variables~flags => variables.map(variable => new Field.WeakField(variable._1, kind, variable._2: _*))}
 
-  def fieldList: Parser[List[Array[String]]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
+  def fieldList: Parser[List[Field.WeakField]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
 
   def packet = packetName ~ ("=" ~> regex("""[0-9]+""".r) <~ ";") ~ repsep(packetFlag, ",") ~
   fieldList <~

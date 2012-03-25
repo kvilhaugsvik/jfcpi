@@ -32,16 +32,16 @@ class ParseSharedTest {
       CParserTest.parsesCorrectly(input, parserShared, parserShared.intExpr).get.toString)
 
   @Test def value = assertIntExpressionBecomes("4", "4")
-  @Test def constantName = assertIntExpressionBecomes("MAX_THING", "MAX_THING")
+  @Test def constantName = assertIntExpressionBecomes("Constants.MAX_THING", "MAX_THING")
 
   // Parses basic unary operations
   @Test def parenParen = assertIntExpressionBecomes("4", "((4))")
   @Test def unaryAdd = assertIntExpressionBecomes("4", "+4")
   @Test def unaryMinus = assertIntExpressionBecomes("-4", "-4")
-  @Test def prefixPlusPlus = assertIntExpressionBecomes("++A", "++A")
-  @Test def suffixPlusPlus = assertIntExpressionBecomes("A++", "A++")
-  @Test def prefixMinusMinus = assertIntExpressionBecomes("--A", "--A")
-  @Test def suffixMinusMinus = assertIntExpressionBecomes("A--", "A--")
+  @Test def prefixPlusPlus = assertIntExpressionBecomes("++Constants.A", "++A")
+  @Test def suffixPlusPlus = assertIntExpressionBecomes("Constants.A++", "A++")
+  @Test def prefixMinusMinus = assertIntExpressionBecomes("--Constants.A", "--A")
+  @Test def suffixMinusMinus = assertIntExpressionBecomes("Constants.A--", "A--")
 
   // Parses basic binary operations
   @Test def binaryAdd = assertIntExpressionBecomes("1 + 2", "1 + 2")

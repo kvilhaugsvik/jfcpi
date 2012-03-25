@@ -85,8 +85,8 @@ public class Field {
         String arrayLevel = "";
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
-            if (null != element.elementsToTransfer)
-                out += "(" + element.getMaxSize() + " <= " + element.elementsToTransfer + callOnElementsToTransfer + ")" + "||";
+            if (null != element.getElementsToTransfer())
+                out += "(" + element.getMaxSize() + " <= " + element.getElementsToTransfer() + callOnElementsToTransfer + ")" + "||";
             out += "(" + this.getVariableName() + arrayLevel + ".length != " + element.getSize(callOnElementsToTransfer) + ")";
             out += "||";
             arrayLevel += "[0]";
@@ -101,35 +101,62 @@ public class Field {
                         " constructed with value out of scope in packet " + name + "\");"};
     }
 
-    private static final Pattern aConstant = Pattern.compile("\\D\\w*");
     public Collection<Requirement> getReqs() {
         HashSet<Requirement> reqs = new HashSet<Requirement>();
         reqs.add(new Requirement(getType(), Requirement.Kind.FIELD_TYPE));
 
         for (ArrayDeclaration declaration : declarations) {
-            if (aConstant.matcher(declaration.maxSize).matches())
-                reqs.add(new Requirement(declaration.maxSize, Requirement.Kind.VALUE));
+            reqs.addAll(declaration.getReqs());
         }
         return reqs;
     }
 
     public static class ArrayDeclaration {
-        private final String maxSize, elementsToTransfer;
+        private final IntExpression maxSize;
+        private final String elementsToTransfer;
 
-        public ArrayDeclaration(String maxSize, String elementsToTransfer) {
+        public ArrayDeclaration(IntExpression maxSize, String elementsToTransfer) {
             this.maxSize = maxSize;
             this.elementsToTransfer = elementsToTransfer;
         }
 
         public String getMaxSize() {
-            if (aConstant.matcher(maxSize).matches())
-                return "Constants." + maxSize;
-            else
-                return maxSize;
+            return maxSize.toString();
+        }
+
+        public String getElementsToTransfer() {
+            return elementsToTransfer;
+        }
+
+        public Collection<Requirement> getReqs() {
+            return maxSize.getReqs();
         }
 
         private String getSize(String callOnElementsToTransfer) {
             return (null == elementsToTransfer? getMaxSize(): elementsToTransfer + callOnElementsToTransfer);
+        }
+    }
+
+    public static class WeakField {
+        private final String name, type;
+        private final ArrayDeclaration[] declarations;
+
+        public WeakField(String name, String kind, ArrayDeclaration... declarations) {
+            this.name = name;
+            this.type = kind;
+            this.declarations = declarations;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ArrayDeclaration[] getDeclarations() {
+            return declarations;
         }
     }
 }
