@@ -27,7 +27,7 @@ public class PacketsStore {
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
     // Idea from http://stackoverflow.com/q/822701
     private final HashMap<String, Packet> packets = new HashMap<String, Packet>();
-    private final HashMap<Integer, String> packetsByNumber = new HashMap<Integer, String>();
+    private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
     public PacketsStore(boolean hasTwoBytePacketNumber) {
         this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
