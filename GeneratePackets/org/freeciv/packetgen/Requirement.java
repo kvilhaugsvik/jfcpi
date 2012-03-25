@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen;
 
-public class Requirement {
+public class Requirement implements Comparable<Requirement> {
     private final String name;
     private final Kind kind;
 
@@ -43,6 +43,16 @@ public class Requirement {
     @Override
     public int hashCode() {
         return name.hashCode() + kind.ordinal();
+    }
+
+    @Override
+    public int compareTo(Requirement that) {
+        if (this.getKind().ordinal() < that.getKind().ordinal())
+            return -1;
+        else if (that.getKind().ordinal() < this.getKind().ordinal())
+            return 1;
+        else
+            return this.getName().compareTo(that.getName());
     }
 
     @Override
