@@ -36,8 +36,10 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
   println()
 
   println("Extracting from protocol definition")
-  if (!Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))).successful) {
-    throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
+  private val packetsDefResult =
+    Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath))))
+  if (!packetsDefResult.successful) {
+    throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath + "\n" + packetsDefResult.toString)
   }
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
