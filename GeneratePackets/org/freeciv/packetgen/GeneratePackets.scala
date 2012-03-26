@@ -29,17 +29,16 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
   private val Parser = new ParsePacketsDef(storage)
 
   GeneratePackets.checkFilesCanRead(packetsDefPath :: cPaths)
-
-  println("Extracting from protocol definition")
-  if (!Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))).successful) {
-    throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
-  }
-
   print("Extracting from provided C code")
   val extractor = new FromCExtractor()
   cPaths.map(code => {print("."); extractor.extract(GeneratePackets.readFileAsString(code))}).flatten
     .foreach(storage.addDependency(_))
   println()
+
+  println("Extracting from protocol definition")
+  if (!Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath)))).successful) {
+    throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath)
+  }
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
