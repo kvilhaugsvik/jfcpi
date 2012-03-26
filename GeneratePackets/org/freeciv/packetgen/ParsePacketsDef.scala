@@ -18,13 +18,13 @@ import util.parsing.input.Reader
 import collection.JavaConversions._
 
 class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
-  def fieldType = regex("""[A-Z](\w|_)*""".r)
+  def fieldTypeAlias = regex(identifierRegEx)
   def basicFieldType: Parser[(String, String)] = identifierRegEx ~ ("(" ~> cType <~ ")") ^^ {
     case iotype~ptype => iotype -> ptype.reduce(_ + " " + _)
   }
-  def fieldTypeDef: PackratParser[Any] = basicFieldType | fieldType
+  def fieldType: PackratParser[Any] = basicFieldType | fieldTypeAlias
 
-  def fieldTypeAssign: Parser[Any] = "type" ~> fieldType ~ ("=" ~> fieldTypeDef) ^^ {
+  def fieldTypeAssign: Parser[Any] = "type" ~> fieldTypeAlias ~ ("=" ~> fieldType) ^^ {
     case alias~(aliased: String) => storage.registerTypeAlias(alias, aliased)
     case alias~Pair((iotype: String), (ptype: String)) => storage.registerTypeAlias(alias, iotype, ptype)
     case result => failure(result + " was not recognized as a new field type alias and what it's aliasing")
@@ -72,7 +72,7 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
         case maxSize ~ toTransferThisTime =>
           new Field.ArrayDeclaration(maxSize, toTransferThisTime.getOrElse(null))})}
 
-  def fields = (fieldType ~ rep1sep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
+  def fields = (fieldTypeAlias ~ rep1sep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
     case kind~variables~flags => variables.map(variable => new Field.WeakField(variable._1, kind, variable._2: _*))}
 
   def fieldList: Parser[List[Field.WeakField]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
