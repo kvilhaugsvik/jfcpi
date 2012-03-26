@@ -38,10 +38,10 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(String alias, String iotype, String ptype) throws UndefinedException {
-        FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider
-                (new Requirement(iotype + "(" + ptype + ")", Requirement.Kind.PRIMITIVE_FIELD_TYPE));
+        Requirement neededBasic = new Requirement(iotype + "(" + ptype + ")", Requirement.Kind.PRIMITIVE_FIELD_TYPE);
+        FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider(neededBasic);
         if (null == basicFieldType)
-            notFoundWhenNeeded.add(new Requirement(iotype + "(" + ptype + ")", Requirement.Kind.FIELD_TYPE));
+            notFoundWhenNeeded.add(neededBasic);
         else
             requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));
     }
