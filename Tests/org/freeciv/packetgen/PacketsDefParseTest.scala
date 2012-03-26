@@ -32,7 +32,7 @@ class PacketsDefParseTest {
   def testBooleanFieldsFriendlyAndInvoiceInPacket(fieldDec: String) {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
+    storage.registerTypeAlias("BOOL", "bool8", "bool")
 
     assertTrue("Couldn't parse", parser.parsePacketsDef("PACKET_HELLO = 5;\n" + fieldDec + "\nend").successful)
     assertTrue("Didn't store packet", storage.hasPacket(5))
@@ -601,7 +601,7 @@ class PacketsDefParseTest {
   @Test def storesTwoFieldsInOneDefine() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
+    storage.registerTypeAlias("BOOL", "bool8", "bool")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly, inVoice;
@@ -616,7 +616,7 @@ class PacketsDefParseTest {
   @Test def storesManyFieldsInOneDefine() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
+    storage.registerTypeAlias("BOOL", "bool8", "bool")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL a, b, c;

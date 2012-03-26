@@ -19,10 +19,15 @@ import collection.JavaConversions._
 
 class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldType = regex("""[A-Z](\w|_)*""".r)
-  def fieldTypeDef = fieldType | regex("""\w*\((\w|\s)*\)""".r)
+  def basicFieldType: Parser[(String, String)] = identifierRegEx ~ ("(" ~> cType <~ ")") ^^ {
+    case iotype~ptype => iotype -> ptype.reduce(_ + " " + _)
+  }
+  def fieldTypeDef: PackratParser[Any] = basicFieldType | fieldType
 
   def fieldTypeAssign: Parser[Any] = "type" ~> fieldType ~ ("=" ~> fieldTypeDef) ^^ {
-    case alias~aliased => storage.registerTypeAlias(alias, aliased)
+    case alias~(aliased: String) => storage.registerTypeAlias(alias, aliased)
+    case alias~Pair((iotype: String), (ptype: String)) => storage.registerTypeAlias(alias, iotype, ptype)
+    case result => failure(result + " was not recognized as a new field type alias and what it's aliasing")
   }
 
   def comment = CComment |

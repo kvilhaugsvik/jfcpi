@@ -35,14 +35,14 @@ public class PacketsStoreTest {
 
     @Test public void registerType() throws UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("UINT32", "uint32(int)");
+        storage.registerTypeAlias("UINT32", "uint32", "int");
 
         assertTrue(storage.hasTypeAlias("UINT32"));
     }
 
     @Test public void registerTypeAlias() throws UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("UINT32", "uint32(int)");
+        storage.registerTypeAlias("UINT32", "uint32", "int");
         storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
 
         assertTrue(storage.hasTypeAlias("UNSIGNEDINT32"));
@@ -57,7 +57,7 @@ public class PacketsStoreTest {
 
     @Test public void registerTypeRequiredNotExisting() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
+        storage.registerTypeAlias("ACTIVITY", "uint8", "enum unit_activity");
 
         registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
 
@@ -87,7 +87,7 @@ public class PacketsStoreTest {
     @Test public void registerTypeRequired() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
         storage.addDependency(new Enum("unit_activity", false));
-        storage.registerTypeAlias("ACTIVITY", "uint8(enum unit_activity)");
+        storage.registerTypeAlias("ACTIVITY", "uint8", "enum unit_activity");
 
         registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
 
@@ -102,7 +102,7 @@ public class PacketsStoreTest {
     @Test public void codeIsThere() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
 
-        storage.registerTypeAlias("UINT32", "uint32(int)");
+        storage.registerTypeAlias("UINT32", "uint32", "int");
         storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
 
         registerPacketToPullInnFieldtype(storage, "UINT32", 0);
@@ -146,7 +146,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("STRING", "string(char)");
+        storage.registerTypeAlias("STRING", "string", "char");
         Field.WeakField field1 = new Field.WeakField("myNameIs", "STRING",
                 new Field.ArrayDeclaration(IntExpression.integer("50"), null));
         LinkedList<Field.WeakField> fields = new LinkedList<Field.WeakField>();
@@ -172,7 +172,7 @@ public class PacketsStoreTest {
         LinkedList<Field.WeakField> fields = new LinkedList<Field.WeakField>();
         fields.add(field1);
 
-        storage.registerTypeAlias("STRING", "string(char)");
+        storage.registerTypeAlias("STRING", "string", "char");
         storage.registerPacket("PACKET_HELLO", 25, fields);
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));

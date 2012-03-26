@@ -33,12 +33,17 @@ public class PacketsStore {
         this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
     }
 
-    public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
-        final FieldTypeBasic basicFieldType = Hardcoded.getBasicFieldType(aliased);
-        Requirement req = new Requirement(aliased, Requirement.Kind.FIELD_TYPE);
-        if (null != basicFieldType) {
+    public void registerTypeAlias(String alias, String iotype, String ptype) throws UndefinedException {
+        final FieldTypeBasic basicFieldType = Hardcoded.getBasicFieldType(iotype + "(" + ptype + ")");
+        if (null == basicFieldType)
+            notFoundWhenNeeded.add(new Requirement(iotype + "(" + ptype + ")", Requirement.Kind.FIELD_TYPE));
+        else
             requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));
-        } else if (requirements.isAwareOfPotentialProvider(req)) {
+    }
+
+    public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
+        Requirement req = new Requirement(aliased, Requirement.Kind.FIELD_TYPE);
+        if (requirements.isAwareOfPotentialProvider(req)) {
             requirements.addPossibleRequirement(((FieldTypeAlias)requirements.getPotentialProvider(req))
                     .getBasicType().createFieldType(alias));
         } else {
