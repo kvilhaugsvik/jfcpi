@@ -29,7 +29,8 @@ public class FieldTypeBasic implements IDependency {
     private final FieldTypeBasic basicType = this;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
-                          String decode, String encode, String encodedSize, boolean arrayEater) {
+                          String decode, String encode, String encodedSize,
+                          boolean arrayEater, Collection<Requirement> needs) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         this.javaType = javaType;
@@ -39,11 +40,7 @@ public class FieldTypeBasic implements IDependency {
         this.arrayEater = arrayEater;
         this.fromJavaType = fromJavaType;
 
-        requirement = new ArrayList<Requirement>();
-        String[] publicTypeParts = publicType.split("\\s");
-        if ("enum".equals(publicTypeParts[0])) {
-            requirement.add(new Requirement(publicTypeParts[1], Requirement.Kind.ENUM));
-        }
+        requirement = needs;
     }
 
     public String getFieldTypeBasic() {

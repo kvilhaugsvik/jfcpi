@@ -28,21 +28,21 @@ public class Hardcoded {
                         "value = from.readUnsignedByte();",
                         "to.writeByte(value);",
                         "return 1;",
-                        false),
+                        false, Collections.<Requirement>emptySet()),
                 new FieldTypeBasic("uint16", "int",
                         "Integer",
                         new String[]{"this.value = value;"},
                         "value = (int) from.readChar();",
                         "to.writeChar(value);",
                         "return 2;",
-                        false),
+                        false, Collections.<Requirement>emptySet()),
                 new FieldTypeBasic("uint32", "int",
                         "Long",
                         new String[]{"this.value = value;"},
                         readUIntCode(4, "Long", "value"),
                         writeWriteUInt(4),
                         "return 4;",
-                        false),
+                        false, Collections.<Requirement>emptySet()),
                 getFloat("100"),
                 getFloat("10000"),
                 getFloat("1000000"),
@@ -65,35 +65,35 @@ public class Hardcoded {
                         "to.writeBytes(" + "value" + ");\n" +
                                 "to.writeByte(0);",
                         "return " + "value" + ".length() + 1;",
-                        true),
+                        true, Collections.<Requirement>emptySet()),
                 new FieldTypeBasic("bool8", "bool",
                         "Boolean",
                         new String[]{"this.value = value;"},
                         "value = from.readBoolean();",
                         "to.writeBoolean(value);",
                         "return 1;",
-                        false),
+                        false, Collections.<Requirement>emptySet()),
                 new FieldTypeBasic("sint8", "int",
                         "Byte",
                         new String[]{"this.value = value;"},
                         "value = from.readByte();",
                         "to.writeByte(value);",
                         "return 2;",
-                        false),
+                        false, Collections.<Requirement>emptySet()),
                 new FieldTypeBasic("sint16", "int",
                         "Short",
                         new String[]{"this.value = value;"},
                         "value = from.readShort();",
                         "to.writeShort(value);",
                         "return 2;",
-                        false),
+                        false, Collections.<Requirement>emptySet()),
                 new FieldTypeBasic("sint32", "int",
                         "Integer",
                         new String[]{"this.value = value;"},
                         "value = from.readInt();",
                         "to.writeInt(value);",
                         "return 4;",
-                        false),
+                        false, Collections.<Requirement>emptySet()),
                 getUInt8Enum("unit_activity"),
                 getUInt8Enum("airlifting_style"),
                 getUInt8Enum("authentication_type"),
@@ -123,14 +123,14 @@ public class Hardcoded {
                         "value = tile_special_type.valueOf((int) from.readChar());",
                         "to.writeChar(value.getNumber());",
                         "return 2;",
-                        false),
+                        false, Arrays.<Requirement>asList(new Requirement("tile_special_type", Requirement.Kind.ENUM))),
                 new FieldTypeBasic("sint16", "enum event_type",
                         "event_type",
                         new String[]{"this.value = value;"},
                         "value = event_type.valueOf(from.readShort());",
                         "to.writeShort(value.getNumber());",
                         "return 2;",
-                        false)
+                        false, Arrays.<Requirement>asList(new Requirement("event_type", Requirement.Kind.ENUM)))
 
         }) {
             data.put(src.getFieldTypeBasic(), src);
@@ -157,17 +157,19 @@ public class Hardcoded {
                 "value = from.readFloat() / " + times + ";",
                 "to.writeFloat(value * " + times + ");",
                 "return 4;",
-                false);
+                false, Collections.<Requirement>emptySet());
     }
 
     private static FieldTypeBasic getUInt8Enum(String named) {
+        HashSet<Requirement> req = new HashSet<Requirement>();
+        req.add(new Requirement(named, Requirement.Kind.ENUM));
         return new FieldTypeBasic("uint8", "enum " + named,
                 named,
                 new String[]{"this.value = value;"},
                 "value = " + named + ".valueOf(from.readUnsignedByte());",
                 "to.writeByte(value.getNumber());",
                 "return 1;",
-                false);
+                false, req);
     }
 
     public static String writeWriteUInt(int bytenumber) {
