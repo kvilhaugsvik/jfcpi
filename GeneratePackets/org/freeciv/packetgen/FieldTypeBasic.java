@@ -53,7 +53,7 @@ public class FieldTypeBasic implements IDependency {
 
     @Override
     public Collection<Requirement> getReqs() {
-        return requirement;
+        return Collections.<Requirement>emptySet();
     }
 
     @Override
