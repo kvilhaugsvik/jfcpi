@@ -22,7 +22,7 @@ public class PacketsStore {
     private final boolean hasTwoBytePacketNumber;
 
     private final HashSet<Requirement> notFoundWhenNeeded = new HashSet<Requirement>();
-    private final DependencyStore requirements = new DependencyStore();
+    private final DependencyStore requirements;
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
     // Idea from http://stackoverflow.com/q/822701
@@ -31,10 +31,15 @@ public class PacketsStore {
 
     public PacketsStore(boolean hasTwoBytePacketNumber) {
         this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
+        requirements = new DependencyStore();
+        for (IDependency primitive : Hardcoded.values()) {
+            requirements.addPossibleRequirement(primitive);
+        }
     }
 
     public void registerTypeAlias(String alias, String iotype, String ptype) throws UndefinedException {
-        final FieldTypeBasic basicFieldType = Hardcoded.getBasicFieldType(iotype + "(" + ptype + ")");
+        FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider
+                (new Requirement(iotype + "(" + ptype + ")", Requirement.Kind.PRIMITIVE_FIELD_TYPE));
         if (null == basicFieldType)
             notFoundWhenNeeded.add(new Requirement(iotype + "(" + ptype + ")", Requirement.Kind.FIELD_TYPE));
         else

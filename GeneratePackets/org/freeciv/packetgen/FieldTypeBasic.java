@@ -16,7 +16,7 @@ package org.freeciv.packetgen;
 
 import java.util.*;
 
-public class FieldTypeBasic {
+public class FieldTypeBasic implements IDependency {
     private final String fieldTypeBasic;
     private final String publicType;
     private final String javaType;
@@ -52,6 +52,16 @@ public class FieldTypeBasic {
 
     public String getPublicType() {
         return publicType;
+    }
+
+    @Override
+    public Collection<Requirement> getReqs() {
+        return requirement;
+    }
+
+    @Override
+    public Requirement getIFulfillReq() {
+        return new Requirement(fieldTypeBasic, Requirement.Kind.PRIMITIVE_FIELD_TYPE);
     }
 
     public FieldTypeAlias createFieldType(String name) {
