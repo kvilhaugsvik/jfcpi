@@ -122,4 +122,8 @@ public class FieldTypeBasic implements IDependency {
             return new Requirement(getName(), Requirement.Kind.FIELD_TYPE);
         }
     }
+
+    public static interface Generator {
+        public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io);
+    }
 }
