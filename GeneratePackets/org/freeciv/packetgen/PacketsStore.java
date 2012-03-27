@@ -37,9 +37,35 @@ public class PacketsStore {
         }
     }
 
+    private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype) {
+        Requirement wantPType = new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE);
+        Requirement wantIOType = new Requirement(iotype, Requirement.Kind.FROM_NETWORK_TO_INT);
+        if (!requirements.isAwareOfPotentialProvider(wantPType)) {
+            notFoundWhenNeeded.add(wantPType);
+            return null;
+        } else if (!requirements.isAwareOfPotentialProvider(wantIOType)) {
+            notFoundWhenNeeded.add(wantIOType);
+            return null;
+        }
+
+        IDependency pubType = requirements.getPotentialProvider(wantPType);
+        IDependency ioType = requirements.getPotentialProvider(wantIOType);
+        if (pubType instanceof FieldTypeBasic.Generator && ioType instanceof NetworkIO) {
+            FieldTypeBasic basicFieldType = ((FieldTypeBasic.Generator) pubType).getBasicFieldTypeOnInput((NetworkIO) ioType);
+            requirements.addPossibleRequirement(basicFieldType);
+            return basicFieldType;
+        } // TODO: When reporting is added report wrong combination
+
+        return null;
+    }
+
     public void registerTypeAlias(String alias, String iotype, String ptype) throws UndefinedException {
         Requirement neededBasic = new Requirement(iotype + "(" + ptype + ")", Requirement.Kind.PRIMITIVE_FIELD_TYPE);
         FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider(neededBasic);
+
+        if (null == basicFieldType)
+            basicFieldType = tryToCreatePrimitive(iotype, ptype);
+
         if (null == basicFieldType)
             notFoundWhenNeeded.add(neededBasic);
         else
