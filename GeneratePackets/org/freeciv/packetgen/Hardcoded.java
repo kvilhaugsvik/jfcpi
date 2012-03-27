@@ -117,8 +117,8 @@ public class Hardcoded {
                 getUInt8Enum("special_river_move"),
                 getUInt8Enum("sset_class"),
                 getUInt8Enum("sset_type"),
-                getEnum("tile_special_type", "uint16", "return 2;", "(int) from.readChar()", "to.writeChar"),
-                getEnum("event_type", "sint16", "return 2;", "from.readShort()", "to.writeShort")
+                getEnum("tile_special_type", new NetworkIO("uint16", "return 2;", "(int) from.readChar()", "to.writeChar")),
+                getEnum("event_type", new NetworkIO("sint16", "return 2;", "from.readShort()", "to.writeShort"))
 
         }) {
             data.put(src.getFieldTypeBasic(), src);
@@ -149,18 +149,18 @@ public class Hardcoded {
     }
 
     private static FieldTypeBasic getUInt8Enum(String named) {
-        return getEnum(named, "uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte");
+        return getEnum(named, new NetworkIO("uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte"));
     }
 
-    public static FieldTypeBasic getEnum(String named, String iotype, String iosize, String ioread, String iowrite) {
+    public static FieldTypeBasic getEnum(String named, NetworkIO io) {
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement(named, Requirement.Kind.ENUM));
-        return new FieldTypeBasic(iotype, "enum " + named,
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named,
                 named,
                 new String[]{"this.value = value;"},
-                "value = " + named + ".valueOf(" + ioread + ");",
-                iowrite + "(value.getNumber());",
-                iosize,
+                "value = " + named + ".valueOf(" + io.getRead() + ");",
+                io.getWrite() + "(value.getNumber());",
+                io.getSize(),
                 false, req);
     }
 
