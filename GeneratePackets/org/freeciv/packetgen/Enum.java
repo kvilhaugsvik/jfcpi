@@ -18,7 +18,7 @@ import org.freeciv.types.FCEnum;
 
 import java.util.*;
 
-public class Enum extends ClassWriter implements IDependency.ManyFulfiller {
+public class Enum extends ClassWriter implements IDependency.ManyFulfiller, FieldTypeBasic.Generator {
     private final boolean bitwise;
     private final EnumElement invalidDefault;
     private final EnumElement countElement;
@@ -140,5 +140,19 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller {
     @Override
     public Collection<Requirement> getIAlsoFulfillReqs() {
         return Arrays.<Requirement>asList(new Requirement("enum " + super.getName(), Requirement.Kind.AS_JAVA_DATATYPE));
+    }
+
+    @Override
+    public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
+        String named = this.getName();
+        HashSet<Requirement> req = new HashSet<Requirement>();
+        req.add(new Requirement(named, Requirement.Kind.ENUM));
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named,
+                named,
+                new String[]{"this.value = value;"},
+                "value = " + named + ".valueOf(" + io.getRead() + ");",
+                io.getWrite() + "(value.getNumber());",
+                io.getSize(),
+                false, req);
     }
 }

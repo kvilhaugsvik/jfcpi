@@ -61,7 +61,8 @@ public class PacketsStoreTest {
 
         registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
 
-        assertLooksForButNoCodeYet(storage, new Requirement("unit_activity", Requirement.Kind.ENUM), "ACTIVITY");
+        assertLooksForButNoCodeYet(storage, new Requirement("enum unit_activity",
+                Requirement.Kind.AS_JAVA_DATATYPE), "ACTIVITY");
     }
 
     @Test public void registerTypeNotExisting() throws UndefinedException, PacketCollisionException {

@@ -93,37 +93,16 @@ public class Hardcoded {
                         "value = from.readInt();",
                         "to.writeInt(value);",
                         "return 4;",
-                        false, Collections.<Requirement>emptySet()),
-                getUInt8Enum("unit_activity"),
-                getUInt8Enum("airlifting_style"),
-                getUInt8Enum("authentication_type"),
-                getUInt8Enum("base_gui_type"),
-                getUInt8Enum("borders_mode"),
-                getUInt8Enum("clause_type"),
-                getUInt8Enum("cmdlevel"),
-                getUInt8Enum("diplomacy_mode"),
-                getUInt8Enum("diplomat_actions"),
-                getUInt8Enum("direction8"),
-                getUInt8Enum("effect_type"),
-                getUInt8Enum("gui_type"),
-                getUInt8Enum("impr_genus_id"),
-                getUInt8Enum("known_type"),
-                getUInt8Enum("unit_orders"),
-                getUInt8Enum("phase_mode_types"),
-                getUInt8Enum("spaceship_place_type"),
-                getUInt8Enum("report_type"),
-                getUInt8Enum("req_range"),
-                getUInt8Enum("universals_n"),
-                getUInt8Enum("special_river_move"),
-                getUInt8Enum("sset_class"),
-                getUInt8Enum("sset_type"),
-                getEnum("tile_special_type", new NetworkIO("uint16", "return 2;", "(int) from.readChar()", "to.writeChar")),
-                getEnum("event_type", new NetworkIO("sint16", "return 2;", "from.readShort()", "to.writeShort"))
-
+                        false, Collections.<Requirement>emptySet())
         }) {
             data.put(src.getFieldTypeBasic(), src);
         }
     }
+
+    public static final Collection<NetworkIO> netCon = Arrays.asList(
+        new NetworkIO("uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte"),
+        new NetworkIO("uint16", "return 2;", "(int) from.readChar()", "to.writeChar"),
+        new NetworkIO("sint16", "return 2;", "from.readShort()", "to.writeShort"));
 
     public static String arrayEaterScopeCheck(String check) {
         return "if (" + check + ") " +
@@ -134,8 +113,10 @@ public class Hardcoded {
         return data.get(src);
     }
 
-    public static Collection<FieldTypeBasic> values() {
-        return Collections.unmodifiableCollection(data.values());
+    public static Collection<IDependency> values() {
+        HashSet<IDependency> out = new HashSet<IDependency>(data.values());
+        out.addAll(netCon);
+        return out;
     }
 
     private static FieldTypeBasic getFloat(String times) {
@@ -146,22 +127,6 @@ public class Hardcoded {
                 "to.writeFloat(value * " + times + ");",
                 "return 4;",
                 false, Collections.<Requirement>emptySet());
-    }
-
-    private static FieldTypeBasic getUInt8Enum(String named) {
-        return getEnum(named, new NetworkIO("uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte"));
-    }
-
-    public static FieldTypeBasic getEnum(String named, NetworkIO io) {
-        HashSet<Requirement> req = new HashSet<Requirement>();
-        req.add(new Requirement(named, Requirement.Kind.ENUM));
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named,
-                named,
-                new String[]{"this.value = value;"},
-                "value = " + named + ".valueOf(" + io.getRead() + ");",
-                io.getWrite() + "(value.getNumber());",
-                io.getSize(),
-                false, req);
     }
 
     public static String writeWriteUInt(int bytenumber) {
