@@ -25,9 +25,18 @@ public final class DependencyStore {
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
     private final HashSet<IDependency> wantsOut = new HashSet<IDependency>();
 
+    /**
+     * Make the dependency store aware of the fulfillment of a possible requirement.
+     * Any existing fulfillment will be overwritten. A ManyFulfiller will have every fulfillment added at once. In other
+     * words: An earlier registered primary fulfillment will be overwritten by the ManyFulfiller's also-fulfillment.
+     * @param item The dependency to add.
+     */
     public void addPossibleRequirement(IDependency item) {
         if (null == item) throw new NullPointerException(nullNotAllowed);
         existing.put(item.getIFulfillReq(), item);
+        if (item instanceof IDependency.ManyFulfiller)
+            for (Requirement also : ((IDependency.ManyFulfiller) item).getIAlsoFulfillReqs())
+                existing.put(also, item);
         dependenciesUnfulfilled.clear();
     }
 
