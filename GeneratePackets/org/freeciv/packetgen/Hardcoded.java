@@ -76,7 +76,7 @@ public class Hardcoded {
                 new FieldTypeBasic("sint8", "int",
                         "Integer",
                         new String[]{"this.value = value;"},
-                        "value = from.readByte();",
+                        "value = (int) from.readByte();",
                         "to.writeByte(value);",
                         "return 2;",
                         false, Collections.<Requirement>emptySet()),
@@ -102,7 +102,7 @@ public class Hardcoded {
     public static final Collection<NetworkIO> netCon = Arrays.asList(
         new NetworkIO("uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte"),
         new NetworkIO("uint16", "return 2;", "(int) from.readChar()", "to.writeChar"),
-        new NetworkIO("sint16", "return 2;", "from.readShort()", "to.writeShort"));
+        new NetworkIO("sint16", "return 2;", "(int) from.readShort()", "to.writeShort"));
 
     public static String arrayEaterScopeCheck(String check) {
         return "if (" + check + ") " +
