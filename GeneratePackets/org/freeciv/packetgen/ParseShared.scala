@@ -21,12 +21,17 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   def exprs: Parser[Any] = rep(expr)
 
-  def CComment: Parser[String] = ("""/\*+""".r ~> rep("""([^*\n\r]|\*+[^/*])+""".r) <~ """\*+/""".r) ^^ {_.reduce(_+_)} |
-    regex("""/\*+\*/""".r) ^^^ null |
-    "//" ~> regex("""[^\n\r]*""".r)
+  def CComment: Parser[String] = (cStyleStart.r ~> rep(cStyleMiddle.r) <~ cStyleEnd.r) ^^ {_.reduce(_+_)} |
+    regex(cStyleManyStars.r) ^^^ null |
+    regex(cXXStyleComment.r)
 
   protected val cXXStyleComment = """//[^\n\r]*"""
-  protected val cStyleComment = "(" + """/\*+\*/""" + "|" + """/\*+""" + """([^*\n\r]|\*+[^/*])+""" + """\*+/""" + ")"
+  private val cStyleManyStars = """/\*+\*/"""
+  private val cStyleStart = """/\*+"""
+  private val cStyleMiddle = """([^*\n\r]|\*+[^/*])+"""
+  private val cStyleEnd = """\*+/"""
+  protected val cStyleComment = "(" + cStyleManyStars + "|" + cStyleStart + cStyleMiddle + cStyleEnd + ")"
+
   protected val spaceBetweenWords = """[\t ]"""
 
   protected def regExOr(arg: String*): String = "(" + arg.reduce(_ + "|" + _) + ")"
