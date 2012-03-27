@@ -22,6 +22,7 @@ import org.freeciv.Connect;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class GenerateTest {
@@ -61,16 +62,30 @@ public class GenerateTest {
         writeJavaFile(bitwise);
         writeJavaFile(testCount);
 
+        HashMap<String, FieldTypeBasic> primitiveTypes = new HashMap<String, FieldTypeBasic>();
+        HashMap<String, FieldTypeBasic.Generator> generators = new HashMap<String, FieldTypeBasic.Generator>();
+        HashMap<String, NetworkIO> network = new HashMap<String, NetworkIO>();
+
+        for (IDependency mayBeNeeded : Hardcoded.values()) {
+            if (mayBeNeeded instanceof FieldTypeBasic)
+                primitiveTypes.put(((FieldTypeBasic) mayBeNeeded).getFieldTypeBasic(), (FieldTypeBasic)mayBeNeeded);
+            else if (mayBeNeeded instanceof FieldTypeBasic.Generator)
+                generators.put(mayBeNeeded.getIFulfillReq().getName(),
+                        (FieldTypeBasic.Generator)mayBeNeeded);
+            else if (mayBeNeeded instanceof NetworkIO)
+                network.put(mayBeNeeded.getIFulfillReq().getName(), (NetworkIO)mayBeNeeded);
+        }
+
         FieldTypeBasic.FieldTypeAlias uint8 =
-                Hardcoded.getBasicFieldType("uint8(int)").createFieldType("UINT8");
+                getPrimitiveFieldType(primitiveTypes, generators, network, "uint8", "int", "UINT8");
         FieldTypeBasic.FieldTypeAlias uint32 =
-                Hardcoded.getBasicFieldType("uint32(int)").createFieldType("UINT32");
+                getPrimitiveFieldType(primitiveTypes, generators, network, "uint32", "int", "UINT32");
         FieldTypeBasic.FieldTypeAlias string =
-                Hardcoded.getBasicFieldType("string(char)").createFieldType("STRING");
+                getPrimitiveFieldType(primitiveTypes, generators, network, "string", "char", "STRING");
         FieldTypeBasic.FieldTypeAlias bool =
-                Hardcoded.getBasicFieldType("bool8(bool)").createFieldType("BOOL");
+                getPrimitiveFieldType(primitiveTypes, generators, network, "bool8", "bool", "BOOL");
         FieldTypeBasic.FieldTypeAlias connection =
-                Hardcoded.getBasicFieldType("sint16(int)").createFieldType("CONNECTION");
+                getPrimitiveFieldType(primitiveTypes, generators, network, "sint16", "int", "CONNECTION");
 
         writeJavaFile(uint8);
         writeJavaFile(uint32);
@@ -153,6 +168,15 @@ public class GenerateTest {
             packetList.write(packet + "\n");
         }
         packetList.close();
+    }
+
+    private static FieldTypeBasic.FieldTypeAlias getPrimitiveFieldType(HashMap<String, FieldTypeBasic> primitiveTypes,
+                HashMap<String, FieldTypeBasic.Generator> generators, HashMap<String, NetworkIO> network,
+                String netType, String pType, String alias) {
+        if (primitiveTypes.containsKey(netType + "(" + pType + ")"))
+            return primitiveTypes.get(netType + "(" + pType + ")").createFieldType(alias);
+        else
+            return generators.get(pType).getBasicFieldTypeOnInput(network.get(netType)).createFieldType(alias);
     }
 
     private static void writePacket(Packet packet) throws IOException {

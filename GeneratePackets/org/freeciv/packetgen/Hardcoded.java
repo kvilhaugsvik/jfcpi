@@ -109,10 +109,6 @@ public class Hardcoded {
                 "throw new IllegalArgumentException(\"Value out of scope\");" + "\n";
     }
 
-    public static FieldTypeBasic getBasicFieldType(String src) {
-        return data.get(src);
-    }
-
     public static Collection<IDependency> values() {
         HashSet<IDependency> out = new HashSet<IDependency>(data.values());
         out.addAll(netCon);
