@@ -58,20 +58,6 @@ public class Hardcoded {
                         "value = from.readBoolean();",
                         "to.writeBoolean(value);",
                         "return 1;",
-                        false, Collections.<Requirement>emptySet()),
-                new FieldTypeBasic("sint8", "int",
-                        "Integer",
-                        new String[]{"this.value = value;"},
-                        "value = (int) from.readByte();",
-                        "to.writeByte(value);",
-                        "return 2;",
-                        false, Collections.<Requirement>emptySet()),
-                new FieldTypeBasic("sint32", "int",
-                        "Integer",
-                        new String[]{"this.value = value;"},
-                        "value = from.readInt();",
-                        "to.writeInt(value);",
-                        "return 4;",
                         false, Collections.<Requirement>emptySet())
         }) {
             data.put(src.getFieldTypeBasic(), src);
@@ -80,8 +66,10 @@ public class Hardcoded {
 
     public static final Collection<NetworkIO> netCon = Arrays.asList(
         new NetworkIO("uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte"),
+        new NetworkIO("sint8", "return 2;", "(int) from.readByte()", "to.writeByte"),
         new NetworkIO("uint16", "return 2;", "(int) from.readChar()", "to.writeChar"),
-        new NetworkIO("sint16", "return 2;", "(int) from.readShort()", "to.writeShort"));
+        new NetworkIO("sint16", "return 2;", "(int) from.readShort()", "to.writeShort"),
+        new NetworkIO("sint32", "return 4;", "from.readInt()", "to.writeInt"));
 
     private static final Collection<JavaNative> nativeJava = Arrays.asList(
             new JavaNative("int", "Integer")
