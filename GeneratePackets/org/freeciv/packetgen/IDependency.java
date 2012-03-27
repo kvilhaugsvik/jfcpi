@@ -21,6 +21,17 @@ public interface IDependency {
     public Requirement getIFulfillReq();
 
     /**
+     * Fulfill more than one thing.
+     */
+    public static interface ManyFulfiller extends IDependency {
+        /**
+         * Extra requirements fulfilled in addition to the primary fulfillment in getIFulfillReq.
+         * @return the additional requirements fulfilled.
+         */
+        public Collection<Requirement> getIAlsoFulfillReqs();
+    }
+
+    /**
      * Impose a total order on some objects of the type IDependency that contains everything required by all of its
      * elements and that has no circular requirements.
      *
