@@ -16,11 +16,9 @@ package org.freeciv.packetgen;
 
 import org.freeciv.types.FCEnum;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 
-public class Enum extends ClassWriter implements IDependency {
+public class Enum extends ClassWriter implements IDependency.ManyFulfiller {
     private final boolean bitwise;
     private final EnumElement invalidDefault;
     private final EnumElement countElement;
@@ -137,5 +135,10 @@ public class Enum extends ClassWriter implements IDependency {
     @Override
     public Requirement getIFulfillReq() {
         return new Requirement(super.getName(), Requirement.Kind.ENUM);
+    }
+
+    @Override
+    public Collection<Requirement> getIAlsoFulfillReqs() {
+        return Arrays.<Requirement>asList(new Requirement("enum " + super.getName(), Requirement.Kind.AS_JAVA_DATATYPE));
     }
 }
