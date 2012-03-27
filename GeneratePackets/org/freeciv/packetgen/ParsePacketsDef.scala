@@ -33,7 +33,7 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def comment = CComment |
     regex("""#[^\n\r]*""".r)
 
-  def packetName = regex("""PACKET_[A-Za-z0-9_]+""".r)
+  def packetName = regex(("PACKET_" + identifier).r)
 
   def packetFlag = "is-info" |
     "is-game-info" |
