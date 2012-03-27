@@ -18,10 +18,7 @@ import java.util.*;
 
 //TODO: Move data to file
 public class Hardcoded {
-    private static final HashMap<String, FieldTypeBasic> data = new HashMap<String, FieldTypeBasic>();
-
-    static {
-        for (FieldTypeBasic src: new FieldTypeBasic[]{
+    private static final Collection<FieldTypeBasic> primitiveFieldTypes = Arrays.asList(
                 new FieldTypeBasic("uint32", "int",
                         "Long",
                         new String[]{"this.value = value;"},
@@ -59,10 +56,7 @@ public class Hardcoded {
                         "to.writeBoolean(value);",
                         "return 1;",
                         false, Collections.<Requirement>emptySet())
-        }) {
-            data.put(src.getFieldTypeBasic(), src);
-        }
-    }
+    );
 
     public static final Collection<NetworkIO> netCon = Arrays.asList(
         new NetworkIO("uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte"), // to.writeByte wraps around so
@@ -81,7 +75,7 @@ public class Hardcoded {
     }
 
     public static Collection<IDependency> values() {
-        HashSet<IDependency> out = new HashSet<IDependency>(data.values());
+        HashSet<IDependency> out = new HashSet<IDependency>(primitiveFieldTypes);
         out.addAll(netCon);
         out.addAll(nativeJava);
         return out;
