@@ -117,20 +117,8 @@ public class Hardcoded {
                 getUInt8Enum("special_river_move"),
                 getUInt8Enum("sset_class"),
                 getUInt8Enum("sset_type"),
-                new FieldTypeBasic("uint16", "enum tile_special_type",
-                        "tile_special_type",
-                        new String[]{"this.value = value;"},
-                        "value = tile_special_type.valueOf((int) from.readChar());",
-                        "to.writeChar(value.getNumber());",
-                        "return 2;",
-                        false, Arrays.<Requirement>asList(new Requirement("tile_special_type", Requirement.Kind.ENUM))),
-                new FieldTypeBasic("sint16", "enum event_type",
-                        "event_type",
-                        new String[]{"this.value = value;"},
-                        "value = event_type.valueOf(from.readShort());",
-                        "to.writeShort(value.getNumber());",
-                        "return 2;",
-                        false, Arrays.<Requirement>asList(new Requirement("event_type", Requirement.Kind.ENUM)))
+                getEnum("tile_special_type", "uint16", "return 2;", "(int) from.readChar()", "to.writeChar"),
+                getEnum("event_type", "sint16", "return 2;", "from.readShort()", "to.writeShort")
 
         }) {
             data.put(src.getFieldTypeBasic(), src);
@@ -161,14 +149,18 @@ public class Hardcoded {
     }
 
     private static FieldTypeBasic getUInt8Enum(String named) {
+        return getEnum(named, "uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte");
+    }
+
+    public static FieldTypeBasic getEnum(String named, String iotype, String iosize, String ioread, String iowrite) {
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement(named, Requirement.Kind.ENUM));
-        return new FieldTypeBasic("uint8", "enum " + named,
+        return new FieldTypeBasic(iotype, "enum " + named,
                 named,
                 new String[]{"this.value = value;"},
-                "value = " + named + ".valueOf(from.readUnsignedByte());",
-                "to.writeByte(value.getNumber());",
-                "return 1;",
+                "value = " + named + ".valueOf(" + ioread + ");",
+                iowrite + "(value.getNumber());",
+                iosize,
                 false, req);
     }
 
