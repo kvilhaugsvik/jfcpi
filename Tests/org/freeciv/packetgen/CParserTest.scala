@@ -291,6 +291,18 @@ class CParserSyntaxTest {
 """
     assertParesSuccess(input, parser.parse(parser.expr, new parser.PackratReader(new CharArrayReader(input.toArray))))
   }
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test pure parsing of typedefs
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def typedefSimpleInt =
+    parsesCorrectly("typedef int not_complicated;", new ParseCCode())
+
+  @Test def typedefUnsignedInt =
+    parsesCorrectly("typedef unsigned int more_complicated;", new ParseCCode())
+
+  @Test def typedefEnum =
+    parsesCorrectly("typedef enum test more_complicated;", new ParseCCode())
 }
 
 class CParserSemanticTest {

@@ -30,6 +30,7 @@ class ParseCCode extends ParseShared {
   def startOfSpecEnum: String = DEFINE + "\\s+" + SPECENUM + NAME
   def startOfCEnum: String = "enum"
   def startOfConstant: String = DEFINE
+  def startOfTypeDefinition : String = "typedef"
 
   def startsOfExtractable = List(
     startOfConstant + "\\s+" + identifier,
@@ -137,7 +138,7 @@ class ParseCCode extends ParseShared {
   private var ignoreNewLinesFlag = true
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
 
-
+  def typedef = startOfTypeDefinition ~ cType ~ identifierRegEx ~ ";"
 
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
 
@@ -147,6 +148,7 @@ class ParseCCode extends ParseShared {
 
   def expr = cEnumDef |
     specEnumDef |
+    typedef |
     constantValueDef |
     CComment
 }
