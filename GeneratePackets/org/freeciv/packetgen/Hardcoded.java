@@ -22,20 +22,6 @@ public class Hardcoded {
 
     static {
         for (FieldTypeBasic src: new FieldTypeBasic[]{
-                new FieldTypeBasic("uint8", "int",
-                        "Integer",
-                        new String[]{"this.value = value;"},
-                        "value = from.readUnsignedByte();",
-                        "to.writeByte(value);",
-                        "return 1;",
-                        false, Collections.<Requirement>emptySet()),
-                new FieldTypeBasic("uint16", "int",
-                        "Integer",
-                        new String[]{"this.value = value;"},
-                        "value = (int) from.readChar();",
-                        "to.writeChar(value);",
-                        "return 2;",
-                        false, Collections.<Requirement>emptySet()),
                 new FieldTypeBasic("uint32", "int",
                         "Long",
                         new String[]{"this.value = value;"},
@@ -80,13 +66,6 @@ public class Hardcoded {
                         "to.writeByte(value);",
                         "return 2;",
                         false, Collections.<Requirement>emptySet()),
-                new FieldTypeBasic("sint16", "int",
-                        "Integer",
-                        new String[]{"this.value = value;"},
-                        "value = (int) from.readShort();",
-                        "to.writeShort(value);",
-                        "return 2;",
-                        false, Collections.<Requirement>emptySet()),
                 new FieldTypeBasic("sint32", "int",
                         "Integer",
                         new String[]{"this.value = value;"},
@@ -104,6 +83,10 @@ public class Hardcoded {
         new NetworkIO("uint16", "return 2;", "(int) from.readChar()", "to.writeChar"),
         new NetworkIO("sint16", "return 2;", "(int) from.readShort()", "to.writeShort"));
 
+    private static final Collection<JavaNative> nativeJava = Arrays.asList(
+            new JavaNative("int", "Integer")
+    );
+
     public static String arrayEaterScopeCheck(String check) {
         return "if (" + check + ") " +
                 "throw new IllegalArgumentException(\"Value out of scope\");" + "\n";
@@ -112,6 +95,7 @@ public class Hardcoded {
     public static Collection<IDependency> values() {
         HashSet<IDependency> out = new HashSet<IDependency>(data.values());
         out.addAll(netCon);
+        out.addAll(nativeJava);
         return out;
     }
 
@@ -144,5 +128,36 @@ public class Hardcoded {
         }
 
         return out;
+    }
+
+    private static class JavaNative implements IDependency, FieldTypeBasic.Generator {
+        private final Requirement meInC;
+        private final String meInJava;
+
+        private JavaNative(String nameInC, String nameInJava) {
+            this.meInJava = nameInJava;
+            this.meInC = new Requirement(nameInC, Requirement.Kind.AS_JAVA_DATATYPE);
+        }
+
+        @Override
+        public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
+            return new FieldTypeBasic(io.getIFulfillReq().getName(), meInC.getName(),
+                    meInJava,
+                    new String[]{"this.value = value;"},
+                    "value = " + io.getRead() + ";",
+                    io.getWrite() + "(value);",
+                    io.getSize(),
+                    false, Collections.<Requirement>emptySet());
+        }
+
+        @Override
+        public Collection<Requirement> getReqs() {
+            return Collections.<Requirement>emptySet();
+        }
+
+        @Override
+        public Requirement getIFulfillReq() {
+            return meInC;
+        }
     }
 }
