@@ -40,11 +40,12 @@ public class PacketsStore {
     private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype) {
         Requirement wantPType = new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE);
         Requirement wantIOType = new Requirement(iotype, Requirement.Kind.FROM_NETWORK_TO_INT);
-        if (!requirements.isAwareOfPotentialProvider(wantPType)) {
-            notFoundWhenNeeded.add(wantPType);
-            return null;
-        } else if (!requirements.isAwareOfPotentialProvider(wantIOType)) {
-            notFoundWhenNeeded.add(wantIOType);
+        if (!requirements.isAwareOfPotentialProvider(wantPType)
+                || !requirements.isAwareOfPotentialProvider(wantIOType)) {
+            if (!requirements.isAwareOfPotentialProvider(wantPType))
+                notFoundWhenNeeded.add(wantPType);
+            if (!requirements.isAwareOfPotentialProvider(wantIOType))
+                notFoundWhenNeeded.add(wantIOType);
             return null;
         }
 
