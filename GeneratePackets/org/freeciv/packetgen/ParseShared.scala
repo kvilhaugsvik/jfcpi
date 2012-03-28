@@ -69,6 +69,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   // The literal names of the built in types are valid identifiers.
   // If a need to be more strict arises only accept identifiers in struct/union/enum and use built in type names
+  // TODO: if needed: support defining an anonymous enum, struct or union
   def cType: Parser[List[String]] =
     ("struct"|"union"|"enum") ~ cType ^^ {found => found._1 :: found._2} |
     ("unsigned"|"signed") ~ cType ^^ {found => found._1 :: found._2} |
