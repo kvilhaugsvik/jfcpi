@@ -66,4 +66,32 @@ class ParseSharedTest {
   @Test def binMinusUminus = assertIntExpressionBecomes("2 - (-3)", "2 - -3")
   @Test def uminusParenBinMinus = assertIntExpressionBecomes("-(2 - 3)", "-(2 - 3)")
   @Test def manyPlus = assertIntExpressionBecomes("(((((4 + 4) + 4) + 4) + 4) + 4) + 4", "4+4+4+4+4+4+4")
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Normalization of C int type declarations
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def shortIntIsShort = assertEquals(
+    parserShared.normalizeCIntDeclaration(List("short", "int")),
+    parserShared.normalizeCIntDeclaration(List("short"))
+  )
+
+  @Test def signedIsInt = assertEquals(
+    parserShared.normalizeCIntDeclaration(List("signed")),
+    parserShared.normalizeCIntDeclaration(List("int"))
+  )
+
+  @Test def signedLongIsLongInt = assertEquals(
+    parserShared.normalizeCIntDeclaration(List("signed", "long")),
+    parserShared.normalizeCIntDeclaration(List("long", "int"))
+  )
+
+  @Test def uintIsUnsigned = assertEquals(
+    parserShared.normalizeCIntDeclaration(List("uint")),
+    parserShared.normalizeCIntDeclaration(List("unsigned"))
+  )
+
+  @Test def signedLongIntIsLong = assertEquals(
+    parserShared.normalizeCIntDeclaration(List("signed", "long", "int")),
+    parserShared.normalizeCIntDeclaration(List("long"))
+  )
 }

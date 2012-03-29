@@ -75,6 +75,41 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     ("unsigned"|"signed") ~ cType ^^ {found => found._1 :: found._2} |
     identifierRegEx ^^ {List(_)}
 
+  /**
+   * Normalize a C integer type to easier to process.
+   * In other words make "signed short" and "short" the same list, here "short int".
+   * @param tokens a list of tokens that represent a C int type
+   * @return the tokens in a standard form
+   */
+  def normalizeCIntDeclaration(tokens : List[String]): List[String] = {
+    val processed = expandCIntDeclaration(tokens);
+    if ("signed".equals(processed.head))
+      processed.tail // signed is default so remove it
+    else
+      processed
+  }
+
+  /**
+   * Almost normalize a C integer type. "signed" isn't normalized. Only use this if you fix "signed" your self.
+   * @param tokens a list of tokens that represent a C int type
+   * @return the tokens in a standard form
+   */
+  protected def expandCIntDeclaration(tokens : List[String]): List[String] = tokens match {
+    case Nil => Nil
+    case "uint" :: (tail : List[String]) => "unsigned" :: "int" :: expandCIntDeclaration(tail) // a C extension
+    case "sint" :: (tail : List[String]) => "int" :: expandCIntDeclaration(tail) // a C extension. Signed is default
+    case (lastToken : String) :: Nil => expandLastInt(lastToken) // last token isn't sin or uint so expand if needed
+    case token :: (tail : List[String]) => token :: expandCIntDeclaration(tail)
+  }
+
+  @inline private def expandLastInt(lastToken : String): List[String] = lastToken match {
+    case "short" => "short" :: "int" :: Nil
+    case "long" => "long" :: "int" :: Nil
+    case "unsigned" => "unsigned" :: "int" :: Nil
+    case "signed" => "int" :: Nil // signed is default for int
+    case _ => lastToken :: Nil
+  }
+
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean
 
   private val spaceOrComment =
