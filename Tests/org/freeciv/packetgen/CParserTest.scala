@@ -310,7 +310,6 @@ class CParserSyntaxTest {
   @Test def bvIntegerLong = parsesCorrectly("BV_DEFINE(bv_test, 8);", new ParseCCode())
   @Test def bvAConstantLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", new ParseCCode())
   @Test def bvAConstantAddIntLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", new ParseCCode())
-
 }
 
 class CParserSemanticTest {
@@ -553,6 +552,41 @@ class CParserSemanticTest {
     assertFalse("Should depend on two other values", reqs.isEmpty)
     assertTrue("Should depend on WRONG", reqs.contains(new Requirement("WRONG", Requirement.Kind.VALUE)))
     assertTrue("Should depend on WRONG", reqs.contains(new Requirement("SIMPLE", Requirement.Kind.VALUE)))
+  }
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test pure parsing of typedefs
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def bvInteger = {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("BV_DEFINE(bv_test, 8);", parser, parser.exprConverted).get
+
+    assertTrue("No need for any constant", result.getReqs.isEmpty)
+    assertEquals("Should provide it self",
+      new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
+      result.getIFulfillReq)
+  }
+
+  @Test def bvConstant = {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", parser, parser.exprConverted).get
+
+    assertTrue("Should need CONSTANT", result.getReqs.contains(
+      new Requirement("CONSTANT", Requirement.Kind.VALUE)))
+    assertEquals("Should provide it self",
+      new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
+      result.getIFulfillReq)
+  }
+
+  @Test def bvConstantAddInteger = {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", parser, parser.exprConverted).get
+
+    assertTrue("Should need CONSTANT", result.getReqs.contains(
+      new Requirement("CONSTANT", Requirement.Kind.VALUE)))
+    assertEquals("Should provide it self",
+      new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
+      result.getIFulfillReq)
   }
 }
 

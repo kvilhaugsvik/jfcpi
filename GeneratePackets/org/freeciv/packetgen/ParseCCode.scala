@@ -190,11 +190,13 @@ class ParseCCode extends ParseShared {
 
   def bitVectorDef = startOfBitVector ~ "(" ~> identifierRegEx ~ ("," ~> intExpr) <~ ")" ~ ";"
 
+  def bitVectorDefConverted = bitVectorDef ^^ {vec => new BitVector(vec._1, vec._2)}
+
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
-  def exprConverted = cEnumDefConverted | specEnumDefConverted | typedefConverted | constantValueDefConverted
+  def exprConverted = cEnumDefConverted | specEnumDefConverted | bitVectorDefConverted | typedefConverted | constantValueDefConverted
 
   def expr = cEnumDef |
     specEnumDef |
