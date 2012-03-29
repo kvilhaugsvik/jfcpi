@@ -34,6 +34,7 @@ class ParseCCode extends ParseShared {
 
   def startsOfExtractable = List(
     startOfConstant + "\\s+" + identifier,
+    startOfTypeDefinition + "\\s+",
     startOfCEnum + "\\s+" + identifier,
     startOfSpecEnum + "\\s+" + identifier
   )
@@ -138,13 +139,57 @@ class ParseCCode extends ParseShared {
   private var ignoreNewLinesFlag = true
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
 
-  def typedef = startOfTypeDefinition ~ cType ~ identifierRegEx ~ ";"
+  def typedef = startOfTypeDefinition ~> cType ~ identifierRegEx <~ ";"
+
+  // TODO: if needed: support defining a anonymous enum, struct or union instead of refering to an existing definition
+  // in that case throw away typedef and return the anon
+  def typedefConverted = typedef ^^ {
+    case types ~ name => {
+      val (isSigned, dec) = expandCIntDeclaration(types) match {
+        case "unsigned" :: tail => false -> tail
+        case "signed" :: tail => true -> tail
+        case all => true -> all // signed is default for int. The compiler choose for char.
+      }
+
+      val (isNative, wrappedType) = dec match {
+        case "char" :: Nil => pickJavaInt(8, isSigned)
+        case "short" :: "int" :: Nil => pickJavaInt(16, isSigned)
+        case "int" :: Nil => pickJavaInt(32, isSigned) // at least 16 bits. Assume 32 bits
+        case "long" :: "int" :: Nil => pickJavaInt(32, isSigned) // at least 32 bits
+        case "long" :: "long" :: "int" :: Nil => pickJavaInt(64, isSigned) // at least 64 bits
+
+        case "float" :: Nil => true -> "Float"
+        case "double" :: Nil => true -> "Double"
+
+        case "bool" :: Nil => true -> "Boolean"
+
+        case "enum" :: name :: Nil => false -> name
+        case "struct" :: name :: Nil => false -> name
+        case "union" :: name :: Nil => false -> name
+      } // TODO: isSigned and bits can be used to check lower range on unsigned ints
+
+      new DefinedCType(name, wrappedType, if (isNative) null else dec.reduce(_+" "+_))
+    }
+  }
+
+  def pickJavaInt(sizeInBytes: Int, isSigned: Boolean): (Boolean, String) = {
+    // Java don't have unsigned so something bigger is needed...
+    val realSize: Int = if (isSigned) sizeInBytes else sizeInBytes + 1
+
+    // Java really really likes int so don't use shorter values
+    if (realSize <= 32)
+      true -> "Integer"
+    else if (realSize <= 64)
+      true -> "Long"
+    else
+      true -> "BigInteger"
+  }
 
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
-  def exprConverted = cEnumDefConverted | specEnumDefConverted | constantValueDefConverted
+  def exprConverted = cEnumDefConverted | specEnumDefConverted | typedefConverted | constantValueDefConverted
 
   def expr = cEnumDef |
     specEnumDef |
