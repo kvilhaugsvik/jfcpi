@@ -158,14 +158,14 @@ class ParseCCode extends ParseShared {
         case "long" :: "int" :: Nil => pickJavaInt(32, isSigned) // at least 32 bits
         case "long" :: "long" :: "int" :: Nil => pickJavaInt(64, isSigned) // at least 64 bits
 
-        case "float" :: Nil => true -> "Float"
-        case "double" :: Nil => true -> "Double"
+//        case "float" :: Nil => true -> "Float"
+//        case "double" :: Nil => true -> "Double"
 
-        case "bool" :: Nil => true -> "Boolean"
+//        case "bool" :: Nil => true -> "Boolean"
 
         case "enum" :: name :: Nil => false -> name
-        case "struct" :: name :: Nil => false -> name
-        case "union" :: name :: Nil => false -> name
+//        case "struct" :: name :: Nil => false -> name
+//        case "union" :: name :: Nil => false -> name
       } // TODO: isSigned and bits can be used to check lower range on unsigned ints
 
       new DefinedCType(name, wrappedType, if (isNative) null else dec.reduce(_+" "+_))
@@ -182,7 +182,9 @@ class ParseCCode extends ParseShared {
     else if (realSize <= 64)
       true -> "Long"
     else
-      true -> "BigInteger"
+      throw new UnsupportedOperationException("No Java integer supports " + realSize + " bits." +
+        " BigInteger may be used when users of this method can handle making a constructor for it.")
+//      true -> "BigInteger"
   }
 
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
