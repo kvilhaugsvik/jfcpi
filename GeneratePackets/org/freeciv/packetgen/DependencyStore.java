@@ -33,11 +33,15 @@ public final class DependencyStore {
      */
     public void addPossibleRequirement(IDependency item) {
         if (null == item) throw new NullPointerException(nullNotAllowed);
-        existing.put(item.getIFulfillReq(), item);
+        putAllProvdesIn(item, existing);
+        dependenciesUnfulfilled.clear();
+    }
+
+    private static void putAllProvdesIn(IDependency item, HashMap<Requirement, IDependency> depCategory) {
+        depCategory.put(item.getIFulfillReq(), item);
         if (item instanceof IDependency.ManyFulfiller)
             for (Requirement also : ((IDependency.ManyFulfiller) item).getIAlsoFulfillReqs())
-                existing.put(also, item);
-        dependenciesUnfulfilled.clear();
+                depCategory.put(also, item);
     }
 
     public void addWanted(IDependency item) {
@@ -68,7 +72,7 @@ public final class DependencyStore {
     }
 
     private boolean declareFulfilled(IDependency item) {
-        dependenciesFulfilled.put(item.getIFulfillReq(), item);
+        putAllProvdesIn(item, dependenciesFulfilled);
         return true;
     }
 
