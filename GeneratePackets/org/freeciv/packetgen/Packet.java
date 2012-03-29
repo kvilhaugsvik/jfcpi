@@ -157,7 +157,7 @@ public class Packet extends ClassWriter implements IDependency {
             encodeFields.add("// body");
             for (Field field: fields)
                 encodeFields.addAll(Arrays.asList(forElementsInField(field, "",
-                        field.getVariableName() + "[i].encodeTo(to);", "")));
+                        "this." + field.getVariableName() + "[i].encodeTo(to);", "")));
         }
         addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encodeFields.toArray(new String[0]));
     }
@@ -168,14 +168,14 @@ public class Packet extends ClassWriter implements IDependency {
             if (field.hasDeclarations())
                 encodeFieldsLen.addAll(Arrays.asList(forElementsInField(field,
                         "int " + field.getVariableName() + "Len" + " = " + "0;",
-                        field.getVariableName() + "Len" + "+=" + field.getVariableName() + "[i].encodedLength();",
-                        "")));
+                        field.getVariableName() + "Len" + "+=" + "this." + field.getVariableName() +
+                                "[i].encodedLength();", "")));
         encodeFieldsLen.add("return " + (hasTwoBytePacketNumber ? "4" : "3"));
         if (0 < fields.length) {
             for (Field field: fields)
                 encodeFieldsLen.add("\t" + "+ " + ((field.hasDeclarations())?
                         field.getVariableName() + "Len":
-                        field.getVariableName() + ".encodedLength()"));
+                        "this." + field.getVariableName() + ".encodedLength()"));
         }
         encodeFieldsLen.add(encodeFieldsLen.removeLast() + ";");
         addMethodPublicReadObjectState(null, "int", "getEncodedSize", encodeFieldsLen.toArray(new String[0]));
@@ -187,10 +187,10 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field: fields)
             if (field.hasDeclarations())
                 getToString.addAll(Arrays.asList(forElementsInField(field, "out += \"\\n\\t" + field.getVariableName() +
-                        " += (\";", "out += " + field.getVariableName() + "[i].getValue();", "out += \")\";")));
+                        " += (\";", "out += " + "this." + field.getVariableName() + "[i].getValue();", "out += \")\";")));
             else
                 getToString.add("out += \"\\n\\t" + field.getVariableName() +
-                        " = \" + " + field.getVariableName() + ".getValue();");
+                        " = \" + " + "this." + field.getVariableName() + ".getValue();");
         getToString.add("");
         getToString.add("return out + \"\\n\";");
         addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
@@ -199,7 +199,7 @@ public class Packet extends ClassWriter implements IDependency {
     private void addGetAsField(Field field) {
         addMethodPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
                 + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
-                "return " + field.getVariableName() + ";");
+                "return " + "this." + field.getVariableName() + ";");
     }
 
     private void addJavaGetter(Field field) {
@@ -210,9 +210,9 @@ public class Packet extends ClassWriter implements IDependency {
                         forElementsInField(field,
                                 field.getJType() + field.getArrayDeclaration() + " out = new " +
                                         field.getJType() + field.getNewCreation(".getValue()") + ";",
-                                "out[i] = " + field.getVariableName() + "[i].getValue();",
+                                "out[i] = " + "this." + field.getVariableName() + "[i].getValue();",
                                 "return out;") :
-                        new String[]{"return " + field.getVariableName() + ".getValue();"}
+                        new String[]{"return " + "this." + field.getVariableName() + ".getValue();"}
         );
     }
 
@@ -230,7 +230,7 @@ public class Packet extends ClassWriter implements IDependency {
         String replaceWith = "";
         for (int counter = 0; counter < level; counter++) {
             wrappedInFor[counter] = "for(int " + getCounterNumber(counter) + " = 0; " +
-                    getCounterNumber(counter) + " < " + field.getVariableName() + replaceWith + ".length; " +
+                    getCounterNumber(counter) + " < " + "this." + field.getVariableName() + replaceWith + ".length; " +
                     getCounterNumber(counter) + "++) {";
             wrappedInFor[1 + counter + level] = "}";
             replaceWith += "[" + getCounterNumber(counter) + "]";
