@@ -303,6 +303,14 @@ class CParserSyntaxTest {
 
   @Test def typedefEnum =
     parsesCorrectly("typedef enum test more_complicated;", new ParseCCode())
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test pure parsing of typedefs
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def bvIntegerLong = parsesCorrectly("BV_DEFINE(bv_test, 8);", new ParseCCode())
+  @Test def bvAConstantLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", new ParseCCode())
+  @Test def bvAConstantAddIntLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", new ParseCCode())
+
 }
 
 class CParserSemanticTest {

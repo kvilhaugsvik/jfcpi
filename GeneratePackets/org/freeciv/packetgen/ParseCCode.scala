@@ -31,6 +31,7 @@ class ParseCCode extends ParseShared {
   def startOfCEnum: String = "enum"
   def startOfConstant: String = DEFINE
   def startOfTypeDefinition : String = "typedef"
+  def startOfBitVector: String = "BV_DEFINE"
 
   def startsOfExtractable = List(
     startOfConstant + "\\s+" + identifier,
@@ -187,6 +188,8 @@ class ParseCCode extends ParseShared {
 //      true -> "BigInteger"
   }
 
+  def bitVectorDef = startOfBitVector ~ "(" ~> identifierRegEx ~ ("," ~> intExpr) <~ ")" ~ ";"
+
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
@@ -195,6 +198,7 @@ class ParseCCode extends ParseShared {
 
   def expr = cEnumDef |
     specEnumDef |
+    bitVectorDef |
     typedef |
     constantValueDef |
     CComment
