@@ -36,6 +36,7 @@ class ParseCCode extends ParseShared {
   def startsOfExtractable = List(
     startOfConstant + "\\s+" + identifier,
     startOfTypeDefinition + "\\s+",
+    startOfBitVector,
     startOfCEnum + "\\s+" + identifier,
     startOfSpecEnum + "\\s+" + identifier
   )
