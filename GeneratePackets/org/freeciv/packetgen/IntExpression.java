@@ -31,6 +31,42 @@ public class IntExpression {
         return expr.isValue() ? expr.toString() : "(" + expr + ")";
     }
 
+    public boolean hasNoVariables() {
+        return reqs.isEmpty();
+    }
+
+    public int evaluate() {
+        if (!hasNoVariables()) {
+            throw new UnsupportedOperationException("Can't evaluate unknown constants");
+        }
+        if (isValue())
+            return Integer.parseInt(operatorOrValue);
+        if (noPostfix())
+            noToIntSupport("Postfix");
+        if (noPrefix()) {
+            if ("-".equals(operatorOrValue))
+                return -rhs.evaluate();
+            if ("+".equals(operatorOrValue))
+                return rhs.evaluate();
+            noToIntSupport("Unary");
+        }
+        if ("+".equals(operatorOrValue))
+            return lhs.evaluate() + rhs.evaluate();
+        if ("-".equals(operatorOrValue))
+            return lhs.evaluate() - rhs.evaluate();
+        if ("*".equals(operatorOrValue))
+            return lhs.evaluate() * rhs.evaluate();
+        if ("/".equals(operatorOrValue))
+            return lhs.evaluate() / rhs.evaluate();
+        if ("%".equals(operatorOrValue))
+            return lhs.evaluate() % rhs.evaluate();
+        return noToIntSupport("Binary");
+    }
+
+    private int noToIntSupport(String op) {
+        throw new UnsupportedOperationException(op + " operator " + operatorOrValue + " not supported for evaluation");
+    }
+
     @Override
     public String toString() {
         if (isValue())

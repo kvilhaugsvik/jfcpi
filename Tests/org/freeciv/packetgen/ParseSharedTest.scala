@@ -67,6 +67,32 @@ class ParseSharedTest {
   @Test def uminusParenBinMinus = assertIntExpressionBecomes("-(2 - 3)", "-(2 - 3)")
   @Test def manyPlus = assertIntExpressionBecomes("(((((4 + 4) + 4) + 4) + 4) + 4) + 4", "4+4+4+4+4+4+4")
 
+  // Semantic: hasNoVariables
+  @Test def numberIsNumber = assertTrue("The number 4 should be a number",
+    CParserTest.parsesCorrectly("4", parserShared, parserShared.intExpr).get.hasNoVariables)
+  @Test def constantIsConstant = assertFalse("The constant CONS should be a constant",
+    CParserTest.parsesCorrectly("CONS", parserShared, parserShared.intExpr).get.hasNoVariables)
+  @Test def negativeNumberIsNumber = assertTrue("An expression of numbers should be a number",
+    CParserTest.parsesCorrectly("-4", parserShared, parserShared.intExpr).get.hasNoVariables)
+  @Test def numberExpressionIsNumber = assertTrue("An expression of numbers should be a number",
+    CParserTest.parsesCorrectly("4 + 5 * (2 - 3 % 4) / 7", parserShared, parserShared.intExpr).get.hasNoVariables)
+  @Test def expressionWithConsIsNotANumber = assertFalse("An expression that has a constant is no pure number",
+    CParserTest.parsesCorrectly("4 + 5 * (2 - (3 % CONS))", parserShared, parserShared.intExpr).get.hasNoVariables)
+
+  // Semantic: calculates
+  @Test def numberIsSelf = assertEquals("The number 4 should be 4",
+    4,
+    CParserTest.parsesCorrectly("4", parserShared, parserShared.intExpr).get.evaluate)
+  @Test def negativeNumberIsSelf = assertEquals("The expression -4 should be -4",
+    -4,
+    CParserTest.parsesCorrectly("-4", parserShared, parserShared.intExpr).get.evaluate)
+  @Test def numberExpressionIsResult = assertEquals("Wrong result",
+    -4,
+    CParserTest.parsesCorrectly("((1 + 2) * 3 / 4 % 5) - 6", parserShared, parserShared.intExpr).get.evaluate)
+  @Test(expected = classOf[UnsupportedOperationException]) def constantWillNotWork {
+    CParserTest.parsesCorrectly("CONS", parserShared, parserShared.intExpr).get.evaluate
+  }
+
   /*--------------------------------------------------------------------------------------------------------------------
   Normalization of C int type declarations
   --------------------------------------------------------------------------------------------------------------------*/
