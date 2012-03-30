@@ -3,8 +3,12 @@ package org.freeciv.packetgen;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 public class IntExpression {
+    private static final String CONSTANTS_CLASS = "Constants" + ".";
+    private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(CONSTANTS_CLASS);
+
     private final String operatorOrValue;
     private final IntExpression lhs;
     private final IntExpression rhs;
@@ -79,6 +83,10 @@ public class IntExpression {
             return wrapNeeded(lhs) + " " + operatorOrValue + " " + wrapNeeded(rhs);
     }
 
+    public String toStringNotJava() {
+        return FIND_CONSTANTS_CLASS.matcher(toString()).replaceAll("");
+    }
+
     private boolean noPostfix() {
         return null == rhs;
     }
@@ -108,7 +116,7 @@ public class IntExpression {
     }
 
     public static IntExpression variable(String name) {
-        return new IntExpression("Constants" + "." + name, null, null, new Requirement(name, Requirement.Kind.VALUE));
+        return new IntExpression(CONSTANTS_CLASS + name, null, null, new Requirement(name, Requirement.Kind.VALUE));
     }
 
     public Collection<Requirement> getReqs() {

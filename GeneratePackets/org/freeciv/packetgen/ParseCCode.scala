@@ -108,7 +108,7 @@ class ParseCCode extends ParseShared {
       new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues: _*)
   }
 
-  def enumValue = regex("\\w+".r)
+  def enumValue = intExpr
 
   def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment) ^^ {
     case element~value => (element -> value)
@@ -132,11 +132,13 @@ class ParseCCode extends ParseShared {
       }): _*)
   }
 
-  def parseEnumValue(name: String, value: String, from: HashMap[String, ClassWriter.EnumElement]): Int =
-    if (from.containsKey(value))
-      from.get(value).getNumber
+  def parseEnumValue(name: String, value: IntExpression, from: HashMap[String, ClassWriter.EnumElement]): Int =
+    if (from.containsKey(value.toStringNotJava)) // a constant on this enum
+      from.get(value.toStringNotJava).getNumber
+    else if (value.hasNoVariables) // a number
+      value.evaluate()
     else
-      value.toInt
+      throw new UnsupportedOperationException("Can't calculate value depending on external reference")
 
   private var ignoreNewLinesFlag = true
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
