@@ -118,19 +118,24 @@ class ParseCCode extends ParseShared {
   def cEnumDef = regex(startOfCEnum.r) ~> regex(identifier.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
 
   def cEnumDefConverted = cEnumDef ^^ {asStructures =>
-    var globalNumbers: Int = 0
-    val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
     new Enum(asStructures._1.asInstanceOf[String],
       false,
-      asStructures._2.map(elem => {
-        if (!elem._2.isEmpty)
-          globalNumbers = parseEnumValue(elem._1, elem._2.get, alreadyRead)
-        val number = globalNumbers
-        globalNumbers += 1
-        val enumVal = newEnumValue(elem._1, number)
-        alreadyRead.put(elem._1, enumVal)
-        enumVal
-      }): _*)
+      countedCEnumElements(asStructures._2): _*)
+  }
+
+  def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
+    var globalNumbers: Int = 0
+    val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
+
+    elements.map(elem => {
+      if (!elem._2.isEmpty)
+        globalNumbers = parseEnumValue(elem._1, elem._2.get, alreadyRead)
+      val number = globalNumbers
+      globalNumbers += 1
+      val enumVal = newEnumValue(elem._1, number)
+      alreadyRead.put(elem._1, enumVal)
+      enumVal
+    })
   }
 
   def parseEnumValue(name: String, value: IntExpression, from: HashMap[String, ClassWriter.EnumElement]): Int =
