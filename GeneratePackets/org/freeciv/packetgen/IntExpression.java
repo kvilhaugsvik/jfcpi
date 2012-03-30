@@ -24,7 +24,7 @@ public class IntExpression {
     }
 
     private boolean isValue() {
-        return (null == lhs && null == rhs);
+        return (noPrefix() && noPostfix());
     }
 
     private static String wrapNeeded(IntExpression expr) {
@@ -35,12 +35,20 @@ public class IntExpression {
     public String toString() {
         if (isValue())
             return operatorOrValue;
-        else if (null == lhs)
+        else if (noPrefix())
             return operatorOrValue + wrapNeeded(rhs);
-        else if (null == rhs)
+        else if (noPostfix())
             return wrapNeeded(lhs) + operatorOrValue;
         else
             return wrapNeeded(lhs) + " " + operatorOrValue + " " + wrapNeeded(rhs);
+    }
+
+    private boolean noPostfix() {
+        return null == rhs;
+    }
+
+    private boolean noPrefix() {
+        return null == lhs;
     }
 
     public static IntExpression binary(String operator, IntExpression lhs, IntExpression rhs) {
