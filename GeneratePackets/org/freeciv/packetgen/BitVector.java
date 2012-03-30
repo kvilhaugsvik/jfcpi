@@ -1,15 +1,15 @@
 package org.freeciv.packetgen;
 
-import java.util.Collection;
+import java.util.*;
 
-public class BitVector extends ClassWriter implements IDependency {
+public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final Collection<Requirement> iRequire;
     private final Requirement iProvide;
     public BitVector(String name, IntExpression bits) {
         super(org.freeciv.types.BitVector.class.getPackage(), new String[]{"org.freeciv.packet.Constants"},
                 "Freeciv C code", name, "BitVector", null);
 
-        addClassConstant("int", "size", bits.toString());
+        addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
 
         addConstructorPublic("", getName(), "byte[] from", "super(size, " + "from);");
         addConstructorPublic("", getName(), "boolean[] from", "super(from);");
@@ -27,5 +27,26 @@ public class BitVector extends ClassWriter implements IDependency {
     @Override
     public Requirement getIFulfillReq() {
         return iProvide;
+    }
+
+    @Override
+    public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
+        final String bvName = iProvide.getName();
+        final String size = "1 + (" + bvName + ".size" + " - 1) / 8";
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName,
+                bvName,
+                new String[]{"this.value = value;"},
+                "byte[] innBuffer = new byte[" + size + "];\n"
+                        + "from.readFully(innBuffer);\n"
+                        + "value = new " + bvName + "(innBuffer);",
+                "to.write(value.getAsByteArray());",
+                "return " + size + ";",
+                false,
+                Arrays.asList(iProvide));
+    }
+
+    @Override
+    public Requirement.Kind needsDataInFormat() {
+        return Requirement.Kind.FROM_NETWORK_DUMMY;
     }
 }

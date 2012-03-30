@@ -59,6 +59,7 @@ public class Hardcoded {
     );
 
     public static final Collection<NetworkIO> netCon = Arrays.asList(
+        new NetworkIO("bitvector"),
         new NetworkIO("uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte"), // to.writeByte wraps around so
         new NetworkIO("sint8", "return 1;", "(int) from.readByte()", "to.writeByte"),   // -128 shares encoding with 128
         new NetworkIO("uint16", "return 2;", "(int) from.readChar()", "to.writeChar"),
