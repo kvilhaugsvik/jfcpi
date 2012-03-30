@@ -45,6 +45,11 @@ public class DefinedCType implements IDependency, FieldTypeBasic.Generator {
     }
 
     @Override
+    public Requirement.Kind needsDataInFormat() {
+        return Requirement.Kind.FROM_NETWORK_TO_INT;
+    }
+
+    @Override
     public Collection<Requirement> getReqs() {
         return Collections.<Requirement>emptySet();
     }

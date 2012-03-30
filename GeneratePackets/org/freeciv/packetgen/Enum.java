@@ -155,4 +155,9 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
                 io.getSize(),
                 false, req);
     }
+
+    @Override
+    public Requirement.Kind needsDataInFormat() {
+        return Requirement.Kind.FROM_NETWORK_TO_INT;
+    }
 }
