@@ -127,15 +127,17 @@ class ParseCCode extends ParseShared {
     var globalNumbers: Int = 0
     val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
 
-    elements.map(elem => {
-      if (!elem._2.isEmpty)
-        globalNumbers = parseEnumValue(elem._1, elem._2.get, alreadyRead)
+    def countPretty(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
+      if (!registeredValue.isEmpty)
+        globalNumbers = parseEnumValue(name, registeredValue.get, alreadyRead)
       val number = globalNumbers
       globalNumbers += 1
-      val enumVal = newEnumValue(elem._1, number)
-      alreadyRead.put(elem._1, enumVal)
+      val enumVal = newEnumValue(name, number)
+      alreadyRead.put(name, enumVal)
       enumVal
-    })
+    }
+
+    elements.map(elem => countPretty(elem._1, elem._2))
   }
 
   def parseEnumValue(name: String, value: IntExpression, from: HashMap[String, ClassWriter.EnumElement]): Int =
