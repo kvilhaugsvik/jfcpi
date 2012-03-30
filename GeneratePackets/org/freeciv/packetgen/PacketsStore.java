@@ -39,24 +39,30 @@ public class PacketsStore {
 
     private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype) {
         Requirement wantPType = new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE);
-        Requirement wantIOType = new Requirement(iotype, Requirement.Kind.FROM_NETWORK_TO_INT);
-        if (!requirements.isAwareOfPotentialProvider(wantPType)
-                || !requirements.isAwareOfPotentialProvider(wantIOType)) {
-            if (!requirements.isAwareOfPotentialProvider(wantPType))
-                notFoundWhenNeeded.add(wantPType);
-            if (!requirements.isAwareOfPotentialProvider(wantIOType))
-                notFoundWhenNeeded.add(wantIOType);
-            return null;
+        if (!requirements.isAwareOfPotentialProvider(wantPType)) {
+            return failAndBlame(wantPType);
+        }
+        IDependency pubType = requirements.getPotentialProvider(wantPType);
+        if (!(pubType instanceof FieldTypeBasic.Generator)) {
+            return failAndBlame(wantPType);
         }
 
-        IDependency pubType = requirements.getPotentialProvider(wantPType);
+        Requirement wantIOType = new Requirement(iotype, ((FieldTypeBasic.Generator)pubType).needsDataInFormat());
+        if (!requirements.isAwareOfPotentialProvider(wantIOType)) {
+            return failAndBlame(wantIOType);
+        }
         IDependency ioType = requirements.getPotentialProvider(wantIOType);
-        if (pubType instanceof FieldTypeBasic.Generator && ioType instanceof NetworkIO) {
-            FieldTypeBasic basicFieldType = ((FieldTypeBasic.Generator) pubType).getBasicFieldTypeOnInput((NetworkIO) ioType);
-            requirements.addPossibleRequirement(basicFieldType);
-            return basicFieldType;
-        } // TODO: When reporting is added report wrong combination
+        if (!(ioType instanceof NetworkIO)) {
+            return failAndBlame(wantIOType);
+        }
 
+        FieldTypeBasic basicFieldType = ((FieldTypeBasic.Generator) pubType).getBasicFieldTypeOnInput((NetworkIO) ioType);
+        requirements.addPossibleRequirement(basicFieldType);
+        return basicFieldType;
+    }
+
+    private FieldTypeBasic failAndBlame(Requirement missing) {
+        notFoundWhenNeeded.add(missing);
         return null;
     }
 
