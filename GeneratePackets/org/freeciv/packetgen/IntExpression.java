@@ -1,5 +1,7 @@
 package org.freeciv.packetgen;
 
+import scala.Function1;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -69,6 +71,20 @@ public class IntExpression {
 
     private int noToIntSupport(String op) {
         throw new UnsupportedOperationException(op + " operator " + operatorOrValue + " not supported for evaluation");
+    }
+
+    // The one use of the Scala library from Java.
+    // Since an interface like it can be made in 1 minute it won't cause problems should Scala be dropped.
+    // TODO: Optimize if long expression is met.
+    public IntExpression valueMap(Function1<String, String> mapper) {
+        if (isValue())
+            return new IntExpression(mapper.apply(operatorOrValue), lhs, rhs, new Requirement[0]);
+        else if (noPostfix())
+            return new IntExpression(operatorOrValue, lhs.valueMap(mapper), rhs, new Requirement[0]);
+        else if (noPrefix())
+            return new IntExpression(operatorOrValue, lhs, rhs.valueMap(mapper), new Requirement[0]);
+        else
+            return new IntExpression(operatorOrValue, lhs.valueMap(mapper), rhs.valueMap(mapper), new Requirement[0]);
     }
 
     @Override

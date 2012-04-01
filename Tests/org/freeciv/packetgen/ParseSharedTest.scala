@@ -93,6 +93,16 @@ class ParseSharedTest {
     CParserTest.parsesCorrectly("CONS", parserShared, parserShared.intExpr).get.evaluate
   }
 
+  // TODO: Should probably be tested another place
+  // Mapping
+  @Test def mapParsedNumbersToTheirNames = assertEquals("Failed to map the values of an IntExpression",
+    "ONE + ((-TWO) * (THREE++))",
+    CParserTest.parsesCorrectly("1 + -2 * 3++", parserShared, parserShared.intExpr).get.valueMap({
+      case "1" => "ONE"
+      case "2" => "TWO"
+      case "3" => "THREE"
+    }).toString)
+
   /*--------------------------------------------------------------------------------------------------------------------
   Normalization of C int type declarations
   --------------------------------------------------------------------------------------------------------------------*/
