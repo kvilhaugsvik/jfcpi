@@ -127,8 +127,11 @@ class ParseCCode extends ParseShared {
     var globalNumbers: Int = 0
     val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
 
+    @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
+      alreadyRead.containsKey(value.toStringNotJava)
+
     def parseEnumValue(name: String, value: IntExpression): Int =
-      if (alreadyRead.containsKey(value.toStringNotJava)) // a constant on this enum
+      if (isAnInterpretedConstantOnThis(value)) // a constant on this enum
         alreadyRead.get(value.toStringNotJava).getNumber
       else if (value.hasNoVariables) // a number
         value.evaluate()
