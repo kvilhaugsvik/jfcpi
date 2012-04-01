@@ -117,39 +117,39 @@ class ParseCCode extends ParseShared {
 
   def cEnumDef = regex(startOfCEnum.r) ~> regex(identifier.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
 
-  def cEnumDefConverted = cEnumDef ^^ {asStructures =>
+  def cEnumDefConverted = cEnumDef ^^ {asStructures => {
+    def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
+      var globalNumbers: Int = 0
+      val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
+
+      @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
+        alreadyRead.containsKey(value.toStringNotJava)
+
+      def parseEnumValue(name: String, value: IntExpression): Int =
+        if (isAnInterpretedConstantOnThis(value)) // a constant on this enum
+          alreadyRead.get(value.toStringNotJava).getNumber
+        else if (value.hasNoVariables) // a number
+          value.evaluate()
+        else
+          throw new UnsupportedOperationException("Can't calculate value depending on external reference")
+
+      def countPretty(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
+        if (!registeredValue.isEmpty)
+          globalNumbers = parseEnumValue(name, registeredValue.get)
+        val number = globalNumbers
+        globalNumbers += 1
+        val enumVal = newEnumValue(name, number)
+        alreadyRead.put(name, enumVal)
+        enumVal
+      }
+
+      elements.map(elem => countPretty(elem._1, elem._2))
+    }
+
     new Enum(asStructures._1.asInstanceOf[String],
       false,
       countedCEnumElements(asStructures._2): _*)
-  }
-
-  def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
-    var globalNumbers: Int = 0
-    val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
-
-    @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
-      alreadyRead.containsKey(value.toStringNotJava)
-
-    def parseEnumValue(name: String, value: IntExpression): Int =
-      if (isAnInterpretedConstantOnThis(value)) // a constant on this enum
-        alreadyRead.get(value.toStringNotJava).getNumber
-      else if (value.hasNoVariables) // a number
-        value.evaluate()
-      else
-        throw new UnsupportedOperationException("Can't calculate value depending on external reference")
-
-    def countPretty(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
-      if (!registeredValue.isEmpty)
-        globalNumbers = parseEnumValue(name, registeredValue.get)
-      val number = globalNumbers
-      globalNumbers += 1
-      val enumVal = newEnumValue(name, number)
-      alreadyRead.put(name, enumVal)
-      enumVal
-    }
-
-    elements.map(elem => countPretty(elem._1, elem._2))
-  }
+  }}
 
   private var ignoreNewLinesFlag = true
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
