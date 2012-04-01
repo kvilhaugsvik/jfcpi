@@ -127,9 +127,9 @@ class ParseCCode extends ParseShared {
     var globalNumbers: Int = 0
     val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
 
-    def parseEnumValue(name: String, value: IntExpression, from: HashMap[String, ClassWriter.EnumElement]): Int =
-      if (from.containsKey(value.toStringNotJava)) // a constant on this enum
-        from.get(value.toStringNotJava).getNumber
+    def parseEnumValue(name: String, value: IntExpression): Int =
+      if (alreadyRead.containsKey(value.toStringNotJava)) // a constant on this enum
+        alreadyRead.get(value.toStringNotJava).getNumber
       else if (value.hasNoVariables) // a number
         value.evaluate()
       else
@@ -137,7 +137,7 @@ class ParseCCode extends ParseShared {
 
     def countPretty(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
       if (!registeredValue.isEmpty)
-        globalNumbers = parseEnumValue(name, registeredValue.get, alreadyRead)
+        globalNumbers = parseEnumValue(name, registeredValue.get)
       val number = globalNumbers
       globalNumbers += 1
       val enumVal = newEnumValue(name, number)
