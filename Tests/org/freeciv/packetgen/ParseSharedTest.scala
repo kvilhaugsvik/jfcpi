@@ -97,10 +97,15 @@ class ParseSharedTest {
   // Mapping
   @Test def mapParsedNumbersToTheirNames = assertEquals("Failed to map the values of an IntExpression",
     "ONE + ((-TWO) * (THREE++))",
-    CParserTest.parsesCorrectly("1 + -2 * 3++", parserShared, parserShared.intExpr).get.valueMap({
-      case "1" => "ONE"
-      case "2" => "TWO"
-      case "3" => "THREE"
+    CParserTest.parsesCorrectly("1 + -2 * 3++", parserShared, parserShared.intExpr).get.valueMap(leaf => {
+      if ("1".equals(leaf.toString))
+        "ONE"
+      else if ("2".equals(leaf.toString))
+        "TWO"
+      else if ("3".equals(leaf.toString))
+        "THREE"
+      else
+        "UNKNOWN"
     }).toString)
 
   /*--------------------------------------------------------------------------------------------------------------------

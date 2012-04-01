@@ -76,9 +76,9 @@ public class IntExpression {
     // The one use of the Scala library from Java.
     // Since an interface like it can be made in 1 minute it won't cause problems should Scala be dropped.
     // TODO: Optimize if long expression is met.
-    public IntExpression valueMap(Function1<String, String> mapper) {
+    public IntExpression valueMap(Function1<IntExpression, String> mapper) {
         if (isValue())
-            return new IntExpression(mapper.apply(operatorOrValue), lhs, rhs, new Requirement[0]);
+            return new IntExpression(mapper.apply(this), lhs, rhs, new Requirement[0]);
         else if (noPostfix())
             return new IntExpression(operatorOrValue, lhs.valueMap(mapper), rhs, new Requirement[0]);
         else if (noPrefix())
