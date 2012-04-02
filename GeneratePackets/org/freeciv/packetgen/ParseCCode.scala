@@ -15,7 +15,7 @@
 package org.freeciv.packetgen
 
 import collection.mutable.ListBuffer
-import ClassWriter.EnumElement.{newEnumValue, newInvalidEnum}
+import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
 import util.parsing.input.CharArrayReader
 import java.util.HashMap
 
@@ -120,7 +120,7 @@ class ParseCCode extends ParseShared {
   def cEnumDefConverted = cEnumDef ^^ {asStructures => {
     def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
       var globalNumbers: Int = 0
-      val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
+      val alreadyRead = new HashMap[String, Enum.EnumElementKnowsNumber]()
 
       @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
         alreadyRead.containsKey(value.toStringNotJava)

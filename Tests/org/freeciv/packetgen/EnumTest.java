@@ -19,7 +19,7 @@ import org.junit.Test;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
-import static org.freeciv.packetgen.ClassWriter.EnumElement.*;
+import static org.freeciv.packetgen.Enum.EnumElementKnowsNumber.*;
 
 public class EnumTest {
     @Test public void testBitWiseHasANumber0() {
@@ -126,7 +126,7 @@ public class EnumTest {
 
     @Test public void enumValueGetNumber() {
         Enum result = enumWithValues();
-        assertEquals("Enum element number not found", 1, result.getEnumValue("ONE").getNumber());
+        assertEquals("Enum element number not found", "1", result.getEnumValue("ONE").getValueGenerator());
     }
 
     @Test public void enumValueGetToStringName() {
@@ -153,7 +153,7 @@ public class EnumTest {
         assertFalse("Counting element should be invalid", result.getCount().isValid());
         assertEquals("Counting element has wrong name", "ELEMENTS", result.getCount().getEnumValueName());
         assertEquals("Counting element has wrong toStringName", "\"ELEMENTS\"", result.getCount().getToStringName());
-        assertEquals("Counting element don't count elements correctly", 3, result.getCount().getNumber());
+        assertEquals("Counting element don't count elements correctly", "3", result.getCount().getValueGenerator());
     }
 
     @Test public void enumCount2Elements() {
@@ -164,7 +164,7 @@ public class EnumTest {
         assertFalse("Counting element should be invalid", result.getCount().isValid());
         assertEquals("Counting element has wrong name", "ELEMENTS", result.getCount().getEnumValueName());
         assertEquals("Counting element has wrong toStringName", "\"ELEMENTS\"", result.getCount().getToStringName());
-        assertEquals("Counting element don't count elements correctly", 2, result.getCount().getNumber());
+        assertEquals("Counting element don't count elements correctly", "2", result.getCount().getValueGenerator());
     }
 
     @Test public void enumCountNamed() {
@@ -175,7 +175,7 @@ public class EnumTest {
         assertFalse("Counting element should be invalid", result.getCount().isValid());
         assertEquals("Counting element has wrong name", "ELEMENTS", result.getCount().getEnumValueName());
         assertEquals("Counting element has wrong toStringName", "\"the elements\"", result.getCount().getToStringName());
-        assertEquals("Counting element don't count elements correctly", 2, result.getCount().getNumber());
+        assertEquals("Counting element don't count elements correctly", "2", result.getCount().getValueGenerator());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -194,7 +194,7 @@ public class EnumTest {
         assertFalse("Invalid element should be invalid", result.getInvalidDefault().isValid());
         assertEquals("Invalid element has wrong name", "INVALID", result.getInvalidDefault().getEnumValueName());
         assertEquals("Invalid element has wrong toStringName", "\"INVALID\"", result.getInvalidDefault().getToStringName());
-        assertEquals("Invalid element has wrong number", -2, result.getInvalidDefault().getNumber());
+        assertEquals("Invalid element has wrong number", "-2", result.getInvalidDefault().getValueGenerator());
     }
 
     @Test public void enumProvidesValues() {

@@ -330,7 +330,7 @@ public class CodeGenTest {
                 "nothing",
                 "NameOfClass",
                 "Packet");
-        toWrite.addEnumerated(null, "ONE", 1, "\"one\"");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -350,9 +350,9 @@ public class CodeGenTest {
                 "nothing",
                 "NameOfClass",
                 "Packet");
-        toWrite.addEnumerated(null, "ONE", 1, "\"one\"");
-        toWrite.addEnumerated(null, "TWO", 2, "\"two\"");
-        toWrite.addEnumerated(null, "THREE", 3, "\"three\"");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -374,11 +374,11 @@ public class CodeGenTest {
                 "nothing",
                 "NameOfClass",
                 "Packet");
-        toWrite.addEnumerated(null, "INVALID", -1, "\"invalid\"");
-        toWrite.addEnumerated(null, "ONE", 1, "\"one\"");
-        toWrite.addEnumerated(null, "TWO", 2, "\"two\"");
-        toWrite.addEnumerated(null, "THREE", 3, "\"three\"");
-        toWrite.addEnumerated(null, "SMALLEST", -2, "\"minus two\"");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "INVALID", "-1", "\"invalid\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "SMALLEST", "-2", "\"minus two\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -402,9 +402,9 @@ public class CodeGenTest {
                 "nothing",
                 "NameOfClass",
                 "Packet");
-        toWrite.addEnumerated(null, "ONE", 1, "\"one\"");
-        toWrite.addEnumerated("Not a prime number", "TWO", 2, "\"two\"");
-        toWrite.addEnumerated(null, "THREE", 3, "\"three\"");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue("Not a prime number", "TWO", "2", "\"two\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -426,9 +426,9 @@ public class CodeGenTest {
                 "nothing",
                 "NameOfClass",
                 "Packet");
-        toWrite.addEnumerated(null, "ONE", 1, "\"one\"");
-        toWrite.addEnumerated(null, "2nd", 2, "\"2nd\"");
-        toWrite.addEnumerated(null, "TWO", 2, "\"two\"");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "2nd", "2", "\"2nd\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -450,7 +450,7 @@ public class CodeGenTest {
                 "nothing",
                 "NameOfClass",
                 "Packet");
-        toWrite.addEnumerated(null, "One", 1, "one");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "One", "1", "one"));
     }
 
     @Test public void testClassWriterEmptyTwoBlocksOfImports() {

@@ -46,16 +46,18 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
 
             if (value.isValid()) numberOfElements++;
 
-            if (bitwise && (0 < value.getNumber()))
-                for (int testAgainst = 1; testAgainst < value.getNumber() * 2; testAgainst = testAgainst * 2) {
-                    if (value.getNumber() < testAgainst)
-                        throw new IllegalArgumentException("Claims to be bitwise but is not.");
-                }
+            if (bitwise)
+                if (!(value instanceof EnumElementKnowsNumber))
+                    throw new IllegalArgumentException("Only spec enums can be declared bitwise");
+                else if (0 < ((EnumElementKnowsNumber)value).getNumber())
+                    for (int testAgainst = 1; testAgainst < ((EnumElementKnowsNumber)value).getNumber() * 2; testAgainst = testAgainst * 2)
+                        if (((EnumElementKnowsNumber)value).getNumber() < testAgainst)
+                            throw new IllegalArgumentException("Claims to be bitwise but is not.");
         }
         if (null != cntCode) {
             if (bitwise) throw new IllegalArgumentException("");
-            this.countElement = EnumElement.newInvalidEnum(cntCode,
-                    (null == cntString? '"' + cntCode + '"': cntString),
+            this.countElement = EnumElementKnowsNumber.newInvalidEnum(cntCode,
+                    (null == cntString ? '"' + cntCode + '"' : cntString),
                     numberOfElements);
             this.addEnumerated(this.countElement);
         } else {
@@ -64,7 +66,7 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         if (enums.containsKey("INVALID")) {
             this.invalidDefault = enums.get("INVALID");
         } else {
-            this.invalidDefault = EnumElement.newInvalidEnum(-1);
+            this.invalidDefault = EnumElementKnowsNumber.newInvalidEnum(-1);
             this.addEnumerated(this.invalidDefault);
         }
 
@@ -100,6 +102,13 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
                 "}",
                 "}",
                 "return INVALID;");
+    }
+
+    public void addEnumerated(String comment,
+                              String enumName,
+                              int number,
+                              String toStringName) {
+        addEnumerated(EnumElementKnowsNumber.newEnumValue(comment, enumName, number, toStringName));
     }
 
     public boolean isBitwise() {
@@ -159,5 +168,61 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
     @Override
     public Requirement.Kind needsDataInFormat() {
         return Requirement.Kind.FROM_NETWORK_TO_INT;
+    }
+
+    static class EnumElementKnowsNumber extends ClassWriter.EnumElement {
+        private final int number;
+
+        EnumElementKnowsNumber(String comment, String elementName, int number, String toStringName, boolean valid) {
+            super(comment, elementName, number + "", toStringName, valid);
+
+            if (null == elementName)
+                throw new IllegalArgumentException("All elements of enums must have names");
+
+            // Look up numbers in a uniform way
+            if (null == toStringName)
+                throw new IllegalArgumentException("All elements of enums must have toStringNames");
+
+            this.number = number;
+        }
+
+        public int getNumber() {
+            return number;
+        }
+
+        public int compareTo(EnumElementKnowsNumber other) {
+            if (other.getNumber() == this.getNumber())
+                return 0;
+            if (0 <= this.getNumber() && 0 > other.getNumber())
+                return -1;
+            if (0 > this.getNumber() && 0 <= other.getNumber())
+                return 1;
+            return (this.getNumber() < other.getNumber())? -1: 1;
+        }
+
+        @Override
+        public int compareTo(EnumElement that) {
+            return that instanceof EnumElementKnowsNumber ? compareTo((EnumElementKnowsNumber) that) : -1;
+        }
+
+        static EnumElementKnowsNumber newEnumValue(String enumValueName, int number) {
+            return newEnumValue(enumValueName, number, '"' + enumValueName +  '"');
+        }
+
+        static EnumElementKnowsNumber newEnumValue(String enumValueName, int number, String toStringName) {
+            return newEnumValue(null, enumValueName, number, toStringName);
+        }
+
+        static EnumElementKnowsNumber newEnumValue(String comment, String enumValueName, int number, String toStringName) {
+            return new EnumElementKnowsNumber(comment, enumValueName, number, toStringName, true);
+        }
+
+        public static EnumElementKnowsNumber newInvalidEnum(int value) {
+            return newInvalidEnum("INVALID", "\"INVALID\"",  value);
+        }
+
+        public static EnumElementKnowsNumber newInvalidEnum(String nameInCode, String toStringName, int value) {
+            return new EnumElementKnowsNumber(null, nameInCode, value, toStringName, false);
+        }
     }
 }

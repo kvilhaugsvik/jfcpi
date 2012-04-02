@@ -122,16 +122,9 @@ public class ClassWriter {
         methods.add(Method.newPublicConstructor(comment, name, paramList, body));
     }
 
-    public void addEnumerated(String comment,
-                              String enumName,
-                              int number,
-                              String toStringName) {
+    protected void addEnumerated(EnumElement element) {
         assert kind.equals(ClassKind.ENUM);
 
-        addEnumerated(EnumElement.newEnumValue(comment, enumName, number, toStringName));
-    }
-
-    protected void addEnumerated(EnumElement element) {
         enums.put(element.getEnumValueName(), element);
     }
 
@@ -391,11 +384,11 @@ public class ClassWriter {
     static class EnumElement implements Comparable<EnumElement> {
         private final String comment;
         private final String elementName;
-        private final int number;
+        private final String valueGen;
         private final String toStringName;
         private final boolean valid;
 
-        EnumElement(String comment, String elementName, int number, String toStringName, boolean valid) {
+        EnumElement(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
             if (null == elementName)
                 throw new IllegalArgumentException("All elements of enums must have names");
 
@@ -405,13 +398,13 @@ public class ClassWriter {
 
             this.comment = comment;
             this.elementName = elementName;
-            this.number = number;
+            this.valueGen = valueGen;
             this.toStringName = toStringName;
             this.valid = valid;
         }
 
-        public int getNumber() {
-            return number;
+        public String getValueGenerator() {
+            return valueGen;
         }
 
         public String getEnumValueName() {
@@ -427,39 +420,45 @@ public class ClassWriter {
         }
 
         @Override
-        public int compareTo(EnumElement other) {
-            if (other.getNumber() == this.getNumber())
-                return 0;
-            if (0 <= this.getNumber() && 0 > other.getNumber())
-                return -1;
-            if (0 > this.getNumber() && 0 <= other.getNumber())
-                return 1;
-            return (this.getNumber() < other.getNumber())? -1: 1;
+        public int compareTo(EnumElement that) {
+            // valids before invalids
+            if (this.isValid() != that.isValid())
+                if (this.isValid())
+                    return 1;
+                else
+                    return -1;
+
+            // (probably) positive before (probably) negative
+            // (heuristic is wrong in many cases, like --1 and -1 + 5, so don't use this compare for anything important
+            if (this.getValueGenerator().startsWith("-") != that.getValueGenerator().startsWith("-"))
+                if (this.getValueGenerator().startsWith("-"))
+                    return 1;
+                else
+                    return -1;
+
+            // order (probably) positive small to big and (probably) negative big to small
+            // (heuristic is wrong in many cases, like --1 and -1 + 5, so don't use this compare for anything important
+            if (this.getValueGenerator().startsWith("-"))
+                return -1 * this.valueGen.compareTo(that.valueGen);
+            else
+                return this.valueGen.compareTo(that.valueGen);
         }
 
         public String toString() {
-            return elementName + " (" + number + ", " + toStringName +
+            return elementName + " (" + valueGen + ", " + toStringName +
                     (!valid?", " + valid : "") + ")" + ifIs(" /* ", comment, " */");
         }
 
-        static EnumElement newEnumValue(String enumValueName, int number) {
-            return newEnumValue(enumValueName, number, '"' + enumValueName +  '"');
+        static EnumElement newEnumValue(String enumValueName, String number) {
+            return newEnumValue(null, enumValueName, number);
         }
 
-        static EnumElement newEnumValue(String enumValueName, int number, String toStringName) {
-            return newEnumValue(null, enumValueName, number, toStringName);
+        static EnumElement newEnumValue(String comment, String enumValueName, String number) {
+            return EnumElement.newEnumValue(comment, enumValueName, number, "\"" + enumValueName + "\"");
         }
 
-        static EnumElement newEnumValue(String comment, String enumValueName, int number, String toStringName) {
+        static EnumElement newEnumValue(String comment, String enumValueName, String number, String toStringName) {
             return new EnumElement(comment, enumValueName, number, toStringName, true);
-        }
-
-        public static EnumElement newInvalidEnum(int value) {
-            return new EnumElement(null, "INVALID", value,  "\"INVALID\"", false);
-        }
-
-        public static EnumElement newInvalidEnum(String nameInCode, String toStringName, int value) {
-            return new EnumElement(null, nameInCode, value, toStringName, false);
         }
     }
 

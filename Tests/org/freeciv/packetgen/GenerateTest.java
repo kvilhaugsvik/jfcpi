@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import static org.freeciv.packetgen.Enum.EnumElementKnowsNumber.*;
+
 public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
@@ -38,23 +40,23 @@ public class GenerateTest {
         }
 
         Enum test = new Enum("test", false,
-                ClassWriter.EnumElement.newEnumValue("one", 1),
-                ClassWriter.EnumElement.newEnumValue("two", 2, "\"2nd\""),
-                ClassWriter.EnumElement.newEnumValue("three", 3),
-                ClassWriter.EnumElement.newInvalidEnum(-3));
+                newEnumValue("one", 1),
+                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("three", 3),
+                newInvalidEnum(-3));
         Enum testDefaultInvalid = new Enum("testDefaultInvalid", false,
-                ClassWriter.EnumElement.newEnumValue("one", 1),
-                ClassWriter.EnumElement.newEnumValue("two", 2, "\"2nd\""),
-                ClassWriter.EnumElement.newEnumValue("three", 3));
+                newEnumValue("one", 1),
+                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("three", 3));
         Enum testCount = new Enum("testCount", "COUNT", "\"numbers listed\"",
-                ClassWriter.EnumElement.newEnumValue("zero", 0),
-                ClassWriter.EnumElement.newEnumValue("one", 1),
-                ClassWriter.EnumElement.newEnumValue("two", 2, "\"2nd\""),
-                ClassWriter.EnumElement.newEnumValue("three", 3));
+                newEnumValue("zero", 0),
+                newEnumValue("one", 1),
+                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("three", 3));
         Enum bitwise = new Enum("bitwise", true,
-                ClassWriter.EnumElement.newEnumValue("one", 1),
-                ClassWriter.EnumElement.newEnumValue("two", 2),
-                ClassWriter.EnumElement.newEnumValue("four", 4));
+                newEnumValue("one", 1),
+                newEnumValue("two", 2),
+                newEnumValue("four", 4));
 
 
         writeJavaFile(test);
