@@ -16,6 +16,8 @@ package org.freeciv.packetgen;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -180,7 +182,7 @@ public class EnumTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void enumCountBitwiseSpecified() {
-        Enum result = new Enum("test", true, "ELEMENTS", "\"the elements\"",
+        Enum result = new Enum("test", true, "ELEMENTS", "\"the elements\"", Collections.<Requirement>emptySet(),
                 newEnumValue("ONE", 1));
     }
 
@@ -217,6 +219,14 @@ public class EnumTest {
                 .contains(new Requirement("Count", Requirement.Kind.ENUM)));
         assertEquals("TWO has wrong value", "org.freeciv.types.Count.TWO.getNumber()",
                 constants.get("TWO").getExpression());
+    }
+
+    @Test public void enumRequiresOther() {
+        Requirement constantReferedTo = new Requirement("START_VALUE", Requirement.Kind.VALUE);
+        Enum inNeed = new Enum("NeedOther", Arrays.asList(constantReferedTo),
+                ClassWriter.EnumElement.newEnumValue("ONE", "Constants.START_VALUE"),
+                ClassWriter.EnumElement.newEnumValue("TWO", "ONE.getNumber() + 1"));
+        assertTrue("Enum should require the given requirements", inNeed.getReqs().contains(constantReferedTo));
     }
 
     @Test public void testEnumElement() {

@@ -20,11 +20,12 @@ import java.util.*;
 
 public class Enum extends ClassWriter implements IDependency.ManyFulfiller, FieldTypeBasic.Generator {
     private final boolean bitwise;
+    private final Collection<Requirement> iRequire;
     private final EnumElement invalidDefault;
     private final EnumElement countElement;
 
     public Enum(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
-        this(enumName, bitwise, null, null, values);
+        this(enumName, bitwise, null, null, Collections.<Requirement>emptySet(), values);
     }
 
     public Enum(String enumName, String cntCode, ClassWriter.EnumElement... values) {
@@ -32,13 +33,18 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
     }
 
     public Enum(String enumName, String cntCode, String cntString, ClassWriter.EnumElement... values) {
-        this(enumName, false, cntCode, cntString, values);
+        this(enumName, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
     }
 
-    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, ClassWriter.EnumElement... values) {
+    public Enum(String enumName, Collection<Requirement> reqs, ClassWriter.EnumElement... values) {
+        this(enumName, false, null, null, reqs, values);
+    }
+
+    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs, ClassWriter.EnumElement... values) {
         super(ClassKind.ENUM, FCEnum.class.getPackage(), null, "Freeciv C code", enumName, "FCEnum");
 
         this.bitwise = bitwise;
+        this.iRequire = reqs;
 
         int numberOfElements = 0;
         for (ClassWriter.EnumElement value: values) {
@@ -138,7 +144,7 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
 
     @Override
     public Collection<Requirement> getReqs() {
-        return Collections.EMPTY_SET;
+        return iRequire;
     }
 
     @Override
