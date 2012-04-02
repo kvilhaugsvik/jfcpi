@@ -124,7 +124,11 @@ public class IntExpression {
     }
 
     public static IntExpression integer(String value) {
-        return new IntExpression(value, null, null);
+        return handled(value);
+    }
+
+    public static IntExpression handled(String expression, Requirement... reqs) {
+        return new IntExpression(expression, null, null, reqs);
     }
 
     public static IntExpression readFromOther(IDependency other, String readStatement) {
