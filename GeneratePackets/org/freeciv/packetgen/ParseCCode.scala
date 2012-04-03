@@ -80,7 +80,7 @@ class ParseCCode extends ParseShared {
     @inline def enumerations: Map[String, String] = asStructures._2
     val bitwise = enumerations.contains("BITWISE")
 
-    val outEnumValues: ListBuffer[ClassWriter.EnumElement] = ListBuffer[ClassWriter.EnumElement](
+    val outEnumValues: ListBuffer[Enum.EnumElementKnowsNumber] = ListBuffer[Enum.EnumElementKnowsNumber](
       enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
         @inline def key = element._1
         @inline def nameInCode = enumerations.get(key).get
@@ -100,14 +100,15 @@ class ParseCCode extends ParseShared {
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
     if (enumerations.contains("INVALID"))
       outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
+    val sortedEnumValues: List[ClassWriter.EnumElement] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
     if (enumerations.contains("COUNT"))
       if (enumerations.contains("COUNT"+NAME))
         new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
-          enumerations.get("COUNT"+NAME).get, outEnumValues.asJava)
+          enumerations.get("COUNT"+NAME).get, sortedEnumValues.asJava)
       else
-        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, outEnumValues.asJava)
+        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, sortedEnumValues.asJava)
     else
-      new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues.asJava)
+      new Enum(asStructures._1.asInstanceOf[String], bitwise, sortedEnumValues.asJava)
   }
 
   def enumValue = intExpr

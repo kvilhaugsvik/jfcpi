@@ -374,11 +374,11 @@ public class CodeGenTest {
                 "nothing",
                 "NameOfClass",
                 "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "INVALID", "-1", "\"invalid\""));
         toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
         toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
         toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
         toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "SMALLEST", "-2", "\"minus two\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "INVALID", "-1", "\"invalid\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +

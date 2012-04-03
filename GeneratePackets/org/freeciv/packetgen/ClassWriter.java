@@ -32,7 +32,7 @@ public class ClassWriter {
     private final LinkedList<VariableDeclaration> stateVars = new LinkedList<VariableDeclaration>();
 
     private final LinkedList<Method> methods = new LinkedList<Method>();
-    protected final HashMap<String, EnumElement> enums = new HashMap<String, ClassWriter.EnumElement>();
+    protected final LinkedHashMap<String, EnumElement> enums = new LinkedHashMap<String, ClassWriter.EnumElement>();
 
     public ClassWriter(ClassKind kind, Package where, String[] imports, String madeFrom, String name, String parent, String implementsInterface) {
         if (null == name) throw new IllegalArgumentException("No name for class to be generated");
@@ -144,9 +144,7 @@ public class ClassWriter {
     private String formatEnumeratedElements() {
         String out = "";
 
-        LinkedList<EnumElement> elements = new LinkedList<EnumElement>(enums.values());
-        Collections.sort(elements);
-        for (EnumElement element: elements) {
+        for (EnumElement element: enums.values()) {
             out += "\t" + element + "," + "\n";
         }
         if (!enums.isEmpty())
@@ -381,7 +379,7 @@ public class ClassWriter {
         }
     }
 
-    static class EnumElement implements Comparable<EnumElement> {
+    static class EnumElement {
         private final String comment;
         private final String elementName;
         private final String valueGen;
@@ -417,31 +415,6 @@ public class ClassWriter {
 
         public boolean isValid() {
             return valid;
-        }
-
-        @Override
-        public int compareTo(EnumElement that) {
-            // valids before invalids
-            if (this.isValid() != that.isValid())
-                if (this.isValid())
-                    return 1;
-                else
-                    return -1;
-
-            // (probably) positive before (probably) negative
-            // (heuristic is wrong in many cases, like --1 and -1 + 5, so don't use this compare for anything important
-            if (this.getValueGenerator().startsWith("-") != that.getValueGenerator().startsWith("-"))
-                if (this.getValueGenerator().startsWith("-"))
-                    return 1;
-                else
-                    return -1;
-
-            // order (probably) positive small to big and (probably) negative big to small
-            // (heuristic is wrong in many cases, like --1 and -1 + 5, so don't use this compare for anything important
-            if (this.getValueGenerator().startsWith("-"))
-                return -1 * this.valueGen.compareTo(that.valueGen);
-            else
-                return this.valueGen.compareTo(that.valueGen);
         }
 
         public String toString() {

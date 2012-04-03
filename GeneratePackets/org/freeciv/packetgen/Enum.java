@@ -217,21 +217,6 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
             return number;
         }
 
-        public int compareTo(EnumElementKnowsNumber other) {
-            if (other.getNumber() == this.getNumber())
-                return 0;
-            if (0 <= this.getNumber() && 0 > other.getNumber())
-                return -1;
-            if (0 > this.getNumber() && 0 <= other.getNumber())
-                return 1;
-            return (this.getNumber() < other.getNumber())? -1: 1;
-        }
-
-        @Override
-        public int compareTo(EnumElement that) {
-            return that instanceof EnumElementKnowsNumber ? compareTo((EnumElementKnowsNumber) that) : -1;
-        }
-
         static EnumElementKnowsNumber newEnumValue(String enumValueName, int number) {
             return newEnumValue(enumValueName, number, '"' + enumValueName +  '"');
         }
