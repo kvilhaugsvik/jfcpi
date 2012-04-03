@@ -382,8 +382,8 @@ class CParserSemanticTest {
   @Test def testCEnum3ElementsNoAssign: Unit = {
     parsesCEnumCorrectly(cEnum3ElementsNoAssign, parseEnumTest,
       ("one", "0", "\"one\""),
-      ("two", "1", "\"two\""),
-      ("three", "2", "\"three\""))
+      ("two", "1 + one.getNumber()", "\"two\""),
+      ("three", "1 + two.getNumber()", "\"three\""))
   }
 
   @Test def testCEnum3ElementsAssignAll: Unit = {
@@ -396,22 +396,22 @@ class CParserSemanticTest {
   @Test def testCEnum3ElementsFirstNumbered: Unit = {
     parsesCEnumCorrectly(cEnum3ElementsFirstNumbered, parseEnumTest,
       ("two", "2", "\"two\""),
-      ("three", "3", "\"three\""),
-      ("four", "4", "\"four\""))
+      ("three", "1 + two.getNumber()", "\"three\""),
+      ("four", "1 + three.getNumber()", "\"four\""))
   }
 
   @Test def testCEnum3ElementsFirstAndLastTheSame: Unit = {
     parsesCEnumCorrectly(cEnum3ElementsFirstAndLastTheSame, parseEnumTest,
       ("zero", "0", "\"zero\""),
-      ("one", "1", "\"one\""),
+      ("one", "1 + zero.getNumber()", "\"one\""),
       ("null", "0", "\"null\""))
   }
 
   @Test def testCDefineElementAsEqualPreviouslyDefined: Unit = {
     parsesCEnumCorrectly("enum test {zero, one, null = zero}", parseEnumTest,
       ("zero", "0", "\"zero\""),
-      ("one", "1", "\"one\""),
-      ("null", "0", "\"null\""))
+      ("one", "1 + zero.getNumber()", "\"one\""),
+      ("null", "zero.getNumber()", "\"null\""))
   }
 
   @Test def cEnumNeedingConstant {

@@ -125,33 +125,11 @@ class ParseCCode extends ParseShared {
     var iRequire = new HashSet[Requirement]()
 
     def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
-      var globalNumbers: Int = 0
-      val alreadyRead = new HashMap[String, Enum.EnumElementKnowsNumber]()
-
-      // TODO: let all be expressions.
       var globalNumberExpression: IntExpression = IntExpression.integer("0")
       val alreadyReadExpression = new HashMap[String, ClassWriter.EnumElement]()
 
       @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
-        alreadyRead.containsKey(value.toStringNotJava) || alreadyReadExpression.containsKey(value.toStringNotJava)
-
-      def parseEnumValue(name: String, value: IntExpression): Int =
-        if (isAnInterpretedConstantOnThis(value)) // a constant on this enum
-          alreadyRead.get(value.toStringNotJava).getNumber
-        else if (value.hasNoVariables) // a number
-          value.evaluate()
-        else
-          throw new UnsupportedOperationException("Can't calculate value depending on external reference")
-
-      def countPretty(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
-        if (!registeredValue.isEmpty)
-          globalNumbers = parseEnumValue(name, registeredValue.get)
-        val number = globalNumbers
-        globalNumbers += 1
-        val enumVal = newEnumValue(name, number)
-        alreadyRead.put(name, enumVal)
-        enumVal
-      }
+        alreadyReadExpression.containsKey(value.toStringNotJava)
 
       def countParanoid(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
         if (!registeredValue.isEmpty) { // Value is specified
@@ -177,13 +155,7 @@ class ParseCCode extends ParseShared {
         enumVal
       }
 
-      try {
-        elements.map(elem => countPretty(elem._1, elem._2))
-      } catch {
-        case notSupported : UnsupportedOperationException =>
-          elements.map(elem => countParanoid(elem._1, elem._2))
-        case e => throw e
-      }
+      elements.map(elem => countParanoid(elem._1, elem._2))
     }
 
     new Enum(asStructures._1.asInstanceOf[String],
