@@ -77,6 +77,24 @@ object CParserTest {
     /* comment */
   }"""
 
+  def cEnumHavingExternalStartValue = """
+    enum refersToConstant {
+      ONE = START_VALUE,
+      TWO
+    }"""
+
+  def cEnumStartValueIsAnExpressionInvolvingExternal = """
+    enum refersToConstant {
+      FIRST = START_VALUE * 16,
+      NEXT
+    }"""
+
+  def cEnumHavingExternalStartValueRefersBack = """
+    enum refersToConstant {
+      FIRST = 1,
+      NEXT = FIRST * 3
+    }"""
+
   def commentCxxOneLine = "// A comment" + "\n"
   def commentCOneLine = "/* A comment */" + "\n"
 
@@ -318,10 +336,10 @@ class CParserSemanticTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Common helper methods
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline private def checkElement(element: ClassWriter.EnumElement, nameInCode: String, number: Int, toStringName: String) {
+  @inline private def checkElement(element: ClassWriter.EnumElement, nameInCode: String, number: String, toStringName: String) {
     assertNotNull("Element " + nameInCode + " don't exist", element)
     assertEquals("Wrong name in code for element " + nameInCode, nameInCode, element.getEnumValueName)
-    assertEquals("Wrong number for element " + nameInCode, number, element.getNumber)
+    assertEquals("Wrong number for element " + nameInCode, number, element.getValueGenerator)
     assertEquals("Wrong toString() value for element " + nameInCode, toStringName, element.getToStringName)
     assertTrue("Element " + nameInCode + " should be valid", element.isValid)
   }
@@ -330,14 +348,14 @@ class CParserSemanticTest {
                                      parser: ParseShared,
                                      converter: ParseShared#Parser[Enum],
                                      isBitWise: Boolean,
-                                     values: (String, Int,  String)*): Enum = {
+                                     values: (String, String, String)*): Enum = {
     val result = parsesCorrectly(expression, parser, converter).get
 
     assertEquals("Wrong name for enumeration class", "test", result.getName)
     assertTrue("Wrong bitwise for enumeration class", result.isBitwise == isBitWise)
 
     values.foreach({
-      case (nameInCode: String, number: Int, toStringName: String) =>
+      case (nameInCode: String, number: String, toStringName: String) =>
         val element = result.getEnumValue(nameInCode)
         checkElement(element, nameInCode, number, toStringName)
       case _ => throw new IllegalArgumentException("Method signature updated without fixing element testing?")
@@ -349,58 +367,131 @@ class CParserSemanticTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Test semantics of enums declared with the enum name {element, element} syntax
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline def parsesCEnumCorrectly(expression: String, parser: ParseCCode, values: (String, Int,  String)*): Enum  = {
+  @inline def parsesCEnumCorrectly(expression: String, parser: ParseCCode, values: (String, String,  String)*): Enum  = {
     return parseEnumCorrectly(expression, parser, parser.cEnumDefConverted, false, values: _*)
   }
 
   @Test def testCEnum1ElementNoAssign: Unit = {
-    parsesCEnumCorrectly(cEnum1ElementNoAssign, parseEnumTest, ("one", 0, "\"one\""))
+    parsesCEnumCorrectly(cEnum1ElementNoAssign, parseEnumTest, ("one", "0", "\"one\""))
   }
 
   @Test def testCEnum1ElementAssign: Unit  = {
-    parsesCEnumCorrectly(cEnum1ElementAssign, parseEnumTest, ("one", 1, "\"one\""))
+    parsesCEnumCorrectly(cEnum1ElementAssign, parseEnumTest, ("one", "1", "\"one\""))
   }
 
   @Test def testCEnum3ElementsNoAssign: Unit = {
     parsesCEnumCorrectly(cEnum3ElementsNoAssign, parseEnumTest,
-      ("one", 0, "\"one\""),
-      ("two", 1, "\"two\""),
-      ("three", 2, "\"three\""))
+      ("one", "0", "\"one\""),
+      ("two", "1 + one.getNumber()", "\"two\""),
+      ("three", "1 + two.getNumber()", "\"three\""))
   }
 
   @Test def testCEnum3ElementsAssignAll: Unit = {
     parsesCEnumCorrectly(cEnum3ElementsAssignAll, parseEnumTest,
-      ("one", 1, "\"one\""),
-      ("two", 2, "\"two\""),
-      ("three", 3, "\"three\""))
+      ("one", "1", "\"one\""),
+      ("two", "2", "\"two\""),
+      ("three", "3", "\"three\""))
   }
 
   @Test def testCEnum3ElementsFirstNumbered: Unit = {
     parsesCEnumCorrectly(cEnum3ElementsFirstNumbered, parseEnumTest,
-      ("two", 2, "\"two\""),
-      ("three", 3, "\"three\""),
-      ("four", 4, "\"four\""))
+      ("two", "2", "\"two\""),
+      ("three", "1 + two.getNumber()", "\"three\""),
+      ("four", "1 + three.getNumber()", "\"four\""))
   }
 
   @Test def testCEnum3ElementsFirstAndLastTheSame: Unit = {
     parsesCEnumCorrectly(cEnum3ElementsFirstAndLastTheSame, parseEnumTest,
-      ("zero", 0, "\"zero\""),
-      ("one", 1, "\"one\""),
-      ("null", 0, "\"null\""))
+      ("zero", "0", "\"zero\""),
+      ("one", "1 + zero.getNumber()", "\"one\""),
+      ("null", "0", "\"null\""))
   }
 
   @Test def testCDefineElementAsEqualPreviouslyDefined: Unit = {
     parsesCEnumCorrectly("enum test {zero, one, null = zero}", parseEnumTest,
-      ("zero", 0, "\"zero\""),
-      ("one", 1, "\"one\""),
-      ("null", 0, "\"null\""))
+      ("zero", "0", "\"zero\""),
+      ("one", "1 + zero.getNumber()", "\"one\""),
+      ("null", "zero.getNumber()", "\"null\""))
   }
 
+  @Test def cEnumNeedingConstant {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
+    assertTrue("C enum based on external constant should depend on it",
+      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+  }
+
+  @Test def cEnumElementParanoidValueGeneratorSimple {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
+
+    assertTrue("C enum based on external constant should depend on it",
+      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+
+    assertEquals("Should get value of constant",
+      "Constants.START_VALUE",
+      result.get.asInstanceOf[Enum].getEnumValue("ONE").getValueGenerator)
+
+    assertEquals("Should get value of constant",
+      "1 + ONE.getNumber()",
+      result.get.asInstanceOf[Enum].getEnumValue("TWO").getValueGenerator)
+  }
+
+  @Test def cEnumElementParanoidValueGeneratorExpression {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly(cEnumStartValueIsAnExpressionInvolvingExternal, parser, parser.exprConverted)
+
+    assertTrue("C enum based on external constant should depend on it",
+      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+
+    assertEquals("Should contain calculation",
+      "Constants.START_VALUE * 16",
+      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+
+    assertEquals("Should get value of constant",
+      "1 + FIRST.getNumber()",
+      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+  }
+
+  @Test def cEnumElementParanoidValueGeneratorPreviousExpression {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly(cEnumHavingExternalStartValueRefersBack, parser, parser.exprConverted)
+    assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
+      result.get.getReqs.isEmpty)
+
+    assertEquals("Wrong value",
+      "1",
+      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+
+    assertEquals("Should get value of constant",
+      "FIRST.getNumber() * 3",
+      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+  }
+
+  @Test def cEnumElementParanoidValueGeneratorFirstIsSane {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""
+enum implicitFirst {
+  FIRST,
+  NEXT = FIRST + 32
+}
+    """, parser, parser.exprConverted)
+    assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
+      result.get.getReqs.isEmpty)
+
+    assertEquals("Wrong value",
+      "0",
+      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+
+    assertEquals("Should get value of constant",
+      "FIRST.getNumber() + 32",
+      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+  }
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test semantics of enums declared with SPECENUM
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline def parsesSpecEnumCorrectly(expression: String, parser: ParseCCode, isBitWise: Boolean, values: (String, Int,  String)*): Enum  = {
+  @inline def parsesSpecEnumCorrectly(expression: String, parser: ParseCCode, isBitWise: Boolean, values: (String, String, String)*): Enum  = {
     return parseEnumCorrectly(expression, parser, parser.specEnumDefConverted, isBitWise, values: _*)
   }
 
@@ -414,66 +505,66 @@ class CParserSemanticTest {
 
   @Test def testSpecEnum2Elements: Unit = {
     parsesSpecEnumCorrectly(specEnum2Elements, parseEnumTest, false,
-      ("ZERO", 0, "\"ZERO\""),
-      ("ONE", 1, "\"ONE\""))
+      ("ZERO", "0", "\"ZERO\""),
+      ("ONE", "1", "\"ONE\""))
   }
 
   @Test def testSpecEnum2NamedElements: Unit = {
     parsesSpecEnumCorrectly(specEnumTwoNamedElements, parseEnumTest, false,
-      ("ZERO", 0, "\"nothing\""),
-      ("ONE", 1, "\"something\""))
+      ("ZERO", "0", "\"nothing\""),
+      ("ONE", "1", "\"something\""))
   }
 
   @Test def testSpecEnum3ElementsBitwise: Unit = {
     parsesSpecEnumCorrectly(specEnum3ElementsBitwise, parseEnumTest, true,
-      ("ONE", 1, "\"ONE\""),
-      ("TWO", 2, "\"TWO\""),
-      ("THREE", 4, "\"THREE\""))
+      ("ONE", "1", "\"ONE\""),
+      ("TWO", "2", "\"TWO\""),
+      ("THREE", "4", "\"THREE\""))
   }
 
   @Test def testSpecEnum4ElementsBitwiseZero: Unit = {
     parsesSpecEnumCorrectly(specEnum4ElementsBitwiseZero, parseEnumTest, true,
-      ("ZERO", 0, "\"ZERO\""),
-      ("ONE", 1, "\"ONE\""),
-      ("TWO", 2, "\"TWO\""),
-      ("THREE", 4, "\"THREE\""))
+      ("ZERO", "0", "\"ZERO\""),
+      ("ONE", "1", "\"ONE\""),
+      ("TWO", "2", "\"TWO\""),
+      ("THREE", "4", "\"THREE\""))
   }
 
   @Test def testSpecEnum3ElementsBitwiseNamedZero: Unit = {
     parsesSpecEnumCorrectly(specEnum2ElementsBitwiseNamedZero, parseEnumTest, true,
-      ("ZERO", 0, "\"nothing\""),
-      ("ONE", 1, "\"ONE\""),
-      ("TWO", 2, "\"TWO\""))
+      ("ZERO", "0", "\"nothing\""),
+      ("ONE", "1", "\"ONE\""),
+      ("TWO", "2", "\"TWO\""))
   }
 
   @Test def testSpecEnum2ElementsInvalid: Unit = {
     val enum = parsesSpecEnumCorrectly(specEnum2ElementsInvalid, parseEnumTest, false,
-      ("ONE", 0, "\"ONE\""),
-      ("TWO", 1, "\"TWO\""))
+      ("ONE", "0", "\"ONE\""),
+      ("TWO", "1", "\"TWO\""))
     @inline val invalid = enum.getInvalidDefault
     assertNotNull("No invalid element found", invalid)
     assertFalse("The invalid element should be invalid", invalid.isValid)
-    assertEquals("Wrong invalid number", -2, invalid.getNumber)
+    assertEquals("Wrong invalid number", "-2", invalid.getValueGenerator)
   }
 
   @Test def testSpecEnum2ElementsCount: Unit = {
     val enum = parsesSpecEnumCorrectly(specEnum2ElementsCount, parseEnumTest, false,
-      ("ONE", 0, "\"ONE\""),
-      ("TWO", 1, "\"TWO\""))
+      ("ONE", "0", "\"ONE\""),
+      ("TWO", "1", "\"TWO\""))
     assertNotNull("No count element found", enum.getCount)
     assertEquals("Wrong name in code for count element", "NUMBER_OF", enum.getCount.getEnumValueName)
-    assertEquals("Wrong number for count element", 2, enum.getCount.getNumber)
+    assertEquals("Wrong number for count element", "2", enum.getCount.getValueGenerator)
     assertEquals("Wrong toString() value for count element", "\"NUMBER_OF\"", enum.getCount.getToStringName)
     assertFalse("The count element should be invalid", enum.getCount.isValid)
   }
 
   @Test def testSpecEnum2ElementsNamedCount: Unit = {
     val enum = parsesSpecEnumCorrectly(specEnum2ElementsNamedCount, parseEnumTest, false,
-      ("ONE", 0, "\"ONE\""),
-      ("TWO", 1, "\"TWO\""))
+      ("ONE", "0", "\"ONE\""),
+      ("TWO", "1", "\"TWO\""))
     assertNotNull("No count element found", enum.getCount)
     assertEquals("Wrong name in code for count element", "NUMBER_OF", enum.getCount.getEnumValueName)
-    assertEquals("Wrong number for count element", 2, enum.getCount.getNumber)
+    assertEquals("Wrong number for count element", "2", enum.getCount.getValueGenerator)
     assertEquals("Wrong toString() value for count element", "\"last\"", enum.getCount.getToStringName)
     assertFalse("The count element should be invalid", enum.getCount.isValid)
   }
@@ -487,18 +578,92 @@ class CParserSemanticTest {
   #define SPECENUM_COUNT ELEMENTS
   #include "specenum_gen.h"
   """, parseEnumTest, false,
-      ("ONE", 0, "\"ONE\""),
-      ("TWO", 1, "\"TWO\""))
+      ("ONE", "0", "\"ONE\""),
+      ("TWO", "1", "\"TWO\""))
 
     assertNotNull("No invalid element found", enum.getInvalidDefault)
     assertFalse("The invalid element should be invalid", enum.getInvalidDefault.isValid)
-    assertEquals("Wrong invalid number", -2, enum.getInvalidDefault.getNumber)
+    assertEquals("Wrong invalid number", "-2", enum.getInvalidDefault.getValueGenerator)
 
     assertNotNull("No count element found", enum.getCount)
     assertEquals("Wrong name in code for count element", "ELEMENTS", enum.getCount.getEnumValueName)
-    assertEquals("Wrong number for count element,", 2, enum.getCount.getNumber)
+    assertEquals("Wrong number for count element,", "2", enum.getCount.getValueGenerator)
     assertEquals("Wrong toString() value for count element", "\"ELEMENTS\"", enum.getCount.getToStringName)
     assertFalse("The count element should be invalid", enum.getCount.isValid)
+  }
+
+  @Test def testSpecEnumCountInvalidSortedRight: Unit = {
+    val enum = parsesSpecEnumCorrectly("""
+  #define SPECENUM_NAME test
+  #define SPECENUM_INVALID -2
+  #define SPECENUM_VALUE0 ONE
+  #define SPECENUM_VALUE1 TWO
+  #define SPECENUM_VALUE2 THREE
+  #define SPECENUM_COUNT ELEMENTS
+  #include "specenum_gen.h"
+  """, parseEnumTest, false,
+      ("ONE", "0", "\"ONE\""),
+      ("TWO", "1", "\"TWO\""))
+
+    //  Wrong sorting (what is tested here) or just a format change?
+    assertEquals("Generated enum code not as expected.",
+      """package org.freeciv.types;
+
+// This code was auto generated from Freeciv C code
+public enum test implements FCEnum {
+	ONE (0, "ONE"),
+	TWO (1, "TWO"),
+	THREE (2, "THREE"),
+	ELEMENTS (3, "ELEMENTS", false),
+	INVALID (-2, "INVALID", false);
+
+	private final int number;
+	private final boolean valid;
+	private final String toStringName;
+
+	private test(int number, String toStringName) {
+		this(number, toStringName, true);
+	}
+
+	private test(int number, String toStringName, boolean valid) {
+		this.number = number;
+		this.toStringName = toStringName;
+		this.valid = valid;
+	}
+
+	public int getNumber() {
+		return number;
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public String toString() {
+		return toStringName;
+	}
+
+	/**
+	 * Is the enum bitwise? An enum is bitwise if it's number increase by two's
+	 * exponent.
+	 * @return true if the enum is bitwise
+	 */
+	public static boolean isBitWise() {
+		return false;
+	}
+
+""" + "\t" // Work around bug adding a tab on a blank line
++ """
+	public static test valueOf(int number) {
+		for (test element: values()) {
+			if (element.getNumber() == number) {
+				return element;
+			}
+		}
+		return INVALID;
+	}
+}
+""", enum.toString)
   }
 
   /*--------------------------------------------------------------------------------------------------------------------

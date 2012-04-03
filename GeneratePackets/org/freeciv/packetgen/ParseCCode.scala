@@ -15,9 +15,10 @@
 package org.freeciv.packetgen
 
 import collection.mutable.ListBuffer
-import ClassWriter.EnumElement.{newEnumValue, newInvalidEnum}
+import scala.collection.JavaConverters.seqAsJavaListConverter
+import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
 import util.parsing.input.CharArrayReader
-import java.util.HashMap
+import java.util.{HashSet, HashMap}
 
 class ParseCCode extends ParseShared {
   def enumElemCode = identifierRegEx
@@ -59,7 +60,8 @@ class ParseCCode extends ParseShared {
   @inline private def se[Ret](kind: String, followedBy: Parser[Ret]) =
     defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}) ~ followedBy)
 
-  def specEnumOrName(kind: String) = se(kind + NAME, regex(""""[^\n\r\"]*?"""".r)) ||| se(kind, enumElemCode)
+  def specEnumOrName(kind: String) = se(kind + NAME, "\"" ~> enumElemCode <~ "\"" ^^ {"\"" + _ + "\""}) |
+    se(kind, enumElemCode)
 
   def specEnumDef = defineLine(startOfSpecEnum, regex(identifier.r)) ~
     (rep((specEnumOrName("VALUE\\d+") |
@@ -78,7 +80,7 @@ class ParseCCode extends ParseShared {
     @inline def enumerations: Map[String, String] = asStructures._2
     val bitwise = enumerations.contains("BITWISE")
 
-    val outEnumValues: ListBuffer[ClassWriter.EnumElement] = ListBuffer[ClassWriter.EnumElement](
+    val outEnumValues: ListBuffer[Enum.EnumElementKnowsNumber] = ListBuffer[Enum.EnumElementKnowsNumber](
       enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
         @inline def key = element._1
         @inline def nameInCode = enumerations.get(key).get
@@ -98,17 +100,20 @@ class ParseCCode extends ParseShared {
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
     if (enumerations.contains("INVALID"))
       outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
+    else
+      outEnumValues += newInvalidEnum(-1) // All spec enums have an invalid. Default value is -1
+    val sortedEnumValues: List[ClassWriter.EnumElement] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
     if (enumerations.contains("COUNT"))
       if (enumerations.contains("COUNT"+NAME))
         new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
-          enumerations.get("COUNT"+NAME).get, outEnumValues: _*)
+          enumerations.get("COUNT"+NAME).get, sortedEnumValues.asJava)
       else
-        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, outEnumValues: _*)
+        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, sortedEnumValues.asJava)
     else
-      new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues: _*)
+      new Enum(asStructures._1.asInstanceOf[String], bitwise, sortedEnumValues.asJava)
   }
 
-  def enumValue = regex("\\w+".r)
+  def enumValue = intExpr
 
   def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment) ^^ {
     case element~value => (element -> value)
@@ -116,27 +121,47 @@ class ParseCCode extends ParseShared {
 
   def cEnumDef = regex(startOfCEnum.r) ~> regex(identifier.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
 
-  def cEnumDefConverted = cEnumDef ^^ {asStructures =>
-    var globalNumbers: Int = 0
-    val alreadyRead = new HashMap[String, ClassWriter.EnumElement]()
-    new Enum(asStructures._1.asInstanceOf[String],
-      false,
-      asStructures._2.map(elem => {
-        if (!elem._2.isEmpty)
-          globalNumbers = parseEnumValue(elem._1, elem._2.get, alreadyRead)
-        val number = globalNumbers
-        globalNumbers += 1
-        val enumVal = newEnumValue(elem._1, number)
-        alreadyRead.put(elem._1, enumVal)
-        enumVal
-      }): _*)
-  }
+  def cEnumDefConverted = cEnumDef ^^ {asStructures => {
+    var iRequire = new HashSet[Requirement]()
 
-  def parseEnumValue(name: String, value: String, from: HashMap[String, ClassWriter.EnumElement]): Int =
-    if (from.containsKey(value))
-      from.get(value).getNumber
-    else
-      value.toInt
+    def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
+      var globalNumberExpression: IntExpression = IntExpression.integer("0")
+      val alreadyReadExpression = new HashMap[String, ClassWriter.EnumElement]()
+
+      @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
+        alreadyReadExpression.containsKey(value.toStringNotJava)
+
+      def countParanoid(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
+        if (!registeredValue.isEmpty) { // Value is specified
+          if (registeredValue.get.hasNoVariables)
+            globalNumberExpression = registeredValue.get
+          else {
+            globalNumberExpression = registeredValue.get.valueMap(value => {
+              if (isAnInterpretedConstantOnThis(value)) {
+                value.toStringNotJava + ".getNumber()"
+              } else {
+                iRequire.addAll(value.getReqs)
+                value.toString
+              }
+            })
+          }
+        }
+        val number = globalNumberExpression
+        globalNumberExpression = IntExpression.binary("+",
+          IntExpression.integer("1"),
+          IntExpression.handled(name + ".getNumber()"))
+        val enumVal = ClassWriter.EnumElement.newEnumValue(name, number.toString)
+        alreadyReadExpression.put(name, enumVal)
+        enumVal
+      }
+
+      elements.map(elem => countParanoid(elem._1, elem._2))
+    }
+
+    new Enum(asStructures._1.asInstanceOf[String],
+      iRequire,
+      countedCEnumElements(asStructures._2).asJava)
+  }}
 
   private var ignoreNewLinesFlag = true
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag

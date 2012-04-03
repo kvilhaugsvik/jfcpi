@@ -67,6 +67,47 @@ class ParseSharedTest {
   @Test def uminusParenBinMinus = assertIntExpressionBecomes("-(2 - 3)", "-(2 - 3)")
   @Test def manyPlus = assertIntExpressionBecomes("(((((4 + 4) + 4) + 4) + 4) + 4) + 4", "4+4+4+4+4+4+4")
 
+  // Semantic: hasNoVariables
+  @Test def numberIsNumber = assertTrue("The number 4 should be a number",
+    CParserTest.parsesCorrectly("4", parserShared, parserShared.intExpr).get.hasNoVariables)
+  @Test def constantIsConstant = assertFalse("The constant CONS should be a constant",
+    CParserTest.parsesCorrectly("CONS", parserShared, parserShared.intExpr).get.hasNoVariables)
+  @Test def negativeNumberIsNumber = assertTrue("An expression of numbers should be a number",
+    CParserTest.parsesCorrectly("-4", parserShared, parserShared.intExpr).get.hasNoVariables)
+  @Test def numberExpressionIsNumber = assertTrue("An expression of numbers should be a number",
+    CParserTest.parsesCorrectly("4 + 5 * (2 - 3 % 4) / 7", parserShared, parserShared.intExpr).get.hasNoVariables)
+  @Test def expressionWithConsIsNotANumber = assertFalse("An expression that has a constant is no pure number",
+    CParserTest.parsesCorrectly("4 + 5 * (2 - (3 % CONS))", parserShared, parserShared.intExpr).get.hasNoVariables)
+
+  // Semantic: calculates
+  @Test def numberIsSelf = assertEquals("The number 4 should be 4",
+    4,
+    CParserTest.parsesCorrectly("4", parserShared, parserShared.intExpr).get.evaluate)
+  @Test def negativeNumberIsSelf = assertEquals("The expression -4 should be -4",
+    -4,
+    CParserTest.parsesCorrectly("-4", parserShared, parserShared.intExpr).get.evaluate)
+  @Test def numberExpressionIsResult = assertEquals("Wrong result",
+    -4,
+    CParserTest.parsesCorrectly("((1 + 2) * 3 / 4 % 5) - 6", parserShared, parserShared.intExpr).get.evaluate)
+  @Test(expected = classOf[UnsupportedOperationException]) def constantWillNotWork {
+    CParserTest.parsesCorrectly("CONS", parserShared, parserShared.intExpr).get.evaluate
+  }
+
+  // TODO: Should probably be tested another place
+  // Mapping
+  @Test def mapParsedNumbersToTheirNames = assertEquals("Failed to map the values of an IntExpression",
+    "ONE + ((-TWO) * (THREE++))",
+    CParserTest.parsesCorrectly("1 + -2 * 3++", parserShared, parserShared.intExpr).get.valueMap(leaf => {
+      if ("1".equals(leaf.toString))
+        "ONE"
+      else if ("2".equals(leaf.toString))
+        "TWO"
+      else if ("3".equals(leaf.toString))
+        "THREE"
+      else
+        "UNKNOWN"
+    }).toString)
+
   /*--------------------------------------------------------------------------------------------------------------------
   Normalization of C int type declarations
   --------------------------------------------------------------------------------------------------------------------*/

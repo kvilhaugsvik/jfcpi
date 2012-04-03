@@ -20,53 +20,67 @@ import java.util.*;
 
 public class Enum extends ClassWriter implements IDependency.ManyFulfiller, FieldTypeBasic.Generator {
     private final boolean bitwise;
+    private final Collection<Requirement> iRequire;
     private final EnumElement invalidDefault;
     private final EnumElement countElement;
 
-    public Enum(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
-        this(enumName, bitwise, null, null, values);
+    public Enum(String enumName, boolean bitwise, List<ClassWriter.EnumElement> values) {
+        this(enumName, bitwise, null, null, Collections.<Requirement>emptySet(), values);
     }
 
-    public Enum(String enumName, String cntCode, ClassWriter.EnumElement... values) {
+    public Enum(String enumName, String cntCode, List<ClassWriter.EnumElement> values) {
         this(enumName, cntCode, null, values);
     }
 
-    public Enum(String enumName, String cntCode, String cntString, ClassWriter.EnumElement... values) {
-        this(enumName, false, cntCode, cntString, values);
+    public Enum(String enumName, String cntCode, String cntString, List<ClassWriter.EnumElement> values) {
+        this(enumName, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
     }
 
-    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, ClassWriter.EnumElement... values) {
-        super(ClassKind.ENUM, FCEnum.class.getPackage(), null, "Freeciv C code", enumName, "FCEnum");
+    public Enum(String enumName, Collection<Requirement> reqs, List<ClassWriter.EnumElement> values) {
+        this(enumName, false, null, null, reqs, values);
+    }
+
+    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs, List<ClassWriter.EnumElement> values) {
+        super(ClassKind.ENUM,
+                FCEnum.class.getPackage(),
+                reqs.isEmpty() ? null : new String[]{"org.freeciv.packet.Constants"},
+                "Freeciv C code",
+                enumName,
+                "FCEnum");
 
         this.bitwise = bitwise;
+        this.iRequire = reqs;
 
         int numberOfElements = 0;
+        EnumElement invalidCandidate = null;
         for (ClassWriter.EnumElement value: values) {
-            this.addEnumerated(value);
+            if (value.isValid()) {
+                numberOfElements++;
+                this.addEnumerated(value);
+            } else if (value.getEnumValueName().equals("INVALID"))
+                invalidCandidate = value;
 
-            if (value.isValid()) numberOfElements++;
-
-            if (bitwise && (0 < value.getNumber()))
-                for (int testAgainst = 1; testAgainst < value.getNumber() * 2; testAgainst = testAgainst * 2) {
-                    if (value.getNumber() < testAgainst)
-                        throw new IllegalArgumentException("Claims to be bitwise but is not.");
-                }
+            if (bitwise)
+                if (!(value instanceof EnumElementKnowsNumber))
+                    throw new IllegalArgumentException("Only spec enums can be declared bitwise");
+                else if (0 < ((EnumElementKnowsNumber)value).getNumber())
+                    for (int testAgainst = 1; testAgainst < ((EnumElementKnowsNumber)value).getNumber() * 2; testAgainst = testAgainst * 2)
+                        if (((EnumElementKnowsNumber)value).getNumber() < testAgainst)
+                            throw new IllegalArgumentException("Claims to be bitwise but is not.");
         }
         if (null != cntCode) {
             if (bitwise) throw new IllegalArgumentException("");
-            this.countElement = EnumElement.newInvalidEnum(cntCode,
-                    (null == cntString? '"' + cntCode + '"': cntString),
+            this.countElement = EnumElementKnowsNumber.newInvalidEnum(cntCode,
+                    (null == cntString ? '"' + cntCode + '"' : cntString),
                     numberOfElements);
             this.addEnumerated(this.countElement);
         } else {
             this.countElement = null;
         }
-        if (enums.containsKey("INVALID")) {
-            this.invalidDefault = enums.get("INVALID");
-        } else {
-            this.invalidDefault = EnumElement.newInvalidEnum(-1);
-            this.addEnumerated(this.invalidDefault);
-        }
+        if (null == invalidCandidate) // TODO: Should C enums have invalid? If not remove this.
+            invalidCandidate = EnumElementKnowsNumber.newInvalidEnum(-1);
+        this.invalidDefault = invalidCandidate;
+        this.addEnumerated(this.invalidDefault);
 
         addObjectConstant("int", "number");
         addObjectConstant("boolean", "valid");
@@ -102,6 +116,13 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
                 "return INVALID;");
     }
 
+    public void addEnumerated(String comment,
+                              String enumName,
+                              int number,
+                              String toStringName) {
+        addEnumerated(EnumElementKnowsNumber.newEnumValue(comment, enumName, number, toStringName));
+    }
+
     public boolean isBitwise() {
         return bitwise;
     }
@@ -129,7 +150,7 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
 
     @Override
     public Collection<Requirement> getReqs() {
-        return Collections.EMPTY_SET;
+        return iRequire;
     }
 
     @Override
@@ -159,5 +180,62 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
     @Override
     public Requirement.Kind needsDataInFormat() {
         return Requirement.Kind.FROM_NETWORK_TO_INT;
+    }
+
+    public static Enum fromArray(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
+        return new Enum(enumName, bitwise, Arrays.asList(values));
+    }
+
+    public static Enum fromArray(String enumName, String cntCode, ClassWriter.EnumElement... values) {
+        return new Enum(enumName, cntCode, Arrays.asList(values));
+    }
+
+    public static Enum fromArray(String enumName, String cntCode, String cntString, ClassWriter.EnumElement... values) {
+        return new Enum(enumName, cntCode, cntString, Arrays.asList(values));
+    }
+
+    public static Enum fromArray(String enumName, Collection<Requirement> reqs, ClassWriter.EnumElement... values) {
+        return new Enum(enumName, reqs, Arrays.asList(values));
+    }
+
+    static class EnumElementKnowsNumber extends ClassWriter.EnumElement {
+        private final int number;
+
+        EnumElementKnowsNumber(String comment, String elementName, int number, String toStringName, boolean valid) {
+            super(comment, elementName, number + "", toStringName, valid);
+
+            if (null == elementName)
+                throw new IllegalArgumentException("All elements of enums must have names");
+
+            // Look up numbers in a uniform way
+            if (null == toStringName)
+                throw new IllegalArgumentException("All elements of enums must have toStringNames");
+
+            this.number = number;
+        }
+
+        public int getNumber() {
+            return number;
+        }
+
+        static EnumElementKnowsNumber newEnumValue(String enumValueName, int number) {
+            return newEnumValue(enumValueName, number, '"' + enumValueName +  '"');
+        }
+
+        static EnumElementKnowsNumber newEnumValue(String enumValueName, int number, String toStringName) {
+            return newEnumValue(null, enumValueName, number, toStringName);
+        }
+
+        static EnumElementKnowsNumber newEnumValue(String comment, String enumValueName, int number, String toStringName) {
+            return new EnumElementKnowsNumber(comment, enumValueName, number, toStringName, true);
+        }
+
+        public static EnumElementKnowsNumber newInvalidEnum(int value) {
+            return newInvalidEnum("INVALID", "\"INVALID\"",  value);
+        }
+
+        public static EnumElementKnowsNumber newInvalidEnum(String nameInCode, String toStringName, int value) {
+            return new EnumElementKnowsNumber(null, nameInCode, value, toStringName, false);
+        }
     }
 }
