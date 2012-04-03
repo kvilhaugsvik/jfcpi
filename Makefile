@@ -10,6 +10,11 @@ GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.jav
 PROTOOUT ?= out/Protocol
 PACKETGENOUT ?= out/GeneratePackages
 TESTOUT ?= out/Tests
+
+# take instructions from trunk.xml
+VERSIONCONFIGURATION ?= trunk.xml
+# assume to be placed in the top level directory of Freeciv's source code unless told otherwise
+INPUTPATHPREFIX ?= ..
 DEVMODE ?= true
 
 PROTOJAR = FreecivProto.jar
@@ -27,6 +32,8 @@ generatordefaults:
 	echo "package org.freeciv.packetgen;" >> ${GENERATORDEFAULTS}
 	echo "public class GeneratorDefaults {" >> ${GENERATORDEFAULTS}
 	echo "  public static final String GENERATEDOUT = \"${GENERATEDOUT}\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final String INPUTPATHPREFIX = \"${INPUTPATHPREFIX}\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final boolean DEVMODE = ${DEVMODE};" >> ${GENERATORDEFAULTS}
 	echo "}" >>${GENERATORDEFAULTS}
 	touch generatordefaults

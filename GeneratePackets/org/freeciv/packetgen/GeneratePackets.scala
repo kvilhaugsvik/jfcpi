@@ -18,6 +18,7 @@ import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 import org.freeciv.Connect
+import xml.{Text, XML}
 
 class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
 
@@ -74,7 +75,22 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
 
 object GeneratePackets {
   def main(args: Array[String]) {
-    val self = new GeneratePackets(args(0), args.tail.toList, GeneratorDefaults.DEVMODE, true)
+    val pathPrefix = if (args.length < 1) GeneratorDefaults.INPUTPATHPREFIX else args(0)
+    val versionConfPath = if (args.length < 2) GeneratorDefaults.VERSIONCONFIGURATION else args(1)
+
+    val versionConfiguration = readVersionParameters(new File(versionConfPath))
+
+    val hasTwoBytePacketNumber = versionConfiguration.attribute("packetNumberSize").isDefined &&
+      versionConfiguration.attribute("packetNumberSize").get.text.toInt == 2
+
+    val inputSources = (versionConfiguration \"inputSource").map(elem =>
+      elem.attribute("parseAs").get.text -> (elem\"file").map(pathPrefix + "/" + _.text)).toMap
+
+    val self = new GeneratePackets(inputSources("packets").head,
+      inputSources("C").toList,
+      GeneratorDefaults.DEVMODE,
+      hasTwoBytePacketNumber)
+
     self.writeToDir(GeneratorDefaults.GENERATEDOUT)
   }
 
@@ -93,5 +109,10 @@ object GeneratePackets {
     val content = StreamReader(codeFile).source.toString
     codeFile.close()
     return content
+  }
+
+  def readVersionParameters(listFile: File) = {
+    checkFilesCanRead(listFile :: Nil)
+    XML.loadFile(listFile)
   }
 }
