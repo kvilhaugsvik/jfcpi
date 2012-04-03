@@ -45,6 +45,15 @@ generator: generatordefaults protocol
 	${SCALAC} -classpath ${PACKETGENOUT}:${PROTOOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.scala
 	touch generator
 
+sourceFromFreeciv: generator
+	${SCALA} -classpath ${PACKETGENOUT}:${PROTOOUT} org.freeciv.packetgen.GeneratePackets ${INPUTPATHPREFIX}
+	touch sourceFromFreeciv
+
+compileFromFreeciv: sourceFromFreeciv
+	${JAVAC} -d ${PROTOOUT} -cp ${PROTOOUT} ${GENERATEDOUT}/org/freeciv/*/*.java ${GENERATEDOUT}/org/freeciv/*/*/*.java
+	cp ${GENERATEDOUT}/org/freeciv/packet/packets.txt ${PROTOOUT}/org/freeciv/packet/
+	touch compileFromFreeciv
+
 testpackets: protocol generator
 	mkdir -p ${TESTOUT}
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT} Tests/org/freeciv/packetgen/GenerateTest.java
@@ -120,6 +129,8 @@ clean:
 	rm -f all
 	rm -rf testsignintoserver
 	rm -rf ${PROTOJAR}
+	rm -rf sourceFromFreeciv
+	rm -rf compileFromFreeciv
 
 distclean: clean
 	rm -rf out ${GENERATEDOUT}
