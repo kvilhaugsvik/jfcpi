@@ -17,7 +17,7 @@ package org.freeciv.packetgen
 import collection.mutable.ListBuffer
 import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
 import util.parsing.input.CharArrayReader
-import java.util.HashMap
+import java.util.{HashSet, HashMap}
 
 class ParseCCode extends ParseShared {
   def enumElemCode = identifierRegEx
@@ -118,12 +118,18 @@ class ParseCCode extends ParseShared {
   def cEnumDef = regex(startOfCEnum.r) ~> regex(identifier.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
 
   def cEnumDefConverted = cEnumDef ^^ {asStructures => {
+    var iRequire = new HashSet[Requirement]()
+
     def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
       var globalNumbers: Int = 0
       val alreadyRead = new HashMap[String, Enum.EnumElementKnowsNumber]()
 
+      // TODO: let all be expressions.
+      var globalNumberExpression: IntExpression = IntExpression.integer("0")
+      val alreadyReadExpression = new HashMap[String, ClassWriter.EnumElement]()
+
       @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
-        alreadyRead.containsKey(value.toStringNotJava)
+        alreadyRead.containsKey(value.toStringNotJava) || alreadyReadExpression.containsKey(value.toStringNotJava)
 
       def parseEnumValue(name: String, value: IntExpression): Int =
         if (isAnInterpretedConstantOnThis(value)) // a constant on this enum
@@ -143,11 +149,41 @@ class ParseCCode extends ParseShared {
         enumVal
       }
 
-      elements.map(elem => countPretty(elem._1, elem._2))
+      def countParanoid(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
+        if (!registeredValue.isEmpty) { // Value is specified
+          if (registeredValue.get.hasNoVariables)
+            globalNumberExpression = registeredValue.get
+          else {
+            globalNumberExpression = registeredValue.get.valueMap(value => {
+              if (isAnInterpretedConstantOnThis(value)) {
+                value.toStringNotJava + ".getNumber()"
+              } else {
+                iRequire.addAll(value.getReqs)
+                value.toString
+              }
+            })
+          }
+        }
+        val number = globalNumberExpression
+        globalNumberExpression = IntExpression.binary("+",
+          IntExpression.integer("1"),
+          IntExpression.handled(name + ".getNumber()"))
+        val enumVal = ClassWriter.EnumElement.newEnumValue(name, number.toString)
+        alreadyReadExpression.put(name, enumVal)
+        enumVal
+      }
+
+      try {
+        elements.map(elem => countPretty(elem._1, elem._2))
+      } catch {
+        case notSupported : UnsupportedOperationException =>
+          elements.map(elem => countParanoid(elem._1, elem._2))
+        case e => throw e
+      }
     }
 
     new Enum(asStructures._1.asInstanceOf[String],
-      false,
+      iRequire,
       countedCEnumElements(asStructures._2): _*)
   }}
 

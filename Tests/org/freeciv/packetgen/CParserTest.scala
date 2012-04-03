@@ -77,6 +77,24 @@ object CParserTest {
     /* comment */
   }"""
 
+  def cEnumHavingExternalStartValue = """
+    enum refersToConstant {
+      ONE = START_VALUE,
+      TWO
+    }"""
+
+  def cEnumStartValueIsAnExpressionInvolvingExternal = """
+    enum refersToConstant {
+      FIRST = START_VALUE * 16,
+      NEXT
+    }"""
+
+  def cEnumHavingExternalStartValueRefersBack = """
+    enum refersToConstant {
+      FIRST = 1,
+      NEXT = FIRST * 3
+    }"""
+
   def commentCxxOneLine = "// A comment" + "\n"
   def commentCOneLine = "/* A comment */" + "\n"
 
@@ -396,6 +414,79 @@ class CParserSemanticTest {
       ("null", "0", "\"null\""))
   }
 
+  @Test def cEnumNeedingConstant {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
+    assertTrue("C enum based on external constant should depend on it",
+      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+  }
+
+  @Test def cEnumElementParanoidValueGeneratorSimple {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
+
+    assertTrue("C enum based on external constant should depend on it",
+      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+
+    assertEquals("Should get value of constant",
+      "Constants.START_VALUE",
+      result.get.asInstanceOf[Enum].getEnumValue("ONE").getValueGenerator)
+
+    assertEquals("Should get value of constant",
+      "1 + ONE.getNumber()",
+      result.get.asInstanceOf[Enum].getEnumValue("TWO").getValueGenerator)
+  }
+
+  @Test def cEnumElementParanoidValueGeneratorExpression {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly(cEnumStartValueIsAnExpressionInvolvingExternal, parser, parser.exprConverted)
+
+    assertTrue("C enum based on external constant should depend on it",
+      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+
+    assertEquals("Should contain calculation",
+      "Constants.START_VALUE * 16",
+      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+
+    assertEquals("Should get value of constant",
+      "1 + FIRST.getNumber()",
+      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+  }
+
+  @Test def cEnumElementParanoidValueGeneratorPreviousExpression {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly(cEnumHavingExternalStartValueRefersBack, parser, parser.exprConverted)
+    assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
+      result.get.getReqs.isEmpty)
+
+    assertEquals("Wrong value",
+      "1",
+      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+
+    assertEquals("Should get value of constant",
+      "FIRST.getNumber() * 3",
+      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+  }
+
+  @Test def cEnumElementParanoidValueGeneratorFirstIsSane {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""
+enum implicitFirst {
+  FIRST,
+  NEXT = FIRST + 32
+}
+    """, parser, parser.exprConverted)
+    assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
+      result.get.getReqs.isEmpty)
+
+    assertEquals("Wrong value",
+      "0",
+      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+
+    assertEquals("Should get value of constant",
+      "FIRST.getNumber() + 32",
+      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+  }
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test semantics of enums declared with SPECENUM
