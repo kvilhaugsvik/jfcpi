@@ -15,6 +15,7 @@
 package org.freeciv.packetgen
 
 import collection.mutable.ListBuffer
+import scala.collection.JavaConverters.seqAsJavaListConverter
 import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
@@ -102,11 +103,11 @@ class ParseCCode extends ParseShared {
     if (enumerations.contains("COUNT"))
       if (enumerations.contains("COUNT"+NAME))
         new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
-          enumerations.get("COUNT"+NAME).get, outEnumValues: _*)
+          enumerations.get("COUNT"+NAME).get, outEnumValues.asJava)
       else
-        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, outEnumValues: _*)
+        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, outEnumValues.asJava)
     else
-      new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues: _*)
+      new Enum(asStructures._1.asInstanceOf[String], bitwise, outEnumValues.asJava)
   }
 
   def enumValue = intExpr
@@ -184,7 +185,7 @@ class ParseCCode extends ParseShared {
 
     new Enum(asStructures._1.asInstanceOf[String],
       iRequire,
-      countedCEnumElements(asStructures._2): _*)
+      countedCEnumElements(asStructures._2).asJava)
   }}
 
   private var ignoreNewLinesFlag = true

@@ -39,21 +39,21 @@ public class GenerateTest {
             (new File(GeneratorDefaults.GENERATEDOUT + "/" + pack.getName().replace('.', '/'))).mkdirs();
         }
 
-        Enum test = new Enum("test", false,
+        Enum test = Enum.fromArray("test", false,
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
                 newEnumValue("three", 3),
                 newInvalidEnum(-3));
-        Enum testDefaultInvalid = new Enum("testDefaultInvalid", false,
+        Enum testDefaultInvalid = Enum.fromArray("testDefaultInvalid", false,
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
                 newEnumValue("three", 3));
-        Enum testCount = new Enum("testCount", "COUNT", "\"numbers listed\"",
+        Enum testCount = Enum.fromArray("testCount", "COUNT", "\"numbers listed\"",
                 newEnumValue("zero", 0),
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
                 newEnumValue("three", 3));
-        Enum bitwise = new Enum("bitwise", true,
+        Enum bitwise = Enum.fromArray("bitwise", true,
                 newEnumValue("one", 1),
                 newEnumValue("two", 2),
                 newEnumValue("four", 4));

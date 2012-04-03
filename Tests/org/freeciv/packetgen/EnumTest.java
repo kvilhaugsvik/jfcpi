@@ -25,67 +25,67 @@ import static org.freeciv.packetgen.Enum.EnumElementKnowsNumber.*;
 
 public class EnumTest {
     @Test public void testBitWiseHasANumber0() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("NOT2EXP", 0));
     }
 
     @Test public void testBitWiseHasANumber1() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("NOT2EXP", 1));
     }
 
     @Test public void testBitWiseHasANumber2() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("NOT2EXP", 2));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber3() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("TWO", 2),
                 newEnumValue("THREE", 3));
     }
 
     @Test public void testBitWiseHasANumber4() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("NOT2EXP", 4));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber15() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("TWO", 2),
                 newEnumValue("NOT2EXP", 15));
     }
 
     @Test public void testBitWiseHasANumber16() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("TWO", 2),
                 newEnumValue("NOT2EXP", 16));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber17() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("TWO", 2),
                 newEnumValue("NOT2EXP", 17));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber18() {
-        new Enum("test", true,
+        Enum.fromArray("test", true,
                 newEnumValue("TWO", 2),
                 newEnumValue("NOT2EXP", 18));
     }
 
     @Test public void testBitWiseIsBitWise() {
-        Enum result = new Enum("test", true,
+        Enum result = Enum.fromArray("test", true,
                 newEnumValue("TWO", 2));
         assertTrue("A bitwise Enum should report to be bitwise", result.isBitwise());
     }
 
     private Enum enumWithValues() {
-        return new Enum("test", false,
+        return Enum.fromArray("test", false,
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2));
@@ -147,7 +147,7 @@ public class EnumTest {
     }
 
     @Test public void enumCount() {
-        Enum result = new Enum("test", "ELEMENTS",
+        Enum result = Enum.fromArray("test", "ELEMENTS",
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2));
@@ -159,7 +159,7 @@ public class EnumTest {
     }
 
     @Test public void enumCount2Elements() {
-        Enum result = new Enum("test", "ELEMENTS",
+        Enum result = Enum.fromArray("test", "ELEMENTS",
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1));
         assertNotNull("Counting element not added", result.getCount());
@@ -170,7 +170,7 @@ public class EnumTest {
     }
 
     @Test public void enumCountNamed() {
-        Enum result = new Enum("test", "ELEMENTS", "\"the elements\"",
+        Enum result = Enum.fromArray("test", "ELEMENTS", "\"the elements\"",
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1));
         assertNotNull("Counting element not added", result.getCount());
@@ -183,11 +183,11 @@ public class EnumTest {
     @Test(expected = IllegalArgumentException.class)
     public void enumCountBitwiseSpecified() {
         Enum result = new Enum("test", true, "ELEMENTS", "\"the elements\"", Collections.<Requirement>emptySet(),
-                newEnumValue("ONE", 1));
+                Arrays.<ClassWriter.EnumElement>asList(newEnumValue("ONE", 1)));
     }
 
     @Test public void enumInvalidBitwise() {
-        Enum result = new Enum("test", true,
+        Enum result = Enum.fromArray("test", true,
                 newInvalidEnum(-2),
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1),
@@ -201,7 +201,7 @@ public class EnumTest {
 
     @Test public void enumProvidesValues() {
         HashMap<String, Constant> constants = new HashMap<String, Constant>();
-        Enum hasValues = new Enum("Count", false,
+        Enum hasValues = Enum.fromArray("Count", false,
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2));
 
@@ -223,7 +223,7 @@ public class EnumTest {
 
     @Test public void enumRequiresOther() {
         Requirement constantReferedTo = new Requirement("START_VALUE", Requirement.Kind.VALUE);
-        Enum inNeed = new Enum("NeedOther", Arrays.asList(constantReferedTo),
+        Enum inNeed = Enum.fromArray("NeedOther", Arrays.asList(constantReferedTo),
                 ClassWriter.EnumElement.newEnumValue("ONE", "Constants.START_VALUE"),
                 ClassWriter.EnumElement.newEnumValue("TWO", "ONE.getNumber() + 1"));
         assertTrue("Enum should require the given requirements", inNeed.getReqs().contains(constantReferedTo));

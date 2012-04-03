@@ -24,23 +24,23 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
     private final EnumElement invalidDefault;
     private final EnumElement countElement;
 
-    public Enum(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
+    public Enum(String enumName, boolean bitwise, List<ClassWriter.EnumElement> values) {
         this(enumName, bitwise, null, null, Collections.<Requirement>emptySet(), values);
     }
 
-    public Enum(String enumName, String cntCode, ClassWriter.EnumElement... values) {
+    public Enum(String enumName, String cntCode, List<ClassWriter.EnumElement> values) {
         this(enumName, cntCode, null, values);
     }
 
-    public Enum(String enumName, String cntCode, String cntString, ClassWriter.EnumElement... values) {
+    public Enum(String enumName, String cntCode, String cntString, List<ClassWriter.EnumElement> values) {
         this(enumName, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
     }
 
-    public Enum(String enumName, Collection<Requirement> reqs, ClassWriter.EnumElement... values) {
+    public Enum(String enumName, Collection<Requirement> reqs, List<ClassWriter.EnumElement> values) {
         this(enumName, false, null, null, reqs, values);
     }
 
-    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs, ClassWriter.EnumElement... values) {
+    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs, List<ClassWriter.EnumElement> values) {
         super(ClassKind.ENUM,
                 FCEnum.class.getPackage(),
                 reqs.isEmpty() ? null : new String[]{"org.freeciv.packet.Constants"},
@@ -179,6 +179,22 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
     @Override
     public Requirement.Kind needsDataInFormat() {
         return Requirement.Kind.FROM_NETWORK_TO_INT;
+    }
+
+    public static Enum fromArray(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
+        return new Enum(enumName, bitwise, Arrays.asList(values));
+    }
+
+    public static Enum fromArray(String enumName, String cntCode, ClassWriter.EnumElement... values) {
+        return new Enum(enumName, cntCode, Arrays.asList(values));
+    }
+
+    public static Enum fromArray(String enumName, String cntCode, String cntString, ClassWriter.EnumElement... values) {
+        return new Enum(enumName, cntCode, cntString, Arrays.asList(values));
+    }
+
+    public static Enum fromArray(String enumName, Collection<Requirement> reqs, ClassWriter.EnumElement... values) {
+        return new Enum(enumName, reqs, Arrays.asList(values));
     }
 
     static class EnumElementKnowsNumber extends ClassWriter.EnumElement {
