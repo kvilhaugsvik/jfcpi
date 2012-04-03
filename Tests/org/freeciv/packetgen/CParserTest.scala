@@ -592,6 +592,80 @@ enum implicitFirst {
     assertFalse("The count element should be invalid", enum.getCount.isValid)
   }
 
+  @Test def testSpecEnumCountInvalidSortedRight: Unit = {
+    val enum = parsesSpecEnumCorrectly("""
+  #define SPECENUM_NAME test
+  #define SPECENUM_INVALID -2
+  #define SPECENUM_VALUE0 ONE
+  #define SPECENUM_VALUE1 TWO
+  #define SPECENUM_VALUE2 THREE
+  #define SPECENUM_COUNT ELEMENTS
+  #include "specenum_gen.h"
+  """, parseEnumTest, false,
+      ("ONE", "0", "\"ONE\""),
+      ("TWO", "1", "\"TWO\""))
+
+    //  Wrong sorting (what is tested here) or just a format change?
+    assertEquals("Generated enum code not as expected.",
+      """package org.freeciv.types;
+
+// This code was auto generated from Freeciv C code
+public enum test implements FCEnum {
+	ONE (0, "ONE"),
+	TWO (1, "TWO"),
+	THREE (2, "THREE"),
+	ELEMENTS (3, "ELEMENTS", false),
+	INVALID (-2, "INVALID", false);
+
+	private final int number;
+	private final boolean valid;
+	private final String toStringName;
+
+	private test(int number, String toStringName) {
+		this(number, toStringName, true);
+	}
+
+	private test(int number, String toStringName, boolean valid) {
+		this.number = number;
+		this.toStringName = toStringName;
+		this.valid = valid;
+	}
+
+	public int getNumber() {
+		return number;
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public String toString() {
+		return toStringName;
+	}
+
+	/**
+	 * Is the enum bitwise? An enum is bitwise if it's number increase by two's
+	 * exponent.
+	 * @return true if the enum is bitwise
+	 */
+	public static boolean isBitWise() {
+		return false;
+	}
+
+""" + "\t" // Work around bug adding a tab on a blank line
++ """
+	public static test valueOf(int number) {
+		for (test element: values()) {
+			if (element.getNumber() == number) {
+				return element;
+			}
+		}
+		return INVALID;
+	}
+}
+""", enum.toString)
+  }
+
   /*--------------------------------------------------------------------------------------------------------------------
   Test semantics of constants
   --------------------------------------------------------------------------------------------------------------------*/

@@ -100,6 +100,8 @@ class ParseCCode extends ParseShared {
         outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
     if (enumerations.contains("INVALID"))
       outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
+    else
+      outEnumValues += newInvalidEnum(-1) // All spec enums have an invalid. Default value is -1
     val sortedEnumValues: List[ClassWriter.EnumElement] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
     if (enumerations.contains("COUNT"))
       if (enumerations.contains("COUNT"+NAME))

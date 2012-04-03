@@ -52,10 +52,13 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         this.iRequire = reqs;
 
         int numberOfElements = 0;
+        EnumElement invalidCandidate = null;
         for (ClassWriter.EnumElement value: values) {
-            this.addEnumerated(value);
-
-            if (value.isValid()) numberOfElements++;
+            if (value.isValid()) {
+                numberOfElements++;
+                this.addEnumerated(value);
+            } else if (value.getEnumValueName().equals("INVALID"))
+                invalidCandidate = value;
 
             if (bitwise)
                 if (!(value instanceof EnumElementKnowsNumber))
@@ -74,12 +77,10 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         } else {
             this.countElement = null;
         }
-        if (enums.containsKey("INVALID")) {
-            this.invalidDefault = enums.get("INVALID");
-        } else {
-            this.invalidDefault = EnumElementKnowsNumber.newInvalidEnum(-1);
-            this.addEnumerated(this.invalidDefault);
-        }
+        if (null == invalidCandidate) // TODO: Should C enums have invalid? If not remove this.
+            invalidCandidate = EnumElementKnowsNumber.newInvalidEnum(-1);
+        this.invalidDefault = invalidCandidate;
+        this.addEnumerated(this.invalidDefault);
 
         addObjectConstant("int", "number");
         addObjectConstant("boolean", "valid");
