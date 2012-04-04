@@ -145,7 +145,7 @@ public class PacketsStore {
         if (out.size() < inn.size()) {
             int border = GeneratorDefaults.CONSTANT_LOCATION.lastIndexOf('.');
             ClassWriter constants =
-                    new ClassWriter(Package.getPackage(GeneratorDefaults.CONSTANT_LOCATION.substring(0, border)),
+                    new ClassWriter(new ClassWriter.TargetPackage(GeneratorDefaults.CONSTANT_LOCATION.substring(0, border)),
                             new String[0],
                             "Freeciv C code",
                             GeneratorDefaults.CONSTANT_LOCATION.substring(border + 1),
