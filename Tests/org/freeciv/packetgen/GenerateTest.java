@@ -31,12 +31,18 @@ public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
     public static void main(String[] args) throws IOException {
+        String targetFolder;
+        if (args.length < 1)
+            targetFolder = GeneratorDefaults.GENERATED_SOURCE_FOLDER;
+        else
+            targetFolder = args[0];
+
         for (Package pack: new Package[]{
                 org.freeciv.types.FCEnum.class.getPackage(),
                 org.freeciv.packet.Packet.class.getPackage(),
                 org.freeciv.packet.fieldtype.FieldType.class.getPackage()
         }) {
-            (new File(GeneratorDefaults.GENERATED_SOURCE_FOLDER + "/" + pack.getName().replace('.', '/'))).mkdirs();
+            (new File(targetFolder + "/" + pack.getName().replace('.', '/'))).mkdirs();
         }
 
         Enum test = Enum.fromArray("test", false,
@@ -59,10 +65,10 @@ public class GenerateTest {
                 newEnumValue("four", 4));
 
 
-        writeJavaFile(test);
-        writeJavaFile(testDefaultInvalid);
-        writeJavaFile(bitwise);
-        writeJavaFile(testCount);
+        writeJavaFile(test, targetFolder);
+        writeJavaFile(testDefaultInvalid, targetFolder);
+        writeJavaFile(bitwise, targetFolder);
+        writeJavaFile(testCount, targetFolder);
 
         HashMap<String, FieldTypeBasic> primitiveTypes = new HashMap<String, FieldTypeBasic>();
         HashMap<String, FieldTypeBasic.Generator> generators = new HashMap<String, FieldTypeBasic.Generator>();
@@ -89,11 +95,11 @@ public class GenerateTest {
         FieldTypeBasic.FieldTypeAlias connection =
                 getPrimitiveFieldType(primitiveTypes, generators, network, "sint16", "int", "CONNECTION");
 
-        writeJavaFile(uint8);
-        writeJavaFile(uint32);
-        writeJavaFile(string);
-        writeJavaFile(bool);
-        writeJavaFile(connection);
+        writeJavaFile(uint8, targetFolder);
+        writeJavaFile(uint32, targetFolder);
+        writeJavaFile(string, targetFolder);
+        writeJavaFile(bool, targetFolder);
+        writeJavaFile(connection, targetFolder);
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
                 false,
@@ -105,7 +111,7 @@ public class GenerateTest {
                         new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("major_version", uint32),
                 new Field("minor_version", uint32),
-                new Field("patch_version", uint32)));
+                new Field("patch_version", uint32)), targetFolder);
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
                 false,
@@ -116,9 +122,9 @@ public class GenerateTest {
                         new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("challenge_file", string,
                         new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("conn_id", connection)));
-        writePacket(new Packet("CONN_PING", 88, false));
-        writePacket(new Packet("CONN_PONG", 89, false));
+                new Field("conn_id", connection)), targetFolder);
+        writePacket(new Packet("CONN_PING", 88, false), targetFolder);
+        writePacket(new Packet("CONN_PONG", 89, false), targetFolder);
         writePacket(new Packet("SERVER_JOIN_REQ2ByteKind",
                 4,
                 true,
@@ -130,24 +136,24 @@ public class GenerateTest {
                         new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("major_version", uint32),
                 new Field("minor_version", uint32),
-                new Field("patch_version", uint32)));
+                new Field("patch_version", uint32)), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
                 true,
                 new Field("theArray", uint32,
-                        new Field.ArrayDeclaration(IntExpression.integer("2"), null))));
+                        new Field.ArrayDeclaration(IntExpression.integer("2"), null))), targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
                 true,
                 new Field("toTransfer", uint8),
                 new Field("theArray", uint32,
-                        new Field.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))));
+                        new Field.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))), targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
                 true,
                 new Field("theArray", uint32,
                         new Field.ArrayDeclaration(IntExpression.integer("2"), null),
-                        new Field.ArrayDeclaration(IntExpression.integer("3"), null))));
+                        new Field.ArrayDeclaration(IntExpression.integer("3"), null))), targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
                 true,
@@ -155,7 +161,7 @@ public class GenerateTest {
                 new Field("toTransfer2", uint8),
                 new Field("theArray", uint32,
                         new Field.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"),
-                        new Field.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))));
+                        new Field.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))), targetFolder);
         writePacket(new Packet("StringArray",
                 930,
                 true,
@@ -163,9 +169,9 @@ public class GenerateTest {
                         new Field.ArrayDeclaration(IntExpression.integer("15"), null)),
                 new Field("theArray", string,
                         new Field.ArrayDeclaration(IntExpression.integer("3"), null),
-                        new Field.ArrayDeclaration(IntExpression.integer("10"), null))));
+                        new Field.ArrayDeclaration(IntExpression.integer("10"), null))), targetFolder);
 
-        FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATED_SOURCE_FOLDER + Connect.packetsList);
+        FileWriter packetList = new FileWriter(targetFolder + Connect.packetsList);
         for (String packet: writtenPackets) {
             packetList.write(packet + "\n");
         }
@@ -181,14 +187,14 @@ public class GenerateTest {
             return generators.get(pType).getBasicFieldTypeOnInput(network.get(netType)).createFieldType(alias);
     }
 
-    private static void writePacket(Packet packet) throws IOException {
-        writeJavaFile(packet);
+    private static void writePacket(Packet packet, String targetFolder) throws IOException {
+        writeJavaFile(packet, targetFolder);
         writtenPackets.add((packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName()));
     }
 
-    private static void writeJavaFile(ClassWriter content) throws IOException {
+    private static void writeJavaFile(ClassWriter content, String targetFolder) throws IOException {
         String packagePath = content.getPackage().replace('.', '/');
-        File classFile = new File(GeneratorDefaults.GENERATED_SOURCE_FOLDER +
+        File classFile = new File(targetFolder +
                 "/" + packagePath + "/" + content.getName() + ".java");
         System.out.println(classFile.getAbsolutePath());
         classFile.createNewFile();
