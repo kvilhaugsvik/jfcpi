@@ -429,7 +429,7 @@ class CParserSemanticTest {
       result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
 
     assertEquals("Should get value of constant",
-      "Constants.START_VALUE",
+      GeneratorDefaults.CONSTANT_LOCATION + ".START_VALUE",
       result.get.asInstanceOf[Enum].getEnumValue("ONE").getValueGenerator)
 
     assertEquals("Should get value of constant",
@@ -445,7 +445,7 @@ class CParserSemanticTest {
       result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
 
     assertEquals("Should contain calculation",
-      "Constants.START_VALUE * 16",
+      GeneratorDefaults.CONSTANT_LOCATION + ".START_VALUE * 16",
       result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
 
     assertEquals("Should get value of constant",
@@ -683,7 +683,7 @@ public enum test implements FCEnum {
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
-    assertEquals("Wrong value generation expression", "Constants.WRONG", result.get.getExpression)
+    assertEquals("Wrong value generation expression", GeneratorDefaults.CONSTANT_LOCATION + ".WRONG", result.get.getExpression)
 
     val reqs: Collection[Requirement] = result.get.getReqs
     assertNotNull("Didn't even generate requirements...", reqs)
@@ -710,7 +710,7 @@ public enum test implements FCEnum {
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "COMPLEX", result.get.getName)
-    assertEquals("Wrong value generation expression", "(Constants.WRONG * 2) + Constants.SIMPLE", result.get.getExpression)
+    assertEquals("Wrong value generation expression", "(" + GeneratorDefaults.CONSTANT_LOCATION + ".WRONG * 2) + " + GeneratorDefaults.CONSTANT_LOCATION + ".SIMPLE", result.get.getExpression)
 
     val reqs: Collection[Requirement] = result.get.getReqs
     assertNotNull("Didn't even generate requirements...", reqs)

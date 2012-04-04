@@ -8,8 +8,7 @@ import java.util.HashSet;
 import java.util.regex.Pattern;
 
 public class IntExpression {
-    private static final String CONSTANTS_CLASS = GeneratorDefaults.CONSTANT_LOCATION
-            .substring(GeneratorDefaults.CONSTANT_LOCATION.lastIndexOf('.') + 1) + ".";
+    private static final String CONSTANTS_CLASS = GeneratorDefaults.CONSTANT_LOCATION + ".";
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(CONSTANTS_CLASS);
 
     private final String operatorOrValue;

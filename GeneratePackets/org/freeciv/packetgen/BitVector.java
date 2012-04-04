@@ -6,7 +6,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
     private final Collection<Requirement> iRequire;
     private final Requirement iProvide;
     public BitVector(String name, IntExpression bits) {
-        super(org.freeciv.types.BitVector.class.getPackage(), new String[]{GeneratorDefaults.CONSTANT_LOCATION},
+        super(org.freeciv.types.BitVector.class.getPackage(), null,
                 "Freeciv C code", name, "BitVector", null);
 
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
