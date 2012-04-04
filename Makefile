@@ -63,15 +63,14 @@ sourceTestPeers: compileBasicProtocol compileCodeGenerator
 	${JAVA} -cp ${TESTOUT}:${PACKETGENOUT}:${PROTOOUT} org.freeciv.packetgen.GenerateTest
 	touch sourceTestPeers
 
-# since the parser isn't finished use GenerateTest as generator
 compileTestPeers: compileCodeGenerator compileBasicProtocol sourceTestPeers
 	${JAVAC} -d ${PROTOOUT} -cp ${PROTOOUT} ${GENERATEDOUT}/org/freeciv/*/*.java \
 	                                        ${GENERATEDOUT}/org/freeciv/*/*/*.java
 	cp ${GENERATEDOUT}/org/freeciv/packet/packets.txt ${PROTOOUT}/org/freeciv/packet/
 	touch compileTestPeers
 
-protojar: compileTestPeers
-	${JAR} cf ${PROTOJAR} ${PACKETGENOUT}
+protojar: compileFromFreeciv
+	${JAR} cf ${PROTOJAR} ${PROTOOUT}
 	touch protojar
 
 folderTestOut:
