@@ -75,7 +75,7 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
 
 object GeneratePackets {
   def main(args: Array[String]) {
-    val pathPrefix = if (args.length < 1) GeneratorDefaults.INPUTPATHPREFIX else args(0)
+    val pathPrefix = if (args.length < 1) GeneratorDefaults.FREECIV_SOURCE_PATH else args(0)
     val versionConfPath = if (args.length < 2) GeneratorDefaults.VERSIONCONFIGURATION else args(1)
 
     val versionConfiguration = readVersionParameters(new File(versionConfPath))
