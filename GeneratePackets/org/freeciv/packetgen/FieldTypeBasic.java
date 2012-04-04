@@ -72,7 +72,7 @@ public class FieldTypeBasic implements IDependency {
     public class FieldTypeAlias extends ClassWriter implements IDependency {
 
         private FieldTypeAlias(String name) {
-            super(org.freeciv.packet.fieldtype.FieldType.class.getPackage(),
+            super(new ClassWriter.TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
                     new String[]{
                             java.io.DataInput.class.getCanonicalName(),
                             java.io.DataOutput.class.getCanonicalName(),

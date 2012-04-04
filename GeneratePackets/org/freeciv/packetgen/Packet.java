@@ -24,7 +24,7 @@ public class Packet extends ClassWriter implements IDependency {
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
     public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
-        super(org.freeciv.packet.Packet.class.getPackage(),
+        super(new ClassWriter.TargetPackage(org.freeciv.packet.Packet.class.getPackage()),
                 new String[]{
                         allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
                         allInPackageOf(org.freeciv.types.FCEnum.class),

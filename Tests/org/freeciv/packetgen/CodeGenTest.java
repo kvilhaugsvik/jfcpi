@@ -239,7 +239,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoPackage() {
-        ClassWriter toWrite = new ClassWriter(null,
+        ClassWriter toWrite = new ClassWriter((TargetPackage)null,
                 new String[]{"org.freeciv.packet.Packet"},
                 "nothing",
                 "NameOfClass",

@@ -42,8 +42,8 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
 
     public Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs, List<ClassWriter.EnumElement> values) {
         super(ClassKind.ENUM,
-                FCEnum.class.getPackage(),
-                reqs.isEmpty() ? null : new String[]{"org.freeciv.packet.Constants"},
+                new ClassWriter.TargetPackage(FCEnum.class.getPackage()),
+                null,
                 "Freeciv C code",
                 enumName,
                 "FCEnum");
