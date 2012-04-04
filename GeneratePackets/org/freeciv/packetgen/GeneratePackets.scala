@@ -91,7 +91,7 @@ object GeneratePackets {
       GeneratorDefaults.DEVMODE,
       hasTwoBytePacketNumber)
 
-    self.writeToDir(GeneratorDefaults.GENERATEDOUT)
+    self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
   }
 
   def checkFilesCanRead(files: List[File]) {

@@ -36,7 +36,7 @@ public class GenerateTest {
                 org.freeciv.packet.Packet.class.getPackage(),
                 org.freeciv.packet.fieldtype.FieldType.class.getPackage()
         }) {
-            (new File(GeneratorDefaults.GENERATEDOUT + "/" + pack.getName().replace('.', '/'))).mkdirs();
+            (new File(GeneratorDefaults.GENERATED_SOURCE_FOLDER + "/" + pack.getName().replace('.', '/'))).mkdirs();
         }
 
         Enum test = Enum.fromArray("test", false,
@@ -165,7 +165,7 @@ public class GenerateTest {
                         new Field.ArrayDeclaration(IntExpression.integer("3"), null),
                         new Field.ArrayDeclaration(IntExpression.integer("10"), null))));
 
-        FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATEDOUT + Connect.packetsList);
+        FileWriter packetList = new FileWriter(GeneratorDefaults.GENERATED_SOURCE_FOLDER + Connect.packetsList);
         for (String packet: writtenPackets) {
             packetList.write(packet + "\n");
         }
@@ -188,7 +188,7 @@ public class GenerateTest {
 
     private static void writeJavaFile(ClassWriter content) throws IOException {
         String packagePath = content.getPackage().replace('.', '/');
-        File classFile = new File(GeneratorDefaults.GENERATEDOUT +
+        File classFile = new File(GeneratorDefaults.GENERATED_SOURCE_FOLDER +
                 "/" + packagePath + "/" + content.getName() + ".java");
         System.out.println(classFile.getAbsolutePath());
         classFile.createNewFile();
