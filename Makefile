@@ -23,13 +23,16 @@ PROTOJAR = FreecivProto.jar
 all: protojar
 	touch all
 
-protocol:
+tests: runTests
+	touch tests
+
+compileBasicProtocol:
 	mkdir -p ${PROTOOUT}
 	${JAVAC} -d ${PROTOOUT} Protocol/org/freeciv/*.java Protocol/org/freeciv/packet/*.java \
 	                        Protocol/org/freeciv/types/*.java Protocol/org/freeciv/packet/*/*.java
-	touch protocol
+	touch compileBasicProtocol
 
-generatordefaults:
+sourceDefaultsForGenerator:
 	echo "package org.freeciv.packetgen;" >> ${GENERATORDEFAULTS}
 	echo "public class GeneratorDefaults {" >> ${GENERATORDEFAULTS}
 	echo "  public static final String GENERATEDOUT = \"${GENERATEDOUT}\";" >> ${GENERATORDEFAULTS}
@@ -37,41 +40,49 @@ generatordefaults:
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final boolean DEVMODE = ${DEVMODE};" >> ${GENERATORDEFAULTS}
 	echo "}" >>${GENERATORDEFAULTS}
-	touch generatordefaults
+	touch sourceDefaultsForGenerator
 
-generator: generatordefaults protocol
+compileCodeGenerator: sourceDefaultsForGenerator compileBasicProtocol
 	mkdir -p ${PACKETGENOUT}
 	${JAVAC} -cp ${PROTOOUT}:${SCALALIB} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.java
 	${SCALAC} -classpath ${PACKETGENOUT}:${PROTOOUT} -d ${PACKETGENOUT} GeneratePackets/org/freeciv/packetgen/*.scala
-	touch generator
+	touch compileCodeGenerator
 
-testpackets: protocol generator
+sourceFromFreeciv: compileCodeGenerator
+	${SCALA} -classpath ${PACKETGENOUT}:${PROTOOUT} org.freeciv.packetgen.GeneratePackets ${INPUTPATHPREFIX}
+	touch sourceFromFreeciv
+
+compileFromFreeciv: sourceFromFreeciv
+	${JAVAC} -d ${PROTOOUT} -cp ${PROTOOUT} ${GENERATEDOUT}/org/freeciv/*/*.java ${GENERATEDOUT}/org/freeciv/*/*/*.java
+	cp ${GENERATEDOUT}/org/freeciv/packet/packets.txt ${PROTOOUT}/org/freeciv/packet/
+	touch compileFromFreeciv
+
+sourceTestPeers: compileBasicProtocol compileCodeGenerator
 	mkdir -p ${TESTOUT}
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT} Tests/org/freeciv/packetgen/GenerateTest.java
 	${JAVA} -cp ${TESTOUT}:${PACKETGENOUT}:${PROTOOUT} org.freeciv.packetgen.GenerateTest
-	touch testpackets
+	touch sourceTestPeers
 
-# since the parser isn't finished use GenerateTest as generator
-generated: generator protocol testpackets
+compileTestPeers: compileCodeGenerator compileBasicProtocol sourceTestPeers
 	${JAVAC} -d ${PROTOOUT} -cp ${PROTOOUT} ${GENERATEDOUT}/org/freeciv/*/*.java \
 	                                        ${GENERATEDOUT}/org/freeciv/*/*/*.java
 	cp ${GENERATEDOUT}/org/freeciv/packet/packets.txt ${PROTOOUT}/org/freeciv/packet/
-	touch generated
+	touch compileTestPeers
 
-protojar: generated
-	${JAR} cf ${PROTOJAR} ${PACKETGENOUT}
+protojar: compileFromFreeciv
+	${JAR} cf ${PROTOJAR} ${PROTOOUT}
 	touch protojar
 
-testout:
+folderTestOut:
 	mkdir -p ${TESTOUT}
-	touch testout
+	touch folderTestOut
 
-generatortestcompile: testout generator
+compileTestsOfGenerator: folderTestOut compileCodeGenerator
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT} Tests/org/freeciv/packetgen/*.java
 	${SCALAC} -d ${TESTOUT} -classpath ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} Tests/org/freeciv/packetgen/*.scala
-	touch generatortestcompile
+	touch compileTestsOfGenerator
 
-generatortest: generatortestcompile
+runTestsOfGenerator: compileTestsOfGenerator
 	${JAVA} -ea -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
 	${JAVA} -ea -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packetgen.CodeGenTest
 	${JAVA} -ea -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packetgen.EnumTest
@@ -81,46 +92,48 @@ generatortest: generatortestcompile
 	${SCALA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packetgen.CParserSyntaxTest
 	${SCALA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packetgen.CParserSemanticTest
 	${SCALA} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packetgen.FromCExtractorTest
-	touch generatortest
+	touch runTestsOfGenerator
 
-testcode: generated testout
+compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${TESTOUT} -cp ${PACKETGENOUT}:${PROTOOUT}:${JUNIT} Tests/org/freeciv/test/*.java
-	touch testcode
+	touch compileTestGeneratedCode
 
 # not included in tests since it needs a running Freeciv server
-testsignintoserver: testcode
+runtestsignintoserver: compileTestGeneratedCode
 	${JAVA} -cp ${PROTOOUT}:${TESTOUT} org.freeciv.test.SignInAndWait
-	touch testsignintoserver
+	touch runtestsignintoserver
 
-packettestcompile: testout protocol
+compilePacketTest: folderTestOut compileBasicProtocol
 	${JAVAC} -d ${TESTOUT} -cp ${PROTOOUT}:${JUNIT} Tests/org/freeciv/packet/*.java
-	touch packettestcompile
+	touch compilePacketTest
 
-packettest: packettestcompile
+runPacketTest: compilePacketTest
 	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.packet.PacketTest
-	touch packettest
+	touch runPacketTest
 
-tests: testcode generatortest packettest
+runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest
 	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.GeneratedPacketTest
 	${JAVA} -cp ${PROTOOUT}:${JUNIT}:${TESTOUT} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
-	touch tests
+	touch runTests
 
 clean:
-	rm -rf ${PROTOOUT} protocol
-	rm -rf packettest packettestcompile
-	rm -rf ${PACKETGENOUT} generator
-	rm -rf generated
-	rm -rf testcode
-	rm -rf generatortestcompile
-	rm -rf generatortest
-	rm -rf tests
-	rm -rf testout ${TESTOUT}
-	rm -rf ${GENERATEDOUT}/* testpackets
+	rm -rf ${PROTOOUT} compileBasicProtocol
+	rm -rf runPacketTest compilePacketTest
+	rm -rf ${PACKETGENOUT} compileCodeGenerator
+	rm -rf compileTestPeers
+	rm -rf compileTestGeneratedCode
+	rm -rf compileTestsOfGenerator
+	rm -rf runTestsOfGenerator
+	rm -rf runTests tests
+	rm -rf folderTestOut ${TESTOUT}
+	rm -rf ${GENERATEDOUT}/* sourceTestPeers
 	rm -f ${PROTOJAR} protojar
 	rm -f all
-	rm -rf testsignintoserver
+	rm -rf runtestsignintoserver
 	rm -rf ${PROTOJAR}
+	rm -rf sourceFromFreeciv
+	rm -rf compiledFromFreeciv
 
 distclean: clean
 	rm -rf out ${GENERATEDOUT}
-	rm -rf ${GENERATORDEFAULTS} generatordefaults
+	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
