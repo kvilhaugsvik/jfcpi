@@ -100,6 +100,14 @@ object CParserTest {
   #include "specenum_gen.h"
   """
 
+  def specEnumNamedElementWithSpace = """
+  #define SPECENUM_NAME test
+  #define SPECENUM_VALUE0 ZERO
+  #define SPECENUM_VALUE1 ONE
+  #define SPECENUM_VALUE1NAME "this should work"
+  #include "specenum_gen.h"
+  """
+
   def specEnum3ElementsBitwise = """
   #define SPECENUM_NAME test
   #define SPECENUM_BITWISE
@@ -258,6 +266,8 @@ class CParserSyntaxTest {
     parsesCorrectly(specEnumTwoNamedElementsWithComments, parseEnumTest)
   @Test def testSpecEnumCommentBeforeAndAfterDef =
     parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, parseEnumTest)
+  @Test def testSpecEnumNamedElementWithSpace =
+    parsesCorrectly(specEnumNamedElementWithSpace, parseEnumTest)
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of constants
