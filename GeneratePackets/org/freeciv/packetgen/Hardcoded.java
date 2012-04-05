@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Sveinung Kvilhaugsvik
+ * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,8 +22,14 @@ public class Hardcoded {
                 new FieldTypeBasic("uint32", "int",
                         "Long",
                         new String[]{"this.value = value;"},
-                        readUIntCode(4, "Long", "value"),
-                        writeWriteUInt(4),
+                        "int bufferValue = from.readInt();" + "\n" +
+                                "if (0 <= bufferValue) {" + "\n" +
+                                "value = (long)bufferValue;" + "\n" +
+                                "} else {" + "\n" +
+                                "final long removedByCast = (-1L * Integer.MIN_VALUE) + Integer.MAX_VALUE + 1L;" + "\n" +
+                                "value = (long)bufferValue + removedByCast;" + "\n" +
+                                "}",
+                        "to.writeInt(value.intValue()); // int is two's compliment so a uint32 don't lose information",
                         "return 4;",
                         false, Collections.<Requirement>emptySet()),
                 getFloat("100"),
@@ -99,27 +105,6 @@ public class Hardcoded {
                 "to.writeFloat(value * " + times + ");",
                 "return 4;",
                 false, Collections.<Requirement>emptySet());
-    }
-
-    public static String writeWriteUInt(int bytenumber) {
-        String out = "";
-        while (1 <= bytenumber) {
-            out += "to.writeByte((int) ((value >>> ((" + bytenumber + " - 1) * 8)) & 0xFF));" + "\n";
-            bytenumber--;
-        }
-        return out;
-    }
-
-    public static String readUIntCode(int bytenumber, String Javatype, String var) {
-        String out = var + " = ";
-        out += "(" + Javatype.toLowerCase() + ")";
-        while (1 <= bytenumber) {
-            out += "(from.readUnsignedByte() << 8 * (" + bytenumber + " - 1)) " +
-                    (1 < bytenumber ? "+" : ";") + "\n";
-            bytenumber--;
-        }
-
-        return out;
     }
 
     private static class JavaNative implements IDependency, FieldTypeBasic.Generator {
