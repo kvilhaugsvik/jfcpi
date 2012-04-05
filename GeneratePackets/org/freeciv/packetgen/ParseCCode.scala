@@ -60,7 +60,7 @@ class ParseCCode extends ParseShared {
   @inline private def se[Ret](kind: String, followedBy: Parser[Ret]) =
     defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}) ~ followedBy)
 
-  def specEnumOrName(kind: String) = se(kind + NAME, "\"" ~> enumElemCode <~ "\"" ^^ {"\"" + _ + "\""}) |
+  def specEnumOrName(kind: String) = se(kind + NAME, quotedString.r) |
     se(kind, enumElemCode)
 
   def specEnumDef = defineLine(startOfSpecEnum, regex(identifier.r)) ~
