@@ -5,12 +5,8 @@ import scala.Function1;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.regex.Pattern;
 
 public class IntExpression {
-    private static final String CONSTANTS_CLASS = GeneratorDefaults.CONSTANT_LOCATION + ".";
-    private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(CONSTANTS_CLASS);
-
     private final String operatorOrValue;
     private final IntExpression lhs;
     private final IntExpression rhs;
@@ -100,7 +96,7 @@ public class IntExpression {
     }
 
     public String toStringNotJava() {
-        return FIND_CONSTANTS_CLASS.matcher(toString()).replaceAll("");
+        return Constant.stripJavaCodeFromReference(toString());
     }
 
     private boolean noPostfix() {
@@ -136,7 +132,8 @@ public class IntExpression {
     }
 
     public static IntExpression variable(String name) {
-        return new IntExpression(CONSTANTS_CLASS + name, null, null, new Requirement(name, Requirement.Kind.VALUE));
+        Requirement valueDefinition = new Requirement(name, Requirement.Kind.VALUE);
+        return new IntExpression(Constant.referToInJavaCode(valueDefinition), null, null, valueDefinition);
     }
 
     public Collection<Requirement> getReqs() {

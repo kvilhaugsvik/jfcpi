@@ -15,11 +15,15 @@
 package org.freeciv.packetgen;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class Constant implements IDependency {
     private final String name;
     private final IntExpression expression;
     private final HashSet<Requirement> reqs = new HashSet<Requirement>();
+
+    private static final String constantPrefix = GeneratorDefaults.CONSTANT_LOCATION + ".";
+    private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
 
     public Constant(String name, IntExpression expression) {
         this.name = name;
@@ -43,5 +47,15 @@ public class Constant implements IDependency {
     @Override
     public Requirement getIFulfillReq() {
         return new Requirement(name, Requirement.Kind.VALUE);
+    }
+
+    public static String referToInJavaCode(Requirement req) {
+        assert (Requirement.Kind.VALUE.equals(req.getKind()));
+
+        return constantPrefix + req.getName();
+    }
+
+    public static String stripJavaCodeFromReference(String constantName) {
+        return FIND_CONSTANTS_CLASS.matcher(constantName).replaceAll("");
     }
 }
