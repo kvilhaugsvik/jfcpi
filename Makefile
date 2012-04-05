@@ -142,7 +142,7 @@ clean:
 	rm -rf runtestsignintoserver
 	rm -rf ${PROTOCOL_DISTRIBUTION}
 	rm -rf sourceFromFreeciv
-	rm -rf compiledFromFreeciv
+	rm -rf compileFromFreeciv
 
 distclean: clean
 	rm -rf out ${GENERATED_TEST_SOURCE_FOLDER}
