@@ -36,12 +36,13 @@ public class DefinedCType implements IDependency, FieldTypeBasic.Generator {
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(),
-                type,
-                new String[]{"this.value = value;"},
-                "value = " + (isNative? io.getRead() : type + ".valueOf(" + io.getRead() + ")") + ";",
-                io.getWrite() + (isNative? "(value);" : "(value.getNumber());"),
-                io.getSize(),
-                false, willRequire);
+                                  type,
+                                  new String[]{"this.value = value;"},
+                                  "value = " + (isNative ? io.getRead() : type + ".valueOf(" + io
+                                          .getRead() + ")") + ";",
+                                  io.getWrite() + (isNative ? "(value);" : "(value.getNumber());"),
+                                  io.getSize(),
+                                  false, willRequire);
     }
 
     @Override

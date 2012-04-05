@@ -22,7 +22,8 @@ import xml.{Text, XML}
 
 class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
 
-  def this(packetsDefPathString: String, cPathsString: List[String], devMode: Boolean, hasTwoBytePacketNumber: Boolean) = {
+  def this(packetsDefPathString: String, cPathsString: List[String], devMode: Boolean,
+           hasTwoBytePacketNumber: Boolean) = {
     this(new File(packetsDefPathString), cPathsString.map(new File(_)), devMode, hasTwoBytePacketNumber)
   }
 
@@ -83,8 +84,8 @@ object GeneratePackets {
     val hasTwoBytePacketNumber = versionConfiguration.attribute("packetNumberSize").isDefined &&
       versionConfiguration.attribute("packetNumberSize").get.text.toInt == 2
 
-    val inputSources = (versionConfiguration \"inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem\"file").map(pathPrefix + "/" + _.text)).toMap
+    val inputSources = (versionConfiguration \ "inputSource").map(elem =>
+      elem.attribute("parseAs").get.text -> (elem \ "file").map(pathPrefix + "/" + _.text)).toMap
 
     val self = new GeneratePackets(inputSources("packets").head,
       inputSources("C").toList,

@@ -73,21 +73,22 @@ public class FieldTypeBasic implements IDependency {
 
         private FieldTypeAlias(String name) {
             super(new ClassWriter.TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
-                    new String[]{
-                            java.io.DataInput.class.getCanonicalName(),
-                            java.io.DataOutput.class.getCanonicalName(),
-                            java.io.IOException.class.getCanonicalName(),
-                            null,
-                            allInPackageOf(org.freeciv.types.FCEnum.class)
-                    },
-                    "Freeciv's protocol definition",
-                    name,
-                    "FieldType<" + javaType + ">");
+                  new String[]{
+                          java.io.DataInput.class.getCanonicalName(),
+                          java.io.DataOutput.class.getCanonicalName(),
+                          java.io.IOException.class.getCanonicalName(),
+                          null,
+                          allInPackageOf(org.freeciv.types.FCEnum.class)
+                  },
+                  "Freeciv's protocol definition",
+                  name,
+                  "FieldType<" + javaType + ">");
 
             addObjectConstant(javaType, "value");
             if (arrayEater) {
                 addConstructorPublic(null, name, javaType + " value" + ", int arraySize", fromJavaType);
-                addConstructorPublicWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException", decode);
+                addConstructorPublicWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException",
+                                                   decode);
             } else {
                 addConstructorPublic(null, name, javaType + " value", fromJavaType);
                 addConstructorPublicWithExceptions(null, name, "DataInput from", "IOException", decode);
@@ -97,11 +98,11 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicReadObjectState(null, javaType, "getValue", "return value;");
             addMethodPublicReadObjectState(null, "String", "toString", "return value.toString();");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
-                "if (other instanceof " + name + ") {",
-                    "return this.value == ((" + name + ")other).getValue();",
-                "} else {",
-                    "return false;",
-                "}");
+                      "if (other instanceof " + name + ") {",
+                      "return this.value == ((" + name + ")other).getValue();",
+                      "} else {",
+                      "return false;",
+                      "}");
         }
 
         public FieldTypeBasic getBasicType() {

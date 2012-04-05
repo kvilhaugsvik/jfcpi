@@ -5,9 +5,10 @@ import java.util.*;
 public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final Collection<Requirement> iRequire;
     private final Requirement iProvide;
+
     public BitVector(String name, IntExpression bits) {
         super(new ClassWriter.TargetPackage(org.freeciv.types.BitVector.class.getPackage()), null,
-                "Freeciv C code", name, "BitVector", null);
+              "Freeciv C code", name, "BitVector", null);
 
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
 
@@ -34,15 +35,15 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         final String bvName = iProvide.getName();
         final String size = "1 + (" + bvName + ".size" + " - 1) / 8";
         return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName,
-                bvName,
-                new String[]{"this.value = value;"},
-                "byte[] innBuffer = new byte[" + size + "];\n"
-                        + "from.readFully(innBuffer);\n"
-                        + "value = new " + bvName + "(innBuffer);",
-                "to.write(value.getAsByteArray());",
-                "return " + size + ";",
-                false,
-                Arrays.asList(iProvide));
+                                  bvName,
+                                  new String[]{"this.value = value;"},
+                                  "byte[] innBuffer = new byte[" + size + "];\n"
+                                          + "from.readFully(innBuffer);\n"
+                                          + "value = new " + bvName + "(innBuffer);",
+                                  "to.write(value.getAsByteArray());",
+                                  "return " + size + ";",
+                                  false,
+                                  Arrays.asList(iProvide));
     }
 
     @Override

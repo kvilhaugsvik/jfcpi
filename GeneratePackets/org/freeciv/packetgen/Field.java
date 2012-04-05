@@ -49,7 +49,7 @@ public class Field {
     }
 
     int getNumberOfDeclarations() {
-        return (type.getBasicType().isArrayEater())? declarations.length - 1: declarations.length;
+        return (type.getBasicType().isArrayEater()) ? declarations.length - 1 : declarations.length;
     }
 
     String getArrayDeclaration() {
@@ -70,14 +70,14 @@ public class Field {
 
     String getNewFromDataStream(String streamName) {
         return "new " + this.getType() + "(" + streamName +
-                (type.getBasicType().isArrayEater()?
-                        ", " + declarations[declarations.length -1].getSize(".getValue()"): "") + ");";
+                (type.getBasicType().isArrayEater() ?
+                        ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
     }
 
     String getNewFromJavaType() {
         return "new " + this.getType() + "(" + this.getVariableName() + "[i]" +
-                (type.getBasicType().isArrayEater()?
-                        ", " + declarations[declarations.length -1].getSize(".getValue()"): "") + ");";
+                (type.getBasicType().isArrayEater() ?
+                        ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
     }
 
     private String getLegalSize(String callOnElementsToTransfer) {
@@ -86,8 +86,10 @@ public class Field {
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
             if (null != element.getElementsToTransfer())
-                out += "(" + element.getMaxSize() + " <= " + element.getElementsToTransfer() + callOnElementsToTransfer + ")" + "||";
-            out += "(" + this.getVariableName() + arrayLevel + ".length != " + element.getSize(callOnElementsToTransfer) + ")";
+                out += "(" + element.getMaxSize() + " <= " + element
+                        .getElementsToTransfer() + callOnElementsToTransfer + ")" + "||";
+            out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
+                    .getSize(callOnElementsToTransfer) + ")";
             out += "||";
             arrayLevel += "[0]";
         }
@@ -133,7 +135,7 @@ public class Field {
         }
 
         private String getSize(String callOnElementsToTransfer) {
-            return (null == elementsToTransfer? getMaxSize(): elementsToTransfer + callOnElementsToTransfer);
+            return (null == elementsToTransfer ? getMaxSize() : elementsToTransfer + callOnElementsToTransfer);
         }
     }
 

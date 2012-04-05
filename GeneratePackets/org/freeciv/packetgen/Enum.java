@@ -40,20 +40,21 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         this(enumName, false, null, null, reqs, values);
     }
 
-    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs, List<ClassWriter.EnumElement> values) {
+    public Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs,
+                List<ClassWriter.EnumElement> values) {
         super(ClassKind.ENUM,
-                new ClassWriter.TargetPackage(FCEnum.class.getPackage()),
-                null,
-                "Freeciv C code",
-                enumName,
-                "FCEnum");
+              new ClassWriter.TargetPackage(FCEnum.class.getPackage()),
+              null,
+              "Freeciv C code",
+              enumName,
+              "FCEnum");
 
         this.bitwise = bitwise;
         this.iRequire = reqs;
 
         int numberOfElements = 0;
         EnumElement invalidCandidate = null;
-        for (ClassWriter.EnumElement value: values) {
+        for (ClassWriter.EnumElement value : values) {
             if (value.isValid()) {
                 numberOfElements++;
                 this.addEnumerated(value);
@@ -64,15 +65,17 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
                 if (!(value instanceof EnumElementKnowsNumber))
                     throw new IllegalArgumentException("Only spec enums can be declared bitwise");
                 else if (0 < ((EnumElementKnowsNumber)value).getNumber())
-                    for (int testAgainst = 1; testAgainst < ((EnumElementKnowsNumber)value).getNumber() * 2; testAgainst = testAgainst * 2)
+                    for (int testAgainst = 1; testAgainst < ((EnumElementKnowsNumber)value)
+                            .getNumber() * 2; testAgainst = testAgainst * 2)
                         if (((EnumElementKnowsNumber)value).getNumber() < testAgainst)
                             throw new IllegalArgumentException("Claims to be bitwise but is not.");
         }
         if (null != cntCode) {
             if (bitwise) throw new IllegalArgumentException("");
             this.countElement = EnumElementKnowsNumber.newInvalidEnum(cntCode,
-                    (null == cntString ? '"' + cntCode + '"' : cntString),
-                    numberOfElements);
+                                                                      (null == cntString ? '"' + cntCode + '"' :
+                                                                              cntString),
+                                                                      numberOfElements);
             this.addEnumerated(this.countElement);
         } else {
             this.countElement = null;
@@ -88,32 +91,33 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName, "int number, String toStringName", null,
-                "this(number, toStringName, true);");
+                  "this(number, toStringName, true);");
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName,
-                "int number, String toStringName, boolean valid",
-                null,
-                "this.number = number;",
-                "this.toStringName = toStringName;",
-                "this.valid = valid;");
+                  "int number, String toStringName, boolean valid",
+                  null,
+                  "this.number = number;",
+                  "this.toStringName = toStringName;",
+                  "this.valid = valid;");
 
         addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
         addMethodPublicReadObjectState(null, "boolean", "isValid", "return valid;");
         addMethodPublicReadObjectState(null, "String", "toString", "return toStringName;");
 
         addMethodReadClassState("/**" + "\n" +
-                " * Is the enum bitwise? An enum is bitwise if it's number increase by two's" + "\n" +
-                " * exponent." + "\n" +
-                " * @return true if the enum is bitwise" + "\n" +
-                " */",
-                "boolean", "isBitWise", "return " + bitwise + ";");
+                                        " * Is the enum bitwise? An enum is bitwise if it's number increase by two's"
+                                        + "\n" +
+                                        " * exponent." + "\n" +
+                                        " * @return true if the enum is bitwise" + "\n" +
+                                        " */",
+                                "boolean", "isBitWise", "return " + bitwise + ";");
 
         addMethod("", Visibility.PUBLIC, Scope.CLASS, this.getName(), "valueOf", "int number", null,
-                "for (" + this.getName() + " element: values()) {",
-                "if (element.getNumber() == number) {",
-                "return element;",
-                "}",
-                "}",
-                "return INVALID;");
+                  "for (" + this.getName() + " element: values()) {",
+                  "if (element.getNumber() == number) {",
+                  "return element;",
+                  "}",
+                  "}",
+                  "return INVALID;");
     }
 
     public void addEnumerated(String comment,
@@ -143,7 +147,9 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         Collection<IDependency> out = new LinkedList<IDependency>();
         for (String valueName : enums.keySet()) {
             out.add(new Constant(valueName, IntExpression.readFromOther(this,
-                    this.getPackage() + "." + this.getName() + "." + valueName + ".getNumber()")));
+                                                                        this.getPackage() + "." + this
+                                                                                .getName() + "." + valueName + "" +
+                                                                                ".getNumber()")));
         }
         return out;
     }
@@ -160,7 +166,8 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
 
     @Override
     public Collection<Requirement> getIAlsoFulfillReqs() {
-        return Arrays.<Requirement>asList(new Requirement("enum " + super.getName(), Requirement.Kind.AS_JAVA_DATATYPE));
+        return Arrays
+                .<Requirement>asList(new Requirement("enum " + super.getName(), Requirement.Kind.AS_JAVA_DATATYPE));
     }
 
     @Override
@@ -169,12 +176,12 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement(named, Requirement.Kind.ENUM));
         return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named,
-                named,
-                new String[]{"this.value = value;"},
-                "value = " + named + ".valueOf(" + io.getRead() + ");",
-                io.getWrite() + "(value.getNumber());",
-                io.getSize(),
-                false, req);
+                                  named,
+                                  new String[]{"this.value = value;"},
+                                  "value = " + named + ".valueOf(" + io.getRead() + ");",
+                                  io.getWrite() + "(value.getNumber());",
+                                  io.getSize(),
+                                  false, req);
     }
 
     @Override
@@ -219,19 +226,20 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         }
 
         static EnumElementKnowsNumber newEnumValue(String enumValueName, int number) {
-            return newEnumValue(enumValueName, number, '"' + enumValueName +  '"');
+            return newEnumValue(enumValueName, number, '"' + enumValueName + '"');
         }
 
         static EnumElementKnowsNumber newEnumValue(String enumValueName, int number, String toStringName) {
             return newEnumValue(null, enumValueName, number, toStringName);
         }
 
-        static EnumElementKnowsNumber newEnumValue(String comment, String enumValueName, int number, String toStringName) {
+        static EnumElementKnowsNumber newEnumValue(String comment, String enumValueName, int number,
+                                                   String toStringName) {
             return new EnumElementKnowsNumber(comment, enumValueName, number, toStringName, true);
         }
 
         public static EnumElementKnowsNumber newInvalidEnum(int value) {
-            return newInvalidEnum("INVALID", "\"INVALID\"",  value);
+            return newInvalidEnum("INVALID", "\"INVALID\"", value);
         }
 
         public static EnumElementKnowsNumber newInvalidEnum(String nameInCode, String toStringName, int value) {

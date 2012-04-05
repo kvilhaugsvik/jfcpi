@@ -47,10 +47,10 @@ public interface IDependency {
         private final boolean strict;
 
         /**
-        * Construct a comparator for some objects of the type IDependency
-        * @param othersCanBeFoundIn should contain the elements each element in it requires without circles
-        * @param beStrict look for circular references and missing requirements
-        */
+         * Construct a comparator for some objects of the type IDependency
+         * @param othersCanBeFoundIn should contain the elements each element in it requires without circles
+         * @param beStrict look for circular references and missing requirements
+         */
         private TotalOrderNoCircles(Iterable<IDependency> othersCanBeFoundIn, boolean beStrict) {
             this.strict = beStrict;
             this.found = new HashMap<Requirement, Set<Requirement>>();
