@@ -33,30 +33,6 @@ public class NetworkIO implements IDependency {
         this.write = write;
     }
 
-    /**
-     * A network reader that uses int as representation
-     * @param type the IOType it should match
-     * @param size expression returning the value
-     * @param read code to get an integer from a DataInput named "from"
-     * @param write code to write an integer provided in braces right after to a DataOutput named "to"
-     */
-    public NetworkIO(String type, String size, String read, String write) {
-        this(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT, read);
-    }
-
-    /**
-     * A network reader that read X bytes into a byte[] called innBuffer
-     * @param type the IOType it should match
-     */
-    public NetworkIO(String type) {
-        this(type,
-             null,
-             "to.write",
-             Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES,
-             "byte[] innBuffer = new byte[", "];\n" +
-                     "from.readFully(innBuffer);\n");
-    }
-
     public String getSize() {
         return "return " + size + ";";
     }
@@ -83,5 +59,29 @@ public class NetworkIO implements IDependency {
     @Override
     public Requirement getIFulfillReq() {
         return me;
+    }
+
+    /**
+     * A network reader that uses int as intermediate representation
+     * @param type the IOType it should match
+     * @param size expression returning the since on the wire in bytes
+     * @param read code to read an integer from a DataInput named "from"
+     * @param write code to write an integer provided in braces right after to a DataOutput named "to"
+     */
+    public static NetworkIO witIntAsIntermediate(String type, String size, String read, String write) {
+        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT, read);
+    }
+
+    /**
+     * A network reader that read X bytes into a byte[] called innBuffer
+     * @param type the IOType it should match
+     */
+    public static NetworkIO withBytesAsIntermediate(String type) {
+        return new NetworkIO(type,
+             null,
+             "to.write",
+             Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES,
+             "byte[] innBuffer = new byte[", "];\n" +
+                "from.readFully(innBuffer);\n");
     }
 }
