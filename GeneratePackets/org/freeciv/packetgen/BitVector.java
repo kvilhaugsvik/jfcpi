@@ -1,5 +1,7 @@
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
+
 import java.util.*;
 
 public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {

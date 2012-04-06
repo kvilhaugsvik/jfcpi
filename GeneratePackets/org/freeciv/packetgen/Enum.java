@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;

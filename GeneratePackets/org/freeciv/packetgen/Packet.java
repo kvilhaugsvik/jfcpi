@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
+
 import java.util.*;
 
 public class Packet extends ClassWriter implements IDependency {

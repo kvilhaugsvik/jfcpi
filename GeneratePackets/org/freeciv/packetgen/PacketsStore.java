@@ -17,6 +17,7 @@ package org.freeciv.packetgen;
 import java.util.*;
 
 import org.freeciv.packetgen.FieldTypeBasic.FieldTypeAlias;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
 public class PacketsStore {
     private final boolean hasTwoBytePacketNumber;

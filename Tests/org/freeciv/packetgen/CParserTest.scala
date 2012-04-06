@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen
 
+import javaGenerator.ClassWriter
 import org.junit.Test
 import org.junit.Assert._
 import scala.inline

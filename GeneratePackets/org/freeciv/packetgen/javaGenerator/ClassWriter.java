@@ -12,7 +12,9 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.javaGenerator;
+
+import org.freeciv.packetgen.Wrapped;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -210,7 +212,7 @@ public class ClassWriter {
         return "import " + toImport + ";";
     }
 
-    static String allInPackageOf(Class thisClass) {
+    protected static String allInPackageOf(Class thisClass) {
         return thisClass.getPackage().getName() + ".*";
     }
 
@@ -373,14 +375,14 @@ public class ClassWriter {
         }
     }
 
-    static class EnumElement {
+    public static class EnumElement {
         private final String comment;
         private final String elementName;
         private final String valueGen;
         private final String toStringName;
         private final boolean valid;
 
-        EnumElement(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
+        protected EnumElement(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
             if (null == elementName)
                 throw new IllegalArgumentException("All elements of enums must have names");
 
@@ -416,15 +418,15 @@ public class ClassWriter {
                     (!valid ? ", " + valid : "") + ")" + ifIs(" /* ", comment, " */");
         }
 
-        static EnumElement newEnumValue(String enumValueName, String number) {
+        public static EnumElement newEnumValue(String enumValueName, String number) {
             return newEnumValue(null, enumValueName, number);
         }
 
-        static EnumElement newEnumValue(String comment, String enumValueName, String number) {
+        public static EnumElement newEnumValue(String comment, String enumValueName, String number) {
             return EnumElement.newEnumValue(comment, enumValueName, number, "\"" + enumValueName + "\"");
         }
 
-        static EnumElement newEnumValue(String comment, String enumValueName, String number, String toStringName) {
+        public static EnumElement newEnumValue(String comment, String enumValueName, String number, String toStringName) {
             return new EnumElement(comment, enumValueName, number, toStringName, true);
         }
     }
