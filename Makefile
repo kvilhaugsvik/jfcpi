@@ -36,8 +36,7 @@ tests: runTests
 
 compileBasicProtocol:
 	mkdir -p ${COMPILED_PROTOCOL_FOLDER}
-	${JAVAC} -d ${COMPILED_PROTOCOL_FOLDER} Protocol/org/freeciv/*.java Protocol/org/freeciv/packet/*.java \
-	                        Protocol/org/freeciv/types/*.java Protocol/org/freeciv/packet/*/*.java
+	${JAVAC} -d ${COMPILED_PROTOCOL_FOLDER} `find Protocol -iname "*.java"`
 	touch compileBasicProtocol
 
 sourceDefaultsForGenerator:
@@ -53,8 +52,8 @@ sourceDefaultsForGenerator:
 
 compileCodeGenerator: sourceDefaultsForGenerator compileBasicProtocol
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
-	${JAVAC} -cp ${COMPILED_PROTOCOL_FOLDER}:${SCALALIB} -d ${COMPILED_GENERATOR_FOLDER} GeneratePackets/org/freeciv/packetgen/*.java
-	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} GeneratePackets/org/freeciv/packetgen/*.scala
+	${JAVAC} -cp ${COMPILED_PROTOCOL_FOLDER}:${SCALALIB} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
+	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.scala"`
 	touch compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
@@ -62,7 +61,7 @@ sourceFromFreeciv: compileCodeGenerator
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv
-	${JAVAC} -d ${COMPILED_PROTOCOL_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} ${GENERATED_SOURCE_FOLDER}/org/freeciv/*.java ${GENERATED_SOURCE_FOLDER}/org/freeciv/*/*.java ${GENERATED_SOURCE_FOLDER}/org/freeciv/*/*/*.java
+	${JAVAC} -d ${COMPILED_PROTOCOL_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find ${GENERATED_SOURCE_FOLDER} -iname "*.java"`
 	cp ${GENERATED_SOURCE_FOLDER}/org/freeciv/packet/packets.txt ${COMPILED_PROTOCOL_FOLDER}/org/freeciv/packet/
 	touch compileFromFreeciv
 
@@ -73,8 +72,7 @@ sourceTestPeers: compileBasicProtocol compileCodeGenerator
 	touch sourceTestPeers
 
 compileTestPeers: compileCodeGenerator compileBasicProtocol sourceTestPeers
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} ${GENERATED_TEST_SOURCE_FOLDER}/org/freeciv/*/*.java \
-	                                        ${GENERATED_TEST_SOURCE_FOLDER}/org/freeciv/*/*/*.java
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find ${GENERATED_TEST_SOURCE_FOLDER} -iname "*.java"`
 	cp ${GENERATED_TEST_SOURCE_FOLDER}/org/freeciv/packet/packets.txt ${COMPILED_TESTS_FOLDER}/org/freeciv/packet/
 	touch compileTestPeers
 
@@ -87,8 +85,8 @@ folderTestOut:
 	touch folderTestOut
 
 compileTestsOfGenerator: folderTestOut compileCodeGenerator
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT} Tests/org/freeciv/packetgen/*.java
-	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} Tests/org/freeciv/packetgen/*.scala
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/packetgen/ -iname "*.java"`
+	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} `find Tests/org/freeciv/packetgen/ -iname "*.scala"`
 	touch compileTestsOfGenerator
 
 runTestsOfGenerator: compileTestsOfGenerator
@@ -104,7 +102,7 @@ runTestsOfGenerator: compileTestsOfGenerator
 	touch runTestsOfGenerator
 
 compileTestGeneratedCode: compileTestPeers folderTestOut
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} Tests/org/freeciv/test/*.java
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} `find Tests/org/freeciv/test/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
 # not included in tests since it needs a running Freeciv server
@@ -113,7 +111,7 @@ runtestsignintoserver: compileTestGeneratedCode
 	touch runtestsignintoserver
 
 compilePacketTest: folderTestOut compileBasicProtocol
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} Tests/org/freeciv/packet/*.java
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/packet/ -iname "*.java"`
 	touch compilePacketTest
 
 runPacketTest: compilePacketTest
