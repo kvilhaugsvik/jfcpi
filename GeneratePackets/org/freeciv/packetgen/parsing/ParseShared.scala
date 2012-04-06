@@ -12,9 +12,10 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen
+package org.freeciv.packetgen.parsing
 
 import util.parsing.combinator._
+import org.freeciv.packetgen.IntExpression
 
 abstract class ParseShared extends RegexParsers with PackratParsers {
   def expr: Parser[Any]

@@ -12,10 +12,11 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen
+package org.freeciv.packetgen.parsing
 
 import util.parsing.input.Reader
 import collection.JavaConversions._
+import org.freeciv.packetgen.{Field, PacketsStore}
 
 class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldTypeAlias = regex(identifierRegEx)

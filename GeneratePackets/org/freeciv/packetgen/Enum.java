@@ -204,7 +204,7 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         return new Enum(enumName, reqs, Arrays.asList(values));
     }
 
-    static class EnumElementKnowsNumber extends ClassWriter.EnumElement {
+    public static class EnumElementKnowsNumber extends ClassWriter.EnumElement {
         private final int number;
 
         EnumElementKnowsNumber(String comment, String elementName, int number, String toStringName, boolean valid) {
@@ -224,15 +224,15 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
             return number;
         }
 
-        static EnumElementKnowsNumber newEnumValue(String enumValueName, int number) {
+        public static EnumElementKnowsNumber newEnumValue(String enumValueName, int number) {
             return newEnumValue(enumValueName, number, '"' + enumValueName + '"');
         }
 
-        static EnumElementKnowsNumber newEnumValue(String enumValueName, int number, String toStringName) {
+        public static EnumElementKnowsNumber newEnumValue(String enumValueName, int number, String toStringName) {
             return newEnumValue(null, enumValueName, number, toStringName);
         }
 
-        static EnumElementKnowsNumber newEnumValue(String comment, String enumValueName, int number,
+        public static EnumElementKnowsNumber newEnumValue(String comment, String enumValueName, int number,
                                                    String toStringName) {
             return new EnumElementKnowsNumber(comment, enumValueName, number, toStringName, true);
         }

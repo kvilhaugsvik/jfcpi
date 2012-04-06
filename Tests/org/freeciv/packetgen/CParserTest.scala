@@ -18,6 +18,7 @@ import dependency.Requirement
 import javaGenerator.ClassWriter
 import org.junit.Test
 import org.junit.Assert._
+import parsing.{ParseShared, FromCExtractor, ParseCCode}
 import scala.inline
 import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader

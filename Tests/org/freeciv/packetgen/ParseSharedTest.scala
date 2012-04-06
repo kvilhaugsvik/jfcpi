@@ -16,6 +16,7 @@ package org.freeciv.packetgen
 
 import org.junit.Assert._
 import org.junit.Test
+import parsing.ParseShared
 
 class ParseSharedTest {
   def parserShared = new ParseShared {

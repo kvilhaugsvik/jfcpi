@@ -20,6 +20,7 @@ package org.freeciv.packetgen
 import org.junit.Test
 import org.junit.Assert._
 import collection.JavaConversions._
+import parsing.ParsePacketsDef
 import util.parsing.input.CharArrayReader
 
 class PacketsDefParseTest {

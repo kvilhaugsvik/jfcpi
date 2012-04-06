@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen
 
+import parsing.{ParsePacketsDef, FromCExtractor}
 import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._

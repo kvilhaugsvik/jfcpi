@@ -12,15 +12,16 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen
+package org.freeciv.packetgen.parsing
 
 import collection.mutable.ListBuffer
-import dependency.Requirement
-import javaGenerator.ClassWriter
+import org.freeciv.packetgen.dependency.Requirement
+import org.freeciv.packetgen.javaGenerator.ClassWriter
 import scala.collection.JavaConverters.seqAsJavaListConverter
-import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
+import org.freeciv.packetgen.Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
+import org.freeciv.packetgen._
 
 class ParseCCode extends ParseShared {
   def enumElemCode = identifierRegEx
