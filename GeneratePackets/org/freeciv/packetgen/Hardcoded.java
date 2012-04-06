@@ -84,8 +84,8 @@ public class Hardcoded {
             NetworkIO.witIntAsIntermediate("sint16", "2", "(int) from.readShort()", "to.writeShort"),
             NetworkIO.witIntAsIntermediate("sint32", "4", "from.readInt()", "to.writeInt"));
 
-    private static final Collection<JavaNative> nativeJava = Arrays.asList(
-            new JavaNative("int", "Integer")
+    private static final Collection<IDependency> nativeJava = Arrays.asList(
+            (IDependency)(new SimpleTypeAlias("int", "Integer", null))
     );
 
     public static String arrayEaterScopeCheck(String check) {
@@ -108,41 +108,5 @@ public class Hardcoded {
                                   "to.writeFloat(value * " + times + ");",
                                   "return 4;",
                                   false, Collections.<Requirement>emptySet());
-    }
-
-    private static class JavaNative implements IDependency, FieldTypeBasic.Generator {
-        private final Requirement meInC;
-        private final String meInJava;
-
-        private JavaNative(String nameInC, String nameInJava) {
-            this.meInJava = nameInJava;
-            this.meInC = new Requirement(nameInC, Requirement.Kind.AS_JAVA_DATATYPE);
-        }
-
-        @Override
-        public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
-            return new FieldTypeBasic(io.getIFulfillReq().getName(), meInC.getName(),
-                                      meInJava,
-                                      new String[]{"this.value = value;"},
-                                      "value = " + io.getRead() + ";",
-                                      io.getWrite("value"),
-                                      io.getSize(),
-                                      false, Collections.<Requirement>emptySet());
-        }
-
-        @Override
-        public Requirement.Kind needsDataInFormat() {
-            return Requirement.Kind.FROM_NETWORK_TO_INT;
-        }
-
-        @Override
-        public Collection<Requirement> getReqs() {
-            return Collections.<Requirement>emptySet();
-        }
-
-        @Override
-        public Requirement getIFulfillReq() {
-            return meInC;
-        }
     }
 }

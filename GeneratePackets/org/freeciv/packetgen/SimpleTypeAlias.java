@@ -16,15 +16,15 @@ package org.freeciv.packetgen;
 
 import java.util.*;
 
-public class DefinedCType implements IDependency, FieldTypeBasic.Generator {
+public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
-    private final String type;
+    private final String typeInJava;
     private final boolean isNative;
 
-    public DefinedCType(String name, String jType, String outsideRequirement) {
+    public SimpleTypeAlias(String name, String jType, String outsideRequirement) {
         this.iProvide = new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE);
-        this.type = jType;
+        this.typeInJava = jType;
 
         isNative = (null == outsideRequirement);
         if (isNative)
@@ -36,9 +36,9 @@ public class DefinedCType implements IDependency, FieldTypeBasic.Generator {
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(),
-                                  type,
+                                  typeInJava,
                                   new String[]{"this.value = value;"},
-                                  "value = " + (isNative ? io.getRead() : type + ".valueOf(" + io
+                                  "value = " + (isNative ? io.getRead() : typeInJava + ".valueOf(" + io
                                           .getRead() + ")") + ";",
                                   io.getWrite((isNative ? "value" : "value.getNumber()")),
                                   io.getSize(),

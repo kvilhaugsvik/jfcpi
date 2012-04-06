@@ -205,7 +205,7 @@ class ParseCCode extends ParseShared {
 //        case "union" :: name :: Nil => false -> name
       } // TODO: isSigned and bits can be used to check lower range on unsigned ints
 
-      new DefinedCType(name, wrappedType, if (isNative) null else dec.reduce(_ + " " + _))
+      new SimpleTypeAlias(name, wrappedType, if (isNative) null else dec.reduce(_ + " " + _))
     }
   }
 
