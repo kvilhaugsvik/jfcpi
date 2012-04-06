@@ -12,19 +12,24 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties.supporting;
+
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 
 import java.util.*;
 
-public class DefinedCType implements IDependency, FieldTypeBasic.Generator {
+public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
-    private final String type;
+    private final String typeInJava;
     private final boolean isNative;
 
-    public DefinedCType(String name, String jType, String outsideRequirement) {
+    public SimpleTypeAlias(String name, String jType, String outsideRequirement) {
         this.iProvide = new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE);
-        this.type = jType;
+        this.typeInJava = jType;
 
         isNative = (null == outsideRequirement);
         if (isNative)
@@ -36,12 +41,13 @@ public class DefinedCType implements IDependency, FieldTypeBasic.Generator {
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(),
-                type,
-                new String[]{"this.value = value;"},
-                "value = " + (isNative? io.getRead() : type + ".valueOf(" + io.getRead() + ")") + ";",
-                io.getWrite() + (isNative? "(value);" : "(value.getNumber());"),
-                io.getSize(),
-                false, willRequire);
+                                  typeInJava,
+                                  new String[]{"this.value = value;"},
+                                  "value = " + (isNative ? io.getRead() : typeInJava + ".valueOf(" + io
+                                          .getRead() + ")") + ";",
+                                  io.getWrite((isNative ? "value" : "value.getNumber()")),
+                                  io.getSize(),
+                                  false, willRequire);
     }
 
     @Override

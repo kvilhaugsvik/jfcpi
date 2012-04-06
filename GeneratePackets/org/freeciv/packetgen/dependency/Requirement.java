@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.dependency;
 
 public class Requirement implements Comparable<Requirement> {
     private final String name;
@@ -64,7 +64,7 @@ public class Requirement implements Comparable<Requirement> {
         VALUE,
         ENUM,
         FROM_NETWORK_TO_INT,
-        FROM_NETWORK_DUMMY,
+        FROM_NETWORK_AMOUNT_OF_BYTES,
         AS_JAVA_DATATYPE,
         PRIMITIVE_FIELD_TYPE,
         FIELD_TYPE,

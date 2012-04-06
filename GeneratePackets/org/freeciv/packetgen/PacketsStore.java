@@ -14,9 +14,15 @@
 
 package org.freeciv.packetgen;
 
-import java.util.*;
+import org.freeciv.packetgen.enteties.FieldTypeBasic.FieldTypeAlias;
+import org.freeciv.packetgen.dependency.*;
+import org.freeciv.packetgen.enteties.*;
+import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.enteties.supporting.Field;
+import org.freeciv.packetgen.enteties.supporting.NetworkIO;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
-import org.freeciv.packetgen.FieldTypeBasic.FieldTypeAlias;
+import java.util.*;
 
 public class PacketsStore {
     private final boolean hasTwoBytePacketNumber;
@@ -56,7 +62,7 @@ public class PacketsStore {
             return failAndBlame(wantIOType);
         }
 
-        FieldTypeBasic basicFieldType = ((FieldTypeBasic.Generator) pubType).getBasicFieldTypeOnInput((NetworkIO) ioType);
+        FieldTypeBasic basicFieldType = ((FieldTypeBasic.Generator)pubType).getBasicFieldTypeOnInput((NetworkIO)ioType);
         requirements.addPossibleRequirement(basicFieldType);
         return basicFieldType;
     }
@@ -83,7 +89,7 @@ public class PacketsStore {
         Requirement req = new Requirement(aliased, Requirement.Kind.FIELD_TYPE);
         if (requirements.isAwareOfPotentialProvider(req)) {
             requirements.addPossibleRequirement(((FieldTypeAlias)requirements.getPotentialProvider(req))
-                    .getBasicType().createFieldType(alias));
+                                                        .getBasicType().createFieldType(alias));
         } else {
             notFoundWhenNeeded.add(req);
         }
@@ -93,7 +99,8 @@ public class PacketsStore {
         return requirements.isAwareOfPotentialProvider(new Requirement(name, Requirement.Kind.FIELD_TYPE));
     }
 
-    public void registerPacket(String name, int number, List<Field.WeakField> fields) throws PacketCollisionException, UndefinedException {
+    public void registerPacket(String name, int number, List<Field.WeakField> fields)
+            throws PacketCollisionException, UndefinedException {
         if (hasPacket(name)) {
             throw new PacketCollisionException("Packet name " + name + " already in use");
         } else if (hasPacket(number)) {
@@ -101,14 +108,14 @@ public class PacketsStore {
         }
 
         List<Field> fieldList = new LinkedList<Field>();
-        for (Field.WeakField fieldType: fields) {
+        for (Field.WeakField fieldType : fields) {
             Requirement req = new Requirement(fieldType.getType(), Requirement.Kind.FIELD_TYPE);
             if (!requirements.isAwareOfPotentialProvider(req)) {
                 notFoundWhenNeeded.add(req);
                 return;
             }
             fieldList.add(new Field(fieldType.getName(), ((FieldTypeAlias)requirements.getPotentialProvider(req)),
-                    fieldType.getDeclarations()));
+                                    fieldType.getDeclarations()));
         }
 
         Packet packet = new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0]));
@@ -138,18 +145,17 @@ public class PacketsStore {
 
         for (IDependency dep : inn)
             if (dep instanceof ClassWriter)
-                out.add((ClassWriter) dep);
+                out.add((ClassWriter)dep);
             else if (dep instanceof Constant)
-                sortedConstants.add((Constant) dep);
+                sortedConstants.add((Constant)dep);
 
         if (out.size() < inn.size()) {
             int border = GeneratorDefaults.CONSTANT_LOCATION.lastIndexOf('.');
             ClassWriter constants =
-                    new ClassWriter(new ClassWriter.TargetPackage(GeneratorDefaults.CONSTANT_LOCATION.substring(0, border)),
-                            new String[0],
-                            "Freeciv C code",
-                            GeneratorDefaults.CONSTANT_LOCATION.substring(border + 1),
-                            null);
+                    new ClassWriter(ClassWriter.ClassKind.CLASS, new ClassWriter.TargetPackage(
+                            GeneratorDefaults.CONSTANT_LOCATION.substring(0, border)), new String[0],
+                                    "Freeciv C code", GeneratorDefaults.CONSTANT_LOCATION.substring(border + 1),
+                                    null, null);
 
             for (Constant dep : sortedConstants)
                 constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "int", dep.getName(), dep.getExpression());
@@ -169,7 +175,7 @@ public class PacketsStore {
     public String getPacketList() {
         String out = "";
 
-        for (int number: packetsByNumber.keySet()) {
+        for (int number : packetsByNumber.keySet()) {
             Packet packet = packets.get(packetsByNumber.get(number));
             if (requirements.dependenciesFound(packet))
                 out += packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName() + "\n";
@@ -179,7 +185,7 @@ public class PacketsStore {
 
     public void addDependency(IDependency fulfillment) {
         if (fulfillment instanceof Enum)
-            for (IDependency constant : ((Enum) fulfillment).getEnumConstants())
+            for (IDependency constant : ((Enum)fulfillment).getEnumConstants())
                 requirements.addPossibleRequirement(constant);
         requirements.addPossibleRequirement(fulfillment);
     }

@@ -12,9 +12,15 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties;
 
-import java.util.*;
+import org.freeciv.packetgen.enteties.supporting.NetworkIO;
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
+
+import java.util.Collection;
+import java.util.Collections;
 
 public class FieldTypeBasic implements IDependency {
     private final String fieldTypeBasic;
@@ -72,22 +78,19 @@ public class FieldTypeBasic implements IDependency {
     public class FieldTypeAlias extends ClassWriter implements IDependency {
 
         private FieldTypeAlias(String name) {
-            super(new ClassWriter.TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
-                    new String[]{
-                            java.io.DataInput.class.getCanonicalName(),
-                            java.io.DataOutput.class.getCanonicalName(),
-                            java.io.IOException.class.getCanonicalName(),
-                            null,
-                            allInPackageOf(org.freeciv.types.FCEnum.class)
-                    },
-                    "Freeciv's protocol definition",
-                    name,
-                    "FieldType<" + javaType + ">");
+            super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()), new String[]{
+                                      java.io.DataInput.class.getCanonicalName(),
+                                      java.io.DataOutput.class.getCanonicalName(),
+                                      java.io.IOException.class.getCanonicalName(),
+                                      null,
+                                      allInPackageOf(org.freeciv.types.FCEnum.class)
+                              }, "Freeciv's protocol definition", name, null, "FieldType<" + javaType + ">");
 
             addObjectConstant(javaType, "value");
             if (arrayEater) {
                 addConstructorPublic(null, name, javaType + " value" + ", int arraySize", fromJavaType);
-                addConstructorPublicWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException", decode);
+                addConstructorPublicWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException",
+                                                   decode);
             } else {
                 addConstructorPublic(null, name, javaType + " value", fromJavaType);
                 addConstructorPublicWithExceptions(null, name, "DataInput from", "IOException", decode);
@@ -97,11 +100,11 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicReadObjectState(null, javaType, "getValue", "return value;");
             addMethodPublicReadObjectState(null, "String", "toString", "return value.toString();");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
-                "if (other instanceof " + name + ") {",
-                    "return this.value == ((" + name + ")other).getValue();",
-                "} else {",
-                    "return false;",
-                "}");
+                      "if (other instanceof " + name + ") {",
+                      "return this.value == ((" + name + ")other).getValue();",
+                      "} else {",
+                      "return false;",
+                      "}");
         }
 
         public FieldTypeBasic getBasicType() {

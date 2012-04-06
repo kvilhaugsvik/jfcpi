@@ -14,9 +14,7 @@
 
 package org.freeciv.packet;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class RawPacket implements Packet {
     private final boolean hasTwoBytePacketNumber;

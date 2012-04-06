@@ -1,3 +1,5 @@
+package org.freeciv.packetgen.parsing
+
 /*
  * Copyright (c) 2011. Sveinung Kvilhaugsvik
  * Portions are data from Freeciv's common/packets.def. Copyright
@@ -15,12 +17,12 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen
-
 import org.junit.Test
 import org.junit.Assert._
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
+import org.freeciv.packetgen.PacketsStore
+import org.freeciv.packetgen.enteties.supporting.Field
 
 class PacketsDefParseTest {
   @inline def storePars = {
