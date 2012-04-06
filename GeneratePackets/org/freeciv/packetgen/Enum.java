@@ -179,7 +179,7 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
                                   named,
                                   new String[]{"this.value = value;"},
                                   "value = " + named + ".valueOf(" + io.getRead() + ");",
-                                  io.getWrite() + "(value.getNumber());",
+                                  io.getWrite("value.getNumber()"),
                                   io.getSize(),
                                   false, req);
     }

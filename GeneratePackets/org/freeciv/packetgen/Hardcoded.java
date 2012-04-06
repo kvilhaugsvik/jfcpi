@@ -125,7 +125,7 @@ public class Hardcoded {
                                       meInJava,
                                       new String[]{"this.value = value;"},
                                       "value = " + io.getRead() + ";",
-                                      io.getWrite() + "(value);",
+                                      io.getWrite("value"),
                                       io.getSize(),
                                       false, Collections.<Requirement>emptySet());
         }

@@ -58,8 +58,8 @@ public class NetworkIO implements IDependency {
         return read;
     }
 
-    public String getWrite() {
-        return write;
+    public String getWrite(String toWrite) {
+        return write + "(" + toWrite + ");";
     }
 
     @Override

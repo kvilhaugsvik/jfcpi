@@ -40,7 +40,7 @@ public class DefinedCType implements IDependency, FieldTypeBasic.Generator {
                                   new String[]{"this.value = value;"},
                                   "value = " + (isNative ? io.getRead() : type + ".valueOf(" + io
                                           .getRead() + ")") + ";",
-                                  io.getWrite() + (isNative ? "(value);" : "(value.getNumber());"),
+                                  io.getWrite((isNative ? "value" : "value.getNumber()")),
                                   io.getSize(),
                                   false, willRequire);
     }
