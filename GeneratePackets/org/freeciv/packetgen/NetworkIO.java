@@ -21,10 +21,12 @@ import java.util.*;
 public class NetworkIO implements IDependency {
     private final Requirement me;
     private final String size;
-    private final String read;
+    private final String[] read;
     private final String write;
 
-    private NetworkIO(String type, String size, String read, String write, Requirement.Kind kind) {
+    private NetworkIO(String type, String size, String write, Requirement.Kind kind, String... read) {
+        assert null == read || 0 < read.length: "If defined read need at least 1 element";
+
         this.me = new Requirement(type, kind);
         this.size = size;
         this.read = read;
@@ -39,7 +41,7 @@ public class NetworkIO implements IDependency {
      * @param write code to write an integer provided in braces right after to a DataOutput named "to"
      */
     public NetworkIO(String type, String size, String read, String write) {
-        this(type, size, read, write, Requirement.Kind.FROM_NETWORK_TO_INT);
+        this(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT, read);
     }
 
     /**
@@ -47,15 +49,19 @@ public class NetworkIO implements IDependency {
      * @param type the IOType it should match
      */
     public NetworkIO(String type) {
-        this(type, null, null, null, Requirement.Kind.FROM_NETWORK_DUMMY);
+        this(type, null, null, Requirement.Kind.FROM_NETWORK_DUMMY, null);
     }
 
     public String getSize() {
         return "return " + size + ";";
     }
 
-    public String getRead() {
-        return read;
+    public String getRead(String... arguments) {
+        switch (arguments.length) {
+            case (0):
+                return read[0];
+        }
+        throw new UnsupportedOperationException("No support for generating from " + arguments.length + " arguments.");
     }
 
     public String getWrite(String toWrite) {
