@@ -19,12 +19,11 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
+import static org.freeciv.packetgen.Enum.EnumElementKnowsNumber.newEnumValue;
+import static org.freeciv.packetgen.Enum.EnumElementKnowsNumber.newInvalidEnum;
 import static org.junit.Assert.*;
-import static org.freeciv.packetgen.Enum.EnumElementKnowsNumber.*;
 
 public class EnumTest {
     @Test public void testBitWiseHasANumber0() {

@@ -18,7 +18,6 @@ import org.freeciv.packetgen.dependency.Requirement;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.regex.Pattern;
 
 public class Field {
     private final String variableName;

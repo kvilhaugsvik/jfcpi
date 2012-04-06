@@ -18,7 +18,7 @@ import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 import org.freeciv.Connect
-import xml.{Text, XML}
+import xml.XML
 
 class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
 

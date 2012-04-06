@@ -18,11 +18,11 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packet.fieldtype.FieldType;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import static org.freeciv.packetgen.javaGenerator.ClassWriter.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CodeGenTest {
     @Test public void testMethodEverything() {

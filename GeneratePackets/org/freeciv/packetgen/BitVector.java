@@ -4,7 +4,8 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final Collection<Requirement> iRequire;

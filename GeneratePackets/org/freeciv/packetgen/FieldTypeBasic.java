@@ -18,7 +18,8 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
 
 public class FieldTypeBasic implements IDependency {
     private final String fieldTypeBasic;

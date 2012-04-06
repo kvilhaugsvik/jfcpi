@@ -14,11 +14,11 @@
 
 package org.freeciv.packetgen;
 
-import java.util.*;
-
-import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.FieldTypeBasic.FieldTypeAlias;
+import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
+
+import java.util.*;
 
 public class PacketsStore {
     private final boolean hasTwoBytePacketNumber;
