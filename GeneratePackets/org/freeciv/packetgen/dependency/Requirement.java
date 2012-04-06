@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.dependency;
 
 public class Requirement implements Comparable<Requirement> {
     private final String name;

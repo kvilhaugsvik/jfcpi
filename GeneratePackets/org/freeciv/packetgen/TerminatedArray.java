@@ -1,5 +1,7 @@
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.dependency.Requirement;
+
 import java.util.*;
 
 import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;

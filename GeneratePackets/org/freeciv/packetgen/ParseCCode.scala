@@ -15,6 +15,7 @@
 package org.freeciv.packetgen
 
 import collection.mutable.ListBuffer
+import dependency.Requirement
 import javaGenerator.ClassWriter
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}

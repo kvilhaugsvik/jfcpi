@@ -1,5 +1,7 @@
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
 import java.util.*;

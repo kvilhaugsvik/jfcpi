@@ -18,6 +18,7 @@
 package org.freeciv.packetgen;
 
 import org.freeciv.Connect;
+import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
 import java.io.File;

@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.junit.Test;
 

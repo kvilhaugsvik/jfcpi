@@ -14,6 +14,9 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
+
 import java.util.*;
 
 // TODO: Quick: Split based on kind of fulfillment so a dummy don't have get for the nulls or throw excpetion on null

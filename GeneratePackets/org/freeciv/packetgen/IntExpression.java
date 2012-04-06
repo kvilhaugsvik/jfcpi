@@ -1,5 +1,7 @@
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
 import scala.Function1;
 
 import java.util.Collection;

@@ -14,6 +14,9 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
