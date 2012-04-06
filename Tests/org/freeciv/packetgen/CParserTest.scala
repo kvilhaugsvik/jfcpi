@@ -15,6 +15,7 @@
 package org.freeciv.packetgen
 
 import dependency.Requirement
+import enteties.Enum
 import javaGenerator.ClassWriter
 import org.junit.Test
 import org.junit.Assert._

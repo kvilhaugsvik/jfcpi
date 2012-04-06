@@ -12,10 +12,12 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.IntExpression;
+import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.types.FCEnum;
 
@@ -138,11 +140,11 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         return countElement;
     }
 
-    ClassWriter.EnumElement getEnumValue(String named) {
+    public ClassWriter.EnumElement getEnumValue(String named) {
         return enums.get(named);
     }
 
-    Collection<IDependency> getEnumConstants() {
+    public Collection<IDependency> getEnumConstants() {
         Collection<IDependency> out = new LinkedList<IDependency>();
         for (String valueName : enums.keySet()) {
             out.add(new Constant(valueName, IntExpression.readFromOther(this,

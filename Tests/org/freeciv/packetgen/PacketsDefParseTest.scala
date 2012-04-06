@@ -17,6 +17,7 @@
 
 package org.freeciv.packetgen
 
+import enteties.supporting.Field
 import org.junit.Test
 import org.junit.Assert._
 import collection.JavaConversions._

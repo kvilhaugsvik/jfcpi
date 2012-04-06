@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.parsing
 
 import util.parsing.combinator._
-import org.freeciv.packetgen.IntExpression
+import org.freeciv.packetgen.enteties.supporting.IntExpression
 
 abstract class ParseShared extends RegexParsers with PackratParsers {
   def expr: Parser[Any]

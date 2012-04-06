@@ -18,7 +18,9 @@ import collection.mutable.ListBuffer
 import org.freeciv.packetgen.dependency.Requirement
 import org.freeciv.packetgen.javaGenerator.ClassWriter
 import scala.collection.JavaConverters.seqAsJavaListConverter
-import org.freeciv.packetgen.Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
+import org.freeciv.packetgen.enteties.{Enum, Constant, BitVector}
+import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
+import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, IntExpression}
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
 import org.freeciv.packetgen._

@@ -14,8 +14,12 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.packetgen.FieldTypeBasic.FieldTypeAlias;
+import org.freeciv.packetgen.enteties.FieldTypeBasic.FieldTypeAlias;
 import org.freeciv.packetgen.dependency.*;
+import org.freeciv.packetgen.enteties.*;
+import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.enteties.supporting.Field;
+import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
 import java.util.*;

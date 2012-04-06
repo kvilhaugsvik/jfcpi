@@ -1,7 +1,9 @@
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.IntExpression;
+import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
 import java.util.Arrays;

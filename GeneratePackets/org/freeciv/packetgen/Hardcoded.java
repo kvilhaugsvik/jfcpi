@@ -16,6 +16,8 @@ package org.freeciv.packetgen;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.supporting.*;
 
 import java.util.*;
 
