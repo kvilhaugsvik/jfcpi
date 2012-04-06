@@ -24,6 +24,7 @@ import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, IntExpression
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
 import org.freeciv.packetgen._
+import enteties.Enum.EnumElementFC
 
 class ParseCCode extends ParseShared {
   def enumElemCode = identifierRegEx
@@ -114,7 +115,7 @@ class ParseCCode extends ParseShared {
         outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
       else
         outEnumValues += newInvalidEnum(-1) // All spec enums have an invalid. Default value is -1
-      val sortedEnumValues: List[ClassWriter.EnumElement] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
+      val sortedEnumValues: List[EnumElementFC] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
       if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
           new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
@@ -139,12 +140,12 @@ class ParseCCode extends ParseShared {
 
       def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
         var globalNumberExpression: IntExpression = IntExpression.integer("0")
-        val alreadyReadExpression = new HashMap[String, ClassWriter.EnumElement]()
+        val alreadyReadExpression = new HashMap[String, EnumElementFC]()
 
         @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
           alreadyReadExpression.containsKey(value.toStringNotJava)
 
-        def countParanoid(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
+        def countParanoid(name: String, registeredValue: Option[IntExpression]): EnumElementFC = {
           if (!registeredValue.isEmpty) { // Value is specified
             if (registeredValue.get.hasNoVariables)
               globalNumberExpression = registeredValue.get
@@ -163,7 +164,7 @@ class ParseCCode extends ParseShared {
           globalNumberExpression = IntExpression.binary("+",
             IntExpression.integer("1"),
             IntExpression.handled(name + ".getNumber()"))
-          val enumVal = ClassWriter.EnumElement.newEnumValue(name, number.toString)
+          val enumVal = EnumElementFC.newEnumValue(name, number.toString)
           alreadyReadExpression.put(name, enumVal)
           enumVal
         }

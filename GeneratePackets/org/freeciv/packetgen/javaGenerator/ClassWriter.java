@@ -378,56 +378,35 @@ public class ClassWriter {
     public static class EnumElement {
         private final String comment;
         private final String elementName;
-        private final String valueGen;
-        private final String toStringName;
-        private final boolean valid;
+        private final String paramlist;
 
-        protected EnumElement(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
+        protected EnumElement(String comment, String elementName, String params) {
             if (null == elementName)
                 throw new IllegalArgumentException("All elements of enums must have names");
 
-            // Look up numbers in a uniform way
-            if (null == toStringName)
-                throw new IllegalArgumentException("All elements of enums must have toStringNames");
-
             this.comment = comment;
             this.elementName = elementName;
-            this.valueGen = valueGen;
-            this.toStringName = toStringName;
-            this.valid = valid;
-        }
-
-        public String getValueGenerator() {
-            return valueGen;
+            this.paramlist = params;
         }
 
         public String getEnumValueName() {
             return elementName;
         }
 
-        public String getToStringName() {
-            return toStringName;
-        }
-
-        public boolean isValid() {
-            return valid;
-        }
-
         public String toString() {
-            return elementName + " (" + valueGen + ", " + toStringName +
-                    (!valid ? ", " + valid : "") + ")" + ifIs(" /* ", comment, " */");
+            return elementName + " (" + paramlist + ")" + ifIs(" /* ", comment, " */");
         }
 
-        public static EnumElement newEnumValue(String enumValueName, String number) {
-            return newEnumValue(null, enumValueName, number);
+        public static EnumElement newEnumValue(String enumValueName) {
+            return newEnumValue(null, enumValueName, null);
         }
 
-        public static EnumElement newEnumValue(String comment, String enumValueName, String number) {
-            return EnumElement.newEnumValue(comment, enumValueName, number, "\"" + enumValueName + "\"");
+        public static EnumElement newEnumValue(String enumValueName, String params) {
+            return newEnumValue(null, enumValueName, params);
         }
 
-        public static EnumElement newEnumValue(String comment, String enumValueName, String number, String toStringName) {
-            return new EnumElement(comment, enumValueName, number, toStringName, true);
+        public static EnumElement newEnumValue(String comment, String enumValueName, String params) {
+            return new EnumElement(comment, enumValueName, params);
         }
     }
 

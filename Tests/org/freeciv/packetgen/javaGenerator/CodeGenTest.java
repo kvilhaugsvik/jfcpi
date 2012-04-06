@@ -312,7 +312,7 @@ public class CodeGenTest {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
                                               new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
                                               "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1, \"one\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -329,9 +329,9 @@ public class CodeGenTest {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
                                               new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
                                               "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3"));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -339,9 +339,9 @@ public class CodeGenTest {
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1, \"one\")," + "\n" +
-                        "\t" + "TWO (2, \"two\")," + "\n" +
-                        "\t" + "THREE (3, \"three\");" + "\n" +
+                        "\t" + "ONE (1)," + "\n" +
+                        "\t" + "TWO (2)," + "\n" +
+                        "\t" + "THREE (3);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
@@ -350,11 +350,11 @@ public class CodeGenTest {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
                                               new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
                                               "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "SMALLEST", "-2", "\"minus two\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "INVALID", "-1", "\"invalid\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue("SMALLEST", "-2"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "INVALID", "-1"));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -362,11 +362,11 @@ public class CodeGenTest {
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1, \"one\")," + "\n" +
-                        "\t" + "TWO (2, \"two\")," + "\n" +
-                        "\t" + "THREE (3, \"three\")," + "\n" +
-                        "\t" + "SMALLEST (-2, \"minus two\")," + "\n" +
-                        "\t" + "INVALID (-1, \"invalid\");" + "\n" +
+                        "\t" + "ONE (1)," + "\n" +
+                        "\t" + "TWO (2)," + "\n" +
+                        "\t" + "THREE (3)," + "\n" +
+                        "\t" + "SMALLEST (-2)," + "\n" +
+                        "\t" + "INVALID (-1);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
@@ -375,9 +375,9 @@ public class CodeGenTest {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
                                               new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
                                               "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue("Not a prime number", "TWO", "2", "\"two\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue("Not a prime number", "TWO", "2"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3"));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -385,9 +385,9 @@ public class CodeGenTest {
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1, \"one\")," + "\n" +
-                        "\t" + "TWO (2, \"two\") /* Not a prime number */," + "\n" +
-                        "\t" + "THREE (3, \"three\");" + "\n" +
+                        "\t" + "ONE (1)," + "\n" +
+                        "\t" + "TWO (2) /* Not a prime number */," + "\n" +
+                        "\t" + "THREE (3);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
@@ -396,9 +396,9 @@ public class CodeGenTest {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
                                               new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
                                               "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "2nd", "2", "\"2nd\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1, \"one\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "2nd", "2, \"2nd\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2, \"two\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -418,7 +418,7 @@ public class CodeGenTest {
         ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"),
                                               new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
                                               "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "One", "1", "one"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "One", "1"));
     }
 
     @Test public void testClassWriterEmptyTwoBlocksOfImports() {

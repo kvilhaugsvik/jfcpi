@@ -187,7 +187,7 @@ public class EnumTest {
     @Test(expected = IllegalArgumentException.class)
     public void enumCountBitwiseSpecified() {
         Enum result = new Enum("test", true, "ELEMENTS", "\"the elements\"", Collections.<Requirement>emptySet(),
-                Arrays.<ClassWriter.EnumElement>asList(newEnumValue("ONE", 1)));
+                Arrays.<Enum.EnumElementFC>asList(newEnumValue("ONE", 1)));
     }
 
     @Test public void enumInvalidBitwise() {
@@ -228,8 +228,8 @@ public class EnumTest {
     @Test public void enumRequiresOther() {
         Requirement constantReferedTo = new Requirement("START_VALUE", Requirement.Kind.VALUE);
         Enum inNeed = Enum.fromArray("NeedOther", Arrays.asList(constantReferedTo),
-                ClassWriter.EnumElement.newEnumValue("ONE", "Constants.START_VALUE"),
-                ClassWriter.EnumElement.newEnumValue("TWO", "ONE.getNumber() + 1"));
+                Enum.EnumElementFC.newEnumValue("ONE", "Constants.START_VALUE"),
+                Enum.EnumElementFC.newEnumValue("TWO", "ONE.getNumber() + 1"));
         assertTrue("Enum should require the given requirements", inNeed.getReqs().contains(constantReferedTo));
     }
 

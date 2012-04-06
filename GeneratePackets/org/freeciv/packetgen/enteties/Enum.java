@@ -26,27 +26,27 @@ import java.util.*;
 public class Enum extends ClassWriter implements IDependency.ManyFulfiller, FieldTypeBasic.Generator {
     private final boolean bitwise;
     private final Collection<Requirement> iRequire;
-    private final EnumElement invalidDefault;
-    private final EnumElement countElement;
+    private final EnumElementFC invalidDefault;
+    private final EnumElementFC countElement;
 
-    public Enum(String enumName, boolean bitwise, List<ClassWriter.EnumElement> values) {
+    public Enum(String enumName, boolean bitwise, List<EnumElementFC> values) {
         this(enumName, bitwise, null, null, Collections.<Requirement>emptySet(), values);
     }
 
-    public Enum(String enumName, String cntCode, List<ClassWriter.EnumElement> values) {
+    public Enum(String enumName, String cntCode, List<EnumElementFC> values) {
         this(enumName, cntCode, null, values);
     }
 
-    public Enum(String enumName, String cntCode, String cntString, List<ClassWriter.EnumElement> values) {
+    public Enum(String enumName, String cntCode, String cntString, List<EnumElementFC> values) {
         this(enumName, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
     }
 
-    public Enum(String enumName, Collection<Requirement> reqs, List<ClassWriter.EnumElement> values) {
+    public Enum(String enumName, Collection<Requirement> reqs, List<EnumElementFC> values) {
         this(enumName, false, null, null, reqs, values);
     }
 
     protected Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs,
-                List<ClassWriter.EnumElement> values) {
+                List<EnumElementFC> values) {
         super(ClassKind.ENUM, new TargetPackage(FCEnum.class.getPackage()), null, "Freeciv C code", enumName, null,
               "FCEnum");
 
@@ -54,8 +54,8 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         this.iRequire = reqs;
 
         int numberOfElements = 0;
-        EnumElement invalidCandidate = null;
-        for (ClassWriter.EnumElement value : values) {
+        EnumElementFC invalidCandidate = null;
+        for (EnumElementFC value : values) {
             if (value.isValid()) {
                 numberOfElements++;
                 this.addEnumerated(value);
@@ -132,16 +132,16 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         return bitwise;
     }
 
-    public ClassWriter.EnumElement getInvalidDefault() {
+    public EnumElementFC getInvalidDefault() {
         return invalidDefault;
     }
 
-    public ClassWriter.EnumElement getCount() {
+    public EnumElementFC getCount() {
         return countElement;
     }
 
-    public ClassWriter.EnumElement getEnumValue(String named) {
-        return enums.get(named);
+    public EnumElementFC getEnumValue(String named) {
+        return (EnumElementFC)enums.get(named);
     }
 
     public Collection<IDependency> getEnumConstants() {
@@ -190,23 +190,23 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
         return Requirement.Kind.FROM_NETWORK_TO_INT;
     }
 
-    public static Enum fromArray(String enumName, boolean bitwise, ClassWriter.EnumElement... values) {
+    public static Enum fromArray(String enumName, boolean bitwise, EnumElementFC... values) {
         return new Enum(enumName, bitwise, Arrays.asList(values));
     }
 
-    public static Enum fromArray(String enumName, String cntCode, ClassWriter.EnumElement... values) {
+    public static Enum fromArray(String enumName, String cntCode, EnumElementFC... values) {
         return new Enum(enumName, cntCode, Arrays.asList(values));
     }
 
-    public static Enum fromArray(String enumName, String cntCode, String cntString, ClassWriter.EnumElement... values) {
+    public static Enum fromArray(String enumName, String cntCode, String cntString, EnumElementFC... values) {
         return new Enum(enumName, cntCode, cntString, Arrays.asList(values));
     }
 
-    public static Enum fromArray(String enumName, Collection<Requirement> reqs, ClassWriter.EnumElement... values) {
+    public static Enum fromArray(String enumName, Collection<Requirement> reqs, EnumElementFC... values) {
         return new Enum(enumName, reqs, Arrays.asList(values));
     }
 
-    public static class EnumElementKnowsNumber extends ClassWriter.EnumElement {
+    public static class EnumElementKnowsNumber extends EnumElementFC {
         private final int number;
 
         EnumElementKnowsNumber(String comment, String elementName, int number, String toStringName, boolean valid) {
@@ -245,6 +245,48 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
 
         public static EnumElementKnowsNumber newInvalidEnum(String nameInCode, String toStringName, int value) {
             return new EnumElementKnowsNumber(null, nameInCode, value, toStringName, false);
+        }
+    }
+
+    public static class EnumElementFC extends ClassWriter.EnumElement {
+        private final String valueGen;
+        private final String toStringName;
+        private final boolean valid;
+
+        protected EnumElementFC(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
+            super(comment, elementName, valueGen + ", " + toStringName + (!valid ? ", " + valid : ""));
+
+            // Look up numbers in a uniform way
+            if (null == toStringName)
+                throw new IllegalArgumentException("All elements of enums must have toStringNames");
+
+            this.valueGen = valueGen;
+            this.toStringName = toStringName;
+            this.valid = valid;
+        }
+
+        public String getValueGenerator() {
+            return valueGen;
+        }
+
+        public String getToStringName() {
+            return toStringName;
+        }
+
+        public boolean isValid() {
+            return valid;
+        }
+
+        public static EnumElementFC newEnumValue(String enumValueName, String number) {
+            return newEnumValue(null, enumValueName, number);
+        }
+
+        public static EnumElementFC newEnumValue(String comment, String enumValueName, String number) {
+            return newEnumValue(comment, enumValueName, number, "\"" + enumValueName + "\"");
+        }
+
+        public static EnumElementFC newEnumValue(String comment, String enumValueName, String number, String toStringName) {
+            return new EnumElementFC(comment, enumValueName, number, toStringName, true);
         }
     }
 }

@@ -16,6 +16,7 @@ package org.freeciv.packetgen
 
 import dependency.Requirement
 import enteties.Enum
+import enteties.Enum.EnumElementFC
 import javaGenerator.ClassWriter
 import org.junit.Test
 import org.junit.Assert._
@@ -350,7 +351,7 @@ class CParserSemanticTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Common helper methods
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline private def checkElement(element: ClassWriter.EnumElement, nameInCode: String, number: String, toStringName: String) {
+  @inline private def checkElement(element: EnumElementFC, nameInCode: String, number: String, toStringName: String) {
     assertNotNull("Element " + nameInCode + " don't exist", element)
     assertEquals("Wrong name in code for element " + nameInCode, nameInCode, element.getEnumValueName)
     assertEquals("Wrong number for element " + nameInCode, number, element.getValueGenerator)
