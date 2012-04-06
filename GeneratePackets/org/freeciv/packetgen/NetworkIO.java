@@ -45,11 +45,16 @@ public class NetworkIO implements IDependency {
     }
 
     /**
-     * A dummy
+     * A network reader that read X bytes into a byte[] called innBuffer
      * @param type the IOType it should match
      */
     public NetworkIO(String type) {
-        this(type, null, null, Requirement.Kind.FROM_NETWORK_DUMMY, null);
+        this(type,
+             null,
+             "to.write",
+             Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES,
+             "byte[] innBuffer = new byte[", "];\n" +
+                     "from.readFully(innBuffer);\n");
     }
 
     public String getSize() {
@@ -60,6 +65,8 @@ public class NetworkIO implements IDependency {
         switch (arguments.length) {
             case (0):
                 return read[0];
+            case (1):
+                return read[0] + arguments[0] + read[1];
         }
         throw new UnsupportedOperationException("No support for generating from " + arguments.length + " arguments.");
     }

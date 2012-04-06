@@ -37,10 +37,9 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName,
                                   bvName,
                                   new String[]{"this.value = value;"},
-                                  "byte[] innBuffer = new byte[" + size + "];\n"
-                                          + "from.readFully(innBuffer);\n"
+                                  io.getRead(size)
                                           + "value = new " + bvName + "(innBuffer);",
-                                  "to.write(value.getAsByteArray());",
+                                  io.getWrite("value.getAsByteArray()"),
                                   "return " + size + ";",
                                   false,
                                   Arrays.asList(iProvide));
@@ -48,6 +47,6 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
 
     @Override
     public Requirement.Kind needsDataInFormat() {
-        return Requirement.Kind.FROM_NETWORK_DUMMY;
+        return Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES;
     }
 }
