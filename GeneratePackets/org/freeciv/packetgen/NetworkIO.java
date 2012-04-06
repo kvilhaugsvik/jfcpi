@@ -34,7 +34,7 @@ public class NetworkIO implements IDependency {
     /**
      * A network reader that uses int as representation
      * @param type the IOType it should match
-     * @param size code that returns its size
+     * @param size expression returning the value
      * @param read code to get an integer from a DataInput named "from"
      * @param write code to write an integer provided in braces right after to a DataOutput named "to"
      */
@@ -51,7 +51,7 @@ public class NetworkIO implements IDependency {
     }
 
     public String getSize() {
-        return size;
+        return "return " + size + ";";
     }
 
     public String getRead() {

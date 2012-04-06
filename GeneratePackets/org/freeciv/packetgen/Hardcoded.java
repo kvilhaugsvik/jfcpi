@@ -77,12 +77,12 @@ public class Hardcoded {
 
     public static final Collection<NetworkIO> netCon = Arrays.asList(
             new NetworkIO("bitvector"),
-            new NetworkIO("uint8", "return 1;", "from.readUnsignedByte()", "to.writeByte"),
+            new NetworkIO("uint8", "1", "from.readUnsignedByte()", "to.writeByte"),
             // to.writeByte wraps around so -128 shares encoding with 128
-            new NetworkIO("sint8", "return 1;", "(int) from.readByte()", "to.writeByte"),
-            new NetworkIO("uint16", "return 2;", "(int) from.readChar()", "to.writeChar"),
-            new NetworkIO("sint16", "return 2;", "(int) from.readShort()", "to.writeShort"),
-            new NetworkIO("sint32", "return 4;", "from.readInt()", "to.writeInt"));
+            new NetworkIO("sint8", "1", "(int) from.readByte()", "to.writeByte"),
+            new NetworkIO("uint16", "2", "(int) from.readChar()", "to.writeChar"),
+            new NetworkIO("sint16", "2", "(int) from.readShort()", "to.writeShort"),
+            new NetworkIO("sint32", "4", "from.readInt()", "to.writeInt"));
 
     private static final Collection<JavaNative> nativeJava = Arrays.asList(
             new JavaNative("int", "Integer")
