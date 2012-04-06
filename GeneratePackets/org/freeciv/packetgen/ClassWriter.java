@@ -49,31 +49,6 @@ public class ClassWriter {
         visibility = Visibility.PUBLIC;
     }
 
-    public ClassWriter(ClassKind kind, TargetPackage where, String[] imports, String madeFrom, String name,
-                       String implementsInterface) {
-        this(kind, where, imports, madeFrom, name, null, implementsInterface);
-    }
-
-    public ClassWriter(ClassKind kind, Package where, String[] imports, String madeFrom, String name,
-                       String implementsInterface) {
-        this(kind, new TargetPackage(where), imports, madeFrom, name, implementsInterface);
-    }
-
-    public ClassWriter(TargetPackage where, String[] imports, String madeFrom, String name,
-                       String implementsInterface) {
-        this(ClassKind.CLASS, where, imports, madeFrom, name, implementsInterface);
-    }
-
-    public ClassWriter(Package where, String[] imports, String madeFrom, String name, String implementsInterface) {
-        this(new TargetPackage(where), imports, madeFrom, name, implementsInterface);
-    }
-
-    public ClassWriter(TargetPackage where, String[] imports, String madeFrom, String name, String parent,
-                       String implementsInterface) {
-        this(ClassKind.CLASS, where, imports, madeFrom, name, parent, implementsInterface);
-    }
-
-
     public void addClassConstant(String type, String name, String value) {
         constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }

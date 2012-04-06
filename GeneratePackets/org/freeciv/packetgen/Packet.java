@@ -24,18 +24,14 @@ public class Packet extends ClassWriter implements IDependency {
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
     public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
-        super(new ClassWriter.TargetPackage(org.freeciv.packet.Packet.class.getPackage()),
-              new String[]{
-                      allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
-                      allInPackageOf(org.freeciv.types.FCEnum.class),
-                      null,
-                      java.io.DataInput.class.getCanonicalName(),
-                      java.io.DataOutput.class.getCanonicalName(),
-                      java.io.IOException.class.getCanonicalName()
-              },
-              "Freeciv's protocol definition",
-              name,
-              "Packet");
+        super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new String[]{
+                              allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
+                              allInPackageOf(org.freeciv.types.FCEnum.class),
+                              null,
+                              java.io.DataInput.class.getCanonicalName(),
+                              java.io.DataOutput.class.getCanonicalName(),
+                              java.io.IOException.class.getCanonicalName()
+                      }, "Freeciv's protocol definition", name, null, "Packet");
 
         this.number = number;
         this.fields = fields;
