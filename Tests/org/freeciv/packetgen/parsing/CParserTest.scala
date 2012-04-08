@@ -343,6 +343,39 @@ class CParserSyntaxTest {
   @Test def bvIntegerLong = parsesCorrectly("BV_DEFINE(bv_test, 8);", new ParseCCode())
   @Test def bvAConstantLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", new ParseCCode())
   @Test def bvAConstantAddIntLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", new ParseCCode())
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test pure parsing of structs
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def structOneFieldPrimitive =
+    parsesCorrectly("""struct justOne {bool value;};""",
+      new ParseCCode())
+
+  @Test def structOneFieldEnum =
+    parsesCorrectly("""struct justOne {enum test value;};""",
+      new ParseCCode())
+
+  @Test def structTwoFieldsPrimitive =
+    parsesCorrectly("""struct two {bool value1; int value2;};""",
+      new ParseCCode())
+
+  @Test def structTwoFieldsEnum =
+    parsesCorrectly("""
+struct two {
+  enum test value1;
+  enum bitwise value2;
+};
+    """,
+      new ParseCCode())
+
+  @Test def structTwoFieldsCommented =
+    parsesCorrectly("""
+struct two {
+  int value1; // C++ comment
+  enum bitwise value2; /* C style comment */
+};
+    """,
+      new ParseCCode())
 }
 
 class CParserSemanticTest {

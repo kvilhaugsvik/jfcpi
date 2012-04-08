@@ -44,6 +44,8 @@ class ParseCCode extends ParseShared {
 
   def startOfBitVector: String = "BV_DEFINE"
 
+  def startOfStruct: String = "struct"
+
   def startsOfExtractable = List(
     startOfConstant + "\\s+" + identifier,
     startOfTypeDefinition + "\\s+",
@@ -234,6 +236,22 @@ class ParseCCode extends ParseShared {
 
   def bitVectorDefConverted = bitVectorDef ^^ {vec => new BitVector(vec._1, vec._2)}
 
+  def struct: Parser[(String, List[(List[String], String)])] = {
+    val me = startOfStruct ~> identifierRegEx ~ ("{" ~>
+      rep1(cType ~ identifierRegEx <~ ";" ^^ {element => element._1 -> element._2}) <~
+      "}" ~ ";") ^^ {struct => struct._1 -> struct._2}
+
+    new Parser[(String, List[(List[String], String)])] {
+      def apply(in: ParseCCode.this.type#Input): ParseResult[(String, List[(List[String], String)])] = {
+        val oldIgnoreCommentsFlag = ignoreCommentsFlag
+        ignoreCommentsFlag = true
+        val result: ParseResult[(String, List[(List[String], String)])] = me(in)
+        ignoreCommentsFlag = oldIgnoreCommentsFlag
+        return result
+      }
+    }
+  }
+
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
@@ -243,6 +261,7 @@ class ParseCCode extends ParseShared {
 
   def expr = cEnumDef |
     specEnumDef |
+    struct |
     bitVectorDef |
     typedef |
     constantValueDef |
