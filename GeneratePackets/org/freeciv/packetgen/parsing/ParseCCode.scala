@@ -56,9 +56,10 @@ class ParseCCode extends ParseShared {
     val me = opt(ENDDEFINE) ~ start.r ~> followedBy <~ ENDDEFINE
     new Parser[Ret] {
       def apply(in: ParseCCode.this.type#Input): ParseResult[Ret] = {
+        val oldIgnoreNewLinesFlag = ignoreNewLinesFlag
         ignoreNewLinesFlag = false
         val result = me(in)
-        ignoreNewLinesFlag = true
+        ignoreNewLinesFlag = oldIgnoreNewLinesFlag
         return result
       }
     }
