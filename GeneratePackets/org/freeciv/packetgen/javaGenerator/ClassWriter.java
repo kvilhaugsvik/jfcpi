@@ -118,6 +118,31 @@ public class ClassWriter {
         enums.put(element.getEnumValueName(), element);
     }
 
+    /**
+     * Create a parameter list
+     * @param parameters the parameters given as a list of map entry that maps from type to name
+     * @return the parameter list
+     */
+    protected static String createParameterList(List<Map.Entry<String, String>> parameters) {
+        String argumentsList = "";
+        if (0 < parameters.size()) {
+            for (Map.Entry<String, String> field : parameters) {
+                argumentsList += field.getKey() + " " + field.getValue() + ", ";
+            }
+            argumentsList = argumentsList.substring(0, argumentsList.length() - 2);
+        }
+        return argumentsList;
+    }
+
+    /**
+     * Get a line that sets a field's value to the value of the variable of the same name.
+     * @param field Name of the field (and variable)
+     * @return a line of Java setting the field's value to the value of the variable with the same name
+     */
+    protected static String setFieldToVariableSameName(String field) {
+        return "this." + field + " = " + field + ";";
+    }
+
     private String formatImports() {
         String out = "";
 

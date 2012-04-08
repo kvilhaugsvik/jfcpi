@@ -30,7 +30,7 @@ class ParseCCode extends ParseShared {
   def enumElemCode = identifierRegEx
 
   private final val DEFINE: String = "#define"
-  private final val ENDDEFINE = """(\n|\r|\z)+""".r //TODO: Don't match backslash newline
+  private final val ENDDEFINE = """(\n|\r|\z)""".r //TODO: Don't match backslash newline
   private final val SPECENUM: String = "SPECENUM_"
   private final val NAME: String = "NAME"
 
@@ -55,14 +55,26 @@ class ParseCCode extends ParseShared {
   )
 
   def defineLine[Ret](start: String, followedBy: Parser[Ret]): Parser[Ret] = {
-    val me = opt(ENDDEFINE) ~ start.r ~> followedBy <~ ENDDEFINE
+    val me = followedBy <~ ENDDEFINE
     new Parser[Ret] {
       def apply(in: ParseCCode.this.type#Input): ParseResult[Ret] = {
-        val oldIgnoreNewLinesFlag = ignoreNewLinesFlag
-        ignoreNewLinesFlag = false
+        // Save old state
         val oldIgnoreCommentsFlag = ignoreCommentsFlag
+        val oldIgnoreNewLinesFlag = ignoreNewLinesFlag
+
+        // Look for the start of a define ignoring comments and newlines
         ignoreCommentsFlag = true
-        val result = me(in)
+        ignoreNewLinesFlag = true
+        val beginning = regex(start.r)(in)
+
+        val result = if (beginning.successful) {
+          ignoreNewLinesFlag = false
+          me(beginning.next)
+        } else {
+          (regex(start.r) ~> me)(in) // TODO: fail in a cheaper way
+        }
+
+        // restore old state
         ignoreNewLinesFlag = oldIgnoreNewLinesFlag
         ignoreCommentsFlag = oldIgnoreCommentsFlag
         return result

@@ -79,25 +79,26 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addConstructorFromFields(String name, Field[] fields) {
         LinkedList<String> constructorBody = new LinkedList<String>();
-        String arglist = "";
-        if (0 < fields.length) {
-            for (Field field : fields) {
-                arglist += buildArgumentList(field.getType(), field);
-                if (field.hasDeclarations())
-                    constructorBody.addAll(Arrays.asList(field.validate(".getValue()", this.getName())));
-                constructorBody.add("this." + field.getVariableName() + " = " + field.getVariableName() + ";");
-            }
-            arglist = trimArgList(arglist);
+        LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
+        for (Field field : fields) {
+            params.add(new AbstractMap
+                    .SimpleImmutableEntry<String, String>(field.getType() + field.getArrayDeclaration(),
+                                                          field.getVariableName()));
+            if (field.hasDeclarations())
+                constructorBody.addAll(Arrays.asList(field.validate(".getValue()", this.getName())));
+            constructorBody.add(setFieldToVariableSameName(field.getVariableName()));
         }
-        addConstructorPublic(null, name, arglist, constructorBody.toArray(new String[0]));
+        addConstructorPublic(null, name, createParameterList(params), constructorBody.toArray(new String[0]));
     }
 
     private void addConstructorFromJavaTypes(String name, Field[] fields) {
-        String javatypearglist = "";
-        LinkedList<String> constructorBodyJ = new LinkedList<String>();
         if (0 < fields.length) {
+            LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
+            LinkedList<String> constructorBodyJ = new LinkedList<String>();
             for (Field field : fields) {
-                javatypearglist += buildArgumentList(field.getJType(), field);
+                params.add(new AbstractMap
+                        .SimpleImmutableEntry<String, String>(field.getJType() + field.getArrayDeclaration(),
+                                                              field.getVariableName()));
                 if (field.hasDeclarations())
                     constructorBodyJ.addAll(Arrays.asList(field.validate("", this.getName())));
                 constructorBodyJ.addAll(
@@ -108,9 +109,7 @@ public class Packet extends ClassWriter implements IDependency {
                                                                  .getNewFromJavaType(),
                                                          "")));
             }
-            javatypearglist = trimArgList(javatypearglist);
-
-            addConstructorPublic(null, name, javatypearglist, constructorBodyJ.toArray(new String[0]));
+            addConstructorPublic(null, name, createParameterList(params), constructorBodyJ.toArray(new String[0]));
         }
     }
 
@@ -271,14 +270,6 @@ public class Packet extends ClassWriter implements IDependency {
 
     public int getNumber() {
         return number;
-    }
-
-    private static String buildArgumentList(String kind, Field field) {
-        return kind + field.getArrayDeclaration() + " " + field.getVariableName() + ", ";
-    }
-
-    private static String trimArgList(String arglist) {
-        return arglist.substring(0, arglist.length() - 2);
     }
 
     public List<? extends Field> getFields() {
