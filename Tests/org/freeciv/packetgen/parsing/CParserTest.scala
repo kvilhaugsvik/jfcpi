@@ -291,6 +291,17 @@ class CParserSyntaxTest {
     parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, parseEnumTest)
   @Test def testSpecEnumNamedElementWithSpace =
     parsesCorrectly(specEnumNamedElementWithSpace, parseEnumTest)
+  @Test def specEnumTwoCommentsInARowBetweenElements =
+    parsesCorrectly("""
+#define SPECENUM_NAME hasTwoComments
+#define SPECENUM_VALUE0 FIRST
+#define SPECENUM_VALUE0NAME "alpha"
+/* Put more between */
+/* not just one more */
+#define SPECENUM_VALUE1 LAST
+#define SPECENUM_VALUE1NAME "omega"
+#include "specenum_gen.h"
+    """, new ParseCCode())
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of constants
