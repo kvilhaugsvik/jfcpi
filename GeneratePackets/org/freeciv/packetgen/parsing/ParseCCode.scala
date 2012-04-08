@@ -12,13 +12,19 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen
+package org.freeciv.packetgen.parsing
 
 import collection.mutable.ListBuffer
+import org.freeciv.packetgen.dependency.Requirement
+import org.freeciv.packetgen.javaGenerator.ClassWriter
 import scala.collection.JavaConverters.seqAsJavaListConverter
+import org.freeciv.packetgen.enteties.{Enum, Constant, BitVector}
 import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
+import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, IntExpression}
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
+import org.freeciv.packetgen._
+import enteties.Enum.EnumElementFC
 
 class ParseCCode extends ParseShared {
   def enumElemCode = identifierRegEx
@@ -29,9 +35,13 @@ class ParseCCode extends ParseShared {
   private final val NAME: String = "NAME"
 
   def startOfSpecEnum: String = DEFINE + "\\s+" + SPECENUM + NAME
+
   def startOfCEnum: String = "enum"
+
   def startOfConstant: String = DEFINE
-  def startOfTypeDefinition : String = "typedef"
+
+  def startOfTypeDefinition: String = "typedef"
+
   def startOfBitVector: String = "BV_DEFINE"
 
   def startsOfExtractable = List(
@@ -44,11 +54,15 @@ class ParseCCode extends ParseShared {
 
   def defineLine[Ret](start: String, followedBy: Parser[Ret]): Parser[Ret] = {
     val me = opt(ENDDEFINE) ~ start.r ~> followedBy <~ ENDDEFINE
-    new Parser[Ret]{
+    new Parser[Ret] {
       def apply(in: ParseCCode.this.type#Input): ParseResult[Ret] = {
+        val oldIgnoreNewLinesFlag = ignoreNewLinesFlag
         ignoreNewLinesFlag = false
+        val oldIgnoreCommentsFlag = ignoreCommentsFlag
+        ignoreCommentsFlag = true
         val result = me(in)
-        ignoreNewLinesFlag = true
+        ignoreNewLinesFlag = oldIgnoreNewLinesFlag
+        ignoreCommentsFlag = oldIgnoreCommentsFlag
         return result
       }
     }
@@ -56,6 +70,7 @@ class ParseCCode extends ParseShared {
 
   @inline private def se(kind: String) =
     defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
+
   //TODO: join the se above and the one below. Only difference is taking followBy as a parameter and use it
   @inline private def se[Ret](kind: String, followedBy: Parser[Ret]) =
     defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}) ~ followedBy)
@@ -68,103 +83,112 @@ class ParseCCode extends ParseShared {
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
       se("INVALID", sInteger)) ^^ {parsed => (parsed._1 -> parsed._2)} |
-        CComment ^^ {comment => "comment" -> comment} |
-        se("BITWISE") ^^ {bitwise => bitwise -> bitwise}
+      CComment ^^ {comment => "comment" -> comment} |
+      se("BITWISE") ^^ {bitwise => bitwise -> bitwise}
     ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
 
-  def specEnumDefConverted = specEnumDef ^^ {asStructures =>
-    if (asStructures._2.isEmpty)
-      throw new UndefinedException("No point in porting over an empty enum...")
+  def specEnumDefConverted = specEnumDef ^^ {
+    asStructures =>
+      if (asStructures._2.isEmpty)
+        throw new UndefinedException("No point in porting over an empty enum...")
 
-    @inline def enumerations: Map[String, String] = asStructures._2
-    val bitwise = enumerations.contains("BITWISE")
+      @inline def enumerations: Map[String, String] = asStructures._2
+      val bitwise = enumerations.contains("BITWISE")
 
-    val outEnumValues: ListBuffer[Enum.EnumElementKnowsNumber] = ListBuffer[Enum.EnumElementKnowsNumber](
-      enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
-        @inline def key = element._1
-        @inline def nameInCode = enumerations.get(key).get
-        @inline def specenumnumber = key.substring(5).toInt
-        val inCodeNumber: Int = if (bitwise)
-          Integer.rotateLeft(2, specenumnumber - 1)
+      val outEnumValues: ListBuffer[Enum.EnumElementKnowsNumber] = ListBuffer[Enum.EnumElementKnowsNumber](
+        enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
+          @inline def key = element._1
+          @inline def nameInCode = enumerations.get(key).get
+          @inline def specenumnumber = key.substring(5).toInt
+          val inCodeNumber: Int = if (bitwise)
+            Integer.rotateLeft(2, specenumnumber - 1)
+          else
+            specenumnumber
+          if (enumerations.contains(key + NAME))
+            newEnumValue(nameInCode, inCodeNumber, enumerations.get(key + NAME).get)
+          else
+            newEnumValue(nameInCode, inCodeNumber)
+        }).toSeq: _*)
+      if (enumerations.contains("ZERO"))
+        if (enumerations.contains("ZERO" + NAME))
+          outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + NAME).get)
         else
-          specenumnumber
-        if (enumerations.contains(key + NAME))
-          newEnumValue(nameInCode, inCodeNumber, enumerations.get(key + NAME).get)
-        else
-          newEnumValue(nameInCode, inCodeNumber)}).toSeq : _*)
-    if (enumerations.contains("ZERO"))
-      if (enumerations.contains("ZERO" + NAME))
-        outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + NAME).get)
-    else
-        outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
-    if (enumerations.contains("INVALID"))
-      outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
-    else
-      outEnumValues += newInvalidEnum(-1) // All spec enums have an invalid. Default value is -1
-    val sortedEnumValues: List[ClassWriter.EnumElement] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
-    if (enumerations.contains("COUNT"))
-      if (enumerations.contains("COUNT"+NAME))
-        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
-          enumerations.get("COUNT"+NAME).get, sortedEnumValues.asJava)
+          outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
+      if (enumerations.contains("INVALID"))
+        outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
       else
-        new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, sortedEnumValues.asJava)
-    else
-      new Enum(asStructures._1.asInstanceOf[String], bitwise, sortedEnumValues.asJava)
+        outEnumValues += newInvalidEnum(-1) // All spec enums have an invalid. Default value is -1
+      val sortedEnumValues: List[EnumElementFC] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
+      if (enumerations.contains("COUNT"))
+        if (enumerations.contains("COUNT" + NAME))
+          new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
+            enumerations.get("COUNT" + NAME).get, sortedEnumValues.asJava)
+        else
+          new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, sortedEnumValues.asJava)
+      else
+        new Enum(asStructures._1.asInstanceOf[String], bitwise, sortedEnumValues.asJava)
   }
 
   def enumValue = intExpr
 
   def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment) ^^ {
-    case element~value => (element -> value)
+    case element ~ value => (element -> value)
   }
 
   def cEnumDef = regex(startOfCEnum.r) ~> regex(identifier.r) ~ ("{" ~> repsep(cEnum, ",") <~ opt(",") ~ "}")
 
-  def cEnumDefConverted = cEnumDef ^^ {asStructures => {
-    var iRequire = new HashSet[Requirement]()
+  def cEnumDefConverted = cEnumDef ^^ {
+    asStructures => {
+      var iRequire = new HashSet[Requirement]()
 
-    def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
-      var globalNumberExpression: IntExpression = IntExpression.integer("0")
-      val alreadyReadExpression = new HashMap[String, ClassWriter.EnumElement]()
+      def countedCEnumElements(elements: List[(String, Option[IntExpression])]) = {
+        var globalNumberExpression: IntExpression = IntExpression.integer("0")
+        val alreadyReadExpression = new HashMap[String, EnumElementFC]()
 
-      @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
-        alreadyReadExpression.containsKey(value.toStringNotJava)
+        @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
+          alreadyReadExpression.containsKey(value.toStringNotJava)
 
-      def countParanoid(name: String, registeredValue: Option[IntExpression]): ClassWriter.EnumElement = {
-        if (!registeredValue.isEmpty) { // Value is specified
-          if (registeredValue.get.hasNoVariables)
-            globalNumberExpression = registeredValue.get
-          else {
-            globalNumberExpression = registeredValue.get.valueMap(value => {
-              if (isAnInterpretedConstantOnThis(value)) {
-                value.toStringNotJava + ".getNumber()"
-              } else {
-                iRequire.addAll(value.getReqs)
-                value.toString
-              }
-            })
+        def countParanoid(name: String, registeredValue: Option[IntExpression]): EnumElementFC = {
+          if (!registeredValue.isEmpty) { // Value is specified
+            if (registeredValue.get.hasNoVariables)
+              globalNumberExpression = registeredValue.get
+            else {
+              globalNumberExpression = registeredValue.get.valueMap(value => {
+                if (isAnInterpretedConstantOnThis(value)) {
+                  value.toStringNotJava + ".getNumber()"
+                } else {
+                  iRequire.addAll(value.getReqs)
+                  value.toString
+                }
+              })
+            }
           }
+          val number = globalNumberExpression
+          globalNumberExpression = IntExpression.binary("+",
+            IntExpression.integer("1"),
+            IntExpression.handled(name + ".getNumber()"))
+          val enumVal = EnumElementFC.newEnumValue(name, number.toString)
+          alreadyReadExpression.put(name, enumVal)
+          enumVal
         }
-        val number = globalNumberExpression
-        globalNumberExpression = IntExpression.binary("+",
-          IntExpression.integer("1"),
-          IntExpression.handled(name + ".getNumber()"))
-        val enumVal = ClassWriter.EnumElement.newEnumValue(name, number.toString)
-        alreadyReadExpression.put(name, enumVal)
-        enumVal
+
+        elements.map(elem => countParanoid(elem._1, elem._2))
       }
 
-      elements.map(elem => countParanoid(elem._1, elem._2))
+      new Enum(asStructures._1.asInstanceOf[String],
+        iRequire,
+        countedCEnumElements(asStructures._2).asJava)
     }
-
-    new Enum(asStructures._1.asInstanceOf[String],
-      iRequire,
-      countedCEnumElements(asStructures._2).asJava)
-  }}
+  }
 
   private var ignoreNewLinesFlag = true
+
+  private var ignoreCommentsFlag = false
+
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
+
+  protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean = ignoreCommentsFlag
 
   def typedef = startOfTypeDefinition ~> cType ~ identifierRegEx <~ ";"
 
@@ -185,17 +209,10 @@ class ParseCCode extends ParseShared {
         case "long" :: "int" :: Nil => pickJavaInt(32, isSigned) // at least 32 bits
         case "long" :: "long" :: "int" :: Nil => pickJavaInt(64, isSigned) // at least 64 bits
 
-//        case "float" :: Nil => true -> "Float"
-//        case "double" :: Nil => true -> "Double"
-
-//        case "bool" :: Nil => true -> "Boolean"
-
         case "enum" :: name :: Nil => false -> name
-//        case "struct" :: name :: Nil => false -> name
-//        case "union" :: name :: Nil => false -> name
       } // TODO: isSigned and bits can be used to check lower range on unsigned ints
 
-      new DefinedCType(name, wrappedType, if (isNative) null else dec.reduce(_+" "+_))
+      new SimpleTypeAlias(name, wrappedType, if (isNative) null else dec.reduce(_ + " " + _))
     }
   }
 
@@ -211,7 +228,6 @@ class ParseCCode extends ParseShared {
     else
       throw new UnsupportedOperationException("No Java integer supports " + realSize + " bits." +
         " BigInteger may be used when users of this method can handle making a constructor for it.")
-//      true -> "BigInteger"
   }
 
   def bitVectorDef = startOfBitVector ~ "(" ~> identifierRegEx ~ ("," ~> intExpr) <~ ")" ~ ";"
@@ -222,7 +238,8 @@ class ParseCCode extends ParseShared {
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
-  def exprConverted = cEnumDefConverted | specEnumDefConverted | bitVectorDefConverted | typedefConverted | constantValueDefConverted
+  def exprConverted = cEnumDefConverted | specEnumDefConverted | bitVectorDefConverted | typedefConverted |
+    constantValueDefConverted
 
   def expr = cEnumDef |
     specEnumDef |
@@ -234,6 +251,7 @@ class ParseCCode extends ParseShared {
 
 class FromCExtractor() {
   def this(toLookFor: Iterable[Requirement]) = this()
+
   private val parser = new ParseCCode()
   private val lookFor = parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _).r
 

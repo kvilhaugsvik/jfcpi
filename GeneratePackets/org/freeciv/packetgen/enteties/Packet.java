@@ -12,7 +12,12 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties;
+
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.Field;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
 import java.util.*;
 
@@ -24,18 +29,14 @@ public class Packet extends ClassWriter implements IDependency {
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
     public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
-        super(new ClassWriter.TargetPackage(org.freeciv.packet.Packet.class.getPackage()),
-                new String[]{
-                        allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
-                        allInPackageOf(org.freeciv.types.FCEnum.class),
-                        null,
-                        java.io.DataInput.class.getCanonicalName(),
-                        java.io.DataOutput.class.getCanonicalName(),
-                        java.io.IOException.class.getCanonicalName()
-                },
-                "Freeciv's protocol definition",
-                name,
-                "Packet");
+        super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new String[]{
+                              allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
+                              allInPackageOf(org.freeciv.types.FCEnum.class),
+                              null,
+                              java.io.DataInput.class.getCanonicalName(),
+                              java.io.DataOutput.class.getCanonicalName(),
+                              java.io.IOException.class.getCanonicalName()
+                      }, "Freeciv's protocol definition", name, null, "Packet");
 
         this.number = number;
         this.fields = fields;
@@ -43,7 +44,7 @@ public class Packet extends ClassWriter implements IDependency {
         addClassConstant("int", "number", number + "");
         addClassConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
 
-        for (Field field: fields) {
+        for (Field field : fields) {
             addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getVariableName());
         }
 
@@ -61,15 +62,15 @@ public class Packet extends ClassWriter implements IDependency {
 
         addToString(name, fields);
 
-        for (Field field: fields) {
+        for (Field field : fields) {
             addGetAsField(field);
         }
 
-        for (Field field: fields) {
+        for (Field field : fields) {
             addJavaGetter(field);
         }
 
-        for (Field field: fields) {
+        for (Field field : fields) {
             requirements.addAll(field.getReqs());
         }
 
@@ -80,9 +81,10 @@ public class Packet extends ClassWriter implements IDependency {
         LinkedList<String> constructorBody = new LinkedList<String>();
         String arglist = "";
         if (0 < fields.length) {
-            for (Field field: fields) {
+            for (Field field : fields) {
                 arglist += buildArgumentList(field.getType(), field);
-                if (field.hasDeclarations()) constructorBody.addAll(Arrays.asList(field.validate(".getValue()", this.getName())));
+                if (field.hasDeclarations())
+                    constructorBody.addAll(Arrays.asList(field.validate(".getValue()", this.getName())));
                 constructorBody.add("this." + field.getVariableName() + " = " + field.getVariableName() + ";");
             }
             arglist = trimArgList(arglist);
@@ -94,15 +96,17 @@ public class Packet extends ClassWriter implements IDependency {
         String javatypearglist = "";
         LinkedList<String> constructorBodyJ = new LinkedList<String>();
         if (0 < fields.length) {
-            for (Field field: fields) {
+            for (Field field : fields) {
                 javatypearglist += buildArgumentList(field.getJType(), field);
                 if (field.hasDeclarations())
                     constructorBodyJ.addAll(Arrays.asList(field.validate("", this.getName())));
                 constructorBodyJ.addAll(
                         Arrays.asList(forElementsInField(field,
-                                "this." + field.getVariableName() + " = new " + field.getType() + field.getNewCreation("") + ";",
-                                "this." + field.getVariableName() + "[i] = " + field.getNewFromJavaType(),
-                                "")));
+                                                         "this." + field.getVariableName() + " = new " + field
+                                                                 .getType() + field.getNewCreation("") + ";",
+                                                         "this." + field.getVariableName() + "[i] = " + field
+                                                                 .getNewFromJavaType(),
+                                                         "")));
             }
             javatypearglist = trimArgList(javatypearglist);
 
@@ -113,36 +117,39 @@ public class Packet extends ClassWriter implements IDependency {
     private void addConstructorFromDataInput(String name, Field[] fields) {
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
         final String streamName = "from";
-        for (Field field: fields) {
+        for (Field field : fields) {
             constructorBodyStream.addAll(
                     Arrays.asList(forElementsInField(field, "this." + field.getVariableName() +
                             " = new " + field.getType() +
                             field.getNewCreation(".getValue()") + ";",
-                            "this." + field.getVariableName() + "[i] = " + field.getNewFromDataStream(streamName),
-                            "")));
+                                                     "this." + field.getVariableName() + "[i] = " + field
+                                                             .getNewFromDataStream(streamName),
+                                                     "")));
         }
         constructorBodyStream.add("if (getNumber() != packet) {");
         constructorBodyStream.add("throw new IOException(\"Tried to create package " +
-                name + " but packet number was \" + packet);");
+                                          name + " but packet number was \" + packet);");
         constructorBodyStream.add("}");
         constructorBodyStream.add("");
         constructorBodyStream.add("if (getEncodedSize() != headerLen) {");
         constructorBodyStream.add(
                 "throw new IOException(\"Package size in header and Java packet not the same. Header: \"" +
-                " + headerLen");
+                        " + headerLen");
         constructorBodyStream.add("+ \" Packet: \" + getEncodedSize());");
         constructorBodyStream.add("}");
         addConstructorPublicWithExceptions("/***\n" +
-                " * Construct an object from a DataInput\n" +
-                " * @param " + streamName + " data stream that is at the start of the package body  \n" +
-                " * @param headerLen length from header package\n" +
-                " * @param packet the number of the packet specified in the header\n" +
-                " * @throws IOException if the DataInput has a problem\n" +
-                " */",
-                name,
-                "DataInput " + streamName + ", int headerLen, int packet",
-                "IOException",
-                constructorBodyStream.toArray(new String[0]));
+                                                   " * Construct an object from a DataInput\n" +
+                                                   " * @param " + streamName + " data stream that is at the start of " +
+                                                   "the package body  \n" +
+                                                   " * @param headerLen length from header package\n" +
+                                                   " * @param packet the number of the packet specified in the " +
+                                                   "header\n" +
+                                                   " * @throws IOException if the DataInput has a problem\n" +
+                                                   " */",
+                                           name,
+                                           "DataInput " + streamName + ", int headerLen, int packet",
+                                           "IOException",
+                                           constructorBodyStream.toArray(new String[0]));
     }
 
     private void addEncoder(boolean hasTwoBytePacketNumber, Field[] fields) {
@@ -155,26 +162,33 @@ public class Packet extends ClassWriter implements IDependency {
         if (0 < fields.length) {
             encodeFields.add("");
             encodeFields.add("// body");
-            for (Field field: fields)
+            for (Field field : fields)
                 encodeFields.addAll(Arrays.asList(forElementsInField(field, "",
-                        "this." + field.getVariableName() + "[i].encodeTo(to);", "")));
+                                                                     "this." + field
+                                                                             .getVariableName() + "[i].encodeTo(to);",
+                                                                     "")));
         }
-        addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encodeFields.toArray(new String[0]));
+        addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException",
+                               encodeFields.toArray(new String[0]));
     }
 
     private void addEncodedSize(boolean hasTwoBytePacketNumber, Field[] fields) {
         LinkedList<String> encodeFieldsLen = new LinkedList<String>();
-        for (Field field: fields)
+        for (Field field : fields)
             if (field.hasDeclarations())
                 encodeFieldsLen.addAll(Arrays.asList(forElementsInField(field,
-                        "int " + field.getVariableName() + "Len" + " = " + "0;",
-                        field.getVariableName() + "Len" + "+=" + "this." + field.getVariableName() +
-                                "[i].encodedLength();", "")));
+                                                                        "int " + field
+                                                                                .getVariableName() + "Len" + " = " +
+                                                                                "0;",
+                                                                        field.getVariableName() + "Len" + "+=" +
+                                                                                "this." + field
+                                                                                .getVariableName() +
+                                                                                "[i].encodedLength();", "")));
         encodeFieldsLen.add("return " + (hasTwoBytePacketNumber ? "4" : "3"));
         if (0 < fields.length) {
-            for (Field field: fields)
-                encodeFieldsLen.add("\t" + "+ " + ((field.hasDeclarations())?
-                        field.getVariableName() + "Len":
+            for (Field field : fields)
+                encodeFieldsLen.add("\t" + "+ " + ((field.hasDeclarations()) ?
+                        field.getVariableName() + "Len" :
                         "this." + field.getVariableName() + ".encodedLength()"));
         }
         encodeFieldsLen.add(encodeFieldsLen.removeLast() + ";");
@@ -184,13 +198,14 @@ public class Packet extends ClassWriter implements IDependency {
     private void addToString(String name, Field[] fields) {
         LinkedList<String> getToString = new LinkedList<String>();
         getToString.add("String out = \"" + name + "\" + \"(\" + number + \")\";");
-        for (Field field: fields)
+        for (Field field : fields)
             if (field.hasDeclarations())
                 getToString.addAll(Arrays.asList(forElementsInField(field, "out += \"\\n\\t" + field.getVariableName() +
-                        " += (\";", "out += " + "this." + field.getVariableName() + "[i].getValue();", "out += \")\";")));
+                        " += (\";", "out += " + "this." + field.getVariableName() + "[i].getValue();",
+                                                                    "out += \")\";")));
             else
                 getToString.add("out += \"\\n\\t" + field.getVariableName() +
-                        " = \" + " + "this." + field.getVariableName() + ".getValue();");
+                                        " = \" + " + "this." + field.getVariableName() + ".getValue();");
         getToString.add("");
         getToString.add("return out + \"\\n\";");
         addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
@@ -199,25 +214,29 @@ public class Packet extends ClassWriter implements IDependency {
     private void addGetAsField(Field field) {
         addMethodPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
                 + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
-                "return " + "this." + field.getVariableName() + ";");
+                                       "return " + "this." + field.getVariableName() + ";");
     }
 
     private void addJavaGetter(Field field) {
         addMethodPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
                 + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
                 + "Value",
-                (field.hasDeclarations()) ?
-                        forElementsInField(field,
-                                field.getJType() + field.getArrayDeclaration() + " out = new " +
-                                        field.getJType() + field.getNewCreation(".getValue()") + ";",
-                                "out[i] = " + "this." + field.getVariableName() + "[i].getValue();",
-                                "return out;") :
-                        new String[]{"return " + "this." + field.getVariableName() + ".getValue();"}
+                                       (field.hasDeclarations()) ?
+                                               forElementsInField(field,
+                                                                  field.getJType() + field
+                                                                          .getArrayDeclaration() + " out = new " +
+                                                                          field.getJType() + field
+                                                                          .getNewCreation(".getValue()") + ";",
+                                                                  "out[i] = " + "this." + field
+                                                                          .getVariableName() + "[i].getValue();",
+                                                                  "return out;") :
+                                               new String[]{
+                                                       "return " + "this." + field.getVariableName() + ".getValue();"}
         );
     }
 
     private String[] forElementsInField(Field field, String before, String in, String after) {
-        assert(null != in && !in.isEmpty());
+        assert (null != in && !in.isEmpty());
 
         LinkedList<String> out = new LinkedList<String>();
         final int level = field.getNumberOfDeclarations();

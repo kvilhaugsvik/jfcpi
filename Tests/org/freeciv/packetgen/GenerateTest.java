@@ -18,14 +18,18 @@
 package org.freeciv.packetgen;
 
 import org.freeciv.Connect;
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.enteties.*;
+import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.enteties.supporting.*;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import static org.freeciv.packetgen.Enum.EnumElementKnowsNumber.*;
+import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newEnumValue;
+import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newInvalidEnum;
 
 public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();

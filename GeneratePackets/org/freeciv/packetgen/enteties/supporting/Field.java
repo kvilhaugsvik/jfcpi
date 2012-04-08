@@ -12,11 +12,13 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties.supporting;
+
+import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.FieldTypeBasic;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.regex.Pattern;
 
 public class Field {
     private final String variableName;
@@ -44,15 +46,15 @@ public class Field {
         return type.getJavaType();
     }
 
-    boolean hasDeclarations() {
+    public boolean hasDeclarations() {
         return (0 < getNumberOfDeclarations());
     }
 
-    int getNumberOfDeclarations() {
-        return (type.getBasicType().isArrayEater())? declarations.length - 1: declarations.length;
+    public int getNumberOfDeclarations() {
+        return (type.getBasicType().isArrayEater()) ? declarations.length - 1 : declarations.length;
     }
 
-    String getArrayDeclaration() {
+    public String getArrayDeclaration() {
         String out = "";
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             out += "[]";
@@ -60,7 +62,7 @@ public class Field {
         return out;
     }
 
-    String getNewCreation(String callOnElementsToTransfer) {
+    public String getNewCreation(String callOnElementsToTransfer) {
         String out = "";
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             out += "[" + declarations[i].getSize(callOnElementsToTransfer) + "]";
@@ -68,16 +70,16 @@ public class Field {
         return out;
     }
 
-    String getNewFromDataStream(String streamName) {
+    public String getNewFromDataStream(String streamName) {
         return "new " + this.getType() + "(" + streamName +
-                (type.getBasicType().isArrayEater()?
-                        ", " + declarations[declarations.length -1].getSize(".getValue()"): "") + ");";
+                (type.getBasicType().isArrayEater() ?
+                        ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
     }
 
-    String getNewFromJavaType() {
+    public String getNewFromJavaType() {
         return "new " + this.getType() + "(" + this.getVariableName() + "[i]" +
-                (type.getBasicType().isArrayEater()?
-                        ", " + declarations[declarations.length -1].getSize(".getValue()"): "") + ");";
+                (type.getBasicType().isArrayEater() ?
+                        ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
     }
 
     private String getLegalSize(String callOnElementsToTransfer) {
@@ -86,15 +88,17 @@ public class Field {
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
             if (null != element.getElementsToTransfer())
-                out += "(" + element.getMaxSize() + " <= " + element.getElementsToTransfer() + callOnElementsToTransfer + ")" + "||";
-            out += "(" + this.getVariableName() + arrayLevel + ".length != " + element.getSize(callOnElementsToTransfer) + ")";
+                out += "(" + element.getMaxSize() + " <= " + element
+                        .getElementsToTransfer() + callOnElementsToTransfer + ")" + "||";
+            out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
+                    .getSize(callOnElementsToTransfer) + ")";
             out += "||";
             arrayLevel += "[0]";
         }
         return out.substring(0, out.length() - 2);
     }
 
-    String[] validate(String callOnElementsToTransfer, String name) {
+    public String[] validate(String callOnElementsToTransfer, String name) {
         return new String[]{
                 "if " + "(" + this.getLegalSize(callOnElementsToTransfer) + ")",
                 "\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
@@ -133,7 +137,7 @@ public class Field {
         }
 
         private String getSize(String callOnElementsToTransfer) {
-            return (null == elementsToTransfer? getMaxSize(): elementsToTransfer + callOnElementsToTransfer);
+            return (null == elementsToTransfer ? getMaxSize() : elementsToTransfer + callOnElementsToTransfer);
         }
     }
 

@@ -14,10 +14,12 @@
 
 package org.freeciv.packetgen;
 
-import java.util.*;
+import org.freeciv.packetgen.dependency.*;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.*;
+
+import static org.junit.Assert.assertTrue;
 
 public class DependencyStoreTest {
     private static Requirement reqFor(String has) {

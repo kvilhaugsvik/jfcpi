@@ -15,13 +15,14 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packet.fieldtype.FieldType;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static org.freeciv.packetgen.ClassWriter.*;
+import static org.freeciv.packetgen.javaGenerator.ClassWriter.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CodeGenTest {
     @Test public void testMethodEverything() {
@@ -223,11 +224,9 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyClass() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -239,11 +238,9 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoPackage() {
-        ClassWriter toWrite = new ClassWriter((TargetPackage)null,
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, (TargetPackage)null,
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
         assertEquals("Generated source not as expected",
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
@@ -253,11 +250,8 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoImports() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                null,
-                "nothing",
-                "NameOfClass",
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"), null,
+                                              "nothing", "NameOfClass", null, "Packet");
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -267,11 +261,9 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoSourceGiven() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                null,
-                "NameOfClass",
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, null, "NameOfClass", null,
+                                              "Packet");
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -282,11 +274,9 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoInterfaceGiven() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                null);
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              null);
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -299,20 +289,15 @@ public class CodeGenTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testClassWriterEmptyNoNameGiven() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                null,
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", null, null,
+                                              "Packet");
     }
 
     @Test public void testClassWriterEmptyEnum() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
-                this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -324,13 +309,10 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEnumWithOneElement() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
-                this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1, \"one\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -344,15 +326,12 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEnumWithThreeElements() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
-                this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3"));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -360,25 +339,22 @@ public class CodeGenTest {
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1, \"one\")," + "\n" +
-                        "\t" + "TWO (2, \"two\")," + "\n" +
-                        "\t" + "THREE (3, \"three\");" + "\n" +
+                        "\t" + "ONE (1)," + "\n" +
+                        "\t" + "TWO (2)," + "\n" +
+                        "\t" + "THREE (3);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
 
     @Test public void testClassWriterEnumWithFiveElementsSomeNegative() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
-                this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "SMALLEST", "-2", "\"minus two\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "INVALID", "-1", "\"invalid\""));
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue("SMALLEST", "-2"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "INVALID", "-1"));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -386,25 +362,22 @@ public class CodeGenTest {
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1, \"one\")," + "\n" +
-                        "\t" + "TWO (2, \"two\")," + "\n" +
-                        "\t" + "THREE (3, \"three\")," + "\n" +
-                        "\t" + "SMALLEST (-2, \"minus two\")," + "\n" +
-                        "\t" + "INVALID (-1, \"invalid\");" + "\n" +
+                        "\t" + "ONE (1)," + "\n" +
+                        "\t" + "TWO (2)," + "\n" +
+                        "\t" + "THREE (3)," + "\n" +
+                        "\t" + "SMALLEST (-2)," + "\n" +
+                        "\t" + "INVALID (-1);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
 
     @Test public void testClassWriterEnumWithThreeElementsOneIsCommented() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
-                this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue("Not a prime number", "TWO", "2", "\"two\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3", "\"three\""));
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue("Not a prime number", "TWO", "2"));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "THREE", "3"));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -412,23 +385,20 @@ public class CodeGenTest {
                         "\n" +
                         "// This code was auto generated from nothing" + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1, \"one\")," + "\n" +
-                        "\t" + "TWO (2, \"two\") /* Not a prime number */," + "\n" +
-                        "\t" + "THREE (3, \"three\");" + "\n" +
+                        "\t" + "ONE (1)," + "\n" +
+                        "\t" + "TWO (2) /* Not a prime number */," + "\n" +
+                        "\t" + "THREE (3);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
 
     @Test public void testClassWriterEnumWithThreeElementsTwoAreTheSame() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM,
-                this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1", "\"one\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "2nd", "2", "\"2nd\""));
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2", "\"two\""));
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "ONE", "1, \"one\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "2nd", "2, \"2nd\""));
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "TWO", "2, \"two\""));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -445,24 +415,18 @@ public class CodeGenTest {
 
     @Test(expected = AssertionError.class)
     public void testNotEnumAddsEnumerated() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                new String[]{"org.freeciv.packet.Packet"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
-        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "One", "1", "one"));
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"org.freeciv.packet.Packet"}, "nothing", "NameOfClass", null,
+                                              "Packet");
+        toWrite.addEnumerated(ClassWriter.EnumElement.newEnumValue(null, "One", "1"));
     }
 
     @Test public void testClassWriterEmptyTwoBlocksOfImports() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                new String[]{
-                        "org.freeciv.packet.Packet",
-                        null,
-                        "java.util.List"
-                },
-                "nothing",
-                "NameOfClass",
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"), new String[]{
+                                "org.freeciv.packet.Packet",
+                                null,
+                                "java.util.List"
+                        }, "nothing", "NameOfClass", null, "Packet");
 
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
@@ -477,15 +441,11 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyTwoBlocksOfImportsSeparatedByEmpthy() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                new String[]{
-                        "org.freeciv.packet.Packet",
-                        "",
-                        "java.util.List"
-                },
-                "nothing",
-                "NameOfClass",
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"), new String[]{
+                                "org.freeciv.packet.Packet",
+                                "",
+                                "java.util.List"
+                        }, "nothing", "NameOfClass", null, "Packet");
 
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
@@ -500,11 +460,8 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterStyleConstantNoBlankLineAtTheEndOfTheClassScope() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-                new String[]{"java.util.List"},
-                "nothing",
-                "NameOfClass",
-                "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"java.util.List"}, "nothing", "NameOfClass", null, "Packet");
         toWrite.addClassConstant("int", "five", "5");
 
         String[] lines = toWrite.toString().split("\n");
@@ -516,11 +473,8 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterStyleAlwaysEndWithNewLine() {
-        ClassWriter toWrite = new ClassWriter(this.getClass().getPackage(),
-            new String[]{"java.util.List"},
-            "nothing",
-            "NameOfClass",
-            "Packet");
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"),
+                                              new String[]{"java.util.List"}, "nothing", "NameOfClass", null, "Packet");
 
         assertTrue("File should end with line break", toWrite.toString().endsWith("\n"));
 }

@@ -12,16 +12,17 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen
+package org.freeciv.packetgen.parsing
 
 import util.parsing.combinator._
+import org.freeciv.packetgen.enteties.supporting.IntExpression
 
 abstract class ParseShared extends RegexParsers with PackratParsers {
   def expr: Parser[Any]
 
   def exprs: Parser[Any] = rep(expr)
 
-  def CComment: Parser[String] = (cStyleStart.r ~> rep(cStyleMiddle.r) <~ cStyleEnd.r) ^^ {_.reduce(_+_)} |
+  def CComment: Parser[String] = (cStyleStart.r ~> rep(cStyleMiddle.r) <~ cStyleEnd.r) ^^ {_.reduce(_ + _)} |
     regex(cStyleManyStars.r) ^^^ null |
     regex(cXXStyleComment.r)
 
@@ -37,34 +38,37 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   protected def regExOr(arg: String*): String = "(" + arg.reduce(_ + "|" + _) + ")"
 
   def sInteger = """[+|-]*[0-9]+""".r
+
   def identifier = """[A-Za-z]\w*"""
+
   val identifierRegEx = identifier.r
+
   def quotedString = """\"[^"]*?\""""
 
-  private def binOpLev(operators: Parser[String]): PackratParser[(IntExpression,  IntExpression) => IntExpression] =
+  private def binOpLev(operators: Parser[String]): PackratParser[(IntExpression, IntExpression) => IntExpression] =
     operators ^^ {operator => (lhs: IntExpression, rhs: IntExpression) => IntExpression.binary(operator, lhs, rhs)}
 
-  private val intExprLevelBinAdd: PackratParser[IntExpression] = chainl1(intExprLevelBinMul, binOpLev(("+"|"-")))
+  private val intExprLevelBinAdd: PackratParser[IntExpression] = chainl1(intExprLevelBinMul, binOpLev(("+" | "-")))
 
-  private val intExprLevelBinMul: PackratParser[IntExpression] = chainl1(intExprLevelUnary, binOpLev(("*"|"/"|"%")))
+  private val intExprLevelBinMul: PackratParser[IntExpression] = chainl1(intExprLevelUnary, binOpLev(("*" | "/" | "%")))
 
   private val intExprLevelUnary: PackratParser[IntExpression] =
     "--" ~> intExprLevelPrimary ^^ {IntExpression.unary("--", _)} |
-    "++" ~> intExprLevelPrimary ^^ {IntExpression.unary("++", _)} |
-    "-" ~> intExprLevelPrimary ^^ {IntExpression.unary("-", _)} |
-    "+" ~> intExprLevelPrimary |
-    intExprLevelPrimary
+      "++" ~> intExprLevelPrimary ^^ {IntExpression.unary("++", _)} |
+      "-" ~> intExprLevelPrimary ^^ {IntExpression.unary("-", _)} |
+      "+" ~> intExprLevelPrimary |
+      intExprLevelPrimary
 
   private val intExprLevelPrimary: PackratParser[IntExpression] =
     (intExprBasic <~ "--") ^^ {IntExpression.suf(_, "--")} |
-    (intExprBasic <~ "++") ^^ {IntExpression.suf(_, "++")} |
-    intExprBasic
+      (intExprBasic <~ "++") ^^ {IntExpression.suf(_, "++")} |
+      intExprBasic
 
   private val intExprBasic: Parser[IntExpression] =
     """[0-9]+""".r ^^ {IntExpression.integer(_)} |
-    identifierRegEx ^^ {IntExpression.variable(_)} |
-    "(" ~> intExpr <~ ")" |
-    intExpr
+      identifierRegEx ^^ {IntExpression.variable(_)} |
+      "(" ~> intExpr <~ ")" |
+      intExpr
 
   val intExpr: Parser[IntExpression] = intExprLevelBinAdd
 
@@ -72,9 +76,9 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   // If a need to be more strict arises only accept identifiers in struct/union/enum and use built in type names
   // TODO: if needed: support defining an anonymous enum, struct or union
   def cType: Parser[List[String]] =
-    ("struct"|"union"|"enum") ~ cType ^^ {found => found._1 :: found._2} |
-    ("unsigned"|"signed") ~ cType ^^ {found => found._1 :: found._2} |
-    identifierRegEx ^^ {List(_)}
+    ("struct" | "union" | "enum") ~ cType ^^ {found => found._1 :: found._2} |
+      ("unsigned" | "signed") ~ cType ^^ {found => found._1 :: found._2} |
+      identifierRegEx ^^ {List(_)}
 
   /**
    * Normalize a C integer type to easier to process.
@@ -82,7 +86,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
    * @param tokens a list of tokens that represent a C int type
    * @return the tokens in a standard form
    */
-  def normalizeCIntDeclaration(tokens : List[String]): List[String] = {
+  def normalizeCIntDeclaration(tokens: List[String]): List[String] = {
     val processed = expandCIntDeclaration(tokens);
     if ("signed".equals(processed.head))
       processed.tail // signed is default so remove it
@@ -95,15 +99,15 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
    * @param tokens a list of tokens that represent a C int type
    * @return the tokens in a standard form
    */
-  protected def expandCIntDeclaration(tokens : List[String]): List[String] = tokens match {
+  protected def expandCIntDeclaration(tokens: List[String]): List[String] = tokens match {
     case Nil => Nil
-    case "uint" :: (tail : List[String]) => "unsigned" :: "int" :: expandCIntDeclaration(tail) // a C extension
-    case "sint" :: (tail : List[String]) => "int" :: expandCIntDeclaration(tail) // a C extension. Signed is default
-    case (lastToken : String) :: Nil => expandLastInt(lastToken) // last token isn't sin or uint so expand if needed
-    case token :: (tail : List[String]) => token :: expandCIntDeclaration(tail)
+    case "uint" :: (tail: List[String]) => "unsigned" :: "int" :: expandCIntDeclaration(tail) // a C extension
+    case "sint" :: (tail: List[String]) => "int" :: expandCIntDeclaration(tail) // a C extension. Signed is default
+    case (lastToken: String) :: Nil => expandLastInt(lastToken) // last token isn't sin or uint so expand if needed
+    case token :: (tail: List[String]) => token :: expandCIntDeclaration(tail)
   }
 
-  @inline private def expandLastInt(lastToken : String): List[String] = lastToken match {
+  @inline private def expandLastInt(lastToken: String): List[String] = lastToken match {
     case "short" => "short" :: "int" :: Nil
     case "long" => "long" :: "int" :: Nil
     case "unsigned" => "unsigned" :: "int" :: Nil
@@ -113,17 +117,32 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean
 
-  private val spaceOrComment =
-    regExOr(regExOr(spaceBetweenWords, cStyleComment)+"+" + "("+cXXStyleComment+")?", cXXStyleComment).r
+  protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean
+
+  private val space = (spaceBetweenWords + "+").r
+
+  private val matchSpaceComment: String =
+    regExOr(regExOr(spaceBetweenWords, cStyleComment) + "+" + "(" + cXXStyleComment + ")?", cXXStyleComment)
+
+  private val spaceOrComment = matchSpaceComment.r
+
+  private val spaceCommentOrNewLine = (regExOr(matchSpaceComment, "\n", "\r") + "+").r
+
   override protected def handleWhiteSpace(source: CharSequence, offset: Int): Int = {
     if (0 == source.length())
       offset
 
-    if (isNewLineIgnored(source, offset))
+    if (isNewLineIgnored(source, offset) && !areCommentsIgnored(source, offset))
       super.handleWhiteSpace(source, offset)
     else {
-      val found = spaceOrComment
-        .findPrefixMatchOf(source.subSequence(offset, source.length()))
+      val found =
+        (if (!isNewLineIgnored(source, offset) && areCommentsIgnored(source, offset))
+          spaceOrComment
+        else if (!isNewLineIgnored(source, offset) && !areCommentsIgnored(source, offset))
+          space
+        else
+          spaceCommentOrNewLine
+        ).findPrefixMatchOf(source.subSequence(offset, source.length()))
       if (found.isEmpty)
         return offset
       else
