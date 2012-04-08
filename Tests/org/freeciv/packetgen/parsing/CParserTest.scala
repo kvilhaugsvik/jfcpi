@@ -302,6 +302,16 @@ class CParserSyntaxTest {
 #define SPECENUM_VALUE1NAME "omega"
 #include "specenum_gen.h"
     """, new ParseCCode())
+  @Test def specEnumMultiLineCommentAtTheEnd =
+    parsesCorrectly("""
+#define SPECENUM_NAME hasTwoComments
+#define SPECENUM_VALUE0 ELEMENT
+/* Multi
+ * line
+ * comment */
+#define SPECENUM_VALUE1 ELEMENT2
+#include "specenum_gen.h"
+    """, new ParseCCode())
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of constants
