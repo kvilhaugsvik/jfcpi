@@ -117,18 +117,32 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean
 
-  private val spaceOrComment =
-    regExOr(regExOr(spaceBetweenWords, cStyleComment) + "+" + "(" + cXXStyleComment + ")?", cXXStyleComment).r
+  protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean
+
+  private val space = (spaceBetweenWords + "+").r
+
+  private val matchSpaceComment: String =
+    regExOr(regExOr(spaceBetweenWords, cStyleComment) + "+" + "(" + cXXStyleComment + ")?", cXXStyleComment)
+
+  private val spaceOrComment = matchSpaceComment.r
+
+  private val spaceCommentOrNewLine = (regExOr(matchSpaceComment, "\n", "\r") + "+").r
 
   override protected def handleWhiteSpace(source: CharSequence, offset: Int): Int = {
     if (0 == source.length())
       offset
 
-    if (isNewLineIgnored(source, offset))
+    if (isNewLineIgnored(source, offset) && !areCommentsIgnored(source, offset))
       super.handleWhiteSpace(source, offset)
     else {
-      val found = spaceOrComment
-        .findPrefixMatchOf(source.subSequence(offset, source.length()))
+      val found =
+        (if (!isNewLineIgnored(source, offset) && areCommentsIgnored(source, offset))
+          spaceOrComment
+        else if (!isNewLineIgnored(source, offset) && !areCommentsIgnored(source, offset))
+          space
+        else
+          spaceCommentOrNewLine
+        ).findPrefixMatchOf(source.subSequence(offset, source.length()))
       if (found.isEmpty)
         return offset
       else

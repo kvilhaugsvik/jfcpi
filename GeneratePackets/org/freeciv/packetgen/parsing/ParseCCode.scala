@@ -58,8 +58,11 @@ class ParseCCode extends ParseShared {
       def apply(in: ParseCCode.this.type#Input): ParseResult[Ret] = {
         val oldIgnoreNewLinesFlag = ignoreNewLinesFlag
         ignoreNewLinesFlag = false
+        val oldIgnoreCommentsFlag = ignoreCommentsFlag
+        ignoreCommentsFlag = true
         val result = me(in)
         ignoreNewLinesFlag = oldIgnoreNewLinesFlag
+        ignoreCommentsFlag = oldIgnoreCommentsFlag
         return result
       }
     }
@@ -181,7 +184,11 @@ class ParseCCode extends ParseShared {
 
   private var ignoreNewLinesFlag = true
 
+  private var ignoreCommentsFlag = false
+
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
+
+  protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean = ignoreCommentsFlag
 
   def typedef = startOfTypeDefinition ~> cType ~ identifierRegEx <~ ";"
 

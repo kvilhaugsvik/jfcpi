@@ -22,7 +22,9 @@ class ParseSharedTest {
   def parserShared = new ParseShared {
     def expr = null
 
-    protected def isNewLineIgnored(source: CharSequence, offset: Int) = false
+    protected def isNewLineIgnored(source: CharSequence, offset: Int) = true
+
+    protected def areCommentsIgnored(source: CharSequence, offset: Int) = false
   }
 
   /*--------------------------------------------------------------------------------------------------------------------

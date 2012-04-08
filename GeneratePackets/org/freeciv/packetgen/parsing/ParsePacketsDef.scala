@@ -101,4 +101,6 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def parsePacketsDef(input: Reader[Char]) = parseAll(exprs, input)
 
   protected def isNewLineIgnored(source: CharSequence, offset: Int) = true
+
+  protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean = false
 }
