@@ -16,7 +16,7 @@ package org.freeciv.packetgen.parsing
 
 import org.junit.Assert._
 import org.junit.Test
-import org.freeciv.packetgen.{GeneratorDefaults, CParserTest}
+import org.freeciv.packetgen.GeneratorDefaults
 
 class ParseSharedTest {
   def parserShared = new ParseShared {

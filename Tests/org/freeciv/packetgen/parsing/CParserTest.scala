@@ -12,19 +12,19 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen
+package org.freeciv.packetgen.parsing
 
-import dependency.Requirement
-import enteties.Enum
-import enteties.Enum.EnumElementFC
-import javaGenerator.ClassWriter
+import org.freeciv.packetgen.dependency.Requirement
+import org.freeciv.packetgen.enteties.Enum
+import org.freeciv.packetgen.enteties.Enum.EnumElementFC
+import org.freeciv.packetgen.javaGenerator.ClassWriter
 import org.junit.Test
 import org.junit.Assert._
-import parsing.{ParseShared, FromCExtractor, ParseCCode}
 import scala.inline
 import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader
 import java.util.Collection
+import org.freeciv.packetgen.{UndefinedException, GeneratorDefaults}
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
