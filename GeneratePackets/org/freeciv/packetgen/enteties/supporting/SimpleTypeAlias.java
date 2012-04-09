@@ -25,17 +25,11 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
     private final String typeInJava;
-    private final boolean isNative;
 
-    public SimpleTypeAlias(String name, String jType, String outsideRequirement) {
+    public SimpleTypeAlias(String name, String jType, Collection<Requirement> reqs) {
         this.iProvide = new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE);
         this.typeInJava = jType;
-
-        isNative = (null == outsideRequirement);
-        if (isNative)
-            this.willRequire = Collections.<Requirement>emptySet();
-        else
-            this.willRequire = Arrays.asList(new Requirement(outsideRequirement, Requirement.Kind.AS_JAVA_DATATYPE));
+        this.willRequire = reqs;
     }
 
     @Override
@@ -43,9 +37,9 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(),
                                   typeInJava,
                                   new String[]{"this.value = value;"},
-                                  "value = " + (isNative ? io.getRead() : typeInJava + ".valueOf(" + io
+                                  "value = " + (willRequire.isEmpty() ? io.getRead() : typeInJava + ".valueOf(" + io
                                           .getRead() + ")") + ";",
-                                  io.getWrite((isNative ? "value" : "value.getNumber()")),
+                                  io.getWrite((willRequire.isEmpty() ? "value" : "value.getNumber()")),
                                   io.getSize(),
                                   false, willRequire);
     }

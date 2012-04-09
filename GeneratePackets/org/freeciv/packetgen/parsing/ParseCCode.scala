@@ -210,38 +210,9 @@ class ParseCCode extends ParseShared {
   // in that case throw away typedef and return the anon
   def typedefConverted = typedef ^^ {
     case types ~ name => {
-      val (isSigned, dec) = expandCIntDeclaration(types) match {
-        case "unsigned" :: tail => false -> tail
-        case "signed" :: tail => true -> tail
-        case all => true -> all // signed is default for int. The compiler choose for char.
-      }
-
-      val (isNative, wrappedType) = dec match {
-        case "char" :: Nil => pickJavaInt(8, isSigned)
-        case "short" :: "int" :: Nil => pickJavaInt(16, isSigned)
-        case "int" :: Nil => pickJavaInt(32, isSigned) // at least 16 bits. Assume 32 bits
-        case "long" :: "int" :: Nil => pickJavaInt(32, isSigned) // at least 32 bits
-        case "long" :: "long" :: "int" :: Nil => pickJavaInt(64, isSigned) // at least 64 bits
-
-        case "enum" :: name :: Nil => false -> name
-      } // TODO: isSigned and bits can be used to check lower range on unsigned ints
-
-      new SimpleTypeAlias(name, wrappedType, if (isNative) null else dec.reduce(_ + " " + _))
+      val translatedTypes = cTypeDecsToJava(types)
+      new SimpleTypeAlias(name, translatedTypes._1, translatedTypes._2)
     }
-  }
-
-  def pickJavaInt(sizeInBytes: Int, isSigned: Boolean): (Boolean, String) = {
-    // Java don't have unsigned so something bigger is needed...
-    val realSize: Int = if (isSigned) sizeInBytes else sizeInBytes + 1
-
-    // Java really really likes int so don't use shorter values
-    if (realSize <= 32)
-      true -> "Integer"
-    else if (realSize <= 64)
-      true -> "Long"
-    else
-      throw new UnsupportedOperationException("No Java integer supports " + realSize + " bits." +
-        " BigInteger may be used when users of this method can handle making a constructor for it.")
   }
 
   def bitVectorDef = startOfBitVector ~ "(" ~> identifierRegEx ~ ("," ~> intExpr) <~ ")" ~ ";"

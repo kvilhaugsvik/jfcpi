@@ -90,7 +90,7 @@ public class Hardcoded {
             NetworkIO.witIntAsIntermediate("sint32", "4", "from.readInt()", "to.writeInt"));
 
     private static final Collection<IDependency> nativeJava = Arrays.asList(
-            (IDependency)(new SimpleTypeAlias("int", "Integer", null))
+            (IDependency)(new SimpleTypeAlias("int", "Integer", Collections.<Requirement>emptySet()))
     );
 
     public static String arrayEaterScopeCheck(String check) {
