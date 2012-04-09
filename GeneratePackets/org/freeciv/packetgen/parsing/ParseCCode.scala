@@ -51,6 +51,7 @@ class ParseCCode extends ParseShared {
     startOfConstant + "\\s+" + identifier,
     startOfTypeDefinition + "\\s+",
     startOfBitVector,
+    startOfStruct + "\\s+" + identifier,
     startOfCEnum + "\\s+" + identifier,
     startOfSpecEnum + "\\s+" + identifier
   )
