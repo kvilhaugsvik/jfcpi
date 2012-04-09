@@ -14,13 +14,18 @@
 
 package org.freeciv.packetgen.enteties;
 
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
 
-public class Struct extends ClassWriter {
-    public Struct(String name, List<Map.Entry<String, String>> fields) {
+public class Struct extends ClassWriter implements IDependency {
+    private final Set<Requirement> iRequire;
+    private final Requirement iProvide;
+
+    public Struct(String name, List<Map.Entry<String, String>> fields, Set<Requirement> willNeed) {
         super(ClassKind.CLASS,
                 new TargetPackage(FCEnum.class.getPackage()),
                 new String[]{}, "Freeciv C code", name, null, null);
@@ -32,6 +37,9 @@ public class Struct extends ClassWriter {
             addMethodPublicReadObjectState(null, field.getKey(), "get" + field.getValue(),
                     "return " + field.getValue() + ";");
         }
+
+        iRequire = willNeed;
+        iProvide = new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE);
     }
 
     private void addConstructorParameterToFields(String name, List<Map.Entry<String, String>> fields) {
@@ -40,5 +48,15 @@ public class Struct extends ClassWriter {
             body[i] = setFieldToVariableSameName(fields.get(i).getValue());
         }
         addConstructorPublic(null, name, createParameterList(fields), body);
+    }
+
+    @Override
+    public Collection<Requirement> getReqs() {
+        return iRequire;
+    }
+
+    @Override
+    public Requirement getIFulfillReq() {
+        return iProvide;
     }
 }

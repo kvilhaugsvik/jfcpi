@@ -822,6 +822,42 @@ public enum test implements FCEnum {
       new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
       result.getIFulfillReq)
   }
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test semantics of structs
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def structOneFieldPrimitiveBoolean {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""struct justOne {bool value;};""", parser, parser.structConverted)
+    assertTrue("The primitive bool should not depend on anything", result.get.getReqs.isEmpty)
+  }
+
+  @Test def structOneFieldEnum {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""struct justOne {enum test value;};""", parser, parser.structConverted)
+    assertTrue("The enum test should be needed here",
+      result.get.getReqs.contains(new Requirement("enum test", Requirement.Kind.AS_JAVA_DATATYPE)))
+  }
+
+  @Test def structTwoFieldsPrimitive {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""struct two {bool value1; int value2;};""", parser, parser.structConverted)
+    assertTrue("The primitives bool and int should not depend on anything", result.get.getReqs.isEmpty)
+  }
+
+  @Test def structTwoFieldsEnum {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""
+struct two {
+  enum test value1;
+  enum bitwise value2;
+};
+    """, parser, parser.structConverted)
+    assertTrue("The enum test should be needed here",
+      result.get.getReqs.contains(new Requirement("enum test", Requirement.Kind.AS_JAVA_DATATYPE)))
+    assertTrue("The enum bitwise should be needed here",
+      result.get.getReqs.contains(new Requirement("enum bitwise", Requirement.Kind.AS_JAVA_DATATYPE)))
+  }
 }
 
 class FromCExtractorTest {

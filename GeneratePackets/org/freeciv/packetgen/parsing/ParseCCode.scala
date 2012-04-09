@@ -18,13 +18,14 @@ import collection.mutable.ListBuffer
 import org.freeciv.packetgen.dependency.Requirement
 import org.freeciv.packetgen.javaGenerator.ClassWriter
 import scala.collection.JavaConverters.seqAsJavaListConverter
-import org.freeciv.packetgen.enteties.{Enum, Constant, BitVector}
-import Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
+import org.freeciv.packetgen.enteties.{Struct, Enum, Constant, BitVector}
+import org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
 import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, IntExpression}
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
-import org.freeciv.packetgen._
-import enteties.Enum.EnumElementFC
+import org.freeciv.packetgen.enteties.Enum.EnumElementFC
+import org.freeciv.packetgen.UndefinedException
+import java.util.AbstractMap.SimpleImmutableEntry
 
 class ParseCCode extends ParseShared {
   def enumElemCode = identifierRegEx
@@ -235,12 +236,24 @@ class ParseCCode extends ParseShared {
     }
   }
 
+  def structConverted = struct ^^ {
+    val willRequire = new java.util.HashSet[Requirement]()
+    struct => new Struct(struct._1, struct._2.map(entry => {
+      val fieldType = cTypeDecsToJava(entry._1)
+      willRequire.addAll(fieldType._2)
+      new SimpleImmutableEntry[String, String](fieldType._1,
+        entry._2): java.util.Map.Entry[String, String]
+    }).asJava,
+      willRequire)
+  }
+
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
   def exprConverted = cEnumDefConverted |
     specEnumDefConverted |
+    structConverted |
     bitVectorDefConverted |
     typedefConverted |
     constantValueDefConverted
