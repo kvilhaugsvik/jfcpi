@@ -167,9 +167,9 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       case "double" :: Nil => ("Double", nativeJava)
       case other :: Nil => (other, needAsJava(other))
 
-      case "enum" :: name :: Nil => (name, needAsJava(name))
-      case "struct" :: name :: Nil => (name, needAsJava(name))
-      case "union" :: name :: Nil => (name, needAsJava(name))
+      case "enum" :: name :: Nil => (name, needAsJava("enum" + " " + name))
+      case "struct" :: name :: Nil => (name, needAsJava("struct" + " " + name))
+      case "union" :: name :: Nil => (name, needAsJava("union" + " " + name))
     }
   }
 
