@@ -239,7 +239,10 @@ class ParseCCode extends ParseShared {
 
   def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
 
-  def exprConverted = cEnumDefConverted | specEnumDefConverted | bitVectorDefConverted | typedefConverted |
+  def exprConverted = cEnumDefConverted |
+    specEnumDefConverted |
+    bitVectorDefConverted |
+    typedefConverted |
     constantValueDefConverted
 
   def expr = cEnumDef |
