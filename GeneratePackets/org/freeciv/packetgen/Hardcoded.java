@@ -39,6 +39,27 @@ public class Hardcoded {
                                        "information",
                                "return 4;",
                                false, Collections.<Requirement>emptySet()),
+            new FieldTypeBasic("requirement", "struct requirement", "requirement",
+                    new String[]{"this.value = value;"},
+                    "value = new requirement(\n" +
+                            "\tnew universal(universals_n.valueOf(from.readUnsignedByte()),\n" +
+                            "\t\tfrom.readInt()),\n" +
+                            "\treq_range.valueOf(from.readUnsignedByte()),\n" +
+                            "\tfrom.readBoolean(),\n" +
+                            "\tfrom.readBoolean());\n",
+                    "to.writeByte(value.getsource().getkind().getNumber());\n" +
+                            "to.writeInt(value.getsource().getValue());\n" +
+                            "to.writeByte(value.getrange().getNumber());\n" +
+                            "to.writeBoolean(value.getsurvives());\n" +
+                            "to.writeBoolean(value.getnegated());",
+                    "return 8;",
+                    false,
+                    Arrays.asList(
+                            new Requirement("struct requirement", Requirement.Kind.AS_JAVA_DATATYPE),
+                            new Requirement("enum req_range", Requirement.Kind.AS_JAVA_DATATYPE),
+                            new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
+                            new Requirement("universal", Requirement.Kind.AS_JAVA_DATATYPE))
+            ),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
