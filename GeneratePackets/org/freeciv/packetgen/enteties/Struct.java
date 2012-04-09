@@ -39,7 +39,7 @@ public class Struct extends ClassWriter implements IDependency {
         }
 
         iRequire = willNeed;
-        iProvide = new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE);
+        iProvide = new Requirement("struct" + " " + name, Requirement.Kind.AS_JAVA_DATATYPE);
     }
 
     private void addConstructorParameterToFields(String name, List<Map.Entry<String, String>> fields) {
