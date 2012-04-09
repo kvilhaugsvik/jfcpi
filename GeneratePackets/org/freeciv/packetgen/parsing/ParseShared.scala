@@ -16,6 +16,7 @@ package org.freeciv.packetgen.parsing
 
 import util.parsing.combinator._
 import org.freeciv.packetgen.enteties.supporting.IntExpression
+import org.freeciv.packetgen.dependency.Requirement
 
 abstract class ParseShared extends RegexParsers with PackratParsers {
   def expr: Parser[Any]
@@ -113,6 +114,63 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     case "unsigned" => "unsigned" :: "int" :: Nil
     case "signed" => "int" :: Nil // signed is default for int
     case _ => lastToken :: Nil
+  }
+
+  def cTypeDecsToJava(cTypeDecs: List[String]): (String, java.util.Set[Requirement]) = {
+    def needAsJava(name: String): java.util.Set[Requirement] = {
+      val out = new java.util.HashSet[Requirement]();
+      out.add(new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE));
+      out
+    }
+
+    val nativeJava = java.util.Collections.emptySet[Requirement]()
+
+    def pickJavaInt(sizeInBytes: Int, isSigned: Boolean): String = {
+      // TODO: isSigned and bits can be used to check range
+
+      // Java don't have unsigned so something bigger is needed...
+      val realSize: Int = if (isSigned) sizeInBytes else sizeInBytes + 1
+
+      // Java really really likes int so don't use shorter values
+      if (realSize <= 32)
+        "Integer"
+      else if (realSize <= 64)
+        "Long"
+      else
+        throw new UnsupportedOperationException("No Java integer supports " + realSize + " bits." +
+          " BigInteger may be used when users of this method can handle making a constructor for it.")
+    }
+
+    def normalizedIntSize(normalizedInt: List[String]) = normalizedInt match {
+      case "char" :: Nil => 8
+      case "short" :: "int" :: Nil => 16
+      case "int" :: Nil => 16 // at least 16 bits. Assume 32 bits
+      case "long" :: "int" :: Nil => 31 // at least 32 bits
+      case "long" :: "long" :: "int" :: Nil => 64 // at least 64 bits
+    }
+
+    def isIntIsh(cTypeDecs: List[String]): Boolean =
+      List("unsigned", "signed", "long", "short", "int", "char", "sint", "uint").contains(cTypeDecs.head)
+
+    if (isIntIsh(cTypeDecs))
+      normalizeCIntDeclaration(cTypeDecs) match { // signed is default for int. The compiler choose for char.
+        case "unsigned" :: tail =>
+          (pickJavaInt(normalizedIntSize(tail), false), nativeJava)
+        case "signed" :: tail =>
+          (pickJavaInt(normalizedIntSize(tail), true), nativeJava)
+        case signed =>
+          (pickJavaInt(normalizedIntSize(signed), true), nativeJava)
+      }
+    else cTypeDecs match {
+      case "bool" :: Nil => ("Boolean", nativeJava)
+      case "float" :: Nil => ("Float", nativeJava)
+      case "double" :: Nil => ("Double", nativeJava)
+      case other :: Nil => (other, needAsJava(other))
+
+      case "enum" :: name :: Nil => (name, needAsJava(name))
+      case "struct" :: name :: Nil => (name, needAsJava(name))
+      case "union" :: name :: Nil => (name, needAsJava(name))
+    }
   }
 
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean
