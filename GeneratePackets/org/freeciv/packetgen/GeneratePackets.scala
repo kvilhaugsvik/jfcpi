@@ -14,15 +14,17 @@
 
 package org.freeciv.packetgen
 
+import parsing.{ParsePacketsDef, FromCExtractor}
 import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 import org.freeciv.Connect
-import xml.{Text, XML}
+import xml.XML
 
 class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
 
-  def this(packetsDefPathString: String, cPathsString: List[String], devMode: Boolean, hasTwoBytePacketNumber: Boolean) = {
+  def this(packetsDefPathString: String, cPathsString: List[String], devMode: Boolean,
+           hasTwoBytePacketNumber: Boolean) = {
     this(new File(packetsDefPathString), cPathsString.map(new File(_)), devMode, hasTwoBytePacketNumber)
   }
 
@@ -42,6 +44,9 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
   if (!packetsDefResult.successful) {
     throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath + "\n" + packetsDefResult.toString)
   }
+
+  println("Applying manual changes")
+  Hardcoded.applyManualChanges(storage);
 
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
@@ -83,8 +88,8 @@ object GeneratePackets {
     val hasTwoBytePacketNumber = versionConfiguration.attribute("packetNumberSize").isDefined &&
       versionConfiguration.attribute("packetNumberSize").get.text.toInt == 2
 
-    val inputSources = (versionConfiguration \"inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem\"file").map(pathPrefix + "/" + _.text)).toMap
+    val inputSources = (versionConfiguration \ "inputSource").map(elem =>
+      elem.attribute("parseAs").get.text -> (elem \ "file").map(pathPrefix + "/" + _.text)).toMap
 
     val self = new GeneratePackets(inputSources("packets").head,
       inputSources("C").toList,

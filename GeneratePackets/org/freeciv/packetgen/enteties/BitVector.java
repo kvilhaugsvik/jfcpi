@@ -1,13 +1,21 @@
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties;
 
-import java.util.*;
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.IntExpression;
+import org.freeciv.packetgen.enteties.supporting.NetworkIO;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final Collection<Requirement> iRequire;
     private final Requirement iProvide;
+
     public BitVector(String name, IntExpression bits) {
-        super(new ClassWriter.TargetPackage(org.freeciv.types.BitVector.class.getPackage()), null,
-                "Freeciv C code", name, "BitVector", null);
+        super(ClassKind.CLASS, new TargetPackage(org.freeciv.types.BitVector.class.getPackage()), null,
+              "Freeciv C code", name, "BitVector", null);
 
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
 
@@ -34,19 +42,18 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         final String bvName = iProvide.getName();
         final String size = "1 + (" + bvName + ".size" + " - 1) / 8";
         return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName,
-                bvName,
-                new String[]{"this.value = value;"},
-                "byte[] innBuffer = new byte[" + size + "];\n"
-                        + "from.readFully(innBuffer);\n"
-                        + "value = new " + bvName + "(innBuffer);",
-                "to.write(value.getAsByteArray());",
-                "return " + size + ";",
-                false,
-                Arrays.asList(iProvide));
+                                  bvName,
+                                  new String[]{"this.value = value;"},
+                                  io.getRead(size)
+                                          + "value = new " + bvName + "(innBuffer);",
+                                  io.getWrite("value.getAsByteArray()"),
+                                  "return " + size + ";",
+                                  false,
+                                  Arrays.asList(iProvide));
     }
 
     @Override
     public Requirement.Kind needsDataInFormat() {
-        return Requirement.Kind.FROM_NETWORK_DUMMY;
+        return Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES;
     }
 }

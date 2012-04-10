@@ -17,9 +17,9 @@ package org.freeciv.test;
 import org.freeciv.packet.fieldtype.UINT32;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import java.io.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class FieldTypeTests {
     private static long roundTripUINT32(long number) throws IOException {

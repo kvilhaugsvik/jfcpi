@@ -12,14 +12,19 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen
+package org.freeciv.packetgen.parsing
 
+import org.freeciv.packetgen.dependency.Requirement
+import org.freeciv.packetgen.enteties.Enum
+import org.freeciv.packetgen.enteties.Enum.EnumElementFC
+import org.freeciv.packetgen.javaGenerator.ClassWriter
 import org.junit.Test
 import org.junit.Assert._
 import scala.inline
 import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader
 import java.util.Collection
+import org.freeciv.packetgen.{UndefinedException, GeneratorDefaults}
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
@@ -286,6 +291,27 @@ class CParserSyntaxTest {
     parsesCorrectly(specEnumTwoNamedElementsWithCommentBeforeAndAfter, parseEnumTest)
   @Test def testSpecEnumNamedElementWithSpace =
     parsesCorrectly(specEnumNamedElementWithSpace, parseEnumTest)
+  @Test def specEnumTwoCommentsInARowBetweenElements =
+    parsesCorrectly("""
+#define SPECENUM_NAME hasTwoComments
+#define SPECENUM_VALUE0 FIRST
+#define SPECENUM_VALUE0NAME "alpha"
+/* Put more between */
+/* not just one more */
+#define SPECENUM_VALUE1 LAST
+#define SPECENUM_VALUE1NAME "omega"
+#include "specenum_gen.h"
+    """, new ParseCCode())
+  @Test def specEnumMultiLineCommentAtTheEnd =
+    parsesCorrectly("""
+#define SPECENUM_NAME hasTwoComments
+#define SPECENUM_VALUE0 ELEMENT
+/* Multi
+ * line
+ * comment */
+#define SPECENUM_VALUE1 ELEMENT2
+#include "specenum_gen.h"
+    """, new ParseCCode())
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of constants
@@ -338,6 +364,39 @@ class CParserSyntaxTest {
   @Test def bvIntegerLong = parsesCorrectly("BV_DEFINE(bv_test, 8);", new ParseCCode())
   @Test def bvAConstantLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", new ParseCCode())
   @Test def bvAConstantAddIntLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", new ParseCCode())
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test pure parsing of structs
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def structOneFieldPrimitive =
+    parsesCorrectly("""struct justOne {bool value;};""",
+      new ParseCCode())
+
+  @Test def structOneFieldEnum =
+    parsesCorrectly("""struct justOne {enum test value;};""",
+      new ParseCCode())
+
+  @Test def structTwoFieldsPrimitive =
+    parsesCorrectly("""struct two {bool value1; int value2;};""",
+      new ParseCCode())
+
+  @Test def structTwoFieldsEnum =
+    parsesCorrectly("""
+struct two {
+  enum test value1;
+  enum bitwise value2;
+};
+    """,
+      new ParseCCode())
+
+  @Test def structTwoFieldsCommented =
+    parsesCorrectly("""
+struct two {
+  int value1; // C++ comment
+  enum bitwise value2; /* C style comment */
+};
+    """,
+      new ParseCCode())
 }
 
 class CParserSemanticTest {
@@ -346,7 +405,7 @@ class CParserSemanticTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Common helper methods
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline private def checkElement(element: ClassWriter.EnumElement, nameInCode: String, number: String, toStringName: String) {
+  @inline private def checkElement(element: EnumElementFC, nameInCode: String, number: String, toStringName: String) {
     assertNotNull("Element " + nameInCode + " don't exist", element)
     assertEquals("Wrong name in code for element " + nameInCode, nameInCode, element.getEnumValueName)
     assertEquals("Wrong number for element " + nameInCode, number, element.getValueGenerator)
@@ -762,6 +821,42 @@ public enum test implements FCEnum {
     assertEquals("Should provide it self",
       new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
       result.getIFulfillReq)
+  }
+
+  /*--------------------------------------------------------------------------------------------------------------------
+  Test semantics of structs
+  --------------------------------------------------------------------------------------------------------------------*/
+  @Test def structOneFieldPrimitiveBoolean {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""struct justOne {bool value;};""", parser, parser.structConverted)
+    assertTrue("The primitive bool should not depend on anything", result.get.getReqs.isEmpty)
+  }
+
+  @Test def structOneFieldEnum {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""struct justOne {enum test value;};""", parser, parser.structConverted)
+    assertTrue("The enum test should be needed here",
+      result.get.getReqs.contains(new Requirement("enum test", Requirement.Kind.AS_JAVA_DATATYPE)))
+  }
+
+  @Test def structTwoFieldsPrimitive {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""struct two {bool value1; int value2;};""", parser, parser.structConverted)
+    assertTrue("The primitives bool and int should not depend on anything", result.get.getReqs.isEmpty)
+  }
+
+  @Test def structTwoFieldsEnum {
+    val parser = new ParseCCode()
+    val result = parsesCorrectly("""
+struct two {
+  enum test value1;
+  enum bitwise value2;
+};
+    """, parser, parser.structConverted)
+    assertTrue("The enum test should be needed here",
+      result.get.getReqs.contains(new Requirement("enum test", Requirement.Kind.AS_JAVA_DATATYPE)))
+    assertTrue("The enum bitwise should be needed here",
+      result.get.getReqs.contains(new Requirement("enum bitwise", Requirement.Kind.AS_JAVA_DATATYPE)))
   }
 }
 

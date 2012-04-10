@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.dependency;
 
 import java.util.*;
 
@@ -40,7 +40,7 @@ public final class DependencyStore {
     private static void putAllProvdesIn(IDependency item, HashMap<Requirement, IDependency> depCategory) {
         depCategory.put(item.getIFulfillReq(), item);
         if (item instanceof IDependency.ManyFulfiller)
-            for (Requirement also : ((IDependency.ManyFulfiller) item).getIAlsoFulfillReqs())
+            for (Requirement also : ((IDependency.ManyFulfiller)item).getIAlsoFulfillReqs())
                 depCategory.put(also, item);
     }
 
@@ -86,7 +86,7 @@ public final class DependencyStore {
             return false;
         } else {
             boolean missingReq = false;
-            for (Requirement req: item.getReqs()) {
+            for (Requirement req : item.getReqs()) {
                 if (!(existing.containsKey(req) && dependenciesFound(existing.get(req)))) {
                     dependenciesUnfulfilled.add(req);
                     missingReq = true;
@@ -95,7 +95,7 @@ public final class DependencyStore {
             if (missingReq) {
                 dependenciesUnfulfilled.add(item.getIFulfillReq());
                 return false;
-            } else  {
+            } else {
                 return declareFulfilled(item);
             }
         }
@@ -105,7 +105,7 @@ public final class DependencyStore {
         assert (null != item) : nullNotAllowed;
         assert (dependenciesFulfilled.containsKey(item.getIFulfillReq())) : "Missing dependency";
         if (!resolved.containsKey(item.getIFulfillReq())) {
-            for (Requirement dependOn: item.getReqs()) {
+            for (Requirement dependOn : item.getReqs()) {
                 addWillCrashUnlessAlreadyChecked(dependenciesFulfilled.get(dependOn));
             }
             resolved.put(item.getIFulfillReq(), item);
@@ -120,7 +120,7 @@ public final class DependencyStore {
     }
 
     private void resolve() {
-        for (IDependency toAdd: wantsOut) {
+        for (IDependency toAdd : wantsOut) {
             addToResolvedIfPossible(toAdd);
         }
         wantsOut.removeAll(resolved.values());

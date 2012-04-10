@@ -12,7 +12,9 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.javaGenerator;
+
+import org.freeciv.packetgen.Wrapped;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -34,7 +36,10 @@ public class ClassWriter {
     private final LinkedList<Method> methods = new LinkedList<Method>();
     protected final LinkedHashMap<String, EnumElement> enums = new LinkedHashMap<String, ClassWriter.EnumElement>();
 
-    public ClassWriter(ClassKind kind, TargetPackage where, String[] imports, String madeFrom, String name, String parent, String implementsInterface) {
+    private boolean constructorFromAllFields = false;
+
+    public ClassWriter(ClassKind kind, TargetPackage where, String[] imports, String madeFrom, String name,
+                       String parent, String implementsInterface) {
         if (null == name) throw new IllegalArgumentException("No name for class to be generated");
 
         this.where = where;
@@ -48,27 +53,6 @@ public class ClassWriter {
         visibility = Visibility.PUBLIC;
     }
 
-    public ClassWriter(ClassKind kind, TargetPackage where, String[] imports, String madeFrom, String name, String implementsInterface) {
-        this(kind, where, imports, madeFrom, name, null, implementsInterface);
-    }
-
-    public ClassWriter(ClassKind kind, Package where, String[] imports, String madeFrom, String name, String implementsInterface) {
-        this(kind, new TargetPackage(where), imports, madeFrom, name, implementsInterface);
-    }
-
-    public ClassWriter(TargetPackage where, String[] imports, String madeFrom, String name, String implementsInterface) {
-        this(ClassKind.CLASS, where, imports, madeFrom, name, implementsInterface);
-    }
-
-    public ClassWriter(Package where, String[] imports, String madeFrom, String name, String implementsInterface) {
-        this(new TargetPackage(where), imports, madeFrom, name, implementsInterface);
-    }
-
-    public ClassWriter(TargetPackage where, String[] imports, String madeFrom, String name, String parent, String implementsInterface) {
-        this(ClassKind.CLASS, where, imports, madeFrom, name, parent, implementsInterface);
-    }
-
-
     public void addClassConstant(String type, String name, String value) {
         constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
@@ -79,6 +63,10 @@ public class ClassWriter {
 
     public void addObjectConstant(String type, String name) {
         stateVars.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
+    }
+
+    public void addPublicObjectConstant(String type, String name) {
+        stateVars.add(new VariableDeclaration(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addMethod(String comment,
@@ -130,16 +118,45 @@ public class ClassWriter {
         methods.add(Method.newPublicConstructor(comment, name, paramList, body));
     }
 
+    public void addConstructorFields() {
+        constructorFromAllFields = true;
+    }
+
     protected void addEnumerated(EnumElement element) {
         assert kind.equals(ClassKind.ENUM);
 
         enums.put(element.getEnumValueName(), element);
     }
 
+    /**
+     * Create a parameter list
+     * @param parameters the parameters given as a list of map entry that maps from type to name
+     * @return the parameter list
+     */
+    protected static String createParameterList(List<Map.Entry<String, String>> parameters) {
+        String argumentsList = "";
+        if (0 < parameters.size()) {
+            for (Map.Entry<String, String> field : parameters) {
+                argumentsList += field.getKey() + " " + field.getValue() + ", ";
+            }
+            argumentsList = argumentsList.substring(0, argumentsList.length() - 2);
+        }
+        return argumentsList;
+    }
+
+    /**
+     * Get a line that sets a field's value to the value of the variable of the same name.
+     * @param field Name of the field (and variable)
+     * @return a line of Java setting the field's value to the value of the variable with the same name
+     */
+    protected static String setFieldToVariableSameName(String field) {
+        return "this." + field + " = " + field + ";";
+    }
+
     private String formatImports() {
         String out = "";
 
-        for (String anImport: imports) {
+        for (String anImport : imports) {
             if ((null != anImport) && !anImport.isEmpty())
                 out += declareImport(anImport);
             out += "\n";
@@ -152,7 +169,7 @@ public class ClassWriter {
     private String formatEnumeratedElements() {
         String out = "";
 
-        for (EnumElement element: enums.values()) {
+        for (EnumElement element : enums.values()) {
             out += "\t" + element + "," + "\n";
         }
         if (!enums.isEmpty())
@@ -164,7 +181,7 @@ public class ClassWriter {
     private static String formatVariableDeclarations(List<VariableDeclaration> variables) {
         String out = "";
 
-        for (VariableDeclaration variable: variables) {
+        for (VariableDeclaration variable : variables) {
             out += "\t" + variable + "\n";
         }
         if (!variables.isEmpty()) out += "\n";
@@ -175,11 +192,21 @@ public class ClassWriter {
     private static String formatMethods(List<Method> methods) {
         String out = "";
 
-        for (Method method: methods) {
+        for (Method method : methods) {
             out += method + "\n";
         }
 
         return out;
+    }
+
+    private String constructorFromFields() {
+        LinkedList<String> body = new LinkedList<String>();
+        LinkedList<Map.Entry<String, String>> args = new LinkedList<Map.Entry<String, String>>();
+        for (VariableDeclaration dec : stateVars) {
+            body.add(setFieldToVariableSameName(dec.name));
+            args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.type, dec.name));
+        }
+        return Method.newPublicConstructor(null, name, createParameterList(args), body.toArray(new String[0])) + "\n";
     }
 
     public String toString() {
@@ -191,13 +218,18 @@ public class ClassWriter {
         if (null != imports) out += formatImports();
 
         if (null != madeFrom) out += commentAutoGenerated(madeFrom) + "\n";
-        out += visibility + " " + kind + " " + name + ifIs(" extends ", parent, "") + ifIs(" implements ", implementsInterface, "") + " {" + "\n";
+        out += visibility + " " + kind + " " + name + ifIs(" extends ", parent, "") + ifIs(" implements ",
+                                                                                           implementsInterface,
+                                                                                           "") + " {" + "\n";
 
         if (ClassKind.ENUM == kind)
             out += formatEnumeratedElements();
 
         out += formatVariableDeclarations(constants);
         out += formatVariableDeclarations(stateVars);
+
+        if (constructorFromAllFields)
+            out += constructorFromFields();
 
         out += formatMethods(methods);
 
@@ -228,7 +260,7 @@ public class ClassWriter {
         return "import " + toImport + ";";
     }
 
-    static String allInPackageOf(Class thisClass) {
+    protected static String allInPackageOf(Class thisClass) {
         return thisClass.getPackage().getName() + ".*";
     }
 
@@ -240,7 +272,7 @@ public class ClassWriter {
     private static String indent(String[] lines, String startAt) {
         String out = "";
         int extraIndention = 0;
-        for (String line: lines) {
+        for (String line : lines) {
             if (null != line) {
                 char[] addIndention;
                 Matcher scopeEndFirstInLine = scopeEndFirst.matcher(line);
@@ -248,12 +280,11 @@ public class ClassWriter {
                     final int numberOfScopes = extraIndention - scopeEndFirstInLine.end();
                     if (0 > numberOfScopes) throw endOfScopeNotBegan(line);
                     addIndention = new char[numberOfScopes];
-                }
-                else
+                } else
                     addIndention = new char[extraIndention];
                 extraIndention = updateIndention(extraIndention, line);
                 Arrays.fill(addIndention, '\t');
-                out += !line.isEmpty()? (startAt + new String(addIndention) + line) : "";
+                out += !line.isEmpty() ? (startAt + new String(addIndention) + line) : "";
             }
             out += "\n";
             if (0 > extraIndention)
@@ -271,8 +302,12 @@ public class ClassWriter {
     private static int updateIndention(int extraIndention, String line) {
         for (int position = 0; position < line.length(); position++) {
             switch (line.charAt(position)) {
-                case '{': extraIndention++; break;
-                case '}': extraIndention--; break;
+                case '{':
+                    extraIndention++;
+                    break;
+                case '}':
+                    extraIndention--;
+                    break;
             }
         }
         return extraIndention;
@@ -287,7 +322,7 @@ public class ClassWriter {
     }
 
     private static String ifIs(String before, String element, String after) {
-        return (null == element? "" : before + element + after);
+        return (null == element ? "" : before + element + after);
     }
 
     private static String removeBlankLine(String out) {
@@ -304,7 +339,8 @@ public class ClassWriter {
         private final String exceptionList;
         private final String[] body;
 
-        public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList, String exceptionList, String... body) {
+        public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
+                      String exceptionList, String... body) {
             this.comment = comment;
             this.visibility = visibility;
             this.scope = scope;
@@ -334,16 +370,16 @@ public class ClassWriter {
         }
 
         static Method newPublicConstructor(String comment,
-                                                    String name,
-                                                    String paramList,
-                                                    String... body) {
+                                           String name,
+                                           String paramList,
+                                           String... body) {
             return newPublicConstructorWithException(comment, name, paramList, null, body);
         }
 
         static Method newPublicReadObjectState(String comment,
-                                            String type,
-                                            String name,
-                                            String... body) {
+                                               String type,
+                                               String name,
+                                               String... body) {
             return newPublicDynamicMethod(comment, type, name, null, null, body);
         }
 
@@ -370,7 +406,7 @@ public class ClassWriter {
         private final String value;
 
         public VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
-                                    String type, String name, String value) {
+                                   String type, String name, String value) {
             this.visibility = visibility;
             this.scope = scope;
             this.modifiable = modifiable;
@@ -387,65 +423,44 @@ public class ClassWriter {
         }
     }
 
-    static class EnumElement {
+    public static class EnumElement {
         private final String comment;
         private final String elementName;
-        private final String valueGen;
-        private final String toStringName;
-        private final boolean valid;
+        private final String paramlist;
 
-        EnumElement(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
+        protected EnumElement(String comment, String elementName, String params) {
             if (null == elementName)
                 throw new IllegalArgumentException("All elements of enums must have names");
 
-            // Look up numbers in a uniform way
-            if (null == toStringName)
-                throw new IllegalArgumentException("All elements of enums must have toStringNames");
-
             this.comment = comment;
             this.elementName = elementName;
-            this.valueGen = valueGen;
-            this.toStringName = toStringName;
-            this.valid = valid;
-        }
-
-        public String getValueGenerator() {
-            return valueGen;
+            this.paramlist = params;
         }
 
         public String getEnumValueName() {
             return elementName;
         }
 
-        public String getToStringName() {
-            return toStringName;
-        }
-
-        public boolean isValid() {
-            return valid;
-        }
-
         public String toString() {
-            return elementName + " (" + valueGen + ", " + toStringName +
-                    (!valid?", " + valid : "") + ")" + ifIs(" /* ", comment, " */");
+            return elementName + " (" + paramlist + ")" + ifIs(" /* ", comment, " */");
         }
 
-        static EnumElement newEnumValue(String enumValueName, String number) {
-            return newEnumValue(null, enumValueName, number);
+        public static EnumElement newEnumValue(String enumValueName) {
+            return newEnumValue(null, enumValueName, null);
         }
 
-        static EnumElement newEnumValue(String comment, String enumValueName, String number) {
-            return EnumElement.newEnumValue(comment, enumValueName, number, "\"" + enumValueName + "\"");
+        public static EnumElement newEnumValue(String enumValueName, String params) {
+            return newEnumValue(null, enumValueName, params);
         }
 
-        static EnumElement newEnumValue(String comment, String enumValueName, String number, String toStringName) {
-            return new EnumElement(comment, enumValueName, number, toStringName, true);
+        public static EnumElement newEnumValue(String comment, String enumValueName, String params) {
+            return new EnumElement(comment, enumValueName, params);
         }
     }
 
     public enum Visibility {
         PUBLIC,
-        PACKAGE (null),
+        PACKAGE(null),
         PROTECTED,
         PRIVATE;
 
@@ -466,8 +481,8 @@ public class ClassWriter {
     }
 
     public enum Scope {
-        CLASS ("static"),
-        OBJECT (null);
+        CLASS("static"),
+        OBJECT(null);
 
         private final String code;
 
@@ -482,8 +497,8 @@ public class ClassWriter {
     }
 
     public enum Modifiable {
-        YES (null),
-        NO ("final");
+        YES(null),
+        NO("final");
 
         private final String code;
 
@@ -498,7 +513,9 @@ public class ClassWriter {
     }
 
     public enum ClassKind {
-        CLASS, ENUM, INTERFACE;
+        CLASS,
+        ENUM,
+        INTERFACE;
 
         private final String code;
 

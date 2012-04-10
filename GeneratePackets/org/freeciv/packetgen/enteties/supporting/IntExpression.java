@@ -1,10 +1,11 @@
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.Constant;
 import scala.Function1;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 
 public class IntExpression {
     private final String operatorOrValue;

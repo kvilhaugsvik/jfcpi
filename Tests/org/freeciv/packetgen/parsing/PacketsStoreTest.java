@@ -1,3 +1,5 @@
+package org.freeciv.packetgen.parsing;
+
 /*
  * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
@@ -12,13 +14,15 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
-
+import org.freeciv.packetgen.*;
+import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.enteties.supporting.Field;
+import org.freeciv.packetgen.enteties.supporting.IntExpression;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.junit.Test;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
