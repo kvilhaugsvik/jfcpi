@@ -40,14 +40,15 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
         final String bvName = iProvide.getName();
-        final String size = "1 + (" + bvName + ".size" + " - 1) / 8";
+        final String[] size = new String[]{"1 + (", " - 1) / 8"};
+        final String realBitVector =  bvName + ".size";
         return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName,
                                   bvName,
                                   new String[]{"this.value = value;"},
-                                  io.getRead(size)
+                                  io.getRead(size[0] + realBitVector + size[1])
                                           + "value = new " + bvName + "(innBuffer);",
                                   io.getWrite("value.getAsByteArray()"),
-                                  "return " + size + ";",
+                                  "return " + size[0] + realBitVector + size[1] + ";",
                                   false,
                                   Arrays.asList(iProvide));
     }
