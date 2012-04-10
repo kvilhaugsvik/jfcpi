@@ -63,6 +63,10 @@ public class ClassWriter {
         stateVars.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
+    public void addPublicObjectConstant(String type, String name) {
+        stateVars.add(new VariableDeclaration(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
+    }
+
     public void addMethod(String comment,
                           Visibility visibility,
                           Scope scope,
