@@ -16,6 +16,7 @@ package org.freeciv.packetgen;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.BitVector;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
@@ -159,6 +160,10 @@ public class Hardcoded {
         HashSet<IDependency> out = new HashSet<IDependency>(primitiveFieldTypes);
         out.addAll(netCon);
         out.addAll(nativeJava);
+        BitVector bitString = new BitVector();
+        out.add(bitString);
+        out.add(bitString.getBasicFieldTypeOnInput(
+                NetworkIO.withBytesAsIntermediate("bit_string")));
         return out;
     }
 

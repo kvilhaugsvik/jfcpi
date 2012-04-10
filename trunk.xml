@@ -5,6 +5,7 @@
     </inputSource>
 
     <inputSource parseAs="C">
+        <file>common/spaceship.h</file>
         <file>common/city.h</file>
         <file>common/disaster.h</file>
         <file>common/road.h</file>
