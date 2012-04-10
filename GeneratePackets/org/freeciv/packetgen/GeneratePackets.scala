@@ -45,6 +45,9 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
     throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath + "\n" + packetsDefResult.toString)
   }
 
+  println("Applying manual changes")
+  Hardcoded.applyManualChanges(storage);
+
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
   def writeToDir(path: File) {

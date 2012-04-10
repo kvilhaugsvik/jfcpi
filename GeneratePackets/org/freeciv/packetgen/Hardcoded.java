@@ -17,7 +17,9 @@ package org.freeciv.packetgen;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
 import java.util.*;
 
@@ -117,6 +119,20 @@ public class Hardcoded {
     public static String arrayEaterScopeCheck(String check) {
         return "if (" + check + ") " +
                 "throw new IllegalArgumentException(\"Value out of scope\");" + "\n";
+    }
+
+    public static void applyManualChanges(PacketsStore toStorage) {
+        // TODO: autoconvert the enums
+        // TODO: when given the location of the tables convert table items as well
+        SpecialClass handRolledUniversal =
+                new SpecialClass(new ClassWriter.TargetPackage(org.freeciv.types.FCEnum.class.getPackage()),
+                "Freeciv source interpreted by hand", "universal",
+                new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE),
+                Collections.<Requirement>emptySet());
+        handRolledUniversal.addPublicObjectConstant("universals_n", "kind");
+        handRolledUniversal.addPublicObjectConstant("int", "value");
+        handRolledUniversal.addConstructorFields();
+        toStorage.addDependency(handRolledUniversal);
     }
 
     public static Collection<IDependency> values() {
