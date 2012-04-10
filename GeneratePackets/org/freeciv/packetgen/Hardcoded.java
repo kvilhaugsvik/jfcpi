@@ -47,8 +47,8 @@ public class Hardcoded {
                             "\treq_range.valueOf(from.readUnsignedByte()),\n" +
                             "\tfrom.readBoolean(),\n" +
                             "\tfrom.readBoolean());\n",
-                    "to.writeByte(value.getsource().getkind().getNumber());\n" +
-                            "to.writeInt(value.getsource().getValue());\n" +
+                    "to.writeByte(value.getsource().kind.getNumber());\n" +
+                            "to.writeInt(value.getsource().value);\n" +
                             "to.writeByte(value.getrange().getNumber());\n" +
                             "to.writeBoolean(value.getsurvives());\n" +
                             "to.writeBoolean(value.getnegated());",
