@@ -62,6 +62,26 @@ public class Hardcoded {
                             new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
+            new FieldTypeBasic("worklist", "struct worklist", "universal[]",
+                    new String[]{"this.value = value;"},
+                    "int length = from.readUnsignedByte();" + "\n" +
+                            "value = new universal[length];" + "\n" +
+                            "for (int i = 0; i < length; i++) {" + "\n" +
+                            "value[i] = new universal(" + "\n" +
+                            "\t" + "universals_n.valueOf(from.readUnsignedByte())," + "\n" +
+                            "\t" + "from.readUnsignedByte());" + "\n" +
+                            "}",
+                    "to.writeByte(value.length);\n" +
+                            "for (universal element : value) {" + "\n" +
+                            "to.writeByte(element.kind.getNumber());" + "\n" +
+                            "to.writeByte(element.value);" + "\n" +
+                            "}",
+                    "return value.length;",
+                    false,
+                    Arrays.asList(
+                            new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
+                            new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
+            ),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
