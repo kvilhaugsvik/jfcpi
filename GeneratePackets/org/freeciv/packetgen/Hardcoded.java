@@ -58,7 +58,7 @@ public class Hardcoded {
                             new Requirement("struct requirement", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("enum req_range", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
-                            new Requirement("universal", Requirement.Kind.AS_JAVA_DATATYPE))
+                            new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
             getFloat("100"),
             getFloat("10000"),
