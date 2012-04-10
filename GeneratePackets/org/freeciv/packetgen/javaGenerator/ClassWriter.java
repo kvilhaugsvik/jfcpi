@@ -36,6 +36,8 @@ public class ClassWriter {
     private final LinkedList<Method> methods = new LinkedList<Method>();
     protected final LinkedHashMap<String, EnumElement> enums = new LinkedHashMap<String, ClassWriter.EnumElement>();
 
+    private boolean constructorFromAllFields = false;
+
     public ClassWriter(ClassKind kind, TargetPackage where, String[] imports, String madeFrom, String name,
                        String parent, String implementsInterface) {
         if (null == name) throw new IllegalArgumentException("No name for class to be generated");
@@ -116,6 +118,10 @@ public class ClassWriter {
         methods.add(Method.newPublicConstructor(comment, name, paramList, body));
     }
 
+    public void addConstructorFields() {
+        constructorFromAllFields = true;
+    }
+
     protected void addEnumerated(EnumElement element) {
         assert kind.equals(ClassKind.ENUM);
 
@@ -193,6 +199,16 @@ public class ClassWriter {
         return out;
     }
 
+    private String constructorFromFields() {
+        LinkedList<String> body = new LinkedList<String>();
+        LinkedList<Map.Entry<String, String>> args = new LinkedList<Map.Entry<String, String>>();
+        for (VariableDeclaration dec : stateVars) {
+            body.add(setFieldToVariableSameName(dec.name));
+            args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.type, dec.name));
+        }
+        return Method.newPublicConstructor(null, name, createParameterList(args), body.toArray(new String[0])) + "\n";
+    }
+
     public String toString() {
         String out = "";
 
@@ -211,6 +227,9 @@ public class ClassWriter {
 
         out += formatVariableDeclarations(constants);
         out += formatVariableDeclarations(stateVars);
+
+        if (constructorFromAllFields)
+            out += constructorFromFields();
 
         out += formatMethods(methods);
 
