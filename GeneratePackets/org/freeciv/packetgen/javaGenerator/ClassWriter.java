@@ -104,18 +104,16 @@ public class ClassWriter {
     }
 
     public void addConstructorPublicWithExceptions(String comment,
-                                                   String name,
                                                    String paramList,
                                                    String exceptionList,
                                                    String... body) {
-        methods.add(Method.newPublicConstructorWithException(comment, name, paramList, exceptionList, body));
+        methods.add(Method.newPublicConstructorWithException(comment, getName(), paramList, exceptionList, body));
     }
 
     public void addConstructorPublic(String comment,
-                                     String name,
                                      String paramList,
                                      String... body) {
-        methods.add(Method.newPublicConstructor(comment, name, paramList, body));
+        methods.add(Method.newPublicConstructor(comment, getName(), paramList, body));
     }
 
     public void addConstructorFields() {

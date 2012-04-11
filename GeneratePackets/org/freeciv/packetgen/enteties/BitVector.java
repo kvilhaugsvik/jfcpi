@@ -19,9 +19,9 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
 
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
 
-        addConstructorPublic("", getName(), "byte[] from", "super(size, " + "from);");
-        addConstructorPublic("", getName(), "boolean[] from", "super(from);");
-        addConstructorPublic("", getName(), "boolean setAllTo", "super(size, " + "setAllTo);");
+        addConstructorPublic("", "byte[] from", "super(size, " + "from);");
+        addConstructorPublic("", "boolean[] from", "super(from);");
+        addConstructorPublic("", "boolean setAllTo", "super(size, " + "setAllTo);");
 
         iRequire = bits.getReqs();
         iProvide = new Requirement(getName(), Requirement.Kind.AS_JAVA_DATATYPE);

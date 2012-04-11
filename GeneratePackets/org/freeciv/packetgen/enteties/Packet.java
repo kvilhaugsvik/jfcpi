@@ -88,7 +88,7 @@ public class Packet extends ClassWriter implements IDependency {
                 constructorBody.addAll(Arrays.asList(field.validate(".getValue()", this.getName())));
             constructorBody.add(setFieldToVariableSameName(field.getVariableName()));
         }
-        addConstructorPublic(null, name, createParameterList(params), constructorBody.toArray(new String[0]));
+        addConstructorPublic(null, createParameterList(params), constructorBody.toArray(new String[0]));
     }
 
     private void addConstructorFromJavaTypes(String name, Field[] fields) {
@@ -109,7 +109,7 @@ public class Packet extends ClassWriter implements IDependency {
                                                                  .getNewFromJavaType(),
                                                          "")));
             }
-            addConstructorPublic(null, name, createParameterList(params), constructorBodyJ.toArray(new String[0]));
+            addConstructorPublic(null, createParameterList(params), constructorBodyJ.toArray(new String[0]));
         }
     }
 
@@ -145,7 +145,6 @@ public class Packet extends ClassWriter implements IDependency {
                                                    "header\n" +
                                                    " * @throws IOException if the DataInput has a problem\n" +
                                                    " */",
-                                           name,
                                            "DataInput " + streamName + ", int headerLen, int packet",
                                            "IOException",
                                            constructorBodyStream.toArray(new String[0]));
