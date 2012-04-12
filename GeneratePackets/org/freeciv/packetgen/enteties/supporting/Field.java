@@ -137,7 +137,11 @@ public class Field {
         }
 
         private String getSize(String callOnElementsToTransfer) {
-            return (null == elementsToTransfer ? getMaxSize() : elementsToTransfer + callOnElementsToTransfer);
+            return (null == elementsToTransfer ?
+                    getMaxSize() :
+                    ("".equals(callOnElementsToTransfer) ?
+                            elementsToTransfer :
+                            "this." + elementsToTransfer + callOnElementsToTransfer));
         }
     }
 
