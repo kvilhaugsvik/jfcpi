@@ -68,6 +68,7 @@ public class Requirement implements Comparable<Requirement> {
         AS_JAVA_DATATYPE,
         PRIMITIVE_FIELD_TYPE,
         FIELD_TYPE,
+        HARD_FAILURE, // a Requirement that already has failed to be met
         PACKET
     }
 }

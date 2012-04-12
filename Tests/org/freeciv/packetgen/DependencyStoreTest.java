@@ -54,6 +54,28 @@ public class DependencyStoreTest {
         }
     }
 
+    IDependency impossible = new IDependency() {
+        @Override public Collection<Requirement> getReqs() {
+            return Collections.<Requirement>emptySet();
+        }
+
+        @Override public Requirement getIFulfillReq() {
+            return new Requirement("Impossible", Requirement.Kind.HARD_FAILURE);
+        }
+    };
+
+    @Test(expected = AssertionError.class)
+    public void hardFailuresCanNotBeFulfilled() {
+        DependencyStore store = new DependencyStore();
+        store.addPossibleRequirement(impossible);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void hardFailuresCanNotBeFulfilledSoItCanNotBeAWantedFulfillment() {
+        DependencyStore store = new DependencyStore();
+        store.addWanted(impossible);
+    }
+
     public static class OnlyRequire implements IDependency {
         private final HashSet<Requirement> want;
         private final Requirement has;
