@@ -108,20 +108,27 @@ public class PacketsStore {
         }
 
         List<Field> fieldList = new LinkedList<Field>();
+        HashSet<Requirement> allNeeded = new HashSet<Requirement>();
+        HashSet<Requirement> missingWhenNeeded = new HashSet<Requirement>();
         for (Field.WeakField fieldType : fields) {
             Requirement req = new Requirement(fieldType.getType(), Requirement.Kind.FIELD_TYPE);
+            allNeeded.add(req);
             if (!requirements.isAwareOfPotentialProvider(req)) {
-                notFoundWhenNeeded.add(req);
-                return;
-            }
-            fieldList.add(new Field(fieldType.getName(), ((FieldTypeAlias)requirements.getPotentialProvider(req)),
+                missingWhenNeeded.add(req);
+            } else
+              fieldList.add(new Field(fieldType.getName(), ((FieldTypeAlias)requirements.getPotentialProvider(req)),
                                     fieldType.getDeclarations()));
         }
 
-        Packet packet = new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0]));
-        requirements.addWanted(packet);
-        packets.put(name, packet);
-        packetsByNumber.put(number, name);
+        if (missingWhenNeeded.isEmpty()) {
+            Packet packet = new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0]));
+            requirements.addWanted(packet);
+            packets.put(name, packet);
+            packetsByNumber.put(number, name);
+        } else {
+            requirements.addWanted(
+                    new NotCreated(new Requirement(name, Requirement.Kind.PACKET), allNeeded, missingWhenNeeded));
+        }
     }
 
     public boolean hasPacket(String name) {
