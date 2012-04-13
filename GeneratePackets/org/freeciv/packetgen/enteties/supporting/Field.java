@@ -17,8 +17,7 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 
 public class Field {
     private final String variableName;
@@ -82,27 +81,75 @@ public class Field {
                         ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
     }
 
-    private String getLegalSize(String callOnElementsToTransfer) {
+    private String getLegalSize(String callOnElementsToTransfer, boolean testArrayLength) {
         String out = "";
         String arrayLevel = "";
+
+        if (type.getBasicType().isArrayEater())
+            out += validateElementsToTransfer(callOnElementsToTransfer, declarations[declarations.length - 1]);
+
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
-            if (null != element.getElementsToTransfer())
-                out += "(" + element.getMaxSize() + " <= " + element
-                        .getElementsToTransfer() + callOnElementsToTransfer + ")" + "||";
-            out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
-                    .getSize(callOnElementsToTransfer) + ")";
-            out += "||";
+            out += validateElementsToTransfer(callOnElementsToTransfer, element);
+            if (testArrayLength)
+                out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
+                        .getSize(callOnElementsToTransfer) + ")" + "||";
             arrayLevel += "[0]";
         }
-        return out.substring(0, out.length() - 2);
+        return out;
     }
 
-    public String[] validate(String callOnElementsToTransfer, String name) {
-        return new String[]{
-                "if " + "(" + this.getLegalSize(callOnElementsToTransfer) + ")",
+    private static String validateElementsToTransfer(String callOnElementsToTransfer, ArrayDeclaration element) {
+        if (null != element.getElementsToTransfer(callOnElementsToTransfer))
+            return "(" + element.getMaxSize() + " <= " + element
+                .getElementsToTransfer(callOnElementsToTransfer) + ")" + "||";
+        else
+            return "";
+    }
+
+    public String[] validate(String name, boolean testArrayLength) {
+        String sizeChecks = this.getLegalSize(".getValue()", testArrayLength);
+        if ("".equals(sizeChecks))
+            return new String[]{};
+        else
+            return new String[]{
+                "if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")",
                 "\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
                         " constructed with value out of scope in packet " + name + "\");"};
+    }
+
+    public String[] forElementsInField(String before, String in, String after) {
+        assert (null != in && !in.isEmpty());
+
+        LinkedList<String> out = new LinkedList<String>();
+        final int level = this.getNumberOfDeclarations();
+
+        if (0 < level && null != before && !before.isEmpty()) {
+            out.add(before);
+        }
+
+        String[] wrappedInFor = new String[1 + level * 2];
+        String replaceWith = "";
+        for (int counter = 0; counter < level; counter++) {
+            wrappedInFor[counter] = "for(int " + getCounterNumber(counter) + " = 0; " +
+                    getCounterNumber(counter) + " < " + "this." + this.getVariableName() + replaceWith + ".length; " +
+                    getCounterNumber(counter) + "++) {";
+            wrappedInFor[1 + counter + level] = "}";
+            replaceWith += "[" + getCounterNumber(counter) + "]";
+        }
+        wrappedInFor[level] = in.replaceAll("\\[i\\]", replaceWith);
+
+        out.addAll(Arrays.asList(wrappedInFor));
+
+        if (0 < level && null != after && !after.isEmpty()) {
+            out.add(after);
+        }
+
+        return out.toArray(new String[0]);
+    }
+
+    private char getCounterNumber(int counter) {
+        return ((char)('i' + counter));
     }
 
     public Collection<Requirement> getReqs() {
@@ -128,8 +175,10 @@ public class Field {
             return maxSize.toString();
         }
 
-        public String getElementsToTransfer() {
-            return elementsToTransfer;
+        public String getElementsToTransfer(String callOnElementsToTransfer) {
+            return (null == elementsToTransfer || "".equals(callOnElementsToTransfer) ?
+                    elementsToTransfer :
+                    "this." + elementsToTransfer + callOnElementsToTransfer);
         }
 
         public Collection<Requirement> getReqs() {
@@ -139,9 +188,7 @@ public class Field {
         private String getSize(String callOnElementsToTransfer) {
             return (null == elementsToTransfer ?
                     getMaxSize() :
-                    ("".equals(callOnElementsToTransfer) ?
-                            elementsToTransfer :
-                            "this." + elementsToTransfer + callOnElementsToTransfer));
+                    getElementsToTransfer(callOnElementsToTransfer));
         }
     }
 
