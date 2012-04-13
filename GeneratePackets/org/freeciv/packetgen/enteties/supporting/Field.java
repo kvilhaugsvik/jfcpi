@@ -98,9 +98,9 @@ public class Field {
         return out.substring(0, out.length() - 2);
     }
 
-    public String[] validate(String callOnElementsToTransfer, String name) {
+    public String[] validate(String name) {
         return new String[]{
-                "if " + "(" + this.getLegalSize(callOnElementsToTransfer) + ")",
+                "if " + "(" + this.getLegalSize(".getValue()") + ")",
                 "\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
                         " constructed with value out of scope in packet " + name + "\");"};
     }
