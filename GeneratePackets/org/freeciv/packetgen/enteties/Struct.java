@@ -30,7 +30,7 @@ public class Struct extends ClassWriter implements IDependency {
                 new TargetPackage(FCEnum.class.getPackage()),
                 new String[]{}, "Freeciv C code", name, null, null);
 
-        addConstructorParameterToFields(name, fields);
+        addConstructorFields();
 
         for (Map.Entry<String, String> field: fields) {
             addObjectConstant(field.getKey(), field.getValue());
@@ -40,14 +40,6 @@ public class Struct extends ClassWriter implements IDependency {
 
         iRequire = willNeed;
         iProvide = new Requirement("struct" + " " + name, Requirement.Kind.AS_JAVA_DATATYPE);
-    }
-
-    private void addConstructorParameterToFields(String name, List<Map.Entry<String, String>> fields) {
-        String[] body = new String[fields.size()];
-        for (int i = 0; i < fields.size(); i++) {
-            body[i] = setFieldToVariableSameName(fields.get(i).getValue());
-        }
-        addConstructorPublic(null, name, createParameterList(fields), body);
     }
 
     @Override

@@ -27,7 +27,6 @@ import java.util.*;
 public class PacketsStore {
     private final boolean hasTwoBytePacketNumber;
 
-    private final HashSet<Requirement> notFoundWhenNeeded = new HashSet<Requirement>();
     private final DependencyStore requirements;
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
@@ -43,23 +42,23 @@ public class PacketsStore {
         }
     }
 
-    private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype) {
+    private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype, Requirement neededBasic) {
         Requirement wantPType = new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE);
         if (!requirements.isAwareOfPotentialProvider(wantPType)) {
-            return failAndBlame(wantPType);
+            return failAndBlame(wantPType, neededBasic, ptype);
         }
         IDependency pubType = requirements.getPotentialProvider(wantPType);
         if (!(pubType instanceof FieldTypeBasic.Generator)) {
-            return failAndBlame(wantPType);
+            return failAndBlame(wantPType, neededBasic, ptype);
         }
 
         Requirement wantIOType = new Requirement(iotype, ((FieldTypeBasic.Generator)pubType).needsDataInFormat());
         if (!requirements.isAwareOfPotentialProvider(wantIOType)) {
-            return failAndBlame(wantIOType);
+            return failAndBlame(wantIOType, neededBasic, ptype);
         }
         IDependency ioType = requirements.getPotentialProvider(wantIOType);
         if (!(ioType instanceof NetworkIO)) {
-            return failAndBlame(wantIOType);
+            return failAndBlame(wantIOType, neededBasic, ptype);
         }
 
         FieldTypeBasic basicFieldType = ((FieldTypeBasic.Generator)pubType).getBasicFieldTypeOnInput((NetworkIO)ioType);
@@ -67,8 +66,11 @@ public class PacketsStore {
         return basicFieldType;
     }
 
-    private FieldTypeBasic failAndBlame(Requirement missing) {
-        notFoundWhenNeeded.add(missing);
+    private FieldTypeBasic failAndBlame(Requirement missing, Requirement wanted, String ptype) {
+        requirements.addPossibleRequirement(new NotCreated(
+                wanted,
+                Arrays.asList(new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE), missing),
+                Arrays.asList(missing)));
         return null;
     }
 
@@ -77,10 +79,11 @@ public class PacketsStore {
         FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider(neededBasic);
 
         if (null == basicFieldType)
-            basicFieldType = tryToCreatePrimitive(iotype, ptype);
+            basicFieldType = tryToCreatePrimitive(iotype, ptype, neededBasic);
 
         if (null == basicFieldType)
-            notFoundWhenNeeded.add(neededBasic);
+            requirements.addPossibleRequirement(new NotCreated(
+                    new Requirement(alias, Requirement.Kind.FIELD_TYPE), Arrays.asList(neededBasic)));
         else
             requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));
     }
@@ -91,7 +94,8 @@ public class PacketsStore {
             requirements.addPossibleRequirement(((FieldTypeAlias)requirements.getPotentialProvider(req))
                                                         .getBasicType().createFieldType(alias));
         } else {
-            notFoundWhenNeeded.add(req);
+            requirements.addPossibleRequirement(new NotCreated(
+                    new Requirement(alias, Requirement.Kind.FIELD_TYPE), Arrays.asList(req)));
         }
     }
 
@@ -108,20 +112,29 @@ public class PacketsStore {
         }
 
         List<Field> fieldList = new LinkedList<Field>();
+        HashSet<Requirement> allNeeded = new HashSet<Requirement>();
+        HashSet<Requirement> missingWhenNeeded = new HashSet<Requirement>();
         for (Field.WeakField fieldType : fields) {
             Requirement req = new Requirement(fieldType.getType(), Requirement.Kind.FIELD_TYPE);
-            if (!requirements.isAwareOfPotentialProvider(req)) {
-                notFoundWhenNeeded.add(req);
-                return;
-            }
-            fieldList.add(new Field(fieldType.getName(), ((FieldTypeAlias)requirements.getPotentialProvider(req)),
-                                    fieldType.getDeclarations()));
+            allNeeded.add(req);
+            if (requirements.isAwareOfPotentialProvider(req) &&
+                    requirements.getPotentialProvider(req) instanceof FieldTypeAlias) {
+                fieldList.add(new Field(fieldType.getName(),
+                                        (FieldTypeAlias)requirements.getPotentialProvider(req),
+                                        fieldType.getDeclarations()));
+            } else
+                missingWhenNeeded.add(req);
         }
 
-        Packet packet = new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0]));
-        requirements.addWanted(packet);
-        packets.put(name, packet);
-        packetsByNumber.put(number, name);
+        if (missingWhenNeeded.isEmpty()) {
+            Packet packet = new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0]));
+            requirements.addWanted(packet);
+            packets.put(name, packet);
+            packetsByNumber.put(number, name);
+        } else {
+            requirements.addWanted(
+                    new NotCreated(new Requirement(name, Requirement.Kind.PACKET), allNeeded, missingWhenNeeded));
+        }
     }
 
     public boolean hasPacket(String name) {
@@ -168,7 +181,6 @@ public class PacketsStore {
 
     public Collection<Requirement> getUnsolvedRequirements() {
         TreeSet<Requirement> out = new TreeSet<Requirement>(requirements.getMissingRequirements());
-        out.addAll(notFoundWhenNeeded);
         return out;
     }
 

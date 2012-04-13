@@ -23,9 +23,9 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
         knowsSize = true;
 
-        addConstructorPublic("", getName(), "byte[] from", "super(size, " + "from);");
-        addConstructorPublic("", getName(), "boolean[] from", "super(from);");
-        addConstructorPublic("", getName(), "boolean setAllTo", "super(size, " + "setAllTo);");
+        addConstructorPublic("", "byte[] from", "super(size, " + "from);");
+        addConstructorPublic("", "boolean[] from", "super(from);");
+        addConstructorPublic("", "boolean setAllTo", "super(size, " + "setAllTo);");
 
         iRequire = bits.getReqs();
         iProvide = new Requirement(getName(), Requirement.Kind.AS_JAVA_DATATYPE);
@@ -39,11 +39,11 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         knowsSize = false;
 
         final String setSize = "this.size = ";
-        addConstructorPublic("", getName(), "byte[] from, int sizeInBits",
+        addConstructorPublic("", "byte[] from, int sizeInBits",
                 "super(sizeInBits, " + "from);", setSize + "sizeInBits;");
-        addConstructorPublic("", getName(), "boolean[] from", "super(from);",
+        addConstructorPublic("", "boolean[] from", "super(from);",
                 setSize + "from.length;");
-        addConstructorPublic("", getName(), "boolean setAllTo, int size",
+        addConstructorPublic("", "boolean setAllTo, int size",
                 "super(size, " + "setAllTo);", setSize + "size;");
 
         iRequire = Collections.<Requirement>emptySet();

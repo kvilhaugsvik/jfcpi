@@ -88,12 +88,12 @@ public class FieldTypeBasic implements IDependency {
 
             addObjectConstant(javaType, "value");
             if (arrayEater) {
-                addConstructorPublic(null, name, javaType + " value" + ", int arraySize", fromJavaType);
-                addConstructorPublicWithExceptions(null, name, "DataInput from" + ", int arraySize", "IOException",
+                addConstructorPublic(null, javaType + " value" + ", int arraySize", fromJavaType);
+                addConstructorPublicWithExceptions(null, "DataInput from" + ", int arraySize", "IOException",
                                                    decode);
             } else {
-                addConstructorPublic(null, name, javaType + " value", fromJavaType);
-                addConstructorPublicWithExceptions(null, name, "DataInput from", "IOException", decode);
+                addConstructorPublic(null, javaType + " value", fromJavaType);
+                addConstructorPublicWithExceptions(null, "DataInput from", "IOException", decode);
             }
             addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
             addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);

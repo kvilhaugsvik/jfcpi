@@ -28,7 +28,7 @@ COMPILED_TESTS_FOLDER ?= out/Tests
 # Generated jars
 PROTOCOL_DISTRIBUTION = FreecivProto.jar
 
-all: protojar
+all: tests protojar
 	touch all
 
 tests: runTests
