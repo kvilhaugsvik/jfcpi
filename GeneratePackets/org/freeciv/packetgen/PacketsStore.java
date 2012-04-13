@@ -80,7 +80,8 @@ public class PacketsStore {
             basicFieldType = tryToCreatePrimitive(iotype, ptype);
 
         if (null == basicFieldType)
-            notFoundWhenNeeded.add(neededBasic);
+            requirements.addPossibleRequirement(new NotCreated(
+                    new Requirement(alias, Requirement.Kind.FIELD_TYPE), Arrays.asList(neededBasic)));
         else
             requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));
     }
@@ -113,11 +114,13 @@ public class PacketsStore {
         for (Field.WeakField fieldType : fields) {
             Requirement req = new Requirement(fieldType.getType(), Requirement.Kind.FIELD_TYPE);
             allNeeded.add(req);
-            if (!requirements.isAwareOfPotentialProvider(req)) {
-                missingWhenNeeded.add(req);
+            if (requirements.isAwareOfPotentialProvider(req) &&
+                    requirements.getPotentialProvider(req) instanceof FieldTypeAlias) {
+                fieldList.add(new Field(fieldType.getName(),
+                                        (FieldTypeAlias)requirements.getPotentialProvider(req),
+                                        fieldType.getDeclarations()));
             } else
-              fieldList.add(new Field(fieldType.getName(), ((FieldTypeAlias)requirements.getPotentialProvider(req)),
-                                    fieldType.getDeclarations()));
+                missingWhenNeeded.add(req);
         }
 
         if (missingWhenNeeded.isEmpty()) {
