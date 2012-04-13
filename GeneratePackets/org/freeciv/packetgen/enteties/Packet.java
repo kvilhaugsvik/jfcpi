@@ -102,8 +102,7 @@ public class Packet extends ClassWriter implements IDependency {
                 if (field.hasDeclarations())
                     constructorBodyJ.addAll(Arrays.asList(field.validate(this.getName(), true)));
                 constructorBodyJ.addAll(
-                        Arrays.asList(forElementsInField(field,
-                                                         "this." + field.getVariableName() + " = new " + field
+                        Arrays.asList(field.forElementsInField("this." + field.getVariableName() + " = new " + field
                                                                  .getType() + field.getNewCreation("") + ";",
                                                          "this." + field.getVariableName() + "[i] = " + field
                                                                  .getNewFromJavaType(),
@@ -119,8 +118,7 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields) {
             if (field.hasDeclarations())
                 constructorBodyStream.addAll(Arrays.asList(field.validate(this.getName(), false)));
-            constructorBodyStream.addAll(Arrays.asList(forElementsInField(
-                            field,
+            constructorBodyStream.addAll(Arrays.asList(field.forElementsInField(
                             "this." + field.getVariableName() + " = new " + field.getType() +
                                     field.getNewCreation(".getValue()") + ";",
                             "this." + field.getVariableName() + "[i] = " + field.getNewFromDataStream(streamName),
@@ -162,7 +160,7 @@ public class Packet extends ClassWriter implements IDependency {
             encodeFields.add("");
             encodeFields.add("// body");
             for (Field field : fields)
-                encodeFields.addAll(Arrays.asList(forElementsInField(field, "",
+                encodeFields.addAll(Arrays.asList(field.forElementsInField("",
                                                                      "this." + field
                                                                              .getVariableName() + "[i].encodeTo(to);",
                                                                      "")));
@@ -175,8 +173,7 @@ public class Packet extends ClassWriter implements IDependency {
         LinkedList<String> encodeFieldsLen = new LinkedList<String>();
         for (Field field : fields)
             if (field.hasDeclarations())
-                encodeFieldsLen.addAll(Arrays.asList(forElementsInField(field,
-                                                                        "int " + field
+                encodeFieldsLen.addAll(Arrays.asList(field.forElementsInField("int " + field
                                                                                 .getVariableName() + "Len" + " = " +
                                                                                 "0;",
                                                                         field.getVariableName() + "Len" + "+=" +
@@ -199,7 +196,7 @@ public class Packet extends ClassWriter implements IDependency {
         getToString.add("String out = \"" + name + "\" + \"(\" + number + \")\";");
         for (Field field : fields)
             if (field.hasDeclarations())
-                getToString.addAll(Arrays.asList(forElementsInField(field, "out += \"\\n\\t" + field.getVariableName() +
+                getToString.addAll(Arrays.asList(field.forElementsInField("out += \"\\n\\t" + field.getVariableName() +
                         " += (\";", "out += " + "this." + field.getVariableName() + "[i].getValue();",
                                                                     "out += \")\";")));
             else
@@ -221,8 +218,7 @@ public class Packet extends ClassWriter implements IDependency {
                 + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
                 + "Value",
                                        (field.hasDeclarations()) ?
-                                               forElementsInField(field,
-                                                                  field.getJType() + field
+                                               field.forElementsInField(field.getJType() + field
                                                                           .getArrayDeclaration() + " out = new " +
                                                                           field.getJType() + field
                                                                           .getNewCreation(".getValue()") + ";",
@@ -232,40 +228,6 @@ public class Packet extends ClassWriter implements IDependency {
                                                new String[]{
                                                        "return " + "this." + field.getVariableName() + ".getValue();"}
         );
-    }
-
-    private String[] forElementsInField(Field field, String before, String in, String after) {
-        assert (null != in && !in.isEmpty());
-
-        LinkedList<String> out = new LinkedList<String>();
-        final int level = field.getNumberOfDeclarations();
-
-        if (0 < level && null != before && !before.isEmpty()) {
-            out.add(before);
-        }
-
-        String[] wrappedInFor = new String[1 + level * 2];
-        String replaceWith = "";
-        for (int counter = 0; counter < level; counter++) {
-            wrappedInFor[counter] = "for(int " + getCounterNumber(counter) + " = 0; " +
-                    getCounterNumber(counter) + " < " + "this." + field.getVariableName() + replaceWith + ".length; " +
-                    getCounterNumber(counter) + "++) {";
-            wrappedInFor[1 + counter + level] = "}";
-            replaceWith += "[" + getCounterNumber(counter) + "]";
-        }
-        wrappedInFor[level] = in.replaceAll("\\[i\\]", replaceWith);
-
-        out.addAll(Arrays.asList(wrappedInFor));
-
-        if (0 < level && null != after && !after.isEmpty()) {
-            out.add(after);
-        }
-
-        return out.toArray(new String[0]);
-    }
-
-    private char getCounterNumber(int counter) {
-        return ((char)('i' + counter));
     }
 
     public int getNumber() {
