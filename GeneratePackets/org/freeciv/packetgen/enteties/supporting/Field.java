@@ -87,9 +87,9 @@ public class Field {
         String arrayLevel = "";
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
-            if (null != element.getElementsToTransfer())
+            if (null != element.getElementsToTransfer(callOnElementsToTransfer))
                 out += "(" + element.getMaxSize() + " <= " + element
-                        .getElementsToTransfer() + callOnElementsToTransfer + ")" + "||";
+                        .getElementsToTransfer(callOnElementsToTransfer) + ")" + "||";
             out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
                     .getSize(callOnElementsToTransfer) + ")";
             out += "||";
@@ -128,8 +128,10 @@ public class Field {
             return maxSize.toString();
         }
 
-        public String getElementsToTransfer() {
-            return elementsToTransfer;
+        public String getElementsToTransfer(String callOnElementsToTransfer) {
+            return (null == elementsToTransfer || "".equals(callOnElementsToTransfer) ?
+                    elementsToTransfer :
+                    "this." + elementsToTransfer + callOnElementsToTransfer);
         }
 
         public Collection<Requirement> getReqs() {
@@ -139,9 +141,7 @@ public class Field {
         private String getSize(String callOnElementsToTransfer) {
             return (null == elementsToTransfer ?
                     getMaxSize() :
-                    ("".equals(callOnElementsToTransfer) ?
-                            elementsToTransfer :
-                            "this." + elementsToTransfer + callOnElementsToTransfer));
+                    getElementsToTransfer(callOnElementsToTransfer));
         }
     }
 
