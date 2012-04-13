@@ -27,7 +27,6 @@ import java.util.*;
 public class PacketsStore {
     private final boolean hasTwoBytePacketNumber;
 
-    private final HashSet<Requirement> notFoundWhenNeeded = new HashSet<Requirement>();
     private final DependencyStore requirements;
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
@@ -95,7 +94,8 @@ public class PacketsStore {
             requirements.addPossibleRequirement(((FieldTypeAlias)requirements.getPotentialProvider(req))
                                                         .getBasicType().createFieldType(alias));
         } else {
-            notFoundWhenNeeded.add(req);
+            requirements.addPossibleRequirement(new NotCreated(
+                    new Requirement(alias, Requirement.Kind.FIELD_TYPE), Arrays.asList(req)));
         }
     }
 
@@ -181,7 +181,6 @@ public class PacketsStore {
 
     public Collection<Requirement> getUnsolvedRequirements() {
         TreeSet<Requirement> out = new TreeSet<Requirement>(requirements.getMissingRequirements());
-        out.addAll(notFoundWhenNeeded);
         return out;
     }
 
