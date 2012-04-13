@@ -82,7 +82,7 @@ public class Field {
                         ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
     }
 
-    private String getLegalSize(String callOnElementsToTransfer) {
+    private String getLegalSize(String callOnElementsToTransfer, boolean testArrayLength) {
         String out = "";
         String arrayLevel = "";
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
@@ -90,17 +90,21 @@ public class Field {
             if (null != element.getElementsToTransfer(callOnElementsToTransfer))
                 out += "(" + element.getMaxSize() + " <= " + element
                         .getElementsToTransfer(callOnElementsToTransfer) + ")" + "||";
-            out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
-                    .getSize(callOnElementsToTransfer) + ")";
-            out += "||";
+            if (testArrayLength)
+                out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
+                        .getSize(callOnElementsToTransfer) + ")" + "||";
             arrayLevel += "[0]";
         }
-        return out.substring(0, out.length() - 2);
+        return out;
     }
 
-    public String[] validate(String name) {
-        return new String[]{
-                "if " + "(" + this.getLegalSize(".getValue()") + ")",
+    public String[] validate(String name, boolean testArrayLength) {
+        String sizeChecks = this.getLegalSize(".getValue()", testArrayLength);
+        if ("".equals(sizeChecks))
+            return new String[]{};
+        else
+            return new String[]{
+                "if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")",
                 "\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
                         " constructed with value out of scope in packet " + name + "\");"};
     }
