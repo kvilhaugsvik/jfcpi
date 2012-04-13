@@ -84,17 +84,27 @@ public class Field {
     private String getLegalSize(String callOnElementsToTransfer, boolean testArrayLength) {
         String out = "";
         String arrayLevel = "";
+
+        if (type.getBasicType().isArrayEater())
+            out += validateElementsToTransfer(callOnElementsToTransfer, declarations[declarations.length - 1]);
+
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
-            if (null != element.getElementsToTransfer(callOnElementsToTransfer))
-                out += "(" + element.getMaxSize() + " <= " + element
-                        .getElementsToTransfer(callOnElementsToTransfer) + ")" + "||";
+            out += validateElementsToTransfer(callOnElementsToTransfer, element);
             if (testArrayLength)
                 out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
                         .getSize(callOnElementsToTransfer) + ")" + "||";
             arrayLevel += "[0]";
         }
         return out;
+    }
+
+    private static String validateElementsToTransfer(String callOnElementsToTransfer, ArrayDeclaration element) {
+        if (null != element.getElementsToTransfer(callOnElementsToTransfer))
+            return "(" + element.getMaxSize() + " <= " + element
+                .getElementsToTransfer(callOnElementsToTransfer) + ")" + "||";
+        else
+            return "";
     }
 
     public String[] validate(String name, boolean testArrayLength) {
