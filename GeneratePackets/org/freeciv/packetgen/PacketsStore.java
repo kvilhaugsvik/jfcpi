@@ -43,23 +43,23 @@ public class PacketsStore {
         }
     }
 
-    private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype) {
+    private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype, Requirement neededBasic) {
         Requirement wantPType = new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE);
         if (!requirements.isAwareOfPotentialProvider(wantPType)) {
-            return failAndBlame(wantPType);
+            return failAndBlame(wantPType, neededBasic, ptype);
         }
         IDependency pubType = requirements.getPotentialProvider(wantPType);
         if (!(pubType instanceof FieldTypeBasic.Generator)) {
-            return failAndBlame(wantPType);
+            return failAndBlame(wantPType, neededBasic, ptype);
         }
 
         Requirement wantIOType = new Requirement(iotype, ((FieldTypeBasic.Generator)pubType).needsDataInFormat());
         if (!requirements.isAwareOfPotentialProvider(wantIOType)) {
-            return failAndBlame(wantIOType);
+            return failAndBlame(wantIOType, neededBasic, ptype);
         }
         IDependency ioType = requirements.getPotentialProvider(wantIOType);
         if (!(ioType instanceof NetworkIO)) {
-            return failAndBlame(wantIOType);
+            return failAndBlame(wantIOType, neededBasic, ptype);
         }
 
         FieldTypeBasic basicFieldType = ((FieldTypeBasic.Generator)pubType).getBasicFieldTypeOnInput((NetworkIO)ioType);
@@ -67,8 +67,11 @@ public class PacketsStore {
         return basicFieldType;
     }
 
-    private FieldTypeBasic failAndBlame(Requirement missing) {
-        notFoundWhenNeeded.add(missing);
+    private FieldTypeBasic failAndBlame(Requirement missing, Requirement wanted, String ptype) {
+        requirements.addPossibleRequirement(new NotCreated(
+                wanted,
+                Arrays.asList(new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE), missing),
+                Arrays.asList(missing)));
         return null;
     }
 
@@ -77,7 +80,7 @@ public class PacketsStore {
         FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider(neededBasic);
 
         if (null == basicFieldType)
-            basicFieldType = tryToCreatePrimitive(iotype, ptype);
+            basicFieldType = tryToCreatePrimitive(iotype, ptype, neededBasic);
 
         if (null == basicFieldType)
             requirements.addPossibleRequirement(new NotCreated(
