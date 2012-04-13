@@ -101,7 +101,7 @@ public class Packet extends ClassWriter implements IDependency {
                 constructorBodyJ.addAll(Arrays.asList(field.validate(this.getName(), true)));
                 constructorBodyJ.addAll(
                         Arrays.asList(field.forElementsInField("this." + field.getVariableName() + " = new " + field
-                                                                 .getType() + field.getNewCreation("") + ";",
+                                                                 .getType() + field.getNewCreation() + ";",
                                                          "this." + field.getVariableName() + "[i] = " + field
                                                                  .getNewFromJavaType(),
                                                          "")));
@@ -117,7 +117,7 @@ public class Packet extends ClassWriter implements IDependency {
             constructorBodyStream.addAll(Arrays.asList(field.validate(this.getName(), false)));
             constructorBodyStream.addAll(Arrays.asList(field.forElementsInField(
                             "this." + field.getVariableName() + " = new " + field.getType() +
-                                    field.getNewCreation(".getValue()") + ";",
+                                    field.getNewCreation() + ";",
                             "this." + field.getVariableName() + "[i] = " + field.getNewFromDataStream(streamName),
                             "")));
         }
@@ -218,7 +218,7 @@ public class Packet extends ClassWriter implements IDependency {
                                                field.forElementsInField(field.getJType() + field
                                                                           .getArrayDeclaration() + " out = new " +
                                                                           field.getJType() + field
-                                                                          .getNewCreation(".getValue()") + ";",
+                                                                          .getNewCreation() + ";",
                                                                   "out[i] = " + "this." + field
                                                                           .getVariableName() + "[i].getValue();",
                                                                   "return out;") :

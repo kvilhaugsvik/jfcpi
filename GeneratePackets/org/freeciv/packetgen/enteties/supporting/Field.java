@@ -61,10 +61,10 @@ public class Field {
         return out;
     }
 
-    public String getNewCreation(String callOnElementsToTransfer) {
+    public String getNewCreation() {
         String out = "";
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
-            out += "[" + declarations[i].getSize(callOnElementsToTransfer) + "]";
+            out += "[" + declarations[i].getSize() + "]";
         }
         return out;
     }
@@ -72,43 +72,43 @@ public class Field {
     public String getNewFromDataStream(String streamName) {
         return "new " + this.getType() + "(" + streamName +
                 (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
+                        ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
 
     public String getNewFromJavaType() {
         return "new " + this.getType() + "(" + this.getVariableName() + "[i]" +
                 (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
+                        ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
 
-    private String getLegalSize(String callOnElementsToTransfer, boolean testArrayLength) {
+    private String getLegalSize(boolean testArrayLength) {
         String out = "";
         String arrayLevel = "";
 
         if (type.getBasicType().isArrayEater())
-            out += validateElementsToTransfer(callOnElementsToTransfer, declarations[declarations.length - 1]);
+            out += validateElementsToTransfer(declarations[declarations.length - 1]);
 
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
-            out += validateElementsToTransfer(callOnElementsToTransfer, element);
+            out += validateElementsToTransfer(element);
             if (testArrayLength)
                 out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
-                        .getSize(callOnElementsToTransfer) + ")" + "||";
+                        .getSize() + ")" + "||";
             arrayLevel += "[0]";
         }
         return out;
     }
 
-    private static String validateElementsToTransfer(String callOnElementsToTransfer, ArrayDeclaration element) {
-        if (null != element.getElementsToTransfer(callOnElementsToTransfer))
+    private static String validateElementsToTransfer(ArrayDeclaration element) {
+        if (null != element.getElementsToTransfer())
             return "(" + element.getMaxSize() + " <= " + element
-                .getElementsToTransfer(callOnElementsToTransfer) + ")" + "||";
+                .getElementsToTransfer() + ")" + "||";
         else
             return "";
     }
 
     public String[] validate(String name, boolean testArrayLength) {
-        String sizeChecks = this.getLegalSize(".getValue()", testArrayLength);
+        String sizeChecks = this.getLegalSize(testArrayLength);
         if ("".equals(sizeChecks))
             return new String[]{};
         else
@@ -175,20 +175,20 @@ public class Field {
             return maxSize.toString();
         }
 
-        public String getElementsToTransfer(String callOnElementsToTransfer) {
-            return (null == elementsToTransfer || "".equals(callOnElementsToTransfer) ?
+        public String getElementsToTransfer() {
+            return (null == elementsToTransfer ?
                     elementsToTransfer :
-                    "this." + elementsToTransfer + callOnElementsToTransfer);
+                    "this." + elementsToTransfer + ".getValue()");
         }
 
         public Collection<Requirement> getReqs() {
             return maxSize.getReqs();
         }
 
-        private String getSize(String callOnElementsToTransfer) {
+        private String getSize() {
             return (null == elementsToTransfer ?
                     getMaxSize() :
-                    getElementsToTransfer(callOnElementsToTransfer));
+                    getElementsToTransfer());
         }
     }
 
