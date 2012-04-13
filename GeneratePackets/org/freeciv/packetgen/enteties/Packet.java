@@ -84,8 +84,7 @@ public class Packet extends ClassWriter implements IDependency {
             params.add(new AbstractMap
                     .SimpleImmutableEntry<String, String>(field.getType() + field.getArrayDeclaration(),
                                                           field.getVariableName()));
-            if (field.hasDeclarations())
-                constructorBody.addAll(Arrays.asList(field.validate(this.getName(), true)));
+            constructorBody.addAll(Arrays.asList(field.validate(this.getName(), true)));
             constructorBody.add(setFieldToVariableSameName(field.getVariableName()));
         }
         addConstructorPublic(null, createParameterList(params), constructorBody.toArray(new String[0]));
@@ -99,8 +98,7 @@ public class Packet extends ClassWriter implements IDependency {
                 params.add(new AbstractMap
                         .SimpleImmutableEntry<String, String>(field.getJType() + field.getArrayDeclaration(),
                                                               field.getVariableName()));
-                if (field.hasDeclarations())
-                    constructorBodyJ.addAll(Arrays.asList(field.validate(this.getName(), true)));
+                constructorBodyJ.addAll(Arrays.asList(field.validate(this.getName(), true)));
                 constructorBodyJ.addAll(
                         Arrays.asList(field.forElementsInField("this." + field.getVariableName() + " = new " + field
                                                                  .getType() + field.getNewCreation("") + ";",
@@ -116,8 +114,7 @@ public class Packet extends ClassWriter implements IDependency {
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
         final String streamName = "from";
         for (Field field : fields) {
-            if (field.hasDeclarations())
-                constructorBodyStream.addAll(Arrays.asList(field.validate(this.getName(), false)));
+            constructorBodyStream.addAll(Arrays.asList(field.validate(this.getName(), false)));
             constructorBodyStream.addAll(Arrays.asList(field.forElementsInField(
                             "this." + field.getVariableName() + " = new " + field.getType() +
                                     field.getNewCreation(".getValue()") + ";",
