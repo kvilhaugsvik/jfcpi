@@ -117,13 +117,12 @@ public class Packet extends ClassWriter implements IDependency {
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
         final String streamName = "from";
         for (Field field : fields) {
-            constructorBodyStream.addAll(
-                    Arrays.asList(forElementsInField(field, "this." + field.getVariableName() +
-                            " = new " + field.getType() +
-                            field.getNewCreation(".getValue()") + ";",
-                                                     "this." + field.getVariableName() + "[i] = " + field
-                                                             .getNewFromDataStream(streamName),
-                                                     "")));
+            constructorBodyStream.addAll(Arrays.asList(forElementsInField(
+                            field,
+                            "this." + field.getVariableName() + " = new " + field.getType() +
+                                    field.getNewCreation(".getValue()") + ";",
+                            "this." + field.getVariableName() + "[i] = " + field.getNewFromDataStream(streamName),
+                            "")));
         }
         constructorBodyStream.add("if (getNumber() != packet) {");
         constructorBodyStream.add("throw new IOException(\"Tried to create package " +
