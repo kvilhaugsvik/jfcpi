@@ -34,6 +34,25 @@ public class Field {
         this.declarations = declarations;
     }
 
+    public void introduceNeighbours(Field[] neighbours) {
+        HashMap<String, ArrayDeclaration> unsolvedReferences = new HashMap<String, ArrayDeclaration>();
+        for (ArrayDeclaration dec : declarations) {
+            if (dec.hasTransfer()) {
+                unsolvedReferences.put(dec.getFieldThatHoldsSize(), dec);
+            }
+        }
+        if (unsolvedReferences.isEmpty())
+            return;
+
+        Field[] others = neighbours;
+        for (Field other : others) {
+            if (unsolvedReferences.containsKey(other.getVariableName())) { // the value of the field is used
+                ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getVariableName());
+                toIntroduce.setJavaTypeOfTransfer(other.getJType());
+            }
+        }
+    }
+
     public String getVariableName() {
         return variableName;
     }
@@ -108,41 +127,26 @@ public class Field {
             return "";
     }
 
-    private String transferTypeCheck(String packetName, Field[] others) throws UndefinedException {
-        HashMap<String, ArrayDeclaration> unsolvedReferences = new HashMap<String, ArrayDeclaration>();
+    private String transferTypeCheck(String packetName) throws UndefinedException {
+        String out = "";
         for (ArrayDeclaration dec : declarations) {
             if (dec.hasTransfer()) {
-                unsolvedReferences.put(dec.getFieldThatHoldsSize(), dec);
-            }
-        }
-        if (unsolvedReferences.isEmpty())
-            return "";
-
-        String out = "";
-        for (Field other : others) {
-            if (unsolvedReferences.containsKey(other.getVariableName())) { // the value of the field is used
-                ArrayDeclaration toCheck = unsolvedReferences.remove(other.getVariableName());
-                switch (intClassOf(other.getJType())) {
+                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(packetName, this.getVariableName());
+                switch (intClassOf(javaTypeOfTransfer)) {
                     case 0:
                         break;
                     case 1:
-                        out += "(" + toCheck.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
+                        out += "(" + dec.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
                         break;
                     case -1:
-                        throw new UndefinedException(packetName + " uses the field " + other.getVariableName() +
-                                " of the type " + other.getJType() + " as an array index for the field " +
-                                getVariableName() + " but the type " + other.getJType() +
+                        throw new UndefinedException(packetName + " uses the field " + dec.getFieldThatHoldsSize() +
+                                " of the type " + javaTypeOfTransfer + " as an array index for the field " +
+                                getVariableName() + " but the type " + javaTypeOfTransfer +
                                 " isn't supported as an array index.");
                 }
             }
         }
-
-        if (unsolvedReferences.isEmpty())
-            return out;
-        else
-            throw new UndefinedException("Field " + this.getVariableName() +
-                    " in " + packetName +
-                    " refers to a field " + unsolvedReferences.keySet() + " that don't exist");
+        return out;
     }
 
     private static int intClassOf(String javaType) {
@@ -154,8 +158,8 @@ public class Field {
             return -1; // not supported
     }
 
-    public String[] validate(String name, boolean testArrayLength, Field[] others) throws UndefinedException {
-        String transferTypesAreSafe = transferTypeCheck(name, others);
+    public String[] validate(String name, boolean testArrayLength) throws UndefinedException {
+        String transferTypesAreSafe = transferTypeCheck(name);
         String sizeChecks = this.getLegalSize(testArrayLength);
 
         ArrayList<String> out = new ArrayList<String>(3);
@@ -221,6 +225,8 @@ public class Field {
         private final IntExpression maxSize;
         private final String elementsToTransfer;
 
+        private String elementsToTransferType = null;
+
         public ArrayDeclaration(IntExpression maxSize, String elementsToTransfer) {
             this.maxSize = maxSize;
             this.elementsToTransfer = elementsToTransfer;
@@ -252,6 +258,25 @@ public class Field {
 
         public boolean hasTransfer() {
             return null != elementsToTransfer;
+        }
+
+        private void assumeInitialized(String packetName, String variableName) throws UndefinedException {
+            if (hasTransfer() && null == elementsToTransferType)
+                throw new UndefinedException("Field " + variableName +
+                    " in " + packetName +
+                    " refers to a field " + getFieldThatHoldsSize() + " that don't exist");
+        }
+
+        public void setJavaTypeOfTransfer(String jType) {
+            if ((null == elementsToTransferType))
+                elementsToTransferType = jType;
+            else
+                throw new UnsupportedOperationException("tried to set the type of an array declaration twice");
+        }
+
+        public String getJavaTypeOfTransfer(String packetName, String variableName) throws UndefinedException {
+            assumeInitialized(packetName, variableName);
+            return elementsToTransferType;
         }
     }
 

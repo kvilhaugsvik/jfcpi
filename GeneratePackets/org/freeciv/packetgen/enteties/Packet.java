@@ -43,6 +43,10 @@ public class Packet extends ClassWriter implements IDependency {
         this.fields = fields;
 
         for (Field field : fields) {
+            field.introduceNeighbours(fields);
+        }
+
+        for (Field field : fields) {
             requirements.addAll(field.getReqs());
         }
 
@@ -85,7 +89,7 @@ public class Packet extends ClassWriter implements IDependency {
             params.add(new AbstractMap
                     .SimpleImmutableEntry<String, String>(field.getType() + field.getArrayDeclaration(),
                                                           field.getVariableName()));
-            constructorBody.addAll(Arrays.asList(field.validate(this.getName(), true, fields)));
+            constructorBody.addAll(Arrays.asList(field.validate(this.getName(), true)));
             constructorBody.add(setFieldToVariableSameName(field.getVariableName()));
         }
         addConstructorPublic(null, createParameterList(params), constructorBody.toArray(new String[0]));
@@ -99,7 +103,7 @@ public class Packet extends ClassWriter implements IDependency {
                 params.add(new AbstractMap
                         .SimpleImmutableEntry<String, String>(field.getJType() + field.getArrayDeclaration(),
                                                               field.getVariableName()));
-                constructorBodyJ.addAll(Arrays.asList(field.validate(this.getName(), true, fields)));
+                constructorBodyJ.addAll(Arrays.asList(field.validate(this.getName(), true)));
                 constructorBodyJ.addAll(
                         Arrays.asList(field.forElementsInField("this." + field.getVariableName() + " = new " + field
                                                                  .getType() + field.getNewCreation() + ";",
@@ -115,7 +119,7 @@ public class Packet extends ClassWriter implements IDependency {
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
         final String streamName = "from";
         for (Field field : fields) {
-            constructorBodyStream.addAll(Arrays.asList(field.validate(this.getName(), false, fields)));
+            constructorBodyStream.addAll(Arrays.asList(field.validate(this.getName(), false)));
             constructorBodyStream.addAll(Arrays.asList(field.forElementsInField(
                             "this." + field.getVariableName() + " = new " + field.getType() +
                                     field.getNewCreation() + ";",
