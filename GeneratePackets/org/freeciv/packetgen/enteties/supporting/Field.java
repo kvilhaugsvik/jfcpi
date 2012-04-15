@@ -139,7 +139,7 @@ public class Field {
         String out = "";
         for (ArrayDeclaration dec : declarations) {
             if (dec.hasTransfer()) {
-                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(onPacket, this.getFieldName());
+                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer();
                 switch (intClassOf(javaTypeOfTransfer)) {
                     case 0:
                         break;
@@ -155,7 +155,7 @@ public class Field {
     }
 
     private static UndefinedException notSupportedIndex(String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
-        String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(packetName, fieldName);
+        String javaTypeOfTransfer = dec.getJavaTypeOfTransfer();
         return new UndefinedException(packetName + " uses the field " + dec.getFieldThatHoldsSize() +
                 " of the type " + javaTypeOfTransfer + " as an array index for the field " +
                 fieldName + " but the type " + javaTypeOfTransfer +
@@ -284,10 +284,10 @@ public class Field {
             return null != elementsToTransfer;
         }
 
-        private void assumeInitialized(String packetName, String variableName) throws UndefinedException {
+        private void assumeInitialized() throws UndefinedException {
             if (hasTransfer() && null == elementsToTransferType)
-                throw new UndefinedException("Field " + variableName +
-                    " in " + packetName +
+                throw new UndefinedException("Field " + fieldName +
+                    " in " + onPacket +
                     " refers to a field " + getFieldThatHoldsSize() + " that don't exist");
         }
 
@@ -298,8 +298,8 @@ public class Field {
                 throw new UnsupportedOperationException("tried to set the type of an array declaration twice");
         }
 
-        public String getJavaTypeOfTransfer(String packetName, String variableName) throws UndefinedException {
-            assumeInitialized(packetName, variableName);
+        public String getJavaTypeOfTransfer() throws UndefinedException {
+            assumeInitialized();
             return elementsToTransferType;
         }
     }
