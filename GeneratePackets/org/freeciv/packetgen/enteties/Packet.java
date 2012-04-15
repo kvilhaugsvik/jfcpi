@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
+import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.Field;
@@ -28,7 +29,7 @@ public class Packet extends ClassWriter implements IDependency {
     private final Requirement iFulfill;
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
-    public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) {
+    public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new String[]{
                               allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
                               allInPackageOf(org.freeciv.types.FCEnum.class),
@@ -40,6 +41,16 @@ public class Packet extends ClassWriter implements IDependency {
 
         this.number = number;
         this.fields = fields;
+
+        for (Field field : fields) {
+            field.introduceNeighbours(fields);
+        }
+
+        for (Field field : fields) {
+            requirements.addAll(field.getReqs());
+        }
+
+        iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
 
         addClassConstant("int", "number", number + "");
         addClassConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
@@ -69,15 +80,9 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields) {
             addJavaGetter(field);
         }
-
-        for (Field field : fields) {
-            requirements.addAll(field.getReqs());
-        }
-
-        iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
     }
 
-    private void addConstructorFromFields(String name, Field[] fields) {
+    private void addConstructorFromFields(String name, Field[] fields) throws UndefinedException {
         LinkedList<String> constructorBody = new LinkedList<String>();
         LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
         for (Field field : fields) {
@@ -90,7 +95,7 @@ public class Packet extends ClassWriter implements IDependency {
         addConstructorPublic(null, createParameterList(params), constructorBody.toArray(new String[0]));
     }
 
-    private void addConstructorFromJavaTypes(String name, Field[] fields) {
+    private void addConstructorFromJavaTypes(String name, Field[] fields) throws UndefinedException {
         if (0 < fields.length) {
             LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
             LinkedList<String> constructorBodyJ = new LinkedList<String>();
@@ -101,7 +106,7 @@ public class Packet extends ClassWriter implements IDependency {
                 constructorBodyJ.addAll(Arrays.asList(field.validate(this.getName(), true)));
                 constructorBodyJ.addAll(
                         Arrays.asList(field.forElementsInField("this." + field.getVariableName() + " = new " + field
-                                                                 .getType() + field.getNewCreation("") + ";",
+                                                                 .getType() + field.getNewCreation() + ";",
                                                          "this." + field.getVariableName() + "[i] = " + field
                                                                  .getNewFromJavaType(),
                                                          "")));
@@ -110,14 +115,14 @@ public class Packet extends ClassWriter implements IDependency {
         }
     }
 
-    private void addConstructorFromDataInput(String name, Field[] fields) {
+    private void addConstructorFromDataInput(String name, Field[] fields) throws UndefinedException {
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
         final String streamName = "from";
         for (Field field : fields) {
             constructorBodyStream.addAll(Arrays.asList(field.validate(this.getName(), false)));
             constructorBodyStream.addAll(Arrays.asList(field.forElementsInField(
                             "this." + field.getVariableName() + " = new " + field.getType() +
-                                    field.getNewCreation(".getValue()") + ";",
+                                    field.getNewCreation() + ";",
                             "this." + field.getVariableName() + "[i] = " + field.getNewFromDataStream(streamName),
                             "")));
         }
@@ -210,7 +215,7 @@ public class Packet extends ClassWriter implements IDependency {
                                        "return " + "this." + field.getVariableName() + ";");
     }
 
-    private void addJavaGetter(Field field) {
+    private void addJavaGetter(Field field) throws UndefinedException {
         addMethodPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
                 + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
                 + "Value",
@@ -218,7 +223,7 @@ public class Packet extends ClassWriter implements IDependency {
                                                field.forElementsInField(field.getJType() + field
                                                                           .getArrayDeclaration() + " out = new " +
                                                                           field.getJType() + field
-                                                                          .getNewCreation(".getValue()") + ";",
+                                                                          .getNewCreation() + ";",
                                                                   "out[i] = " + "this." + field
                                                                           .getVariableName() + "[i].getValue();",
                                                                   "return out;") :

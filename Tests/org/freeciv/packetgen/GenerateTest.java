@@ -34,7 +34,7 @@ import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newInva
 public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UndefinedException {
         String targetFolder;
         if (args.length < 1)
             targetFolder = GeneratorDefaults.GENERATED_SOURCE_FOLDER;

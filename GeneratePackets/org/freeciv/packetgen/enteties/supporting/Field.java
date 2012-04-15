@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 
@@ -31,6 +32,25 @@ public class Field {
         this.variableName = variableName;
         this.type = typeAlias;
         this.declarations = declarations;
+    }
+
+    public void introduceNeighbours(Field[] neighbours) {
+        HashMap<String, ArrayDeclaration> unsolvedReferences = new HashMap<String, ArrayDeclaration>();
+        for (ArrayDeclaration dec : declarations) {
+            if (dec.hasTransfer()) {
+                unsolvedReferences.put(dec.getFieldThatHoldsSize(), dec);
+            }
+        }
+        if (unsolvedReferences.isEmpty())
+            return;
+
+        Field[] others = neighbours;
+        for (Field other : others) {
+            if (unsolvedReferences.containsKey(other.getVariableName())) { // the value of the field is used
+                ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getVariableName());
+                toIntroduce.setJavaTypeOfTransfer(other.getJType());
+            }
+        }
     }
 
     public String getVariableName() {
@@ -61,61 +81,105 @@ public class Field {
         return out;
     }
 
-    public String getNewCreation(String callOnElementsToTransfer) {
+    public String getNewCreation() throws UndefinedException {
         String out = "";
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
-            out += "[" + declarations[i].getSize(callOnElementsToTransfer) + "]";
+            out += "[" + declarations[i].getSize() + "]";
         }
         return out;
     }
 
-    public String getNewFromDataStream(String streamName) {
+    public String getNewFromDataStream(String streamName) throws UndefinedException {
         return "new " + this.getType() + "(" + streamName +
                 (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
+                        ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
 
-    public String getNewFromJavaType() {
+    public String getNewFromJavaType() throws UndefinedException {
         return "new " + this.getType() + "(" + this.getVariableName() + "[i]" +
                 (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getSize(".getValue()") : "") + ");";
+                        ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
 
-    private String getLegalSize(String callOnElementsToTransfer, boolean testArrayLength) {
+    private String getLegalSize(boolean testArrayLength) throws UndefinedException {
         String out = "";
         String arrayLevel = "";
 
         if (type.getBasicType().isArrayEater())
-            out += validateElementsToTransfer(callOnElementsToTransfer, declarations[declarations.length - 1]);
+            out += validateElementsToTransfer(declarations[declarations.length - 1]);
 
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
-            out += validateElementsToTransfer(callOnElementsToTransfer, element);
+            out += validateElementsToTransfer(element);
             if (testArrayLength)
                 out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
-                        .getSize(callOnElementsToTransfer) + ")" + "||";
+                        .getSize() + ")" + "||";
             arrayLevel += "[0]";
         }
         return out;
     }
 
-    private static String validateElementsToTransfer(String callOnElementsToTransfer, ArrayDeclaration element) {
-        if (null != element.getElementsToTransfer(callOnElementsToTransfer))
+    private static String validateElementsToTransfer(ArrayDeclaration element) throws UndefinedException {
+        if (null != element.getElementsToTransfer())
             return "(" + element.getMaxSize() + " <= " + element
-                .getElementsToTransfer(callOnElementsToTransfer) + ")" + "||";
+                .getElementsToTransfer() + ")" + "||";
         else
             return "";
     }
 
-    public String[] validate(String name, boolean testArrayLength) {
-        String sizeChecks = this.getLegalSize(".getValue()", testArrayLength);
-        if ("".equals(sizeChecks))
-            return new String[]{};
+    private String transferTypeCheck(String packetName) throws UndefinedException {
+        String out = "";
+        for (ArrayDeclaration dec : declarations) {
+            if (dec.hasTransfer()) {
+                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(packetName, this.getVariableName());
+                switch (intClassOf(javaTypeOfTransfer)) {
+                    case 0:
+                        break;
+                    case 1:
+                        out += "(" + dec.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
+                        break;
+                    case -1:
+                        throw notSupportedIndex(packetName, getVariableName(), dec);
+                }
+            }
+        }
+        return out;
+    }
+
+    private static UndefinedException notSupportedIndex(String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
+        String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(packetName, fieldName);
+        return new UndefinedException(packetName + " uses the field " + dec.getFieldThatHoldsSize() +
+                " of the type " + javaTypeOfTransfer + " as an array index for the field " +
+                fieldName + " but the type " + javaTypeOfTransfer +
+                " isn't supported as an array index.");
+    }
+
+    private static int intClassOf(String javaType) {
+        if ("Integer".equals(javaType))
+            return 0; // safe to use as int. (Byte, Short and Char aren't currently used in fields)
+        else if ("Long".equals(javaType))
+            return 1; // needs to check that it is small enough to use as int
         else
-            return new String[]{
-                "if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")",
-                "\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
-                        " constructed with value out of scope in packet " + name + "\");"};
+            return -1; // not supported
+    }
+
+    public String[] validate(String name, boolean testArrayLength) throws UndefinedException {
+        String transferTypesAreSafe = transferTypeCheck(name);
+        String sizeChecks = this.getLegalSize(testArrayLength);
+
+        ArrayList<String> out = new ArrayList<String>(3);
+        if (!"".equals(transferTypesAreSafe))
+            // TODO: make sure it will cause a compile time error or throw an error here
+            out.add("assert " + transferTypesAreSafe + " : " +
+                    "\"Can't prove that index value will stay in the range Java's signed integers can represent.\";");
+
+        if (!"".equals(sizeChecks)) {
+            out.add("if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")");
+            out.add("\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
+                        " constructed with value out of scope in packet " + name + "\");");
+        }
+
+        return out.toArray(new String[0]);
     }
 
     public String[] forElementsInField(String before, String in, String after) {
@@ -152,6 +216,17 @@ public class Field {
         return ((char)('i' + counter));
     }
 
+    private static String toInt(String elementsToTransferType, String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
+        switch (intClassOf(elementsToTransferType)) {
+            case 0:
+                return "";
+            case 1:
+                return ".intValue()"; // safe since validated
+            default:
+                throw notSupportedIndex(packetName, fieldName, dec);
+        }
+    }
+
     public Collection<Requirement> getReqs() {
         HashSet<Requirement> reqs = new HashSet<Requirement>();
         reqs.add(new Requirement(getType(), Requirement.Kind.FIELD_TYPE));
@@ -166,6 +241,8 @@ public class Field {
         private final IntExpression maxSize;
         private final String elementsToTransfer;
 
+        private String elementsToTransferType = null;
+
         public ArrayDeclaration(IntExpression maxSize, String elementsToTransfer) {
             this.maxSize = maxSize;
             this.elementsToTransfer = elementsToTransfer;
@@ -175,20 +252,47 @@ public class Field {
             return maxSize.toString();
         }
 
-        public String getElementsToTransfer(String callOnElementsToTransfer) {
-            return (null == elementsToTransfer || "".equals(callOnElementsToTransfer) ?
-                    elementsToTransfer :
-                    "this." + elementsToTransfer + callOnElementsToTransfer);
+        public String getElementsToTransfer() throws UndefinedException {
+            return (hasTransfer() ?
+                    "this." + elementsToTransfer + ".getValue()" + toInt(elementsToTransferType, "TODO", "TODO", this) :
+                    elementsToTransfer);
+        }
+
+        public String getFieldThatHoldsSize() {
+            return elementsToTransfer;
         }
 
         public Collection<Requirement> getReqs() {
             return maxSize.getReqs();
         }
 
-        private String getSize(String callOnElementsToTransfer) {
-            return (null == elementsToTransfer ?
-                    getMaxSize() :
-                    getElementsToTransfer(callOnElementsToTransfer));
+        private String getSize() throws UndefinedException {
+            return (hasTransfer() ?
+                    getElementsToTransfer() :
+                    getMaxSize());
+        }
+
+        public boolean hasTransfer() {
+            return null != elementsToTransfer;
+        }
+
+        private void assumeInitialized(String packetName, String variableName) throws UndefinedException {
+            if (hasTransfer() && null == elementsToTransferType)
+                throw new UndefinedException("Field " + variableName +
+                    " in " + packetName +
+                    " refers to a field " + getFieldThatHoldsSize() + " that don't exist");
+        }
+
+        public void setJavaTypeOfTransfer(String jType) {
+            if ((null == elementsToTransferType))
+                elementsToTransferType = jType;
+            else
+                throw new UnsupportedOperationException("tried to set the type of an array declaration twice");
+        }
+
+        public String getJavaTypeOfTransfer(String packetName, String variableName) throws UndefinedException {
+            assumeInitialized(packetName, variableName);
+            return elementsToTransferType;
         }
     }
 
