@@ -42,6 +42,12 @@ public class Packet extends ClassWriter implements IDependency {
         this.number = number;
         this.fields = fields;
 
+        for (Field field : fields) {
+            requirements.addAll(field.getReqs());
+        }
+
+        iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
+
         addClassConstant("int", "number", number + "");
         addClassConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
 
@@ -70,12 +76,6 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields) {
             addJavaGetter(field);
         }
-
-        for (Field field : fields) {
-            requirements.addAll(field.getReqs());
-        }
-
-        iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
     }
 
     private void addConstructorFromFields(String name, Field[] fields) throws UndefinedException {
