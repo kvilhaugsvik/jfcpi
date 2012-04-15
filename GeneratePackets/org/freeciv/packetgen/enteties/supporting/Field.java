@@ -262,7 +262,8 @@ public class Field {
 
         public String getElementsToTransfer() throws UndefinedException {
             return (hasTransfer() ?
-                    "this." + elementsToTransfer + ".getValue()" + toInt(elementsToTransferType, "TODO", "TODO", this) :
+                    "this." + elementsToTransfer + ".getValue()" + toInt(elementsToTransferType,
+                                                                         onPacket, fieldName, this) :
                     elementsToTransfer);
         }
 
