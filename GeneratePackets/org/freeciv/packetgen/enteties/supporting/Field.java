@@ -81,7 +81,7 @@ public class Field {
         return out;
     }
 
-    public String getNewCreation() {
+    public String getNewCreation() throws UndefinedException {
         String out = "";
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             out += "[" + declarations[i].getSize() + "]";
@@ -89,19 +89,19 @@ public class Field {
         return out;
     }
 
-    public String getNewFromDataStream(String streamName) {
+    public String getNewFromDataStream(String streamName) throws UndefinedException {
         return "new " + this.getType() + "(" + streamName +
                 (type.getBasicType().isArrayEater() ?
                         ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
 
-    public String getNewFromJavaType() {
+    public String getNewFromJavaType() throws UndefinedException {
         return "new " + this.getType() + "(" + this.getVariableName() + "[i]" +
                 (type.getBasicType().isArrayEater() ?
                         ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
 
-    private String getLegalSize(boolean testArrayLength) {
+    private String getLegalSize(boolean testArrayLength) throws UndefinedException {
         String out = "";
         String arrayLevel = "";
 
@@ -119,7 +119,7 @@ public class Field {
         return out;
     }
 
-    private static String validateElementsToTransfer(ArrayDeclaration element) {
+    private static String validateElementsToTransfer(ArrayDeclaration element) throws UndefinedException {
         if (null != element.getElementsToTransfer())
             return "(" + element.getMaxSize() + " <= " + element
                 .getElementsToTransfer() + ")" + "||";
@@ -139,14 +139,19 @@ public class Field {
                         out += "(" + dec.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
                         break;
                     case -1:
-                        throw new UndefinedException(packetName + " uses the field " + dec.getFieldThatHoldsSize() +
-                                " of the type " + javaTypeOfTransfer + " as an array index for the field " +
-                                getVariableName() + " but the type " + javaTypeOfTransfer +
-                                " isn't supported as an array index.");
+                        throw notSupportedIndex(packetName, getVariableName(), dec);
                 }
             }
         }
         return out;
+    }
+
+    private static UndefinedException notSupportedIndex(String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
+        String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(packetName, fieldName);
+        return new UndefinedException(packetName + " uses the field " + dec.getFieldThatHoldsSize() +
+                " of the type " + javaTypeOfTransfer + " as an array index for the field " +
+                fieldName + " but the type " + javaTypeOfTransfer +
+                " isn't supported as an array index.");
     }
 
     private static int intClassOf(String javaType) {
@@ -211,6 +216,17 @@ public class Field {
         return ((char)('i' + counter));
     }
 
+    private static String toInt(String elementsToTransferType, String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
+        switch (intClassOf(elementsToTransferType)) {
+            case 0:
+                return "";
+            case 1:
+                return ".intValue()"; // safe since validated
+            default:
+                throw notSupportedIndex(packetName, fieldName, dec);
+        }
+    }
+
     public Collection<Requirement> getReqs() {
         HashSet<Requirement> reqs = new HashSet<Requirement>();
         reqs.add(new Requirement(getType(), Requirement.Kind.FIELD_TYPE));
@@ -236,9 +252,9 @@ public class Field {
             return maxSize.toString();
         }
 
-        public String getElementsToTransfer() {
+        public String getElementsToTransfer() throws UndefinedException {
             return (hasTransfer() ?
-                    "this." + elementsToTransfer + ".getValue()" :
+                    "this." + elementsToTransfer + ".getValue()" + toInt(elementsToTransferType, "TODO", "TODO", this) :
                     elementsToTransfer);
         }
 
@@ -250,7 +266,7 @@ public class Field {
             return maxSize.getReqs();
         }
 
-        private String getSize() {
+        private String getSize() throws UndefinedException {
             return (hasTransfer() ?
                     getElementsToTransfer() :
                     getMaxSize());

@@ -215,7 +215,7 @@ public class Packet extends ClassWriter implements IDependency {
                                        "return " + "this." + field.getVariableName() + ";");
     }
 
-    private void addJavaGetter(Field field) {
+    private void addJavaGetter(Field field) throws UndefinedException {
         addMethodPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
                 + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
                 + "Value",
