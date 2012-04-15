@@ -22,16 +22,16 @@ import java.util.*;
 
 public class Field {
     private final String onPacket;
-    private final String variableName;
+    private final String fieldName;
     private final FieldTypeBasic.FieldTypeAlias type;
     private final ArrayDeclaration[] declarations;
 
-    public Field(String variableName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
+    public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
                  WeakField.ArrayDeclaration... declarations) {
         if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
             throw new IllegalArgumentException("Array eaters needs array declarations");
 
-        this.variableName = variableName;
+        this.fieldName = fieldName;
         this.type = typeAlias;
         this.onPacket = onPacket;
 
@@ -54,15 +54,15 @@ public class Field {
 
         Field[] others = neighbours;
         for (Field other : others) {
-            if (unsolvedReferences.containsKey(other.getVariableName())) { // the value of the field is used
-                ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getVariableName());
+            if (unsolvedReferences.containsKey(other.getFieldName())) { // the value of the field is used
+                ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getFieldName());
                 toIntroduce.setJavaTypeOfTransfer(other.getJType());
             }
         }
     }
 
-    public String getVariableName() {
-        return variableName;
+    public String getFieldName() {
+        return fieldName;
     }
 
     public String getType() {
@@ -104,7 +104,7 @@ public class Field {
     }
 
     public String getNewFromJavaType() throws UndefinedException {
-        return "new " + this.getType() + "(" + this.getVariableName() + "[i]" +
+        return "new " + this.getType() + "(" + this.getFieldName() + "[i]" +
                 (type.getBasicType().isArrayEater() ?
                         ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
@@ -120,7 +120,7 @@ public class Field {
             final ArrayDeclaration element = declarations[i];
             out += validateElementsToTransfer(element);
             if (testArrayLength)
-                out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
+                out += "(" + this.getFieldName() + arrayLevel + ".length != " + element
                         .getSize() + ")" + "||";
             arrayLevel += "[0]";
         }
@@ -139,7 +139,7 @@ public class Field {
         String out = "";
         for (ArrayDeclaration dec : declarations) {
             if (dec.hasTransfer()) {
-                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(onPacket, this.getVariableName());
+                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(onPacket, this.getFieldName());
                 switch (intClassOf(javaTypeOfTransfer)) {
                     case 0:
                         break;
@@ -147,7 +147,7 @@ public class Field {
                         out += "(" + dec.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
                         break;
                     case -1:
-                        throw notSupportedIndex(onPacket, getVariableName(), dec);
+                        throw notSupportedIndex(onPacket, getFieldName(), dec);
                 }
             }
         }
@@ -183,7 +183,7 @@ public class Field {
 
         if (!"".equals(sizeChecks)) {
             out.add("if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")");
-            out.add("\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
+            out.add("\t" + "throw new IllegalArgumentException(\"Array " + this.getFieldName() +
                         " constructed with value out of scope in packet " + onPacket + "\");");
         }
 
@@ -204,7 +204,7 @@ public class Field {
         String replaceWith = "";
         for (int counter = 0; counter < level; counter++) {
             wrappedInFor[counter] = "for(int " + getCounterNumber(counter) + " = 0; " +
-                    getCounterNumber(counter) + " < " + "this." + this.getVariableName() + replaceWith + ".length; " +
+                    getCounterNumber(counter) + " < " + "this." + this.getFieldName() + replaceWith + ".length; " +
                     getCounterNumber(counter) + "++) {";
             wrappedInFor[1 + counter + level] = "}";
             replaceWith += "[" + getCounterNumber(counter) + "]";

@@ -180,7 +180,7 @@ public class PacketsStoreTest {
         storage.registerPacket("PACKET_HELLO", 25, fields);
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
-        assertEquals("myNameIs", storage.getPacket("PACKET_HELLO").getFields().get(0).getVariableName());
+        assertEquals("myNameIs", storage.getPacket("PACKET_HELLO").getFields().get(0).getFieldName());
         assertEquals("STRING", storage.getPacket("PACKET_HELLO").getFields().get(0).getType());
     }
 
