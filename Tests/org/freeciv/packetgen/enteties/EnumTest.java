@@ -214,13 +214,13 @@ public class EnumTest {
 
         assertTrue("ONE is missing", constants.containsKey("ONE"));
         assertTrue("ONE don't require it's enum", constants.get("ONE").getReqs()
-                .contains(new Requirement("Count", Requirement.Kind.ENUM)));
+                .contains(new Requirement("enum Count", Requirement.Kind.AS_JAVA_DATATYPE)));
         assertEquals("ONE has wrong value", "org.freeciv.types.Count.ONE.getNumber()",
                 constants.get("ONE").getExpression());
 
         assertTrue("TWO is missing", constants.containsKey("TWO"));
         assertTrue("TWO don't require it's enum", constants.get("TWO").getReqs()
-                .contains(new Requirement("Count", Requirement.Kind.ENUM)));
+                .contains(new Requirement("enum Count", Requirement.Kind.AS_JAVA_DATATYPE)));
         assertEquals("TWO has wrong value", "org.freeciv.types.Count.TWO.getNumber()",
                 constants.get("TWO").getExpression());
     }

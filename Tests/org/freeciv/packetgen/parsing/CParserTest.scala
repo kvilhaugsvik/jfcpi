@@ -900,9 +900,9 @@ enum test3 {
     assertFalse("Enums not found", enums.isEmpty)
 
     val enumsAsMap = enums.map(_.getIFulfillReq.getName)
-    assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
-    assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
-    assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
+    assertTrue("Specenum test1 not found", enumsAsMap.contains("enum test1"))
+    assertTrue("C style enum test2 not found", enumsAsMap.contains("enum test2"))
+    assertTrue("C style enum test3 not found", enumsAsMap.contains("enum test3"))
   }
 
   @Test def findsEnumsOneMissingExtract {
@@ -912,9 +912,9 @@ enum test3 {
     assertFalse("Enums not found", enums.isEmpty)
 
     val enumsAsMap = enums.map(_.getIFulfillReq.getName)
-    assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
-    assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
-    assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
+    assertTrue("Specenum test1 not found", enumsAsMap.contains("enum test1"))
+    assertTrue("C style enum test2 not found", enumsAsMap.contains("enum test2"))
+    assertTrue("C style enum test3 not found", enumsAsMap.contains("enum test3"))
   }
 
   private final val test123OtherCodeAsWell = """
@@ -959,9 +959,9 @@ enum test3 {
     assertFalse("Enums not found", enums.isEmpty)
 
     val enumsAsMap = enums.map(_.getIFulfillReq.getName)
-    assertTrue("Specenum test1 not found", enumsAsMap.contains("test1"))
-    assertTrue("C style enum test2 not found", enumsAsMap.contains("test2"))
-    assertTrue("C style enum test3 not found", enumsAsMap.contains("test3"))
+    assertTrue("Specenum test1 not found", enumsAsMap.contains("enum test1"))
+    assertTrue("C style enum test2 not found", enumsAsMap.contains("enum test2"))
+    assertTrue("C style enum test3 not found", enumsAsMap.contains("enum test3"))
   }
 
   private final val test123EnumsUsed = """
@@ -1000,9 +1000,9 @@ enum test3 {
     assertFalse("Enums not found", enums.isEmpty)
 
     val enumsNames = enums.map(_.getIFulfillReq.getName)
-    assertTrue("Specenum test1 not found", enumsNames.contains("test1"))
-    assertTrue("C style enum test2 not found", enumsNames.contains("test2"))
-    assertTrue("C style enum test3 not found", enumsNames.contains("test3"))
+    assertTrue("Specenum test1 not found", enumsNames.contains("enum test1"))
+    assertTrue("C style enum test2 not found", enumsNames.contains("enum test2"))
+    assertTrue("C style enum test3 not found", enumsNames.contains("enum test3"))
   }
 
   @Test def findConstantAfterTwoNewLinesWithFollowingUnusedConstant {
