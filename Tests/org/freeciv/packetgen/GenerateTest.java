@@ -108,11 +108,11 @@ public class GenerateTest {
                 4,
                 false,
                 new Field("username", string, "SERVER_JOIN_REQ",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string, "SERVER_JOIN_REQ",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("version_label", string, "SERVER_JOIN_REQ",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("major_version", uint32, "SERVER_JOIN_REQ"),
                 new Field("minor_version", uint32, "SERVER_JOIN_REQ"),
                 new Field("patch_version", uint32, "SERVER_JOIN_REQ")), targetFolder);
@@ -121,11 +121,11 @@ public class GenerateTest {
                 false,
                 new Field("you_can_join", bool, "you_can_join"),
                 new Field("message", string, "you_can_join",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string, "you_can_join",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("challenge_file", string, "you_can_join",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("conn_id", connection, "you_can_join")), targetFolder);
         writePacket(new Packet("CONN_PING", 88, false), targetFolder);
         writePacket(new Packet("CONN_PONG", 89, false), targetFolder);
@@ -133,11 +133,11 @@ public class GenerateTest {
                 4,
                 true,
                 new Field("username", string, "SERVER_JOIN_REQ2ByteKind",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string, "SERVER_JOIN_REQ2ByteKind",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("version_label", string, "SERVER_JOIN_REQ2ByteKind",
-                          new Field.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("major_version", uint32, "SERVER_JOIN_REQ2ByteKind"),
                 new Field("minor_version", uint32, "SERVER_JOIN_REQ2ByteKind"),
                 new Field("patch_version", uint32, "SERVER_JOIN_REQ2ByteKind")), targetFolder);
@@ -145,35 +145,35 @@ public class GenerateTest {
                 926,
                 true,
                 new Field("theArray", uint32, "TestArray",
-                          new Field.ArrayDeclaration(IntExpression.integer("2"), null))), targetFolder);
+                          new WeakField.ArrayDeclaration(IntExpression.integer("2"), null))), targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
                 true,
                 new Field("toTransfer", uint8, "TestArrayTransfer"),
                 new Field("theArray", uint32, "TestArrayTransfer",
-                          new Field.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))), targetFolder);
+                          new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))), targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
                 true,
                 new Field("theArray", uint32, "TestArrayDouble",
-                          new Field.ArrayDeclaration(IntExpression.integer("2"), null),
-                        new Field.ArrayDeclaration(IntExpression.integer("3"), null))), targetFolder);
+                          new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("3"), null))), targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
                 true,
                 new Field("toTransfer", uint8, "TestArrayDoubleTransfer"),
                 new Field("toTransfer2", uint8, "TestArrayDoubleTransfer"),
                 new Field("theArray", uint32, "TestArrayDoubleTransfer",
-                          new Field.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"),
-                        new Field.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))), targetFolder);
+                          new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))), targetFolder);
         writePacket(new Packet("StringArray",
                 930,
                 true,
                 new Field("notAnArray", string, "StringArray",
-                          new Field.ArrayDeclaration(IntExpression.integer("15"), null)),
+                          new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
                 new Field("theArray", string, "StringArray",
-                          new Field.ArrayDeclaration(IntExpression.integer("3"), null),
-                        new Field.ArrayDeclaration(IntExpression.integer("10"), null))), targetFolder);
+                          new WeakField.ArrayDeclaration(IntExpression.integer("3"), null),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("10"), null))), targetFolder);
 
         FileWriter packetList = new FileWriter(targetFolder + Connect.packetsList);
         for (String packet: writtenPackets) {

@@ -27,14 +27,19 @@ public class Field {
     private final ArrayDeclaration[] declarations;
 
     public Field(String variableName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
-                 ArrayDeclaration... declarations) {
+                 WeakField.ArrayDeclaration... declarations) {
         if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
             throw new IllegalArgumentException("Array eaters needs array declarations");
 
         this.variableName = variableName;
         this.type = typeAlias;
-        this.declarations = declarations;
         this.onPacket = onPacket;
+
+        ArrayList<ArrayDeclaration> toDeclarations = new ArrayList<ArrayDeclaration>();
+        for (WeakField.ArrayDeclaration weakDec : declarations) {
+            toDeclarations.add(new ArrayDeclaration(weakDec.maxSize, weakDec.elementsToTransfer));
+        }
+        this.declarations = toDeclarations.toArray(new ArrayDeclaration[0]);
     }
 
     public void introduceNeighbours(Field[] neighbours) {
