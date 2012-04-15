@@ -22,7 +22,7 @@ import org.junit.Assert._
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
 import org.freeciv.packetgen.PacketsStore
-import org.freeciv.packetgen.enteties.supporting.Field
+import org.freeciv.packetgen.enteties.supporting.{WeakField, Field}
 
 class PacketsDefParseTest {
   @inline def storePars = {
@@ -39,7 +39,7 @@ class PacketsDefParseTest {
     assertTrue("Couldn't parse", parser.parsePacketsDef("PACKET_HELLO = 5;\n" + fieldDec + "\nend").successful)
     assertTrue("Didn't store packet", storage.hasPacket(5))
 
-    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getVariableName)
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getFieldName)
     assertTrue("Didn't add field to packet", storedFields.contains("inVoice"))
     assertTrue("Didn't add field to packet", storedFields.contains("friendly"))
   }
@@ -610,7 +610,7 @@ class PacketsDefParseTest {
                                          end""").successful)
     assertTrue(storage.hasPacket(5))
 
-    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getVariableName)
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getFieldName)
     assertTrue(storedFields.contains("friendly"))
     assertTrue(storedFields.contains("inVoice"))
   }
@@ -625,23 +625,23 @@ class PacketsDefParseTest {
                                          end""").successful)
     assertTrue(storage.hasPacket(5))
 
-    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getVariableName)
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getFieldName)
     assertTrue(storedFields.contains("a"))
     assertTrue(storedFields.contains("b"))
     assertTrue(storedFields.contains("c"))
   }
 
-  private def assertWeakFieldIs(message: String, expected: Array[String], actual: Field.WeakField) {
+  private def assertWeakFieldIs(message: String, expected: Array[String], actual: WeakField) {
     assertEquals(message, expected(0), actual.getType)
     assertEquals(message, expected(1), actual.getName)
     assertEquals(message, (expected.size - 2) / 2, actual.getDeclarations.size)
 
-    val decs: Array[Field.ArrayDeclaration] = actual.getDeclarations
+    val decs: Array[WeakField.ArrayDeclaration] = actual.getDeclarations
     var decNum = 0
     while (decNum < decs.size) {
       val declaration = decs(decNum)
-      assertEquals(message, expected(2 + decNum * 2), declaration.getMaxSize)
-      assertEquals(message, expected(1 + 2 + decNum * 2), declaration.getElementsToTransfer())
+      assertEquals(message, expected(2 + decNum * 2), declaration.maxSize.evaluate().toString)
+      assertEquals(message, expected(1 + 2 + decNum * 2), declaration.elementsToTransfer)
       decNum += 1
     }
   }
@@ -656,7 +656,7 @@ class PacketsDefParseTest {
     val result = parser.parseAll(parser.fieldList, manyFieldsInOneDefineSomeWithArrayDeclarations)
     assertTrue(result.toString, result.successful)
 
-    val results: List[Field.WeakField] = result.get
+    val results: List[WeakField] = result.get
 
     storage.registerTypeAlias("UINT8", "uint8", "int") // TODO: Kill with fire in a refactoring
     storage.registerPacket("JUST_FOR_SIDE_EFFECTS", 42, results) // TODO: Kill with fire in a refactoring
@@ -664,9 +664,9 @@ class PacketsDefParseTest {
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "maxB"), results(0))
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "a"), results(1))
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "b", "7", null), results(2))
-    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "c", "8", "this.maxB.getValue()"), results(3))
+    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "c", "8", "maxB"), results(3))
     assertWeakFieldIs("Field parsed in wrong format",
-                      Array("UINT8", "d", "7", null, "8", "this.maxB.getValue()"),
+                      Array("UINT8", "d", "7", null, "8", "maxB"),
                       results(4))
   }
 

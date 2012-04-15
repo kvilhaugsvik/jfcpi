@@ -17,8 +17,7 @@ package org.freeciv.packetgen.parsing;
 import org.freeciv.packetgen.*;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
-import org.freeciv.packetgen.enteties.supporting.Field;
-import org.freeciv.packetgen.enteties.supporting.IntExpression;
+import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.junit.Test;
 
@@ -54,8 +53,8 @@ public class PacketsStoreTest {
 
     private static void registerPacketToPullInnFieldtype(PacketsStore storage, String fieldTypeName, int time)
             throws PacketCollisionException, UndefinedException {
-        LinkedList<Field.WeakField> fields = new LinkedList<Field.WeakField>();
-        fields.add(new Field.WeakField("DragInnDep", fieldTypeName));
+        LinkedList<WeakField> fields = new LinkedList<WeakField>();
+        fields.add(new WeakField("DragInnDep", fieldTypeName));
         storage.registerPacket("DragInnDep" + time, 42 + time, fields);
     }
 
@@ -128,7 +127,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithoutFields() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<Field.WeakField>());
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<WeakField>());
 
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
@@ -138,23 +137,23 @@ public class PacketsStoreTest {
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameNumber() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<Field.WeakField>());
-        storage.registerPacket("PACKET_HI", 25, new LinkedList<Field.WeakField>());
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<WeakField>());
+        storage.registerPacket("PACKET_HI", 25, new LinkedList<WeakField>());
     }
 
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameName() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<Field.WeakField>());
-        storage.registerPacket("PACKET_HELLO", 50, new LinkedList<Field.WeakField>());
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<WeakField>());
+        storage.registerPacket("PACKET_HELLO", 50, new LinkedList<WeakField>());
     }
 
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("STRING", "string", "char");
-        Field.WeakField field1 = new Field.WeakField("myNameIs", "STRING",
-                new Field.ArrayDeclaration(IntExpression.integer("50"), null));
-        LinkedList<Field.WeakField> fields = new LinkedList<Field.WeakField>();
+        WeakField field1 = new WeakField("myNameIs", "STRING",
+                new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
+        LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
         storage.registerPacket("PACKET_HELLO", 25, fields);
 
@@ -172,22 +171,22 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        Field.WeakField field1 = new Field.WeakField("myNameIs", "STRING",
-                new Field.ArrayDeclaration(IntExpression.integer("50"), null));
-        LinkedList<Field.WeakField> fields = new LinkedList<Field.WeakField>();
+        WeakField field1 = new WeakField("myNameIs", "STRING",
+                new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
+        LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
 
         storage.registerTypeAlias("STRING", "string", "char");
         storage.registerPacket("PACKET_HELLO", 25, fields);
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
-        assertEquals("myNameIs", storage.getPacket("PACKET_HELLO").getFields().get(0).getVariableName());
+        assertEquals("myNameIs", storage.getPacket("PACKET_HELLO").getFields().get(0).getFieldName());
         assertEquals("STRING", storage.getPacket("PACKET_HELLO").getFields().get(0).getType());
     }
 
     @Test public void registerPacketWithoutFieldsHasNoFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<Field.WeakField>());
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<WeakField>());
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
         assertTrue(storage.getPacket("PACKET_HELLO").getFields().isEmpty());
@@ -195,8 +194,8 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithUndefinedFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        Field.WeakField field1 = new Field.WeakField("myNameIs", "STRING");
-        LinkedList<Field.WeakField> fields = new LinkedList<Field.WeakField>();
+        WeakField field1 = new WeakField("myNameIs", "STRING");
+        LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
 
         storage.registerPacket("PACKET_HELLO", 25, fields);
@@ -214,7 +213,7 @@ public class PacketsStoreTest {
 
     @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<Field.WeakField>());
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<WeakField>());
 
         String[] packetList = storage.getPacketList().split("[\\t\\r\\n]");
         assertEquals("25", packetList[0]);
@@ -223,8 +222,8 @@ public class PacketsStoreTest {
 
     @Test public void packetsAreListed() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<Field.WeakField>());
-        storage.registerPacket("PACKET_HI", 26, new LinkedList<Field.WeakField>());
+        storage.registerPacket("PACKET_HELLO", 25, new LinkedList<WeakField>());
+        storage.registerPacket("PACKET_HI", 26, new LinkedList<WeakField>());
 
         String[] packetList = storage.getPacketList().split("[\\r\\n]");
         assertTrue(

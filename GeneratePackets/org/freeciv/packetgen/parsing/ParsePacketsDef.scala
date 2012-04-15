@@ -16,8 +16,8 @@ package org.freeciv.packetgen.parsing
 
 import util.parsing.input.Reader
 import collection.JavaConversions._
-import org.freeciv.packetgen.enteties.supporting.Field
 import org.freeciv.packetgen.PacketsStore
+import org.freeciv.packetgen.enteties.supporting.{WeakField, Field}
 
 class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldTypeAlias = regex(identifierRegEx)
@@ -69,20 +69,20 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
 
   def fieldName = regex(identifierRegEx)
 
-  def fieldVar: Parser[(String, List[Field.ArrayDeclaration])] =
+  def fieldVar: Parser[(String, List[WeakField.ArrayDeclaration])] =
     (fieldName ~ rep("[" ~> arrayFullSize ~ opt(":" ~> fieldName) <~ "]")) ^^ {
       case name ~ dimensions =>
         name -> dimensions.map({
           case maxSize ~ toTransferThisTime =>
-            new Field.ArrayDeclaration(maxSize, toTransferThisTime.getOrElse(null))
+            new WeakField.ArrayDeclaration(maxSize, toTransferThisTime.getOrElse(null))
         })
     }
 
   def fields = (fieldTypeAlias ~ rep1sep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
-    case kind ~ variables ~ flags => variables.map(variable => new Field.WeakField(variable._1, kind, variable._2: _*))
+    case kind ~ variables ~ flags => variables.map(variable => new WeakField(variable._1, kind, variable._2: _*))
   }
 
-  def fieldList: Parser[List[Field.WeakField]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
+  def fieldList: Parser[List[WeakField]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
 
   def packet = packetName ~ ("=" ~> regex("""[0-9]+""".r) <~ ";") ~ repsep(packetFlag, ",") ~
     fieldList <~

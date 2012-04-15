@@ -18,8 +18,7 @@ import org.freeciv.packetgen.enteties.FieldTypeBasic.FieldTypeAlias;
 import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
-import org.freeciv.packetgen.enteties.supporting.Field;
-import org.freeciv.packetgen.enteties.supporting.NetworkIO;
+import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 
 import java.util.*;
@@ -103,7 +102,7 @@ public class PacketsStore {
         return requirements.isAwareOfPotentialProvider(new Requirement(name, Requirement.Kind.FIELD_TYPE));
     }
 
-    public void registerPacket(String name, int number, List<Field.WeakField> fields)
+    public void registerPacket(String name, int number, List<WeakField> fields)
             throws PacketCollisionException, UndefinedException {
         if (hasPacket(name)) {
             throw new PacketCollisionException("Packet name " + name + " already in use");
@@ -114,13 +113,14 @@ public class PacketsStore {
         List<Field> fieldList = new LinkedList<Field>();
         HashSet<Requirement> allNeeded = new HashSet<Requirement>();
         HashSet<Requirement> missingWhenNeeded = new HashSet<Requirement>();
-        for (Field.WeakField fieldType : fields) {
+        for (WeakField fieldType : fields) {
             Requirement req = new Requirement(fieldType.getType(), Requirement.Kind.FIELD_TYPE);
             allNeeded.add(req);
             if (requirements.isAwareOfPotentialProvider(req) &&
                     requirements.getPotentialProvider(req) instanceof FieldTypeAlias) {
                 fieldList.add(new Field(fieldType.getName(),
                                         (FieldTypeAlias)requirements.getPotentialProvider(req),
+                                        name,
                                         fieldType.getDeclarations()));
             } else
                 missingWhenNeeded.add(req);

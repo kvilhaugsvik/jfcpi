@@ -56,7 +56,7 @@ public class Packet extends ClassWriter implements IDependency {
         addClassConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
 
         for (Field field : fields) {
-            addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getVariableName());
+            addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getFieldName());
         }
 
         addConstructorFromFields(name, fields);
@@ -88,9 +88,9 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields) {
             params.add(new AbstractMap
                     .SimpleImmutableEntry<String, String>(field.getType() + field.getArrayDeclaration(),
-                                                          field.getVariableName()));
-            constructorBody.addAll(Arrays.asList(field.validate(this.getName(), true)));
-            constructorBody.add(setFieldToVariableSameName(field.getVariableName()));
+                                                          field.getFieldName()));
+            constructorBody.addAll(Arrays.asList(field.validate(true)));
+            constructorBody.add(setFieldToVariableSameName(field.getFieldName()));
         }
         addConstructorPublic(null, createParameterList(params), constructorBody.toArray(new String[0]));
     }
@@ -102,12 +102,12 @@ public class Packet extends ClassWriter implements IDependency {
             for (Field field : fields) {
                 params.add(new AbstractMap
                         .SimpleImmutableEntry<String, String>(field.getJType() + field.getArrayDeclaration(),
-                                                              field.getVariableName()));
-                constructorBodyJ.addAll(Arrays.asList(field.validate(this.getName(), true)));
+                                                              field.getFieldName()));
+                constructorBodyJ.addAll(Arrays.asList(field.validate(true)));
                 constructorBodyJ.addAll(
-                        Arrays.asList(field.forElementsInField("this." + field.getVariableName() + " = new " + field
+                        Arrays.asList(field.forElementsInField("this." + field.getFieldName() + " = new " + field
                                                                  .getType() + field.getNewCreation() + ";",
-                                                         "this." + field.getVariableName() + "[i] = " + field
+                                                         "this." + field.getFieldName() + "[i] = " + field
                                                                  .getNewFromJavaType(),
                                                          "")));
             }
@@ -119,11 +119,11 @@ public class Packet extends ClassWriter implements IDependency {
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
         final String streamName = "from";
         for (Field field : fields) {
-            constructorBodyStream.addAll(Arrays.asList(field.validate(this.getName(), false)));
+            constructorBodyStream.addAll(Arrays.asList(field.validate(false)));
             constructorBodyStream.addAll(Arrays.asList(field.forElementsInField(
-                            "this." + field.getVariableName() + " = new " + field.getType() +
+                            "this." + field.getFieldName() + " = new " + field.getType() +
                                     field.getNewCreation() + ";",
-                            "this." + field.getVariableName() + "[i] = " + field.getNewFromDataStream(streamName),
+                            "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName),
                             "")));
         }
         constructorBodyStream.add("if (getNumber() != packet) {");
@@ -164,7 +164,7 @@ public class Packet extends ClassWriter implements IDependency {
             for (Field field : fields)
                 encodeFields.addAll(Arrays.asList(field.forElementsInField("",
                                                                      "this." + field
-                                                                             .getVariableName() + "[i].encodeTo(to);",
+                                                                             .getFieldName() + "[i].encodeTo(to);",
                                                                      "")));
         }
         addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException",
@@ -176,18 +176,18 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields)
             if (field.hasDeclarations())
                 encodeFieldsLen.addAll(Arrays.asList(field.forElementsInField("int " + field
-                                                                                .getVariableName() + "Len" + " = " +
+                                                                                .getFieldName() + "Len" + " = " +
                                                                                 "0;",
-                                                                        field.getVariableName() + "Len" + "+=" +
+                                                                        field.getFieldName() + "Len" + "+=" +
                                                                                 "this." + field
-                                                                                .getVariableName() +
+                                                                                .getFieldName() +
                                                                                 "[i].encodedLength();", "")));
         encodeFieldsLen.add("return " + (hasTwoBytePacketNumber ? "4" : "3"));
         if (0 < fields.length) {
             for (Field field : fields)
                 encodeFieldsLen.add("\t" + "+ " + ((field.hasDeclarations()) ?
-                        field.getVariableName() + "Len" :
-                        "this." + field.getVariableName() + ".encodedLength()"));
+                        field.getFieldName() + "Len" :
+                        "this." + field.getFieldName() + ".encodedLength()"));
         }
         encodeFieldsLen.add(encodeFieldsLen.removeLast() + ";");
         addMethodPublicReadObjectState(null, "int", "getEncodedSize", encodeFieldsLen.toArray(new String[0]));
@@ -198,12 +198,12 @@ public class Packet extends ClassWriter implements IDependency {
         getToString.add("String out = \"" + name + "\" + \"(\" + number + \")\";");
         for (Field field : fields)
             if (field.hasDeclarations())
-                getToString.addAll(Arrays.asList(field.forElementsInField("out += \"\\n\\t" + field.getVariableName() +
-                        " += (\";", "out += " + "this." + field.getVariableName() + "[i].getValue();",
+                getToString.addAll(Arrays.asList(field.forElementsInField("out += \"\\n\\t" + field.getFieldName() +
+                        " += (\";", "out += " + "this." + field.getFieldName() + "[i].getValue();",
                                                                     "out += \")\";")));
             else
-                getToString.add("out += \"\\n\\t" + field.getVariableName() +
-                                        " = \" + " + "this." + field.getVariableName() + ".getValue();");
+                getToString.add("out += \"\\n\\t" + field.getFieldName() +
+                                        " = \" + " + "this." + field.getFieldName() + ".getValue();");
         getToString.add("");
         getToString.add("return out + \"\\n\";");
         addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
@@ -211,13 +211,13 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addGetAsField(Field field) {
         addMethodPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
-                + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1),
-                                       "return " + "this." + field.getVariableName() + ";");
+                + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1),
+                                       "return " + "this." + field.getFieldName() + ";");
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {
         addMethodPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
-                + field.getVariableName().substring(0, 1).toUpperCase() + field.getVariableName().substring(1)
+                + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1)
                 + "Value",
                                        (field.hasDeclarations()) ?
                                                field.forElementsInField(field.getJType() + field
@@ -225,10 +225,10 @@ public class Packet extends ClassWriter implements IDependency {
                                                                           field.getJType() + field
                                                                           .getNewCreation() + ";",
                                                                   "out[i] = " + "this." + field
-                                                                          .getVariableName() + "[i].getValue();",
+                                                                          .getFieldName() + "[i].getValue();",
                                                                   "return out;") :
                                                new String[]{
-                                                       "return " + "this." + field.getVariableName() + ".getValue();"}
+                                                       "return " + "this." + field.getFieldName() + ".getValue();"}
         );
     }
 

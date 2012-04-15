@@ -21,17 +21,25 @@ import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import java.util.*;
 
 public class Field {
-    private final String variableName;
+    private final String onPacket;
+    private final String fieldName;
     private final FieldTypeBasic.FieldTypeAlias type;
     private final ArrayDeclaration[] declarations;
 
-    public Field(String variableName, FieldTypeBasic.FieldTypeAlias typeAlias, ArrayDeclaration... declarations) {
+    public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
+                 WeakField.ArrayDeclaration... declarations) {
         if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
             throw new IllegalArgumentException("Array eaters needs array declarations");
 
-        this.variableName = variableName;
+        this.fieldName = fieldName;
         this.type = typeAlias;
-        this.declarations = declarations;
+        this.onPacket = onPacket;
+
+        ArrayList<ArrayDeclaration> toDeclarations = new ArrayList<ArrayDeclaration>();
+        for (WeakField.ArrayDeclaration weakDec : declarations) {
+            toDeclarations.add(new ArrayDeclaration(weakDec.maxSize, weakDec.elementsToTransfer));
+        }
+        this.declarations = toDeclarations.toArray(new ArrayDeclaration[0]);
     }
 
     public void introduceNeighbours(Field[] neighbours) {
@@ -46,15 +54,15 @@ public class Field {
 
         Field[] others = neighbours;
         for (Field other : others) {
-            if (unsolvedReferences.containsKey(other.getVariableName())) { // the value of the field is used
-                ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getVariableName());
+            if (unsolvedReferences.containsKey(other.getFieldName())) { // the value of the field is used
+                ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getFieldName());
                 toIntroduce.setJavaTypeOfTransfer(other.getJType());
             }
         }
     }
 
-    public String getVariableName() {
-        return variableName;
+    public String getFieldName() {
+        return fieldName;
     }
 
     public String getType() {
@@ -96,7 +104,7 @@ public class Field {
     }
 
     public String getNewFromJavaType() throws UndefinedException {
-        return "new " + this.getType() + "(" + this.getVariableName() + "[i]" +
+        return "new " + this.getType() + "(" + this.getFieldName() + "[i]" +
                 (type.getBasicType().isArrayEater() ?
                         ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
@@ -112,7 +120,7 @@ public class Field {
             final ArrayDeclaration element = declarations[i];
             out += validateElementsToTransfer(element);
             if (testArrayLength)
-                out += "(" + this.getVariableName() + arrayLevel + ".length != " + element
+                out += "(" + this.getFieldName() + arrayLevel + ".length != " + element
                         .getSize() + ")" + "||";
             arrayLevel += "[0]";
         }
@@ -127,11 +135,11 @@ public class Field {
             return "";
     }
 
-    private String transferTypeCheck(String packetName) throws UndefinedException {
+    private String transferTypeCheck() throws UndefinedException {
         String out = "";
         for (ArrayDeclaration dec : declarations) {
             if (dec.hasTransfer()) {
-                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(packetName, this.getVariableName());
+                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer();
                 switch (intClassOf(javaTypeOfTransfer)) {
                     case 0:
                         break;
@@ -139,7 +147,7 @@ public class Field {
                         out += "(" + dec.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
                         break;
                     case -1:
-                        throw notSupportedIndex(packetName, getVariableName(), dec);
+                        throw notSupportedIndex(onPacket, getFieldName(), dec);
                 }
             }
         }
@@ -147,7 +155,7 @@ public class Field {
     }
 
     private static UndefinedException notSupportedIndex(String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
-        String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(packetName, fieldName);
+        String javaTypeOfTransfer = dec.getJavaTypeOfTransfer();
         return new UndefinedException(packetName + " uses the field " + dec.getFieldThatHoldsSize() +
                 " of the type " + javaTypeOfTransfer + " as an array index for the field " +
                 fieldName + " but the type " + javaTypeOfTransfer +
@@ -163,8 +171,8 @@ public class Field {
             return -1; // not supported
     }
 
-    public String[] validate(String name, boolean testArrayLength) throws UndefinedException {
-        String transferTypesAreSafe = transferTypeCheck(name);
+    public String[] validate(boolean testArrayLength) throws UndefinedException {
+        String transferTypesAreSafe = transferTypeCheck();
         String sizeChecks = this.getLegalSize(testArrayLength);
 
         ArrayList<String> out = new ArrayList<String>(3);
@@ -175,8 +183,8 @@ public class Field {
 
         if (!"".equals(sizeChecks)) {
             out.add("if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")");
-            out.add("\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
-                        " constructed with value out of scope in packet " + name + "\");");
+            out.add("\t" + "throw new IllegalArgumentException(\"Array " + this.getFieldName() +
+                        " constructed with value out of scope in packet " + onPacket + "\");");
         }
 
         return out.toArray(new String[0]);
@@ -196,7 +204,7 @@ public class Field {
         String replaceWith = "";
         for (int counter = 0; counter < level; counter++) {
             wrappedInFor[counter] = "for(int " + getCounterNumber(counter) + " = 0; " +
-                    getCounterNumber(counter) + " < " + "this." + this.getVariableName() + replaceWith + ".length; " +
+                    getCounterNumber(counter) + " < " + "this." + this.getFieldName() + replaceWith + ".length; " +
                     getCounterNumber(counter) + "++) {";
             wrappedInFor[1 + counter + level] = "}";
             replaceWith += "[" + getCounterNumber(counter) + "]";
@@ -237,7 +245,7 @@ public class Field {
         return reqs;
     }
 
-    public static class ArrayDeclaration {
+    public class ArrayDeclaration {
         private final IntExpression maxSize;
         private final String elementsToTransfer;
 
@@ -254,7 +262,8 @@ public class Field {
 
         public String getElementsToTransfer() throws UndefinedException {
             return (hasTransfer() ?
-                    "this." + elementsToTransfer + ".getValue()" + toInt(elementsToTransferType, "TODO", "TODO", this) :
+                    "this." + elementsToTransfer + ".getValue()" + toInt(elementsToTransferType,
+                                                                         onPacket, fieldName, this) :
                     elementsToTransfer);
         }
 
@@ -276,10 +285,10 @@ public class Field {
             return null != elementsToTransfer;
         }
 
-        private void assumeInitialized(String packetName, String variableName) throws UndefinedException {
+        private void assumeInitialized() throws UndefinedException {
             if (hasTransfer() && null == elementsToTransferType)
-                throw new UndefinedException("Field " + variableName +
-                    " in " + packetName +
+                throw new UndefinedException("Field " + fieldName +
+                    " in " + onPacket +
                     " refers to a field " + getFieldThatHoldsSize() + " that don't exist");
         }
 
@@ -290,32 +299,10 @@ public class Field {
                 throw new UnsupportedOperationException("tried to set the type of an array declaration twice");
         }
 
-        public String getJavaTypeOfTransfer(String packetName, String variableName) throws UndefinedException {
-            assumeInitialized(packetName, variableName);
+        public String getJavaTypeOfTransfer() throws UndefinedException {
+            assumeInitialized();
             return elementsToTransferType;
         }
     }
 
-    public static class WeakField {
-        private final String name, type;
-        private final ArrayDeclaration[] declarations;
-
-        public WeakField(String name, String kind, ArrayDeclaration... declarations) {
-            this.name = name;
-            this.type = kind;
-            this.declarations = declarations;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public ArrayDeclaration[] getDeclarations() {
-            return declarations;
-        }
-    }
 }
