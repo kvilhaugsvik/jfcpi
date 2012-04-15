@@ -125,6 +125,9 @@ public class Field {
                 switch (intClassOf(other.getJType())) {
                     case 0:
                         break;
+                    case 1:
+                        out += "(" + toCheck.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
+                        break;
                     case -1:
                         throw new UndefinedException(packetName + " uses the field " + other.getVariableName() +
                                 " of the type " + other.getJType() + " as an array index for the field " +
@@ -145,6 +148,8 @@ public class Field {
     private static int intClassOf(String javaType) {
         if ("Integer".equals(javaType))
             return 0; // safe to use as int. (Byte, Short and Char aren't currently used in fields)
+        else if ("Long".equals(javaType))
+            return 1; // needs to check that it is small enough to use as int
         else
             return -1; // not supported
     }
