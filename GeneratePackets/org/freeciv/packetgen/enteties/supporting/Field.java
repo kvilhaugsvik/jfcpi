@@ -245,7 +245,7 @@ public class Field {
         return reqs;
     }
 
-    public static class ArrayDeclaration {
+    public class ArrayDeclaration {
         private final IntExpression maxSize;
         private final String elementsToTransfer;
 
