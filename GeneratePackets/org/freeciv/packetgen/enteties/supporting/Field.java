@@ -176,9 +176,9 @@ public class Field {
         }
 
         public String getElementsToTransfer() {
-            return (null == elementsToTransfer ?
-                    elementsToTransfer :
-                    "this." + elementsToTransfer + ".getValue()");
+            return (hasTransfer() ?
+                    "this." + elementsToTransfer + ".getValue()" :
+                    elementsToTransfer);
         }
 
         public Collection<Requirement> getReqs() {
@@ -186,9 +186,13 @@ public class Field {
         }
 
         private String getSize() {
-            return (null == elementsToTransfer ?
-                    getMaxSize() :
-                    getElementsToTransfer());
+            return (hasTransfer() ?
+                    getElementsToTransfer() :
+                    getMaxSize());
+        }
+
+        public boolean hasTransfer() {
+            return null != elementsToTransfer;
         }
     }
 
