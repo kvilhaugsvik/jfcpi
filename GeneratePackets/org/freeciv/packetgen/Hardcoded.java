@@ -115,6 +115,18 @@ public class Hardcoded {
             new TerminatedArray("building_list", "int",
                                 new Requirement("MAX_NUM_BUILDING_LIST", Requirement.Kind.VALUE),
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
+            new FieldTypeBasic("memory", "unsigned char",
+                               "byte[]",
+                               new String[]{
+                                       arrayEaterScopeCheck("arraySize != value.length"),
+                                       "this.value = value;"
+                               },
+                               "byte[] innBuffer = new byte[arraySize];\n" +
+                                       "from.readFully(innBuffer);\n" +
+                                       "value = innBuffer;",
+                               "to.write(" + "value" + ");\n",
+                               "return " + "value" + ".length;",
+                               true, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("bool8", "bool",
                                "Boolean",
                                new String[]{"this.value = value;"},
