@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 
@@ -107,15 +108,64 @@ public class Field {
             return "";
     }
 
-    public String[] validate(String name, boolean testArrayLength) {
-        String sizeChecks = this.getLegalSize(testArrayLength);
-        if ("".equals(sizeChecks))
-            return new String[]{};
+    private String transferTypeCheck(String packetName, Field[] others) throws UndefinedException {
+        HashMap<String, ArrayDeclaration> unsolvedReferences = new HashMap<String, ArrayDeclaration>();
+        for (ArrayDeclaration dec : declarations) {
+            if (dec.hasTransfer()) {
+                unsolvedReferences.put(dec.getFieldThatHoldsSize(), dec);
+            }
+        }
+        if (unsolvedReferences.isEmpty())
+            return "";
+
+        String out = "";
+        for (Field other : others) {
+            if (unsolvedReferences.containsKey(other.getVariableName())) { // the value of the field is used
+                ArrayDeclaration toCheck = unsolvedReferences.remove(other.getVariableName());
+                switch (intClassOf(other.getJType())) {
+                    case 0:
+                        break;
+                    case -1:
+                        throw new UndefinedException(packetName + " uses the field " + other.getVariableName() +
+                                " of the type " + other.getJType() + " as an array index for the field " +
+                                getVariableName() + " but the type " + other.getJType() +
+                                " isn't supported as an array index.");
+                }
+            }
+        }
+
+        if (unsolvedReferences.isEmpty())
+            return out;
         else
-            return new String[]{
-                "if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")",
-                "\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
-                        " constructed with value out of scope in packet " + name + "\");"};
+            throw new UndefinedException("Field " + this.getVariableName() +
+                    " in " + packetName +
+                    " refers to a field " + unsolvedReferences.keySet() + " that don't exist");
+    }
+
+    private static int intClassOf(String javaType) {
+        if ("Integer".equals(javaType))
+            return 0; // safe to use as int. (Byte, Short and Char aren't currently used in fields)
+        else
+            return -1; // not supported
+    }
+
+    public String[] validate(String name, boolean testArrayLength, Field[] others) throws UndefinedException {
+        String transferTypesAreSafe = transferTypeCheck(name, others);
+        String sizeChecks = this.getLegalSize(testArrayLength);
+
+        ArrayList<String> out = new ArrayList<String>(3);
+        if (!"".equals(transferTypesAreSafe))
+            // TODO: make sure it will cause a compile time error or throw an error here
+            out.add("assert " + transferTypesAreSafe + " : " +
+                    "\"Can't prove that index value will stay in the range Java's signed integers can represent.\";");
+
+        if (!"".equals(sizeChecks)) {
+            out.add("if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")");
+            out.add("\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
+                        " constructed with value out of scope in packet " + name + "\");");
+        }
+
+        return out.toArray(new String[0]);
     }
 
     public String[] forElementsInField(String before, String in, String after) {
@@ -179,6 +229,10 @@ public class Field {
             return (hasTransfer() ?
                     "this." + elementsToTransfer + ".getValue()" :
                     elementsToTransfer);
+        }
+
+        public String getFieldThatHoldsSize() {
+            return elementsToTransfer;
         }
 
         public Collection<Requirement> getReqs() {
