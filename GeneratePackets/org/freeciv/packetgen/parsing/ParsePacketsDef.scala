@@ -69,12 +69,12 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
 
   def fieldName = regex(identifierRegEx)
 
-  def fieldVar: Parser[(String, List[Field.ArrayDeclaration])] =
+  def fieldVar: Parser[(String, List[WeakField.ArrayDeclaration])] =
     (fieldName ~ rep("[" ~> arrayFullSize ~ opt(":" ~> fieldName) <~ "]")) ^^ {
       case name ~ dimensions =>
         name -> dimensions.map({
           case maxSize ~ toTransferThisTime =>
-            new Field.ArrayDeclaration(maxSize, toTransferThisTime.getOrElse(null))
+            new WeakField.ArrayDeclaration(maxSize, toTransferThisTime.getOrElse(null))
         })
     }
 

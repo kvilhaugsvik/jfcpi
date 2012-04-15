@@ -636,12 +636,12 @@ class PacketsDefParseTest {
     assertEquals(message, expected(1), actual.getName)
     assertEquals(message, (expected.size - 2) / 2, actual.getDeclarations.size)
 
-    val decs: Array[Field.ArrayDeclaration] = actual.getDeclarations
+    val decs: Array[WeakField.ArrayDeclaration] = actual.getDeclarations
     var decNum = 0
     while (decNum < decs.size) {
       val declaration = decs(decNum)
-      assertEquals(message, expected(2 + decNum * 2), declaration.getMaxSize)
-      assertEquals(message, expected(1 + 2 + decNum * 2), declaration.getElementsToTransfer())
+      assertEquals(message, expected(2 + decNum * 2), declaration.maxSize.evaluate().toString)
+      assertEquals(message, expected(1 + 2 + decNum * 2), declaration.elementsToTransfer)
       decNum += 1
     }
   }
@@ -664,9 +664,9 @@ class PacketsDefParseTest {
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "maxB"), results(0))
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "a"), results(1))
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "b", "7", null), results(2))
-    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "c", "8", "this.maxB.getValue()"), results(3))
+    assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "c", "8", "maxB"), results(3))
     assertWeakFieldIs("Field parsed in wrong format",
-                      Array("UINT8", "d", "7", null, "8", "this.maxB.getValue()"),
+                      Array("UINT8", "d", "7", null, "8", "maxB"),
                       results(4))
   }
 

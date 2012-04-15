@@ -152,7 +152,7 @@ public class PacketsStoreTest {
         PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("STRING", "string", "char");
         WeakField field1 = new WeakField("myNameIs", "STRING",
-                new Field.ArrayDeclaration(IntExpression.integer("50"), null));
+                new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
         storage.registerPacket("PACKET_HELLO", 25, fields);
@@ -172,7 +172,7 @@ public class PacketsStoreTest {
     @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
         WeakField field1 = new WeakField("myNameIs", "STRING",
-                new Field.ArrayDeclaration(IntExpression.integer("50"), null));
+                new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
 

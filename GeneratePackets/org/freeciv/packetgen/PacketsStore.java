@@ -118,9 +118,13 @@ public class PacketsStore {
             allNeeded.add(req);
             if (requirements.isAwareOfPotentialProvider(req) &&
                     requirements.getPotentialProvider(req) instanceof FieldTypeAlias) {
+                LinkedList<Field.ArrayDeclaration> declarations = new LinkedList<Field.ArrayDeclaration>();
+                for (WeakField.ArrayDeclaration weak : fieldType.getDeclarations()) {
+                    declarations.add(new Field.ArrayDeclaration(weak.maxSize, weak.elementsToTransfer));
+                }
                 fieldList.add(new Field(fieldType.getName(),
                                         (FieldTypeAlias)requirements.getPotentialProvider(req),
-                                        fieldType.getDeclarations()));
+                                        declarations.toArray(new Field.ArrayDeclaration[0])));
             } else
                 missingWhenNeeded.add(req);
         }

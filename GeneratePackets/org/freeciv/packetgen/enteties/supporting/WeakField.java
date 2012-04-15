@@ -16,9 +16,9 @@ package org.freeciv.packetgen.enteties.supporting;
 
 public class WeakField {
     private final String name, type;
-    private final Field.ArrayDeclaration[] declarations;
+    private final ArrayDeclaration[] declarations;
 
-    public WeakField(String name, String kind, Field.ArrayDeclaration... declarations) {
+    public WeakField(String name, String kind, ArrayDeclaration... declarations) {
         this.name = name;
         this.type = kind;
         this.declarations = declarations;
@@ -32,7 +32,17 @@ public class WeakField {
         return name;
     }
 
-    public Field.ArrayDeclaration[] getDeclarations() {
+    public ArrayDeclaration[] getDeclarations() {
         return declarations;
+    }
+
+    public static class ArrayDeclaration {
+        public final IntExpression maxSize;
+        public final String elementsToTransfer;
+
+        public ArrayDeclaration(IntExpression maxSize, String elementsToTransfer) {
+            this.maxSize = maxSize;
+            this.elementsToTransfer = elementsToTransfer;
+        }
     }
 }
