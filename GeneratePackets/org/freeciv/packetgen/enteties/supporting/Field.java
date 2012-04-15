@@ -296,26 +296,4 @@ public class Field {
         }
     }
 
-    public static class WeakField {
-        private final String name, type;
-        private final ArrayDeclaration[] declarations;
-
-        public WeakField(String name, String kind, ArrayDeclaration... declarations) {
-            this.name = name;
-            this.type = kind;
-            this.declarations = declarations;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public ArrayDeclaration[] getDeclarations() {
-            return declarations;
-        }
-    }
 }

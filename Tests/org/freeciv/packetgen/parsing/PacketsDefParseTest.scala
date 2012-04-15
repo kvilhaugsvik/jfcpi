@@ -22,7 +22,7 @@ import org.junit.Assert._
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
 import org.freeciv.packetgen.PacketsStore
-import org.freeciv.packetgen.enteties.supporting.Field
+import org.freeciv.packetgen.enteties.supporting.{WeakField, Field}
 
 class PacketsDefParseTest {
   @inline def storePars = {
@@ -631,7 +631,7 @@ class PacketsDefParseTest {
     assertTrue(storedFields.contains("c"))
   }
 
-  private def assertWeakFieldIs(message: String, expected: Array[String], actual: Field.WeakField) {
+  private def assertWeakFieldIs(message: String, expected: Array[String], actual: WeakField) {
     assertEquals(message, expected(0), actual.getType)
     assertEquals(message, expected(1), actual.getName)
     assertEquals(message, (expected.size - 2) / 2, actual.getDeclarations.size)
@@ -656,7 +656,7 @@ class PacketsDefParseTest {
     val result = parser.parseAll(parser.fieldList, manyFieldsInOneDefineSomeWithArrayDeclarations)
     assertTrue(result.toString, result.successful)
 
-    val results: List[Field.WeakField] = result.get
+    val results: List[WeakField] = result.get
 
     storage.registerTypeAlias("UINT8", "uint8", "int") // TODO: Kill with fire in a refactoring
     storage.registerPacket("JUST_FOR_SIDE_EFFECTS", 42, results) // TODO: Kill with fire in a refactoring
