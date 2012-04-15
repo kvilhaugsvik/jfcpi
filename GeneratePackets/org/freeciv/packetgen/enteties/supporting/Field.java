@@ -130,11 +130,11 @@ public class Field {
             return "";
     }
 
-    private String transferTypeCheck(String packetName) throws UndefinedException {
+    private String transferTypeCheck() throws UndefinedException {
         String out = "";
         for (ArrayDeclaration dec : declarations) {
             if (dec.hasTransfer()) {
-                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(packetName, this.getVariableName());
+                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer(onPacket, this.getVariableName());
                 switch (intClassOf(javaTypeOfTransfer)) {
                     case 0:
                         break;
@@ -142,7 +142,7 @@ public class Field {
                         out += "(" + dec.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
                         break;
                     case -1:
-                        throw notSupportedIndex(packetName, getVariableName(), dec);
+                        throw notSupportedIndex(onPacket, getVariableName(), dec);
                 }
             }
         }
@@ -166,8 +166,8 @@ public class Field {
             return -1; // not supported
     }
 
-    public String[] validate(String name, boolean testArrayLength) throws UndefinedException {
-        String transferTypesAreSafe = transferTypeCheck(name);
+    public String[] validate(boolean testArrayLength) throws UndefinedException {
+        String transferTypesAreSafe = transferTypeCheck();
         String sizeChecks = this.getLegalSize(testArrayLength);
 
         ArrayList<String> out = new ArrayList<String>(3);
@@ -179,7 +179,7 @@ public class Field {
         if (!"".equals(sizeChecks)) {
             out.add("if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")");
             out.add("\t" + "throw new IllegalArgumentException(\"Array " + this.getVariableName() +
-                        " constructed with value out of scope in packet " + name + "\");");
+                        " constructed with value out of scope in packet " + onPacket + "\");");
         }
 
         return out.toArray(new String[0]);
