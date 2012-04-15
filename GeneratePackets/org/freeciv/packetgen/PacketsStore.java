@@ -124,6 +124,7 @@ public class PacketsStore {
                 }
                 fieldList.add(new Field(fieldType.getName(),
                                         (FieldTypeAlias)requirements.getPotentialProvider(req),
+                                        name,
                                         declarations.toArray(new Field.ArrayDeclaration[0])));
             } else
                 missingWhenNeeded.add(req);

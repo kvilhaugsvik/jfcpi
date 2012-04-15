@@ -21,17 +21,20 @@ import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import java.util.*;
 
 public class Field {
+    private final String onPacket;
     private final String variableName;
     private final FieldTypeBasic.FieldTypeAlias type;
     private final ArrayDeclaration[] declarations;
 
-    public Field(String variableName, FieldTypeBasic.FieldTypeAlias typeAlias, ArrayDeclaration... declarations) {
+    public Field(String variableName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
+                 ArrayDeclaration... declarations) {
         if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
             throw new IllegalArgumentException("Array eaters needs array declarations");
 
         this.variableName = variableName;
         this.type = typeAlias;
         this.declarations = declarations;
+        this.onPacket = onPacket;
     }
 
     public void introduceNeighbours(Field[] neighbours) {
