@@ -20,7 +20,7 @@ import org.freeciv.packetgen.enteties.BitVector;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.TargetPackage;
 
 import java.util.*;
 
@@ -158,7 +158,7 @@ public class Hardcoded {
         // TODO: autoconvert the enums
         // TODO: when given the location of the tables convert table items as well
         SpecialClass handRolledUniversal =
-                new SpecialClass(new ClassWriter.TargetPackage(org.freeciv.types.FCEnum.class.getPackage()),
+                new SpecialClass(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()),
                 "Freeciv source interpreted by hand", "universal",
                 new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE),
                 Collections.<Requirement>emptySet());

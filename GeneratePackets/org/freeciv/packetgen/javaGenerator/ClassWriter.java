@@ -14,8 +14,6 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.TypedValueCode;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -527,17 +525,4 @@ public class ClassWriter {
         }
     }
 
-    public static class TargetPackage extends TypedValueCode {
-        public TargetPackage(String wrapped) {
-            super(wrapped);
-        }
-
-        @Override public String toString() {
-            return getJavaCode();
-        }
-
-        public TargetPackage(Package wrapped) {
-            super(wrapped.getName());
-        }
-    }
 }
