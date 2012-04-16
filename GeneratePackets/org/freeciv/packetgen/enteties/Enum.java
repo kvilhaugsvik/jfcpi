@@ -19,11 +19,12 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.TargetPackage;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
 
-public class Enum extends ClassWriter implements IDependency.ManyFulfiller, FieldTypeBasic.Generator {
+public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final boolean bitwise;
     private final Collection<Requirement> iRequire;
     private final EnumElementFC invalidDefault;
@@ -162,20 +163,14 @@ public class Enum extends ClassWriter implements IDependency.ManyFulfiller, Fiel
 
     @Override
     public Requirement getIFulfillReq() {
-        return new Requirement(super.getName(), Requirement.Kind.ENUM);
-    }
-
-    @Override
-    public Collection<Requirement> getIAlsoFulfillReqs() {
-        return Arrays
-                .<Requirement>asList(new Requirement("enum " + super.getName(), Requirement.Kind.AS_JAVA_DATATYPE));
+        return new Requirement("enum " + super.getName(), Requirement.Kind.AS_JAVA_DATATYPE);
     }
 
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
         String named = this.getName();
         HashSet<Requirement> req = new HashSet<Requirement>();
-        req.add(new Requirement(named, Requirement.Kind.ENUM));
+        req.add(new Requirement("enum " + named, Requirement.Kind.AS_JAVA_DATATYPE));
         return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named,
                                   named,
                                   new String[]{"this.value = value;"},

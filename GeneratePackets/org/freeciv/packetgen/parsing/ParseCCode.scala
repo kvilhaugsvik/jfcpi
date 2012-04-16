@@ -31,7 +31,6 @@ class ParseCCode extends ParseShared {
   def enumElemCode = identifierRegEx
 
   private final val DEFINE: String = "#define"
-  private final val ENDDEFINE = """(\n|\r|\z)""".r //TODO: Don't match backslash newline
   private final val SPECENUM: String = "SPECENUM_"
   private final val NAME: String = "NAME"
 
@@ -57,7 +56,7 @@ class ParseCCode extends ParseShared {
   )
 
   def defineLine[Ret](start: String, followedBy: Parser[Ret]): Parser[Ret] = {
-    val me = followedBy <~ ENDDEFINE
+    val me = followedBy <~ """(\n|\r|\z)""".r
     new Parser[Ret] {
       def apply(in: ParseCCode.this.type#Input): ParseResult[Ret] = {
         // Save old state

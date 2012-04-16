@@ -19,6 +19,7 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.Field;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.TargetPackage;
 
 import java.util.*;
 
@@ -59,9 +60,9 @@ public class Packet extends ClassWriter implements IDependency {
             addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getFieldName());
         }
 
-        addConstructorFromFields(name, fields);
+        addConstructorFromFields(fields);
 
-        addConstructorFromJavaTypes(name, fields);
+        addConstructorFromJavaTypes(fields);
 
         addConstructorFromDataInput(name, fields);
 
@@ -82,7 +83,7 @@ public class Packet extends ClassWriter implements IDependency {
         }
     }
 
-    private void addConstructorFromFields(String name, Field[] fields) throws UndefinedException {
+    private void addConstructorFromFields(Field[] fields) throws UndefinedException {
         LinkedList<String> constructorBody = new LinkedList<String>();
         LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
         for (Field field : fields) {
@@ -95,7 +96,7 @@ public class Packet extends ClassWriter implements IDependency {
         addConstructorPublic(null, createParameterList(params), constructorBody.toArray(new String[0]));
     }
 
-    private void addConstructorFromJavaTypes(String name, Field[] fields) throws UndefinedException {
+    private void addConstructorFromJavaTypes(Field[] fields) throws UndefinedException {
         if (0 < fields.length) {
             LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
             LinkedList<String> constructorBodyJ = new LinkedList<String>();

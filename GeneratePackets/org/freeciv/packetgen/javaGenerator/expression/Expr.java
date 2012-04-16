@@ -12,16 +12,19 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.javaGenerator.expression;
 
-public abstract class Wrapped<Type> {
-    private final Type content;
+/**
+ * An expression that returns a value represented by Returns
+ * @param <Returns> The kind of value it returns
+ */
+public interface Expr<Returns extends TypedValueCode> {
+    /**
+     * Source code for an expression that will return a value of the type represented by Returns
+     * @return The source code
+     */
+    public Returns getCodeFor();
 
-    protected Wrapped(Type wrapped) {
-        this.content = wrapped;
-    }
-
-    public Type get() {
-        return content;
-    }
+    @Override
+    public abstract String toString();
 }

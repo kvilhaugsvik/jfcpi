@@ -20,13 +20,13 @@ import org.freeciv.packetgen.enteties.BitVector;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.TargetPackage;
 
 import java.util.*;
 
 //TODO: Move data to file
 public class Hardcoded {
-    private static final Collection<FieldTypeBasic> primitiveFieldTypes = Arrays.asList(
+    private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
             new FieldTypeBasic("uint32", "int",
                                "Long",
                                new String[]{"this.value = value;"},
@@ -133,19 +133,22 @@ public class Hardcoded {
                                "value = from.readBoolean();",
                                "to.writeBoolean(value);",
                                "return 1;",
-                               false, Collections.<Requirement>emptySet())
-    );
+                               false, Collections.<Requirement>emptySet()),
 
-    public static final Collection<NetworkIO> netCon = Arrays.asList(
+            /************************************************************************************************
+             * Read from and write to the network
+             ************************************************************************************************/
             NetworkIO.withBytesAsIntermediate("bitvector"),
             NetworkIO.witIntAsIntermediate("uint8", "1", "from.readUnsignedByte()", "to.writeByte"),
             // to.writeByte wraps around so -128 shares encoding with 128
             NetworkIO.witIntAsIntermediate("sint8", "1", "(int) from.readByte()", "to.writeByte"),
             NetworkIO.witIntAsIntermediate("uint16", "2", "(int) from.readChar()", "to.writeChar"),
             NetworkIO.witIntAsIntermediate("sint16", "2", "(int) from.readShort()", "to.writeShort"),
-            NetworkIO.witIntAsIntermediate("sint32", "4", "from.readInt()", "to.writeInt"));
+            NetworkIO.witIntAsIntermediate("sint32", "4", "from.readInt()", "to.writeInt"),
 
-    private static final Collection<IDependency> nativeJava = Arrays.asList(
+            /************************************************************************************************
+             * Built in types
+             ************************************************************************************************/
             (IDependency)(new SimpleTypeAlias("int", "Integer", Collections.<Requirement>emptySet()))
     );
 
@@ -158,7 +161,7 @@ public class Hardcoded {
         // TODO: autoconvert the enums
         // TODO: when given the location of the tables convert table items as well
         SpecialClass handRolledUniversal =
-                new SpecialClass(new ClassWriter.TargetPackage(org.freeciv.types.FCEnum.class.getPackage()),
+                new SpecialClass(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()),
                 "Freeciv source interpreted by hand", "universal",
                 new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE),
                 Collections.<Requirement>emptySet());
@@ -169,9 +172,7 @@ public class Hardcoded {
     }
 
     public static Collection<IDependency> values() {
-        HashSet<IDependency> out = new HashSet<IDependency>(primitiveFieldTypes);
-        out.addAll(netCon);
-        out.addAll(nativeJava);
+        HashSet<IDependency> out = new HashSet<IDependency>(hardCodedElements);
         BitVector bitString = new BitVector();
         out.add(bitString);
         out.add(bitString.getBasicFieldTypeOnInput(

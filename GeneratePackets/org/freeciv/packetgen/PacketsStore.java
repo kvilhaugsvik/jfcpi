@@ -20,6 +20,7 @@ import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.TargetPackage;
 
 import java.util.*;
 
@@ -165,7 +166,7 @@ public class PacketsStore {
         if (out.size() < inn.size()) {
             int border = GeneratorDefaults.CONSTANT_LOCATION.lastIndexOf('.');
             ClassWriter constants =
-                    new ClassWriter(ClassWriter.ClassKind.CLASS, new ClassWriter.TargetPackage(
+                    new ClassWriter(ClassWriter.ClassKind.CLASS, new TargetPackage(
                             GeneratorDefaults.CONSTANT_LOCATION.substring(0, border)), new String[0],
                                     "Freeciv C code", GeneratorDefaults.CONSTANT_LOCATION.substring(border + 1),
                                     null, null);
