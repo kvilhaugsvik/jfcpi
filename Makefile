@@ -90,7 +90,7 @@ compileTestsOfGenerator: folderTestOut compileCodeGenerator
 	touch compileTestsOfGenerator
 
 runTestsOfGenerator: compileTestsOfGenerator
-	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.PacketsStoreTest
+	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
 	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.javaGenerator.CodeGenTest
 	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.EnumTest
 	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.DependencyStoreTest

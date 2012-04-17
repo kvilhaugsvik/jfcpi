@@ -1,5 +1,3 @@
-package org.freeciv.packetgen.parsing;
-
 /*
  * Copyright (c) 2011, 2012. Sveinung Kvilhaugsvik
  *
@@ -13,6 +11,8 @@ package org.freeciv.packetgen.parsing;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+
+package org.freeciv.packetgen;
 
 import org.freeciv.packetgen.*;
 import org.freeciv.packetgen.dependency.Requirement;
