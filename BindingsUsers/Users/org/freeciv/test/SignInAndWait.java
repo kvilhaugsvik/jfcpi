@@ -32,9 +32,10 @@ public class SignInAndWait {
 
             con.toSend(new PACKET_CONN_PONG());
 
-            System.out.println(con.getPacket());
-
-            Thread.sleep(10000L);
+            while(true) {
+                System.out.println(con.getPacket());
+                Thread.sleep(1000L);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
