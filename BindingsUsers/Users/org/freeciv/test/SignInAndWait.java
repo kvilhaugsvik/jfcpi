@@ -15,8 +15,8 @@
 package org.freeciv.test;
 
 import org.freeciv.Connect;
-import org.freeciv.packet.CONN_PONG;
-import org.freeciv.packet.SERVER_JOIN_REQ;
+import org.freeciv.packet.PACKET_CONN_PONG;
+import org.freeciv.packet.PACKET_SERVER_JOIN_REQ;
 
 import java.io.IOException;
 
@@ -26,15 +26,16 @@ public class SignInAndWait {
         try {
             Connect con = new Connect("127.0.0.1", 5556);
 
-            con.toSend(new SERVER_JOIN_REQ("FreecivJava", "+Freeciv.Devel-2.4-2011.Aug.02 ", "-dev", 2L, 3L, 99L));
+            con.toSend(new PACKET_SERVER_JOIN_REQ("FreecivJava", "+Freeciv.Devel-2.5-2012.Mar.20 ", "-dev", 2L, 4L, 99L));
 
             System.out.println(con.getPacket());
 
-            con.toSend(new CONN_PONG());
+            con.toSend(new PACKET_CONN_PONG());
 
-            System.out.println(con.getPacket());
-
-            Thread.sleep(10000L);
+            while(true) {
+                System.out.println(con.getPacket());
+                Thread.sleep(1000L);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
