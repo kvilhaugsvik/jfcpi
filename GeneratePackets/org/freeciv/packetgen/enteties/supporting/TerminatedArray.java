@@ -29,7 +29,7 @@ public class TerminatedArray extends FieldTypeBasic {
                       "break;" + "\n" +
                       "}" + "\n" +
                       "}" + "\n" +
-                      "value = java.util.Arrays.copyOf(buffer, pos - 1);",
+                      "value = java.util.Arrays.copyOf(buffer, pos);",
               "to.write(value);\n" +
                       "if (value.length < " + Constant.referToInJavaCode(maxSizeConstant) + ") {" + "\n" +
                       "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
