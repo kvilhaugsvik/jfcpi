@@ -200,7 +200,7 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields)
             if (field.hasDeclarations())
                 getToString.addAll(Arrays.asList(field.forElementsInField(
-                        "out += \"\\n\\t" + field.getFieldName() + " += (\\n\";",
+                        "out += \"\\n\\t" + field.getFieldName() + " = (\\n\";",
                         "out += " + "\"\\t\\t\" + " + "this." + field.getFieldName() + "[i].getValue() + \"\\n\";",
                         "out += \"\\t)\";")));
             else
