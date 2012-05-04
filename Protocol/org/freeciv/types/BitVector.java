@@ -76,6 +76,21 @@ public abstract class BitVector {
 
     @Override
     public String toString() {
-        return vec.toString();
+        if (0 == vec.length)
+            return "()";
+
+        StringBuilder build = new StringBuilder("(");
+        build.append(boolToStr(vec[0]));
+        for (int index = 1; index < vec.length; index++) {
+            build.append(", ");
+            build.append(boolToStr(vec[index]));
+        }
+        build.append(")");
+
+        return build.toString();
+    }
+
+    private static String boolToStr(boolean toConvert) {
+        return (toConvert ? "1" : "0");
     }
 }
