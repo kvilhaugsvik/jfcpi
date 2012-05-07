@@ -14,6 +14,8 @@
 
 package org.freeciv.types;
 
+import static org.freeciv.Util.*;
+
 import java.util.Arrays;
 
 public abstract class BitVector {
@@ -76,18 +78,12 @@ public abstract class BitVector {
 
     @Override
     public String toString() {
-        if (0 == vec.length)
-            return "()";
-
-        StringBuilder build = new StringBuilder("(");
-        build.append(boolToStr(vec[0]));
-        for (int index = 1; index < vec.length; index++) {
-            build.append(", ");
-            build.append(boolToStr(vec[index]));
+        String[] vecAsText = new String[vec.length];
+        for (int index = 0; index < vec.length; index++) {
+            vecAsText[index] = boolToStr(vec[index]);
         }
-        build.append(")");
 
-        return build.toString();
+        return joinStringArray(vecAsText, ", ");
     }
 
     private static String boolToStr(boolean toConvert) {
