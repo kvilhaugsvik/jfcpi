@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.Expr;
+import org.freeciv.packetgen.javaGenerator.expression.TypedValueCode;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -350,14 +350,14 @@ public class ClassWriter {
         }
 
         public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
-                      String exceptionList, Expr... body) {
+                      String exceptionList, TypedValueCode... body) {
             this(comment, visibility, scope, type, name, paramList, exceptionList, exprsToString(body));
         }
 
-        private static String[] exprsToString(Expr[] inn) {
+        private static String[] exprsToString(TypedValueCode[] inn) {
             String[] raw = new String[inn.length];
             for (int i = 0; i < inn.length; i++) {
-                raw[i] = inn[i].getCodeFor().getJavaCode();
+                raw[i] = inn[i].getJavaCode();
             }
             return raw;
         }
