@@ -18,5 +18,10 @@ package org.freeciv.packetgen.javaGenerator.expression;
  * An expression that returns a value of type Returns without needing any other values
  * @param <Returns> The value the expression returns
  */
-public abstract class Expr0<Returns extends TypedValueCode> implements Expr<Returns> {
+public interface Expr0<Returns extends TypedValueCode> extends Expr<Returns> {
+    /**
+     * Source code for an expression that will return a value of the type represented by Returns
+     * @return The source code
+     */
+    public abstract Returns getCodeFor();
 }

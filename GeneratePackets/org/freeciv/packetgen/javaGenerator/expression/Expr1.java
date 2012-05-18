@@ -19,6 +19,11 @@ package org.freeciv.packetgen.javaGenerator.expression;
  * @param <Returns>
  * @param <Argument1>
  */
-public abstract class Expr1<Returns extends TypedValueCode, Argument1 extends TypedValueCode> implements Expr<Returns> {
-    public abstract Argument1 getArgument1();
+public interface Expr1<Returns extends TypedValueCode, Argument1 extends TypedValueCode> extends Expr<Returns> {
+    /**
+     * Source code for an expression that will return a value of the type represented by Returns
+     * @param arg1 the argument taken
+     * @return The source code
+     */
+    public abstract Returns getCodeFor(Argument1 arg1);
 }
