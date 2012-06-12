@@ -168,6 +168,8 @@ public class Hardcoded {
         handRolledUniversal.addPublicObjectConstant("universals_n", "kind");
         handRolledUniversal.addPublicObjectConstant("int", "value");
         handRolledUniversal.addConstructorFields();
+        handRolledUniversal.addMethodPublicReadObjectState(null, "String", "toString",
+                "return \"(\" + kind + \":\" + value + \")\";");
         toStorage.addDependency(handRolledUniversal);
     }
 
