@@ -19,6 +19,7 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.expression.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -30,13 +31,14 @@ public class FieldTypeBasic implements IDependency {
     private final String[] fromJavaType;
     private final String[] decode;
     private final String[] encode, encodedSize;
+    private final OneAnyToString value2String;
     private final boolean arrayEater;
 
     private final Collection<Requirement> requirement;
     private final FieldTypeBasic basicType = this;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
-                          String decode, String encode, String encodedSize,
+                          String decode, String encode, String encodedSize, OneAnyToString toString,
                           boolean arrayEater, Collection<Requirement> needs) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
@@ -45,9 +47,23 @@ public class FieldTypeBasic implements IDependency {
         this.encode = encode.split("\n");
         this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;
+        this.value2String = toString;
         this.fromJavaType = fromJavaType;
 
         requirement = needs;
+    }
+
+    public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
+                          String decode, String encode, String encodedSize,
+                          boolean arrayEater, Collection<Requirement> needs) {
+        this(dataIOType, publicType, javaType, fromJavaType, decode, encode, encodedSize,
+                new OneAnyToString() {
+                    @Override
+                    public StringTyped getCodeFor(TypedValueCode arg1) {
+                        return new StringTyped(arg1.getJavaCode() + ".toString()");
+                    }
+                },
+                arrayEater, needs);
     }
 
     public String getFieldTypeBasic() {
@@ -99,7 +115,8 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
             addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
             addMethodPublicReadObjectState(null, javaType, "getValue", "return value;");
-            addMethodPublicReadObjectState(null, "String", "toString", "return value.toString();");
+            addMethodPublicReadObjectState(null, "String", "toString",
+                    "return " + value2String.getCodeFor(new StringTyped("value")).toString() + ";");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
                       "if (other instanceof " + name + ") {",
                       "return this.value == ((" + name + ")other).getValue();",
