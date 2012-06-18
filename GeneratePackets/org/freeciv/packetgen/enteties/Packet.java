@@ -201,11 +201,11 @@ public class Packet extends ClassWriter implements IDependency {
             if (field.hasDeclarations())
                 getToString.addAll(Arrays.asList(field.forElementsInField(
                         "out += \"\\n\\t" + field.getFieldName() + " = (\\n\";",
-                        "out += " + "\"\\t\\t\" + " + "this." + field.getFieldName() + "[i].getValue() + \"\\n\";",
+                        "out += " + "\"\\t\\t\" + " + "this." + field.getFieldName() + "[i].toString() + \"\\n\";",
                         "out += \"\\t)\";")));
             else
                 getToString.add("out += \"\\n\\t" + field.getFieldName() +
-                                        " = \" + " + "this." + field.getFieldName() + ".getValue();");
+                                        " = \" + " + "this." + field.getFieldName() + ".toString();");
         getToString.add("");
         getToString.add("return out + \"\\n\";");
         addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));

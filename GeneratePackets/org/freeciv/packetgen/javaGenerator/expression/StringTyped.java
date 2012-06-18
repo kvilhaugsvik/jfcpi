@@ -14,14 +14,18 @@
 
 package org.freeciv.packetgen.javaGenerator.expression;
 
-/**
- * An expression that returns a value of type Returns without needing any other values
- * @param <Returns> The value the expression returns
- */
-public interface Expr0<Returns extends TypedValueCode> extends Expr<Returns> {
+public class StringTyped extends TypedValueCode {
     /**
-     * Source code for an expression that will return a value of the type represented by Returns
-     * @return The source code
+     * Constructor that forces the expression to be ready at initialization
+     *
+     * @param javaCode
      */
-    public abstract Returns getCodeFor();
+    public StringTyped(String javaCode) {
+        super(javaCode);
+    }
+
+    @Override
+    public String toString() {
+        return super.getJavaCode();
+    }
 }
