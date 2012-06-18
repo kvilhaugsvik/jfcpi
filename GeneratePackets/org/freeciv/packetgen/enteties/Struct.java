@@ -39,6 +39,13 @@ public class Struct extends ClassWriter implements IDependency {
                     "return " + field.getValue() + ";");
         }
 
+        String[] varNames = new String[fields.size()];
+        for (int index = 0; index < fields.size(); index++) {
+            varNames[index] = "\"" + fields.get(index).getValue() + ": \"" + " + " + fields.get(index).getValue();
+        }
+        addMethodPublicReadObjectState(null, "String", "toString",
+                "return \"(\" + " + org.freeciv.Util.joinStringArray(varNames, " + \", \" + ") + " + \")\";");
+
         iRequire = willNeed;
         iProvide = new Requirement("struct" + " " + name, Requirement.Kind.AS_JAVA_DATATYPE);
     }
