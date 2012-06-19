@@ -147,6 +147,8 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       case "int" :: Nil => 16 // at least 16 bits. Assume 32 bits
       case "long" :: "int" :: Nil => 31 // at least 32 bits
       case "long" :: "long" :: "int" :: Nil => 64 // at least 64 bits
+      case _ => throw new Exception("Could not normalize. Is " +
+        normalizedInt.reduce(_ + " " + _) + " a valid C integer?");
     }
 
     def isIntIsh(cTypeDecs: List[String]): Boolean =
@@ -170,6 +172,8 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       case "enum" :: name :: Nil => (name, needAsJava("enum" + " " + name))
       case "struct" :: name :: Nil => (name, needAsJava("struct" + " " + name))
       case "union" :: name :: Nil => (name, needAsJava("union" + " " + name))
+
+      case _ => throw new Exception("Could not find a Java type for (alleged) C type " + cTypeDecs.reduce(_ + " " + _))
     }
   }
 
