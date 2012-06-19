@@ -101,7 +101,11 @@ public class Hardcoded {
                                        "buf.append((char)letter);" + "\n" +
                                        "letter = from.readByte();" + "\n" +
                                        "}" + "\n" +
-                                       "value = buf.toString();",
+                                       "if (buf.length() == 0) {" + "\n" +
+                                       "value = \"\";" + "\n" +
+                                       "} else {" + "\n" +
+                                       "value = buf.toString();" + "\n"
+                                       + "}",
                                "to.writeBytes(" + "value" + ");\n" +
                                        "to.writeByte(0);",
                                "return " + "value" + ".length() + 1;",
