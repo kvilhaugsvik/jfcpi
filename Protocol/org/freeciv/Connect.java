@@ -18,11 +18,7 @@ import org.freeciv.packet.Packet;
 import org.freeciv.packet.RawPacket;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.net.URL;
-import java.util.HashMap;
 
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
@@ -34,7 +30,7 @@ public class Connect {
     private final OutputStream out;
     private final DataInputStream in;
     private final Socket server;
-    private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
+    private final PacketsMapping interpreter;
 
     public Connect(String address, int port) throws IOException {
         this(address, port, true);
@@ -48,53 +44,16 @@ public class Connect {
 
         out = server.getOutputStream();
 
-        loadPacketClasses();
-    }
-
-    private void loadPacketClasses() throws IOException {
-        URL packetList = this.getClass().getResource(packetsList);
-        if (null == packetList) {
-            throw new IOException("No packet list found");
-        }
-
-        BufferedReader packets = new BufferedReader(new InputStreamReader(packetList.openStream()));
-        String packetMetaData;
-        while(null != (packetMetaData = packets.readLine())) {
-            try {
-                String[] packet = packetMetaData.split("\t");
-                this.packetMakers.put(Integer.parseInt(packet[0]),
-                        Class.forName(packet[1].trim()).getConstructor(DataInput.class, Integer.TYPE, Integer.TYPE));
-            } catch (ClassNotFoundException e) {
-                throw new IOException("List of packets claims that " +
-                        packetMetaData + " is generated but it was not found.");
-            } catch (NoSuchMethodException e) {
-                throw new IOException(packetMetaData + " is not compatible.\n" +
-                        "(No constructor from DataInput, int, int found)");
-            }
-        }
-        packets.close();
+        interpreter = new PacketsMapping();
     }
 
     public Packet getPacket() throws IOException {
         int size = in.readChar();
         int kind = hasTwoBytePacketNumber ? in.readUnsignedShort() : in.readUnsignedByte();
-        if (packetMakers.containsKey(kind)) {
-            try {
-                return (Packet)packetMakers.get(kind).newInstance(in, size, kind);
-            } catch (InstantiationException e) {
-                throw packetReadingError(kind, e);
-            } catch (IllegalAccessException e) {
-                throw packetReadingError(kind, e);
-            } catch (InvocationTargetException e) {
-                throw packetReadingError(kind, e);
-            }
-        } else {
+        if (interpreter.canInterpret(kind))
+            return interpreter.interpret(kind, size, in, hasTwoBytePacketNumber);
+        else
             return new RawPacket(in, size, kind, hasTwoBytePacketNumber);
-        }
-    }
-
-    private static IOException packetReadingError(int kind, Exception exception) {
-        return new IOException("Internal error while trying to read packet numbered " + kind + " from network", exception);
     }
 
     public void toSend(Packet toSend) throws IOException {
