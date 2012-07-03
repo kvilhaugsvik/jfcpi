@@ -51,7 +51,7 @@ public class Connect {
         int size = in.readChar();
         int kind = hasTwoBytePacketNumber ? in.readUnsignedShort() : in.readUnsignedByte();
         if (interpreter.canInterpret(kind))
-            return interpreter.interpret(kind, size, in, hasTwoBytePacketNumber);
+            return interpreter.interpret(kind, size, in);
         else
             return new RawPacket(in, size, kind, hasTwoBytePacketNumber);
     }

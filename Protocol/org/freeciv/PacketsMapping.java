@@ -51,7 +51,7 @@ public class PacketsMapping {
         packets.close();
     }
 
-    public Packet interpret(int kind, int size, DataInputStream in, boolean hasTwoBytePacketNumber) throws IOException {
+    public Packet interpret(int kind, int size, DataInputStream in) throws IOException {
         try {
             return (Packet)packetMakers.get(kind).newInstance(in, size, kind);
         } catch (InstantiationException e) {
