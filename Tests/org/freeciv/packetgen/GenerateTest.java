@@ -174,12 +174,6 @@ public class GenerateTest {
                 new Field("theArray", string, "StringArray",
                           new WeakField.ArrayDeclaration(IntExpression.integer("3"), null),
                         new WeakField.ArrayDeclaration(IntExpression.integer("10"), null))), targetFolder);
-
-        FileWriter packetList = new FileWriter(targetFolder + Connect.packetsList);
-        for (String packet: writtenPackets) {
-            packetList.write(packet + "\n");
-        }
-        packetList.close();
     }
 
     private static FieldTypeBasic.FieldTypeAlias getPrimitiveFieldType(HashMap<String, FieldTypeBasic> primitiveTypes,

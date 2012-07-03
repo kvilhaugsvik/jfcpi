@@ -74,7 +74,6 @@ sourceTestPeers: compileBasicProtocol compileCodeGenerator
 
 compileTestPeers: compileCodeGenerator compileBasicProtocol sourceTestPeers
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find ${GENERATED_TEST_SOURCE_FOLDER} -iname "*.java"`
-	cp ${GENERATED_TEST_SOURCE_FOLDER}/org/freeciv/packet/packets.txt ${COMPILED_TESTS_FOLDER}/org/freeciv/packet/
 	touch compileTestPeers
 
 protojar: compileFromFreeciv
