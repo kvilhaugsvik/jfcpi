@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 public class PacketsMapping {
     private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
+    private final int packetNumberBytes;
 
     public PacketsMapping() throws IOException {
         URL packetList = this.getClass().getResource(Connect.packetsList);
@@ -32,7 +33,8 @@ public class PacketsMapping {
         }
 
         BufferedReader packets = new BufferedReader(new InputStreamReader(packetList.openStream()));
-        String packetMetaData;
+        String packetMetaData = packets.readLine();
+        packetNumberBytes = Integer.parseInt(packetMetaData.split("//|\\s")[0]);
         while(null != (packetMetaData = packets.readLine())) {
             try {
                 String[] packet = packetMetaData.split("\t");
@@ -67,5 +69,9 @@ public class PacketsMapping {
 
     public boolean canInterpret(int kind) {
         return packetMakers.containsKey(kind);
+    }
+
+    public int getLenOfPacketNumber() {
+        return packetNumberBytes;
     }
 }
