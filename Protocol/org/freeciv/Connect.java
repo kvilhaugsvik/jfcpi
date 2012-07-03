@@ -26,18 +26,12 @@ public class Connect {
     public static final String packetsList =
             "/" + Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt";
 
-    private final boolean hasTwoBytePacketNumber;
     private final OutputStream out;
     private final DataInputStream in;
     private final Socket server;
     private final PacketsMapping interpreter;
 
     public Connect(String address, int port) throws IOException {
-        this(address, port, true);
-    }
-
-    public Connect(String address, int port, boolean hasTwoBytePacketNumber) throws IOException {
-        this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
 
         server = new Socket(address, port);
         in = new DataInputStream(server.getInputStream());
@@ -49,11 +43,21 @@ public class Connect {
 
     public Packet getPacket() throws IOException {
         int size = in.readChar();
-        int kind = hasTwoBytePacketNumber ? in.readUnsignedShort() : in.readUnsignedByte();
+        int kind;
+        switch (interpreter.getLenOfPacketNumber()) {
+            case 1:
+                kind = in.readUnsignedShort();
+                break;
+            case 2:
+                kind = in.readUnsignedByte();
+                break;
+            default:
+                throw new IllegalArgumentException("The packet number in the header can only be 1 or 2 bytes long.");
+        }
         if (interpreter.canInterpret(kind))
             return interpreter.interpret(kind, size, in);
         else
-            return new RawPacket(in, size, kind, hasTwoBytePacketNumber);
+            return new RawPacket(in, size, kind, 2 == interpreter.getLenOfPacketNumber());
     }
 
     public void toSend(Packet toSend) throws IOException {
