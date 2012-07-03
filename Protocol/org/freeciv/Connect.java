@@ -23,9 +23,6 @@ import java.net.Socket;
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
 public class Connect {
-    public static final String packetsList =
-            "/" + Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt";
-
     private final OutputStream out;
     private final DataInputStream in;
     private final Socket server;

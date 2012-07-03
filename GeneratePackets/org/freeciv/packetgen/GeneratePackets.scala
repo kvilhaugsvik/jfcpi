@@ -18,7 +18,7 @@ import parsing.{ParsePacketsDef, FromCExtractor}
 import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
-import org.freeciv.Connect
+import org.freeciv.PacketsMapping
 import xml.XML
 
 class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
@@ -70,7 +70,7 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
       classWriter.close()
     })
 
-    val manifest = new File(path + Connect.packetsList)
+    val manifest = new File(path + PacketsMapping.packetsList)
     manifest.createNewFile
     val manifestWriter = new FileWriter(manifest)
     manifestWriter.write(storage.getPacketList)

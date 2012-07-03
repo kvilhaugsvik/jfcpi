@@ -23,11 +23,14 @@ import java.net.URL;
 import java.util.HashMap;
 
 public class PacketsMapping {
+    public static final String packetsList =
+            "/" + Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt";
+
     private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
     private final int packetNumberBytes;
 
     public PacketsMapping() throws IOException {
-        URL packetList = this.getClass().getResource(Connect.packetsList);
+        URL packetList = this.getClass().getResource(packetsList);
         if (null == packetList) {
             throw new IOException("No packet list found");
         }
