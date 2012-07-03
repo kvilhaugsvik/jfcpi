@@ -228,9 +228,7 @@ public class PacketsStoreTest {
         String[] packetList = storage.getPacketList().split("[\\r\\n]");
         assertTrue(
                 (packetList[0].matches("25\\t+org.freeciv.packet.PACKET_HELLO") &&
-                        packetList[1].matches("26\\t+org.freeciv.packet.PACKET_HI")) ||
-                (packetList[0].matches("26\\t+org.freeciv.packet.PACKET_HI") &&
-                        packetList[1].matches("25\\t+org.freeciv.packet.PACKET_HELLO"))
+                        packetList[1].matches("26\\t+org.freeciv.packet.PACKET_HI"))
         );
     }
 }
