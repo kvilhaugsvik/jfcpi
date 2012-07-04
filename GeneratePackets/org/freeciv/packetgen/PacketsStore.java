@@ -186,7 +186,7 @@ public class PacketsStore {
     }
 
     public String getPacketList() {
-        String out = "";
+        String out = (hasTwoBytePacketNumber ? "2" : "1") + " // the size of the packet number in the header\n";
 
         for (int number : packetsByNumber.keySet()) {
             Packet packet = packets.get(packetsByNumber.get(number));

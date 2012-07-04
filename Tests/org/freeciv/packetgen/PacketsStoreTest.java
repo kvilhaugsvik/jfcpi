@@ -208,7 +208,7 @@ public class PacketsStoreTest {
     @Test public void noPacketsAreListedWhenNoPacketsAreRegistered() {
         PacketsStore storage = defaultStorage();
 
-        assertEquals("", storage.getPacketList());
+        assertEquals("2 // the size of the packet number in the header\n", storage.getPacketList());
     }
 
     @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
@@ -216,8 +216,8 @@ public class PacketsStoreTest {
         storage.registerPacket("PACKET_HELLO", 25, new LinkedList<WeakField>());
 
         String[] packetList = storage.getPacketList().split("[\\t\\r\\n]");
-        assertEquals("25", packetList[0]);
-        assertEquals("org.freeciv.packet.PACKET_HELLO", packetList[1]);
+        assertEquals("25", packetList[1]);
+        assertEquals("org.freeciv.packet.PACKET_HELLO", packetList[2]);
     }
 
     @Test public void packetsAreListed() throws PacketCollisionException, UndefinedException {
@@ -227,8 +227,8 @@ public class PacketsStoreTest {
 
         String[] packetList = storage.getPacketList().split("[\\r\\n]");
         assertTrue(
-                (packetList[0].matches("25\\t+org.freeciv.packet.PACKET_HELLO") &&
-                        packetList[1].matches("26\\t+org.freeciv.packet.PACKET_HI"))
+                (packetList[1].matches("25\\t+org.freeciv.packet.PACKET_HELLO") &&
+                        packetList[2].matches("26\\t+org.freeciv.packet.PACKET_HI"))
         );
     }
 }
