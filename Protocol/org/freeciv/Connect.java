@@ -43,10 +43,10 @@ public class Connect {
         int kind;
         switch (interpreter.getLenOfPacketNumber()) {
             case 1:
-                kind = in.readUnsignedShort();
+                kind = in.readUnsignedByte();
                 break;
             case 2:
-                kind = in.readUnsignedByte();
+                kind = in.readUnsignedShort();
                 break;
             default:
                 throw new IllegalArgumentException("The packet number in the header can only be 1 or 2 bytes long.");
