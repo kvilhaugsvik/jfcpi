@@ -26,7 +26,7 @@ public class SignInAndWait {
         try {
             Connect con = new Connect("127.0.0.1", 5556);
 
-            con.toSend(new PACKET_SERVER_JOIN_REQ("FreecivJava", "+Freeciv.Devel-2.5-2012.Jun.28-2 ", "-dev", 2L, 4L, 99L));
+            con.toSend(new PACKET_SERVER_JOIN_REQ("FreecivJava", "+Freeciv.Devel-2.5-2012.Jun.28-2", "-dev", 2L, 4L, 99L));
 
             System.out.println(con.getPacket());
 
