@@ -109,8 +109,9 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 runtestsignintoserver: compileFromFreeciv
 	mkdir -p ${COMPILED_BINDINGS_USERS_FOLDER}
 	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find BindingsUsers/Users -iname "*.java"`
-	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait
-	touch runtestsignintoserver
+	echo "${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait" > runtestsignintoserver
+	chmod +x runtestsignintoserver || rm runtestsignintoserver
+	./runtestsignintoserver
 
 compilePacketTest: folderTestOut compileBasicProtocol
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/packet/ -iname "*.java"`
