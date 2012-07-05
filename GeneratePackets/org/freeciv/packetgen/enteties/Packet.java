@@ -67,7 +67,6 @@ public class Packet extends ClassWriter implements IDependency {
         addConstructorFromDataInput(name, fields);
 
         addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
-        addMethodPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
 
         addEncoder(hasTwoBytePacketNumber, fields);
         addEncodedSize(hasTwoBytePacketNumber, fields);

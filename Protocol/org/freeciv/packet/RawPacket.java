@@ -38,11 +38,6 @@ public class RawPacket implements Packet {
         return kind;
     }
 
-    @Override
-    public boolean hasTwoBytePacketNumber() {
-        return hasTwoBytePacketNumber;
-    }
-
     public void encodeTo(DataOutput to) throws IOException {
         // header
         // length is 2 unsigned bytes
