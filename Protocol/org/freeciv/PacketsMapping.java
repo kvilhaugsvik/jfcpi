@@ -15,6 +15,7 @@
 package org.freeciv;
 
 import org.freeciv.packet.Packet;
+import org.freeciv.packet.PacketHeader;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -54,15 +55,16 @@ public class PacketsMapping {
         packets.close();
     }
 
-    public Packet interpret(int kind, int size, DataInputStream in) throws IOException {
+    public Packet interpret(PacketHeader header, DataInputStream in) throws IOException {
         try {
-            return (Packet)packetMakers.get(kind).newInstance(in, size, kind);
+            return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header.getTotalSize(),
+                                                                                header.getPacketKind());
         } catch (InstantiationException e) {
-            throw packetReadingError(kind, e);
+            throw packetReadingError(header.getPacketKind(), e);
         } catch (IllegalAccessException e) {
-            throw packetReadingError(kind, e);
+            throw packetReadingError(header.getPacketKind(), e);
         } catch (InvocationTargetException e) {
-            throw packetReadingError(kind, e);
+            throw packetReadingError(header.getPacketKind(), e);
         }
     }
 

@@ -14,10 +14,10 @@
 
 package org.freeciv;
 
-import org.freeciv.packet.Packet;
-import org.freeciv.packet.RawPacket;
+import org.freeciv.packet.*;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.net.Socket;
 
 //TODO: Implement delta protocol
@@ -27,6 +27,7 @@ public class Connect {
     private final DataInputStream in;
     private final Socket server;
     private final PacketsMapping interpreter;
+    private final Constructor<? extends PacketHeader> headerReader;
 
     public Connect(String address, int port) throws IOException {
 
@@ -36,25 +37,37 @@ public class Connect {
         out = server.getOutputStream();
 
         interpreter = new PacketsMapping();
-    }
 
-    public Packet getPacket() throws IOException {
-        int size = in.readChar();
-        int kind;
+        Class<? extends PacketHeader> headerReaderClass;
         switch (interpreter.getLenOfPacketNumber()) {
             case 1:
-                kind = in.readUnsignedByte();
+                headerReaderClass = Header_2_1.class;
                 break;
             case 2:
-                kind = in.readUnsignedShort();
+                headerReaderClass = Header_2_2.class;
                 break;
             default:
                 throw new IllegalArgumentException("The packet number in the header can only be 1 or 2 bytes long.");
         }
-        if (interpreter.canInterpret(kind))
-            return interpreter.interpret(kind, size, in);
-        else
-            return new RawPacket(in, size, kind, 2 == interpreter.getLenOfPacketNumber());
+        try {
+            headerReader = headerReaderClass.getConstructor(DataInput.class);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Could not find constructor for header interpreter", e);
+        }
+    }
+
+    public Packet getPacket() throws IOException {
+        try {
+            PacketHeader head = headerReader.newInstance(in);
+            if (interpreter.canInterpret(head.getPacketKind()))
+                return interpreter.interpret(head, in);
+            else
+                return new RawPacket(in, head.getTotalSize(), head.getPacketKind(),
+                                     2 == interpreter.getLenOfPacketNumber());
+
+        } catch (Exception e) {
+            throw new IOException("Could not read packet", e);
+        }
     }
 
     public void toSend(Packet toSend) throws IOException {
