@@ -17,12 +17,14 @@ package org.freeciv.packet;
 import java.io.*;
 
 public class Header_2_1 extends PacketHeader {
+    public static final int HEADER_SIZE = 3;
+
     public Header_2_1(DataInput in) throws IOException {
         this(getSizeThenKind(in));
     }
 
     public Header_2_1(int totalSize, int packetKind) {
-        super(packetKind, totalSize - 3, totalSize);
+        super(packetKind, totalSize - HEADER_SIZE, totalSize);
     }
 
     private Header_2_1(int[] sizeAndKind) {
