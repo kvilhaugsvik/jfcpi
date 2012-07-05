@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 
 public class PacketsStoreTest {
     private static PacketsStore defaultStorage() {
-        return new PacketsStore(true);
+        return new PacketsStore(2);
     }
 
     private static void assertLooksForButNoCodeYet(PacketsStore storage, Requirement looksFor, String noCodeNamed) {

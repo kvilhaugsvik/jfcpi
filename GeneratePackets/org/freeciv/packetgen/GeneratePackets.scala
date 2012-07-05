@@ -21,14 +21,14 @@ import collection.JavaConversions._
 import org.freeciv.PacketsMapping
 import xml.XML
 
-class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, hasTwoBytePacketNumber: Boolean) {
+class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, bytesInPacketNumber: Int) {
 
   def this(packetsDefPathString: String, cPathsString: List[String], devMode: Boolean,
-           hasTwoBytePacketNumber: Boolean) = {
-    this(new File(packetsDefPathString), cPathsString.map(new File(_)), devMode, hasTwoBytePacketNumber)
+           bytesInPacketNumber: Int) = {
+    this(new File(packetsDefPathString), cPathsString.map(new File(_)), devMode, bytesInPacketNumber)
   }
 
-  private val storage = new PacketsStore(hasTwoBytePacketNumber)
+  private val storage = new PacketsStore(bytesInPacketNumber)
   private val Parser = new ParsePacketsDef(storage)
 
   GeneratePackets.checkFilesCanRead(packetsDefPath :: cPaths)
@@ -85,8 +85,7 @@ object GeneratePackets {
 
     val versionConfiguration = readVersionParameters(new File(versionConfPath))
 
-    val hasTwoBytePacketNumber = versionConfiguration.attribute("packetNumberSize").isDefined &&
-      versionConfiguration.attribute("packetNumberSize").get.text.toInt == 2
+    val bytesInPacketNumber = versionConfiguration.attribute("packetNumberSize").get.text.toInt
 
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
       elem.attribute("parseAs").get.text -> (elem \ "file").map(pathPrefix + "/" + _.text)).toMap
@@ -94,7 +93,7 @@ object GeneratePackets {
     val self = new GeneratePackets(inputSources("packets").head,
       inputSources("C").toList,
       GeneratorDefaults.DEVMODE,
-      hasTwoBytePacketNumber)
+      bytesInPacketNumber)
 
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
   }

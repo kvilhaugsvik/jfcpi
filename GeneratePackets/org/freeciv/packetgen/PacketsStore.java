@@ -27,7 +27,8 @@ import org.freeciv.packetgen.javaGenerator.TargetPackage;
 import java.util.*;
 
 public class PacketsStore {
-    private final boolean hasTwoBytePacketNumber;
+    private final int bytesInPacketNumber;
+    private final String packetHeaderType;
 
     private final DependencyStore requirements;
 
@@ -36,11 +37,22 @@ public class PacketsStore {
     private final HashMap<String, Packet> packets = new HashMap<String, Packet>();
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
-    public PacketsStore(boolean hasTwoBytePacketNumber) {
-        this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
+    public PacketsStore(int bytesInPacketNumber) {
+        this.bytesInPacketNumber = bytesInPacketNumber;
         requirements = new DependencyStore();
         for (IDependency primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
+        }
+
+        switch (bytesInPacketNumber) {
+            case 1:
+                packetHeaderType = Header_2_1.class.getCanonicalName();
+                break;
+            case 2:
+                packetHeaderType = Header_2_2.class.getCanonicalName();
+                break;
+            default: throw new IllegalArgumentException("No other sizes than one or two bytes are supported" +
+                                                                "for packet kind field in packet header");
         }
     }
 
@@ -130,9 +142,7 @@ public class PacketsStore {
         }
 
         if (missingWhenNeeded.isEmpty()) {
-            Packet packet = new Packet(name, number, (hasTwoBytePacketNumber ?
-                    Header_2_2.class.getCanonicalName() :
-                    Header_2_1.class.getCanonicalName()), fieldList.toArray(new Field[0]));
+            Packet packet = new Packet(name, number, packetHeaderType, fieldList.toArray(new Field[0]));
             requirements.addWanted(packet);
             packets.put(name, packet);
             packetsByNumber.put(number, name);
@@ -190,7 +200,7 @@ public class PacketsStore {
     }
 
     public String getPacketList() {
-        String out = (hasTwoBytePacketNumber ? "2" : "1") + " // the size of the packet number in the header\n";
+        String out = bytesInPacketNumber + " // the size of the packet number in the header\n";
 
         for (int number : packetsByNumber.keySet()) {
             Packet packet = packets.get(packetsByNumber.get(number));
