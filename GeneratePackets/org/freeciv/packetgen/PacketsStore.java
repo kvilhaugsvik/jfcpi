@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.packet.Header_2_1;
+import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.enteties.FieldTypeBasic.FieldTypeAlias;
 import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.*;
@@ -128,7 +130,9 @@ public class PacketsStore {
         }
 
         if (missingWhenNeeded.isEmpty()) {
-            Packet packet = new Packet(name, number, hasTwoBytePacketNumber, fieldList.toArray(new Field[0]));
+            Packet packet = new Packet(name, number, (hasTwoBytePacketNumber ?
+                    Header_2_2.class.getCanonicalName() :
+                    Header_2_1.class.getCanonicalName()), fieldList.toArray(new Field[0]));
             requirements.addWanted(packet);
             packets.put(name, packet);
             packetsByNumber.put(number, name);

@@ -15,8 +15,6 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.Util;
-import org.freeciv.packet.Header_2_1;
-import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -33,7 +31,7 @@ public class Packet extends ClassWriter implements IDependency {
     private final Requirement iFulfill;
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
-    public Packet(String name, int number, boolean hasTwoBytePacketNumber, Field... fields) throws UndefinedException {
+    public Packet(String name, int number, String headerKind, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new String[]{
                               allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
                               allInPackageOf(org.freeciv.types.FCEnum.class),
@@ -63,10 +61,6 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields) {
             addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getFieldName());
         }
-
-        String headerKind = (hasTwoBytePacketNumber ?
-                Header_2_2.class.getCanonicalName() :
-                Header_2_1.class.getCanonicalName());
 
         addConstructorFromFields(fields, headerKind);
 

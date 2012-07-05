@@ -17,7 +17,8 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.Connect;
+import org.freeciv.packet.Header_2_1;
+import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
@@ -106,7 +107,7 @@ public class GenerateTest {
         writeJavaFile(connection, targetFolder);
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
-                false,
+                Header_2_1.class.getCanonicalName(),
                 new Field("username", string, "SERVER_JOIN_REQ",
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string, "SERVER_JOIN_REQ",
@@ -118,7 +119,7 @@ public class GenerateTest {
                 new Field("patch_version", uint32, "SERVER_JOIN_REQ")), targetFolder);
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
-                false,
+                Header_2_1.class.getCanonicalName(),
                 new Field("you_can_join", bool, "you_can_join"),
                 new Field("message", string, "you_can_join",
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
@@ -127,11 +128,11 @@ public class GenerateTest {
                 new Field("challenge_file", string, "you_can_join",
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("conn_id", connection, "you_can_join")), targetFolder);
-        writePacket(new Packet("CONN_PING", 88, false), targetFolder);
-        writePacket(new Packet("CONN_PONG", 89, false), targetFolder);
+        writePacket(new Packet("CONN_PING", 88, Header_2_1.class.getCanonicalName()), targetFolder);
+        writePacket(new Packet("CONN_PONG", 89, Header_2_1.class.getCanonicalName()), targetFolder);
         writePacket(new Packet("SERVER_JOIN_REQ2ByteKind",
                 4,
-                true,
+                Header_2_2.class.getCanonicalName(),
                 new Field("username", string, "SERVER_JOIN_REQ2ByteKind",
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string, "SERVER_JOIN_REQ2ByteKind",
@@ -143,24 +144,24 @@ public class GenerateTest {
                 new Field("patch_version", uint32, "SERVER_JOIN_REQ2ByteKind")), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
-                true,
+                Header_2_2.class.getCanonicalName(),
                 new Field("theArray", uint32, "TestArray",
                           new WeakField.ArrayDeclaration(IntExpression.integer("2"), null))), targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
-                true,
+                Header_2_2.class.getCanonicalName(),
                 new Field("toTransfer", uint8, "TestArrayTransfer"),
                 new Field("theArray", uint32, "TestArrayTransfer",
                           new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))), targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
-                true,
+                Header_2_2.class.getCanonicalName(),
                 new Field("theArray", uint32, "TestArrayDouble",
                           new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
                         new WeakField.ArrayDeclaration(IntExpression.integer("3"), null))), targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
-                true,
+                Header_2_2.class.getCanonicalName(),
                 new Field("toTransfer", uint8, "TestArrayDoubleTransfer"),
                 new Field("toTransfer2", uint8, "TestArrayDoubleTransfer"),
                 new Field("theArray", uint32, "TestArrayDoubleTransfer",
@@ -168,7 +169,7 @@ public class GenerateTest {
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))), targetFolder);
         writePacket(new Packet("StringArray",
                 930,
-                true,
+                Header_2_2.class.getCanonicalName(),
                 new Field("notAnArray", string, "StringArray",
                           new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
                 new Field("theArray", string, "StringArray",
