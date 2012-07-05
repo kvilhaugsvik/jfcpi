@@ -62,8 +62,7 @@ public class Connect {
             if (interpreter.canInterpret(head.getPacketKind()))
                 return interpreter.interpret(head, in);
             else
-                return new RawPacket(in, head.getTotalSize(), head.getPacketKind(),
-                                     2 == interpreter.getLenOfPacketNumber());
+                return new RawPacket(in, head);
 
         } catch (Exception e) {
             throw new IOException("Could not read packet", e);
