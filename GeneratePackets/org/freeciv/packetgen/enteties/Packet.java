@@ -54,7 +54,6 @@ public class Packet extends ClassWriter implements IDependency {
         iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
 
         addClassConstant("int", "number", number + "");
-        addClassConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
 
         for (Field field : fields) {
             addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getFieldName());
