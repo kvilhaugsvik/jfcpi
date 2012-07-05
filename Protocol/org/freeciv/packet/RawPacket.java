@@ -20,11 +20,6 @@ public class RawPacket implements Packet {
     private final PacketHeader header;
     private final byte[] content;
 
-    @Deprecated
-    public RawPacket(DataInput in, int size, int kind, boolean hasTwoBytePacketNumber) throws IOException {
-        this(in, (hasTwoBytePacketNumber? new Header_2_2(size, kind) : new Header_2_1(size, kind)));
-    }
-
     public RawPacket(DataInput in, PacketHeader header) throws IOException {
         this.header = header;
         content = new byte[header.getBodySize()];

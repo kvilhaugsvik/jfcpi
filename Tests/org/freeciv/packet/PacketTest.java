@@ -27,7 +27,7 @@ public class PacketTest {
                 new byte[]{/*0, 64, 4, */70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
                         105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
                         48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
-        RawPacket packet = new RawPacket(inputStream, 64, 4, false);
+        RawPacket packet = new RawPacket(inputStream, (new Header_2_1(64, 4)));
 
         assertEquals(64, packet.getEncodedSize());
         assertEquals(4, packet.getNumber());
@@ -38,7 +38,7 @@ public class PacketTest {
                 new byte[]{/*0, 64, 4, */70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
                         105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
                         48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
-        RawPacket packet = new RawPacket(inputStream, 64, 4, false);
+        RawPacket packet = new RawPacket(inputStream, (new Header_2_1(64, 4)));
 
         ByteArrayOutputStream serialized = new ByteArrayOutputStream();
         packet.encodeTo(new DataOutputStream(serialized));
@@ -55,7 +55,7 @@ public class PacketTest {
                 new byte[]{/*0, 65, 00, 4, */70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
                         105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
                         48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
-        RawPacket packet = new RawPacket(inputStream, 65, 4, true);
+        RawPacket packet = new RawPacket(inputStream, (new Header_2_2(65, 4)));
 
         ByteArrayOutputStream serialized = new ByteArrayOutputStream();
         packet.encodeTo(new DataOutputStream(serialized));
