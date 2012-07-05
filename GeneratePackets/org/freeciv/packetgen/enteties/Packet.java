@@ -14,6 +14,9 @@
 
 package org.freeciv.packetgen.enteties;
 
+import org.freeciv.Util;
+import org.freeciv.packet.Header_2_1;
+import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -54,23 +57,28 @@ public class Packet extends ClassWriter implements IDependency {
         iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
 
         addClassConstant("int", "number", number + "");
-        addClassConstant("boolean", "hasTwoBytePacketNumber", hasTwoBytePacketNumber + "");
+
+        addObjectConstant("PacketHeader", "header");
 
         for (Field field : fields) {
             addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getFieldName());
         }
 
-        addConstructorFromFields(fields);
+        String headerKind = (hasTwoBytePacketNumber ?
+                Header_2_2.class.getCanonicalName() :
+                Header_2_1.class.getCanonicalName());
 
-        addConstructorFromJavaTypes(fields);
+        addConstructorFromFields(fields, headerKind);
 
-        addConstructorFromDataInput(name, fields);
+        addConstructorFromJavaTypes(fields, headerKind);
+
+        addConstructorFromDataInput(name, fields, headerKind);
 
         addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
-        addMethodPublicReadObjectState(null, "boolean", "hasTwoBytePacketNumber", "return hasTwoBytePacketNumber;");
 
-        addEncoder(hasTwoBytePacketNumber, fields);
-        addEncodedSize(hasTwoBytePacketNumber, fields);
+        addEncoder(fields);
+        addCalcBodyLen(fields);
+        addEncodedSize();
 
         addToString(name, fields);
 
@@ -83,7 +91,7 @@ public class Packet extends ClassWriter implements IDependency {
         }
     }
 
-    private void addConstructorFromFields(Field[] fields) throws UndefinedException {
+    private void addConstructorFromFields(Field[] fields, String headerKind) throws UndefinedException {
         LinkedList<String> constructorBody = new LinkedList<String>();
         LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
         for (Field field : fields) {
@@ -93,10 +101,15 @@ public class Packet extends ClassWriter implements IDependency {
             constructorBody.addAll(Arrays.asList(field.validate(true)));
             constructorBody.add(setFieldToVariableSameName(field.getFieldName()));
         }
+        constructorBody.add(generateHeader(headerKind));
         addConstructorPublic(null, createParameterList(params), constructorBody.toArray(new String[0]));
     }
 
-    private void addConstructorFromJavaTypes(Field[] fields) throws UndefinedException {
+    private String generateHeader(String headerKind) {
+        return "header = new " + headerKind + "(calcBodyLen() + " + headerKind + ".HEADER_SIZE" + ", number);";
+    }
+
+    private void addConstructorFromJavaTypes(Field[] fields, String headerKind) throws UndefinedException {
         if (0 < fields.length) {
             LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
             LinkedList<String> constructorBodyJ = new LinkedList<String>();
@@ -112,12 +125,14 @@ public class Packet extends ClassWriter implements IDependency {
                                                                  .getNewFromJavaType(),
                                                          "")));
             }
+            constructorBodyJ.add(generateHeader(headerKind));
             addConstructorPublic(null, createParameterList(params), constructorBodyJ.toArray(new String[0]));
         }
     }
 
-    private void addConstructorFromDataInput(String name, Field[] fields) throws UndefinedException {
+    private void addConstructorFromDataInput(String name, Field[] fields, String headerKind) throws UndefinedException {
         LinkedList<String> constructorBodyStream = new LinkedList<String>();
+        constructorBodyStream.add("this.header = header;");
         final String streamName = "from";
         for (Field field : fields) {
             constructorBodyStream.addAll(Arrays.asList(field.validate(false)));
@@ -127,38 +142,38 @@ public class Packet extends ClassWriter implements IDependency {
                             "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName),
                             "")));
         }
-        constructorBodyStream.add("if (getNumber() != packet) {");
+        constructorBodyStream.add("if (getNumber() != header.getPacketKind()) {");
         constructorBodyStream.add("throw new IOException(\"Tried to create package " +
-                                          name + " but packet number was \" + packet);");
+                                          name + " but packet number was \" + header.getPacketKind());");
         constructorBodyStream.add("}");
         constructorBodyStream.add("");
-        constructorBodyStream.add("if (getEncodedSize() != headerLen) {");
+
+        constructorBodyStream.add("assert (header instanceof " + headerKind +
+                                          ") : \"Packet not generated for this kind of header\";");
+        constructorBodyStream.add("");
+
+        constructorBodyStream.add("if (calcBodyLen() != header.getBodySize()) {");
         constructorBodyStream.add(
                 "throw new IOException(\"Package size in header and Java packet not the same. Header: \"" +
-                        " + headerLen");
+                        " + header.getTotalSize()");
         constructorBodyStream.add("+ \" Packet: \" + getEncodedSize());");
         constructorBodyStream.add("}");
         addConstructorPublicWithExceptions("/***\n" +
                                                    " * Construct an object from a DataInput\n" +
                                                    " * @param " + streamName + " data stream that is at the start of " +
                                                    "the package body  \n" +
-                                                   " * @param headerLen length from header package\n" +
-                                                   " * @param packet the number of the packet specified in the " +
-                                                   "header\n" +
+                                                   " * @param header header data. Must contain size and number\n" +
                                                    " * @throws IOException if the DataInput has a problem\n" +
                                                    " */",
-                                           "DataInput " + streamName + ", int headerLen, int packet",
+                                           "DataInput " + streamName + ", PacketHeader header",
                                            "IOException",
                                            constructorBodyStream.toArray(new String[0]));
     }
 
-    private void addEncoder(boolean hasTwoBytePacketNumber, Field[] fields) {
+    private void addEncoder(Field[] fields) {
         LinkedList<String> encodeFields = new LinkedList<String>();
         encodeFields.add("// header");
-        encodeFields.add("// length is 2 unsigned bytes");
-        encodeFields.add("to.writeChar(getEncodedSize());");
-        encodeFields.add("// type");
-        encodeFields.add(hasTwoBytePacketNumber ? "to.writeChar(number);" : "to.writeByte(number);");
+        encodeFields.add("header.encodeTo(to);");
         if (0 < fields.length) {
             encodeFields.add("");
             encodeFields.add("// body");
@@ -172,26 +187,34 @@ public class Packet extends ClassWriter implements IDependency {
                                encodeFields.toArray(new String[0]));
     }
 
-    private void addEncodedSize(boolean hasTwoBytePacketNumber, Field[] fields) {
+    private void addCalcBodyLen(Field[] fields) {
         LinkedList<String> encodeFieldsLen = new LinkedList<String>();
         for (Field field : fields)
             if (field.hasDeclarations())
-                encodeFieldsLen.addAll(Arrays.asList(field.forElementsInField("int " + field
-                                                                                .getFieldName() + "Len" + " = " +
-                                                                                "0;",
-                                                                        field.getFieldName() + "Len" + "+=" +
-                                                                                "this." + field
-                                                                                .getFieldName() +
-                                                                                "[i].encodedLength();", "")));
-        encodeFieldsLen.add("return " + (hasTwoBytePacketNumber ? "4" : "3"));
+                encodeFieldsLen.addAll(Arrays.asList(field.forElementsInField(
+                        "int " + field.getFieldName() + "Len" + " = " + "0;",
+                        field.getFieldName() + "Len" + "+=" +
+                                "this." + field.getFieldName() + "[i].encodedLength();", "")));
         if (0 < fields.length) {
-            for (Field field : fields)
-                encodeFieldsLen.add("\t" + "+ " + ((field.hasDeclarations()) ?
-                        field.getFieldName() + "Len" :
-                        "this." + field.getFieldName() + ".encodedLength()"));
+            String[] toSum = new String[fields.length];
+            for (int i = 0; i < fields.length; i++) {
+                toSum[i] = (fields[i].hasDeclarations()) ?
+                        fields[i].getFieldName() + "Len" :
+                        "this." + fields[i].getFieldName() + ".encodedLength()";
+            }
+            encodeFieldsLen.addAll(Arrays.asList(
+                    ("return " + Util.joinStringArray(toSum, "\n\t\t+ ") + ";").split("\n")));
+        } else {
+            encodeFieldsLen.add("return 0;");
         }
-        encodeFieldsLen.add(encodeFieldsLen.removeLast() + ";");
-        addMethodPublicReadObjectState(null, "int", "getEncodedSize", encodeFieldsLen.toArray(new String[0]));
+        addMethod(null,
+                  Visibility.PRIVATE, Scope.OBJECT,
+                  "int", "calcBodyLen", null, null,
+                  encodeFieldsLen.toArray(new String[0]));
+    }
+
+    private void addEncodedSize() {
+        addMethodPublicReadObjectState(null, "int", "getEncodedSize", "return header.getTotalSize();");
     }
 
     private void addToString(String name, Field[] fields) {
@@ -223,12 +246,12 @@ public class Packet extends ClassWriter implements IDependency {
                 + "Value",
                                        (field.hasDeclarations()) ?
                                                field.forElementsInField(field.getJType() + field
-                                                                          .getArrayDeclaration() + " out = new " +
-                                                                          field.getJType() + field
-                                                                          .getNewCreation() + ";",
-                                                                  "out[i] = " + "this." + field
-                                                                          .getFieldName() + "[i].getValue();",
-                                                                  "return out;") :
+                                                       .getArrayDeclaration() + " out = new " +
+                                                                                field.getJType() + field
+                                                       .getNewCreation() + ";",
+                                                                        "out[i] = " + "this." + field
+                                                                                .getFieldName() + "[i].getValue();",
+                                                                        "return out;") :
                                                new String[]{
                                                        "return " + "this." + field.getFieldName() + ".getValue();"}
         );

@@ -17,48 +17,30 @@ package org.freeciv.packet;
 import java.io.*;
 
 public class RawPacket implements Packet {
-    private final boolean hasTwoBytePacketNumber;
-    private final int size;
-    private final int kind;
+    private final PacketHeader header;
     private final byte[] content;
 
-    public RawPacket(DataInput in, int size, int kind, boolean hasTwoBytePacketNumber) throws IOException {
-        this.hasTwoBytePacketNumber = hasTwoBytePacketNumber;
-        this.size = size;
-        this.kind = kind;
-        content = new byte[size - (hasTwoBytePacketNumber ? 4 : 3)];
+    public RawPacket(DataInput in, PacketHeader header) throws IOException {
+        this.header = header;
+        content = new byte[header.getBodySize()];
         in.readFully(content);
     }
 
-    public RawPacket(DataInput in, int size, int kind) throws IOException {
-        this(in, size, kind, true);
-    }
-
     public int getNumber() {
-        return kind;
-    }
-
-    @Override
-    public boolean hasTwoBytePacketNumber() {
-        return hasTwoBytePacketNumber;
+        return header.getPacketKind();
     }
 
     public void encodeTo(DataOutput to) throws IOException {
-        // header
-        // length is 2 unsigned bytes
-        to.writeChar(getEncodedSize());
-        // type
-        if (hasTwoBytePacketNumber) to.writeChar(kind); else to.writeByte(kind);
-
+        header.encodeTo(to);
         to.write(content);
     }
 
     public int getEncodedSize() {
-        return size;
+        return header.getTotalSize();
     }
 
     @Override public String toString() {
-        String out = "(" + kind + ")\t";
+        String out = "(" + header.getPacketKind() + ")\t";
         for (byte part: content) {
             out += ((int)part) + "\t";
         }
