@@ -43,13 +43,13 @@ public class PacketsMapping {
             try {
                 String[] packet = packetMetaData.split("\t");
                 this.packetMakers.put(Integer.parseInt(packet[0]),
-                        Class.forName(packet[1].trim()).getConstructor(DataInput.class, Integer.TYPE, Integer.TYPE));
+                        Class.forName(packet[1].trim()).getConstructor(DataInput.class, PacketHeader.class));
             } catch (ClassNotFoundException e) {
                 throw new IOException("List of packets claims that " +
                         packetMetaData + " is generated but it was not found.");
             } catch (NoSuchMethodException e) {
                 throw new IOException(packetMetaData + " is not compatible.\n" +
-                        "(No constructor from DataInput, int, int found)");
+                        "(No constructor from DataInput, PacketHeader found)");
             }
         }
         packets.close();
@@ -57,8 +57,7 @@ public class PacketsMapping {
 
     public Packet interpret(PacketHeader header, DataInputStream in) throws IOException {
         try {
-            return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header.getTotalSize(),
-                                                                                header.getPacketKind());
+            return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header);
         } catch (InstantiationException e) {
             throw packetReadingError(header.getPacketKind(), e);
         } catch (IllegalAccessException e) {
