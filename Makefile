@@ -55,10 +55,11 @@ compileCodeGenerator: sourceDefaultsForGenerator compileBasicProtocol
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
 	${JAVAC} -cp ${COMPILED_PROTOCOL_FOLDER}:${SCALALIB} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
 	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.scala"`
-	touch compileCodeGenerator
+	echo "${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} org.freeciv.packetgen.GeneratePackets \$$1" > compileCodeGenerator
+	chmod +x compileCodeGenerator || rm compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
-	${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} org.freeciv.packetgen.GeneratePackets ${FREECIV_SOURCE_PATH}
+	sh compileCodeGenerator ${FREECIV_SOURCE_PATH}
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv
