@@ -16,16 +16,21 @@ package org.freeciv;
 
 public class Util {
     public static String joinStringArray(String[] elements, String separator) {
-        if (0 == elements.length)
-            return "()";
+        // TODO: Rename so the surrounding symbols are clear from the name
+        return joinStringArray(elements, separator, "(", ")");
+    }
 
-        StringBuilder build = new StringBuilder("(");
+    public static String joinStringArray(String[] elements, String separator, String begin, String end) {
+        if (0 == elements.length)
+            return begin + end;
+
+        StringBuilder build = new StringBuilder(begin);
         build.append(elements[0]);
         for (int index = 1; index < elements.length; index++) {
             build.append(separator);
             build.append(elements[index]);
         }
-        build.append(")");
+        build.append(end);
 
         return build.toString();
     }
