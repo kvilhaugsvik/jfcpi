@@ -6,8 +6,9 @@ SCALAC ?= scalac
 SCALALIB ?= /usr/share/java/scala-library.jar
 JUNIT ?= /usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar
 
-# How to generate the code
-DEVMODE ?= true
+# Generate code for items that don't depend on them when
+# items are missing in stead of aborting on missing items.
+DEVMODE ?= false
 
 # What it should be generated from
 # take instructions from trunk.xml
