@@ -229,4 +229,16 @@ public class PacketsStoreTest {
         assertTrue("Could not find the number of bytes of the packet header the packet number should take",
                    getVersionData(defaultStorage()).hasConstant("understandsPackets"));
     }
+
+    @Test public void noPacketsAreListedWhenNoPacketsAreRegistered() {
+        assertEquals("{}", getVersionData(defaultStorage()).getField("understandsPackets").getValue());
+    }
+
+    @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
+        PacketsStore storage = defaultStorage();
+        storage.registerPacket("PACKET_HELLO", 0, new LinkedList<WeakField>());
+
+        assertEquals("{\"org.freeciv.packet.PACKET_HELLO\"}",
+                     getVersionData(storage).getField("understandsPackets").getValue());
+    }
 }

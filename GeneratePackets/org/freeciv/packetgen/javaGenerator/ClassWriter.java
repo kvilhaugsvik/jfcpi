@@ -422,7 +422,7 @@ public class ClassWriter {
         }
     }
 
-    static class VariableDeclaration {
+    public static class VariableDeclaration {
         private final Visibility visibility;
         private final Scope scope;
         private final Modifiable modifiable;
@@ -442,6 +442,10 @@ public class ClassWriter {
 
         public String getName() {
             return name;
+        }
+
+        public String getValue() {
+            return value;
         }
 
         public String toString() {
