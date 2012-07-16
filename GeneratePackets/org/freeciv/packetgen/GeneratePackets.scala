@@ -69,12 +69,6 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean
       classWriter.write(code.toString)
       classWriter.close()
     })
-
-    val manifest = new File(path + PacketsMapping.packetsList)
-    manifest.createNewFile
-    val manifestWriter = new FileWriter(manifest)
-    manifestWriter.write(storage.getPacketList)
-    manifestWriter.close()
   }
 }
 

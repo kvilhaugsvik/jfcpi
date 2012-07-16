@@ -45,6 +45,7 @@ sourceDefaultsForGenerator:
 	echo "package org.freeciv.packetgen;" > ${GENERATORDEFAULTS}
 	echo "public class GeneratorDefaults {" >> ${GENERATORDEFAULTS}
 	echo "  public static final String CONSTANT_LOCATION = \"org.freeciv.Constants\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final String VERSION_DATA_LOCATION = \"org.freeciv.VersionData\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String GENERATED_SOURCE_FOLDER = \"${GENERATED_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
@@ -65,7 +66,6 @@ sourceFromFreeciv: compileCodeGenerator
 
 compileFromFreeciv: sourceFromFreeciv
 	${JAVAC} -d ${COMPILED_PROTOCOL_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find ${GENERATED_SOURCE_FOLDER} -iname "*.java"`
-	cp ${GENERATED_SOURCE_FOLDER}/org/freeciv/packet/packets.txt ${COMPILED_PROTOCOL_FOLDER}/org/freeciv/packet/
 	touch compileFromFreeciv
 
 sourceTestPeers: compileBasicProtocol compileCodeGenerator

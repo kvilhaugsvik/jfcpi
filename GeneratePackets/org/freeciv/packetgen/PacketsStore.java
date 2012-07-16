@@ -191,22 +191,39 @@ public class PacketsStore {
             out.add(constants);
         }
 
+        int border = GeneratorDefaults.VERSION_DATA_LOCATION.lastIndexOf('.');
+        ClassWriter version = new ClassWriter(
+                ClassWriter.ClassKind.CLASS,
+                new TargetPackage(GeneratorDefaults.VERSION_DATA_LOCATION.substring(0, border)),
+                new String[0],
+                "extracted and hard coded Freeciv data",
+                GeneratorDefaults.VERSION_DATA_LOCATION.substring(border + 1),
+                null, null);
+        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "int", "networkHeaderPacketNumberBytes", bytesInPacketNumber + "");
+
+        String[] understandsPackets;
+        if (packetsByNumber.isEmpty()) {
+            understandsPackets = new String[0];
+        } else {
+            understandsPackets = new String[packetsByNumber.lastKey() + 1];
+            for (int number = 0; number <= packetsByNumber.lastKey(); number++) {
+                if (packetsByNumber.containsKey(number) && requirements.dependenciesFound(packets.get(packetsByNumber.get(number)))) {
+                    Packet packet = packets.get(packetsByNumber.get(number));
+                    understandsPackets[number] = "\"" + packet.getPackage() + "." + packet.getName() + "\"";
+                } else {
+                    understandsPackets[number] = "\"" + org.freeciv.packet.RawPacket.class.getCanonicalName() + "\""; // DEVMODE is handled elsewhere
+                }
+            }
+        }
+        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String[]", "understandsPackets", org.freeciv.Util.joinStringArray(understandsPackets, ",\n\t", "{", "}"));
+
+        out.add(version);
+
         return out;
     }
 
     public Collection<Requirement> getUnsolvedRequirements() {
         TreeSet<Requirement> out = new TreeSet<Requirement>(requirements.getMissingRequirements());
-        return out;
-    }
-
-    public String getPacketList() {
-        String out = bytesInPacketNumber + " // the size of the packet number in the header\n";
-
-        for (int number : packetsByNumber.keySet()) {
-            Packet packet = packets.get(packetsByNumber.get(number));
-            if (requirements.dependenciesFound(packet))
-                out += packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName() + "\n";
-        }
         return out;
     }
 

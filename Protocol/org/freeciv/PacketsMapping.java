@@ -24,35 +24,34 @@ import java.net.URL;
 import java.util.HashMap;
 
 public class PacketsMapping {
-    public static final String packetsList =
-            "/" + Packet.class.getPackage().getName().replace('.', '/') + "/" + "packets.txt";
-
     private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
     private final int packetNumberBytes;
 
     public PacketsMapping() throws IOException {
-        URL packetList = this.getClass().getResource(packetsList);
-        if (null == packetList) {
-            throw new IOException("No packet list found");
-        }
+      try {
+        Class versionData = Class.forName("org.freeciv.VersionData");
+        String[] understandsPackets = (String[])versionData.getField("understandsPackets").get(null);
+        packetNumberBytes = versionData.getField("networkHeaderPacketNumberBytes").getInt(null);
 
-        BufferedReader packets = new BufferedReader(new InputStreamReader(packetList.openStream()));
-        String packetMetaData = packets.readLine();
-        packetNumberBytes = Integer.parseInt(packetMetaData.split("//|\\s")[0]);
-        while(null != (packetMetaData = packets.readLine())) {
+        for (int number = 0; number < understandsPackets.length; number++) {
             try {
-                String[] packet = packetMetaData.split("\t");
-                this.packetMakers.put(Integer.parseInt(packet[0]),
-                        Class.forName(packet[1].trim()).getConstructor(DataInput.class, PacketHeader.class));
+                this.packetMakers.put(number,
+                        Class.forName(understandsPackets[number]).getConstructor(DataInput.class, PacketHeader.class));
             } catch (ClassNotFoundException e) {
                 throw new IOException("List of packets claims that " +
-                        packetMetaData + " is generated but it was not found.");
+                        understandsPackets[number] + " is generated but it was not found.");
             } catch (NoSuchMethodException e) {
-                throw new IOException(packetMetaData + " is not compatible.\n" +
+                throw new IOException(understandsPackets[number] + " is not compatible.\n" +
                         "(No constructor from DataInput, PacketHeader found)");
             }
         }
-        packets.close();
+      } catch (ClassNotFoundException e) {
+          throw new IOException("Version information missing", e);
+      } catch (NoSuchFieldException e) {
+          throw new IOException("Version information not compatible", e);
+      } catch (IllegalAccessException e) {
+          throw new IOException("Refused to read version information", e);
+      }
     }
 
     public Packet interpret(PacketHeader header, DataInputStream in) throws IOException {
