@@ -131,7 +131,7 @@ public class PacketsStoreTest {
 
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
-        assertTrue("PACKET_HELLO".equals(storage.getJavaCode().iterator().next().getName()));
+        assertEquals("PACKET_HELLO", getSourceOf(storage, "org.freeciv.packet.PACKET_HELLO").getName());
     }
 
     @Test(expected = PacketCollisionException.class)
@@ -205,9 +205,13 @@ public class PacketsStoreTest {
         assertLooksForButNoCodeYet(storage, new Requirement("STRING", Requirement.Kind.FIELD_TYPE), "STRING");
     }
 
-    private ClassWriter getVersionData(PacketsStore storage) {
+    private static ClassWriter getVersionData(PacketsStore storage) {
+        return getSourceOf(storage, "org.freeciv.VersionData");
+    }
+
+    private static ClassWriter getSourceOf(PacketsStore storage, String toGet) {
         for (ClassWriter item : storage.getJavaCode()) {
-            if ("org.freeciv.VersionData".equals(item.getPackage() + "." + item.getName())) return item;
+            if (toGet.equals(item.getPackage() + "." + item.getName())) return item;
         }
         return null;
     }
