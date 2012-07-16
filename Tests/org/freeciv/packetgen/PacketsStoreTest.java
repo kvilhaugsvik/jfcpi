@@ -219,4 +219,14 @@ public class PacketsStoreTest {
     @Test public void versionDataIsAddedToCode() {
         assertNotNull("Version data should be added as generated code", getVersionData(defaultStorage()));
     }
+
+    @Test public void versionDataHasNetworkHeaderPacketNumberBytes() {
+        assertTrue("Could not find the number of bytes of the packet header the packet number should take",
+                      getVersionData(defaultStorage()).hasConstant("networkHeaderPacketNumberBytes"));
+    }
+
+    @Test public void versionDataUnderstandsPackets() {
+        assertTrue("Could not find the number of bytes of the packet header the packet number should take",
+                   getVersionData(defaultStorage()).hasConstant("understandsPackets"));
+    }
 }
