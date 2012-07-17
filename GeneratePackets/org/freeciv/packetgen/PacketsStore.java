@@ -54,7 +54,7 @@ public class PacketsStore {
                                                                 "for packet kind field in packet header");
         }
 
-        requirements.addWanted(new Constant("networkHeaderPacketNumberBytes",
+        requirements.addWanted(new Constant(Util.PACKET_NUMBER_SIZE_NAME,
                                             IntExpression.integer(bytesInPacketNumber + "")));
     }
 
@@ -203,7 +203,7 @@ public class PacketsStore {
                 }
             }
         }
-        constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "String[]", "understandsPackets", org.freeciv.Util.joinStringArray(understandsPackets, ",\n\t", "{", "}"));
+        constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "String[]", Util.PACKET_MAP_NAME, org.freeciv.Util.joinStringArray(understandsPackets, ",\n\t", "{", "}"));
 
         out.add(constants);
 

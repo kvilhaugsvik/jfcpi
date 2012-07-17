@@ -34,8 +34,8 @@ public class PacketsMapping {
     public PacketsMapping() throws IOException {
         try {
             Class constants = Class.forName(Util.VERSION_DATA_CLASS);
-            String[] understandsPackets = (String[])constants.getField("understandsPackets").get(null);
-            packetNumberBytes = constants.getField("networkHeaderPacketNumberBytes").getInt(null);
+            String[] understandsPackets = (String[])constants.getField(Util.PACKET_MAP_NAME).get(null);
+            packetNumberBytes = constants.getField(Util.PACKET_NUMBER_SIZE_NAME).getInt(null);
             capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
             capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
             versionLabel = (String)constants.getField("VERSION_LABEL").get(null);
