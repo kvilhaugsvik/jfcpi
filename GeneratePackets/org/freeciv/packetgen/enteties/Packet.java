@@ -197,7 +197,7 @@ public class Packet extends ClassWriter implements IDependency {
                         "this." + fields[i].getFieldName() + ".encodedLength()";
             }
             encodeFieldsLen.addAll(Arrays.asList(
-                    ("return " + Util.joinStringArray(toSum, "\n\t\t+ ") + ";").split("\n")));
+                    ("return " + Util.joinStringArray(toSum, "\n\t\t+ ", "", "") + ";").split("\n")));
         } else {
             encodeFieldsLen.add("return 0;");
         }

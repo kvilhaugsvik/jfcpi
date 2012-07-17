@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
+import org.freeciv.Util;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
@@ -44,7 +45,7 @@ public class Struct extends ClassWriter implements IDependency {
             varNames[index] = "\"" + fields.get(index).getValue() + ": \"" + " + " + fields.get(index).getValue();
         }
         addMethodPublicReadObjectState(null, "String", "toString",
-                "return \"(\" + " + org.freeciv.Util.joinStringArray(varNames, " + \", \" + ") + " + \")\";");
+                "return " + Util.joinStringArray(varNames, " + \", \" + ", "\"(\" + ", " + \")\"") + ";");
 
         iRequire = willNeed;
         iProvide = new Requirement("struct" + " " + name, Requirement.Kind.AS_JAVA_DATATYPE);

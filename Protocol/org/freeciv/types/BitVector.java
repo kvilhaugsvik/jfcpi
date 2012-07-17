@@ -83,7 +83,7 @@ public abstract class BitVector {
             vecAsText[index] = boolToStr(vec[index]);
         }
 
-        return joinStringArray(vecAsText, ", ");
+        return joinStringArray(vecAsText, ", ", "(", ")");
     }
 
     private static String boolToStr(boolean toConvert) {

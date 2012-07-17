@@ -15,11 +15,6 @@
 package org.freeciv;
 
 public class Util {
-    public static String joinStringArray(String[] elements, String separator) {
-        // TODO: Rename so the surrounding symbols are clear from the name
-        return joinStringArray(elements, separator, "(", ")");
-    }
-
     public static String joinStringArray(String[] elements, String separator, String begin, String end) {
         if (0 == elements.length)
             return begin + end;
