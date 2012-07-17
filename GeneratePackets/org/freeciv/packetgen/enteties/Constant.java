@@ -64,6 +64,10 @@ public class Constant implements IDependency {
         return expression;
     }
 
+    @Override public String toString() {
+        return type + " " + name + " " + expression;
+    }
+
     @Override
     public Collection<Requirement> getReqs() {
         return Collections.unmodifiableCollection(reqs);
