@@ -4,6 +4,10 @@
         <file>common/packets.def</file>
     </inputSource>
 
+    <inputSource parseAs="variables">
+        <file>fc_version</file>
+    </inputSource>
+
     <inputSource parseAs="C">
         <file>common/spaceship.h</file>
         <file>common/city.h</file>

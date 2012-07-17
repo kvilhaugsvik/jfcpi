@@ -41,9 +41,9 @@ public class PacketsMapping {
         capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
         capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
         versionLabel = (String)constants.getField("VERSION_LABEL").get(null);
-        versionMajor = constants.getField("MAJOR_VERSION").getLong(null);
-        versionMinor = constants.getField("MINOR_VERSION").getLong(null);
-        versionPatch = constants.getField("PATCH_VERSION").getLong(null);
+        versionMajor = Long.parseLong((String)constants.getField("MAJOR_VERSION").get(null));
+        versionMinor = Long.parseLong((String)constants.getField("MINOR_VERSION").get(null));
+        versionPatch = Long.parseLong((String)constants.getField("PATCH_VERSION").get(null));
 
         for (int number = 0; number < understandsPackets.length; number++) {
             try {

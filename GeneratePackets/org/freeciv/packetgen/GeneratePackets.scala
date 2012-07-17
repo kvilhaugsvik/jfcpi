@@ -14,20 +14,20 @@
 
 package org.freeciv.packetgen
 
-import parsing.{ParsePacketsDef, FromCExtractor}
+import parsing._
 import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 import org.freeciv.PacketsMapping
 import xml.XML
 
-class GeneratePackets(packetsDefPath: File, cPaths: List[File], requested: List[(String, String)],
-                      devMode: Boolean, bytesInPacketNumber: Int) {
+class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
+                      requested: List[(String, String)], devMode: Boolean, bytesInPacketNumber: Int) {
 
-  def this(packetsDefPathString: String, cPathsString: List[String], requested: List[(String, String)],
-           devMode: Boolean, bytesInPacketNumber: Int) = {
-    this(new File(packetsDefPathString), cPathsString.map(new File(_)), requested,
-      devMode, bytesInPacketNumber)
+  def this(packetsDefPathString: String, versionPath: String, cPathsString: List[String],
+           requested: List[(String, String)], devMode: Boolean, bytesInPacketNumber: Int) = {
+    this(new File(packetsDefPathString), new File(versionPath), cPathsString.map(new File(_)),
+      requested, devMode, bytesInPacketNumber)
   }
 
   private val storage = new PacketsStore(bytesInPacketNumber)
@@ -35,7 +35,11 @@ class GeneratePackets(packetsDefPath: File, cPaths: List[File], requested: List[
 
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
 
-  GeneratePackets.checkFilesCanRead(packetsDefPath :: cPaths)
+  GeneratePackets.checkFilesCanRead(packetsDefPath :: versionPath :: cPaths)
+
+  println("Reading Freeciv version information")
+  VariableAssignmentsExtractor.extract(GeneratePackets.readFileAsString(versionPath)).foreach(storage.addDependency(_))
+
   print("Extracting from provided C code")
   val extractor = new FromCExtractor()
   cPaths.map(code => {print("."); extractor.extract(GeneratePackets.readFileAsString(code))}).flatten
@@ -92,6 +96,7 @@ object GeneratePackets {
       ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
 
     val self = new GeneratePackets(inputSources("packets").head,
+      inputSources("variables").head,
       inputSources("C").toList,
       requested,
       GeneratorDefaults.DEVMODE,
