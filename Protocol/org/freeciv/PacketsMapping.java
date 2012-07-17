@@ -34,36 +34,36 @@ public class PacketsMapping {
     private final long versionPatch;
 
     public PacketsMapping() throws IOException {
-      try {
-        Class constants = Class.forName("org.freeciv.Constants");
-        String[] understandsPackets = (String[])constants.getField("understandsPackets").get(null);
-        packetNumberBytes = constants.getField("networkHeaderPacketNumberBytes").getInt(null);
-        capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
-        capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
-        versionLabel = (String)constants.getField("VERSION_LABEL").get(null);
-        versionMajor = Long.parseLong((String)constants.getField("MAJOR_VERSION").get(null));
-        versionMinor = Long.parseLong((String)constants.getField("MINOR_VERSION").get(null));
-        versionPatch = Long.parseLong((String)constants.getField("PATCH_VERSION").get(null));
+        try {
+            Class constants = Class.forName("org.freeciv.Constants");
+            String[] understandsPackets = (String[])constants.getField("understandsPackets").get(null);
+            packetNumberBytes = constants.getField("networkHeaderPacketNumberBytes").getInt(null);
+            capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
+            capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
+            versionLabel = (String)constants.getField("VERSION_LABEL").get(null);
+            versionMajor = Long.parseLong((String)constants.getField("MAJOR_VERSION").get(null));
+            versionMinor = Long.parseLong((String)constants.getField("MINOR_VERSION").get(null));
+            versionPatch = Long.parseLong((String)constants.getField("PATCH_VERSION").get(null));
 
-        for (int number = 0; number < understandsPackets.length; number++) {
-            try {
-                this.packetMakers.put(number,
-                        Class.forName(understandsPackets[number]).getConstructor(DataInput.class, PacketHeader.class));
-            } catch (ClassNotFoundException e) {
-                throw new IOException("List of packets claims that " +
-                        understandsPackets[number] + " is generated but it was not found.");
-            } catch (NoSuchMethodException e) {
-                throw new IOException(understandsPackets[number] + " is not compatible.\n" +
-                        "(No constructor from DataInput, PacketHeader found)");
+            for (int number = 0; number < understandsPackets.length; number++) {
+                try {
+                    this.packetMakers.put(number,
+                                          Class.forName(understandsPackets[number]).getConstructor(DataInput.class, PacketHeader.class));
+                } catch (ClassNotFoundException e) {
+                    throw new IOException("List of packets claims that " +
+                                                  understandsPackets[number] + " is generated but it was not found.");
+                } catch (NoSuchMethodException e) {
+                    throw new IOException(understandsPackets[number] + " is not compatible.\n" +
+                                                  "(No constructor from DataInput, PacketHeader found)");
+                }
             }
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Version information missing", e);
+        } catch (NoSuchFieldException e) {
+            throw new IOException("Version information not compatible", e);
+        } catch (IllegalAccessException e) {
+            throw new IOException("Refused to read version information", e);
         }
-      } catch (ClassNotFoundException e) {
-          throw new IOException("Version information missing", e);
-      } catch (NoSuchFieldException e) {
-          throw new IOException("Version information not compatible", e);
-      } catch (IllegalAccessException e) {
-          throw new IOException("Refused to read version information", e);
-      }
     }
 
     public Packet interpret(PacketHeader header, DataInputStream in) throws IOException {
