@@ -206,7 +206,7 @@ public class PacketsStoreTest {
     }
 
     private static ClassWriter getVersionData(PacketsStore storage) {
-        return getSourceOf(storage, "org.freeciv.VersionData");
+        return getSourceOf(storage, "org.freeciv.Constants");
     }
 
     private static ClassWriter getSourceOf(PacketsStore storage, String toGet) {
@@ -222,7 +222,7 @@ public class PacketsStoreTest {
 
     @Test public void versionDataHasNetworkHeaderPacketNumberBytes() {
         assertTrue("Could not find the number of bytes of the packet header the packet number should take",
-                getSourceOf(defaultStorage(), "org.freeciv.Constants").hasConstant("networkHeaderPacketNumberBytes"));
+                getVersionData(defaultStorage()).hasConstant("networkHeaderPacketNumberBytes"));
     }
 
     @Test public void versionDataUnderstandsPackets() {

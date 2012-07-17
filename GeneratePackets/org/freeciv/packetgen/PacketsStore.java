@@ -187,7 +187,6 @@ public class PacketsStore {
             else if (dep instanceof Constant)
                 sortedConstants.add((Constant)dep);
 
-        if (out.size() < inn.size()) {
             int border = GeneratorDefaults.CONSTANT_LOCATION.lastIndexOf('.');
             ClassWriter constants =
                     new ClassWriter(ClassWriter.ClassKind.CLASS, new TargetPackage(
@@ -197,18 +196,6 @@ public class PacketsStore {
 
             for (Constant dep : sortedConstants)
                 constants.addClassConstant(ClassWriter.Visibility.PUBLIC, dep.getType(), dep.getName(), dep.getExpression());
-
-            out.add(constants);
-        }
-
-        int border = GeneratorDefaults.VERSION_DATA_LOCATION.lastIndexOf('.');
-        ClassWriter version = new ClassWriter(
-                ClassWriter.ClassKind.CLASS,
-                new TargetPackage(GeneratorDefaults.VERSION_DATA_LOCATION.substring(0, border)),
-                new String[0],
-                "extracted and hard coded Freeciv data",
-                GeneratorDefaults.VERSION_DATA_LOCATION.substring(border + 1),
-                null, null);
 
         String[] understandsPackets;
         if (packetsByNumber.isEmpty()) {
@@ -224,9 +211,9 @@ public class PacketsStore {
                 }
             }
         }
-        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String[]", "understandsPackets", org.freeciv.Util.joinStringArray(understandsPackets, ",\n\t", "{", "}"));
+        constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "String[]", "understandsPackets", org.freeciv.Util.joinStringArray(understandsPackets, ",\n\t", "{", "}"));
 
-        out.add(version);
+        out.add(constants);
 
         return out;
     }
