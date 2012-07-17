@@ -41,8 +41,7 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
   VariableAssignmentsExtractor.extract(GeneratePackets.readFileAsString(versionPath)).foreach(storage.addDependency(_))
 
   print("Extracting from provided C code")
-  val extractor = new FromCExtractor()
-  cPaths.map(code => {print("."); extractor.extract(GeneratePackets.readFileAsString(code))}).flatten
+  cPaths.map(code => {print("."); FromCExtractor.extract(GeneratePackets.readFileAsString(code))}).flatten
     .foreach(storage.addDependency(_))
   println()
 

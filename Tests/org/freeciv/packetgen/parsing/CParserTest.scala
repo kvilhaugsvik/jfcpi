@@ -209,7 +209,7 @@ object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Common helper methods
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline def parseEnumTest = new ParseCCode()
+  @inline def parseEnumTest = ParseCCode
 
   @inline def parsesCorrectly(expression: String, parser: ParseShared) {
     parsesCorrectly(expression, parser, parser.exprs)
@@ -301,7 +301,7 @@ class CParserSyntaxTest {
 #define SPECENUM_VALUE1 LAST
 #define SPECENUM_VALUE1NAME "omega"
 #include "specenum_gen.h"
-    """, new ParseCCode())
+    """, ParseCCode)
   @Test def specEnumMultiLineCommentAtTheEnd =
     parsesCorrectly("""
 #define SPECENUM_NAME hasTwoComments
@@ -311,33 +311,33 @@ class CParserSyntaxTest {
  * comment */
 #define SPECENUM_VALUE1 ELEMENT2
 #include "specenum_gen.h"
-    """, new ParseCCode())
+    """, ParseCCode)
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of constants
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def constantDefinedSimleNumber =
-    parsesCorrectly("#define SIMPLE 5", new ParseCCode())
+    parsesCorrectly("#define SIMPLE 5", ParseCCode)
   @Test def constantDefinedSimleNumberWhitspaceDifferent =
-    parsesCorrectly("#define  SIMPLE  5\n", new ParseCCode())
+    parsesCorrectly("#define  SIMPLE  5\n", ParseCCode)
   @Test def constantWrongValueFails =
-    assertPrefixWillNotParse("#define WRONG 5 +\n10\n", new ParseCCode())
+    assertPrefixWillNotParse("#define WRONG 5 +\n10\n", ParseCCode)
   @Test def constantDefinedTwoSimleNumbers =
     parsesCorrectly("#define SIMPLE 5\n#define OTHER 7",
-      new ParseCCode())
+      ParseCCode)
   @Test def constantDefinedTwoSimpleNumbersComments =
     parsesCorrectly("#define SIMPLE 5//comment C++ style\n#define OTHER /* Comment C style */ 7",
-      new ParseCCode())
+      ParseCCode)
   @Test def constantDefinedAddition =
-    parsesCorrectly("#define SIMPLE 2 + 5", new ParseCCode())
+    parsesCorrectly("#define SIMPLE 2 + 5", ParseCCode)
   @Test def constantDefinedOther =
-    parsesCorrectly("#define SIMPLE WRONG", new ParseCCode())
+    parsesCorrectly("#define SIMPLE WRONG", ParseCCode)
   @Test def constantDefinedOtherTimes =
-    parsesCorrectly("#define SIMPLE WRONG * 2", new ParseCCode())
+    parsesCorrectly("#define SIMPLE WRONG * 2", ParseCCode)
   @Test def constantDefinedManyParts =
-    parsesCorrectly("#define COMPLEX WRONG * 2 + SIMPLE", new ParseCCode())
+    parsesCorrectly("#define COMPLEX WRONG * 2 + SIMPLE", ParseCCode)
   @Test def constantAfterTwoNewLinesWithFollowingItem {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val input = """
 
 #define CONS 5
@@ -350,35 +350,35 @@ class CParserSyntaxTest {
   Test pure parsing of typedefs
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def typedefSimpleInt =
-    parsesCorrectly("typedef int not_complicated;", new ParseCCode())
+    parsesCorrectly("typedef int not_complicated;", ParseCCode)
 
   @Test def typedefUnsignedInt =
-    parsesCorrectly("typedef unsigned int more_complicated;", new ParseCCode())
+    parsesCorrectly("typedef unsigned int more_complicated;", ParseCCode)
 
   @Test def typedefEnum =
-    parsesCorrectly("typedef enum test more_complicated;", new ParseCCode())
+    parsesCorrectly("typedef enum test more_complicated;", ParseCCode)
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of typedefs
   --------------------------------------------------------------------------------------------------------------------*/
-  @Test def bvIntegerLong = parsesCorrectly("BV_DEFINE(bv_test, 8);", new ParseCCode())
-  @Test def bvAConstantLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", new ParseCCode())
-  @Test def bvAConstantAddIntLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", new ParseCCode())
+  @Test def bvIntegerLong = parsesCorrectly("BV_DEFINE(bv_test, 8);", ParseCCode)
+  @Test def bvAConstantLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", ParseCCode)
+  @Test def bvAConstantAddIntLong = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", ParseCCode)
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of structs
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def structOneFieldPrimitive =
     parsesCorrectly("""struct justOne {bool value;};""",
-      new ParseCCode())
+      ParseCCode)
 
   @Test def structOneFieldEnum =
     parsesCorrectly("""struct justOne {enum test value;};""",
-      new ParseCCode())
+      ParseCCode)
 
   @Test def structTwoFieldsPrimitive =
     parsesCorrectly("""struct two {bool value1; int value2;};""",
-      new ParseCCode())
+      ParseCCode)
 
   @Test def structTwoFieldsEnum =
     parsesCorrectly("""
@@ -387,7 +387,7 @@ struct two {
   enum bitwise value2;
 };
     """,
-      new ParseCCode())
+      ParseCCode)
 
   @Test def structTwoFieldsCommented =
     parsesCorrectly("""
@@ -396,7 +396,7 @@ struct two {
   enum bitwise value2; /* C style comment */
 };
     """,
-      new ParseCCode())
+      ParseCCode)
 }
 
 class CParserSemanticTest {
@@ -436,62 +436,62 @@ class CParserSemanticTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Test semantics of enums declared with the enum name {element, element} syntax
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline def parsesCEnumCorrectly(expression: String, parser: ParseCCode, values: (String, String,  String)*): Enum  = {
-    return parseEnumCorrectly(expression, parser, parser.cEnumDefConverted, false, values: _*)
+  @inline def parsesCEnumCorrectly(expression: String, values: (String, String,  String)*): Enum  = {
+    return parseEnumCorrectly(expression, ParseCCode, ParseCCode.cEnumDefConverted, false, values: _*)
   }
 
   @Test def testCEnum1ElementNoAssign: Unit = {
-    parsesCEnumCorrectly(cEnum1ElementNoAssign, parseEnumTest, ("one", "0", "\"one\""))
+    parsesCEnumCorrectly(cEnum1ElementNoAssign, ("one", "0", "\"one\""))
   }
 
   @Test def testCEnum1ElementAssign: Unit  = {
-    parsesCEnumCorrectly(cEnum1ElementAssign, parseEnumTest, ("one", "1", "\"one\""))
+    parsesCEnumCorrectly(cEnum1ElementAssign, ("one", "1", "\"one\""))
   }
 
   @Test def testCEnum3ElementsNoAssign: Unit = {
-    parsesCEnumCorrectly(cEnum3ElementsNoAssign, parseEnumTest,
+    parsesCEnumCorrectly(cEnum3ElementsNoAssign,
       ("one", "0", "\"one\""),
       ("two", "1 + one.getNumber()", "\"two\""),
       ("three", "1 + two.getNumber()", "\"three\""))
   }
 
   @Test def testCEnum3ElementsAssignAll: Unit = {
-    parsesCEnumCorrectly(cEnum3ElementsAssignAll, parseEnumTest,
+    parsesCEnumCorrectly(cEnum3ElementsAssignAll,
       ("one", "1", "\"one\""),
       ("two", "2", "\"two\""),
       ("three", "3", "\"three\""))
   }
 
   @Test def testCEnum3ElementsFirstNumbered: Unit = {
-    parsesCEnumCorrectly(cEnum3ElementsFirstNumbered, parseEnumTest,
+    parsesCEnumCorrectly(cEnum3ElementsFirstNumbered,
       ("two", "2", "\"two\""),
       ("three", "1 + two.getNumber()", "\"three\""),
       ("four", "1 + three.getNumber()", "\"four\""))
   }
 
   @Test def testCEnum3ElementsFirstAndLastTheSame: Unit = {
-    parsesCEnumCorrectly(cEnum3ElementsFirstAndLastTheSame, parseEnumTest,
+    parsesCEnumCorrectly(cEnum3ElementsFirstAndLastTheSame,
       ("zero", "0", "\"zero\""),
       ("one", "1 + zero.getNumber()", "\"one\""),
       ("null", "0", "\"null\""))
   }
 
   @Test def testCDefineElementAsEqualPreviouslyDefined: Unit = {
-    parsesCEnumCorrectly("enum test {zero, one, null = zero}", parseEnumTest,
+    parsesCEnumCorrectly("enum test {zero, one, null = zero}",
       ("zero", "0", "\"zero\""),
       ("one", "1 + zero.getNumber()", "\"one\""),
       ("null", "zero.getNumber()", "\"null\""))
   }
 
   @Test def cEnumNeedingConstant {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
     assertTrue("C enum based on external constant should depend on it",
       result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
   }
 
   @Test def cEnumElementParanoidValueGeneratorSimple {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
 
     assertTrue("C enum based on external constant should depend on it",
@@ -507,7 +507,7 @@ class CParserSemanticTest {
   }
 
   @Test def cEnumElementParanoidValueGeneratorExpression {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly(cEnumStartValueIsAnExpressionInvolvingExternal, parser, parser.exprConverted)
 
     assertTrue("C enum based on external constant should depend on it",
@@ -523,7 +523,7 @@ class CParserSemanticTest {
   }
 
   @Test def cEnumElementParanoidValueGeneratorPreviousExpression {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly(cEnumHavingExternalStartValueRefersBack, parser, parser.exprConverted)
     assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
       result.get.getReqs.isEmpty)
@@ -538,7 +538,7 @@ class CParserSemanticTest {
   }
 
   @Test def cEnumElementParanoidValueGeneratorFirstIsSane {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly("""
 enum implicitFirst {
   FIRST,
@@ -560,8 +560,8 @@ enum implicitFirst {
   /*--------------------------------------------------------------------------------------------------------------------
   Test semantics of enums declared with SPECENUM
   --------------------------------------------------------------------------------------------------------------------*/
-  @inline def parsesSpecEnumCorrectly(expression: String, parser: ParseCCode, isBitWise: Boolean, values: (String, String, String)*): Enum  = {
-    return parseEnumCorrectly(expression, parser, parser.specEnumDefConverted, isBitWise, values: _*)
+  @inline def parsesSpecEnumCorrectly(expression: String, isBitWise: Boolean, values: (String, String, String)*): Enum  = {
+    return parseEnumCorrectly(expression, ParseCCode, ParseCCode.specEnumDefConverted, isBitWise, values: _*)
   }
 
   @Test(expected = classOf[UndefinedException])
@@ -569,30 +569,30 @@ enum implicitFirst {
     parsesSpecEnumCorrectly("""
   #define SPECENUM_NAME test
   #include "specenum_gen.h"
-  """, parseEnumTest, false)
+  """, false)
   }
 
   @Test def testSpecEnum2Elements: Unit = {
-    parsesSpecEnumCorrectly(specEnum2Elements, parseEnumTest, false,
+    parsesSpecEnumCorrectly(specEnum2Elements, false,
       ("ZERO", "0", "\"ZERO\""),
       ("ONE", "1", "\"ONE\""))
   }
 
   @Test def testSpecEnum2NamedElements: Unit = {
-    parsesSpecEnumCorrectly(specEnumTwoNamedElements, parseEnumTest, false,
+    parsesSpecEnumCorrectly(specEnumTwoNamedElements, false,
       ("ZERO", "0", "\"nothing\""),
       ("ONE", "1", "\"something\""))
   }
 
   @Test def testSpecEnum3ElementsBitwise: Unit = {
-    parsesSpecEnumCorrectly(specEnum3ElementsBitwise, parseEnumTest, true,
+    parsesSpecEnumCorrectly(specEnum3ElementsBitwise, true,
       ("ONE", "1", "\"ONE\""),
       ("TWO", "2", "\"TWO\""),
       ("THREE", "4", "\"THREE\""))
   }
 
   @Test def testSpecEnum4ElementsBitwiseZero: Unit = {
-    parsesSpecEnumCorrectly(specEnum4ElementsBitwiseZero, parseEnumTest, true,
+    parsesSpecEnumCorrectly(specEnum4ElementsBitwiseZero, true,
       ("ZERO", "0", "\"ZERO\""),
       ("ONE", "1", "\"ONE\""),
       ("TWO", "2", "\"TWO\""),
@@ -600,14 +600,14 @@ enum implicitFirst {
   }
 
   @Test def testSpecEnum3ElementsBitwiseNamedZero: Unit = {
-    parsesSpecEnumCorrectly(specEnum2ElementsBitwiseNamedZero, parseEnumTest, true,
+    parsesSpecEnumCorrectly(specEnum2ElementsBitwiseNamedZero, true,
       ("ZERO", "0", "\"nothing\""),
       ("ONE", "1", "\"ONE\""),
       ("TWO", "2", "\"TWO\""))
   }
 
   @Test def testSpecEnum2ElementsInvalid: Unit = {
-    val enum = parsesSpecEnumCorrectly(specEnum2ElementsInvalid, parseEnumTest, false,
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsInvalid, false,
       ("ONE", "0", "\"ONE\""),
       ("TWO", "1", "\"TWO\""))
     @inline val invalid = enum.getInvalidDefault
@@ -617,7 +617,7 @@ enum implicitFirst {
   }
 
   @Test def testSpecEnum2ElementsCount: Unit = {
-    val enum = parsesSpecEnumCorrectly(specEnum2ElementsCount, parseEnumTest, false,
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsCount, false,
       ("ONE", "0", "\"ONE\""),
       ("TWO", "1", "\"TWO\""))
     assertNotNull("No count element found", enum.getCount)
@@ -628,7 +628,7 @@ enum implicitFirst {
   }
 
   @Test def testSpecEnum2ElementsNamedCount: Unit = {
-    val enum = parsesSpecEnumCorrectly(specEnum2ElementsNamedCount, parseEnumTest, false,
+    val enum = parsesSpecEnumCorrectly(specEnum2ElementsNamedCount, false,
       ("ONE", "0", "\"ONE\""),
       ("TWO", "1", "\"TWO\""))
     assertNotNull("No count element found", enum.getCount)
@@ -646,7 +646,7 @@ enum implicitFirst {
   #define SPECENUM_VALUE1 TWO
   #define SPECENUM_COUNT ELEMENTS
   #include "specenum_gen.h"
-  """, parseEnumTest, false,
+  """, false,
       ("ONE", "0", "\"ONE\""),
       ("TWO", "1", "\"TWO\""))
 
@@ -670,7 +670,7 @@ enum implicitFirst {
   #define SPECENUM_VALUE2 THREE
   #define SPECENUM_COUNT ELEMENTS
   #include "specenum_gen.h"
-  """, parseEnumTest, false,
+  """, false,
       ("ONE", "0", "\"ONE\""),
       ("TWO", "1", "\"TWO\""))
 
@@ -740,7 +740,7 @@ public enum test implements FCEnum {
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def constantDefinedSimpleNumber {
     val toParse = "#define SIMPLE 5"
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
     assertEquals("Wrong value generation expression", "5", result.get.getExpression)
@@ -748,7 +748,7 @@ public enum test implements FCEnum {
 
   @Test def constantDefinedOther {
     val toParse = "#define SIMPLE WRONG"
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
@@ -762,7 +762,7 @@ public enum test implements FCEnum {
 
   @Test def constantDefinedAddition {
     val toParse = "#define SIMPLE 2 + 5"
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
@@ -775,7 +775,7 @@ public enum test implements FCEnum {
 
   @Test def constantDefinedManyParts {
     val toParse = "#define COMPLEX WRONG * 2 + SIMPLE"
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "COMPLEX", result.get.getName)
@@ -792,7 +792,7 @@ public enum test implements FCEnum {
   Test pure parsing of typedefs
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def bvInteger = {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly("BV_DEFINE(bv_test, 8);", parser, parser.exprConverted).get
 
     assertTrue("No need for any constant", result.getReqs.isEmpty)
@@ -802,7 +802,7 @@ public enum test implements FCEnum {
   }
 
   @Test def bvConstant = {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", parser, parser.exprConverted).get
 
     assertTrue("Should need CONSTANT", result.getReqs.contains(
@@ -813,7 +813,7 @@ public enum test implements FCEnum {
   }
 
   @Test def bvConstantAddInteger = {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", parser, parser.exprConverted).get
 
     assertTrue("Should need CONSTANT", result.getReqs.contains(
@@ -827,26 +827,26 @@ public enum test implements FCEnum {
   Test semantics of structs
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def structOneFieldPrimitiveBoolean {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly("""struct justOne {bool value;};""", parser, parser.structConverted)
     assertTrue("The primitive bool should not depend on anything", result.get.getReqs.isEmpty)
   }
 
   @Test def structOneFieldEnum {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly("""struct justOne {enum test value;};""", parser, parser.structConverted)
     assertTrue("The enum test should be needed here",
       result.get.getReqs.contains(new Requirement("enum test", Requirement.Kind.AS_JAVA_DATATYPE)))
   }
 
   @Test def structTwoFieldsPrimitive {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly("""struct two {bool value1; int value2;};""", parser, parser.structConverted)
     assertTrue("The primitives bool and int should not depend on anything", result.get.getReqs.isEmpty)
   }
 
   @Test def structTwoFieldsEnum {
-    val parser = new ParseCCode()
+    val parser = ParseCCode
     val result = parsesCorrectly("""
 struct two {
   enum test value1;
@@ -862,7 +862,7 @@ struct two {
 
 class FromCExtractorTest {
   @Test def initialize {
-    val extractor = new FromCExtractor()
+    val extractor = FromCExtractor
   }
 
   private final val test123NotingElse = """
@@ -885,7 +885,7 @@ enum test3 {
 """
 
   @Test def findsPositionsAllExist {
-    val positions = new FromCExtractor()
+    val positions = FromCExtractor
       .findPossibleStartPositions(test123NotingElse)
     assertNotNull("Positions don't exist", positions)
     assertTrue("Position missing", positions.contains(1))
@@ -894,7 +894,7 @@ enum test3 {
   }
 
   @Test def findsEnumsAllExist {
-    val enums = new FromCExtractor()
+    val enums = FromCExtractor
       .extract(test123NotingElse)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
@@ -906,7 +906,7 @@ enum test3 {
   }
 
   @Test def findsEnumsOneMissingExtract {
-    val enums = new FromCExtractor()
+    val enums = FromCExtractor
       .extract(test123NotingElse)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
@@ -944,7 +944,7 @@ enum test3 {
 """
 
   @Test def findsPositionsOtherCodeAsWell {
-    val positions = new FromCExtractor()
+    val positions = FromCExtractor
       .findPossibleStartPositions(test123OtherCodeAsWell)
     assertNotNull("Positions don't exist", positions)
 
@@ -954,7 +954,7 @@ enum test3 {
   }
 
   @Test def findsEnumsOtherCodeAsWell {
-    val enums = new FromCExtractor().extract(test123OtherCodeAsWell)
+    val enums = FromCExtractor.extract(test123OtherCodeAsWell)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -988,13 +988,13 @@ enum test3 {
 """
 
   @Test def findsPositionsEnumsUsed {
-    val positions = new FromCExtractor()
+    val positions = FromCExtractor
       .findPossibleStartPositions(test123EnumsUsed)
     assertNotNull("Positions don't exist", positions)
   }
 
   @Test def findsEnumsEnumsUsed {
-    val enums = new FromCExtractor()
+    val enums = FromCExtractor
       .extract(test123EnumsUsed)
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
@@ -1006,7 +1006,7 @@ enum test3 {
   }
 
   @Test def findConstantAfterTwoNewLinesWithFollowingUnusedConstant {
-    val extractor = new FromCExtractor()
+    val extractor = FromCExtractor
     val input = """
 
 #define CONS 5

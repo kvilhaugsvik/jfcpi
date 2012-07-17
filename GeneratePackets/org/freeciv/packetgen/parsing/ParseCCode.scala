@@ -27,7 +27,7 @@ import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.freeciv.packetgen.UndefinedException
 import java.util.AbstractMap.SimpleImmutableEntry
 
-class ParseCCode extends ExtractableParser {
+object ParseCCode extends ExtractableParser {
   def enumElemCode = identifierRegEx
 
   private final val DEFINE: String = "#define"
@@ -267,4 +267,4 @@ class ParseCCode extends ExtractableParser {
     CComment
 }
 
-class FromCExtractor() extends ExtractorShared(new ParseCCode())
+object FromCExtractor extends ExtractorShared(ParseCCode)
