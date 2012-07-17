@@ -39,9 +39,9 @@ public class PacketsMapping {
         Class constants = Class.forName("org.freeciv.Constants");
         String[] understandsPackets = (String[])versionData.getField("understandsPackets").get(null);
         packetNumberBytes = constants.getField("networkHeaderPacketNumberBytes").getInt(null);
-        capStringMandatory = (String)versionData.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
-        capStringOptional = (String)versionData.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
-        versionLabel = (String)versionData.getField("VERSION_LABEL").get(null);
+        capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
+        capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
+        versionLabel = (String)constants.getField("VERSION_LABEL").get(null);
         versionMajor = versionData.getField("MAJOR_VERSION").getLong(null);
         versionMinor = versionData.getField("MINOR_VERSION").getLong(null);
         versionPatch = versionData.getField("PATCH_VERSION").getLong(null);

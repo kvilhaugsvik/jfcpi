@@ -23,6 +23,7 @@ import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.expression.StringTyped;
 
 import java.util.*;
 
@@ -55,6 +56,10 @@ public class PacketsStore {
 
         requirements.addWanted(new Constant("networkHeaderPacketNumberBytes",
                 IntExpression.integer(bytesInPacketNumber + "")));
+
+        requirements.addWanted(new Constant("NETWORK_CAPSTRING_MANDATORY", new StringTyped("\"+Freeciv.Devel-2.5-2012.Jun.28-2\"")));
+        requirements.addWanted(new Constant("NETWORK_CAPSTRING_OPTIONAL", new StringTyped("\"\"")));
+        requirements.addWanted(new Constant("VERSION_LABEL", new StringTyped("\"-dev\"")));
     }
 
     private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype, Requirement neededBasic) {
@@ -201,9 +206,6 @@ public class PacketsStore {
                 GeneratorDefaults.VERSION_DATA_LOCATION.substring(border + 1),
                 null, null);
 
-        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "NETWORK_CAPSTRING_MANDATORY", "\"+Freeciv.Devel-2.5-2012.Jun.28-2\"");
-        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "NETWORK_CAPSTRING_OPTIONAL", "\"\"");
-        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "VERSION_LABEL", "\"-dev\"");
         version.addClassConstant(ClassWriter.Visibility.PUBLIC, "long", "MAJOR_VERSION", "2");
         version.addClassConstant(ClassWriter.Visibility.PUBLIC, "long", "MINOR_VERSION", "4");
         version.addClassConstant(ClassWriter.Visibility.PUBLIC, "long", "PATCH_VERSION", "99");

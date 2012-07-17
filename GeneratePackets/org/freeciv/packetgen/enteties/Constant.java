@@ -18,6 +18,7 @@ import org.freeciv.packetgen.GeneratorDefaults;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.javaGenerator.expression.StringTyped;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -30,6 +31,12 @@ public class Constant implements IDependency {
 
     private static final String constantPrefix = GeneratorDefaults.CONSTANT_LOCATION + ".";
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
+
+    public Constant(String name, StringTyped expression) {
+        this.name = name;
+        this.expression = expression.getJavaCode();
+        this.type = "String";
+    }
 
     public Constant(String name, IntExpression expression) {
         this.name = name;
