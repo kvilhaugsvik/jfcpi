@@ -21,15 +21,19 @@ import collection.JavaConversions._
 import org.freeciv.PacketsMapping
 import xml.XML
 
-class GeneratePackets(packetsDefPath: File, cPaths: List[File], devMode: Boolean, bytesInPacketNumber: Int) {
+class GeneratePackets(packetsDefPath: File, cPaths: List[File], requested: List[(String, String)],
+                      devMode: Boolean, bytesInPacketNumber: Int) {
 
-  def this(packetsDefPathString: String, cPathsString: List[String], devMode: Boolean,
-           bytesInPacketNumber: Int) = {
-    this(new File(packetsDefPathString), cPathsString.map(new File(_)), devMode, bytesInPacketNumber)
+  def this(packetsDefPathString: String, cPathsString: List[String], requested: List[(String, String)],
+           devMode: Boolean, bytesInPacketNumber: Int) = {
+    this(new File(packetsDefPathString), cPathsString.map(new File(_)), requested,
+      devMode, bytesInPacketNumber)
   }
 
   private val storage = new PacketsStore(bytesInPacketNumber)
   private val Parser = new ParsePacketsDef(storage)
+
+  requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
 
   GeneratePackets.checkFilesCanRead(packetsDefPath :: cPaths)
   print("Extracting from provided C code")
@@ -84,8 +88,12 @@ object GeneratePackets {
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
       elem.attribute("parseAs").get.text -> (elem \ "file").map(pathPrefix + "/" + _.text)).toMap
 
+    val requested: List[(String, String)] =
+      ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
+
     val self = new GeneratePackets(inputSources("packets").head,
       inputSources("C").toList,
+      requested,
       GeneratorDefaults.DEVMODE,
       bytesInPacketNumber)
 

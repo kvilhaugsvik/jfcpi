@@ -58,12 +58,12 @@ public class PacketsStore {
         requirements.addWanted(new Constant("networkHeaderPacketNumberBytes",
                 IntExpression.integer(bytesInPacketNumber + "")));
 
-        requirements.addWanted(new Constant("NETWORK_CAPSTRING_MANDATORY", new StringTyped("\"+Freeciv.Devel-2.5-2012.Jun.28-2\"")));
-        requirements.addWanted(new Constant("NETWORK_CAPSTRING_OPTIONAL", new StringTyped("\"\"")));
-        requirements.addWanted(new Constant("VERSION_LABEL", new StringTyped("\"-dev\"")));
-        requirements.addWanted(new Constant("MAJOR_VERSION", new LongTyped("2")));
-        requirements.addWanted(new Constant("MINOR_VERSION", new LongTyped("4")));
-        requirements.addWanted(new Constant("PATCH_VERSION", new LongTyped("99")));
+        requirements.addPossibleRequirement(new Constant("NETWORK_CAPSTRING_MANDATORY", new StringTyped("\"+Freeciv.Devel-2.5-2012.Jun.28-2\"")));
+        requirements.addPossibleRequirement(new Constant("NETWORK_CAPSTRING_OPTIONAL", new StringTyped("\"\"")));
+        requirements.addPossibleRequirement(new Constant("VERSION_LABEL", new StringTyped("\"-dev\"")));
+        requirements.addPossibleRequirement(new Constant("MAJOR_VERSION", new LongTyped("2")));
+        requirements.addPossibleRequirement(new Constant("MINOR_VERSION", new LongTyped("4")));
+        requirements.addPossibleRequirement(new Constant("PATCH_VERSION", new LongTyped("99")));
     }
 
     private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype, Requirement neededBasic) {
@@ -228,5 +228,9 @@ public class PacketsStore {
             for (IDependency constant : ((Enum)fulfillment).getEnumConstants())
                 requirements.addPossibleRequirement(constant);
         requirements.addPossibleRequirement(fulfillment);
+    }
+
+    public void requestConstant(String constant) {
+        requirements.demand(new Requirement(constant, Requirement.Kind.VALUE));
     }
 }
