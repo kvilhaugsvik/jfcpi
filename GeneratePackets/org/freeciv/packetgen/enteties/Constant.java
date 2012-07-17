@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
 
 public class Constant implements IDependency {
     private final String name;
-    private final IntExpression expression;
+    private final String expression;
+    private final String type;
     private final HashSet<Requirement> reqs = new HashSet<Requirement>();
 
     private static final String constantPrefix = GeneratorDefaults.CONSTANT_LOCATION + ".";
@@ -32,8 +33,13 @@ public class Constant implements IDependency {
 
     public Constant(String name, IntExpression expression) {
         this.name = name;
-        this.expression = expression;
+        this.expression = expression.toString();
+        this.type = "int";
         reqs.addAll(expression.getReqs());
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getName() {
@@ -41,7 +47,7 @@ public class Constant implements IDependency {
     }
 
     public String getExpression() {
-        return expression.toString();
+        return expression;
     }
 
     @Override

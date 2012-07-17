@@ -186,7 +186,7 @@ public class PacketsStore {
                                     null, null);
 
             for (Constant dep : sortedConstants)
-                constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "int", dep.getName(), dep.getExpression());
+                constants.addClassConstant(ClassWriter.Visibility.PUBLIC, dep.getType(), dep.getName(), dep.getExpression());
 
             out.add(constants);
         }
