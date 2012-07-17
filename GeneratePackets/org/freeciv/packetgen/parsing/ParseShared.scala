@@ -16,7 +16,8 @@ package org.freeciv.packetgen.parsing
 
 import util.parsing.combinator._
 import org.freeciv.packetgen.enteties.supporting.IntExpression
-import org.freeciv.packetgen.dependency.Requirement
+import org.freeciv.packetgen.dependency.{IDependency, Requirement}
+import util.parsing.input.CharArrayReader
 
 abstract class ParseShared extends RegexParsers with PackratParsers {
   def expr: Parser[Any]
@@ -211,4 +212,26 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
         return offset + found.get.end
     }
   }
+}
+
+abstract class ExtractableParser extends ParseShared {
+  def startsOfExtractable : List[String]
+  def exprConverted: Parser[IDependency]
+}
+
+abstract class ExtractorShared(protected val parser : ExtractableParser) {
+  protected val lookFor = parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _).r
+
+  def findPossibleStartPositions(lookIn: String): List[Int] =
+    lookFor.findAllIn(lookIn).matchData.map(_.start).toList
+
+  def extract(lookIn: String) = {
+    val positions = findPossibleStartPositions(lookIn)
+    val lookInAsReader = new parser.PackratReader(new CharArrayReader(lookIn.toArray))
+
+    positions.map(position => parser.parse(parser.exprConverted, lookInAsReader.drop(position)))
+      .filter(!_.isEmpty).map(_.get)
+  }
+
+  override def toString = "Extracts(" + parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _) + ")"
 }

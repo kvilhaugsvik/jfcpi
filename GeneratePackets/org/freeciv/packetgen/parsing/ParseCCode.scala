@@ -27,7 +27,7 @@ import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.freeciv.packetgen.UndefinedException
 import java.util.AbstractMap.SimpleImmutableEntry
 
-class ParseCCode extends ParseShared {
+class ParseCCode extends ExtractableParser {
   def enumElemCode = identifierRegEx
 
   private final val DEFINE: String = "#define"
@@ -267,22 +267,6 @@ class ParseCCode extends ParseShared {
     CComment
 }
 
-class FromCExtractor() {
+class FromCExtractor() extends ExtractorShared(new ParseCCode()) {
   def this(toLookFor: Iterable[Requirement]) = this()
-
-  private val parser = new ParseCCode()
-  private val lookFor = parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _).r
-
-  def findPossibleStartPositions(lookIn: String): List[Int] =
-    lookFor.findAllIn(lookIn).matchData.map(_.start).toList
-
-  def extract(lookIn: String) = {
-    val positions = findPossibleStartPositions(lookIn)
-    val lookInAsReader = new parser.PackratReader(new CharArrayReader(lookIn.toArray))
-
-    positions.map(position => parser.parse(parser.exprConverted, lookInAsReader.drop(position)))
-      .filter(!_.isEmpty).map(_.get)
-  }
-
-  override def toString = "Extracts(" + parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _) + ")"
 }
