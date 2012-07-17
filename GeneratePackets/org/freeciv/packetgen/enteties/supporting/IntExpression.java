@@ -11,13 +11,13 @@ public class IntExpression {
     private final String operatorOrValue;
     private final IntExpression lhs;
     private final IntExpression rhs;
-    private final HashSet reqs;
+    private final HashSet<Requirement> reqs;
 
     private IntExpression(String operatorOrValue, IntExpression lhs, IntExpression rhs, Requirement... iDemand) {
         this.operatorOrValue = operatorOrValue;
         this.lhs = lhs;
         this.rhs = rhs;
-        this.reqs = new HashSet();
+        this.reqs = new HashSet<Requirement>();
         for (Requirement req : iDemand)
             reqs.add(req);
         if (null != lhs)
@@ -138,6 +138,6 @@ public class IntExpression {
     }
 
     public Collection<Requirement> getReqs() {
-        return Collections.unmodifiableCollection(reqs);
+        return Collections.<Requirement>unmodifiableCollection(reqs);
     }
 }
