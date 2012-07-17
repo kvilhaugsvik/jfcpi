@@ -18,6 +18,7 @@ import org.freeciv.packetgen.GeneratorDefaults;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.javaGenerator.expression.LongTyped;
 import org.freeciv.packetgen.javaGenerator.expression.StringTyped;
 
 import java.util.*;
@@ -36,6 +37,12 @@ public class Constant implements IDependency {
         this.name = name;
         this.expression = expression.getJavaCode();
         this.type = "String";
+    }
+
+    public Constant(String name, LongTyped expression) {
+        this.name = name;
+        this.expression = expression.toString();
+        this.type = "long";
     }
 
     public Constant(String name, IntExpression expression) {
