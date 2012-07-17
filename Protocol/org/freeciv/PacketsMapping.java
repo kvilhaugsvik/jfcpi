@@ -14,8 +14,7 @@
 
 package org.freeciv;
 
-import org.freeciv.packet.Packet;
-import org.freeciv.packet.PacketHeader;
+import org.freeciv.packet.*;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -85,8 +84,15 @@ public class PacketsMapping {
         return packetMakers.containsKey(kind);
     }
 
-    public int getLenOfPacketNumber() {
-        return packetNumberBytes;
+    public Class<? extends PacketHeader> getPacketHeaderClass() {
+        switch (packetNumberBytes) {
+            case 1:
+                return Header_2_1.class;
+            case 2:
+                return Header_2_2.class;
+            default:
+                throw new IllegalArgumentException("The packet number in the header can only be 1 or 2 bytes long.");
+        }
     }
 
     public String getCapStringMandatory() {

@@ -38,19 +38,8 @@ public class Connect {
 
         interpreter = new PacketsMapping();
 
-        Class<? extends PacketHeader> headerReaderClass;
-        switch (interpreter.getLenOfPacketNumber()) {
-            case 1:
-                headerReaderClass = Header_2_1.class;
-                break;
-            case 2:
-                headerReaderClass = Header_2_2.class;
-                break;
-            default:
-                throw new IllegalArgumentException("The packet number in the header can only be 1 or 2 bytes long.");
-        }
         try {
-            headerReader = headerReaderClass.getConstructor(DataInput.class);
+            headerReader = interpreter.getPacketHeaderClass().getConstructor(DataInput.class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Could not find constructor for header interpreter", e);
         }
