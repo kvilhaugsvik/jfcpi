@@ -222,7 +222,7 @@ public class PacketsStoreTest {
 
     @Test public void versionDataHasNetworkHeaderPacketNumberBytes() {
         assertTrue("Could not find the number of bytes of the packet header the packet number should take",
-                      getVersionData(defaultStorage()).hasConstant("networkHeaderPacketNumberBytes"));
+                getSourceOf(defaultStorage(), "org.freeciv.Constants").hasConstant("networkHeaderPacketNumberBytes"));
     }
 
     @Test public void versionDataUnderstandsPackets() {

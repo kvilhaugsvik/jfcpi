@@ -27,7 +27,6 @@ import org.freeciv.packetgen.javaGenerator.TargetPackage;
 import java.util.*;
 
 public class PacketsStore {
-    private final int bytesInPacketNumber;
     private final String packetHeaderType;
 
     private final DependencyStore requirements;
@@ -38,7 +37,6 @@ public class PacketsStore {
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
     public PacketsStore(int bytesInPacketNumber) {
-        this.bytesInPacketNumber = bytesInPacketNumber;
         requirements = new DependencyStore();
         for (IDependency primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
@@ -54,6 +52,9 @@ public class PacketsStore {
             default: throw new IllegalArgumentException("No other sizes than one or two bytes are supported" +
                                                                 "for packet kind field in packet header");
         }
+
+        requirements.addWanted(new Constant("networkHeaderPacketNumberBytes",
+                IntExpression.integer(bytesInPacketNumber + "")));
     }
 
     private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype, Requirement neededBasic) {
@@ -200,7 +201,6 @@ public class PacketsStore {
                 GeneratorDefaults.VERSION_DATA_LOCATION.substring(border + 1),
                 null, null);
 
-        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "int", "networkHeaderPacketNumberBytes", bytesInPacketNumber + "");
         version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "NETWORK_CAPSTRING_MANDATORY", "\"+Freeciv.Devel-2.5-2012.Jun.28-2\"");
         version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "NETWORK_CAPSTRING_OPTIONAL", "\"\"");
         version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "VERSION_LABEL", "\"-dev\"");

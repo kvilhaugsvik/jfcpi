@@ -36,8 +36,9 @@ public class PacketsMapping {
     public PacketsMapping() throws IOException {
       try {
         Class versionData = Class.forName("org.freeciv.VersionData");
+        Class constants = Class.forName("org.freeciv.Constants");
         String[] understandsPackets = (String[])versionData.getField("understandsPackets").get(null);
-        packetNumberBytes = versionData.getField("networkHeaderPacketNumberBytes").getInt(null);
+        packetNumberBytes = constants.getField("networkHeaderPacketNumberBytes").getInt(null);
         capStringMandatory = (String)versionData.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
         capStringOptional = (String)versionData.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
         versionLabel = (String)versionData.getField("VERSION_LABEL").get(null);
