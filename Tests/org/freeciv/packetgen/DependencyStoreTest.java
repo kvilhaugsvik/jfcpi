@@ -76,6 +76,41 @@ public class DependencyStoreTest {
         store.addWanted(impossible);
     }
 
+    @Test public void demandExisting() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("Alone"));
+        OnlyRequire alone = new OnlyRequire("Alone");
+        store.addPossibleRequirement(alone);
+        assertTrue("Demanded item should be in output", store.getResolved().contains(alone));
+    }
+
+    @Test public void demandNotExisting() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("Alone"));
+        assertTrue("Should be informed about missing item",
+                store.getMissingRequirements().contains(reqFor("Alone")));
+    }
+
+    @Test public void demandRequireExisting() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("notAlone"));
+        OnlyRequire notAlone = new OnlyRequire("notAlone", reqFor("Existing"));
+        store.addPossibleRequirement(notAlone);
+        OnlyRequire company = new OnlyRequire("Existing");
+        store.addPossibleRequirement(company);
+        assertTrue("Demanded item should be in output", store.getResolved().contains(notAlone));
+        assertTrue("Dependency of demanded item should be in output", store.getResolved().contains(company));
+    }
+
+    @Test public void demandRequireNonExisting() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("Alone"));
+        OnlyRequire alone = new OnlyRequire("Alone", reqFor("Non existing"));
+        store.addPossibleRequirement(alone);
+        assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Alone")));
+        assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Non existing")));
+    }
+
     public static class OnlyRequire implements IDependency {
         private final HashSet<Requirement> want;
         private final Requirement has;

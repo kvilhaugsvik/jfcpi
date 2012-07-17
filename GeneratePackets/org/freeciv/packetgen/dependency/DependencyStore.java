@@ -23,7 +23,7 @@ public final class DependencyStore {
     private final HashMap<Requirement, IDependency> existing = new HashMap<Requirement, IDependency>();
     private final HashMap<Requirement, IDependency> dependenciesFulfilled = new HashMap<Requirement, IDependency>();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
-    private final HashSet<IDependency> wantsOut = new HashSet<IDependency>();
+    private final HashSet<Requirement> wantsOut = new HashSet<Requirement>();
 
     /**
      * Make the dependency store aware of the fulfillment of a possible requirement.
@@ -50,7 +50,11 @@ public final class DependencyStore {
 
     public void addWanted(IDependency item) {
         addPossibleRequirement(item);
-        wantsOut.add(item);
+        demand(item.getIFulfillReq());
+    }
+
+    public void demand(Requirement requirement) {
+        wantsOut.add(requirement);
     }
 
     public Set<Requirement> getMissingRequirements() {
@@ -124,8 +128,11 @@ public final class DependencyStore {
     }
 
     private void resolve() {
-        for (IDependency toAdd : wantsOut) {
-            addToResolvedIfPossible(toAdd);
+        for (Requirement toAdd : wantsOut) {
+            if (isAwareOfPotentialProvider(toAdd))
+                addToResolvedIfPossible(getPotentialProvider(toAdd));
+            else
+                dependenciesUnfulfilled.add(toAdd);
         }
         wantsOut.removeAll(resolved.values());
     }
