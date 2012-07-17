@@ -20,7 +20,6 @@ import org.freeciv.packet.PacketHeader;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.HashMap;
 
 public class PacketsMapping {

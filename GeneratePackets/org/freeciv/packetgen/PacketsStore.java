@@ -23,8 +23,6 @@ import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
-import org.freeciv.packetgen.javaGenerator.expression.LongTyped;
-import org.freeciv.packetgen.javaGenerator.expression.StringTyped;
 
 import java.util.*;
 
