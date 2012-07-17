@@ -267,6 +267,4 @@ class ParseCCode extends ExtractableParser {
     CComment
 }
 
-class FromCExtractor() extends ExtractorShared(new ParseCCode()) {
-  def this(toLookFor: Iterable[Requirement]) = this()
-}
+class FromCExtractor() extends ExtractorShared(new ParseCCode())
