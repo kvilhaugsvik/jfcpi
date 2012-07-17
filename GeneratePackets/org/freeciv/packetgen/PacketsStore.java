@@ -199,7 +199,14 @@ public class PacketsStore {
                 "extracted and hard coded Freeciv data",
                 GeneratorDefaults.VERSION_DATA_LOCATION.substring(border + 1),
                 null, null);
+
         version.addClassConstant(ClassWriter.Visibility.PUBLIC, "int", "networkHeaderPacketNumberBytes", bytesInPacketNumber + "");
+        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "NETWORK_CAPSTRING_MANDATORY", "\"+Freeciv.Devel-2.5-2012.Jun.28-2\"");
+        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "NETWORK_CAPSTRING_OPTIONAL", "\"\"");
+        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "String", "VERSION_LABEL", "\"-dev\"");
+        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "long", "MAJOR_VERSION", "2");
+        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "long", "MINOR_VERSION", "4");
+        version.addClassConstant(ClassWriter.Visibility.PUBLIC, "long", "PATCH_VERSION", "99");
 
         String[] understandsPackets;
         if (packetsByNumber.isEmpty()) {

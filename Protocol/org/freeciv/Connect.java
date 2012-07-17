@@ -77,4 +77,28 @@ public class Connect {
 
         out.write(packetSerialized.toByteArray());
     }
+
+    public String getCapStringMandatory() {
+        return interpreter.getCapStringMandatory();
+    }
+
+    public String getCapStringOptional() {
+        return interpreter.getCapStringOptional();
+    }
+
+    public String getVersionLabel() {
+        return interpreter.getVersionLabel();
+    }
+
+    public long getVersionMajor() {
+        return interpreter.getVersionMajor();
+    }
+
+    public long getVersionMinor() {
+        return interpreter.getVersionMinor();
+    }
+
+    public long getVersionPatch() {
+        return interpreter.getVersionPatch();
+    }
 }

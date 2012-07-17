@@ -26,12 +26,24 @@ import java.util.HashMap;
 public class PacketsMapping {
     private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
     private final int packetNumberBytes;
+    private final String capStringMandatory;
+    private final String capStringOptional;
+    private final String versionLabel;
+    private final long versionMajor;
+    private final long versionMinor;
+    private final long versionPatch;
 
     public PacketsMapping() throws IOException {
       try {
         Class versionData = Class.forName("org.freeciv.VersionData");
         String[] understandsPackets = (String[])versionData.getField("understandsPackets").get(null);
         packetNumberBytes = versionData.getField("networkHeaderPacketNumberBytes").getInt(null);
+        capStringMandatory = (String)versionData.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
+        capStringOptional = (String)versionData.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
+        versionLabel = (String)versionData.getField("VERSION_LABEL").get(null);
+        versionMajor = versionData.getField("MAJOR_VERSION").getLong(null);
+        versionMinor = versionData.getField("MINOR_VERSION").getLong(null);
+        versionPatch = versionData.getField("PATCH_VERSION").getLong(null);
 
         for (int number = 0; number < understandsPackets.length; number++) {
             try {
@@ -76,5 +88,29 @@ public class PacketsMapping {
 
     public int getLenOfPacketNumber() {
         return packetNumberBytes;
+    }
+
+    public String getCapStringMandatory() {
+        return capStringMandatory;
+    }
+
+    public String getCapStringOptional() {
+        return capStringOptional;
+    }
+
+    public String getVersionLabel() {
+        return versionLabel;
+    }
+
+    public long getVersionMajor() {
+        return versionMajor;
+    }
+
+    public long getVersionMinor() {
+        return versionMinor;
+    }
+
+    public long getVersionPatch() {
+        return versionPatch;
     }
 }
