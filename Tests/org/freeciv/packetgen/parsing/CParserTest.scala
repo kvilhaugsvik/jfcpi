@@ -17,14 +17,14 @@ package org.freeciv.packetgen.parsing
 import org.freeciv.packetgen.dependency.Requirement
 import org.freeciv.packetgen.enteties.Enum
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
-import org.freeciv.packetgen.javaGenerator.ClassWriter
+import org.freeciv.Util
 import org.junit.Test
 import org.junit.Assert._
 import scala.inline
 import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader
 import java.util.Collection
-import org.freeciv.packetgen.{UndefinedException, GeneratorDefaults}
+import org.freeciv.packetgen.UndefinedException
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
@@ -498,7 +498,7 @@ class CParserSemanticTest {
       result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
 
     assertEquals("Should get value of constant",
-      GeneratorDefaults.CONSTANT_LOCATION + ".START_VALUE",
+      Util.VERSION_DATA_CLASS + ".START_VALUE",
       result.get.asInstanceOf[Enum].getEnumValue("ONE").getValueGenerator)
 
     assertEquals("Should get value of constant",
@@ -514,7 +514,7 @@ class CParserSemanticTest {
       result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
 
     assertEquals("Should contain calculation",
-      GeneratorDefaults.CONSTANT_LOCATION + ".START_VALUE * 16",
+      Util.VERSION_DATA_CLASS + ".START_VALUE * 16",
       result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
 
     assertEquals("Should get value of constant",
@@ -752,7 +752,7 @@ public enum test implements FCEnum {
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "SIMPLE", result.get.getName)
-    assertEquals("Wrong value generation expression", GeneratorDefaults.CONSTANT_LOCATION + ".WRONG", result.get.getExpression)
+    assertEquals("Wrong value generation expression", Util.VERSION_DATA_CLASS + ".WRONG", result.get.getExpression)
 
     val reqs: Collection[Requirement] = result.get.getReqs
     assertNotNull("Didn't even generate requirements...", reqs)
@@ -779,7 +779,7 @@ public enum test implements FCEnum {
     val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
 
     assertEquals("Wrong name", "COMPLEX", result.get.getName)
-    assertEquals("Wrong value generation expression", "(" + GeneratorDefaults.CONSTANT_LOCATION + ".WRONG * 2) + " + GeneratorDefaults.CONSTANT_LOCATION + ".SIMPLE", result.get.getExpression)
+    assertEquals("Wrong value generation expression", "(" + Util.VERSION_DATA_CLASS + ".WRONG * 2) + " + Util.VERSION_DATA_CLASS + ".SIMPLE", result.get.getExpression)
 
     val reqs: Collection[Requirement] = result.get.getReqs
     assertNotNull("Didn't even generate requirements...", reqs)

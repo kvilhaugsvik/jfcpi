@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.packetgen.GeneratorDefaults;
+import org.freeciv.Util;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -30,7 +30,7 @@ public class Constant implements IDependency {
     private final String type;
     private final HashSet<Requirement> reqs = new HashSet<Requirement>();
 
-    private static final String constantPrefix = GeneratorDefaults.CONSTANT_LOCATION + ".";
+    private static final String constantPrefix = Util.VERSION_DATA_CLASS + ".";
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
 
     public Constant(String name, StringTyped expression) {

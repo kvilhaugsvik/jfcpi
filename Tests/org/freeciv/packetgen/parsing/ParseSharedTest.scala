@@ -16,7 +16,7 @@ package org.freeciv.packetgen.parsing
 
 import org.junit.Assert._
 import org.junit.Test
-import org.freeciv.packetgen.GeneratorDefaults
+import org.freeciv.Util
 
 class ParseSharedTest {
   def parserShared = new ParseShared {
@@ -36,7 +36,7 @@ class ParseSharedTest {
 
   @Test def value = assertIntExpressionBecomes("4", "4")
 
-  @Test def constantName = assertIntExpressionBecomes(GeneratorDefaults.CONSTANT_LOCATION + ".MAX_THING", "MAX_THING")
+  @Test def constantName = assertIntExpressionBecomes(Util.VERSION_DATA_CLASS + ".MAX_THING", "MAX_THING")
 
   // Parses basic unary operations
   @Test def parenParen = assertIntExpressionBecomes("4", "((4))")
@@ -45,13 +45,13 @@ class ParseSharedTest {
 
   @Test def unaryMinus = assertIntExpressionBecomes("-4", "-4")
 
-  @Test def prefixPlusPlus = assertIntExpressionBecomes("++" + GeneratorDefaults.CONSTANT_LOCATION + ".A", "++A")
+  @Test def prefixPlusPlus = assertIntExpressionBecomes("++" + Util.VERSION_DATA_CLASS + ".A", "++A")
 
-  @Test def suffixPlusPlus = assertIntExpressionBecomes(GeneratorDefaults.CONSTANT_LOCATION + ".A++", "A++")
+  @Test def suffixPlusPlus = assertIntExpressionBecomes(Util.VERSION_DATA_CLASS + ".A++", "A++")
 
-  @Test def prefixMinusMinus = assertIntExpressionBecomes("--" + GeneratorDefaults.CONSTANT_LOCATION + ".A", "--A")
+  @Test def prefixMinusMinus = assertIntExpressionBecomes("--" + Util.VERSION_DATA_CLASS + ".A", "--A")
 
-  @Test def suffixMinusMinus = assertIntExpressionBecomes(GeneratorDefaults.CONSTANT_LOCATION + ".A--", "A--")
+  @Test def suffixMinusMinus = assertIntExpressionBecomes(Util.VERSION_DATA_CLASS + ".A--", "A--")
 
   // Parses basic binary operations
   @Test def binaryAdd = assertIntExpressionBecomes("1 + 2", "1 + 2")

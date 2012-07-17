@@ -33,7 +33,7 @@ public class PacketsMapping {
 
     public PacketsMapping() throws IOException {
         try {
-            Class constants = Class.forName("org.freeciv.Constants");
+            Class constants = Class.forName(Util.VERSION_DATA_CLASS);
             String[] understandsPackets = (String[])constants.getField("understandsPackets").get(null);
             packetNumberBytes = constants.getField("networkHeaderPacketNumberBytes").getInt(null);
             capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);

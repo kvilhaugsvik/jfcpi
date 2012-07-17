@@ -44,7 +44,6 @@ compileBasicProtocol:
 sourceDefaultsForGenerator:
 	echo "package org.freeciv.packetgen;" > ${GENERATORDEFAULTS}
 	echo "public class GeneratorDefaults {" >> ${GENERATORDEFAULTS}
-	echo "  public static final String CONSTANT_LOCATION = \"org.freeciv.Constants\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String GENERATED_SOURCE_FOLDER = \"${GENERATED_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}

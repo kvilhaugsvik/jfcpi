@@ -17,6 +17,11 @@ package org.freeciv;
 import java.lang.reflect.Array;
 
 public class Util {
+    /* Constants */
+    public static final String VERSION_DATA_CLASS = "org.freeciv.VersionData";
+
+    /* Utility methods */
+
     private static String joinStringArrayGeneric(Object elements, String separator, String begin, String end) {
         if (0 == Array.getLength(elements))
             return begin + end;

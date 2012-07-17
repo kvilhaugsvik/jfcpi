@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.Util;
 import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.enteties.FieldTypeBasic.FieldTypeAlias;
@@ -178,11 +179,11 @@ public class PacketsStore {
             else if (dep instanceof Constant)
                 sortedConstants.add((Constant)dep);
 
-        int border = GeneratorDefaults.CONSTANT_LOCATION.lastIndexOf('.');
+        int border = Util.VERSION_DATA_CLASS.lastIndexOf('.');
         ClassWriter constants =
                 new ClassWriter(ClassWriter.ClassKind.CLASS, new TargetPackage(
-                        GeneratorDefaults.CONSTANT_LOCATION.substring(0, border)), new String[0],
-                                "Freeciv C code", GeneratorDefaults.CONSTANT_LOCATION.substring(border + 1),
+                        Util.VERSION_DATA_CLASS.substring(0, border)), new String[0],
+                                "Freeciv C code", Util.VERSION_DATA_CLASS.substring(border + 1),
                                 null, null);
 
         for (Constant dep : sortedConstants)

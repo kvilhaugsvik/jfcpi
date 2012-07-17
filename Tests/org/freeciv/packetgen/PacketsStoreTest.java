@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.packetgen.*;
+import org.freeciv.Util;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
@@ -206,7 +206,7 @@ public class PacketsStoreTest {
     }
 
     private static ClassWriter getVersionData(PacketsStore storage) {
-        return getSourceOf(storage, "org.freeciv.Constants");
+        return getSourceOf(storage, Util.VERSION_DATA_CLASS);
     }
 
     private static ClassWriter getSourceOf(PacketsStore storage, String toGet) {
