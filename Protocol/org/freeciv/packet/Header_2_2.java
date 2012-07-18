@@ -34,13 +34,13 @@ public class Header_2_2 extends PacketHeader {
     @Override public void encodeTo(DataOutput to) throws IOException {
         // header
         // length is 2 unsigned bytes
-        to.writeChar(super.totalSize);
+        to.writeShort(super.totalSize);
         // type
-        to.writeChar(super.packetKind);
+        to.writeShort(super.packetKind);
     }
 
     private static int[] getSizeThenKind(DataInput in) throws IOException {
-        int size = in.readChar();
+        int size = in.readUnsignedShort();
         int kind = in.readUnsignedShort();
         return new int[]{size, kind};
     }
