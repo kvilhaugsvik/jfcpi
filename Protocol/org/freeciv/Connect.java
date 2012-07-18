@@ -94,7 +94,9 @@ public class Connect {
         byte[] out = new byte[wanted];
         int alreadyRead = 0;
         while(alreadyRead < wanted) {
-            alreadyRead += from.read(out, alreadyRead, wanted - alreadyRead);
+            int bytesRead = from.read(out, alreadyRead, wanted - alreadyRead);
+            if (0 < bytesRead)
+                alreadyRead += bytesRead;
             if (alreadyRead < wanted)
                 Thread.yield();
         }
