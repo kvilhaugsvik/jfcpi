@@ -108,7 +108,7 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 compileTestSignInToServer: compileFromFreeciv
 	mkdir -p ${COMPILED_BINDINGS_USERS_FOLDER}
 	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find BindingsUsers/Users -iname "*.java"`
-	echo "${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \$$1" > testSignInToServer
+	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \$$1" > testSignInToServer
 	chmod +x testSignInToServer
 	touch compileTestSignInToServer
 
