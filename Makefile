@@ -105,13 +105,16 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} `find Tests/org/freeciv/test/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-# not included in tests since it needs a running Freeciv server
-runtestsignintoserver: compileFromFreeciv
+compileTestSignInToServer: compileFromFreeciv
 	mkdir -p ${COMPILED_BINDINGS_USERS_FOLDER}
 	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find BindingsUsers/Users -iname "*.java"`
-	echo "${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \$$1" > runtestsignintoserver
-	chmod +x runtestsignintoserver || rm runtestsignintoserver
-	./runtestsignintoserver
+	echo "${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \$$1" > testSignInToServer
+	chmod +x testSignInToServer
+	touch compileTestSignInToServer
+
+# not included in tests since it needs a running Freeciv server
+runtestsignintoserver: compileTestSignInToServer
+	sh testSignInToServer && touch runtestsignintoserver
 
 compilePacketTest: folderTestOut compileBasicProtocol
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/packet/ -iname "*.java"`
@@ -142,7 +145,7 @@ clean:
 	rm -rf ${COMPILED_BINDINGS_USERS_FOLDER}
 	rm -f ${PROTOCOL_DISTRIBUTION} protojar
 	rm -f all
-	rm -rf runtestsignintoserver
+	rm -rf compileTestSignInToServer testSignInToServer runtestsignintoserver
 	rm -rf ${PROTOCOL_DISTRIBUTION}
 	rm -rf sourceFromFreeciv
 	rm -rf compileFromFreeciv
