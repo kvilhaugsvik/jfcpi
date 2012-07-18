@@ -32,10 +32,7 @@ public class Header_2_1 extends PacketHeader {
     }
 
     @Override public void encodeTo(DataOutput to) throws IOException {
-        // header
-        // length is 2 unsigned bytes
         to.writeShort(super.totalSize);
-        // type
         to.writeByte(super.packetKind);
     }
 
