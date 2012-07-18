@@ -26,6 +26,11 @@ public class RawPacket implements Packet {
         in.readFully(content);
     }
 
+    public RawPacket(byte[] in, PacketHeader header) throws IOException {
+        this.header = header;
+        content = in;
+    }
+
     public int getNumber() {
         return header.getPacketKind();
     }

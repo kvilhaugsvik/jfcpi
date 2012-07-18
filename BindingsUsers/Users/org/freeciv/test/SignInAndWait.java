@@ -42,11 +42,8 @@ public class SignInAndWait {
 
             while(true) {
                 System.out.println(con.getPacket());
-                Thread.sleep(1000L);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
