@@ -35,6 +35,14 @@ public class RawPacket implements Packet {
         return header.getPacketKind();
     }
 
+    public PacketHeader getHeader() {
+        return header;
+    }
+
+    public byte[] getBodyBytes() {
+        return content;
+    }
+
     public void encodeTo(DataOutput to) throws IOException {
         header.encodeTo(to);
         to.write(content);

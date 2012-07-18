@@ -15,6 +15,7 @@
 package org.freeciv.test;
 
 import org.freeciv.Connect;
+import org.freeciv.NotReadyYetException;
 import org.freeciv.packet.PACKET_CONN_PONG;
 import org.freeciv.packet.PACKET_SERVER_JOIN_REQ;
 
@@ -36,12 +37,14 @@ public class SignInAndWait {
                     con.getVersionMinor(),
                     con.getVersionPatch()));
 
-            System.out.println(con.getPacket());
-
             con.toSend(new PACKET_CONN_PONG());
 
             while(true) {
-                System.out.println(con.getPacket());
+                try {
+                    System.out.println(con.getPacket());
+                } catch (NotReadyYetException e) {
+                    Thread.yield();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

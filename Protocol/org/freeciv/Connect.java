@@ -18,7 +18,9 @@ import org.freeciv.packet.*;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.util.LinkedList;
 
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
@@ -26,6 +28,7 @@ public class Connect {
     private final OutputStream out;
     private final InputStream in;
     private final Socket server;
+    private final LinkedList<RawPacket> toProcess;
     private final PacketsMapping interpreter;
     private final Constructor<? extends PacketHeader> headerReader;
     private final int headerSize;
@@ -38,6 +41,7 @@ public class Connect {
         out = server.getOutputStream();
 
         interpreter = new PacketsMapping();
+        toProcess = new LinkedList<RawPacket>();
 
         try {
             headerReader = interpreter.getPacketHeaderClass().getConstructor(DataInput.class);
@@ -49,17 +53,38 @@ public class Connect {
         } catch (IllegalAccessException e) {
             throw new IOException("Could not access header size in header interpreter", e);
         }
+
+        Thread fastReader = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                try {
+                    while(server.isConnected()) {
+                        PacketHeader head = headerReader
+                                .newInstance(new DataInputStream(new ByteArrayInputStream(readXBytesFrom(headerSize, in))));
+                        byte[] body = readXBytesFrom(head.getBodySize(), in);
+                        toProcess.add(new RawPacket(body, head));
+                    }
+                } catch (Exception e) {
+                    System.err.println("Problem in the thread that reads from the network");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
+        });
+        fastReader.start();
     }
 
-    public Packet getPacket() throws IOException {
+    public Packet getPacket() throws IOException, NotReadyYetException {
+        if (toProcess.isEmpty())
+            throw new NotReadyYetException("No packets waiting");
+
         try {
-            PacketHeader head = headerReader
-                    .newInstance(new DataInputStream(new ByteArrayInputStream(readXBytesFrom(headerSize, in))));
-            byte[] body = readXBytesFrom(head.getBodySize(), in);
-            if (interpreter.canInterpret(head.getPacketKind()))
-                return interpreter.interpret(head, new DataInputStream(new ByteArrayInputStream(body)));
+            RawPacket out = toProcess.removeFirst();
+            if (interpreter.canInterpret(out.getHeader().getPacketKind()))
+                return interpreter.interpret(out.getHeader(),
+                        new DataInputStream(new ByteArrayInputStream(out.getBodyBytes())));
             else
-                return new RawPacket(body, head);
+                return out;
         } catch (Exception e) {
             throw new IOException("Could not read packet", e);
         }
