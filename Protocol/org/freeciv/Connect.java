@@ -70,6 +70,8 @@ public class Connect {
         int alreadyRead = 0;
         while(alreadyRead < wanted) {
             alreadyRead += from.read(out, alreadyRead, wanted - alreadyRead);
+            if (alreadyRead < wanted)
+                Thread.yield();
         }
         return out;
     }
