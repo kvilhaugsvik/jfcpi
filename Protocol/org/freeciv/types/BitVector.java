@@ -78,15 +78,6 @@ public abstract class BitVector {
 
     @Override
     public String toString() {
-        String[] vecAsText = new String[vec.length];
-        for (int index = 0; index < vec.length; index++) {
-            vecAsText[index] = boolToStr(vec[index]);
-        }
-
-        return joinStringArray(vecAsText, ", ", "(", ")");
-    }
-
-    private static String boolToStr(boolean toConvert) {
-        return (toConvert ? "1" : "0");
+        return joinStringArray(vec, ", ");
     }
 }
