@@ -45,6 +45,8 @@ public class SignInAndWait {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
+        System.exit(0);
     }
 }
