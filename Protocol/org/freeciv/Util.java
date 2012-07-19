@@ -46,4 +46,8 @@ public class Util {
     public static String joinStringArray(byte[] elements, String separator) {
         return joinStringArrayGeneric(elements, separator, "(", ")");
     }
+
+    public static String joinStringArray(boolean[] elements, String separator) {
+        return joinStringArrayGeneric(elements, separator, "(", ")");
+    }
 }

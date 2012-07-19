@@ -32,15 +32,12 @@ public class Header_2_1 extends PacketHeader {
     }
 
     @Override public void encodeTo(DataOutput to) throws IOException {
-        // header
-        // length is 2 unsigned bytes
-        to.writeChar(super.totalSize);
-        // type
+        to.writeShort(super.totalSize);
         to.writeByte(super.packetKind);
     }
 
     private static int[] getSizeThenKind(DataInput in) throws IOException {
-        int size = in.readChar();
+        int size = in.readUnsignedShort();
         int kind = in.readUnsignedByte();
         return new int[]{size, kind};
     }
