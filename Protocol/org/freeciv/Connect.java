@@ -14,12 +14,15 @@
 
 package org.freeciv;
 
+import org.freeciv.connection.ReflexPacketKind;
+import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.*;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.util.Map;
 import java.util.LinkedList;
 
 //TODO: Implement delta protocol
@@ -29,11 +32,13 @@ public class Connect {
     private final InputStream in;
     private final Socket server;
     private final LinkedList<RawPacket> toProcess;
+
     private final PacketsMapping interpreter;
     private final Constructor<? extends PacketHeader> headerReader;
     private final int headerSize;
 
-    public Connect(String address, int port) throws IOException {
+    public Connect(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
+        final ReflexPacketKind quickRespond = new ReflexPacketKind(reflexes, this);
 
         server = new Socket(address, port);
         in = server.getInputStream();
@@ -62,7 +67,9 @@ public class Connect {
                         PacketHeader head = headerReader
                                 .newInstance(new DataInputStream(new ByteArrayInputStream(readXBytesFrom(headerSize, in))));
                         byte[] body = readXBytesFrom(head.getBodySize(), in);
-                        toProcess.add(new RawPacket(body, head));
+                        RawPacket incoming = new RawPacket(body, head);
+                        quickRespond.handle(incoming);
+                        toProcess.add(incoming);
                     }
                 } catch (Exception e) {
                     System.err.println("Problem in the thread that reads from the network");
