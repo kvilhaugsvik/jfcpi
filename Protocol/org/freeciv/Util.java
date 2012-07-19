@@ -39,7 +39,7 @@ public class Util {
         return build.toString();
     }
 
-    public static String joinStringArray(String[] elements, String separator, String begin, String end) {
+    public static String joinStringArray(Object[] elements, String separator, String begin, String end) {
         return joinStringArrayGeneric(elements, separator, begin, end);
     }
 

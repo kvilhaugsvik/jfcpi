@@ -215,14 +215,11 @@ public class Packet extends ClassWriter implements IDependency {
         LinkedList<String> getToString = new LinkedList<String>();
         getToString.add("String out = \"" + name + "\" + \"(\" + number + \")\";");
         for (Field field : fields)
-            if (field.hasDeclarations())
-                getToString.addAll(Arrays.asList(field.forElementsInField(
-                        "out += \"\\n\\t" + field.getFieldName() + " = (\\n\";",
-                        "out += " + "\"\\t\\t\" + " + "this." + field.getFieldName() + "[i].toString() + \"\\n\";",
-                        "out += \"\\t)\";")));
-            else
-                getToString.add("out += \"\\n\\t" + field.getFieldName() +
-                                        " = \" + " + "this." + field.getFieldName() + ".toString();");
+            getToString.add("out += \"\\n\\t" + field.getFieldName() + " = \" + " + (field.hasDeclarations() ?
+                    "org.freeciv.Util.joinStringArray(" + "this." + field.getFieldName() + ", " +
+                            "\"\\n\\t\\t\"" +
+                            ", \"(\", \")\"" + ");" :
+                    "this." + field.getFieldName() + ".toString();"));
         getToString.add("");
         getToString.add("return out + \"\\n\";");
         addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
