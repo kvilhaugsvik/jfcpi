@@ -29,11 +29,14 @@ public class SignInAndWait {
     public static void main(String[] cmd) {
         String address = "127.0.0.1";
         int portNumber = 5556;
+        String userName = "FreecivJava";
 
         if (0 < cmd.length)
-            address = cmd[0];
+            userName = cmd[0];
         if (1 < cmd.length)
-            portNumber = Integer.parseInt(cmd[1]);
+            address = cmd[1];
+        if (2 < cmd.length)
+            portNumber = Integer.parseInt(cmd[2]);
 
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction() {
@@ -55,7 +58,7 @@ public class SignInAndWait {
         try {
             Connect con = new Connect(address, portNumber, reflexes);
 
-            con.toSend(new PACKET_SERVER_JOIN_REQ("FreecivJava",
+            con.toSend(new PACKET_SERVER_JOIN_REQ(userName,
                     con.getCapStringMandatory(),
                     con.getVersionLabel(),
                     con.getVersionMajor(),
