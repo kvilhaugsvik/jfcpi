@@ -125,10 +125,17 @@ public class Connect {
         out.write(packetSerialized.toByteArray());
     }
 
+    /**
+     * Close the connection as soon as its data has been read
+     */
     public void setOver() {
         over = true;
     }
 
+    /**
+     * Will the connection be closed (unless it already is) as soon as its empty?
+     * @return true if the connection is closed or soon will be
+     */
     public boolean isOver() {
         return over;
     }
