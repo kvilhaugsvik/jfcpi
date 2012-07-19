@@ -71,6 +71,7 @@ public class Connect {
                 }
             }
         });
+        fastReader.setDaemon(true);
         fastReader.start();
     }
 
