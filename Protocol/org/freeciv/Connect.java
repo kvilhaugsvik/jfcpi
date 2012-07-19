@@ -20,7 +20,6 @@ import org.freeciv.packet.*;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.Map;
 import java.util.LinkedList;
@@ -36,6 +35,8 @@ public class Connect {
     private final PacketsMapping interpreter;
     private final Constructor<? extends PacketHeader> headerReader;
     private final int headerSize;
+
+    private boolean over = false;
 
     public Connect(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
         final ReflexPacketKind quickRespond = new ReflexPacketKind(reflexes, this);
@@ -59,18 +60,20 @@ public class Connect {
             throw new IOException("Could not access header size in header interpreter", e);
         }
 
+        final Connect owner = this;
         Thread fastReader = new Thread(new Runnable(){
             @Override
             public void run() {
                 try {
-                    while(server.isConnected()) {
+                    while(0 < in.available() || !isOver()) {
                         PacketHeader head = headerReader
-                                .newInstance(new DataInputStream(new ByteArrayInputStream(readXBytesFrom(headerSize, in))));
-                        byte[] body = readXBytesFrom(head.getBodySize(), in);
+                                .newInstance(new DataInputStream(new ByteArrayInputStream(readXBytesFrom(headerSize, in, owner))));
+                        byte[] body = readXBytesFrom(head.getBodySize(), in, owner);
                         RawPacket incoming = new RawPacket(body, head);
                         quickRespond.handle(incoming);
                         toProcess.add(incoming);
                     }
+                    server.close();
                 } catch (Exception e) {
                     System.err.println("Problem in the thread that reads from the network");
                     e.printStackTrace();
@@ -98,13 +101,15 @@ public class Connect {
         }
     }
 
-    public static byte[] readXBytesFrom(int wanted, InputStream from) throws IOException {
+    public static byte[] readXBytesFrom(int wanted, InputStream from, Connect owner) throws IOException {
         byte[] out = new byte[wanted];
         int alreadyRead = 0;
         while(alreadyRead < wanted) {
             int bytesRead = from.read(out, alreadyRead, wanted - alreadyRead);
-            if (0 < bytesRead)
+            if (0 <= bytesRead)
                 alreadyRead += bytesRead;
+            else if (owner.isOver())
+                break;
             if (alreadyRead < wanted)
                 Thread.yield();
         }
@@ -118,6 +123,22 @@ public class Connect {
         toSend.encodeTo(packet);
 
         out.write(packetSerialized.toByteArray());
+    }
+
+    public void setOver() {
+        over = true;
+    }
+
+    public boolean isOver() {
+        return over;
+    }
+
+    public boolean isOpen() {
+        return !server.isClosed();
+    }
+
+    public boolean hasMorePackets() {
+        return !toProcess.isEmpty();
     }
 
     public String getCapStringMandatory() {

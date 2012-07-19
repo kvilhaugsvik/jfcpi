@@ -42,6 +42,12 @@ public class SignInAndWait {
                 }
             }
         });
+        reflexes.put(8, new ReflexReaction() {
+            @Override
+            public void apply(RawPacket incoming, Connect connection) {
+                connection.setOver();
+            }
+        });
         try {
             Connect con = new Connect(address, 5556, reflexes);
 
@@ -52,7 +58,7 @@ public class SignInAndWait {
                     con.getVersionMinor(),
                     con.getVersionPatch()));
 
-            while(true) {
+            while(con.isOpen() || con.hasMorePackets()) {
                 try {
                     System.out.println(con.getPacket());
                 } catch (NotReadyYetException e) {
