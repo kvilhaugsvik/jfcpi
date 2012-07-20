@@ -217,7 +217,7 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields)
             getToString.add("out += \"\\n\\t" + field.getFieldName() + " = \" + " + (field.hasDeclarations() ?
                     "org.freeciv.Util.joinStringArray(" + "this." + field.getFieldName() + ", " +
-                            "\"\\n\\t\\t\"" +
+                            "\", \"" +
                             ", \"(\", \")\"" + ");" :
                     "this." + field.getFieldName() + ".toString();"));
         getToString.add("");
