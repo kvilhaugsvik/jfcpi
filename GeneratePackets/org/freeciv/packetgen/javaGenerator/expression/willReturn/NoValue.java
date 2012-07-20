@@ -14,5 +14,5 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 
-public interface AString extends AValue {
+public interface NoValue extends Returnable {
 }

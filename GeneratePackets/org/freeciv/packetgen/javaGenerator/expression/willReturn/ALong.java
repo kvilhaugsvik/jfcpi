@@ -14,5 +14,5 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 
-public interface ALong extends SomeExpr {
+public interface ALong extends AValue {
 }

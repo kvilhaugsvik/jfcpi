@@ -26,7 +26,7 @@ object ParseVariableAssignments extends ExtractableParser {
   // TODO: Should concatenation be supported?
   def strExpr = quotedString.r ^^ {a => WrapCodeString.asAString(a)}
 
-  def value: Parser[SomeExpr] = strExpr
+  def value: Parser[AValue] = strExpr
 
   // TODO: Error if next item isn't EOL to avoid subtle bugs
   def assignment = (identifierRegEx <~ "=") ~ value

@@ -16,12 +16,12 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ALong;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 /**
  * Wrap a string of source code by declaring what it is
  */
-public abstract class WrapCodeString implements SomeExpr {
+public abstract class WrapCodeString implements AValue {
     private final String javaCode;
 
     /**

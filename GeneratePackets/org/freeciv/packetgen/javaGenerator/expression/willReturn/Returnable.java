@@ -14,5 +14,13 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 
-public interface AString extends AValue {
+public interface Returnable {
+    /**
+     * Get source code for an expression that returns a value
+     * @return the source code
+     */
+    public abstract  String getJavaCode();
+
+    @Override
+    public abstract String toString();
 }

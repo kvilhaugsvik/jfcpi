@@ -5,8 +5,8 @@ import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.util.Arrays;
 
@@ -39,9 +39,9 @@ public class TerminatedArray extends FieldTypeBasic {
                       "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
                       "}",
               "return " + "value.length + (value.length < " + Constant.referToInJavaCode(maxSizeConstant) + "?1:0);",
-              new ExprFrom1<AString, SomeExpr>() {
+              new ExprFrom1<AString, AValue>() {
                   @Override
-                  public AString getCodeFor(SomeExpr arg1) {
+                  public AString getCodeFor(AValue arg1) {
                       return WrapCodeString.asAString("org.freeciv.Util.joinStringArray(" + arg1 + ", \" \")");
                   }
               },
