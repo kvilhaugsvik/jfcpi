@@ -12,14 +12,16 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.expression.creators;
+
+import org.freeciv.packetgen.javaGenerator.expression.Expr;
 
 /**
  * An expression that returns a value of type Return given Argument1
  * @param <Returns>
  * @param <Argument1>
  */
-public interface Expr1<Returns extends TypedValueCode, Argument1 extends TypedValueCode> extends Expr<Returns> {
+public interface ExprFrom1<Returns extends Expr, Argument1 extends Expr> {
     /**
      * Source code for an expression that will return a value of the type represented by Returns
      * @param arg1 the argument taken

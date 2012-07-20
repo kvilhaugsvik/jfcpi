@@ -14,5 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression;
 
-public abstract class OneAnyToString implements Expr1<StringTyped, TypedValueCode> {
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
+
+public abstract class OneAnyToString implements ExprFrom1<StringTyped, TypedValueCode> {
 }

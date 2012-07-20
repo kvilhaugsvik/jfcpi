@@ -15,10 +15,15 @@
 package org.freeciv.packetgen.javaGenerator.expression;
 
 /**
- * An expression that returns a value represented by Returns
- * @param <Returns> The kind of value it returns
+ * An expression that returns a value (void is a value here)
  */
-public interface Expr<Returns extends TypedValueCode> {
+public interface Expr {
+    /**
+     * Get source code for an expression that returns a value
+     * @return the source code
+     */
+    public abstract  String getJavaCode();
+
     @Override
     public abstract String toString();
 }

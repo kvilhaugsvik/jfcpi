@@ -18,7 +18,7 @@ package org.freeciv.packetgen.javaGenerator.expression;
  * A wrapper for source code of an expression that returns a certain kind of value.
  * In other words: A class extending this represents the type and an object of that class has the source code
  */
-public abstract class TypedValueCode {
+public abstract class TypedValueCode implements Expr {
     private final String javaCode;
 
     /**

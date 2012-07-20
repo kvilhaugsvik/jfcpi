@@ -12,7 +12,9 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.expression.creators;
+
+import org.freeciv.packetgen.javaGenerator.expression.Expr;
 
 /**
  * An expression that returns a value of type Return given Argument1 and Argument2
@@ -20,7 +22,7 @@ package org.freeciv.packetgen.javaGenerator.expression;
  * @param <Argument1>
  * @param <Argument2>
  */
-public interface Expr2<Returns extends TypedValueCode, Argument1 extends TypedValueCode, Argument2 extends TypedValueCode> extends Expr<Returns> {
+public interface ExprFrom2<Returns extends Expr, Argument1 extends Expr, Argument2 extends Expr> {
     /**
      * Source code for an expression that will return a value of the type represented by Returns
      * @param arg1 the first argument taken
