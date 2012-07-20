@@ -12,11 +12,11 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.expression.util;
 
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 
-public class StringTyped extends TypedValueCode implements AString {
+class StringTyped extends WrapCodeString implements AString {
     /**
      * Constructor that forces the expression to be ready at initialization
      *

@@ -12,22 +12,23 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.expression.util;
 
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.ALong;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
 
 /**
- * A wrapper for source code of an expression that returns a certain kind of value.
- * In other words: A class extending this represents the type and an object of that class has the source code
+ * Wrap a string of source code by declaring what it is
  */
-public abstract class TypedValueCode implements SomeExpr {
+public abstract class WrapCodeString implements SomeExpr {
     private final String javaCode;
 
     /**
      * Constructor that forces the expression to be ready at initialization
      * @param javaCode
      */
-    protected TypedValueCode(String javaCode) {
+    protected WrapCodeString(String javaCode) {
         this.javaCode = javaCode;
     }
 
@@ -41,4 +42,12 @@ public abstract class TypedValueCode implements SomeExpr {
 
     @Override
     public abstract String toString();
+
+    public static AString asAString(String javaCode) {
+        return new StringTyped(javaCode);
+    }
+
+    public static ALong asALong(String javaCode) {
+        return new LongTyped(javaCode);
+    }
 }

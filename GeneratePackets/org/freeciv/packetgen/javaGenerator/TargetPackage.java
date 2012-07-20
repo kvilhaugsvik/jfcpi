@@ -14,9 +14,9 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.TypedValueCode;
+import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
 
-public class TargetPackage extends TypedValueCode {
+public class TargetPackage extends WrapCodeString {
     public TargetPackage(String wrapped) {
         super(wrapped);
     }

@@ -12,11 +12,11 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.expression.util;
 
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ALong;
 
-public class LongTyped extends TypedValueCode implements ALong {
+class LongTyped extends WrapCodeString implements ALong {
     /**
      * Constructor that forces the expression to be ready at initialization
      *

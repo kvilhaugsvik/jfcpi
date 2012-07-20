@@ -19,8 +19,8 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
-import org.freeciv.packetgen.javaGenerator.expression.*;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
+import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.util.Collection;
@@ -62,7 +62,7 @@ public class FieldTypeBasic implements IDependency {
                 new ExprFrom1<AString, SomeExpr>() {
                     @Override
                     public AString getCodeFor(SomeExpr arg1) {
-                        return new StringTyped(arg1.getJavaCode() + ".toString()");
+                        return WrapCodeString.asAString(arg1.getJavaCode() + ".toString()");
                     }
                 },
                 arrayEater, needs);
@@ -118,7 +118,7 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
             addMethodPublicReadObjectState(null, javaType, "getValue", "return value;");
             addMethodPublicReadObjectState(null, "String", "toString",
-                    "return " + value2String.getCodeFor(new StringTyped("value")).toString() + ";");
+                    "return " + value2String.getCodeFor(WrapCodeString.asAString("value")).toString() + ";");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
                       "if (other instanceof " + name + ") {",
                       "return this.value == ((" + name + ")other).getValue();",
