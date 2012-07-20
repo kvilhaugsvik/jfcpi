@@ -22,43 +22,43 @@ public abstract class BitVector {
     protected final boolean[] vec;
     protected final int sizeInBits;
 
-    private BitVector(int size) {
+    private BitVector(final int size) {
         this.sizeInBits = size;
         this.vec = new boolean[size];
     }
 
-    protected BitVector(int sizeInBits, byte[] src) {
+    protected BitVector(final int sizeInBits, final byte[] src) {
         this(sizeInBits);
-        for (int pos = 0; pos < sizeInBits; sizeInBits++)
+        for (int pos = 0; pos < sizeInBits; pos++)
             vec[pos] = 0 != (src[isInByteNumber(pos)] & (1 << isBitNumberInAByte(pos)));
     }
 
-    protected BitVector(int size, boolean setAllTo) {
+    protected BitVector(final int size, final boolean setAllTo) {
         this(size);
         for (int toSet = 0; toSet < size; toSet++) {
             vec[toSet] = setAllTo;
         }
     }
 
-    protected BitVector(boolean[] normal) {
+    protected BitVector(final boolean[] normal) {
         vec = normal.clone();
         sizeInBits = normal.length;
     }
 
-    private int isBitNumberInAByte(int pos) {
+    private int isBitNumberInAByte(final int pos) {
         return pos % 8;
     }
 
-    private int isInByteNumber(int pos) {
+    private int isInByteNumber(final int pos) {
         return pos / 8;
     }
 
-    public boolean get(int bitNumber) {
+    public boolean get(final int bitNumber) {
         return vec[bitNumber];
     }
 
     // TODO: Move to subclass so this can be made imputable
-    public void set(int bitNumber, boolean value) {
+    public void set(final int bitNumber, final boolean value) {
         vec[bitNumber] = value;
     }
 
