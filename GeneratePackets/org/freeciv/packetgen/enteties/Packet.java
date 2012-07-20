@@ -146,11 +146,11 @@ public class Packet extends ClassWriter implements IDependency {
                                           ") : \"Packet not generated for this kind of header\";");
         constructorBodyStream.add("");
 
-        constructorBodyStream.add("if (calcBodyLen() != header.getBodySize()) {");
-        constructorBodyStream.add(
-                "throw new IOException(\"Package size in header and Java packet not the same. Header: \"" +
-                        " + header.getTotalSize()");
-        constructorBodyStream.add("+ \" Packet: \" + getEncodedSize());");
+        constructorBodyStream.add("if (header.getHeaderSize() + calcBodyLen() != header.getTotalSize()) {");
+        constructorBodyStream.add("throw new IOException(\"Packet size in header and Java packet not the same.\"");
+        constructorBodyStream.add("+ \" Header packet size: \"" + " + header.getTotalSize()");
+        constructorBodyStream.add("+ \" Header size: \" + header.getHeaderSize()");
+        constructorBodyStream.add("+ \" Packet body size: \" + calcBodyLen());");
         constructorBodyStream.add("}");
         addConstructorPublicWithExceptions("/***\n" +
                                                    " * Construct an object from a DataInput\n" +
