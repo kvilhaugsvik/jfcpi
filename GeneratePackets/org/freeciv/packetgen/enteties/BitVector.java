@@ -16,6 +16,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
     private final Requirement iProvide;
 
     private final boolean knowsSize;
+    private final boolean arrayEater;
 
     public BitVector(String name, IntExpression bits) {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.types.BitVector.class.getPackage()), null,
@@ -30,6 +31,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
 
         iRequire = bits.getReqs();
         iProvide = new Requirement(getName(), Requirement.Kind.AS_JAVA_DATATYPE);
+        arrayEater = false;
     }
 
     public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
@@ -49,6 +51,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
 
         iRequire = Collections.<Requirement>emptySet();
         iProvide = new Requirement("char", Requirement.Kind.AS_JAVA_DATATYPE);
+        arrayEater = true;
     }
 
     @Override
@@ -83,7 +86,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                                   "return " + (knowsSize ?
                                           size[0] + realBitVector + size[1] :
                                           "2 + " + size[0] + "value" + ".size" + size[1]) + ";",
-                                  false,
+                                  arrayEater,
                                   Arrays.asList(iProvide));
     }
 
