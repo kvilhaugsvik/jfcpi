@@ -12,11 +12,18 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
+/**
+ * An expression that returns a value (void is a value here)
+ */
+public interface SomeExpr {
+    /**
+     * Get source code for an expression that returns a value
+     * @return the source code
+     */
+    public abstract  String getJavaCode();
 
-public abstract class OneAnyToString implements ExprFrom1<AString, SomeExpr> {
+    @Override
+    public abstract String toString();
 }

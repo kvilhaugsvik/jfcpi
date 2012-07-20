@@ -14,11 +14,13 @@
 
 package org.freeciv.packetgen.javaGenerator.expression;
 
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
+
 /**
  * A wrapper for source code of an expression that returns a certain kind of value.
  * In other words: A class extending this represents the type and an object of that class has the source code
  */
-public abstract class TypedValueCode implements Expr {
+public abstract class TypedValueCode implements SomeExpr {
     private final String javaCode;
 
     /**

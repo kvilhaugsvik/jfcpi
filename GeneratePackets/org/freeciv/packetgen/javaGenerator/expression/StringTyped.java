@@ -14,7 +14,9 @@
 
 package org.freeciv.packetgen.javaGenerator.expression;
 
-public class StringTyped extends TypedValueCode {
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
+
+public class StringTyped extends TypedValueCode implements AString {
     /**
      * Constructor that forces the expression to be ready at initialization
      *

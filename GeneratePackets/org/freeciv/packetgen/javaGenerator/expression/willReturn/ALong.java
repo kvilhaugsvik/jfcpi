@@ -12,18 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 
-/**
- * An expression that returns a value (void is a value here)
- */
-public interface Expr {
-    /**
-     * Get source code for an expression that returns a value
-     * @return the source code
-     */
-    public abstract  String getJavaCode();
-
-    @Override
-    public abstract String toString();
+public interface ALong extends SomeExpr {
 }

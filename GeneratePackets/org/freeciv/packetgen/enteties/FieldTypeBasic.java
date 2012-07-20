@@ -20,6 +20,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
 import org.freeciv.packetgen.javaGenerator.expression.*;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -59,7 +60,7 @@ public class FieldTypeBasic implements IDependency {
         this(dataIOType, publicType, javaType, fromJavaType, decode, encode, encodedSize,
                 new OneAnyToString() {
                     @Override
-                    public StringTyped getCodeFor(TypedValueCode arg1) {
+                    public AString getCodeFor(SomeExpr arg1) {
                         return new StringTyped(arg1.getJavaCode() + ".toString()");
                     }
                 },

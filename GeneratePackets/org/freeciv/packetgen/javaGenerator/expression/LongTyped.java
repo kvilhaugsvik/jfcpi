@@ -14,7 +14,9 @@
 
 package org.freeciv.packetgen.javaGenerator.expression;
 
-public class LongTyped extends TypedValueCode {
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.ALong;
+
+public class LongTyped extends TypedValueCode implements ALong {
     /**
      * Constructor that forces the expression to be ready at initialization
      *

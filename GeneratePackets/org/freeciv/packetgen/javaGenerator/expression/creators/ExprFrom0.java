@@ -14,13 +14,13 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.creators;
 
-import org.freeciv.packetgen.javaGenerator.expression.Expr;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
 
 /**
  * An expression that returns a value of type Returns without needing any other values
  * @param <Returns> The value the expression returns
  */
-public interface ExprFrom0<Returns extends Expr> {
+public interface ExprFrom0<Returns extends SomeExpr> {
     /**
      * Source code for an expression that will return a value of the type represented by Returns
      * @return The source code

@@ -12,11 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
-
-public abstract class OneAnyToString implements ExprFrom1<AString, SomeExpr> {
+public interface AString extends SomeExpr {
 }
