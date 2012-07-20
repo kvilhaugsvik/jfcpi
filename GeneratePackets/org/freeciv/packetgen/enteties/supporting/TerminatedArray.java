@@ -4,6 +4,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.expression.*;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 
@@ -38,7 +39,7 @@ public class TerminatedArray extends FieldTypeBasic {
                       "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
                       "}",
               "return " + "value.length + (value.length < " + Constant.referToInJavaCode(maxSizeConstant) + "?1:0);",
-              new OneAnyToString() {
+              new ExprFrom1<AString, SomeExpr>() {
                   @Override
                   public AString getCodeFor(SomeExpr arg1) {
                       return new StringTyped("org.freeciv.Util.joinStringArray(" + arg1 + ", \" \")");

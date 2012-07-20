@@ -20,6 +20,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
 import org.freeciv.packetgen.javaGenerator.expression.*;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.util.Collection;
@@ -32,14 +33,14 @@ public class FieldTypeBasic implements IDependency {
     private final String[] fromJavaType;
     private final String[] decode;
     private final String[] encode, encodedSize;
-    private final OneAnyToString value2String;
+    private final ExprFrom1<AString, SomeExpr> value2String;
     private final boolean arrayEater;
 
     private final Collection<Requirement> requirement;
     private final FieldTypeBasic basicType = this;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
-                          String decode, String encode, String encodedSize, OneAnyToString toString,
+                          String decode, String encode, String encodedSize, ExprFrom1<AString, SomeExpr> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
@@ -58,7 +59,7 @@ public class FieldTypeBasic implements IDependency {
                           String decode, String encode, String encodedSize,
                           boolean arrayEater, Collection<Requirement> needs) {
         this(dataIOType, publicType, javaType, fromJavaType, decode, encode, encodedSize,
-                new OneAnyToString() {
+                new ExprFrom1<AString, SomeExpr>() {
                     @Override
                     public AString getCodeFor(SomeExpr arg1) {
                         return new StringTyped(arg1.getJavaCode() + ".toString()");
