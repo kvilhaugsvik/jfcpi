@@ -86,11 +86,13 @@ public class Connect {
     }
 
     public Packet getPacket() throws IOException, NotReadyYetException {
+        RawPacket out;
         if (toProcess.isEmpty())
             throw new NotReadyYetException("No packets waiting");
+        else
+            out = toProcess.removeFirst();
 
         try {
-            RawPacket out = toProcess.removeFirst();
             if (interpreter.canInterpret(out.getHeader().getPacketKind()))
                 return interpreter.interpret(out.getHeader(),
                         new DataInputStream(new ByteArrayInputStream(out.getBodyBytes())));
