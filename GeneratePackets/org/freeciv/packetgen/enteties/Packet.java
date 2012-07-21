@@ -136,15 +136,15 @@ public class Packet extends ClassWriter implements IDependency {
                             "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName),
                             "")));
         }
+
+        constructorBodyStream.add("");
         constructorBodyStream.add("if (getNumber() != header.getPacketKind()) {");
         constructorBodyStream.add("throw new IOException(\"Tried to create package " +
                                           name + " but packet number was \" + header.getPacketKind());");
         constructorBodyStream.add("}");
-        constructorBodyStream.add("");
 
         constructorBodyStream.add("assert (header instanceof " + headerKind +
                                           ") : \"Packet not generated for this kind of header\";");
-        constructorBodyStream.add("");
 
         constructorBodyStream.add("if (header.getHeaderSize() + calcBodyLen() != header.getTotalSize()) {");
         constructorBodyStream.add("throw new IOException(\"Packet size in header and Java packet not the same.\"");
