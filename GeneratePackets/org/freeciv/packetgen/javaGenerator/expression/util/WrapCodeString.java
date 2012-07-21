@@ -14,9 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.ALong;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 /**
  * Wrap a string of source code by declaring what it is
@@ -49,5 +47,9 @@ public abstract class WrapCodeString implements AValue {
 
     public static ALong asALong(String javaCode) {
         return new LongTyped(javaCode);
+    }
+
+    public static NoValue asVoid(String javaCode) {
+        return new Void(javaCode);
     }
 }
