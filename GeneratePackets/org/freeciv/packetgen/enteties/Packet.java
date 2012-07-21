@@ -136,15 +136,15 @@ public class Packet extends ClassWriter implements IDependency {
                             "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName),
                             "")));
         }
+
+        constructorBodyStream.add("");
         constructorBodyStream.add("if (getNumber() != header.getPacketKind()) {");
         constructorBodyStream.add("throw new IOException(\"Tried to create package " +
                                           name + " but packet number was \" + header.getPacketKind());");
         constructorBodyStream.add("}");
-        constructorBodyStream.add("");
 
         constructorBodyStream.add("assert (header instanceof " + headerKind +
                                           ") : \"Packet not generated for this kind of header\";");
-        constructorBodyStream.add("");
 
         constructorBodyStream.add("if (header.getHeaderSize() + calcBodyLen() != header.getTotalSize()) {");
         constructorBodyStream.add("throw new IOException(\"Packet size in header and Java packet not the same.\"");
@@ -166,11 +166,8 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addEncoder(Field[] fields) {
         LinkedList<String> encodeFields = new LinkedList<String>();
-        encodeFields.add("// header");
         encodeFields.add("header.encodeTo(to);");
         if (0 < fields.length) {
-            encodeFields.add("");
-            encodeFields.add("// body");
             for (Field field : fields)
                 encodeFields.addAll(Arrays.asList(field.forElementsInField("",
                                                                      "this." + field
@@ -220,7 +217,6 @@ public class Packet extends ClassWriter implements IDependency {
                             "\", \"" +
                             ", \"(\", \")\"" + ");" :
                     "this." + field.getFieldName() + ".toString();"));
-        getToString.add("");
         getToString.add("return out + \"\\n\";");
         addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
     }
