@@ -166,11 +166,8 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addEncoder(Field[] fields) {
         LinkedList<String> encodeFields = new LinkedList<String>();
-        encodeFields.add("// header");
         encodeFields.add("header.encodeTo(to);");
         if (0 < fields.length) {
-            encodeFields.add("");
-            encodeFields.add("// body");
             for (Field field : fields)
                 encodeFields.addAll(Arrays.asList(field.forElementsInField("",
                                                                      "this." + field
