@@ -26,7 +26,4 @@ public abstract interface Packet {
      * @throws IOException when problem writing
      */
     public abstract void encodeTo(DataOutput to) throws IOException;
-
-    @Deprecated public abstract int getEncodedSize();
-    @Deprecated public abstract int getNumber();
 }

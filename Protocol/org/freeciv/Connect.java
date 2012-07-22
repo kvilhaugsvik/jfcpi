@@ -119,7 +119,7 @@ public class Connect {
     }
 
     public void toSend(Packet toSend) throws IOException {
-        ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getEncodedSize());
+        ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getHeader().getTotalSize());
         DataOutputStream packet = new DataOutputStream(packetSerialized);
 
         toSend.encodeTo(packet);

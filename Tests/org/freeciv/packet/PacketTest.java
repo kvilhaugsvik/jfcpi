@@ -29,8 +29,8 @@ public class PacketTest {
                         48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
         RawPacket packet = new RawPacket(inputStream, (new Header_2_1(64, 4)));
 
-        assertEquals(64, packet.getEncodedSize());
-        assertEquals(4, packet.getNumber());
+        assertEquals(64, packet.getHeader().getTotalSize());
+        assertEquals(4, packet.getHeader().getPacketKind());
     }
 
     @Test public void testRawPacketSerializesCorrectly() throws IOException {

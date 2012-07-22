@@ -28,8 +28,8 @@ public class GeneratedPacketTest {
     public void testPacketWithoutFields() throws IOException {
         CONN_PONG packet = new CONN_PONG();
 
-        assertEquals(3, packet.getEncodedSize());
-        assertEquals(89, packet.getNumber());
+        assertEquals(3, packet.getHeader().getTotalSize());
+        assertEquals(89, packet.getHeader().getPacketKind());
     }
 
     @Test
@@ -37,8 +37,8 @@ public class GeneratedPacketTest {
         SERVER_JOIN_REQ packet =
                 new SERVER_JOIN_REQ("FreecivJava", "+Freeciv.Devel-2.4-2011.Aug.02 ", "-dev", 2L, 3L, 99L);
 
-        assertEquals(64, packet.getEncodedSize());
-        assertEquals(4, packet.getNumber());
+        assertEquals(64, packet.getHeader().getTotalSize());
+        assertEquals(4, packet.getHeader().getPacketKind());
     }
 
     @Test
@@ -65,8 +65,8 @@ public class GeneratedPacketTest {
                         new UINT32(3L),
                         new UINT32(99L));
 
-        assertEquals(64, packet.getEncodedSize());
-        assertEquals(4, packet.getNumber());
+        assertEquals(64, packet.getHeader().getTotalSize());
+        assertEquals(4, packet.getHeader().getPacketKind());
     }
 
     @Test
@@ -92,8 +92,8 @@ public class GeneratedPacketTest {
     public void testPacketWithoutFieldsFromStream() throws IOException {
         DataInput inputStream = new DataInputStream(new ByteArrayInputStream(new byte[]{/*0, 3, 89*/}));
         CONN_PONG packet = new CONN_PONG(inputStream, new Header_2_1(3, 89));
-        assertEquals(3, packet.getEncodedSize());
-        assertEquals(89, packet.getNumber());
+        assertEquals(3, packet.getHeader().getTotalSize());
+        assertEquals(89, packet.getHeader().getPacketKind());
     }
 
     @Test
@@ -103,8 +103,8 @@ public class GeneratedPacketTest {
                         105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
                         48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
         SERVER_JOIN_REQ packet = new SERVER_JOIN_REQ(inputStream, new Header_2_1(64, 4));
-        assertEquals(64, packet.getEncodedSize());
-        assertEquals(4, packet.getNumber());
+        assertEquals(64, packet.getHeader().getTotalSize());
+        assertEquals(4, packet.getHeader().getPacketKind());
     }
 
     @Test
