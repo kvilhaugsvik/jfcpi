@@ -68,12 +68,10 @@ public class Packet extends ClassWriter implements IDependency {
 
         addConstructorFromDataInput(name, fields, headerKind);
 
-        addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
         addMethodPublicReadObjectState(null, "PacketHeader", "getHeader", "return header;");
 
         addEncoder(fields);
         addCalcBodyLen(fields);
-        addEncodedSize();
 
         addToString(name, fields);
 
@@ -139,7 +137,7 @@ public class Packet extends ClassWriter implements IDependency {
         }
 
         constructorBodyStream.add("");
-        constructorBodyStream.add("if (getNumber() != header.getPacketKind()) {");
+        constructorBodyStream.add("if (number != header.getPacketKind()) {");
         constructorBodyStream.add("throw new IOException(\"Tried to create package " +
                                           name + " but packet number was \" + header.getPacketKind());");
         constructorBodyStream.add("}");
@@ -203,10 +201,6 @@ public class Packet extends ClassWriter implements IDependency {
                   Visibility.PRIVATE, Scope.OBJECT,
                   "int", "calcBodyLen", null, null,
                   encodeFieldsLen.toArray(new String[0]));
-    }
-
-    private void addEncodedSize() {
-        addMethodPublicReadObjectState(null, "int", "getEncodedSize", "return header.getTotalSize();");
     }
 
     private void addToString(String name, Field[] fields) {
