@@ -69,6 +69,7 @@ public class Packet extends ClassWriter implements IDependency {
         addConstructorFromDataInput(name, fields, headerKind);
 
         addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
+        addMethodPublicReadObjectState(null, "PacketHeader", "getHeader", "return header;");
 
         addEncoder(fields);
         addCalcBodyLen(fields);

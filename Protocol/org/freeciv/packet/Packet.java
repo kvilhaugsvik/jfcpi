@@ -18,7 +18,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public abstract interface Packet {
-    public abstract int getNumber();
+    public abstract PacketHeader getHeader();
 
     /***
      * serialize the packet to the format on the line
@@ -27,5 +27,6 @@ public abstract interface Packet {
      */
     public abstract void encodeTo(DataOutput to) throws IOException;
 
-    public abstract int getEncodedSize();
+    @Deprecated public abstract int getEncodedSize();
+    @Deprecated public abstract int getNumber();
 }
