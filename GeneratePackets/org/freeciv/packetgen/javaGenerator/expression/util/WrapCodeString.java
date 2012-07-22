@@ -45,6 +45,10 @@ public abstract class WrapCodeString implements AValue {
         return new StringTyped(javaCode);
     }
 
+    public static ABool asBool(String javaCode) {
+        return new Bool(javaCode);
+    }
+
     public static ALong asALong(String javaCode) {
         return new LongTyped(javaCode);
     }
