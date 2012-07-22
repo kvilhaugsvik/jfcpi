@@ -56,31 +56,21 @@ public class Packet extends ClassWriter implements IDependency {
 
         addClassConstant("int", "number", number + "");
 
-        addObjectConstant("PacketHeader", "header");
-
-        for (Field field : fields) {
-            addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getFieldName());
-        }
-
         addConstructorFromFields(fields, headerKind);
 
         addConstructorFromJavaTypes(fields, headerKind);
 
         addConstructorFromDataInput(name, fields, headerKind);
 
-        addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
-
         addEncoder(fields);
         addCalcBodyLen(fields);
-        addEncodedSize();
 
         addToString(name, fields);
 
-        for (Field field : fields) {
-            addGetAsField(field);
-        }
+        addObjectConstantAndGetter("PacketHeader", "header");
 
         for (Field field : fields) {
+            addObjectConstantAndGetter(field.getType() + field.getArrayDeclaration(), field.getFieldName());
             addJavaGetter(field);
         }
     }
@@ -138,7 +128,7 @@ public class Packet extends ClassWriter implements IDependency {
         }
 
         constructorBodyStream.add("");
-        constructorBodyStream.add("if (getNumber() != header.getPacketKind()) {");
+        constructorBodyStream.add("if (number != header.getPacketKind()) {");
         constructorBodyStream.add("throw new IOException(\"Tried to create package " +
                                           name + " but packet number was \" + header.getPacketKind());");
         constructorBodyStream.add("}");
@@ -204,10 +194,6 @@ public class Packet extends ClassWriter implements IDependency {
                   encodeFieldsLen.toArray(new String[0]));
     }
 
-    private void addEncodedSize() {
-        addMethodPublicReadObjectState(null, "int", "getEncodedSize", "return header.getTotalSize();");
-    }
-
     private void addToString(String name, Field[] fields) {
         LinkedList<String> getToString = new LinkedList<String>();
         getToString.add("String out = \"" + name + "\" + \"(\" + number + \")\";");
@@ -219,12 +205,6 @@ public class Packet extends ClassWriter implements IDependency {
                     "this." + field.getFieldName() + ".toString();"));
         getToString.add("return out + \"\\n\";");
         addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
-    }
-
-    private void addGetAsField(Field field) {
-        addMethodPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
-                + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1),
-                                       "return " + "this." + field.getFieldName() + ";");
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {

@@ -31,10 +31,6 @@ public class RawPacket implements Packet {
         content = in;
     }
 
-    public int getNumber() {
-        return header.getPacketKind();
-    }
-
     public PacketHeader getHeader() {
         return header;
     }
@@ -48,15 +44,19 @@ public class RawPacket implements Packet {
         to.write(content);
     }
 
-    public int getEncodedSize() {
-        return header.getTotalSize();
-    }
-
     @Override public String toString() {
         String out = "(" + header.getPacketKind() + ")\t";
         for (byte part: content) {
             out += ((int)part) + "\t";
         }
         return out + "\n";
+    }
+
+    public int getNumber() {
+        return header.getPacketKind();
+    }
+
+    public int getEncodedSize() {
+        return header.getTotalSize();
     }
 }
