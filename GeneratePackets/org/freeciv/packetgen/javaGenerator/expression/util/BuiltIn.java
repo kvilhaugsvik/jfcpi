@@ -19,6 +19,9 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import static org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString.*;
 
 public class BuiltIn {
+    public static final ABool TRUE = asBool("true");
+    public static final ABool FALSE = asBool("false");
+
     public static final ExprFrom1<NoValue, AValue> RETURN = new ExprFrom1<NoValue, AValue>() {
         @Override
         public NoValue getCodeFor(AValue arg1) {
