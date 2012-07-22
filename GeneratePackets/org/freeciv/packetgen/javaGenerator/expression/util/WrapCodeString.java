@@ -19,7 +19,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 /**
  * Wrap a string of source code by declaring what it is
  */
-public abstract class WrapCodeString implements AValue {
+public abstract class WrapCodeString {
     private final String javaCode;
 
     /**
