@@ -56,12 +56,6 @@ public class Packet extends ClassWriter implements IDependency {
 
         addClassConstant("int", "number", number + "");
 
-        addObjectConstant("PacketHeader", "header");
-
-        for (Field field : fields) {
-            addObjectConstant(field.getType() + field.getArrayDeclaration(), field.getFieldName());
-        }
-
         addConstructorFromFields(fields, headerKind);
 
         addConstructorFromJavaTypes(fields, headerKind);
@@ -73,10 +67,10 @@ public class Packet extends ClassWriter implements IDependency {
 
         addToString(name, fields);
 
-        addMethodPublicReadObjectState(null, "PacketHeader", "getHeader", "return header;");
+        addObjectConstantAndGetter("PacketHeader", "header");
 
         for (Field field : fields) {
-            addGetAsField(field);
+            addObjectConstantAndGetter(field.getType() + field.getArrayDeclaration(), field.getFieldName());
             addJavaGetter(field);
         }
     }
@@ -211,12 +205,6 @@ public class Packet extends ClassWriter implements IDependency {
                     "this." + field.getFieldName() + ".toString();"));
         getToString.add("return out + \"\\n\";");
         addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
-    }
-
-    private void addGetAsField(Field field) {
-        addMethodPublicReadObjectState(null, field.getType() + field.getArrayDeclaration(), "get"
-                + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1),
-                                       "return " + "this." + field.getFieldName() + ";");
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {
