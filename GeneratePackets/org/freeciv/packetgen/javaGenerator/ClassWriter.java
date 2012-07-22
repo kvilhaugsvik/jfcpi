@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.util.*;
@@ -100,6 +101,13 @@ public class ClassWriter {
                                                String type,
                                                String name,
                                                String... body) {
+        methods.add(Method.newPublicReadObjectState(comment, type, name, body));
+    }
+
+    public void addMethodPublicReadObjectState(String comment,
+                                               String type,
+                                               String name,
+                                               Block body) {
         methods.add(Method.newPublicReadObjectState(comment, type, name, body));
     }
 
@@ -363,19 +371,6 @@ public class ClassWriter {
             this.body = body;
         }
 
-        public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
-                      String exceptionList, AValue... body) {
-            this(comment, visibility, scope, type, name, paramList, exceptionList, exprsToString(body));
-        }
-
-        private static String[] exprsToString(AValue[] inn) {
-            String[] raw = new String[inn.length];
-            for (int i = 0; i < inn.length; i++) {
-                raw[i] = inn[i].getJavaCode();
-            }
-            return raw;
-        }
-
         @Override
         public String toString() {
             String out = (null == comment ? "" : indent(comment) + "\n");
@@ -402,6 +397,13 @@ public class ClassWriter {
         }
 
         static Method newPublicReadObjectState(String comment,
+                                               String type,
+                                               String name,
+                                               Block body) {
+            return newPublicDynamicMethod(comment, type, name, null, null, body.getJavaCodeLines());
+        }
+
+        private static Method newPublicReadObjectState(String comment,
                                                String type,
                                                String name,
                                                String... body) {

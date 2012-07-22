@@ -18,6 +18,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packet.fieldtype.FieldType;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.junit.Test;
 
 import static org.freeciv.packetgen.javaGenerator.ClassWriter.*;
@@ -535,7 +536,8 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicReadObjectState() {
-        String result = Method.newPublicReadObjectState(null, "String", "toString", "return value.toString();").toString();
+        String result = Method.newPublicReadObjectState(null, "String", "toString",
+                new Block("return value.toString()")).toString();
 
         assertEquals("Generated source not as expected",
                 "\tpublic String toString() {\n" +
