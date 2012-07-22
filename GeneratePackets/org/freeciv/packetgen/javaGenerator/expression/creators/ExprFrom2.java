@@ -23,7 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
  * @param <Argument1>
  * @param <Argument2>
  */
-public interface ExprFrom2<Returns extends Returnable, Argument1 extends AValue, Argument2 extends AValue> {
+public interface ExprFrom2<Returns extends Returnable, Argument1 extends Returnable, Argument2 extends Returnable> {
     /**
      * Source code for an expression that will return a value of the type represented by Returns
      * @param arg1 the first argument taken
