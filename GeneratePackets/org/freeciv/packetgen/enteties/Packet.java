@@ -68,18 +68,15 @@ public class Packet extends ClassWriter implements IDependency {
 
         addConstructorFromDataInput(name, fields, headerKind);
 
-        addMethodPublicReadObjectState(null, "PacketHeader", "getHeader", "return header;");
-
         addEncoder(fields);
         addCalcBodyLen(fields);
 
         addToString(name, fields);
 
-        for (Field field : fields) {
-            addGetAsField(field);
-        }
+        addMethodPublicReadObjectState(null, "PacketHeader", "getHeader", "return header;");
 
         for (Field field : fields) {
+            addGetAsField(field);
             addJavaGetter(field);
         }
     }
