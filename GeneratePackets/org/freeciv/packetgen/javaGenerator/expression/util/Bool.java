@@ -25,9 +25,4 @@ class Bool extends WrapCodeString implements ABool {
     public Bool(String javaCode) {
         super(javaCode);
     }
-
-    @Override
-    public String toString() {
-        return super.getJavaCode();
-    }
 }

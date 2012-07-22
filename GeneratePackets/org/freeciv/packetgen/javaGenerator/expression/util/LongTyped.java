@@ -25,9 +25,4 @@ class LongTyped extends WrapCodeString implements ALong {
     public LongTyped(String javaCode) {
         super(javaCode);
     }
-
-    @Override
-    public String toString() {
-        return super.getJavaCode();
-    }
 }

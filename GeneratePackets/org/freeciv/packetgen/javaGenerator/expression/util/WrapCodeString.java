@@ -38,8 +38,9 @@ public abstract class WrapCodeString {
         return javaCode;
     }
 
-    @Override
-    public abstract String toString();
+    public final String toString() {
+        return getJavaCode();
+    }
 
     public static AString asAString(String javaCode) {
         return new StringTyped(javaCode);

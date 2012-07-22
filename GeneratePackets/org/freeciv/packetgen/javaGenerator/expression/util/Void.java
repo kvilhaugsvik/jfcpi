@@ -20,9 +20,4 @@ class Void extends WrapCodeString implements NoValue {
     public Void(String javaCode) {
         super(javaCode);
     }
-
-    @Override
-    public String toString() {
-        return super.getJavaCode();
-    }
 }

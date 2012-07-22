@@ -25,9 +25,4 @@ class StringTyped extends WrapCodeString implements AString {
     public StringTyped(String javaCode) {
         super(javaCode);
     }
-
-    @Override
-    public String toString() {
-        return super.getJavaCode();
-    }
 }

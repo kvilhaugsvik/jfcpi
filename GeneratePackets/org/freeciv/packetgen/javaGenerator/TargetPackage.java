@@ -21,10 +21,6 @@ public class TargetPackage extends WrapCodeString {
         super(wrapped);
     }
 
-    @Override public String toString() {
-        return getJavaCode();
-    }
-
     public TargetPackage(Package wrapped) {
         super(wrapped.getName());
     }
