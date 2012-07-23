@@ -334,15 +334,15 @@ public class ClassWriter {
         return extraIndention;
     }
 
-    private static String ifIs(String element) {
+    static String ifIs(String element) {
         return ifIs("", element, "");
     }
 
-    private static String ifIs(String element, String after) {
+    static String ifIs(String element, String after) {
         return ifIs("", element, after);
     }
 
-    private static String ifIs(String before, String element, String after) {
+    static String ifIs(String before, String element, String after) {
         return (null == element ? "" : before + element + after);
     }
 
