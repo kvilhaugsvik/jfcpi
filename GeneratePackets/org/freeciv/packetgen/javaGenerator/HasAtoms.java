@@ -23,6 +23,7 @@ public interface HasAtoms {
 
     public static final CodeAtom IF = new CodeAtom("if");
     public static final CodeAtom ELSE = new CodeAtom("else");
+    public static final CodeAtom RET = new CodeAtom("return");
 
     public void writeAtoms(CodeAtoms to);
 }

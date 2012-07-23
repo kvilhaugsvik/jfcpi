@@ -16,6 +16,8 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+
 import static org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString.*;
 
 public class BuiltIn {
@@ -24,8 +26,14 @@ public class BuiltIn {
 
     public static final ExprFrom1<NoValue, AValue> RETURN = new ExprFrom1<NoValue, AValue>() {
         @Override
-        public NoValue getCodeFor(AValue arg1) {
-            return asVoid("return " + arg1);
+        public NoValue getCodeFor(final AValue arg1) {
+            return new Formatted() {
+                @Override
+                public void writeAtoms(CodeAtoms to) {
+                    to.add(RET);
+                    arg1.writeAtoms(to);
+                }
+            };
         }
     };
 }
