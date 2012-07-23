@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
+import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
@@ -36,4 +37,6 @@ public class BuiltIn {
             };
         }
     };
+
+    public static final From2or3<NoValue, ABool, Block, Block> IF = new If();
 }
