@@ -14,8 +14,10 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -585,4 +587,57 @@ public class ClassWriter {
         }
     }
 
+    public static final CodeStyle DEFAULT_STYLE;
+    static {
+        CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Insert.SPACE);
+        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                return HasAtoms.ELSE.equals(after) && HasAtoms.RSC.equals(before);
+            }
+        }, CodeStyle.Insert.SPACE);
+        maker.previousIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.EOL.equals(argument);
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
+        maker.previousIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.LSC.equals(argument);
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
+        maker.previousIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.RSC.equals(argument);
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
+        maker.nextIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.EOL.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.nextIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.RSC.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.nextIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.RPR.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.previousIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.LPR.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        DEFAULT_STYLE = maker.getStyle();
+    }
 }
