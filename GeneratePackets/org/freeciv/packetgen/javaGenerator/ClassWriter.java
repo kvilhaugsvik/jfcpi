@@ -90,6 +90,18 @@ public class ClassWriter {
         methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList, body));
     }
 
+    public void addMethod(String comment,
+                          Visibility visibility,
+                          Scope scope,
+                          String type,
+                          String name,
+                          String paramList,
+                          String exceptionList,
+                          Block body) {
+        methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList,
+                body.getJavaCodeLines()));
+    }
+
     public void addMethodReadClassState(String comment,
                                         String type,
                                         String name,
