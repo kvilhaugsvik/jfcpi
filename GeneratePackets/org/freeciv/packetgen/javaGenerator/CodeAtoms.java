@@ -32,7 +32,7 @@ public class CodeAtoms {
         this.reason = reason;
     }
 
-    CodeAtom[] getAtoms() {
+    public CodeAtom[] getAtoms() {
         return atoms.toArray(new CodeAtom[0]);
     }
 }
