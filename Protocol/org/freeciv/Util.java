@@ -50,4 +50,9 @@ public class Util {
     public static String joinStringArray(boolean[] elements, String separator) {
         return joinStringArrayGeneric(elements, separator, "(", ")");
     }
+
+    /* Useful classes */
+    public static interface Does<Arg> {
+        public boolean holdFor(Arg argument);
+    }
 }
