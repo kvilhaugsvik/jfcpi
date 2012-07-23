@@ -1,9 +1,11 @@
 package org.freeciv.packetgen.javaGenerator.expression;
 
-import org.freeciv.Util;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
 import java.util.LinkedList;
 
@@ -19,7 +21,7 @@ import java.util.LinkedList;
  * code is compiled and that putting a comment on a statement becomes harder.
  *
  */
-public class Block implements NoValue {
+public class Block extends Formatted implements NoValue {
     private final LinkedList<Returnable> statements = new LinkedList<Returnable>();
 
     // Empty blocks that don't tell why is ugly
@@ -35,20 +37,15 @@ public class Block implements NoValue {
         statements.add(statement);
     }
 
-    @Override
-    public String getJavaCode() {
-        return Util.joinStringArray(basicFormatBlock(), "\n", "{", "}");
-    }
-
-    private String[] basicFormatBlock() {
-        String[] out = new String[statements.size()];
-        for (int pos = 0; pos < out.length; pos++) {
-            out[pos] = statements.get(pos).getJavaCode() + ";";
-        }
-        return out;
-    }
-
     public String[] getJavaCodeLines() {
         return basicFormatBlock();
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        for (Returnable statement : statements) {
+            statement.writeAtoms(to);
+            to.add(HasAtoms.EOL);
+        }
     }
 }

@@ -15,11 +15,14 @@
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
 /**
  * Wrap a string of source code by declaring what it is
  */
-public abstract class WrapCodeString {
+public abstract class WrapCodeString implements HasAtoms {
     private final String javaCode;
 
     /**
@@ -36,6 +39,10 @@ public abstract class WrapCodeString {
      */
     public String getJavaCode() {
         return javaCode;
+    }
+
+    public void writeAtoms(CodeAtoms to) {
+        to.add(new CodeAtom(javaCode));
     }
 
     public final String toString() {
