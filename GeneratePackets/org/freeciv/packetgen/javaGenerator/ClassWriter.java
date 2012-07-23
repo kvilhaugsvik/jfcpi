@@ -431,56 +431,6 @@ public class ClassWriter {
         }
     }
 
-    public static class VariableDeclaration {
-        private final Visibility visibility;
-        private final Scope scope;
-        private final Modifiable modifiable;
-        private final String type;
-        private final String name;
-        private final String value;
-
-        public VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
-                                   String type, String name, String value) {
-            this.visibility = visibility;
-            this.scope = scope;
-            this.modifiable = modifiable;
-            this.type = type;
-            this.name = name;
-            this.value = value;
-        }
-
-        public Visibility getVisibility() {
-            return visibility;
-        }
-
-        public Scope getScope() {
-            return scope;
-        }
-
-        public Modifiable getModifiable() {
-            return modifiable;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public String toString() {
-            return ifIs(visibility.toString(), " ") +
-                    ifIs(scope.toString(), " ") +
-                    ifIs(modifiable.toString(), " ") +
-                    type + " " + name + ifIs(" = ", value, "") + ";";
-        }
-    }
-
     public static class EnumElement {
         private final String comment;
         private final String elementName;
