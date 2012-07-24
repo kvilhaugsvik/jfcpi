@@ -14,19 +14,24 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public enum ClassKind {
+public enum ClassKind implements HasAtoms {
     CLASS,
     ENUM,
     INTERFACE;
 
-    private final String code;
+    private final CodeAtom code;
 
     ClassKind() {
-        this.code = name().toLowerCase();
+        this.code = new CodeAtom(name().toLowerCase());
     }
 
     @Override
     public String toString() {
-        return code;
+        return code.get();
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        to.add(code);
     }
 }
