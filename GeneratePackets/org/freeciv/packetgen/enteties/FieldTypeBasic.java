@@ -19,8 +19,8 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.util.Collection;
@@ -122,11 +122,10 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicReadObjectState(null, "String", "toString",
                     "return " + value2String.x(asAString("value")).toString() + ";");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
-                      "if (other instanceof " + name + ") {",
-                      "return this.value == ((" + name + ")other).getValue();",
-                      "} else {",
-                      "return false;",
-                      "}");
+                    new Block(IF.x(
+                            asBool("other instanceof " + name),
+                            new Block(RETURN.x(asBool("this.value == ((" + name + ")other).getValue()"))),
+                            new Block(RETURN.x(FALSE)))));
         }
 
         public FieldTypeBasic getBasicType() {
