@@ -65,8 +65,8 @@ public class Util {
     }
 
     /* Useful classes */
-    public static interface Does<Arg> {
-        public boolean holdFor(Arg argument);
+    public static interface OneCondition<Arg> {
+        public boolean isTrueFor(Arg argument);
     }
 
     public static interface TwoConditions<Argument1, Argument2> {

@@ -562,45 +562,45 @@ public class ClassWriter {
                 return HasAtoms.ELSE.equals(after) && HasAtoms.RSC.equals(before);
             }
         }, CodeStyle.Insert.SPACE);
-        maker.previousIs(new Util.Does<CodeAtom>() {
+        maker.previousIs(new Util.OneCondition<CodeAtom>() {
             @Override
-            public boolean holdFor(CodeAtom argument) {
+            public boolean isTrueFor(CodeAtom argument) {
                 return HasAtoms.EOL.equals(argument);
             }
         }, CodeStyle.Insert.LINE_BREAK);
-        maker.previousIs(new Util.Does<CodeAtom>() {
+        maker.previousIs(new Util.OneCondition<CodeAtom>() {
             @Override
-            public boolean holdFor(CodeAtom argument) {
+            public boolean isTrueFor(CodeAtom argument) {
                 return HasAtoms.LSC.equals(argument);
             }
         }, CodeStyle.Insert.LINE_BREAK);
-        maker.previousIs(new Util.Does<CodeAtom>() {
+        maker.previousIs(new Util.OneCondition<CodeAtom>() {
             @Override
-            public boolean holdFor(CodeAtom argument) {
+            public boolean isTrueFor(CodeAtom argument) {
                 return HasAtoms.RSC.equals(argument);
             }
         }, CodeStyle.Insert.LINE_BREAK);
-        maker.nextIs(new Util.Does<CodeAtom>() {
+        maker.nextIs(new Util.OneCondition<CodeAtom>() {
             @Override
-            public boolean holdFor(CodeAtom argument) {
+            public boolean isTrueFor(CodeAtom argument) {
                 return HasAtoms.EOL.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);
-        maker.nextIs(new Util.Does<CodeAtom>() {
+        maker.nextIs(new Util.OneCondition<CodeAtom>() {
             @Override
-            public boolean holdFor(CodeAtom argument) {
+            public boolean isTrueFor(CodeAtom argument) {
                 return HasAtoms.RSC.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);
-        maker.nextIs(new Util.Does<CodeAtom>() {
+        maker.nextIs(new Util.OneCondition<CodeAtom>() {
             @Override
-            public boolean holdFor(CodeAtom argument) {
+            public boolean isTrueFor(CodeAtom argument) {
                 return HasAtoms.RPR.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);
-        maker.previousIs(new Util.Does<CodeAtom>() {
+        maker.previousIs(new Util.OneCondition<CodeAtom>() {
             @Override
-            public boolean holdFor(CodeAtom argument) {
+            public boolean isTrueFor(CodeAtom argument) {
                 return HasAtoms.LPR.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);

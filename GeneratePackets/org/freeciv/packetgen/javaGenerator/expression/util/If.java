@@ -23,9 +23,9 @@ import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
 class If implements From2or3<NoValue, ABool, Block, Block>, ExprFrom2<NoValue, ABool, Block> {
-    private static final Util.Does<CodeAtom> eolKiller = new Util.Does<CodeAtom>() {
+    private static final Util.OneCondition<CodeAtom> eolKiller = new Util.OneCondition<CodeAtom>() {
         @Override
-        public boolean holdFor(CodeAtom argument) {
+        public boolean isTrueFor(CodeAtom argument) {
             return HasAtoms.EOL.equals(argument);
         }
     };

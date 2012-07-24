@@ -20,15 +20,15 @@ import java.util.LinkedList;
 
 public class CodeAtoms {
     private final LinkedList<CodeAtom> atoms = new LinkedList<CodeAtom>();
-    private Util.Does<CodeAtom> reason = null;
+    private Util.OneCondition<CodeAtom> reason = null;
 
     public void add(CodeAtom atom) {
-        if (null == reason || !reason.holdFor(atom))
+        if (null == reason || !reason.isTrueFor(atom))
             atoms.add(atom);
         reason = null;
     }
 
-    public void refuseNextIf(Util.Does<CodeAtom> reason) {
+    public void refuseNextIf(Util.OneCondition<CodeAtom> reason) {
         this.reason = reason;
     }
 

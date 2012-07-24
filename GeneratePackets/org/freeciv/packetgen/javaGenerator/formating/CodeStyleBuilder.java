@@ -36,11 +36,11 @@ public class CodeStyleBuilder {
         };
     }
 
-    public void previousIs(Util.Does<CodeAtom> test, CodeStyle.Insert toInsert) {
+    public void previousIs(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
         triggers.add(new AtomCheckBefore(test, toInsert));
     }
 
-    public void nextIs(Util.Does<CodeAtom> test, CodeStyle.Insert toInsert) {
+    public void nextIs(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
         triggers.add(new AtomCheckAfter(test, toInsert));
     }
 
@@ -115,28 +115,28 @@ public class CodeStyleBuilder {
     }
 
     private class AtomCheckBefore extends AtomCheck {
-        private final Util.Does<CodeAtom> test;
+        private final Util.OneCondition<CodeAtom> test;
 
-        private AtomCheckBefore(Util.Does<CodeAtom> test, CodeStyle.Insert toInsert) {
+        private AtomCheckBefore(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
             super(toInsert);
             this.test = test;
         }
 
         public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-            return null != before && test.holdFor(before);
+            return null != before && test.isTrueFor(before);
         }
     }
 
     private class AtomCheckAfter extends AtomCheck {
-        private final Util.Does<CodeAtom> test;
+        private final Util.OneCondition<CodeAtom> test;
 
-        private AtomCheckAfter(Util.Does<CodeAtom> test, CodeStyle.Insert toInsert) {
+        private AtomCheckAfter(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
             super(toInsert);
             this.test = test;
         }
 
         public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-            return null != after && test.holdFor(after);
+            return null != after && test.isTrueFor(after);
         }
     }
 
