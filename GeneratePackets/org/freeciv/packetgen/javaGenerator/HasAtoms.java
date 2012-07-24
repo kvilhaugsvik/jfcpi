@@ -21,6 +21,7 @@ public interface HasAtoms {
     public static final CodeAtom LPR = new CodeAtom("(");
     public static final CodeAtom RPR = new CodeAtom(")");
     public static final CodeAtom ASSIGN = new CodeAtom("=");
+    public static final CodeAtom ADD = new CodeAtom("+");
 
     public static final CodeAtom IF = new CodeAtom("if");
     public static final CodeAtom ELSE = new CodeAtom("else");

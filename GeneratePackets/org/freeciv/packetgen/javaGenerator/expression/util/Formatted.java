@@ -17,7 +17,7 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
 public abstract class Formatted implements HasAtoms {
@@ -32,4 +32,5 @@ public abstract class Formatted implements HasAtoms {
     }
 
     static abstract class FormattedVoid extends Formatted implements NoValue {}
+    static abstract class FormattedString extends Formatted implements AString {}
 }
