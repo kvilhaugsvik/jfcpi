@@ -27,7 +27,7 @@ public class VariableDeclaration extends Formatted implements Returnable {
     private final String name;
     private final AValue value;
 
-    public VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
+    private VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
                                String type, String name, AValue value) {
         this.visibility = visibility;
         this.scope = scope;
@@ -81,5 +81,10 @@ public class VariableDeclaration extends Formatted implements Returnable {
 
     public static VariableDeclaration local(String type, String name, AValue value) {
         return new VariableDeclaration(null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
+    }
+
+    public static VariableDeclaration field(Visibility visibility, Scope scope, Modifiable modifiable,
+                                            String type, String name, AValue value) {
+        return new VariableDeclaration(visibility, scope, modifiable, type, name, value);
     }
 }

@@ -61,32 +61,32 @@ public class ClassWriter {
     }
 
     public void addClassConstant(String type, String name, String value) {
-        constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
+        constants.add(VariableDeclaration.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
                 asAValue(value)));
     }
 
     public void addClassConstant(Visibility visibility, String type, String name, String value) {
-        constants.add(new VariableDeclaration(visibility, Scope.CLASS, Modifiable.NO, type, name, asAValue(value)));
+        constants.add(VariableDeclaration.field(visibility, Scope.CLASS, Modifiable.NO, type, name, asAValue(value)));
     }
 
     public void addClassConstant(String type, String name, AValue value) {
-        constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
+        constants.add(VariableDeclaration.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
     public void addClassConstant(Visibility visibility, String type, String name, AValue value) {
-        constants.add(new VariableDeclaration(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
+        constants.add(VariableDeclaration.field(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
     public void addObjectConstant(String type, String name) {
-        stateVars.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
+        stateVars.add(VariableDeclaration.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addPublicObjectConstant(String type, String name) {
-        stateVars.add(new VariableDeclaration(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
+        stateVars.add(VariableDeclaration.field(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addObjectConstantAndGetter(String type, String name) {
-        stateVars.add(new VariableDeclaration(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
+        stateVars.add(VariableDeclaration.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
         addMethodPublicReadObjectState(
                         null,
                         type,
