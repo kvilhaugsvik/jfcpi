@@ -14,7 +14,11 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public class VariableDeclaration {
+import org.freeciv.packetgen.javaGenerator.expression.Statement;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+
+public class VariableDeclaration extends Formatted implements Returnable {
     private final Visibility visibility;
     private final Scope scope;
     private final Modifiable modifiable;
@@ -57,9 +61,19 @@ public class VariableDeclaration {
     }
 
     public String toString() {
-        return ClassWriter.ifIs(visibility.toString(), " ") +
-                ClassWriter.ifIs(scope.toString(), " ") +
-                ClassWriter.ifIs(modifiable.toString(), " ") +
-                type + " " + name + ClassWriter.ifIs(" = ", value, "") + ";";
+        return (new Statement(this)).getJavaCode();
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        visibility.writeAtoms(to);
+        scope.writeAtoms(to);
+        modifiable.writeAtoms(to);
+        to.add(new CodeAtom(type));
+        to.add(new CodeAtom(name));
+        if (null != value) {
+            to.add(ASSIGN);
+            to.add(new CodeAtom(value));
+        }
     }
 }
