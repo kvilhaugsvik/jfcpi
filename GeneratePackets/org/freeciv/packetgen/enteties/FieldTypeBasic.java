@@ -63,6 +63,24 @@ public class FieldTypeBasic implements IDependency {
                 arrayEater, needs);
     }
 
+    public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
+                          ExprFrom1<Block, VariableDeclaration> decode, String encode, String encodedSize,
+                          boolean arrayEater, Collection<Requirement> needs) {
+        VariableDeclaration value =
+                VariableDeclaration.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
+        this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
+        this.publicType = publicType;
+        this.javaType = javaType;
+        this.decode = decode.x(value).getJavaCodeLines();
+        this.encode = encode.split("\n");
+        this.encodedSize = encodedSize.split("\n");
+        this.arrayEater = arrayEater;
+        this.value2String = TO_STRING_OBJECT;
+        this.fromJavaType = fromJavaType;
+
+        requirement = needs;
+    }
+
     public String getFieldTypeBasic() {
         return fieldTypeBasic;
     }
