@@ -15,6 +15,7 @@
 package org.freeciv;
 
 import java.lang.reflect.Array;
+import java.util.List;
 
 public class Util {
     /* Constants */
@@ -49,5 +50,26 @@ public class Util {
 
     public static String joinStringArray(boolean[] elements, String separator) {
         return joinStringArrayGeneric(elements, separator, "(", ")");
+    }
+
+    public static <Argument1, Argument2, Cond extends TwoConditions<Argument1, Argument2>> Cond getFirstFound(
+            List<Cond> lookedAt,
+            Argument1 arg1,
+            Argument2 arg2)
+    {
+        for (Cond condition : lookedAt) {
+            if (condition.isTrueFor(arg1, arg2))
+                return condition;
+        }
+        return null;
+    }
+
+    /* Useful classes */
+    public static interface Does<Arg> {
+        public boolean holdFor(Arg argument);
+    }
+
+    public static interface TwoConditions<Argument1, Argument2> {
+        public boolean isTrueFor(Argument1 argument1, Argument2 argument2);
     }
 }

@@ -14,15 +14,15 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 
-class StringTyped extends WrapCodeString implements AString {
+class Bool extends WrapCodeString implements ABool {
     /**
      * Constructor that forces the expression to be ready at initialization
      *
      * @param javaCode
      */
-    public StringTyped(String javaCode) {
+    public Bool(String javaCode) {
         super(javaCode);
     }
 }

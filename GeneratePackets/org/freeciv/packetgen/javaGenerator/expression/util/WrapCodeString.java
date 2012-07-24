@@ -14,14 +14,15 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.ALong;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
 /**
  * Wrap a string of source code by declaring what it is
  */
-public abstract class WrapCodeString implements SomeExpr {
+public abstract class WrapCodeString implements HasAtoms {
     private final String javaCode;
 
     /**
@@ -40,14 +41,27 @@ public abstract class WrapCodeString implements SomeExpr {
         return javaCode;
     }
 
-    @Override
-    public abstract String toString();
+    public void writeAtoms(CodeAtoms to) {
+        to.add(new CodeAtom(javaCode));
+    }
+
+    public final String toString() {
+        return getJavaCode();
+    }
 
     public static AString asAString(String javaCode) {
         return new StringTyped(javaCode);
     }
 
+    public static ABool asBool(String javaCode) {
+        return new Bool(javaCode);
+    }
+
     public static ALong asALong(String javaCode) {
         return new LongTyped(javaCode);
+    }
+
+    public static NoValue asVoid(String javaCode) {
+        return new Void(javaCode);
     }
 }

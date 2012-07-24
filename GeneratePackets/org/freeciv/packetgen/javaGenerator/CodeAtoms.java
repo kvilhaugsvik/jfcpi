@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Sveinung Kvilhaugsvik
+ * Copyright (c) 2012. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,14 +14,25 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
+import org.freeciv.Util;
 
-public class TargetPackage extends WrapCodeString {
-    public TargetPackage(String wrapped) {
-        super(wrapped);
+import java.util.LinkedList;
+
+public class CodeAtoms {
+    private final LinkedList<CodeAtom> atoms = new LinkedList<CodeAtom>();
+    private Util.Does<CodeAtom> reason = null;
+
+    public void add(CodeAtom atom) {
+        if (null == reason || !reason.holdFor(atom))
+            atoms.add(atom);
+        reason = null;
     }
 
-    public TargetPackage(Package wrapped) {
-        super(wrapped.getName());
+    public void refuseNextIf(Util.Does<CodeAtom> reason) {
+        this.reason = reason;
+    }
+
+    public CodeAtom[] getAtoms() {
+        return atoms.toArray(new CodeAtom[0]);
     }
 }

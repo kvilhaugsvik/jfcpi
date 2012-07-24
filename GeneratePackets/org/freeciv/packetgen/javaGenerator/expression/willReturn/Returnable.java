@@ -12,17 +12,17 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression.util;
+package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
-class StringTyped extends WrapCodeString implements AString {
+public interface Returnable extends HasAtoms {
     /**
-     * Constructor that forces the expression to be ready at initialization
-     *
-     * @param javaCode
+     * Get source code for an expression that returns a value
+     * @return the source code
      */
-    public StringTyped(String javaCode) {
-        super(javaCode);
-    }
+    public abstract  String getJavaCode();
+
+    @Override
+    public abstract String toString();
 }

@@ -14,15 +14,20 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
+import org.freeciv.Util;
+import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
+import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
-class StringTyped extends WrapCodeString implements AString {
-    /**
-     * Constructor that forces the expression to be ready at initialization
-     *
-     * @param javaCode
-     */
-    public StringTyped(String javaCode) {
-        super(javaCode);
+public abstract class Formatted implements NoValue {
+    @Override
+    public String getJavaCode() {
+        return Util.joinStringArray(basicFormatBlock(), "\n", "{", "}");
+    }
+
+    protected String[] basicFormatBlock() {
+        CodeAtoms out = new CodeAtoms();
+        writeAtoms(out);
+        return ClassWriter.DEFAULT_STYLE.asFormattedLines(out).toArray(new String[0]);
     }
 }

@@ -33,14 +33,14 @@ public class FieldTypeBasic implements IDependency {
     private final String[] fromJavaType;
     private final String[] decode;
     private final String[] encode, encodedSize;
-    private final ExprFrom1<AString, SomeExpr> value2String;
+    private final ExprFrom1<AString, AValue> value2String;
     private final boolean arrayEater;
 
     private final Collection<Requirement> requirement;
     private final FieldTypeBasic basicType = this;
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
-                          String decode, String encode, String encodedSize, ExprFrom1<AString, SomeExpr> toString,
+                          String decode, String encode, String encodedSize, ExprFrom1<AString, AValue> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
@@ -59,9 +59,9 @@ public class FieldTypeBasic implements IDependency {
                           String decode, String encode, String encodedSize,
                           boolean arrayEater, Collection<Requirement> needs) {
         this(dataIOType, publicType, javaType, fromJavaType, decode, encode, encodedSize,
-                new ExprFrom1<AString, SomeExpr>() {
+                new ExprFrom1<AString, AValue>() {
                     @Override
-                    public AString getCodeFor(SomeExpr arg1) {
+                    public AString getCodeFor(AValue arg1) {
                         return WrapCodeString.asAString(arg1.getJavaCode() + ".toString()");
                     }
                 },

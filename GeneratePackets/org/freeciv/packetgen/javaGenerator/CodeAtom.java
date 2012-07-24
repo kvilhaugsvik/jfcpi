@@ -12,17 +12,16 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression.util;
+package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
+public class CodeAtom {
+    private final String atom;
 
-class StringTyped extends WrapCodeString implements AString {
-    /**
-     * Constructor that forces the expression to be ready at initialization
-     *
-     * @param javaCode
-     */
-    public StringTyped(String javaCode) {
-        super(javaCode);
+    public CodeAtom(String atom) {
+        this.atom = atom;
+    }
+
+    public String get() {
+        return atom;
     }
 }

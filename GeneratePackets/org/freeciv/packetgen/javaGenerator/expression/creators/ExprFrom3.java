@@ -14,21 +14,18 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.creators;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
-/**
- * An expression that returns a value of type Return given Argument1 and Argument2
- * @param <Returns>
- * @param <Argument1>
- * @param <Argument2>
- */
-public interface ExprFrom2<Returns extends Returnable, Argument1 extends Returnable, Argument2 extends Returnable> {
+public interface ExprFrom3<Returns extends Returnable,
+        Argument1 extends Returnable,
+        Argument2 extends Returnable,
+        Argument3 extends Returnable> {
     /**
      * Source code for an expression that will return a value of the type represented by Returns
      * @param arg1 the first argument taken
      * @param arg2 the second argument taken
+     * @param arg3 the third argument taken
      * @return The source code
      */
-    public abstract Returns getCodeFor(Argument1 arg1, Argument2 arg2);
+    public abstract Returns getCodeFor(Argument1 arg1, Argument2 arg2, Argument3 arg3);
 }

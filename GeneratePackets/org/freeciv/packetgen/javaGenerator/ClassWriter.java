@@ -14,7 +14,10 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.SomeExpr;
+import org.freeciv.Util;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -89,6 +92,18 @@ public class ClassWriter {
         methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList, body));
     }
 
+    public void addMethod(String comment,
+                          Visibility visibility,
+                          Scope scope,
+                          String type,
+                          String name,
+                          String paramList,
+                          String exceptionList,
+                          Block body) {
+        methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList,
+                body.getJavaCodeLines()));
+    }
+
     public void addMethodReadClassState(String comment,
                                         String type,
                                         String name,
@@ -109,6 +124,13 @@ public class ClassWriter {
                                                String type,
                                                String name,
                                                String... body) {
+        methods.add(Method.newPublicReadObjectState(comment, type, name, body));
+    }
+
+    public void addMethodPublicReadObjectState(String comment,
+                                               String type,
+                                               String name,
+                                               Block body) {
         methods.add(Method.newPublicReadObjectState(comment, type, name, body));
     }
 
@@ -372,19 +394,6 @@ public class ClassWriter {
             this.body = body;
         }
 
-        public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
-                      String exceptionList, SomeExpr... body) {
-            this(comment, visibility, scope, type, name, paramList, exceptionList, exprsToString(body));
-        }
-
-        private static String[] exprsToString(SomeExpr[] inn) {
-            String[] raw = new String[inn.length];
-            for (int i = 0; i < inn.length; i++) {
-                raw[i] = inn[i].getJavaCode();
-            }
-            return raw;
-        }
-
         @Override
         public String toString() {
             String out = (null == comment ? "" : indent(comment) + "\n");
@@ -411,6 +420,13 @@ public class ClassWriter {
         }
 
         static Method newPublicReadObjectState(String comment,
+                                               String type,
+                                               String name,
+                                               Block body) {
+            return newPublicDynamicMethod(comment, type, name, null, null, body.getJavaCodeLines());
+        }
+
+        private static Method newPublicReadObjectState(String comment,
                                                String type,
                                                String name,
                                                String... body) {
@@ -537,4 +553,57 @@ public class ClassWriter {
         }
     }
 
+    public static final CodeStyle DEFAULT_STYLE;
+    static {
+        CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Insert.SPACE);
+        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                return HasAtoms.ELSE.equals(after) && HasAtoms.RSC.equals(before);
+            }
+        }, CodeStyle.Insert.SPACE);
+        maker.previousIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.EOL.equals(argument);
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
+        maker.previousIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.LSC.equals(argument);
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
+        maker.previousIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.RSC.equals(argument);
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
+        maker.nextIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.EOL.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.nextIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.RSC.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.nextIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.RPR.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.previousIs(new Util.Does<CodeAtom>() {
+            @Override
+            public boolean holdFor(CodeAtom argument) {
+                return HasAtoms.LPR.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        DEFAULT_STYLE = maker.getStyle();
+    }
 }
