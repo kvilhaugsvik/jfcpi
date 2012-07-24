@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
@@ -60,10 +61,19 @@ public class ClassWriter {
     }
 
     public void addClassConstant(String type, String name, String value) {
-        constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
+        constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
+                asAValue(value)));
     }
 
     public void addClassConstant(Visibility visibility, String type, String name, String value) {
+        constants.add(new VariableDeclaration(visibility, Scope.CLASS, Modifiable.NO, type, name, asAValue(value)));
+    }
+
+    public void addClassConstant(String type, String name, AValue value) {
+        constants.add(new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
+    }
+
+    public void addClassConstant(Visibility visibility, String type, String name, AValue value) {
         constants.add(new VariableDeclaration(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 

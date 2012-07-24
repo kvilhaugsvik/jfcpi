@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 public class VariableDeclaration extends Formatted implements Returnable {
@@ -24,10 +25,10 @@ public class VariableDeclaration extends Formatted implements Returnable {
     private final Modifiable modifiable;
     private final String type;
     private final String name;
-    private final String value;
+    private final AValue value;
 
     public VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
-                               String type, String name, String value) {
+                               String type, String name, AValue value) {
         this.visibility = visibility;
         this.scope = scope;
         this.modifiable = modifiable;
@@ -57,7 +58,7 @@ public class VariableDeclaration extends Formatted implements Returnable {
     }
 
     public String getValue() {
-        return value;
+        return value.getJavaCode();
     }
 
     public String toString() {
@@ -73,7 +74,7 @@ public class VariableDeclaration extends Formatted implements Returnable {
         to.add(new CodeAtom(name));
         if (null != value) {
             to.add(ASSIGN);
-            to.add(new CodeAtom(value));
+            value.writeAtoms(to);
         }
     }
 }

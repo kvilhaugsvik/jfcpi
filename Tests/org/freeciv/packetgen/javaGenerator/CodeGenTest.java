@@ -193,7 +193,7 @@ public class CodeGenTest {
     @Test public void testConstantDeclaration() {
         assertEquals("Generated source not as expected",
                 "private static final int integer = 25;",
-                (new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, "int", "integer", "25")).toString());
+                (new VariableDeclaration(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, "int", "integer", asAnInt("25"))).toString());
     }
 
     @Test public void testObjectConstantDeclaration() {
