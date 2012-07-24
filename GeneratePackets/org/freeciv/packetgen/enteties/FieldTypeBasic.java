@@ -59,13 +59,7 @@ public class FieldTypeBasic implements IDependency {
     public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
                           String decode, String encode, String encodedSize,
                           boolean arrayEater, Collection<Requirement> needs) {
-        this(dataIOType, publicType, javaType, fromJavaType, decode, encode, encodedSize,
-                new ExprFrom1<AString, AValue>() {
-                    @Override
-                    public AString x(AValue arg1) {
-                        return asAString(arg1.getJavaCode() + ".toString()");
-                    }
-                },
+        this(dataIOType, publicType, javaType, fromJavaType, decode, encode, encodedSize, TO_STRING_OBJECT,
                 arrayEater, needs);
     }
 

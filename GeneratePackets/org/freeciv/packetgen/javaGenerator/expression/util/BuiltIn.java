@@ -40,6 +40,14 @@ public class BuiltIn {
 
     public static final From2or3<NoValue, ABool, Block, Block> IF = new If();
 
+    public static final ExprFrom1<AString, AValue> TO_STRING_OBJECT =
+            new ExprFrom1<AString, AValue>() {
+                @Override
+                public AString x(AValue arg1) {
+                    return asAString(arg1.getJavaCode() + ".toString()");
+                }
+            };
+
     public static final ExprFrom1<AString, AValue> TO_STRING_NON_OBJECT =
             new ExprFrom1<AString, AValue>() {
                 @Override
