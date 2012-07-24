@@ -27,5 +27,5 @@ public interface ExprFrom3<Returns extends Returnable,
      * @param arg3 the third argument taken
      * @return The source code
      */
-    public abstract Returns getCodeFor(Argument1 arg1, Argument2 arg2, Argument3 arg3);
+    public abstract Returns x(Argument1 arg1, Argument2 arg2, Argument3 arg3);
 }

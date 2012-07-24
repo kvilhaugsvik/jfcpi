@@ -41,7 +41,7 @@ public class TerminatedArray extends FieldTypeBasic {
               "return " + "value.length + (value.length < " + Constant.referToInJavaCode(maxSizeConstant) + "?1:0);",
               new ExprFrom1<AString, AValue>() {
                   @Override
-                  public AString getCodeFor(AValue arg1) {
+                  public AString x(AValue arg1) {
                       return asAString("org.freeciv.Util.joinStringArray(" + arg1 + ", \" \")");
                   }
               },

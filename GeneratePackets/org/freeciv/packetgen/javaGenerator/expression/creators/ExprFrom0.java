@@ -25,5 +25,5 @@ public interface ExprFrom0<Returns extends Returnable> {
      * Source code for an expression that will return a value of the type represented by Returns
      * @return The source code
      */
-    public abstract Returns getCodeFor();
+    public abstract Returns x();
 }

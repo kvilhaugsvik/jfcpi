@@ -31,12 +31,12 @@ class If implements From2or3<NoValue, ABool, Block, Block>, ExprFrom2<NoValue, A
     };
 
     @Override
-    public NoValue getCodeFor(ABool cond, Block then) {
-        return getCodeFor(cond, then, null);
+    public NoValue x(ABool cond, Block then) {
+        return x(cond, then, null);
     }
 
     @Override
-    public NoValue getCodeFor(final ABool cond, final Block then, final Block ifNot) {
+    public NoValue x(final ABool cond, final Block then, final Block ifNot) {
         return new Formatted() {
             @Override
             public void writeAtoms(CodeAtoms to) {

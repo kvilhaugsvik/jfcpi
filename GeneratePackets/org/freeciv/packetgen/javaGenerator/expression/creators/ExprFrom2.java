@@ -30,5 +30,5 @@ public interface ExprFrom2<Returns extends Returnable, Argument1 extends Returna
      * @param arg2 the second argument taken
      * @return The source code
      */
-    public abstract Returns getCodeFor(Argument1 arg1, Argument2 arg2);
+    public abstract Returns x(Argument1 arg1, Argument2 arg2);
 }

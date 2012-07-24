@@ -25,7 +25,7 @@ public class BuiltIn {
 
     public static final ExprFrom1<NoValue, AValue> RETURN = new ExprFrom1<NoValue, AValue>() {
         @Override
-        public NoValue getCodeFor(final AValue arg1) {
+        public NoValue x(final AValue arg1) {
             return new Formatted() {
                 @Override
                 public void writeAtoms(CodeAtoms to) {

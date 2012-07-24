@@ -63,7 +63,7 @@ public class FieldTypeBasic implements IDependency {
         this(dataIOType, publicType, javaType, fromJavaType, decode, encode, encodedSize,
                 new ExprFrom1<AString, AValue>() {
                     @Override
-                    public AString getCodeFor(AValue arg1) {
+                    public AString x(AValue arg1) {
                         return asAString(arg1.getJavaCode() + ".toString()");
                     }
                 },
@@ -120,7 +120,7 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
             addMethodPublicReadObjectState(null, javaType, "getValue", "return value;");
             addMethodPublicReadObjectState(null, "String", "toString",
-                    "return " + value2String.getCodeFor(asAString("value")).toString() + ";");
+                    "return " + value2String.x(asAString("value")).toString() + ";");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
                       "if (other instanceof " + name + ") {",
                       "return this.value == ((" + name + ")other).getValue();",
