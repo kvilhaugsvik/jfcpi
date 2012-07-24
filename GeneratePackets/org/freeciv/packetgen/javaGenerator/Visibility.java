@@ -14,20 +14,26 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public enum Visibility {
+public enum Visibility implements HasAtoms {
     PUBLIC(false),
     PACKAGE(true),
     PROTECTED(false),
     PRIVATE(false);
 
-    private final String code;
+    private final CodeAtom code;
 
     Visibility(boolean silent) {
-        this.code = (silent ? null : name().toLowerCase());
+        this.code = (silent ? null : new CodeAtom(name().toLowerCase()));
     }
 
     @Override
     public String toString() {
-        return code;
+        return (null == code ? null : code.get());
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        if (null != code)
+            to.add(code);
     }
 }
