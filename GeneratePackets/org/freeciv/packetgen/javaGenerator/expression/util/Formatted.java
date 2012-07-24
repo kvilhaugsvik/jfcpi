@@ -16,11 +16,11 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
-public abstract class Formatted implements NoValue {
-    @Override
+public abstract class Formatted implements HasAtoms {
     public String getJavaCode() {
         return Util.joinStringArray(basicFormatBlock(), "\n", "{", "}");
     }
@@ -30,4 +30,6 @@ public abstract class Formatted implements NoValue {
         writeAtoms(out);
         return ClassWriter.DEFAULT_STYLE.asFormattedLines(out).toArray(new String[0]);
     }
+
+    static abstract class FormattedVoid extends Formatted implements NoValue {}
 }

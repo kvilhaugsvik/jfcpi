@@ -16,12 +16,13 @@ package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 /**
  * Represents a complete statement
  */
-public class Statement implements HasAtoms {
+public class Statement extends Formatted implements HasAtoms {
     private final Returnable statement;
 
     public Statement(Returnable statement) {

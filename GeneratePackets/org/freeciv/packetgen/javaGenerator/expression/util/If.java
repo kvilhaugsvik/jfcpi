@@ -37,7 +37,7 @@ class If implements From2or3<NoValue, ABool, Block, Block>, ExprFrom2<NoValue, A
 
     @Override
     public NoValue x(final ABool cond, final Block then, final Block ifNot) {
-        return new Formatted() {
+        return new Formatted.FormattedVoid() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(IF);

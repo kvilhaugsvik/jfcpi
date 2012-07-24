@@ -28,7 +28,7 @@ public class BuiltIn {
     public static final ExprFrom1<NoValue, AValue> RETURN = new ExprFrom1<NoValue, AValue>() {
         @Override
         public NoValue x(final AValue arg1) {
-            return new Formatted() {
+            return new Formatted.FormattedVoid() {
                 @Override
                 public void writeAtoms(CodeAtoms to) {
                     to.add(RET);
