@@ -7,6 +7,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
+import java.util.Collections;
 import java.util.LinkedList;
 
 /***
@@ -24,15 +25,8 @@ import java.util.LinkedList;
 public class Block extends Formatted implements NoValue {
     private final LinkedList<Returnable> statements = new LinkedList<Returnable>();
 
-    public Block() {
-    }
-
-    public Block(Returnable firstStatement) {
-        statements.add(firstStatement);
-    }
-
-    public Block(String firstStatement) {
-        this(asVoid(firstStatement));
+    public Block(Returnable... firstStatements) {
+        Collections.addAll(statements, firstStatements);
     }
 
     public void addStatement(Returnable statement) {
@@ -49,5 +43,12 @@ public class Block extends Formatted implements NoValue {
             statement.writeAtoms(to);
             to.add(HasAtoms.EOL);
         }
+    }
+
+    @Deprecated public static Block fromStrings(String... firstStatements) {
+        Block out = new Block();
+        for (String statement : firstStatements)
+            out.addStatement(asVoid(statement));
+        return out;
     }
 }

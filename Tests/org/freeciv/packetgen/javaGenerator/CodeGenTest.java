@@ -25,6 +25,8 @@ import static org.freeciv.packetgen.javaGenerator.ClassWriter.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+
 public class CodeGenTest {
     @Test public void testMethodEverything() {
         String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
@@ -537,7 +539,7 @@ public class CodeGenTest {
 
     @Test public void testPublicReadObjectState() {
         String result = Method.newPublicReadObjectState(null, "String", "toString",
-                new Block("return value.toString()")).toString();
+                new Block(RETURN.x(asAString("value.toString()")))).toString();
 
         assertEquals("Generated source not as expected",
                 "\tpublic String toString() {\n" +
