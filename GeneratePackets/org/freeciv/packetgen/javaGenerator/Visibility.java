@@ -15,19 +15,15 @@
 package org.freeciv.packetgen.javaGenerator;
 
 public enum Visibility {
-    PUBLIC,
-    PACKAGE(null),
-    PROTECTED,
-    PRIVATE;
+    PUBLIC(false),
+    PACKAGE(true),
+    PROTECTED(false),
+    PRIVATE(false);
 
     private final String code;
 
-    Visibility() {
-        this.code = name().toLowerCase();
-    }
-
-    Visibility(String code) {
-        this.code = code;
+    Visibility(boolean silent) {
+        this.code = (silent ? null : name().toLowerCase());
     }
 
     @Override
