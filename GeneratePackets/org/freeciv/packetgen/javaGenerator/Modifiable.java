@@ -14,18 +14,24 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public enum Modifiable {
+public enum Modifiable implements HasAtoms {
     YES(null),
     NO("final");
 
-    private final String code;
+    private final CodeAtom code;
 
     Modifiable(String code) {
-        this.code = code;
+        this.code = (null == code ? null : new CodeAtom(code));
     }
 
     @Override
     public String toString() {
-        return code;
+        return (null == code ? null : code.get());
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        if (null != code)
+            to.add(code);
     }
 }
