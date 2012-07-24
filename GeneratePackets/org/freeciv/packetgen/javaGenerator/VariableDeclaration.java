@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
@@ -27,6 +28,8 @@ public class VariableDeclaration extends Formatted implements Returnable {
     private final String name;
     private final AValue value;
 
+    private final CodeAtom referName;
+
     private VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
                                String type, String name, AValue value) {
         this.visibility = visibility;
@@ -35,6 +38,8 @@ public class VariableDeclaration extends Formatted implements Returnable {
         this.type = type;
         this.name = name;
         this.value = value;
+
+        this.referName = new CodeAtom((Scope.CODE_BLOCK.equals(scope) ? "" : "this.") + name);
     }
 
     public Visibility getVisibility() {
@@ -84,19 +89,30 @@ public class VariableDeclaration extends Formatted implements Returnable {
      * @return variable name access
      */
     public AValue ref() {
-        final CodeAtom referName = new CodeAtom((Scope.CODE_BLOCK.equals(scope) ? "" : "this.") + name);
-        return new AValue() {
-            @Override
-            public String getJavaCode() {
-                return referName.toString();
-            }
-
+        return new FormattedAValue() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(referName);
             }
         };
     }
+
+    public ExprFrom1<AValue, AValue> assign() {
+        return new ExprFrom1<AValue, AValue>() {
+            @Override
+            public AValue x(final AValue arg1) {
+                return new FormattedAValue() {
+                    @Override
+                    public void writeAtoms(CodeAtoms to) {
+                        to.add(referName);
+                        to.add(ASSIGN);
+                        arg1.writeAtoms(to);
+                    }
+                };
+            }
+        };
+    }
+
 
     public static VariableDeclaration local(String type, String name, AValue value) {
         return new VariableDeclaration(null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
