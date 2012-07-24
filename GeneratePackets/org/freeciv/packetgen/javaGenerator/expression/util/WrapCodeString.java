@@ -61,6 +61,12 @@ public abstract class WrapCodeString implements HasAtoms {
         }
     }
 
+    static class WrappedInt extends WrapCodeString implements AnInt {
+        public WrappedInt(String javaCode) {
+            super(javaCode);
+        }
+    }
+
     static class WrappedString extends WrapCodeString implements AString {
         public WrappedString(String javaCode) {
             super(javaCode);

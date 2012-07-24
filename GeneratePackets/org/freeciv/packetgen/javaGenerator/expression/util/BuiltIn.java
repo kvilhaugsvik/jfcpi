@@ -49,6 +49,10 @@ public class BuiltIn {
         return new WrappedBool(javaCode);
     }
 
+    public static AnInt asAnInt(String javaCode) {
+        return new WrappedInt(javaCode);
+    }
+
     public static ALong asALong(String javaCode) {
         return new WrappedLong(javaCode);
     }
