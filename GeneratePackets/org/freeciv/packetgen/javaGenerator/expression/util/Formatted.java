@@ -22,7 +22,7 @@ import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
 public abstract class Formatted implements HasAtoms {
     public String getJavaCode() {
-        return Util.joinStringArray(basicFormatBlock(), "\n", "{", "}");
+        return Util.joinStringArray(basicFormatBlock(), "\n", "", "");
     }
 
     protected String[] basicFormatBlock() {
