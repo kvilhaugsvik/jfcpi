@@ -42,15 +42,15 @@ public class BuiltIn {
 
 
     public static AString asAString(String javaCode) {
-        return new StringTyped(javaCode);
+        return new WrappedString(javaCode);
     }
 
     public static ABool asBool(String javaCode) {
-        return new Bool(javaCode);
+        return new WrappedBool(javaCode);
     }
 
     public static ALong asALong(String javaCode) {
-        return new LongTyped(javaCode);
+        return new WrappedLong(javaCode);
     }
 
     public static AValue asAValue(String javaCode) {
@@ -58,6 +58,6 @@ public class BuiltIn {
     }
 
     public static NoValue asVoid(String javaCode) {
-        return new Void(javaCode);
+        return new WrappedVoid(javaCode);
     }
 }
