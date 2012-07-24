@@ -16,7 +16,7 @@ package org.freeciv.packetgen.parsing
 
 import org.freeciv.packetgen.javaGenerator.expression.willReturn._
 import org.freeciv.packetgen.enteties.Constant
-import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn._
 
 object ParseVariableAssignments extends ExtractableParser {
   protected def isNewLineIgnored(source: CharSequence, offset: Int) = false
@@ -24,7 +24,7 @@ object ParseVariableAssignments extends ExtractableParser {
   def startsOfExtractable = List(identifier + "\\s*" + "=")
 
   // TODO: Should concatenation be supported?
-  def strExpr = quotedString.r ^^ {a => WrapCodeString.asAString(a)}
+  def strExpr = quotedString.r ^^ {a => asAString(a)}
 
   def value: Parser[AValue] = strExpr
 

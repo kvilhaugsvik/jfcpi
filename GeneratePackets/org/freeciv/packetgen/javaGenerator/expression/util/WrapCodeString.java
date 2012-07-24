@@ -14,7 +14,6 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
@@ -47,21 +46,5 @@ public abstract class WrapCodeString implements HasAtoms {
 
     public final String toString() {
         return getJavaCode();
-    }
-
-    public static AString asAString(String javaCode) {
-        return new StringTyped(javaCode);
-    }
-
-    public static ABool asBool(String javaCode) {
-        return new Bool(javaCode);
-    }
-
-    public static ALong asALong(String javaCode) {
-        return new LongTyped(javaCode);
-    }
-
-    public static NoValue asVoid(String javaCode) {
-        return new Void(javaCode);
     }
 }

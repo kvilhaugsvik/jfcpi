@@ -19,8 +19,6 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString.*;
-
 public class BuiltIn {
     public static final ABool TRUE = asBool("true");
     public static final ABool FALSE = asBool("false");
@@ -39,4 +37,21 @@ public class BuiltIn {
     };
 
     public static final From2or3<NoValue, ABool, Block, Block> IF = new If();
+
+
+    public static AString asAString(String javaCode) {
+        return new StringTyped(javaCode);
+    }
+
+    public static ABool asBool(String javaCode) {
+        return new Bool(javaCode);
+    }
+
+    public static ALong asALong(String javaCode) {
+        return new LongTyped(javaCode);
+    }
+
+    public static NoValue asVoid(String javaCode) {
+        return new Void(javaCode);
+    }
 }

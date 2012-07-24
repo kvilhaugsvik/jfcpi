@@ -26,6 +26,8 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import java.util.Collection;
 import java.util.Collections;
 
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+
 public class FieldTypeBasic implements IDependency {
     private final String fieldTypeBasic;
     private final String publicType;
@@ -62,7 +64,7 @@ public class FieldTypeBasic implements IDependency {
                 new ExprFrom1<AString, AValue>() {
                     @Override
                     public AString getCodeFor(AValue arg1) {
-                        return WrapCodeString.asAString(arg1.getJavaCode() + ".toString()");
+                        return asAString(arg1.getJavaCode() + ".toString()");
                     }
                 },
                 arrayEater, needs);
@@ -118,7 +120,7 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
             addMethodPublicReadObjectState(null, javaType, "getValue", "return value;");
             addMethodPublicReadObjectState(null, "String", "toString",
-                    "return " + value2String.getCodeFor(WrapCodeString.asAString("value")).toString() + ";");
+                    "return " + value2String.getCodeFor(asAString("value")).toString() + ";");
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
                       "if (other instanceof " + name + ") {",
                       "return this.value == ((" + name + ")other).getValue();",

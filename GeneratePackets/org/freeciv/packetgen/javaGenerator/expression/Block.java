@@ -1,7 +1,7 @@
 package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
-import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
@@ -30,7 +30,7 @@ public class Block extends Formatted implements NoValue {
     }
 
     public Block(String firstStatement) {
-        this(WrapCodeString.asVoid(firstStatement));
+        this(asVoid(firstStatement));
     }
 
     public void addStatement(Returnable statement) {
