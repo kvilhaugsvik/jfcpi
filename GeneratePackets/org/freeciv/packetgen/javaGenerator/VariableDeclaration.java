@@ -67,7 +67,8 @@ public class VariableDeclaration extends Formatted implements Returnable {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        visibility.writeAtoms(to);
+        if (null != visibility)
+            visibility.writeAtoms(to);
         scope.writeAtoms(to);
         modifiable.writeAtoms(to);
         to.add(new CodeAtom(type));
@@ -76,5 +77,9 @@ public class VariableDeclaration extends Formatted implements Returnable {
             to.add(ASSIGN);
             value.writeAtoms(to);
         }
+    }
+
+    public static VariableDeclaration local(String type, String name, AValue value) {
+        return new VariableDeclaration(null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
     }
 }
