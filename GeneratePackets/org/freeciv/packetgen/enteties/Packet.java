@@ -21,8 +21,11 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.Field;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
 
 import java.util.*;
+
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class Packet extends ClassWriter implements IDependency {
     private final int number;
@@ -83,7 +86,7 @@ public class Packet extends ClassWriter implements IDependency {
                     .SimpleImmutableEntry<String, String>(field.getType() + field.getArrayDeclaration(),
                                                           field.getFieldName()));
             constructorBody.addAll(Arrays.asList(field.validate(true)));
-            constructorBody.add(setFieldToVariableSameName(field.getFieldName()));
+            constructorBody.add(setFieldToVariableSameName(field.getFieldName()).getJavaCode() + ";");
         }
         constructorBody.add(generateHeader(headerKind));
         addConstructorPublic(null, createParameterList(params), constructorBody.toArray(new String[0]));

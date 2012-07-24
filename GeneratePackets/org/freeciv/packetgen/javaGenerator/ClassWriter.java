@@ -16,12 +16,15 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class ClassWriter {
     private final TargetPackage where;
@@ -178,8 +181,8 @@ public class ClassWriter {
      * @param field Name of the field (and variable)
      * @return a line of Java setting the field's value to the value of the variable with the same name
      */
-    protected static String setFieldToVariableSameName(String field) {
-        return "this." + field + " = " + field + ";";
+    protected static NoValue setFieldToVariableSameName(String field) {
+        return asVoid("this." + field + " = " + field);
     }
 
     private String formatImports() {
@@ -229,13 +232,13 @@ public class ClassWriter {
     }
 
     private String constructorFromFields() {
-        LinkedList<String> body = new LinkedList<String>();
+        Block body = new Block();
         LinkedList<Map.Entry<String, String>> args = new LinkedList<Map.Entry<String, String>>();
         for (VariableDeclaration dec : stateVars) {
-            body.add(setFieldToVariableSameName(dec.getName()));
+            body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.getType(), dec.getName()));
         }
-        return Method.newPublicConstructor(null, name, createParameterList(args), body.toArray(new String[0])) + "\n";
+        return Method.newPublicConstructor(null, name, createParameterList(args), body.getJavaCodeLines()) + "\n";
     }
 
     public String toString() {

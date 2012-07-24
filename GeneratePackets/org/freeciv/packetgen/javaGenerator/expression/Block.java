@@ -24,7 +24,9 @@ import java.util.LinkedList;
 public class Block extends Formatted implements NoValue {
     private final LinkedList<Returnable> statements = new LinkedList<Returnable>();
 
-    // Empty blocks that don't tell why is ugly
+    public Block() {
+    }
+
     public Block(Returnable firstStatement) {
         statements.add(firstStatement);
     }
