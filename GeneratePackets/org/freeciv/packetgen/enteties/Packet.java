@@ -198,16 +198,15 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addToString(String name, Field[] fields) {
-        LinkedList<String> getToString = new LinkedList<String>();
-        getToString.add("String out = \"" + name + "\" + \"(\" + number + \")\";");
+        Block body = new Block("String out = \"" + name + "\" + \"(\" + number + \")\"");
         for (Field field : fields)
-            getToString.add("out += \"\\n\\t" + field.getFieldName() + " = \" + " + (field.hasDeclarations() ?
+            body.addStatement(asVoid("out += \"\\n\\t" + field.getFieldName() + " = \" + " + (field.hasDeclarations() ?
                     "org.freeciv.Util.joinStringArray(" + "this." + field.getFieldName() + ", " +
                             "\", \"" +
-                            ", \"(\", \")\"" + ");" :
-                    "this." + field.getFieldName() + ".toString();"));
-        getToString.add("return out + \"\\n\";");
-        addMethodPublicReadObjectState(null, "String", "toString", getToString.toArray(new String[0]));
+                            ", \"(\", \")\"" + ")" :
+                    "this." + field.getFieldName() + ".toString()")));
+        body.addStatement(RETURN.x(asAString("out + \"\\n\"")));
+        addMethodPublicReadObjectState(null, "String", "toString", body);
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {
