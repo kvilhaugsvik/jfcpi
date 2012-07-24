@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2012. Sveinung Kvilhaugsvik
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
@@ -10,27 +24,20 @@ import org.freeciv.packetgen.javaGenerator.HasAtoms;
 import java.util.Collections;
 import java.util.LinkedList;
 
-/***
- * Represents a block of statements.
- *
- * To avoid having to define statements as a separate abstraction pretend that void
- * is a Java type (even if it strictly isn't) like Scala's Unit. Treat expressions
- * as statements if added to a block. Also pretend that all expressions are valid
- * as statements.
- *
- * Disadvantages of this approach include some bugs won't be detected until the generated
- * code is compiled and that putting a comment on a statement becomes harder.
- *
- */
 public class Block extends Formatted implements NoValue {
-    private final LinkedList<Returnable> statements = new LinkedList<Returnable>();
+    private final LinkedList<Statement> statements = new LinkedList<Statement>();
 
     public Block(Returnable... firstStatements) {
-        Collections.addAll(statements, firstStatements);
+        for (Returnable statement : firstStatements)
+            statements.add(new Statement(statement));
+    }
+
+    public void addStatement(Statement statement) {
+        statements.add(statement);
     }
 
     public void addStatement(Returnable statement) {
-        statements.add(statement);
+        statements.add(new Statement(statement));
     }
 
     public String[] getJavaCodeLines() {
@@ -39,9 +46,8 @@ public class Block extends Formatted implements NoValue {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        for (Returnable statement : statements) {
+        for (HasAtoms statement : statements) {
             statement.writeAtoms(to);
-            to.add(HasAtoms.EOL);
         }
     }
 
