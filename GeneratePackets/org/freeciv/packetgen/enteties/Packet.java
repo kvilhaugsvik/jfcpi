@@ -197,7 +197,9 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addToString(String name, Field[] fields) {
-        Block body = Block.fromStrings("String out = \"" + name + "\" + \"(\" + number + \")\"");
+        VariableDeclaration buildOutput = VariableDeclaration.local("String", "out",
+                asAString("\"" + name + "\" + \"(\" + number + \")\""));
+        Block body = new Block(buildOutput);
         for (Field field : fields)
             body.addStatement(asVoid("out += \"\\n\\t" + field.getFieldName() + " = \" + " + (field.hasDeclarations() ?
                     "org.freeciv.Util.joinStringArray(" + "this." + field.getFieldName() + ", " +
