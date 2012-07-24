@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 import org.freeciv.packetgen.javaGenerator.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 /**
  * Wrap a string of source code by declaring what it is
@@ -46,5 +47,16 @@ public abstract class WrapCodeString implements HasAtoms {
 
     public final String toString() {
         return getJavaCode();
+    }
+
+    static class WrappedAny extends WrapCodeString implements AValue {
+        /**
+         * Constructor that forces the expression to be ready at initialization
+         *
+         * @param javaCode
+         */
+        protected WrappedAny(String javaCode) {
+            super(javaCode);
+        }
     }
 }

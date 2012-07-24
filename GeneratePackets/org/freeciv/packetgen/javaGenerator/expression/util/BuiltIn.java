@@ -19,6 +19,8 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
+import static org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString.*;
+
 public class BuiltIn {
     public static final ABool TRUE = asBool("true");
     public static final ABool FALSE = asBool("false");
@@ -49,6 +51,10 @@ public class BuiltIn {
 
     public static ALong asALong(String javaCode) {
         return new LongTyped(javaCode);
+    }
+
+    public static AValue asAValue(String javaCode) {
+        return new WrappedAny(javaCode);
     }
 
     public static NoValue asVoid(String javaCode) {
