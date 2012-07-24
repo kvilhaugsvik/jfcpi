@@ -79,6 +79,25 @@ public class VariableDeclaration extends Formatted implements Returnable {
         }
     }
 
+    /**
+     * Get the name read from a local scope
+     * @return variable name access
+     */
+    public AValue ref() {
+        final CodeAtom referName = new CodeAtom((Scope.CODE_BLOCK.equals(scope) ? "" : "this.") + name);
+        return new AValue() {
+            @Override
+            public String getJavaCode() {
+                return referName.toString();
+            }
+
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(referName);
+            }
+        };
+    }
+
     public static VariableDeclaration local(String type, String name, AValue value) {
         return new VariableDeclaration(null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
     }
