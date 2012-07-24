@@ -15,14 +15,14 @@
 package org.freeciv.packetgen.javaGenerator;
 
 public class VariableDeclaration {
-    private final ClassWriter.Visibility visibility;
-    private final ClassWriter.Scope scope;
-    private final ClassWriter.Modifiable modifiable;
+    private final Visibility visibility;
+    private final Scope scope;
+    private final Modifiable modifiable;
     private final String type;
     private final String name;
     private final String value;
 
-    public VariableDeclaration(ClassWriter.Visibility visibility, ClassWriter.Scope scope, ClassWriter.Modifiable modifiable,
+    public VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
                                String type, String name, String value) {
         this.visibility = visibility;
         this.scope = scope;
@@ -32,15 +32,15 @@ public class VariableDeclaration {
         this.value = value;
     }
 
-    public ClassWriter.Visibility getVisibility() {
+    public Visibility getVisibility() {
         return visibility;
     }
 
-    public ClassWriter.Scope getScope() {
+    public Scope getScope() {
         return scope;
     }
 
-    public ClassWriter.Modifiable getModifiable() {
+    public Modifiable getModifiable() {
         return modifiable;
     }
 

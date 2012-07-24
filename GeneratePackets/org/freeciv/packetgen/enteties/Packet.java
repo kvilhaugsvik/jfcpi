@@ -19,8 +19,7 @@ import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.Field;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
-import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 
 import java.util.*;

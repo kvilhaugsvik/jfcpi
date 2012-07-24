@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.javaGenerator.ClassKind;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
 

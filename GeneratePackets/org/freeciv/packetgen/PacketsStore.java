@@ -22,8 +22,10 @@ import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
+import org.freeciv.packetgen.javaGenerator.ClassKind;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.Visibility;
 
 import java.util.*;
 
@@ -181,13 +183,13 @@ public class PacketsStore {
 
         int border = Util.VERSION_DATA_CLASS.lastIndexOf('.');
         ClassWriter constants =
-                new ClassWriter(ClassWriter.ClassKind.CLASS, new TargetPackage(
+                new ClassWriter(ClassKind.CLASS, new TargetPackage(
                         Util.VERSION_DATA_CLASS.substring(0, border)), new String[0],
                                 "Freeciv C code", Util.VERSION_DATA_CLASS.substring(border + 1),
                                 null, null);
 
         for (Constant dep : sortedConstants)
-            constants.addClassConstant(ClassWriter.Visibility.PUBLIC, dep.getType(), dep.getName(), dep.getExpression());
+            constants.addClassConstant(Visibility.PUBLIC, dep.getType(), dep.getName(), dep.getExpression());
 
         String[] understandsPackets;
         if (packetsByNumber.isEmpty()) {
@@ -203,7 +205,7 @@ public class PacketsStore {
                 }
             }
         }
-        constants.addClassConstant(ClassWriter.Visibility.PUBLIC, "String[]", Util.PACKET_MAP_NAME, org.freeciv.Util.joinStringArray(understandsPackets, ",\n\t", "{", "}"));
+        constants.addClassConstant(Visibility.PUBLIC, "String[]", Util.PACKET_MAP_NAME, org.freeciv.Util.joinStringArray(understandsPackets, ",\n\t", "{", "}"));
 
         out.add(constants);
 
