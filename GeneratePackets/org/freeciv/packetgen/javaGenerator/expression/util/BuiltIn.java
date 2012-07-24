@@ -40,6 +40,8 @@ public class BuiltIn {
 
     public static final From2or3<NoValue, ABool, Block, Block> IF = new If();
 
+    public static final ExprFrom2<NoValue, ABool, Block> WHILE = new While();
+
     public static final ExprFrom1<AString, AValue> TO_STRING_OBJECT =
             new ExprFrom1<AString, AValue>() {
                 @Override
