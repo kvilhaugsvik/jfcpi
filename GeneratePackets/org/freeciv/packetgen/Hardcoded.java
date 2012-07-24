@@ -21,8 +21,13 @@ import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.VariableDeclaration;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 
 import java.util.*;
+
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 //TODO: Move data to file
 public class Hardcoded {
@@ -125,9 +130,18 @@ public class Hardcoded {
                                        arrayEaterScopeCheck("arraySize != value.length"),
                                        "this.value = value;"
                                },
-                               "byte[] innBuffer = new byte[arraySize];\n" +
-                                       "from.readFully(innBuffer);\n" +
-                                       "value = innBuffer;",
+                               new ExprFrom1<Block, VariableDeclaration>() {
+                                   @Override
+                                   public Block x(VariableDeclaration to) {
+                                       VariableDeclaration innBuf =
+                                               VariableDeclaration.local("byte[]", "innBuffer",
+                                                       asAValue("new byte[arraySize]"));
+                                       Block reader = new Block(innBuf);
+                                       reader.addStatement(asVoid("from.readFully(innBuffer)"));
+                                       reader.addStatement(to.assign().x(innBuf.ref()));
+                                       return reader;
+                                   }
+                               },
                                "to.write(" + "value" + ");\n",
                                "return " + "value" + ".length;",
                                true, Collections.<Requirement>emptySet()),
