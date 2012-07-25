@@ -31,7 +31,7 @@ public class FieldTypeBasic implements IDependency {
     private final String fieldTypeBasic;
     private final String publicType;
     private final String javaType;
-    private final String[] fromJavaType;
+    private final Block constructorBody;
     private final String[] decode;
     private final String[] encode, encodedSize;
     private final ExprFrom1<AString, AValue> value2String;
@@ -43,6 +43,8 @@ public class FieldTypeBasic implements IDependency {
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
                           String decode, String encode, String encodedSize,
                           boolean arrayEater, Collection<Requirement> needs) {
+        VariableDeclaration value =
+                VariableDeclaration.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         this.javaType = javaType;
@@ -51,13 +53,13 @@ public class FieldTypeBasic implements IDependency {
         this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;
         this.value2String = TO_STRING_OBJECT;
-        this.fromJavaType = new String[]{"this.value = value;"};
+        this.constructorBody = new Block(value.assign().x(asAValue("value")));
 
         requirement = needs;
     }
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
-                          ExprFrom1<Block, VariableDeclaration>  fromJavaType,
+                          ExprFrom1<Block, VariableDeclaration>  constructorBody,
                           ExprFrom1<Block, VariableDeclaration> decode, String encode, String encodedSize,
                           ExprFrom1<AString, AValue> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
@@ -71,7 +73,7 @@ public class FieldTypeBasic implements IDependency {
         this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;
         this.value2String = toString;
-        this.fromJavaType = fromJavaType.x(value).getJavaCodeLines();
+        this.constructorBody = constructorBody.x(value);
 
         requirement = needs;
     }
@@ -115,11 +117,11 @@ public class FieldTypeBasic implements IDependency {
 
             addObjectConstant(javaType, "value");
             if (arrayEater) {
-                addConstructorPublic(null, javaType + " value" + ", int arraySize", fromJavaType);
+                addConstructorPublic(null, javaType + " value" + ", int arraySize", constructorBody);
                 addConstructorPublicWithExceptions(null, "DataInput from" + ", int arraySize", "IOException",
                                                    decode);
             } else {
-                addConstructorPublic(null, javaType + " value", fromJavaType);
+                addConstructorPublic(null, javaType + " value", constructorBody);
                 addConstructorPublicWithExceptions(null, "DataInput from", "IOException", decode);
             }
             addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encode);

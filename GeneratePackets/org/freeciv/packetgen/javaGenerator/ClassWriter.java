@@ -162,6 +162,12 @@ public class ClassWriter {
         methods.add(Method.newPublicConstructor(comment, getName(), paramList, body));
     }
 
+    public void addConstructorPublic(String comment,
+                                     String paramList,
+                                     Block body) {
+        methods.add(Method.newPublicConstructor(comment, getName(), paramList, body.getJavaCodeLines()));
+    }
+
     public void addConstructorFields() {
         constructorFromAllFields = true;
     }
