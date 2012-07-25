@@ -17,10 +17,8 @@ import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 public class TerminatedArray extends FieldTypeBasic {
     public TerminatedArray(String dataIOType, String publicType, Requirement maxSizeConstant, Requirement terminator) {
         super(dataIOType, publicType, "byte[]",
-              new String[]{
-                      arrayEaterScopeCheck(Constant.referToInJavaCode(maxSizeConstant) + " < value.length"),
-                      "this.value = value;"
-              },
+              (arrayEaterScopeCheck(Constant.referToInJavaCode(maxSizeConstant) + " < value.length").getJavaCode()
+                      + "\n" + "this.value = value;").split("\n"),
               "byte[] buffer = new byte[" + Constant.referToInJavaCode(maxSizeConstant) + "];" + "\n" +
                       "byte current = from.readByte();" + "\n" +
                       "int pos = 0;" + "\n" +

@@ -24,6 +24,7 @@ import org.freeciv.packetgen.javaGenerator.TargetPackage;
 import org.freeciv.packetgen.javaGenerator.VariableDeclaration;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 import java.util.*;
 
@@ -93,16 +94,14 @@ public class Hardcoded {
             getFloat("1000000"),
             new FieldTypeBasic("string", "char",
                                "String",
-                               new String[]{
-                                       arrayEaterScopeCheck("arraySize < value.length()"),
-                                       "this.value = value;"
-                               },
+                               (arrayEaterScopeCheck("arraySize < value.length()").getJavaCode() +
+                                       "\n" + "this.value = value;").split("\n"),
                                "StringBuffer buf = new StringBuffer();" + "\n" +
                                        "byte letter = from.readByte();" + "\n" +
                                        "int read = 0;" + "\n" +
                                        "while (0 != letter) {" + "\n" +
                                        "read++;" + "\n" +
-                                       arrayEaterScopeCheck("arraySize < read") +
+                                       arrayEaterScopeCheck("arraySize < read").getJavaCode() + "\n" +
                                        "buf.append((char)letter);" + "\n" +
                                        "letter = from.readByte();" + "\n" +
                                        "}" + "\n" +
@@ -126,10 +125,8 @@ public class Hardcoded {
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
             new FieldTypeBasic("memory", "unsigned char",
                                "byte[]",
-                               new String[]{
-                                       arrayEaterScopeCheck("arraySize != value.length"),
-                                       "this.value = value;"
-                               },
+                               (arrayEaterScopeCheck("arraySize != value.length").getJavaCode() +
+                                       "\n" + "this.value = value;").split("\n"),
                                new ExprFrom1<Block, VariableDeclaration>() {
                                    @Override
                                    public Block x(VariableDeclaration to) {
@@ -170,9 +167,8 @@ public class Hardcoded {
             (IDependency)(new SimpleTypeAlias("int", "Integer", Collections.<Requirement>emptySet()))
     );
 
-    public static String arrayEaterScopeCheck(String check) {
-        return "if (" + check + ") " +
-                "throw new IllegalArgumentException(\"Value out of scope\");" + "\n";
+    public static NoValue arrayEaterScopeCheck(String check) {
+        return IF.x(asBool(check), Block.fromStrings("throw new IllegalArgumentException(\"Value out of scope\")"));
     }
 
     public static void applyManualChanges(PacketsStore toStorage) {
