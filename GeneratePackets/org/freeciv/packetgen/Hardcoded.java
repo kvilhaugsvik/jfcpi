@@ -94,22 +94,38 @@ public class Hardcoded {
             getFloat("1000000"),
             new FieldTypeBasic("string", "char",
                                "String",
-                               (arrayEaterScopeCheck("arraySize < value.length()").getJavaCode() +
-                                       "\n" + "this.value = value;").split("\n"),
-                               "StringBuffer buf = new StringBuffer();" + "\n" +
-                                       "byte letter = from.readByte();" + "\n" +
-                                       "int read = 0;" + "\n" +
-                                       "while (0 != letter) {" + "\n" +
-                                       "read++;" + "\n" +
-                                       arrayEaterScopeCheck("arraySize < read").getJavaCode() + "\n" +
-                                       "buf.append((char)letter);" + "\n" +
-                                       "letter = from.readByte();" + "\n" +
-                                       "}" + "\n" +
-                                       "if (buf.length() == 0) {" + "\n" +
-                                       "value = \"\";" + "\n" +
-                                       "} else {" + "\n" +
-                                       "value = buf.toString();" + "\n"
-                                       + "}",
+                               new ExprFrom1<Block, VariableDeclaration>() {
+                                   @Override
+                                   public Block x(VariableDeclaration to) {
+                                       return new Block(
+                                               arrayEaterScopeCheck("arraySize < value.length()"),
+                                               to.assign().x(asAValue("value")));
+                                   }
+                               },
+                               new ExprFrom1<Block, VariableDeclaration>() {
+                                   @Override
+                                   public Block x(VariableDeclaration to) {
+                                       VariableDeclaration buf =
+                                               VariableDeclaration.local("StringBuffer", "buf",
+                                                       asAValue("new StringBuffer()"));
+                                       VariableDeclaration letter = VariableDeclaration.local("byte", "letter",
+                                               asAValue("from.readByte()"));
+                                       VariableDeclaration read = VariableDeclaration.local("int", "read",
+                                               asAnInt("0"));
+                                       return new Block(
+                                               buf,
+                                               letter,
+                                               read,
+                                               WHILE.x(asBool("0 != letter"), new Block(
+                                                       asVoid("read++"),
+                                                       arrayEaterScopeCheck("arraySize < read"),
+                                                       asVoid("buf.append((char)letter)"),
+                                                       letter.assign().x(asAnInt("from.readByte()")))),
+                                               IF.x(asBool("buf.length() == 0"),
+                                                       new Block(to.assign().x(asAString("\"\""))),
+                                                       new Block(to.assign().x(asAString("buf.toString()")))));
+                                   }
+                               },
                                "to.writeBytes(" + "value" + ");\n" +
                                        "to.writeByte(0);",
                                "return " + "value" + ".length() + 1;",
