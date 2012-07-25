@@ -96,7 +96,7 @@ public class Hardcoded {
                                    public Block x(VariableDeclaration to) {
                                        return new Block(
                                                arrayEaterScopeCheck("arraySize < value.length()"),
-                                               to.assign().x(asAValue("value")));
+                                               to.assign(asAValue("value")));
                                    }
                                },
                                new ExprFrom1<Block, VariableDeclaration>() {
@@ -117,10 +117,10 @@ public class Hardcoded {
                                                        asVoid("read++"),
                                                        arrayEaterScopeCheck("arraySize < read"),
                                                        asVoid("buf.append((char)letter)"),
-                                                       letter.assign().x(asAnInt("from.readByte()")))),
+                                                       letter.assign(asAnInt("from.readByte()")))),
                                                IF.x(asBool("buf.length() == 0"),
-                                                       new Block(to.assign().x(asAString("\"\""))),
-                                                       new Block(to.assign().x(asAString("buf.toString()")))));
+                                                       new Block(to.assign(asAString("\"\""))),
+                                                       new Block(to.assign(asAString("buf.toString()")))));
                                    }
                                },
                                "to.writeBytes(" + "value" + ");\n" +
@@ -143,7 +143,7 @@ public class Hardcoded {
                                    public Block x(VariableDeclaration to) {
                                        return new Block(
                                                arrayEaterScopeCheck("arraySize != value.length"),
-                                               to.assign().x(asAValue("value")));
+                                               to.assign(asAValue("value")));
                                    }
                                },
                                new ExprFrom1<Block, VariableDeclaration>() {
@@ -154,7 +154,7 @@ public class Hardcoded {
                                                        asAValue("new byte[arraySize]"));
                                        Block reader = new Block(innBuf);
                                        reader.addStatement(asVoid("from.readFully(innBuffer)"));
-                                       reader.addStatement(to.assign().x(innBuf.ref()));
+                                       reader.addStatement(to.assign(innBuf.ref()));
                                        return reader;
                                    }
                                },

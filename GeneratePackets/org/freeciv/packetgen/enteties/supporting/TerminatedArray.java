@@ -24,7 +24,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     public Block x(VariableDeclaration to) {
                         return new Block(
                                 arrayEaterScopeCheck(Constant.referToInJavaCode(maxSizeConstant) + " < value.length"),
-                                to.assign().x(asAValue("value")));
+                                to.assign(asAValue("value")));
                     }
                 },
                 new ExprFrom1<Block, VariableDeclaration>() {
@@ -41,9 +41,9 @@ public class TerminatedArray extends FieldTypeBasic {
                                         new Block(asVoid("buffer[pos] = current"),
                                                 asVoid("pos++"),
                                                 IF.x(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
-                                                        new Block(current.assign().x(asAnInt("from.readByte()"))),
+                                                        new Block(current.assign(asAnInt("from.readByte()"))),
                                                         new Block(asVoid("break"))))),
-                                to.assign().x((asAValue("java.util.Arrays.copyOf(buffer, pos)"))));
+                                to.assign((asAValue("java.util.Arrays.copyOf(buffer, pos)"))));
                     }
                 },
               "to.write(value);\n" +

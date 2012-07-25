@@ -53,7 +53,7 @@ public class FieldTypeBasic implements IDependency {
         this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;
         this.value2String = TO_STRING_OBJECT;
-        this.constructorBody = new Block(value.assign().x(asAValue("value")));
+        this.constructorBody = new Block(value.assign(asAValue("value")));
 
         requirement = needs;
     }

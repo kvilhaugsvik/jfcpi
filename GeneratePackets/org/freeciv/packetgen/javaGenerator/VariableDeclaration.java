@@ -97,18 +97,13 @@ public class VariableDeclaration extends Formatted implements Returnable {
         };
     }
 
-    public ExprFrom1<AValue, AValue> assign() {
-        return new ExprFrom1<AValue, AValue>() {
+    public AValue assign(final AValue arg1) {
+        return new FormattedAValue() {
             @Override
-            public AValue x(final AValue arg1) {
-                return new FormattedAValue() {
-                    @Override
-                    public void writeAtoms(CodeAtoms to) {
-                        to.add(referName);
-                        to.add(ASSIGN);
-                        arg1.writeAtoms(to);
-                    }
-                };
+            public void writeAtoms(CodeAtoms to) {
+                to.add(referName);
+                to.add(ASSIGN);
+                arg1.writeAtoms(to);
             }
         };
     }
