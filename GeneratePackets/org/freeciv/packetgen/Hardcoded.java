@@ -125,8 +125,14 @@ public class Hardcoded {
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
             new FieldTypeBasic("memory", "unsigned char",
                                "byte[]",
-                               (arrayEaterScopeCheck("arraySize != value.length").getJavaCode() +
-                                       "\n" + "this.value = value;").split("\n"),
+                               new ExprFrom1<Block, VariableDeclaration>() {
+                                   @Override
+                                   public Block x(VariableDeclaration to) {
+                                       return new Block(
+                                               arrayEaterScopeCheck("arraySize != value.length"),
+                                               to.assign().x(asAValue("value")));
+                                   }
+                               },
                                new ExprFrom1<Block, VariableDeclaration>() {
                                    @Override
                                    public Block x(VariableDeclaration to) {

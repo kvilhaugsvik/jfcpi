@@ -63,7 +63,8 @@ public class FieldTypeBasic implements IDependency {
                 arrayEater, needs);
     }
 
-    public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
+    public FieldTypeBasic(String dataIOType, String publicType, String javaType,
+                          ExprFrom1<Block, VariableDeclaration>  fromJavaType,
                           ExprFrom1<Block, VariableDeclaration> decode, String encode, String encodedSize,
                           boolean arrayEater, Collection<Requirement> needs) {
         VariableDeclaration value =
@@ -76,7 +77,7 @@ public class FieldTypeBasic implements IDependency {
         this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;
         this.value2String = TO_STRING_OBJECT;
-        this.fromJavaType = fromJavaType;
+        this.fromJavaType = fromJavaType.x(value).getJavaCodeLines();
 
         requirement = needs;
     }
