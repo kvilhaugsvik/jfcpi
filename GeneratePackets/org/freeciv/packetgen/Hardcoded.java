@@ -129,7 +129,7 @@ public class Hardcoded {
                                "to.writeBytes(" + "value" + ");\n" +
                                        "to.writeByte(0);",
                                "return " + "value" + ".length() + 1;",
-                               true, Collections.<Requirement>emptySet()),
+                               TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new TerminatedArray("tech_list", "int",
                                 new Requirement("MAX_NUM_TECH_LIST", Requirement.Kind.VALUE),
                                 new Requirement("A_LAST", Requirement.Kind.VALUE)),
@@ -163,7 +163,7 @@ public class Hardcoded {
                                },
                                "to.write(" + "value" + ");\n",
                                "return " + "value" + ".length;",
-                               true, Collections.<Requirement>emptySet()),
+                               TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("bool8", "bool",
                                "Boolean",
                                new String[]{"this.value = value;"},

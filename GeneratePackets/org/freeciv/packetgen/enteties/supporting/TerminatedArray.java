@@ -3,6 +3,8 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.javaGenerator.VariableDeclaration;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
@@ -15,23 +17,35 @@ import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 // TODO: Generalize to NetworkIO. Then use for String.
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {
-    public TerminatedArray(String dataIOType, String publicType, Requirement maxSizeConstant, Requirement terminator) {
+    public TerminatedArray(String dataIOType, String publicType, final Requirement maxSizeConstant, final Requirement terminator) {
         super(dataIOType, publicType, "byte[]",
-              (arrayEaterScopeCheck(Constant.referToInJavaCode(maxSizeConstant) + " < value.length").getJavaCode()
-                      + "\n" + "this.value = value;").split("\n"),
-              "byte[] buffer = new byte[" + Constant.referToInJavaCode(maxSizeConstant) + "];" + "\n" +
-                      "byte current = from.readByte();" + "\n" +
-                      "int pos = 0;" + "\n" +
-                      "while (((byte)" + Constant.referToInJavaCode(terminator) + ") != current) {" + "\n" +
-                      "buffer[pos] = current;\n" +
-                      "pos++;" + "\n" +
-                      "if (pos < " + Constant.referToInJavaCode(maxSizeConstant) + ") {" + "\n" +
-                      "current = from.readByte();" + "\n" +
-                      "} else {" + "\n" +
-                      "break;" + "\n" +
-                      "}" + "\n" +
-                      "}" + "\n" +
-                      "value = java.util.Arrays.copyOf(buffer, pos);",
+                new ExprFrom1<Block, VariableDeclaration>() {
+                    @Override
+                    public Block x(VariableDeclaration to) {
+                        return new Block(
+                                arrayEaterScopeCheck(Constant.referToInJavaCode(maxSizeConstant) + " < value.length"),
+                                to.assign().x(asAValue("value")));
+                    }
+                },
+                new ExprFrom1<Block, VariableDeclaration>() {
+                    @Override
+                    public Block x(VariableDeclaration to) {
+                        VariableDeclaration buf = VariableDeclaration.local("byte[]", "buffer",
+                                asAValue("new byte[" +
+                                        Constant.referToInJavaCode(maxSizeConstant) + "]"));
+                        VariableDeclaration current = VariableDeclaration.local("byte", "current",
+                                asAValue("from.readByte()"));
+                        VariableDeclaration pos = VariableDeclaration.local("int", "pos", asAnInt("0"));
+                        return new Block(buf, current, pos,
+                                WHILE.x(asBool("((byte)" + Constant.referToInJavaCode(terminator) + ") != current"),
+                                        new Block(asVoid("buffer[pos] = current"),
+                                                asVoid("pos++"),
+                                                IF.x(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
+                                                        new Block(current.assign().x(asAnInt("from.readByte()"))),
+                                                        new Block(asVoid("break"))))),
+                                to.assign().x((asAValue("java.util.Arrays.copyOf(buffer, pos)"))));
+                    }
+                },
               "to.write(value);\n" +
                       "if (value.length < " + Constant.referToInJavaCode(maxSizeConstant) + ") {" + "\n" +
                       "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
