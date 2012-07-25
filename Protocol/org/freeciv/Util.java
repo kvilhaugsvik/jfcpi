@@ -48,6 +48,10 @@ public class Util {
         return joinStringArrayGeneric(elements, separator, "(", ")");
     }
 
+    public static String joinStringArray(byte[] elements, String separator, String begin, String end) {
+        return joinStringArrayGeneric(elements, separator, begin, end);
+    }
+
     public static String joinStringArray(boolean[] elements, String separator) {
         return joinStringArrayGeneric(elements, separator, "(", ")");
     }

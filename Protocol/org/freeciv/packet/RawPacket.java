@@ -14,6 +14,8 @@
 
 package org.freeciv.packet;
 
+import org.freeciv.Util;
+
 import java.io.*;
 
 public class RawPacket implements Packet {
@@ -45,11 +47,8 @@ public class RawPacket implements Packet {
     }
 
     @Override public String toString() {
-        String out = "(" + header.getPacketKind() + ")\t";
-        for (byte part: content) {
-            out += ((int)part) + "\t";
-        }
-        return out + "\n";
+        return header.getPacketKind() + " (not interpreted)" +
+                Util.joinStringArray(content, ", ", "\n\traw data = (", ")");
     }
 
     public int getNumber() {
