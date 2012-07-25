@@ -50,20 +50,6 @@ public class BuiltIn {
                 }
             };
 
-    public static final ExprFrom1<AString, AValue> TO_STRING_NON_OBJECT =
-            new ExprFrom1<AString, AValue>() {
-                @Override
-                public AString x(final AValue arg1) {
-                    return new Formatted.FormattedString() {
-                        public void writeAtoms(CodeAtoms to) {
-                            arg1.writeAtoms(to);
-                            to.add(ADD);
-                            asAString("\"\\n\"").writeAtoms(to);
-                        }
-                    };
-                }
-            };
-
 
     public static AString asAString(String javaCode) {
         return new WrappedString(javaCode);
