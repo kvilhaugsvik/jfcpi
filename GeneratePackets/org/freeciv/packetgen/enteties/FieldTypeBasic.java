@@ -40,7 +40,7 @@ public class FieldTypeBasic implements IDependency {
     private final Collection<Requirement> requirement;
     private final FieldTypeBasic basicType = this;
 
-    public FieldTypeBasic(String dataIOType, String publicType, String javaType, String[] fromJavaType,
+    public FieldTypeBasic(String dataIOType, String publicType, String javaType,
                           String decode, String encode, String encodedSize,
                           boolean arrayEater, Collection<Requirement> needs) {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
@@ -51,7 +51,7 @@ public class FieldTypeBasic implements IDependency {
         this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;
         this.value2String = TO_STRING_OBJECT;
-        this.fromJavaType = fromJavaType;
+        this.fromJavaType = new String[]{"this.value = value;"};
 
         requirement = needs;
     }

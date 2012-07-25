@@ -73,7 +73,6 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         final String realBitVector =  bvName + ".size";
         return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName,
                                   getName(),
-                                  new String[]{"this.value = value;"},
                                   (knowsSize ?
                                           io.getRead(size[0] + realBitVector  + size[1]) :
                                           "int size = from.readUnsignedShort();" + "\n" +

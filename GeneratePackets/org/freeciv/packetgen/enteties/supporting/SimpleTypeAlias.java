@@ -17,7 +17,6 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 
 import java.util.*;
 
@@ -36,7 +35,6 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(),
                                   typeInJava,
-                                  new String[]{"this.value = value;"},
                                   "value = " + (willRequire.isEmpty() ? io.getRead() : typeInJava + ".valueOf(" + io
                                           .getRead() + ")") + ";",
                                   io.getWrite((willRequire.isEmpty() ? "value" : "value.getNumber()")),

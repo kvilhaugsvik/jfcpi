@@ -35,7 +35,6 @@ public class Hardcoded {
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
             new FieldTypeBasic("uint32", "int",
                                "Long",
-                               new String[]{"this.value = value;"},
                                "int bufferValue = from.readInt();" + "\n" +
                                        "if (0 <= bufferValue) {" + "\n" +
                                        "value = (long)bufferValue;" + "\n" +
@@ -49,7 +48,6 @@ public class Hardcoded {
                                "return 4;",
                                false, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("requirement", "struct requirement", "requirement",
-                    new String[]{"this.value = value;"},
                     "value = new requirement(\n" +
                             "\tnew universal(universals_n.valueOf(from.readUnsignedByte()),\n" +
                             "\t\tfrom.readInt()),\n" +
@@ -70,7 +68,6 @@ public class Hardcoded {
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
             new FieldTypeBasic("worklist", "struct worklist", "universal[]",
-                    new String[]{"this.value = value;"},
                     "int length = from.readUnsignedByte();" + "\n" +
                             "value = new universal[length];" + "\n" +
                             "for (int i = 0; i < length; i++) {" + "\n" +
@@ -166,7 +163,6 @@ public class Hardcoded {
                                TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("bool8", "bool",
                                "Boolean",
-                               new String[]{"this.value = value;"},
                                "value = from.readBoolean();",
                                "to.writeBoolean(value);",
                                "return 1;",
@@ -221,7 +217,6 @@ public class Hardcoded {
     private static FieldTypeBasic getFloat(String times) {
         return new FieldTypeBasic("float" + times, "float",
                                   "Float",
-                                  new String[]{"this.value = value;"},
                                   "value = from.readFloat() / " + times + ";",
                                   "to.writeFloat(value * " + times + ");",
                                   "return 4;",

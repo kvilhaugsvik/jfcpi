@@ -172,7 +172,6 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         req.add(new Requirement("enum " + named, Requirement.Kind.AS_JAVA_DATATYPE));
         return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named,
                                   named,
-                                  new String[]{"this.value = value;"},
                                   "value = " + named + ".valueOf(" + io.getRead() + ");",
                                   io.getWrite("value.getNumber()"),
                                   io.getSize(),
