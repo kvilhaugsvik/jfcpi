@@ -27,6 +27,8 @@ public interface HasAtoms {
     public static final CodeAtom ELSE = new CodeAtom("else");
     public static final CodeAtom RET = new CodeAtom("return");
     public static final CodeAtom WHILE = new CodeAtom("while");
+    public static final CodeAtom FOR = new CodeAtom("for");
+    public static final CodeAtom FORSEP = new CodeAtom(";");
 
     public void writeAtoms(CodeAtoms to);
 }

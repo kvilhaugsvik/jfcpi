@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
+import org.freeciv.packetgen.javaGenerator.VariableDeclaration;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
@@ -52,6 +53,24 @@ public class BuiltIn {
                 cond.writeAtoms(to);
                 to.add(RPR);
                 rep.writeAtoms(to);
+            }
+        };
+    }
+
+    public static NoValue FOR(final VariableDeclaration count, final ABool cond, final NoValue changer,
+                              final Block body) {
+        return new Formatted.FormattedVoid() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(FOR);
+                to.add(LPR);
+                count.writeAtoms(to);
+                to.add(FORSEP);
+                cond.writeAtoms(to);
+                to.add(FORSEP);
+                changer.writeAtoms(to);
+                to.add(RPR);
+                body.writeAtoms(to);
             }
         };
     }

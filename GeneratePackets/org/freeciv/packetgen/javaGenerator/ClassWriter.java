@@ -544,6 +544,12 @@ public class ClassWriter {
         maker.nextIs(new Util.OneCondition<CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.FORSEP.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.nextIs(new Util.OneCondition<CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom argument) {
                 return HasAtoms.RSC.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);
