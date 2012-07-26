@@ -10,6 +10,9 @@ JUNIT ?= /usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar
 # items are missing in stead of aborting on missing items.
 DEVMODE ?= false
 
+# where to log errors
+LOG_TO ?= "Logger.GLOBAL_LOGGER_NAME"
+
 # What it should be generated from
 # take instructions from trunk.xml
 VERSIONCONFIGURATION ?= trunk.xml
@@ -48,6 +51,7 @@ sourceDefaultsForGenerator:
 	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final boolean DEVMODE = ${DEVMODE};" >> ${GENERATORDEFAULTS}
+	echo "  public static final String LOG_TO = \"${LOG_TO}\";" >> ${GENERATORDEFAULTS}
 	echo "}" >>${GENERATORDEFAULTS}
 	touch sourceDefaultsForGenerator
 

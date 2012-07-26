@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.Util;
+import org.freeciv.packetgen.GeneratorDefaults;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -40,6 +41,7 @@ public class Packet extends ClassWriter implements IDependency {
                               null,
                               java.io.DataInput.class.getCanonicalName(),
                               java.io.DataOutput.class.getCanonicalName(),
+                              java.util.logging.Logger.class.getCanonicalName(),
                               java.io.IOException.class.getCanonicalName()
                       }, "Freeciv's protocol definition", name, null, "Packet");
 
@@ -139,6 +141,11 @@ public class Packet extends ClassWriter implements IDependency {
                                           ") : \"Packet not generated for this kind of header\";");
 
         constructorBodyStream.add("if (header.getHeaderSize() + calcBodyLen() != header.getTotalSize()) {");
+        constructorBodyStream.add("Logger.getLogger(" + GeneratorDefaults.LOG_TO + ").warning(" +
+                "\"Probable misinterpretation: \" + " +
+                "\"interpreted packet size (\" + (header.getHeaderSize() + calcBodyLen()) + \")" +
+                " don't match header packet size (\" + header.getTotalSize() + \")" +
+                " for \" + this.toString());");
         constructorBodyStream.add("throw new IOException(\"Packet size in header and Java packet not the same.\"");
         constructorBodyStream.add("+ \" Header packet size: \"" + " + header.getTotalSize()");
         constructorBodyStream.add("+ \" Header size: \" + header.getHeaderSize()");
