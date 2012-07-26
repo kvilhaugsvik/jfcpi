@@ -539,7 +539,7 @@ public class CodeGenTest {
 
     @Test public void testPublicReadObjectState() {
         String result = Method.newPublicReadObjectState(null, "String", "toString",
-                new Block(RETURN.x(asAString("value.toString()")))).toString();
+                new Block(RETURN(asAString("value.toString()")))).toString();
 
         assertEquals("Generated source not as expected",
                 "\tpublic String toString() {\n" +

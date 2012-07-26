@@ -25,9 +25,7 @@ public class BuiltIn {
     public static final ABool TRUE = asBool("true");
     public static final ABool FALSE = asBool("false");
 
-    public static final ExprFrom1<NoValue, AValue> RETURN = new ExprFrom1<NoValue, AValue>() {
-        @Override
-        public NoValue x(final AValue arg1) {
+    public static NoValue RETURN(final AValue arg1) {
             return new Formatted.FormattedVoid() {
                 @Override
                 public void writeAtoms(CodeAtoms to) {
@@ -35,8 +33,7 @@ public class BuiltIn {
                     arg1.writeAtoms(to);
                 }
             };
-        }
-    };
+    }
 
     public static final From2or3<NoValue, ABool, Block, Block> IF = new If();
 

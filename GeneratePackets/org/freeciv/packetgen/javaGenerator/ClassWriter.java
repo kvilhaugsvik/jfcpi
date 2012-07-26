@@ -93,7 +93,7 @@ public class ClassWriter {
                         null,
                         type,
                         "get" + name.substring(0, 1).toUpperCase() + name.substring(1),
-                        new Block(RETURN.x(field.ref())));
+                        new Block(RETURN(field.ref())));
     }
 
     public void addMethod(String comment,
