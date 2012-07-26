@@ -3,7 +3,7 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.javaGenerator.VariableDeclaration;
+import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
@@ -19,23 +19,23 @@ import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 public class TerminatedArray extends FieldTypeBasic {
     public TerminatedArray(String dataIOType, String publicType, final Requirement maxSizeConstant, final Requirement terminator) {
         super(dataIOType, publicType, "byte[]",
-                new ExprFrom1<Block, VariableDeclaration>() {
+                new ExprFrom1<Block, Var>() {
                     @Override
-                    public Block x(VariableDeclaration to) {
+                    public Block x(Var to) {
                         return new Block(
                                 arrayEaterScopeCheck(Constant.referToInJavaCode(maxSizeConstant) + " < value.length"),
                                 to.assign(asAValue("value")));
                     }
                 },
-                new ExprFrom1<Block, VariableDeclaration>() {
+                new ExprFrom1<Block, Var>() {
                     @Override
-                    public Block x(VariableDeclaration to) {
-                        VariableDeclaration buf = VariableDeclaration.local("byte[]", "buffer",
+                    public Block x(Var to) {
+                        Var buf = Var.local("byte[]", "buffer",
                                 asAValue("new byte[" +
                                         Constant.referToInJavaCode(maxSizeConstant) + "]"));
-                        VariableDeclaration current = VariableDeclaration.local("byte", "current",
+                        Var current = Var.local("byte", "current",
                                 asAValue("from.readByte()"));
-                        VariableDeclaration pos = VariableDeclaration.local("int", "pos", asAnInt("0"));
+                        Var pos = Var.local("int", "pos", asAnInt("0"));
                         return new Block(buf, current, pos,
                                 WHILE(asBool("((byte)" + Constant.referToInJavaCode(terminator) + ") != current"),
                                         new Block(asVoid("buffer[pos] = current"),

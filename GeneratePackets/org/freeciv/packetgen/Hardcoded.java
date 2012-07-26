@@ -21,7 +21,7 @@ import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
-import org.freeciv.packetgen.javaGenerator.VariableDeclaration;
+import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
@@ -91,23 +91,23 @@ public class Hardcoded {
             getFloat("1000000"),
             new FieldTypeBasic("string", "char",
                                "String",
-                               new ExprFrom1<Block, VariableDeclaration>() {
+                               new ExprFrom1<Block, Var>() {
                                    @Override
-                                   public Block x(VariableDeclaration to) {
+                                   public Block x(Var to) {
                                        return new Block(
                                                arrayEaterScopeCheck("arraySize < value.length()"),
                                                to.assign(asAValue("value")));
                                    }
                                },
-                               new ExprFrom1<Block, VariableDeclaration>() {
+                               new ExprFrom1<Block, Var>() {
                                    @Override
-                                   public Block x(VariableDeclaration to) {
-                                       VariableDeclaration buf =
-                                               VariableDeclaration.local("StringBuffer", "buf",
+                                   public Block x(Var to) {
+                                       Var buf =
+                                               Var.local("StringBuffer", "buf",
                                                        asAValue("new StringBuffer()"));
-                                       VariableDeclaration letter = VariableDeclaration.local("byte", "letter",
+                                       Var letter = Var.local("byte", "letter",
                                                asAValue("from.readByte()"));
-                                       VariableDeclaration read = VariableDeclaration.local("int", "read",
+                                       Var read = Var.local("int", "read",
                                                asAnInt("0"));
                                        return new Block(
                                                buf,
@@ -138,19 +138,19 @@ public class Hardcoded {
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
             new FieldTypeBasic("memory", "unsigned char",
                                "byte[]",
-                               new ExprFrom1<Block, VariableDeclaration>() {
+                               new ExprFrom1<Block, Var>() {
                                    @Override
-                                   public Block x(VariableDeclaration to) {
+                                   public Block x(Var to) {
                                        return new Block(
                                                arrayEaterScopeCheck("arraySize != value.length"),
                                                to.assign(asAValue("value")));
                                    }
                                },
-                               new ExprFrom1<Block, VariableDeclaration>() {
+                               new ExprFrom1<Block, Var>() {
                                    @Override
-                                   public Block x(VariableDeclaration to) {
-                                       VariableDeclaration innBuf =
-                                               VariableDeclaration.local("byte[]", "innBuffer",
+                                   public Block x(Var to) {
+                                       Var innBuf =
+                                               Var.local("byte[]", "innBuffer",
                                                        asAValue("new byte[arraySize]"));
                                        Block reader = new Block(innBuf);
                                        reader.addStatement(asVoid("from.readFully(innBuffer)"));

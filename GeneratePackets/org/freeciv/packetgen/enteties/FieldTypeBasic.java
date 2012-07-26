@@ -43,8 +43,8 @@ public class FieldTypeBasic implements IDependency {
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
                           String decode, String encode, String encodedSize,
                           boolean arrayEater, Collection<Requirement> needs) {
-        VariableDeclaration value =
-                VariableDeclaration.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
+        Var value =
+                Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         this.javaType = javaType;
@@ -59,12 +59,12 @@ public class FieldTypeBasic implements IDependency {
     }
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
-                          ExprFrom1<Block, VariableDeclaration>  constructorBody,
-                          ExprFrom1<Block, VariableDeclaration> decode, String encode, String encodedSize,
+                          ExprFrom1<Block, Var>  constructorBody,
+                          ExprFrom1<Block, Var> decode, String encode, String encodedSize,
                           ExprFrom1<AString, AValue> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
-        VariableDeclaration value =
-                VariableDeclaration.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
+        Var value =
+                Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         this.javaType = javaType;

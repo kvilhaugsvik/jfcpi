@@ -20,7 +20,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
-public class VariableDeclaration extends Formatted implements Returnable {
+public class Var extends Formatted implements Returnable {
     private final Visibility visibility;
     private final Scope scope;
     private final Modifiable modifiable;
@@ -30,8 +30,8 @@ public class VariableDeclaration extends Formatted implements Returnable {
 
     private final CodeAtom referName;
 
-    private VariableDeclaration(Visibility visibility, Scope scope, Modifiable modifiable,
-                               String type, String name, AValue value) {
+    private Var(Visibility visibility, Scope scope, Modifiable modifiable,
+                String type, String name, AValue value) {
         this.visibility = visibility;
         this.scope = scope;
         this.modifiable = modifiable;
@@ -109,12 +109,12 @@ public class VariableDeclaration extends Formatted implements Returnable {
     }
 
 
-    public static VariableDeclaration local(String type, String name, AValue value) {
-        return new VariableDeclaration(null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
+    public static Var local(String type, String name, AValue value) {
+        return new Var(null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
     }
 
-    public static VariableDeclaration field(Visibility visibility, Scope scope, Modifiable modifiable,
+    public static Var field(Visibility visibility, Scope scope, Modifiable modifiable,
                                             String type, String name, AValue value) {
-        return new VariableDeclaration(visibility, scope, modifiable, type, name, value);
+        return new Var(visibility, scope, modifiable, type, name, value);
     }
 }

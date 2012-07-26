@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.VariableDeclaration;
+import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
@@ -57,7 +57,7 @@ public class BuiltIn {
         };
     }
 
-    public static NoValue FOR(final VariableDeclaration count, final ABool cond, final NoValue changer,
+    public static NoValue FOR(final Var count, final ABool cond, final NoValue changer,
                               final Block body) {
         return new Formatted.FormattedVoid() {
             @Override

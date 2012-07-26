@@ -37,8 +37,8 @@ public class ClassWriter {
     private final String parent;
     private final String implementsInterface;
 
-    private final LinkedList<VariableDeclaration> constants = new LinkedList<VariableDeclaration>();
-    private final LinkedList<VariableDeclaration> stateVars = new LinkedList<VariableDeclaration>();
+    private final LinkedList<Var> constants = new LinkedList<Var>();
+    private final LinkedList<Var> stateVars = new LinkedList<Var>();
 
     private final LinkedList<Method> methods = new LinkedList<Method>();
     protected final LinkedHashMap<String, EnumElement> enums = new LinkedHashMap<String, ClassWriter.EnumElement>();
@@ -61,33 +61,33 @@ public class ClassWriter {
     }
 
     public void addClassConstant(String type, String name, String value) {
-        constants.add(VariableDeclaration.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
+        constants.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
                 asAValue(value)));
     }
 
     public void addClassConstant(Visibility visibility, String type, String name, String value) {
-        constants.add(VariableDeclaration.field(visibility, Scope.CLASS, Modifiable.NO, type, name, asAValue(value)));
+        constants.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, asAValue(value)));
     }
 
     public void addClassConstant(String type, String name, AValue value) {
-        constants.add(VariableDeclaration.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
+        constants.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
     public void addClassConstant(Visibility visibility, String type, String name, AValue value) {
-        constants.add(VariableDeclaration.field(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
+        constants.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
     public void addObjectConstant(String type, String name) {
-        stateVars.add(VariableDeclaration.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
+        stateVars.add(Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addPublicObjectConstant(String type, String name) {
-        stateVars.add(VariableDeclaration.field(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
+        stateVars.add(Var.field(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addObjectConstantAndGetter(String type, String name) {
-        VariableDeclaration field =
-                VariableDeclaration.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null);
+        Var field =
+                Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null);
         stateVars.add(field);
         addMethodPublicReadObjectState(
                         null,
@@ -228,10 +228,10 @@ public class ClassWriter {
         return out;
     }
 
-    private static String formatVariableDeclarations(List<VariableDeclaration> variables) {
+    private static String formatVariableDeclarations(List<Var> variables) {
         String out = "";
 
-        for (VariableDeclaration variable : variables) {
+        for (Var variable : variables) {
             out += "\t" + variable + "\n";
         }
         if (!variables.isEmpty()) out += "\n";
@@ -252,7 +252,7 @@ public class ClassWriter {
     private String constructorFromFields() {
         Block body = new Block();
         LinkedList<Map.Entry<String, String>> args = new LinkedList<Map.Entry<String, String>>();
-        for (VariableDeclaration dec : stateVars) {
+        for (Var dec : stateVars) {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.getType(), dec.getName()));
         }
@@ -298,17 +298,17 @@ public class ClassWriter {
         return where.getJavaCode();
     }
 
-    public VariableDeclaration getField(String name) {
-        HashSet<VariableDeclaration> allFields = new HashSet<VariableDeclaration>(constants);
+    public Var getField(String name) {
+        HashSet<Var> allFields = new HashSet<Var>(constants);
         allFields.addAll(stateVars);
-        for (VariableDeclaration field : allFields) {
+        for (Var field : allFields) {
             if (field.getName().equals(name)) return field;
         }
         return null;
     }
 
     public boolean hasConstant(String name) {
-        VariableDeclaration field = getField(name);
+        Var field = getField(name);
         return null != field && field.getModifiable().equals(Modifiable.NO);
     }
 

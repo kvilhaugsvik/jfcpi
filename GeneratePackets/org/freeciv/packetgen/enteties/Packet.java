@@ -212,7 +212,7 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addToString(String name, Field[] fields) {
-        VariableDeclaration buildOutput = VariableDeclaration.local("String", "out",
+        Var buildOutput = Var.local("String", "out",
                 asAString("\"" + name + "\" + \"(\" + number + \")\""));
         Block body = new Block(buildOutput);
         for (Field field : fields)
