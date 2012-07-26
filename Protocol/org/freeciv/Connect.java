@@ -55,8 +55,8 @@ public class Connect {
                         new DataInputStream(new ByteArrayInputStream(out.getBodyBytes())));
             else
                 return out;
-        } catch (Exception e) {
-            throw new IOException("Could not read packet", e);
+        } catch (IOException e) {
+            return out;
         }
     }
 
