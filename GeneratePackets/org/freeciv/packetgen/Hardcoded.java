@@ -113,7 +113,7 @@ public class Hardcoded {
                                                buf,
                                                letter,
                                                read,
-                                               WHILE.x(asBool("0 != letter"), new Block(
+                                               WHILE(asBool("0 != letter"), new Block(
                                                        asVoid("read++"),
                                                        arrayEaterScopeCheck("arraySize < read"),
                                                        asVoid("buf.append((char)letter)"),
