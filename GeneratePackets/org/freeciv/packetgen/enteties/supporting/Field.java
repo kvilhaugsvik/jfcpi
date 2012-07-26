@@ -204,7 +204,7 @@ public class Field {
         String[] wrappedInFor = new String[1 + level * 2];
         String replaceWith = "";
         for (int counter = 0; counter < level; counter++) {
-            wrappedInFor[counter] = "for(int " + getCounterNumber(counter) + " = 0; " +
+            wrappedInFor[counter] = "for (int " + getCounterNumber(counter) + " = 0; " +
                     getCounterNumber(counter) + " < " + "this." + this.getFieldName() + replaceWith + ".length; " +
                     getCounterNumber(counter) + "++) {";
             wrappedInFor[1 + counter + level] = "}";
