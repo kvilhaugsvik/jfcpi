@@ -68,6 +68,7 @@ public class SignInAndWait {
             while(con.isOpen() || con.hasMorePackets()) {
                 try {
                     System.out.println(con.getPacket());
+                    System.out.println();
                 } catch (NotReadyYetException e) {
                     Thread.yield();
                 }
