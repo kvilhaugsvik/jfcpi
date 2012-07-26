@@ -25,9 +25,7 @@ public class BuiltIn {
     public static final ABool TRUE = asBool("true");
     public static final ABool FALSE = asBool("false");
 
-    public static final ExprFrom1<NoValue, AValue> RETURN = new ExprFrom1<NoValue, AValue>() {
-        @Override
-        public NoValue x(final AValue arg1) {
+    public static NoValue RETURN(final AValue arg1) {
             return new Formatted.FormattedVoid() {
                 @Override
                 public void writeAtoms(CodeAtoms to) {
@@ -35,12 +33,28 @@ public class BuiltIn {
                     arg1.writeAtoms(to);
                 }
             };
-        }
-    };
+    }
 
-    public static final From2or3<NoValue, ABool, Block, Block> IF = new If();
+    private static final From2or3<NoValue, ABool, Block, Block> ifImpl = new If();
+    public static NoValue IF (ABool cond, Block then) {
+        return ifImpl.x(cond, then);
+    }
+    public static NoValue IF (ABool cond, Block then, Block ifNot) {
+        return ifImpl.x(cond, then, ifNot);
+    }
 
-    public static final ExprFrom2<NoValue, ABool, Block> WHILE = new While();
+    public static NoValue WHILE(final ABool cond, final Block rep) {
+        return new Formatted.FormattedVoid() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(WHILE);
+                to.add(LPR);
+                cond.writeAtoms(to);
+                to.add(RPR);
+                rep.writeAtoms(to);
+            }
+        };
+    }
 
     public static final ExprFrom1<AString, AValue> TO_STRING_OBJECT =
             new ExprFrom1<AString, AValue>() {

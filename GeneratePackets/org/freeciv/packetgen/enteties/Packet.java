@@ -221,7 +221,7 @@ public class Packet extends ClassWriter implements IDependency {
                             "\", \"" +
                             ", \"(\", \")\"" + ")" :
                     "this." + field.getFieldName() + ".toString()")));
-        body.addStatement(RETURN.x(buildOutput.ref()));
+        body.addStatement(RETURN(buildOutput.ref()));
         addMethodPublicReadObjectState(null, "String", "toString", body);
     }
 
