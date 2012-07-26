@@ -68,7 +68,7 @@ public class FieldTypeBasic implements IDependency {
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         this.javaType = javaType;
-        this.decode = decode.x(value).getJavaCodeLines();
+        this.decode = ClassWriter.newToOld(decode.x(value));
         this.encode = encode.split("\n");
         this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;

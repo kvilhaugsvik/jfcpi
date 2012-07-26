@@ -23,13 +23,6 @@ import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
 class If implements From2or3<NoValue, ABool, Block, Block>, ExprFrom2<NoValue, ABool, Block> {
-    private static final Util.OneCondition<CodeAtom> eolKiller = new Util.OneCondition<CodeAtom>() {
-        @Override
-        public boolean isTrueFor(CodeAtom argument) {
-            return HasAtoms.EOL.equals(argument);
-        }
-    };
-
     @Override
     public NoValue x(ABool cond, Block then) {
         return x(cond, then, null);
@@ -44,16 +37,11 @@ class If implements From2or3<NoValue, ABool, Block, Block>, ExprFrom2<NoValue, A
                 to.add(LPR);
                 cond.writeAtoms(to);
                 to.add(RPR);
-                to.add(LSC);
                 then.writeAtoms(to);
-                to.add(RSC);
                 if (null != ifNot) {
                     to.add(ELSE);
-                    to.add(LSC);
                     ifNot.writeAtoms(to);
-                    to.add(RSC);
                 }
-                to.refuseNextIf(eolKiller);
             }
         };
     }

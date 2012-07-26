@@ -24,13 +24,6 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 class While implements ExprFrom2<NoValue, ABool, Block> {
-    private static final Util.OneCondition<CodeAtom> eolKiller = new Util.OneCondition<CodeAtom>() {
-        @Override
-        public boolean isTrueFor(CodeAtom argument) {
-            return HasAtoms.EOL.equals(argument);
-        }
-    };
-
     @Override
     public NoValue x(final ABool cond, final Block rep) {
         return new Formatted.FormattedVoid() {
@@ -40,10 +33,7 @@ class While implements ExprFrom2<NoValue, ABool, Block> {
                 to.add(LPR);
                 cond.writeAtoms(to);
                 to.add(RPR);
-                to.add(LSC);
                 rep.writeAtoms(to);
-                to.add(RSC);
-                to.refuseNextIf(eolKiller);
             }
         };
     }

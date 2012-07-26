@@ -116,7 +116,7 @@ public class ClassWriter {
                           String exceptionList,
                           Block body) {
         methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList,
-                body.getJavaCodeLines()));
+                newToOld(body)));
     }
 
     public void addMethodReadClassState(String comment,
@@ -165,7 +165,7 @@ public class ClassWriter {
     public void addConstructorPublic(String comment,
                                      String paramList,
                                      Block body) {
-        methods.add(Method.newPublicConstructor(comment, getName(), paramList, body.getJavaCodeLines()));
+        methods.add(Method.newPublicConstructor(comment, getName(), paramList, newToOld(body)));
     }
 
     public void addConstructorFields() {
@@ -256,7 +256,7 @@ public class ClassWriter {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.getType(), dec.getName()));
         }
-        return Method.newPublicConstructor(null, name, createParameterList(args), body.getJavaCodeLines()) + "\n";
+        return Method.newPublicConstructor(null, name, createParameterList(args), newToOld(body)) + "\n";
     }
 
     public String toString() {
@@ -393,6 +393,11 @@ public class ClassWriter {
         return out.substring(0, out.length() - 1);
     }
 
+    public static String[] newToOld(Block body) {
+        String[] all = body.getJavaCodeLines();
+        return Arrays.copyOfRange(all, 1, all.length - 1);
+    }
+
     static class Method {
         private final String comment;
         private final Visibility visibility;
@@ -444,7 +449,7 @@ public class ClassWriter {
                                                String type,
                                                String name,
                                                Block body) {
-            return newPublicDynamicMethod(comment, type, name, null, null, body.getJavaCodeLines());
+            return newPublicDynamicMethod(comment, type, name, null, null, newToOld(body));
         }
 
         private static Method newPublicReadObjectState(String comment,

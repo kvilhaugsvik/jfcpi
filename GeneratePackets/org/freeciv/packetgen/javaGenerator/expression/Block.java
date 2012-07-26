@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.javaGenerator.expression;
 
+import org.freeciv.Util;
+import org.freeciv.packetgen.javaGenerator.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
@@ -25,6 +27,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class Block extends Formatted implements NoValue {
+    private static final Util.OneCondition<CodeAtom> eolKiller = new Util.OneCondition<CodeAtom>() {
+        @Override
+        public boolean isTrueFor(CodeAtom argument) {
+            return HasAtoms.EOL.equals(argument);
+        }
+    };
+
     private final LinkedList<Statement> statements = new LinkedList<Statement>();
 
     public Block(Returnable... firstStatements) {
@@ -46,9 +55,12 @@ public class Block extends Formatted implements NoValue {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
+        to.add(LSC);
         for (HasAtoms statement : statements) {
             statement.writeAtoms(to);
         }
+        to.add(RSC);
+        to.refuseNextIf(eolKiller);
     }
 
     @Deprecated public static Block fromStrings(String... firstStatements) {
