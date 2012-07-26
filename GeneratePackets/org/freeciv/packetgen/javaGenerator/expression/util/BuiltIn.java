@@ -35,7 +35,13 @@ public class BuiltIn {
             };
     }
 
-    public static final From2or3<NoValue, ABool, Block, Block> IF = new If();
+    private static final From2or3<NoValue, ABool, Block, Block> ifImpl = new If();
+    public static NoValue IF (ABool cond, Block then) {
+        return ifImpl.x(cond, then);
+    }
+    public static NoValue IF (ABool cond, Block then, Block ifNot) {
+        return ifImpl.x(cond, then, ifNot);
+    }
 
     public static NoValue WHILE(final ABool cond, final Block rep) {
         return new Formatted.FormattedVoid() {

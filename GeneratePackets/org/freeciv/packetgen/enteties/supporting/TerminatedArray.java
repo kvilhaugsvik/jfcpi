@@ -40,7 +40,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                 WHILE(asBool("((byte)" + Constant.referToInJavaCode(terminator) + ") != current"),
                                         new Block(asVoid("buffer[pos] = current"),
                                                 asVoid("pos++"),
-                                                IF.x(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
+                                                IF(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
                                                         new Block(current.assign(asAnInt("from.readByte()"))),
                                                         new Block(asVoid("break"))))),
                                 to.assign((asAValue("java.util.Arrays.copyOf(buffer, pos)"))));

@@ -130,7 +130,7 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicReadObjectState(null, "String", "toString",
                     new Block(RETURN(value2String.x(asAString("value")))));
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
-                    new Block(IF.x(
+                    new Block(IF(
                             asBool("other instanceof " + name),
                             new Block(RETURN(asBool("this.value == ((" + name + ")other).getValue()"))),
                             new Block(RETURN(FALSE)))));

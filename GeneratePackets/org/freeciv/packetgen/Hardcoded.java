@@ -118,7 +118,7 @@ public class Hardcoded {
                                                        arrayEaterScopeCheck("arraySize < read"),
                                                        asVoid("buf.append((char)letter)"),
                                                        letter.assign(asAnInt("from.readByte()")))),
-                                               IF.x(asBool("buf.length() == 0"),
+                                               IF(asBool("buf.length() == 0"),
                                                        new Block(to.assign(asAString("\"\""))),
                                                        new Block(to.assign(asAString("buf.toString()")))));
                                    }
@@ -186,7 +186,7 @@ public class Hardcoded {
     );
 
     public static NoValue arrayEaterScopeCheck(String check) {
-        return IF.x(asBool(check), Block.fromStrings("throw new IllegalArgumentException(\"Value out of scope\")"));
+        return IF(asBool(check), Block.fromStrings("throw new IllegalArgumentException(\"Value out of scope\")"));
     }
 
     public static void applyManualChanges(PacketsStore toStorage) {
