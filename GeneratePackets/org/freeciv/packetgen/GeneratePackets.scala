@@ -87,6 +87,7 @@ object GeneratePackets {
     val pathPrefix = if (args.length < 1) GeneratorDefaults.FREECIV_SOURCE_PATH else args(0)
     val versionConfPath = if (args.length < 2) GeneratorDefaults.VERSIONCONFIGURATION else args(1)
     val logger = if (args.length < 3) GeneratorDefaults.LOG_TO else args(2)
+    val devmode = if (args.length < 4) GeneratorDefaults.DEVMODE else args(3).toBoolean
 
     val versionConfiguration = readVersionParameters(new File(versionConfPath))
 
@@ -103,7 +104,7 @@ object GeneratePackets {
       inputSources("C").toList,
       requested,
       logger,
-      GeneratorDefaults.DEVMODE,
+      devmode,
       bytesInPacketNumber)
 
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
