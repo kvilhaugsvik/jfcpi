@@ -22,15 +22,18 @@ import org.freeciv.PacketsMapping
 import xml.XML
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
-                      requested: List[(String, String)], devMode: Boolean, bytesInPacketNumber: Int) {
+                      requested: List[(String, String)], logger: String,
+                      devMode: Boolean, bytesInPacketNumber: Int) {
 
   def this(packetsDefPathString: String, versionPath: String, cPathsString: List[String],
-           requested: List[(String, String)], devMode: Boolean, bytesInPacketNumber: Int) = {
+           requested: List[(String, String)], logger: String,
+           devMode: Boolean, bytesInPacketNumber: Int) = {
     this(new File(packetsDefPathString), new File(versionPath), cPathsString.map(new File(_)),
-      requested, devMode, bytesInPacketNumber)
+      requested, logger,
+      devMode, bytesInPacketNumber)
   }
 
-  private val storage = new PacketsStore(bytesInPacketNumber)
+  private val storage = new PacketsStore(bytesInPacketNumber, logger)
   private val Parser = new ParsePacketsDef(storage)
 
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
@@ -83,6 +86,7 @@ object GeneratePackets {
   def main(args: Array[String]) {
     val pathPrefix = if (args.length < 1) GeneratorDefaults.FREECIV_SOURCE_PATH else args(0)
     val versionConfPath = if (args.length < 2) GeneratorDefaults.VERSIONCONFIGURATION else args(1)
+    val logger = if (args.length < 3) GeneratorDefaults.LOG_TO else args(2)
 
     val versionConfiguration = readVersionParameters(new File(versionConfPath))
 
@@ -98,6 +102,7 @@ object GeneratePackets {
       inputSources("variables").head,
       inputSources("C").toList,
       requested,
+      logger,
       GeneratorDefaults.DEVMODE,
       bytesInPacketNumber)
 

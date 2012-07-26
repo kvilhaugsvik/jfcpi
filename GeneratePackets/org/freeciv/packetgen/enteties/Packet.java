@@ -31,10 +31,16 @@ public class Packet extends ClassWriter implements IDependency {
     private final int number;
     private final Field[] fields;
 
+    private final String logger;
+
     private final Requirement iFulfill;
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
-    public Packet(String name, int number, String headerKind, Field... fields) throws UndefinedException {
+    @Deprecated public Packet(String name, int number, String headerKind, Field... fields) throws UndefinedException {
+        this(name, number, headerKind, GeneratorDefaults.LOG_TO, fields);
+    }
+
+    public Packet(String name, int number, String headerKind, String logger, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new String[]{
                               allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
                               allInPackageOf(org.freeciv.types.FCEnum.class),
@@ -47,6 +53,8 @@ public class Packet extends ClassWriter implements IDependency {
 
         this.number = number;
         this.fields = fields;
+
+        this.logger = logger;
 
         for (Field field : fields) {
             field.introduceNeighbours(fields);
@@ -141,7 +149,7 @@ public class Packet extends ClassWriter implements IDependency {
                                           ") : \"Packet not generated for this kind of header\";");
 
         constructorBodyStream.add("if (header.getHeaderSize() + calcBodyLen() != header.getTotalSize()) {");
-        constructorBodyStream.add("Logger.getLogger(" + GeneratorDefaults.LOG_TO + ").warning(" +
+        constructorBodyStream.add("Logger.getLogger(" + logger + ").warning(" +
                 "\"Probable misinterpretation: \" + " +
                 "\"interpreted packet size (\" + (header.getHeaderSize() + calcBodyLen()) + \")" +
                 " don't match header packet size (\" + header.getTotalSize() + \")" +

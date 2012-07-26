@@ -31,6 +31,7 @@ import java.util.*;
 
 public class PacketsStore {
     private final String packetHeaderType;
+    private final String logger;
 
     private final DependencyStore requirements;
 
@@ -39,11 +40,17 @@ public class PacketsStore {
     private final HashMap<String, Packet> packets = new HashMap<String, Packet>();
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
-    public PacketsStore(int bytesInPacketNumber) {
+    @Deprecated public PacketsStore(int bytesInPacketNumber) {
+        this(bytesInPacketNumber, GeneratorDefaults.LOG_TO);
+    }
+
+    public PacketsStore(int bytesInPacketNumber, String logger) {
         requirements = new DependencyStore();
         for (IDependency primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
         }
+
+        this.logger = logger;
 
         switch (bytesInPacketNumber) {
             case 1:
@@ -146,7 +153,7 @@ public class PacketsStore {
         }
 
         if (missingWhenNeeded.isEmpty()) {
-            Packet packet = new Packet(name, number, packetHeaderType, fieldList.toArray(new Field[0]));
+            Packet packet = new Packet(name, number, packetHeaderType, logger, fieldList.toArray(new Field[0]));
             requirements.addWanted(packet);
             packets.put(name, packet);
             packetsByNumber.put(number, name);
