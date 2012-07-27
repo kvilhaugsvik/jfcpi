@@ -226,20 +226,21 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {
-        addMethodPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(), "get"
-                + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1)
-                + "Value",
-                                       (field.hasDeclarations()) ?
-                                               field.forElementsInField(field.getJType() + field
-                                                       .getArrayDeclaration() + " out = new " +
-                                                                                field.getJType() + field
-                                                       .getNewCreation() + ";",
-                                                                        "out[i] = " + "this." + field
-                                                                                .getFieldName() + "[i].getValue();",
-                                                                        "return out;") :
-                                               new String[]{
-                                                       "return " + "this." + field.getFieldName() + ".getValue();"}
-        );
+        Block body;
+
+        if (field.hasDeclarations()) {
+            Var out = Var.local(field.getJType() + field.getArrayDeclaration(), "out",
+                    asAValue("new " + field.getJType() + field.getNewCreation()));
+            body = new Block(out);
+            field.forElementsInField("out[i] = " + "this." + field.getFieldName() + "[i].getValue()", body);
+            body.addStatement(RETURN(out.ref()));
+        } else {
+            body = new Block(RETURN(asAValue("this." + field.getFieldName() + ".getValue()")));
+        }
+
+        addMethodPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(),
+                "get" + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1) + "Value",
+                body);
     }
 
     public int getNumber() {

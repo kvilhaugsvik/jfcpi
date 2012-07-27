@@ -17,8 +17,13 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.javaGenerator.Var;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.*;
+
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class Field {
     private final String onPacket;
@@ -219,6 +224,27 @@ public class Field {
         }
 
         return out.toArray(new String[0]);
+    }
+
+    // TODO: in should be a ExprFrom1
+    public void forElementsInField(String in, Block out) {
+        final int level = this.getNumberOfDeclarations();
+
+        String replaceWith = "";
+        Block ref = out;
+        for (int counter = 0; counter < level; counter++) {
+            Var count = Var.local("int", getCounterNumber(counter) + "", asAnInt("0"));
+            Block inner = new Block();
+
+            ref.addStatement(FOR(count,
+                    asBool(count.ref().getJavaCode() + "< " + "this." + this.getFieldName() + replaceWith + ".length"),
+                    asVoid(getCounterNumber(counter) + "++"),
+                    inner));
+            ref = inner;
+
+            replaceWith += "[" + getCounterNumber(counter) + "]";
+        }
+        ref.addStatement(asVoid(in.replaceAll("\\[i\\]", replaceWith)));
     }
 
     private char getCounterNumber(int counter) {
