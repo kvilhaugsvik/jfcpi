@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 public interface HasAtoms {
     public static final CodeAtom EOL = new CodeAtom(";");
+    public static final CodeAtom SEP = new CodeAtom(",");
     public static final CodeAtom LSC = new CodeAtom("{");
     public static final CodeAtom RSC = new CodeAtom("}");
     public static final CodeAtom LPR = new CodeAtom("(");
