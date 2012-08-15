@@ -58,14 +58,11 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
 
   def flagArgument = "(" ~> identifierRegEx <~ ")"
 
-  def capability = identifierRegEx
-
-  def fieldFlag = (
+  def fieldFlag =
     "key" |
-      "add-cap(" ~ capability ~ ")" |
-      "diff" |
-      "remove-cap(" ~ capability ~ ")"
-    )
+    "add-cap" |
+    "diff" |
+    "remove-cap"
 
   def arrayFullSize = intExpr
 
@@ -80,8 +77,9 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
         })
     }
 
-  def fields = (fieldTypeAlias ~ rep1sep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag, ",") ^^ {
-    case kind ~ variables ~ flags => variables.map(variable => new WeakField(variable._1, kind, variable._2: _*))
+  def fields = (fieldTypeAlias ~ rep1sep(fieldVar, ",") <~ ";") ~ repsep(fieldFlag ~ opt(flagArgument), ",") ^^ {
+    case kind ~ variables ~ flags =>
+      variables.map(variable => new WeakField(variable._1, kind, wrapFlags(flags), variable._2: _*))
   }
 
   def fieldList: Parser[List[WeakField]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
@@ -93,12 +91,15 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
       storage.registerPacket(
         name,
         Integer.parseInt(number),
-        flags.map({
-          case flag ~ Some(args) => new WeakFlag(flag, args)
-          case flag ~ None => new WeakFlag(flag)
-        }),
+        wrapFlags(flags),
         fields)
-  };
+  }
+
+  def wrapFlags(flags: List[~[String, Option[String]]]): List[WeakFlag] =
+    flags.map({
+    case flag ~ Some(args) => new WeakFlag(flag, args)
+    case flag ~ None => new WeakFlag(flag)
+  })
 
   def expr: Parser[Any] = fieldTypeAssign | comment | packet
 
