@@ -128,11 +128,6 @@ public class PacketsStore {
         return requirements.isAwareOfPotentialProvider(new Requirement(name, Requirement.Kind.FIELD_TYPE));
     }
 
-    @Deprecated public void registerPacket(String name, int number, List<WeakField> fields)
-            throws PacketCollisionException, UndefinedException {
-        registerPacket(name, number, Collections.<WeakFlag>emptyList(), fields);
-    }
-
     public void registerPacket(String name, int number, List<WeakFlag> flags, List<WeakField> fields)
             throws PacketCollisionException, UndefinedException {
         if (hasPacket(name)) {
