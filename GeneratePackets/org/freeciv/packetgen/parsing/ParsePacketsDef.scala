@@ -17,7 +17,7 @@ package org.freeciv.packetgen.parsing
 import util.parsing.input.Reader
 import collection.JavaConversions._
 import org.freeciv.packetgen.PacketsStore
-import org.freeciv.packetgen.enteties.supporting.{WeakField, Field}
+import org.freeciv.packetgen.enteties.supporting.{WeakFlag, WeakField, Field}
 
 class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldTypeAlias = regex(identifierRegEx)
@@ -42,7 +42,7 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def packetFlag = "is-info" |
     "is-game-info" |
     "force" |
-    "cancel" ~ ("(" ~> packetName <~ ")") |
+    "cancel" |
     "pre-send" |
     "post-recv" |
     "post-send" |
@@ -55,6 +55,8 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
     "lsend" |
     "cs" |
     "sc"
+
+  def flagArgument = "(" ~> identifierRegEx <~ ")"
 
   def capability = identifierRegEx
 
@@ -84,13 +86,17 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
 
   def fieldList: Parser[List[WeakField]] = rep(comment) ~> rep((fields <~ rep(comment))) ^^ {_.flatten}
 
-  def packet = packetName ~ ("=" ~> regex("""[0-9]+""".r) <~ ";") ~ repsep(packetFlag, ",") ~
+  def packet = packetName ~ ("=" ~> regex("""[0-9]+""".r) <~ ";") ~ repsep(packetFlag ~ opt(flagArgument), ",") ~
     fieldList <~
     "end" ^^ {
     case name ~ number ~ flags ~ fields =>
       storage.registerPacket(
         name,
         Integer.parseInt(number),
+        flags.map({
+          case flag ~ Some(args) => new WeakFlag(flag, args)
+          case flag ~ None => new WeakFlag(flag)
+        }),
         fields)
   };
 
