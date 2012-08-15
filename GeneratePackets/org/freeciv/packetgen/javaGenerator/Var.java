@@ -15,7 +15,6 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
@@ -97,15 +96,8 @@ public class Var extends Formatted implements Returnable {
         };
     }
 
-    public AValue assign(final AValue arg1) {
-        return new FormattedAValue() {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                to.add(referName);
-                to.add(ASSIGN);
-                arg1.writeAtoms(to);
-            }
-        };
+    public SetTo assign(final AValue value) {
+        return new SetTo(referName, value);
     }
 
 
@@ -116,5 +108,27 @@ public class Var extends Formatted implements Returnable {
     public static Var field(Visibility visibility, Scope scope, Modifiable modifiable,
                                             String type, String name, AValue value) {
         return new Var(visibility, scope, modifiable, type, name, value);
+    }
+
+
+    public static class SetTo extends FormattedAValue {
+        private final CodeAtom referName;
+        private final AValue value;
+
+        private SetTo(CodeAtom referName, AValue value) {
+            this.referName = referName;
+            this.value = value;
+        }
+
+        @Override
+        public void writeAtoms(CodeAtoms to) {
+            to.add(referName);
+            to.add(ASSIGN);
+            value.writeAtoms(to);
+        }
+
+        public static SetTo strToVal(String variable, AValue value) {
+            return new SetTo(new CodeAtom(variable), value);
+        }
     }
 }
