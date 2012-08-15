@@ -42,7 +42,7 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def packetFlag = "is-info" |
     "is-game-info" |
     "force" |
-    """cancel(""" ~ packetName ~ """)""" |
+    "cancel" ~ ("(" ~> packetName <~ ")") |
     "pre-send" |
     "post-recv" |
     "post-send" |
