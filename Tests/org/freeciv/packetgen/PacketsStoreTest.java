@@ -54,8 +54,8 @@ public class PacketsStoreTest {
     private static void registerPacketToPullInnFieldtype(PacketsStore storage, String fieldTypeName, int time)
             throws PacketCollisionException, UndefinedException {
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
-        fields.add(new WeakField("DragInnDep", fieldTypeName));
-        storage.registerPacket("DragInnDep" + time, 42 + time, fields);
+        fields.add(new WeakField("DragInnDep", fieldTypeName, Collections.<WeakFlag>emptyList()));
+        storage.registerPacket("DragInnDep" + time, 42 + time, Collections.<WeakFlag>emptyList(), fields);
     }
 
     @Test public void registerTypeRequiredNotExisting() throws UndefinedException, PacketCollisionException {
@@ -151,7 +151,7 @@ public class PacketsStoreTest {
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("STRING", "string", "char");
-        WeakField field1 = new WeakField("myNameIs", "STRING",
+        WeakField field1 = new WeakField("myNameIs", "STRING", Collections.<WeakFlag>emptyList(),
                 new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
@@ -171,7 +171,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithFieldsStoresField() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        WeakField field1 = new WeakField("myNameIs", "STRING",
+        WeakField field1 = new WeakField("myNameIs", "STRING", Collections.<WeakFlag>emptyList(),
                 new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
@@ -194,7 +194,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithUndefinedFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        WeakField field1 = new WeakField("myNameIs", "STRING");
+        WeakField field1 = new WeakField("myNameIs", "STRING", Collections.<WeakFlag>emptyList());
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
 

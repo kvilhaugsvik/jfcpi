@@ -21,10 +21,6 @@ public class WeakField {
     private final String name, type;
     private final ArrayDeclaration[] declarations;
 
-    @Deprecated public WeakField(String name, String kind, ArrayDeclaration... declarations) {
-        this(name, kind, Collections.<WeakFlag>emptyList(), declarations);
-    }
-
     public WeakField(String name, String kind, List<WeakFlag> flags, ArrayDeclaration... declarations) {
         this.name = name;
         this.type = kind;
