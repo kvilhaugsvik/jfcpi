@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public class CodeAtom {
+public class CodeAtom implements HasAtoms {
     private final String atom;
 
     public CodeAtom(String atom) {
@@ -23,5 +23,10 @@ public class CodeAtom {
 
     public String get() {
         return atom;
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        to.add(this);
     }
 }
