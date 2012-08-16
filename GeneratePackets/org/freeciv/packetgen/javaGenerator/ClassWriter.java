@@ -321,10 +321,6 @@ public class ClassWriter {
         return "package " + inPackage.getJavaCode() + ";";
     }
 
-    protected static Import allInPackageOf(Class thisClass) {
-        return Import.allIn(new TargetPackage(thisClass.getPackage()));
-    }
-
     private static String indent(String code) {
         return "\t" + code.replace("\n", "\n\t");
     }

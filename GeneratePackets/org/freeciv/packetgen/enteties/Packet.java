@@ -43,8 +43,8 @@ public class Packet extends ClassWriter implements IDependency {
 
     public Packet(String name, int number, String headerKind, String logger, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new Import[]{
-                              allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
-                              allInPackageOf(org.freeciv.types.FCEnum.class),
+                              Import.allIn(new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage())),
+                              Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage())),
                               null,
                               Import.classIn(java.io.DataInput.class),
                               Import.classIn(java.io.DataOutput.class),
