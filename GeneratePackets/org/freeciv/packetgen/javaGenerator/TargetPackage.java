@@ -14,24 +14,12 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
-
-public class TargetPackage extends Formatted implements HasAtoms {
-    private final CodeAtom[] components;
-
+public class TargetPackage extends Address {
     public TargetPackage(String... parts) {
-        components = new CodeAtom[parts.length];
-        for (int i = 0; i < parts.length; i++) {
-            components[i] = new CodeAtom(parts[i]);
-        }
+        super(parts);
     }
 
     public TargetPackage(Package wrapped) {
-        this(wrapped.getName().split("\\."));
-    }
-
-    @Override
-    public void writeAtoms(CodeAtoms to) {
-        to.joinSep(HAS, components);
+        super(wrapped.getName().split("\\."));
     }
 }
