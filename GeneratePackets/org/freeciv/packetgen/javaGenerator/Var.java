@@ -70,6 +70,11 @@ public class Var extends Formatted implements Returnable {
     }
 
     @Override
+    public String getJavaCodeIndented(String start) {
+        return new Statement(this).getJavaCodeIndented(start);
+    }
+
+    @Override
     public void writeAtoms(CodeAtoms to) {
         if (null != visibility)
             visibility.writeAtoms(to);

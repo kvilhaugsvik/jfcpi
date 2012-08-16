@@ -246,7 +246,7 @@ public class ClassWriter {
         String out = "";
 
         for (Var variable : variables) {
-            out += "\t" + variable + "\n";
+            out += variable.getJavaCodeIndented("\t");
         }
         if (!variables.isEmpty()) out += "\n";
 
