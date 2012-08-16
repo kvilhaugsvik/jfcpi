@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Sveinung Kvilhaugsvik
+ * Copyright (c) 2012, Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,19 +14,24 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public class CodeAtom implements HasAtoms {
-    private final String atom;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
-    public CodeAtom(String atom) {
-        this.atom = atom;
-    }
+public class Annotate extends Formatted implements HasAtoms {
+    private final String annotation;
+    private final Var.SetTo[] arguments;
 
-    public String get() {
-        return atom;
+    public Annotate(String annotation, Var.SetTo... arguments) {
+        this.annotation = annotation;
+        this.arguments = arguments;
     }
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        to.add(this);
+        to.add(new CodeAtom("@" + annotation));
+        if (0 < arguments.length) {
+            to.add(LPR);
+            to.joinSep(SEP, arguments);
+            to.add(RPR);
+        }
     }
 }

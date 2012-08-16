@@ -678,7 +678,9 @@ enum implicitFirst {
     assertEquals("Generated enum code not as expected.",
       """package org.freeciv.types;
 
-// This code was auto generated from Freeciv C code
+import javax.annotation.Generated;
+
+@Generated(comments = "Auto generated from Freeciv C code", value = "org.freeciv.packetgen.javaGenerator.ClassWriter")
 public enum test implements FCEnum {
 	ONE (0, "ONE"),
 	TWO (1, "TWO"),

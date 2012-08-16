@@ -191,7 +191,7 @@ public class PacketsStore {
         int border = Util.VERSION_DATA_CLASS.lastIndexOf('.');
         ClassWriter constants =
                 new ClassWriter(ClassKind.CLASS, new TargetPackage(
-                        Util.VERSION_DATA_CLASS.substring(0, border)), new String[0],
+                        Util.VERSION_DATA_CLASS.substring(0, border)), null,
                                 "Freeciv C code", Util.VERSION_DATA_CLASS.substring(border + 1),
                                 null, null);
 

@@ -19,6 +19,7 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
@@ -107,12 +108,13 @@ public class FieldTypeBasic implements IDependency {
     public class FieldTypeAlias extends ClassWriter implements IDependency {
 
         private FieldTypeAlias(String name) {
-            super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()), new String[]{
-                                      java.io.DataInput.class.getCanonicalName(),
-                                      java.io.DataOutput.class.getCanonicalName(),
-                                      java.io.IOException.class.getCanonicalName(),
+            super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
+                              new Import[]{
+                                      Import.classIn(java.io.DataInput.class),
+                                      Import.classIn(java.io.DataOutput.class),
+                                      Import.classIn(java.io.IOException.class),
                                       null,
-                                      allInPackageOf(org.freeciv.types.FCEnum.class)
+                                      Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()))
                               }, "Freeciv's protocol definition", name, null, "FieldType<" + javaType + ">");
 
             addObjectConstant(javaType, "value");

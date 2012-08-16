@@ -16,10 +16,12 @@ package org.freeciv.packetgen.javaGenerator;
 
 public interface HasAtoms {
     public static final CodeAtom EOL = new CodeAtom(";");
+    public static final CodeAtom SEP = new CodeAtom(",");
     public static final CodeAtom LSC = new CodeAtom("{");
     public static final CodeAtom RSC = new CodeAtom("}");
     public static final CodeAtom LPR = new CodeAtom("(");
     public static final CodeAtom RPR = new CodeAtom(")");
+    public static final CodeAtom HAS = new CodeAtom(".");
     public static final CodeAtom ASSIGN = new CodeAtom("=");
     public static final CodeAtom ADD = new CodeAtom("+");
 

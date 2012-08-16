@@ -14,14 +14,16 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
-
-public class TargetPackage extends WrapCodeString {
-    public TargetPackage(String wrapped) {
-        super(wrapped);
+public class TargetPackage extends Address {
+    public TargetPackage(String... parts) {
+        super(parts);
     }
 
     public TargetPackage(Package wrapped) {
-        super(wrapped.getName());
+        super(wrapped.getName().split("\\."));
+    }
+
+    public Address has(final String element) {
+        return new Address(this, new CodeAtom(element));
     }
 }
