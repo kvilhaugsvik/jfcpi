@@ -35,4 +35,15 @@ public class CodeAtoms {
     public CodeAtom[] getAtoms() {
         return atoms.toArray(new CodeAtom[0]);
     }
+
+    public void joinSep(HasAtoms separator, HasAtoms[] toJoin) {
+        if (toJoin.length < 1)
+            return;
+
+        toJoin[0].writeAtoms(this);
+        for (int index = 1; index < toJoin.length; index++) {
+            separator.writeAtoms(this);
+            toJoin[index].writeAtoms(this);
+        }
+    }
 }
