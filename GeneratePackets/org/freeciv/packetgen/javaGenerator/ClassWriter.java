@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
@@ -29,7 +30,7 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class ClassWriter {
     private final TargetPackage where;
-    private final String[] imports;
+    private final List<Import> imports;
     private final Visibility visibility;
     private final ClassKind kind;
     private final String madeFrom;
@@ -45,12 +46,12 @@ public class ClassWriter {
 
     private boolean constructorFromAllFields = false;
 
-    public ClassWriter(ClassKind kind, TargetPackage where, String[] imports, String madeFrom, String name,
+    public ClassWriter(ClassKind kind, TargetPackage where, Import[] imports, String madeFrom, String name,
                        String parent, String implementsInterface) {
         if (null == name) throw new IllegalArgumentException("No name for class to be generated");
 
         this.where = where;
-        this.imports = imports;
+        this.imports = null == imports ? new LinkedList<Import>() : new ArrayList<Import>(Arrays.asList(imports));
         this.madeFrom = madeFrom;
         this.name = name;
         this.parent = parent;
@@ -206,12 +207,12 @@ public class ClassWriter {
     private String formatImports() {
         String out = "";
 
-        for (String anImport : imports) {
-            if ((null != anImport) && !anImport.isEmpty())
-                out += declareImport(anImport);
+        for (Import anImport : imports) {
+            if ((null != anImport))
+                out += anImport.getJavaCode();
             out += "\n";
         }
-        if (0 < imports.length) out += "\n";
+        if (0 < imports.size()) out += "\n";
 
         return out;
     }
@@ -320,12 +321,8 @@ public class ClassWriter {
         return "package " + inPackage.getJavaCode() + ";";
     }
 
-    static String declareImport(String toImport) {
-        return "import " + toImport + ";";
-    }
-
-    protected static String allInPackageOf(Class thisClass) {
-        return thisClass.getPackage().getName() + ".*";
+    protected static Import allInPackageOf(Class thisClass) {
+        return Import.allIn(new TargetPackage(thisClass.getPackage()));
     }
 
     private static String indent(String code) {

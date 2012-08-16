@@ -22,6 +22,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.Field;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.Import;
 
 import java.util.*;
 
@@ -41,14 +42,14 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     public Packet(String name, int number, String headerKind, String logger, Field... fields) throws UndefinedException {
-        super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new String[]{
+        super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new Import[]{
                               allInPackageOf(org.freeciv.packet.fieldtype.FieldType.class),
                               allInPackageOf(org.freeciv.types.FCEnum.class),
                               null,
-                              java.io.DataInput.class.getCanonicalName(),
-                              java.io.DataOutput.class.getCanonicalName(),
-                              java.util.logging.Logger.class.getCanonicalName(),
-                              java.io.IOException.class.getCanonicalName()
+                              Import.classIn(java.io.DataInput.class),
+                              Import.classIn(java.io.DataOutput.class),
+                              Import.classIn(java.util.logging.Logger.class),
+                              Import.classIn(java.io.IOException.class)
                       }, "Freeciv's protocol definition", name, null, "Packet");
 
         this.number = number;
