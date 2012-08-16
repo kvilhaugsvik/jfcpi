@@ -15,17 +15,14 @@
 package org.freeciv.packetgen;
 
 import org.freeciv.Util;
-import org.freeciv.packet.Header_2_1;
-import org.freeciv.packet.Header_2_2;
+import org.freeciv.packet.*;
 import org.freeciv.packetgen.enteties.FieldTypeBasic.FieldTypeAlias;
 import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.enteties.Packet;
 import org.freeciv.packetgen.enteties.supporting.*;
-import org.freeciv.packetgen.javaGenerator.ClassKind;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
-import org.freeciv.packetgen.javaGenerator.TargetPackage;
-import org.freeciv.packetgen.javaGenerator.Visibility;
+import org.freeciv.packetgen.javaGenerator.*;
 
 import java.util.*;
 
@@ -136,6 +133,16 @@ public class PacketsStore {
             throw new PacketCollisionException("Packet number " + number + " already in use");
         }
 
+        List<Annotate> packetFlags = new LinkedList<Annotate>();
+        byte sentBy = 0;
+        for (WeakFlag flag : flags) {
+            if ("sc".equals(flag.getName()))
+                sentBy += 2;
+            else if ("cs".equals(flag.getName()))
+                sentBy += 1;
+        }
+        packetFlags.add(new Sender(sentBy));
+
         List<Field> fieldList = new LinkedList<Field>();
         HashSet<Requirement> allNeeded = new HashSet<Requirement>();
         HashSet<Requirement> missingWhenNeeded = new HashSet<Requirement>();
@@ -153,7 +160,8 @@ public class PacketsStore {
         }
 
         if (missingWhenNeeded.isEmpty()) {
-            Packet packet = new Packet(name, number, packetHeaderType, logger, fieldList.toArray(new Field[0]));
+            Packet packet = new Packet(name, number, packetHeaderType, logger,
+                                       packetFlags, fieldList.toArray(new Field[0]));
             requirements.addWanted(packet);
             packets.put(name, packet);
             packetsByNumber.put(number, name);
