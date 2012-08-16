@@ -14,14 +14,24 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
-public class TargetPackage extends WrapCodeString {
-    public TargetPackage(String wrapped) {
-        super(wrapped);
+public class TargetPackage extends Formatted implements HasAtoms {
+    private final CodeAtom[] components;
+
+    public TargetPackage(String... parts) {
+        components = new CodeAtom[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            components[i] = new CodeAtom(parts[i]);
+        }
     }
 
     public TargetPackage(Package wrapped) {
-        super(wrapped.getName());
+        this(wrapped.getName().split("\\."));
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        to.joinSep(HAS, components);
     }
 }
