@@ -22,4 +22,8 @@ public class TargetPackage extends Address {
     public TargetPackage(Package wrapped) {
         super(wrapped.getName().split("\\."));
     }
+
+    public Address has(final String element) {
+        return new Address(this, new CodeAtom(element));
+    }
 }
