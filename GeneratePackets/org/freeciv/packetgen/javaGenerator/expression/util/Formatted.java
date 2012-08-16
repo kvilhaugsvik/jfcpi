@@ -21,6 +21,10 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
 public abstract class Formatted implements HasAtoms {
+    public String getJavaCodeIndented(String start) {
+        return ClassWriter.indent(basicFormatBlock(), start);
+    }
+
     public String getJavaCode() {
         return Util.joinStringArray(basicFormatBlock(), "\n", "", "");
     }

@@ -282,7 +282,7 @@ public class ClassWriter {
         if (null != imports) out += formatImports();
 
         for (Annotate ann : classAnnotate)
-            out += ann.getJavaCode() + "\n";
+            out += ann.getJavaCodeIndented("");
 
         out += visibility + " " + kind + " " + name + ifIs(" extends ", parent, "") + ifIs(" implements ",
                                                                                            implementsInterface,
@@ -345,7 +345,7 @@ public class ClassWriter {
     }
 
     private static final Pattern scopeEndFirst = Pattern.compile("\\A\\}+");
-    private static String indent(String[] lines, String startAt) {
+    public static String indent(String[] lines, String startAt) {
         String out = "";
         int extraIndention = 0;
         for (String line : lines) {
