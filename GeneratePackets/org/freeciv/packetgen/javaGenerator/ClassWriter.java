@@ -570,6 +570,30 @@ public class ClassWriter {
                 return HasAtoms.SEP.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);
+        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom l, CodeAtom r) {
+                return HasAtoms.WHILE.equals(l) && HasAtoms.LPR.equals(r);
+            }
+        }, CodeStyle.Insert.SPACE);
+        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom l, CodeAtom r) {
+                return HasAtoms.IF.equals(l) && HasAtoms.LPR.equals(r);
+            }
+        }, CodeStyle.Insert.SPACE);
+        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom l, CodeAtom r) {
+                return HasAtoms.FOR.equals(l) && HasAtoms.LPR.equals(r);
+            }
+        }, CodeStyle.Insert.SPACE);
+        maker.nextIs(new Util.OneCondition<CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.LPR.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
         maker.previousIs(new Util.OneCondition<CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom argument) {
