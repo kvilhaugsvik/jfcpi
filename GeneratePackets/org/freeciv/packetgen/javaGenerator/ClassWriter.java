@@ -384,6 +384,12 @@ public class ClassWriter {
                 case '}':
                     extraIndention--;
                     break;
+                case '(':
+                    extraIndention++;
+                    break;
+                case ')':
+                    extraIndention--;
+                    break;
             }
         }
         return extraIndention;

@@ -49,11 +49,11 @@ public class Hardcoded {
                                false, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("requirement", "struct requirement", "requirement",
                     "value = new requirement(\n" +
-                            "\tnew universal(universals_n.valueOf(from.readUnsignedByte()),\n" +
-                            "\t\tfrom.readInt()),\n" +
-                            "\treq_range.valueOf(from.readUnsignedByte()),\n" +
-                            "\tfrom.readBoolean(),\n" +
-                            "\tfrom.readBoolean());\n",
+                            "new universal(universals_n.valueOf(from.readUnsignedByte()),\n" +
+                            "from.readInt()),\n" +
+                            "req_range.valueOf(from.readUnsignedByte()),\n" +
+                            "from.readBoolean(),\n" +
+                            "from.readBoolean());\n",
                     "to.writeByte(value.getsource().kind.getNumber());\n" +
                             "to.writeInt(value.getsource().value);\n" +
                             "to.writeByte(value.getrange().getNumber());\n" +
@@ -72,8 +72,8 @@ public class Hardcoded {
                             "value = new universal[length];" + "\n" +
                             "for (int i = 0; i < length; i++) {" + "\n" +
                             "value[i] = new universal(" + "\n" +
-                            "\t" + "universals_n.valueOf(from.readUnsignedByte())," + "\n" +
-                            "\t" + "from.readUnsignedByte());" + "\n" +
+                            "universals_n.valueOf(from.readUnsignedByte())," + "\n" +
+                            "from.readUnsignedByte());" + "\n" +
                             "}",
                     "to.writeByte(value.length);\n" +
                             "for (universal element : value) {" + "\n" +
