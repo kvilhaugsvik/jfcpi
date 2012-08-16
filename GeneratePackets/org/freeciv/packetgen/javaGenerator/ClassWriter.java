@@ -547,6 +547,18 @@ public class ClassWriter {
                 return HasAtoms.FORSEP.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);
+        maker.previousIs(new Util.OneCondition<CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.HAS.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.nextIs(new Util.OneCondition<CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.HAS.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
         maker.nextIs(new Util.OneCondition<CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom argument) {
