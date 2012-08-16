@@ -31,7 +31,7 @@ public class Address extends Formatted implements HasAtoms {
     public Address(Address start, CodeAtom... parts) {
         this.components = new CodeAtom[start.components.length + parts.length];
         System.arraycopy(start.components, 0, this.components, 0, start.components.length);
-        System.arraycopy(parts, start.components.length, this.components, 0, this.components.length);
+        System.arraycopy(parts, 0, this.components, start.components.length, parts.length);
     }
 
     @Override
