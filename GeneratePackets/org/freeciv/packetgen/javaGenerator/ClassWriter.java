@@ -528,7 +528,7 @@ public class ClassWriter {
 
     public static final CodeStyle DEFAULT_STYLE;
     static {
-        CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Insert.SPACE);
+        final CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Insert.SPACE, 110, 10);
         maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom before, CodeAtom after) {
@@ -589,6 +589,12 @@ public class ClassWriter {
                 return HasAtoms.RPR.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);
+        maker.previousIs(new Util.OneCondition<CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.SEP.equals(argument) && 1 < maker.getStatus().getLineBreakTry();
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
         maker.nextIs(new Util.OneCondition<CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom argument) {

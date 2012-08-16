@@ -25,8 +25,15 @@ import java.util.List;
 public class CodeStyleBuilder {
     private final LinkedList<AtomCheck> triggers;
     private final AtomCheck stdIns;
+    private final int tryLineBreakAt;
+    private final int maxLineBreakAttempts;
 
-    public CodeStyleBuilder(final CodeStyle.Insert standard) {
+    private final Status status = new Status();
+
+    public CodeStyleBuilder(final CodeStyle.Insert standard, int tryLineBreakAt, int maxLineBreakAttempts) {
+        this.tryLineBreakAt = tryLineBreakAt;
+        this.maxLineBreakAttempts = maxLineBreakAttempts;
+
         triggers = new LinkedList<AtomCheck>();
         this.stdIns = new AtomCheck(standard) {
             @Override
@@ -34,6 +41,10 @@ public class CodeStyleBuilder {
                 return true;
             }
         };
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     public void previousIs(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
@@ -72,10 +83,20 @@ public class CodeStyleBuilder {
                 LinkedList<String> out = new LinkedList<String>();
 
                 int pointerAfter = 0;
+                int lineBeganAt;
                 while (pointerAfter < atoms.length) {
                     StringBuilder line = new StringBuilder();
+                    lineBeganAt = pointerAfter;
+                    status.lineBreakTry = 0;
                     line: while (pointerAfter < atoms.length) {
                         line.append(atoms[pointerAfter].get());
+
+                        if (tryLineBreakAt < line.length() && status.lineBreakTry < maxLineBreakAttempts) {
+                            pointerAfter = lineBeganAt;
+                            status.lineBreakTry++;
+                            line = new StringBuilder();
+                            continue;
+                        }
 
                         switch (Util.<CodeAtom, CodeAtom, AtomCheck>getFirstFound(
                                 rules,
@@ -159,6 +180,17 @@ public class CodeStyleBuilder {
 
         public boolean isTrueFor(CodeAtom before, CodeAtom after) {
             return null != before && null != after && test.isTrueFor(before, after);
+        }
+    }
+
+    public static class Status {
+        private int lineBreakTry = 0;
+
+        private Status() {
+        }
+
+        public int getLineBreakTry() {
+            return lineBreakTry;
         }
     }
 }
