@@ -595,6 +595,26 @@ public class ClassWriter {
                 return HasAtoms.SEP.equals(argument) && 1 < maker.getStatus().getLineBreakTry();
             }
         }, CodeStyle.Insert.LINE_BREAK);
+        maker.previousIs(new Util.OneCondition<CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.ALS.equals(argument) && 0 < maker.getStatus().getLineBreakTry();
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
+        maker.nextIs(new Util.OneCondition<CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.ALE.equals(argument) && 0 < maker.getStatus().getLineBreakTry();
+            }
+        }, CodeStyle.Insert.LINE_BREAK);
+        maker.previousIs(new Util.OneCondition<CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.ALS.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
+        maker.nextIs(new Util.OneCondition<CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom argument) {
+                return HasAtoms.ALE.equals(argument);
+            }
+        }, CodeStyle.Insert.NOTHING);
         maker.nextIs(new Util.OneCondition<CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom argument) {
