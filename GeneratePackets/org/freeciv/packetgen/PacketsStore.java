@@ -142,6 +142,8 @@ public class PacketsStore {
                 sentBy += 1;
             else if ("no-delta".equals(flag.getName()))
                 packetFlags.add(new Annotate(NoDelta.class.getSimpleName()));
+            else if ("is-info".equals(flag.getName()))
+                packetFlags.add(new Annotate(IsInfo.class.getSimpleName()));
         }
         packetFlags.add(new Sender(sentBy));
 
