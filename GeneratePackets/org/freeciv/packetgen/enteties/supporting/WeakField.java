@@ -14,11 +14,14 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import java.util.Collections;
+import java.util.List;
+
 public class WeakField {
     private final String name, type;
     private final ArrayDeclaration[] declarations;
 
-    public WeakField(String name, String kind, ArrayDeclaration... declarations) {
+    public WeakField(String name, String kind, List<WeakFlag> flags, ArrayDeclaration... declarations) {
         this.name = name;
         this.type = kind;
         this.declarations = declarations;

@@ -38,10 +38,11 @@ public class Packet extends ClassWriter implements IDependency {
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
     @Deprecated public Packet(String name, int number, String headerKind, Field... fields) throws UndefinedException {
-        this(name, number, headerKind, GeneratorDefaults.LOG_TO, fields);
+        this(name, number, headerKind, GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), fields);
     }
 
-    public Packet(String name, int number, String headerKind, String logger, Field... fields) throws UndefinedException {
+    public Packet(String name, int number, String headerKind, String logger,
+                  List<Annotate> packetFlags, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new Import[]{
                               Import.allIn(new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage())),
                               Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage())),

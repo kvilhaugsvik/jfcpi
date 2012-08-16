@@ -22,7 +22,7 @@ import org.junit.Assert._
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
 import org.freeciv.packetgen.PacketsStore
-import org.freeciv.packetgen.enteties.supporting.{WeakField, Field}
+import org.freeciv.packetgen.enteties.supporting.{WeakFlag, WeakField, Field}
 
 class PacketsDefParseTest {
   @inline def storePars = {
@@ -659,7 +659,7 @@ class PacketsDefParseTest {
     val results: List[WeakField] = result.get
 
     storage.registerTypeAlias("UINT8", "uint8", "int") // TODO: Kill with fire in a refactoring
-    storage.registerPacket("JUST_FOR_SIDE_EFFECTS", 42, results) // TODO: Kill with fire in a refactoring
+    storage.registerPacket("JUST_FOR_SIDE_EFFECTS", 42, List.empty[WeakFlag], results) // TODO: Kill with fire in a refactoring
 
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "maxB"), results(0))
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "a"), results(1))
