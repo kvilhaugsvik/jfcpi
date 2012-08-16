@@ -571,6 +571,7 @@ public class ClassWriter {
                 return HasAtoms.LPR.equals(argument);
             }
         }, CodeStyle.Insert.NOTHING);
+        maker.atTheEnd(CodeStyle.Insert.NOTHING);
         DEFAULT_STYLE = maker.getStyle();
     }
 }

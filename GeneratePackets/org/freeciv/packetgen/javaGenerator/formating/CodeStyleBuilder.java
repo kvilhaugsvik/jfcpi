@@ -48,6 +48,15 @@ public class CodeStyleBuilder {
         triggers.add(new AtomCheckBetween(test, toInsert));
     }
 
+    public void atTheEnd(CodeStyle.Insert toInsert) {
+        triggers.add(new AtomCheck(toInsert) {
+            @Override
+            public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                return null == after;
+            }
+        });
+    }
+
     public CodeStyle getStyle() {
         return new CodeStyle() {
             // Prevent rules added to the builder after style construction from being added to the style

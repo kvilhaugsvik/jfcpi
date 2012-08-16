@@ -237,7 +237,7 @@ public class Field {
             Block inner = new Block();
 
             ref.addStatement(FOR(count,
-                    asBool(count.ref().getJavaCode() + "< " + "this." + this.getFieldName() + replaceWith + ".length"),
+                    asBool(count.ref().getJavaCode() + " < " + "this." + this.getFieldName() + replaceWith + ".length"),
                     asVoid(getCounterNumber(counter) + "++"),
                     inner));
             ref = inner;
