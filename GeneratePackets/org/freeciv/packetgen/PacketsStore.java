@@ -144,6 +144,8 @@ public class PacketsStore {
                 packetFlags.add(new Annotate(NoDelta.class.getSimpleName()));
             else if ("is-info".equals(flag.getName()))
                 packetFlags.add(new Annotate(IsInfo.class.getSimpleName()));
+            else if ("is-game-info".equals(flag.getName()))
+                packetFlags.add(new Annotate(IsGameInfo.class.getSimpleName()));
         }
         packetFlags.add(new Sender(sentBy));
 
