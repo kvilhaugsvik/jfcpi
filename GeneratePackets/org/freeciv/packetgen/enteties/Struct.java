@@ -31,7 +31,7 @@ public class Struct extends ClassWriter implements IDependency {
     public Struct(String name, List<Map.Entry<String, String>> fields, Set<Requirement> willNeed) {
         super(ClassKind.CLASS,
                 new TargetPackage(FCEnum.class.getPackage()),
-                new String[]{}, "Freeciv C code", name, null, null);
+                null, "Freeciv C code", name, null, null);
 
         addConstructorFields();
 
