@@ -57,6 +57,8 @@ public class Field extends Var {
         for (WeakFlag flag : flags)
             if ("key".equals(flag.getName()))
                 annotations.add(new Annotate(Key.class.getSimpleName()));
+            else if ("diff".equals(flag.getName()))
+                annotations.add(new Annotate(ArrayDiff.class.getSimpleName()));
 
         return annotations;
     }
