@@ -19,8 +19,16 @@ import org.freeciv.Util;
 import java.util.LinkedList;
 
 public class CodeAtoms {
-    private final LinkedList<CodeAtom> atoms = new LinkedList<CodeAtom>();
-    private Util.OneCondition<CodeAtom> reason = null;
+    private final LinkedList<CodeAtom> atoms;
+    private Util.OneCondition<CodeAtom> reason;
+
+    public CodeAtoms(HasAtoms... start) {
+        atoms = new LinkedList<CodeAtom>();
+        reason = null;
+
+        for (HasAtoms owner : start)
+            owner.writeAtoms(this);
+    }
 
     public void add(CodeAtom atom) {
         if (null == reason || !reason.isTrueFor(atom))
