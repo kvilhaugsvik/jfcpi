@@ -241,7 +241,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         }
     }
 
-    public static class EnumElementFC extends ClassWriter.EnumElement {
+    public static class EnumElementFC extends EnumElement {
         private final String valueGen;
         private final String toStringName;
         private final boolean valid;

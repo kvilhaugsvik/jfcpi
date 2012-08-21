@@ -42,7 +42,7 @@ public class ClassWriter {
     private final LinkedList<Var> stateVars = new LinkedList<Var>();
 
     private final LinkedList<Method> methods = new LinkedList<Method>();
-    protected final LinkedHashMap<String, EnumElement> enums = new LinkedHashMap<String, ClassWriter.EnumElement>();
+    protected final LinkedHashMap<String, EnumElement> enums = new LinkedHashMap<String, EnumElement>();
 
     private boolean constructorFromAllFields = false;
 
@@ -490,41 +490,6 @@ public class ClassWriter {
 
         public static Method newReadClassState(String comment, String type, String name, String... body) {
             return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
-        }
-    }
-
-    public static class EnumElement {
-        private final String comment;
-        private final String elementName;
-        private final String paramlist;
-
-        protected EnumElement(String comment, String elementName, String params) {
-            if (null == elementName)
-                throw new IllegalArgumentException("All elements of enums must have names");
-
-            this.comment = comment;
-            this.elementName = elementName;
-            this.paramlist = params;
-        }
-
-        public String getEnumValueName() {
-            return elementName;
-        }
-
-        public String toString() {
-            return elementName + " (" + paramlist + ")" + ifIs(" /* ", comment, " */");
-        }
-
-        public static EnumElement newEnumValue(String enumValueName) {
-            return newEnumValue(null, enumValueName, null);
-        }
-
-        public static EnumElement newEnumValue(String enumValueName, String params) {
-            return newEnumValue(null, enumValueName, params);
-        }
-
-        public static EnumElement newEnumValue(String comment, String enumValueName, String params) {
-            return new EnumElement(comment, enumValueName, params);
         }
     }
 
