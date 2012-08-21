@@ -529,66 +529,16 @@ public class ClassWriter {
     public static final CodeStyle DEFAULT_STYLE;
     static {
         final CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Insert.SPACE, 110, 10);
-        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-                return HasAtoms.ELSE.equals(after) && HasAtoms.RSC.equals(before);
-            }
-        }, CodeStyle.Insert.SPACE);
-        maker.previousIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.EOL.equals(argument);
-            }
-        }, CodeStyle.Insert.LINE_BREAK);
-        maker.previousIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.LSC.equals(argument);
-            }
-        }, CodeStyle.Insert.LINE_BREAK);
-        maker.previousIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.RSC.equals(argument);
-            }
-        }, CodeStyle.Insert.LINE_BREAK);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.EOL.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.FORSEP.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.previousIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.HAS.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.HAS.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.RSC.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.RPR.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
+        maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Insert.SPACE);
+        maker.whenAfter(HasAtoms.EOL, CodeStyle.Insert.LINE_BREAK);
+        maker.whenAfter(HasAtoms.LSC, CodeStyle.Insert.LINE_BREAK);
+        maker.whenAfter(HasAtoms.RSC, CodeStyle.Insert.LINE_BREAK);
+        maker.whenBefore(HasAtoms.EOL, CodeStyle.Insert.NOTHING);
+        maker.whenBefore(HasAtoms.FORSEP, CodeStyle.Insert.NOTHING);
+        maker.whenAfter(HasAtoms.HAS, CodeStyle.Insert.NOTHING);
+        maker.whenBefore(HasAtoms.HAS, CodeStyle.Insert.NOTHING);
+        maker.whenBefore(HasAtoms.RSC, CodeStyle.Insert.NOTHING);
+        maker.whenBefore(HasAtoms.RPR, CodeStyle.Insert.NOTHING);
         maker.previousIs(new Util.OneCondition<CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom argument) {
@@ -605,52 +555,14 @@ public class ClassWriter {
                 return HasAtoms.ALE.equals(argument) && 0 < maker.getStatus().getLineBreakTry();
             }
         }, CodeStyle.Insert.LINE_BREAK);
-        maker.previousIs(new Util.OneCondition<CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.ALS.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.ALE.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.SEP.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom l, CodeAtom r) {
-                return HasAtoms.WHILE.equals(l) && HasAtoms.LPR.equals(r);
-            }
-        }, CodeStyle.Insert.SPACE);
-        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom l, CodeAtom r) {
-                return HasAtoms.IF.equals(l) && HasAtoms.LPR.equals(r);
-            }
-        }, CodeStyle.Insert.SPACE);
-        maker.isBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom l, CodeAtom r) {
-                return HasAtoms.FOR.equals(l) && HasAtoms.LPR.equals(r);
-            }
-        }, CodeStyle.Insert.SPACE);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.LPR.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
-        maker.previousIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.LPR.equals(argument);
-            }
-        }, CodeStyle.Insert.NOTHING);
+        maker.whenAfter(HasAtoms.ALS, CodeStyle.Insert.NOTHING);
+        maker.whenBefore(HasAtoms.ALE, CodeStyle.Insert.NOTHING);
+        maker.whenBefore(HasAtoms.SEP, CodeStyle.Insert.NOTHING);
+        maker.whenBetween(HasAtoms.WHILE, HasAtoms.LPR, CodeStyle.Insert.SPACE);
+        maker.whenBetween(HasAtoms.IF, HasAtoms.LPR, CodeStyle.Insert.SPACE);
+        maker.whenBetween(HasAtoms.FOR, HasAtoms.LPR, CodeStyle.Insert.SPACE);
+        maker.whenBefore(HasAtoms.LPR, CodeStyle.Insert.NOTHING);
+        maker.whenAfter(HasAtoms.LPR, CodeStyle.Insert.NOTHING);
         maker.atTheEnd(CodeStyle.Insert.NOTHING);
         DEFAULT_STYLE = maker.getStyle();
     }

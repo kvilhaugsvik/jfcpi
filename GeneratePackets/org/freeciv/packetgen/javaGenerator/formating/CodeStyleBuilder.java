@@ -15,8 +15,7 @@
 package org.freeciv.packetgen.javaGenerator.formating;
 
 import org.freeciv.Util;
-import org.freeciv.packetgen.javaGenerator.CodeAtom;
-import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -47,16 +46,36 @@ public class CodeStyleBuilder {
         return status;
     }
 
+    public void whenAfter(final CodeAtom atom, CodeStyle.Insert toInsert) {
+        triggers.add(new AtomCheckBefore(new Util.OneCondition<CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom argument) {
+                return atom.equals(argument);
+            }
+        }, toInsert));
+    }
+
     public void previousIs(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
         triggers.add(new AtomCheckBefore(test, toInsert));
+    }
+
+    public void whenBefore(final CodeAtom atom, CodeStyle.Insert toInsert) {
+        triggers.add(new AtomCheckAfter(new Util.OneCondition<CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom argument) {
+                return atom.equals(argument);
+            }
+        }, toInsert));
     }
 
     public void nextIs(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
         triggers.add(new AtomCheckAfter(test, toInsert));
     }
 
-    public void isBetween(Util.TwoConditions<CodeAtom, CodeAtom> test, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckBetween(test, toInsert));
+    public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Insert toInsert) {
+        triggers.add(new AtomCheckBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom left, CodeAtom right) {
+                return before.equals(left) && after.equals(right);
+            }
+        }, toInsert));
     }
 
     public void atTheEnd(CodeStyle.Insert toInsert) {
