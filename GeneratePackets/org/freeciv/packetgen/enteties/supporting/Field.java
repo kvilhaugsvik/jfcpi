@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packet.fieldtype.*;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
@@ -52,6 +53,10 @@ public class Field extends Var {
 
     private static List<Annotate> fieldFlagsToAnnotations(List<WeakFlag> flags) {
         LinkedList<Annotate> annotations = new LinkedList<Annotate>();
+
+        for (WeakFlag flag : flags)
+            if ("key".equals(flag.getName()))
+                annotations.add(new Annotate(Key.class.getSimpleName()));
 
         return annotations;
     }
