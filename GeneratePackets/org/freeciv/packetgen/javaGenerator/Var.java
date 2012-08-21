@@ -19,7 +19,11 @@ import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
+import java.util.Collections;
+import java.util.List;
+
 public class Var extends Formatted implements Returnable {
+    private final List<Annotate> annotations;
     private final Visibility visibility;
     private final Scope scope;
     private final Modifiable modifiable;
@@ -29,8 +33,9 @@ public class Var extends Formatted implements Returnable {
 
     private final CodeAtom referName;
 
-    protected Var(Visibility visibility, Scope scope, Modifiable modifiable,
+    protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
                 String type, String name, AValue value) {
+        this.annotations = annotations;
         this.visibility = visibility;
         this.scope = scope;
         this.modifiable = modifiable;
@@ -76,6 +81,8 @@ public class Var extends Formatted implements Returnable {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
+        for (Annotate annotation : annotations)
+            annotation.writeAtoms(to);
         if (null != visibility)
             visibility.writeAtoms(to);
         scope.writeAtoms(to);
@@ -107,12 +114,17 @@ public class Var extends Formatted implements Returnable {
 
 
     public static Var local(String type, String name, AValue value) {
-        return new Var(null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
+        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
     }
 
     public static Var field(Visibility visibility, Scope scope, Modifiable modifiable,
                                             String type, String name, AValue value) {
-        return new Var(visibility, scope, modifiable, type, name, value);
+        return field(Collections.<Annotate>emptyList(), visibility, scope, modifiable, type, name, value);
+    }
+
+    public static Var field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
+                            String type, String name, AValue value) {
+        return new Var(annotations, visibility, scope, modifiable, type, name, value);
     }
 
 

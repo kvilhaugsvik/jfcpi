@@ -32,7 +32,7 @@ public class Field extends Var {
 
     public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
                  WeakField.ArrayDeclaration... declarations) {
-        super(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+        super(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
               typeAlias.getName() + getArrayDeclaration(typeAlias, decWeakToStrong(declarations, onPacket, fieldName)),
               fieldName, null);
 
