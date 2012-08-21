@@ -17,74 +17,83 @@ package org.freeciv.packetgen.javaGenerator.formating;
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.*;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class CodeStyleBuilder {
     private final LinkedList<AtomCheck> triggers;
+    private final HashMap<CodeAtom, CodeStyle.ChangeScope> chScopeBefore;
+    private final HashMap<CodeAtom, CodeStyle.ChangeScope> chScopeAfter;
     private final AtomCheck stdIns;
     private final int tryLineBreakAt;
     private final int maxLineBreakAttempts;
-
-    private final Status status = new Status();
 
     public CodeStyleBuilder(final CodeStyle.Insert standard, int tryLineBreakAt, int maxLineBreakAttempts) {
         this.tryLineBreakAt = tryLineBreakAt;
         this.maxLineBreakAttempts = maxLineBreakAttempts;
 
         triggers = new LinkedList<AtomCheck>();
-        this.stdIns = new AtomCheck(standard) {
-            @Override
-            public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+        this.stdIns = new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom codeAtom, CodeAtom codeAtom1) {
                 return true;
             }
-        };
+        }, standard, ignoresScope);
+
+        this.chScopeBefore = new HashMap<CodeAtom, CodeStyle.ChangeScope>();
+        this.chScopeAfter = new HashMap<CodeAtom, CodeStyle.ChangeScope>();
     }
 
-    public Status getStatus() {
-        return status;
+    public void changeScopeAfter(CodeAtom atom, CodeStyle.ChangeScope change) {
+        chScopeAfter.put(atom, change);
+    }
+
+    public void changeScopeBefore(CodeAtom atom, CodeStyle.ChangeScope change) {
+        chScopeBefore.put(atom, change);
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckRaw(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        whenAfter(atom, toInsert, ignoresScope);
+    }
+
+    public void whenAfter(final CodeAtom atom, CodeStyle.Insert toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
+        triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                 return null != before && atom.equals(before);
             }
-        }, toInsert));
-    }
-
-    public void previousIs(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckBefore(test, toInsert));
+        }, toInsert, scopeCond));
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckRaw(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        whenBefore(atom, toInsert, ignoresScope);
+    }
+
+    public void whenBefore(final CodeAtom atom, CodeStyle.Insert toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
+        triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                 return null != after && atom.equals(after);
             }
-        }, toInsert));
-    }
-
-    public void nextIs(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckAfter(test, toInsert));
+        }, toInsert, scopeCond));
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckRaw(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        whenBetween(before, after, toInsert, ignoresScope);
+    }
+
+    public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Insert toInsert,
+                            Util.OneCondition<ScopeInfo> scopeCond) {
+        triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override public boolean isTrueFor(CodeAtom left, CodeAtom right) {
                 return null != left && null != right && before.equals(left) && after.equals(right);
             }
-        }, toInsert));
+        }, toInsert, scopeCond));
     }
 
     public void atTheEnd(CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheck(toInsert) {
+        triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                 return null == after;
             }
-        });
+        }, toInsert, ignoresScope));
     }
 
     public CodeStyle getStyle() {
@@ -101,24 +110,41 @@ public class CodeStyleBuilder {
                 final CodeAtom[] atoms = from.getAtoms();
                 LinkedList<String> out = new LinkedList<String>();
 
+                ScopeStack<ScopeInfo> scopeStack = null;
+                try {
+                    scopeStack = new ScopeStack<ScopeInfo>(ScopeInfo.class);
+                } catch (NoSuchMethodException e) {
+                    throw new Error("Could not initialize ScopeStack", e);
+                } catch (IllegalAccessException e) {
+                    throw new Error("Could not initialize ScopeStack", e);
+                } catch (InstantiationException e) {
+                    throw new Error("Could not initialize ScopeStack", e);
+                }
+
+                ArrayList<CompiledAtomCheck> rulesKnowStack = new ArrayList<CompiledAtomCheck>();
+                for (AtomCheck rule : rules) {
+                    rulesKnowStack.add(rule.forStack(scopeStack));
+                }
+
                 int pointerAfter = 0;
                 int lineBeganAt;
                 while (pointerAfter < atoms.length) {
                     StringBuilder line = new StringBuilder();
                     lineBeganAt = pointerAfter;
-                    status.lineBreakTry = 0;
                     line: while (pointerAfter < atoms.length) {
+                        checkScopeChange(atoms[pointerAfter], chScopeBefore, scopeStack);
                         line.append(atoms[pointerAfter].get());
+                        checkScopeChange(atoms[pointerAfter], chScopeAfter, scopeStack);
 
-                        if (tryLineBreakAt < line.length() && status.lineBreakTry < maxLineBreakAttempts) {
+                        if (tryLineBreakAt < line.length() && scopeStack.get().lineBreakTry < maxLineBreakAttempts) {
                             pointerAfter = lineBeganAt;
-                            status.lineBreakTry++;
+                            scopeStack.get().lineBreakTry++;
                             line = new StringBuilder();
                             continue;
                         }
 
-                        switch (Util.<CodeAtom, CodeAtom, AtomCheck>getFirstFound(
-                                rules,
+                        switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck>getFirstFound(
+                                rulesKnowStack,
                                 getOrNull(atoms, pointerAfter),
                                 getOrNull(atoms, pointerAfter + 1)
                         ).getToInsert()) {
@@ -146,67 +172,77 @@ public class CodeStyleBuilder {
                     return null;
                 }
             }
+
+            private void checkScopeChange(CodeAtom atom, HashMap<CodeAtom, CodeStyle.ChangeScope> chScope,
+                                          CodeStyle.ScopeStack<ScopeInfo> scopeStack) {
+                if (chScope.containsKey(atom))
+                    switch (chScope.get(atom)) {
+                        case ENTER:
+                            scopeStack.open();
+                            break;
+                        case EXIT:
+                            scopeStack.close();
+                            break;
+                    }
+            }
         };
     }
 
-    private abstract class AtomCheck implements Util.TwoConditions<CodeAtom, CodeAtom> {
-        private final CodeStyle.Insert toInsert;
+    private class CompiledAtomCheck implements Util.TwoConditions<CodeAtom, CodeAtom> {
+        private final AtomCheck check;
+        private final CodeStyle.ScopeStack<ScopeInfo> stack;
 
-        protected AtomCheck(CodeStyle.Insert toInsert) {
+        private CompiledAtomCheck(AtomCheck check, CodeStyle.ScopeStack stack) {
+            this.check = check;
+            this.stack = stack;
+        }
+
+        public CodeStyle.Insert getToInsert() {
+            return check.getToInsert();
+        }
+
+        public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+            return check.getCheck().isTrueFor(before, after) && check.getScopeTest().isTrueFor(stack.get());
+        }
+    }
+
+    private final Util.OneCondition<ScopeInfo> ignoresScope = new Util.OneCondition<ScopeInfo>() {
+        @Override public boolean isTrueFor(ScopeInfo argument) {
+            return true;
+        }
+    };
+
+    private class AtomCheck {
+        private final Util.TwoConditions<CodeAtom, CodeAtom> test;
+        private final CodeStyle.Insert toInsert;
+        private final Util.OneCondition<ScopeInfo> scopeTest;
+
+        public AtomCheck(Util.TwoConditions<CodeAtom, CodeAtom> positionTest, CodeStyle.Insert toInsert,
+                         Util.OneCondition<ScopeInfo> scopeTest) {
+            this.test = positionTest;
+            this.scopeTest = scopeTest;
             this.toInsert = toInsert;
+        }
+
+        public CompiledAtomCheck forStack(CodeStyle.ScopeStack scope) {
+            return new CompiledAtomCheck(this, scope);
         }
 
         public CodeStyle.Insert getToInsert() {
             return toInsert;
         }
 
-        public abstract boolean isTrueFor(CodeAtom before, CodeAtom after);
-    }
-
-    private class AtomCheckBefore extends AtomCheck {
-        private final Util.OneCondition<CodeAtom> test;
-
-        private AtomCheckBefore(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
-            super(toInsert);
-            this.test = test;
+        public Util.TwoConditions<CodeAtom, CodeAtom> getCheck() {
+            return test;
         }
 
-        public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-            return null != before && test.isTrueFor(before);
+        public Util.OneCondition<ScopeInfo> getScopeTest() {
+            return scopeTest;
         }
     }
 
-    private class AtomCheckAfter extends AtomCheck {
-        private final Util.OneCondition<CodeAtom> test;
-
-        private AtomCheckAfter(Util.OneCondition<CodeAtom> test, CodeStyle.Insert toInsert) {
-            super(toInsert);
-            this.test = test;
-        }
-
-        public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-            return null != after && test.isTrueFor(after);
-        }
-    }
-
-    private class AtomCheckRaw extends AtomCheck {
-        private final Util.TwoConditions<CodeAtom, CodeAtom> test;
-
-        private AtomCheckRaw(Util.TwoConditions<CodeAtom, CodeAtom> test, CodeStyle.Insert toInsert) {
-            super(toInsert);
-            this.test = test;
-        }
-
-        public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-            return test.isTrueFor(before, after);
-        }
-    }
-
-    public static class Status {
+    public static class ScopeInfo {
         private int lineBreakTry = 0;
-
-        private Status() {
-        }
 
         public int getLineBreakTry() {
             return lineBreakTry;

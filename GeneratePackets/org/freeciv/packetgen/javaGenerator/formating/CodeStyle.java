@@ -16,6 +16,9 @@ package org.freeciv.packetgen.javaGenerator.formating;
 
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
 import java.util.List;
 
 public interface CodeStyle {
@@ -25,5 +28,45 @@ public interface CodeStyle {
         NOTHING,
         SPACE,
         LINE_BREAK
+    }
+
+    public enum ChangeScope {
+        ENTER,
+        EXIT
+    }
+
+    public static class ScopeStack<Scope> {
+        private final Constructor<Scope> kind;
+        private final LinkedList<Scope> stack;
+
+        public ScopeStack(Class<Scope> kind)
+                throws NoSuchMethodException, IllegalAccessException, InstantiationException {
+            this.kind = kind.getConstructor();
+            this.stack = new LinkedList<Scope>();
+            this.stack.push(kind.newInstance());
+        }
+
+        public Scope get() {
+            return stack.peekLast();
+        }
+
+        public void open() {
+            try {
+                this.stack.push(kind.newInstance());
+            } catch (InstantiationException e) {
+                throw new Error("Exception thrown after initialization but not during?", e);
+            } catch (IllegalAccessException e) {
+                throw new Error("Exception thrown after initialization but not during?", e);
+            } catch (InvocationTargetException e) {
+                throw new Error("Exception thrown after initialization but not during?", e);
+            }
+        }
+
+        public void close() {
+            if (this.stack.size() < 2)
+                throw new IllegalStateException("Tried to close newer opened scope");
+
+            this.stack.pop();
+        }
     }
 }

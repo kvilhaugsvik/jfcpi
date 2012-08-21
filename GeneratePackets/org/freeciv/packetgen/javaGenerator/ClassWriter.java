@@ -539,22 +539,21 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.HAS, CodeStyle.Insert.NOTHING);
         maker.whenBefore(HasAtoms.RSC, CodeStyle.Insert.NOTHING);
         maker.whenBefore(HasAtoms.RPR, CodeStyle.Insert.NOTHING);
-        maker.previousIs(new Util.OneCondition<CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.SEP.equals(argument) && 1 < maker.getStatus().getLineBreakTry();
+        maker.whenAfter(HasAtoms.SEP, CodeStyle.Insert.LINE_BREAK, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
+            @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
+                return 1 < argument.getLineBreakTry();
             }
-        }, CodeStyle.Insert.LINE_BREAK);
-        maker.previousIs(new Util.OneCondition<CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.ALS.equals(argument) && 0 < maker.getStatus().getLineBreakTry();
+        });
+        maker.whenAfter(HasAtoms.ALS, CodeStyle.Insert.LINE_BREAK, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
+            @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
+                return 0 < argument.getLineBreakTry();
             }
-        }, CodeStyle.Insert.LINE_BREAK);
-        maker.nextIs(new Util.OneCondition<CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom argument) {
-                return HasAtoms.ALE.equals(argument) && 0 < maker.getStatus().getLineBreakTry();
+        });
+        maker.whenBefore(HasAtoms.ALE, CodeStyle.Insert.LINE_BREAK, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
+            @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
+                return 0 < argument.getLineBreakTry();
             }
-        }, CodeStyle.Insert.LINE_BREAK);
+        });
         maker.whenAfter(HasAtoms.ALS, CodeStyle.Insert.NOTHING);
         maker.whenBefore(HasAtoms.ALE, CodeStyle.Insert.NOTHING);
         maker.whenBefore(HasAtoms.SEP, CodeStyle.Insert.NOTHING);
@@ -564,6 +563,14 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.LPR, CodeStyle.Insert.NOTHING);
         maker.whenAfter(HasAtoms.LPR, CodeStyle.Insert.NOTHING);
         maker.atTheEnd(CodeStyle.Insert.NOTHING);
+
+        maker.changeScopeAfter(HasAtoms.ALS, CodeStyle.ChangeScope.ENTER);
+        maker.changeScopeBefore(HasAtoms.ALE, CodeStyle.ChangeScope.EXIT);
+        maker.changeScopeAfter(HasAtoms.LPR, CodeStyle.ChangeScope.ENTER);
+        maker.changeScopeBefore(HasAtoms.RPR, CodeStyle.ChangeScope.EXIT);
+        maker.changeScopeAfter(HasAtoms.LSC, CodeStyle.ChangeScope.ENTER);
+        maker.changeScopeBefore(HasAtoms.RSC, CodeStyle.ChangeScope.EXIT);
+
         DEFAULT_STYLE = maker.getStyle();
     }
 }
