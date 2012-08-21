@@ -47,9 +47,9 @@ public class CodeStyleBuilder {
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckBefore(new Util.OneCondition<CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom argument) {
-                return atom.equals(argument);
+        triggers.add(new AtomCheckRaw(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                return null != before && atom.equals(before);
             }
         }, toInsert));
     }
@@ -59,9 +59,9 @@ public class CodeStyleBuilder {
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckAfter(new Util.OneCondition<CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom argument) {
-                return atom.equals(argument);
+        triggers.add(new AtomCheckRaw(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                return null != after && atom.equals(after);
             }
         }, toInsert));
     }
@@ -71,9 +71,9 @@ public class CodeStyleBuilder {
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Insert toInsert) {
-        triggers.add(new AtomCheckBetween(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        triggers.add(new AtomCheckRaw(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override public boolean isTrueFor(CodeAtom left, CodeAtom right) {
-                return before.equals(left) && after.equals(right);
+                return null != left && null != right && before.equals(left) && after.equals(right);
             }
         }, toInsert));
     }
@@ -189,16 +189,16 @@ public class CodeStyleBuilder {
         }
     }
 
-    private class AtomCheckBetween extends AtomCheck {
+    private class AtomCheckRaw extends AtomCheck {
         private final Util.TwoConditions<CodeAtom, CodeAtom> test;
 
-        private AtomCheckBetween(Util.TwoConditions<CodeAtom, CodeAtom> test, CodeStyle.Insert toInsert) {
+        private AtomCheckRaw(Util.TwoConditions<CodeAtom, CodeAtom> test, CodeStyle.Insert toInsert) {
             super(toInsert);
             this.test = test;
         }
 
         public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-            return null != before && null != after && test.isTrueFor(before, after);
+            return test.isTrueFor(before, after);
         }
     }
 
