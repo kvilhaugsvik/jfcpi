@@ -100,13 +100,15 @@ public class ClassWriter {
     }
 
     public void addObjectConstantAndGetter(String type, String name) {
-        Var field =
-                Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null);
+        addObjectConstantAndGetter(Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
+    }
+
+    public void addObjectConstantAndGetter(Var field) {
         stateVars.add(field);
         addMethodPublicReadObjectState(
                         null,
-                        type,
-                        "get" + name.substring(0, 1).toUpperCase() + name.substring(1),
+                        field.getType(),
+                        "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1),
                         new Block(RETURN(field.ref())));
     }
 
