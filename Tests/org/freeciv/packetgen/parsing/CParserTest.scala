@@ -683,11 +683,11 @@ import javax.annotation.Generated;
 @Generated(comments = "Auto generated from Freeciv C code",
 """ + "\t" + """value = "org.freeciv.packetgen.javaGenerator.ClassWriter")
 public enum test implements FCEnum {
-	ONE (0, "ONE"),
-	TWO (1, "TWO"),
-	THREE (2, "THREE"),
-	ELEMENTS (3, "ELEMENTS", false),
-	INVALID (-2, "INVALID", false);
+	ONE(0, "ONE"),
+	TWO(1, "TWO"),
+	THREE(2, "THREE"),
+	ELEMENTS(3, "ELEMENTS", false),
+	INVALID(-2, "INVALID", false);
 
 	private final int number;
 	private final boolean valid;

@@ -234,51 +234,51 @@ public class EnumTest {
 
     @Test public void testEnumElement() {
         assertEquals("Generated source not as expected",
-                "ONE (1, \"one\")",
+                "ONE(1, \"one\")",
                 newEnumValue("ONE", 1, "\"one\"").toString());
     }
 
     @Test public void testEnumElementNoToStringButOkEntryPoint() {
         assertEquals("Generated source not as expected",
-                "ONE (1, \"ONE\")",
+                "ONE(1, \"ONE\")",
                 newEnumValue("ONE", 1).toString());
     }
 
     @Test public void testEnumElementInvalid() {
         assertEquals("Generated source not as expected",
-                "INVALID (-1, \"INVALID\", false)",
+                "INVALID(-1, \"INVALID\", false)",
                 newInvalidEnum(-1).toString());
     }
 
     @Test public void testEnumElementInvalidNonDefaultNumber() {
         assertEquals("Generated source not as expected",
-                "INVALID (64, \"INVALID\", false)",
+                "INVALID(64, \"INVALID\", false)",
                 newInvalidEnum(64).toString());
     }
 
     @Test public void testEnumElementCount() {
         assertEquals("Generated source not as expected",
-                "NUMBEROFF (64, \"number off\", false)",
+                "NUMBEROFF(64, \"number off\", false)",
                 newInvalidEnum("NUMBEROFF", "\"number off\"", 64).toString());
     }
 
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
-                "ONE (1, \"one\") /* An integer */",
+                "ONE(1, \"one\") /* An integer */",
                 newEnumValue("An integer", "ONE", 1, "\"one\"").toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEnumElementNoName() {
         assertEquals("Generated source not as expected",
-                "ONE (1, \"one\")",
+                "ONE(1, \"one\")",
                 newEnumValue(null, 1, "\"one\"").toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEnumElementNoToString() {
         assertEquals("Generated source not as expected",
-                "ONE (1, \"one\")",
+                "ONE(1, \"one\")",
                 newEnumValue("ONE", 1, null).toString());
     }
 }

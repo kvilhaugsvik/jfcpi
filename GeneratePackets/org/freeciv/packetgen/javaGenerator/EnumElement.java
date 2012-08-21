@@ -35,7 +35,7 @@ public class EnumElement {
     }
 
     public String toString() {
-        return elementName + " (" + Util.joinStringArray(paramlist, ", ", "", "") + ")" + ClassWriter.ifIs(" /* ", comment, " */");
+        return elementName + "(" + Util.joinStringArray(paramlist, ", ", "", "") + ")" + ClassWriter.ifIs(" /* ", comment, " */");
     }
 
     public static EnumElement newEnumValue(String enumValueName) {

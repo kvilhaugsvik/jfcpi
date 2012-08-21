@@ -333,7 +333,7 @@ public class CodeGenTest {
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1, \"one\");" + "\n" +
+                        "\t" + "ONE(1, \"one\");" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
@@ -353,9 +353,9 @@ public class CodeGenTest {
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1)," + "\n" +
-                        "\t" + "TWO (2)," + "\n" +
-                        "\t" + "THREE (3);" + "\n" +
+                        "\t" + "ONE(1)," + "\n" +
+                        "\t" + "TWO(2)," + "\n" +
+                        "\t" + "THREE(3);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
@@ -377,11 +377,11 @@ public class CodeGenTest {
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1)," + "\n" +
-                        "\t" + "TWO (2)," + "\n" +
-                        "\t" + "THREE (3)," + "\n" +
-                        "\t" + "SMALLEST (-2)," + "\n" +
-                        "\t" + "INVALID (-1);" + "\n" +
+                        "\t" + "ONE(1)," + "\n" +
+                        "\t" + "TWO(2)," + "\n" +
+                        "\t" + "THREE(3)," + "\n" +
+                        "\t" + "SMALLEST(-2)," + "\n" +
+                        "\t" + "INVALID(-1);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
@@ -401,9 +401,9 @@ public class CodeGenTest {
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1)," + "\n" +
-                        "\t" + "TWO (2) /* Not a prime number */," + "\n" +
-                        "\t" + "THREE (3);" + "\n" +
+                        "\t" + "ONE(1)," + "\n" +
+                        "\t" + "TWO(2) /* Not a prime number */," + "\n" +
+                        "\t" + "THREE(3);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
@@ -423,9 +423,9 @@ public class CodeGenTest {
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
-                        "\t" + "ONE (1, \"one\")," + "\n" +
-                        "\t" + "2nd (2, \"2nd\")," + "\n" +
-                        "\t" + "TWO (2, \"two\");" + "\n" +
+                        "\t" + "ONE(1, \"one\")," + "\n" +
+                        "\t" + "2nd(2, \"2nd\")," + "\n" +
+                        "\t" + "TWO(2, \"two\");" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
     }
