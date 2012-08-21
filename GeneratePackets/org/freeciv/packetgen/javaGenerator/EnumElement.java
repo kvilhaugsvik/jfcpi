@@ -19,7 +19,7 @@ public class EnumElement {
     private final String elementName;
     private final String paramlist;
 
-    public EnumElement(String comment, String elementName, String params) {
+    protected EnumElement(String comment, String elementName, String params) {
         if (null == elementName)
             throw new IllegalArgumentException("All elements of enums must have names");
 
