@@ -138,6 +138,7 @@ public class PacketsStore {
 
         List<Annotate> packetFlags = new LinkedList<Annotate>();
         byte sentBy = 0;
+        LinkedList<String> canceled = new LinkedList<String>();
         for (WeakFlag flag : flags) {
             if ("sc".equals(flag.getName()))
                 sentBy += 2;
@@ -149,7 +150,11 @@ public class PacketsStore {
                 packetFlags.add(new Annotate(IsInfo.class.getSimpleName()));
             else if ("is-game-info".equals(flag.getName()))
                 packetFlags.add(new Annotate(IsGameInfo.class.getSimpleName()));
+            else if ("cancel".equals(flag.getName()))
+                canceled.add(flag.getArguments()[0]);
+
         }
+        if (!canceled.isEmpty()) packetFlags.add(new Canceler(canceled));
         packetFlags.add(new Sender(sentBy));
 
         List<Field> fieldList = new LinkedList<Field>();
