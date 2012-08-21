@@ -23,6 +23,9 @@ import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.Packet;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.expression.ArrayLiteral;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 
 import java.util.*;
 
@@ -212,21 +215,22 @@ public class PacketsStore {
         for (Constant dep : sortedConstants)
             constants.addClassConstant(Visibility.PUBLIC, dep.getType(), dep.getName(), dep.getExpression());
 
-        String[] understandsPackets;
+        AString[] understandsPackets;
         if (packetsByNumber.isEmpty()) {
-            understandsPackets = new String[0];
+            understandsPackets = new AString[0];
         } else {
-            understandsPackets = new String[packetsByNumber.lastKey() + 1];
+            understandsPackets = new AString[packetsByNumber.lastKey() + 1];
             for (int number = 0; number <= packetsByNumber.lastKey(); number++) {
                 if (packetsByNumber.containsKey(number) && requirements.dependenciesFound(packets.get(packetsByNumber.get(number)))) {
                     Packet packet = packets.get(packetsByNumber.get(number));
-                    understandsPackets[number] = "\"" + packet.getPackage() + "." + packet.getName() + "\"";
+                    understandsPackets[number] = BuiltIn.asAString("\"" + packet.getPackage() + "." + packet.getName() + "\"");
                 } else {
-                    understandsPackets[number] = "\"" + org.freeciv.packet.RawPacket.class.getCanonicalName() + "\""; // DEVMODE is handled elsewhere
+                    understandsPackets[number] = BuiltIn.asAString("\"" + org.freeciv.packet.RawPacket.class.getCanonicalName() + "\""); // DEVMODE is handled elsewhere
                 }
             }
         }
-        constants.addClassConstant(Visibility.PUBLIC, "String[]", Util.PACKET_MAP_NAME, org.freeciv.Util.joinStringArray(understandsPackets, ",\n\t", "{", "}"));
+        constants.addClassConstant(Visibility.PUBLIC, "String[]", Util.PACKET_MAP_NAME,
+                                   new ArrayLiteral(understandsPackets));
 
         out.add(constants);
 
