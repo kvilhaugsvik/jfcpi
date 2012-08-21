@@ -84,7 +84,7 @@ public class Packet extends ClassWriter implements IDependency {
         addObjectConstantAndGetter("PacketHeader", "header");
 
         for (Field field : fields) {
-            addObjectConstantAndGetter(field.getType() + field.getArrayDeclaration(), field.getFieldName());
+            addObjectConstantAndGetter(field);
             addJavaGetter(field);
         }
     }
@@ -94,7 +94,7 @@ public class Packet extends ClassWriter implements IDependency {
         LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
         for (Field field : fields) {
             params.add(new AbstractMap
-                    .SimpleImmutableEntry<String, String>(field.getType() + field.getArrayDeclaration(),
+                    .SimpleImmutableEntry<String, String>(field.getFType() + field.getArrayDeclaration(),
                                                           field.getFieldName()));
             constructorBody.addAll(Arrays.asList(field.validate(true)));
             constructorBody.add(setFieldToVariableSameName(field.getFieldName()).getJavaCode() + ";");
@@ -118,7 +118,7 @@ public class Packet extends ClassWriter implements IDependency {
                 constructorBodyJ.addAll(Arrays.asList(field.validate(true)));
                 constructorBodyJ.addAll(
                         Arrays.asList(field.forElementsInField("this." + field.getFieldName() + " = new " + field
-                                                                 .getType() + field.getNewCreation() + ";",
+                                                                 .getFType() + field.getNewCreation() + ";",
                                                          "this." + field.getFieldName() + "[i] = " + field
                                                                  .getNewFromJavaType(),
                                                          "")));
@@ -135,7 +135,7 @@ public class Packet extends ClassWriter implements IDependency {
         for (Field field : fields) {
             constructorBodyStream.addAll(Arrays.asList(field.validate(false)));
             constructorBodyStream.addAll(Arrays.asList(field.forElementsInField(
-                            "this." + field.getFieldName() + " = new " + field.getType() +
+                            "this." + field.getFieldName() + " = new " + field.getFType() +
                                     field.getNewCreation() + ";",
                             "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName),
                             "")));

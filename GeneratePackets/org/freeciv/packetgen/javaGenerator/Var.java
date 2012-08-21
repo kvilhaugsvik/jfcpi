@@ -29,7 +29,7 @@ public class Var extends Formatted implements Returnable {
 
     private final CodeAtom referName;
 
-    private Var(Visibility visibility, Scope scope, Modifiable modifiable,
+    protected Var(Visibility visibility, Scope scope, Modifiable modifiable,
                 String type, String name, AValue value) {
         this.visibility = visibility;
         this.scope = scope;

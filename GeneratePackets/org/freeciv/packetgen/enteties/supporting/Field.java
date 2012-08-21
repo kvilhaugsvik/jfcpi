@@ -17,7 +17,7 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.javaGenerator.Var;
+import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
@@ -25,26 +25,33 @@ import java.util.*;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
-public class Field {
+public class Field extends Var {
     private final String onPacket;
-    private final String fieldName;
     private final FieldTypeBasic.FieldTypeAlias type;
     private final ArrayDeclaration[] declarations;
 
     public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
                  WeakField.ArrayDeclaration... declarations) {
+        super(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+              typeAlias.getName() + getArrayDeclaration(typeAlias, decWeakToStrong(declarations, onPacket, fieldName)),
+              fieldName, null);
+
         if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
             throw new IllegalArgumentException("Array eaters needs array declarations");
 
-        this.fieldName = fieldName;
         this.type = typeAlias;
         this.onPacket = onPacket;
 
+        this.declarations = decWeakToStrong(declarations, onPacket, fieldName);
+    }
+
+    private static ArrayDeclaration[] decWeakToStrong(WeakField.ArrayDeclaration[] declarations,
+                                                      String onPacket, String onField) {
         ArrayList<ArrayDeclaration> toDeclarations = new ArrayList<ArrayDeclaration>();
         for (WeakField.ArrayDeclaration weakDec : declarations) {
-            toDeclarations.add(new ArrayDeclaration(weakDec.maxSize, weakDec.elementsToTransfer));
+            toDeclarations.add(new ArrayDeclaration(weakDec.maxSize, weakDec.elementsToTransfer, onPacket, onField));
         }
-        this.declarations = toDeclarations.toArray(new ArrayDeclaration[0]);
+        return toDeclarations.toArray(new ArrayDeclaration[0]);
     }
 
     public void introduceNeighbours(Field[] neighbours) {
@@ -67,10 +74,10 @@ public class Field {
     }
 
     public String getFieldName() {
-        return fieldName;
+        return super.getName();
     }
 
-    public String getType() {
+    public String getFType() {
         return type.getName();
     }
 
@@ -82,16 +89,24 @@ public class Field {
         return (0 < getNumberOfDeclarations());
     }
 
-    public int getNumberOfDeclarations() {
+    public static int getNumberOfDeclarations(FieldTypeBasic.FieldTypeAlias type, ArrayDeclaration[] declarations) {
         return (type.getBasicType().isArrayEater()) ? declarations.length - 1 : declarations.length;
     }
 
-    public String getArrayDeclaration() {
+    public int getNumberOfDeclarations() {
+        return getNumberOfDeclarations(type, declarations);
+    }
+
+    public static String getArrayDeclaration(FieldTypeBasic.FieldTypeAlias type, ArrayDeclaration[] declarations) {
         String out = "";
-        for (int i = 0; i < getNumberOfDeclarations(); i++) {
+        for (int i = 0; i < getNumberOfDeclarations(type, declarations); i++) {
             out += "[]";
         }
         return out;
+    }
+
+    public String getArrayDeclaration() {
+        return getArrayDeclaration(type, declarations);
     }
 
     public String getNewCreation() throws UndefinedException {
@@ -103,13 +118,13 @@ public class Field {
     }
 
     public String getNewFromDataStream(String streamName) throws UndefinedException {
-        return "new " + this.getType() + "(" + streamName +
+        return "new " + this.getFType() + "(" + streamName +
                 (type.getBasicType().isArrayEater() ?
                         ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
 
     public String getNewFromJavaType() throws UndefinedException {
-        return "new " + this.getType() + "(" + this.getFieldName() + "[i]" +
+        return "new " + this.getFType() + "(" + this.getFieldName() + "[i]" +
                 (type.getBasicType().isArrayEater() ?
                         ", " + declarations[declarations.length - 1].getSize() : "") + ");";
     }
@@ -264,7 +279,7 @@ public class Field {
 
     public Collection<Requirement> getReqs() {
         HashSet<Requirement> reqs = new HashSet<Requirement>();
-        reqs.add(new Requirement(getType(), Requirement.Kind.FIELD_TYPE));
+        reqs.add(new Requirement(getFType(), Requirement.Kind.FIELD_TYPE));
 
         for (ArrayDeclaration declaration : declarations) {
             reqs.addAll(declaration.getReqs());
@@ -272,15 +287,18 @@ public class Field {
         return reqs;
     }
 
-    public class ArrayDeclaration {
+    public static class ArrayDeclaration {
         private final IntExpression maxSize;
         private final String elementsToTransfer;
+        private final String onPacket, onField;
 
         private String elementsToTransferType = null;
 
-        public ArrayDeclaration(IntExpression maxSize, String elementsToTransfer) {
+        public ArrayDeclaration(IntExpression maxSize, String elementsToTransfer, String onPacket, String onField) {
             this.maxSize = maxSize;
             this.elementsToTransfer = elementsToTransfer;
+            this.onField = onField;
+            this.onPacket = onPacket;
         }
 
         public String getMaxSize() {
@@ -290,7 +308,7 @@ public class Field {
         public String getElementsToTransfer() throws UndefinedException {
             return (hasTransfer() ?
                     "this." + elementsToTransfer + ".getValue()" + toInt(elementsToTransferType,
-                                                                         onPacket, fieldName, this) :
+                                                                         onPacket, onField, this) :
                     elementsToTransfer);
         }
 
@@ -314,7 +332,7 @@ public class Field {
 
         private void assumeInitialized() throws UndefinedException {
             if (hasTransfer() && null == elementsToTransferType)
-                throw new UndefinedException("Field " + fieldName +
+                throw new UndefinedException("Field " + onField +
                     " in " + onPacket +
                     " refers to a field " + getFieldThatHoldsSize() + " that don't exist");
         }
