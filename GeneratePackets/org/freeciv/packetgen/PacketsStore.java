@@ -150,6 +150,8 @@ public class PacketsStore {
                 packetFlags.add(new Annotate(IsInfo.class.getSimpleName()));
             else if ("is-game-info".equals(flag.getName()))
                 packetFlags.add(new Annotate(IsGameInfo.class.getSimpleName()));
+            else if ("force".equals(flag.getName()))
+                packetFlags.add(new Annotate(Force.class.getSimpleName()));
             else if ("cancel".equals(flag.getName()))
                 canceled.add(flag.getArguments()[0]);
 
