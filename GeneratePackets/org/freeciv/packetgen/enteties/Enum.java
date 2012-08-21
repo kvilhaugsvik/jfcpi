@@ -247,7 +247,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         private final boolean valid;
 
         protected EnumElementFC(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
-            super(comment, elementName, valueGen + ", " + toStringName + (!valid ? ", " + valid : ""));
+            super(comment, elementName, parList(valueGen, toStringName, valid));
 
             // Look up numbers in a uniform way
             if (null == toStringName)
@@ -256,6 +256,19 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
             this.valueGen = valueGen;
             this.toStringName = toStringName;
             this.valid = valid;
+        }
+
+        private static String[] parList(String valueGen, String toStringName, boolean valid) {
+            String[] out;
+            if (valid) {
+                out = new String[2];
+            } else {
+                out = new String[3];
+                out[2] = valid + "";
+            }
+            out[0] = valueGen;
+            out[1] = toStringName;
+            return out;
         }
 
         public String getValueGenerator() {

@@ -367,7 +367,7 @@ public class CodeGenTest {
         toWrite.addEnumerated(EnumElement.newEnumValue(null, "ONE", "1"));
         toWrite.addEnumerated(EnumElement.newEnumValue(null, "TWO", "2"));
         toWrite.addEnumerated(EnumElement.newEnumValue(null, "THREE", "3"));
-        toWrite.addEnumerated(EnumElement.newEnumValue("SMALLEST", "-2"));
+        toWrite.addEnumerated(EnumElement.newEnumValue(null, "SMALLEST", "-2"));
         toWrite.addEnumerated(EnumElement.newEnumValue(null, "INVALID", "-1"));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +

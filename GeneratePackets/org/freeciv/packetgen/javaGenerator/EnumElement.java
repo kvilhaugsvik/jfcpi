@@ -14,12 +14,14 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.Util;
+
 public class EnumElement {
     private final String comment;
     private final String elementName;
-    private final String paramlist;
+    private final String[] paramlist;
 
-    protected EnumElement(String comment, String elementName, String params) {
+    protected EnumElement(String comment, String elementName, String... params) {
         if (null == elementName)
             throw new IllegalArgumentException("All elements of enums must have names");
 
@@ -33,18 +35,14 @@ public class EnumElement {
     }
 
     public String toString() {
-        return elementName + " (" + paramlist + ")" + ClassWriter.ifIs(" /* ", comment, " */");
+        return elementName + " (" + Util.joinStringArray(paramlist, ", ", "", "") + ")" + ClassWriter.ifIs(" /* ", comment, " */");
     }
 
     public static EnumElement newEnumValue(String enumValueName) {
-        return newEnumValue(null, enumValueName, null);
+        return new EnumElement(null, enumValueName);
     }
 
-    public static EnumElement newEnumValue(String enumValueName, String params) {
-        return newEnumValue(null, enumValueName, params);
-    }
-
-    public static EnumElement newEnumValue(String comment, String enumValueName, String params) {
+    public static EnumElement newEnumValue(String comment, String enumValueName, String... params) {
         return new EnumElement(comment, enumValueName, params);
     }
 }
