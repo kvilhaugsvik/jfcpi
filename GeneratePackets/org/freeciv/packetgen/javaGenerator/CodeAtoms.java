@@ -40,6 +40,10 @@ public class CodeAtoms {
         this.reason = reason;
     }
 
+    public CodeAtom get(int number) {
+        return atoms.get(number);
+    }
+
     public CodeAtom[] getAtoms() {
         return atoms.toArray(new CodeAtom[0]);
     }
