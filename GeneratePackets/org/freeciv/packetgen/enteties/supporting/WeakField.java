@@ -20,11 +20,13 @@ import java.util.List;
 public class WeakField {
     private final String name, type;
     private final ArrayDeclaration[] declarations;
+    private final List<WeakFlag> flags;
 
     public WeakField(String name, String kind, List<WeakFlag> flags, ArrayDeclaration... declarations) {
         this.name = name;
         this.type = kind;
         this.declarations = declarations;
+        this.flags = flags;
     }
 
     public String getType() {
@@ -37,6 +39,10 @@ public class WeakField {
 
     public ArrayDeclaration[] getDeclarations() {
         return declarations;
+    }
+
+    public List<WeakFlag> getFlags() {
+        return flags;
     }
 
     public static class ArrayDeclaration {

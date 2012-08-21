@@ -30,9 +30,14 @@ public class Field extends Var {
     private final FieldTypeBasic.FieldTypeAlias type;
     private final ArrayDeclaration[] declarations;
 
-    public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
+    @Deprecated public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
                  WeakField.ArrayDeclaration... declarations) {
-        super(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+        this(fieldName, typeAlias, onPacket, Collections.<WeakFlag>emptyList(), declarations);
+    }
+
+    public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket, List<WeakFlag> flags,
+                 WeakField.ArrayDeclaration... declarations) {
+        super(fieldFlagsToAnnotations(flags), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
               typeAlias.getName() + getArrayDeclaration(typeAlias, decWeakToStrong(declarations, onPacket, fieldName)),
               fieldName, null);
 
@@ -43,6 +48,12 @@ public class Field extends Var {
         this.onPacket = onPacket;
 
         this.declarations = decWeakToStrong(declarations, onPacket, fieldName);
+    }
+
+    private static List<Annotate> fieldFlagsToAnnotations(List<WeakFlag> flags) {
+        LinkedList<Annotate> annotations = new LinkedList<Annotate>();
+
+        return annotations;
     }
 
     private static ArrayDeclaration[] decWeakToStrong(WeakField.ArrayDeclaration[] declarations,

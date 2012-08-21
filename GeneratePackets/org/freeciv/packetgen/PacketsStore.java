@@ -170,6 +170,7 @@ public class PacketsStore {
                 fieldList.add(new Field(fieldType.getName(),
                                         (FieldTypeAlias)requirements.getPotentialProvider(req),
                                         name,
+                                        fieldType.getFlags(),
                                         fieldType.getDeclarations()));
             } else
                 missingWhenNeeded.add(req);
