@@ -84,6 +84,13 @@ public class CodeStyleBuilder {
                 firstMatchOnly.add(stdIns);
             }
 
+            final ArrayList<AtomCheck> triggerMany = new ArrayList<AtomCheck>(); {
+                for (CodeAtom atom : chScopeAfter.keySet())
+                    triggerMany.add(AtomCheck.leftIs(atom, chScopeAfter.get(atom)));
+                for (CodeAtom atom : chScopeBefore.keySet())
+                    triggerMany.add(AtomCheck.rightIs(atom, chScopeBefore.get(atom)));
+            }
+
             @Override
             public List<String> asFormattedLines(CodeAtoms from) {
                 final CodeAtom[] atoms = from.getAtoms();
@@ -105,15 +112,22 @@ public class CodeStyleBuilder {
                     firstMatchOnlyKnowStack.add(rule.forStack(scopeStack));
                 }
 
+                ArrayList<CompiledAtomCheck> allMatchesKnowStack = new ArrayList<CompiledAtomCheck>();
+                for (AtomCheck rule : triggerMany) {
+                    allMatchesKnowStack.add(rule.forStack(scopeStack));
+                }
+
                 int pointerAfter = 0;
                 int lineBeganAt;
                 while (pointerAfter < atoms.length) {
                     StringBuilder line = new StringBuilder();
                     lineBeganAt = pointerAfter;
                     line: while (pointerAfter < atoms.length) {
-                        checkScopeChange(atoms[pointerAfter], chScopeBefore, scopeStack);
+                        for (CompiledAtomCheck rule : allMatchesKnowStack)
+                            if (rule.isTrueFor(getOrNull(atoms, pointerAfter), getOrNull(atoms, pointerAfter + 1)))
+                                doAction(rule.getToInsert(), scopeStack);
+
                         line.append(atoms[pointerAfter].get());
-                        checkScopeChange(atoms[pointerAfter], chScopeAfter, scopeStack);
 
                         if (tryLineBreakAt < line.length() && scopeStack.get().lineBreakTry < maxLineBreakAttempts) {
                             pointerAfter = lineBeganAt;
@@ -152,17 +166,15 @@ public class CodeStyleBuilder {
                 }
             }
 
-            private void checkScopeChange(CodeAtom atom, HashMap<CodeAtom, CodeStyle.Action> chScope,
-                                          CodeStyle.ScopeStack<ScopeInfo> scopeStack) {
-                if (chScope.containsKey(atom))
-                    switch (chScope.get(atom)) {
-                        case SCOPE_ENTER:
-                            scopeStack.open();
-                            break;
-                        case SCOPE_EXIT:
-                            scopeStack.close();
-                            break;
-                    }
+            private void doAction(Action action, CodeStyle.ScopeStack<ScopeInfo> scopeStack) {
+                switch (action) {
+                    case SCOPE_ENTER:
+                        scopeStack.open();
+                        break;
+                    case SCOPE_EXIT:
+                        scopeStack.close();
+                        break;
+                }
             }
         };
     }
