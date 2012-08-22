@@ -494,10 +494,10 @@ public class ClassWriter {
 
     public static final CodeStyle DEFAULT_STYLE;
     static {
-        final CodeStyleBuilder<CodeStyleBuilder.ScopeInfo> maker =
-                new CodeStyleBuilder<CodeStyleBuilder.ScopeInfo>(
+        final CodeStyleBuilder<DefaultStyleScopeInfo> maker =
+                new CodeStyleBuilder<DefaultStyleScopeInfo>(
                         CodeStyle.Action.INSERT_SPACE,
-                        CodeStyleBuilder.ScopeInfo.class);
+                        DefaultStyleScopeInfo.class);
 
         maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
@@ -509,18 +509,18 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.RSC, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.RPR, CodeStyle.Action.DO_NOTHING);
-        maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
-            @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
+        maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 1 < argument.getLineBreakTry();
             }
         });
-        maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
-            @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
+        maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 0 < argument.getLineBreakTry();
             }
         });
-        maker.whenBefore(HasAtoms.ALE, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
-            @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
+        maker.whenBefore(HasAtoms.ALE, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 0 < argument.getLineBreakTry();
             }
         });
@@ -540,12 +540,22 @@ public class ClassWriter {
         maker.changeScopeBefore(HasAtoms.RPR, CodeStyle.Action.SCOPE_EXIT);
         maker.changeScopeAfter(HasAtoms.LSC, CodeStyle.Action.SCOPE_ENTER);
         maker.changeScopeBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
-        maker.alwaysOnState(new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
-            @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo info) {
-                return 110 <= info.getLineLength() && info.getLineBreakTry() < 10;
+        maker.alwaysOnState(new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override public boolean isTrueFor(DefaultStyleScopeInfo info) {
+                boolean toLong = 110 <= info.getLineLength() && info.getLineBreakTry() < 10;
+                if (toLong) info.lineBreakTry++; //TODO: Stop doing as a side effect
+                return toLong;
             }
         }, CodeStyle.Action.RESET_LINE);
 
         DEFAULT_STYLE = maker.getStyle();
+    }
+
+    public static class DefaultStyleScopeInfo extends CodeStyleBuilder.ScopeInfo {
+        private int lineBreakTry = 0;
+
+        public int getLineBreakTry() {
+            return lineBreakTry;
+        }
     }
 }

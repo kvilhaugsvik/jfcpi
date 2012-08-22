@@ -138,8 +138,6 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                                         break;
                                     case RESET_LINE:
                                         pointerAfter = lineBeganAt;
-                                        ScopeInfoKind scopeInfo = scopeStack.get();
-                                        scopeInfo.setLineBreakTry(scopeInfo.getLineBreakTry() + 1);
                                         line = new StringBuilder();
                                         continue line;
                                 }
@@ -305,19 +303,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
     }
 
     public static class ScopeInfo {
-        private int lineBreakTry = 0;
         private int lineLength = 0;
-
-        public int getLineBreakTry() {
-            return lineBreakTry;
-        }
 
         public int getLineLength() {
             return lineLength;
-        }
-
-        void setLineBreakTry(int number) {
-            lineBreakTry = number;
         }
 
         void setLineLength(int length) {
