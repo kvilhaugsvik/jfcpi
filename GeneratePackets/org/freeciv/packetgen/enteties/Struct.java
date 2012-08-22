@@ -17,12 +17,14 @@ package org.freeciv.packetgen.enteties;
 import org.freeciv.Util;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.javaGenerator.ClassKind;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
-import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
+
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class Struct extends ClassWriter implements IDependency {
     private final Set<Requirement> iRequire;
@@ -38,16 +40,21 @@ public class Struct extends ClassWriter implements IDependency {
         for (Map.Entry<String, String> field: fields) {
             addObjectConstant(field.getKey(), field.getValue());
             addMethodPublicReadObjectState(null, field.getKey(), "get" + field.getValue(),
-                    "return " + "this." + field.getValue() + ";");
+                    new Block(RETURN(getField(field.getValue()).ref())));
         }
 
-        String[] varNames = new String[fields.size()];
-        for (int index = 0; index < fields.size(); index++) {
-            varNames[index] = "\"" + fields.get(index).getValue() + ": \"" + " + " +
-                    "this." + fields.get(index).getValue();
+        AValue varsToString = literalString("(");
+        for (int i = 0; i < fields.size(); i++) {
+            if (0 != i)
+                varsToString = sum(varsToString, literalString(", "));
+            varsToString = sum(
+                    varsToString,
+                    literalString(fields.get(i).getValue() + ": "),
+                    getField(fields.get(i).getValue()).ref());
         }
+        varsToString = sum(varsToString, literalString(")"));
         addMethodPublicReadObjectState(null, "String", "toString",
-                "return " + Util.joinStringArray(varNames, " + \", \" + ", "\"(\" + ", " + \")\"") + ";");
+                new Block(RETURN(varsToString)));
 
         iRequire = willNeed;
         iProvide = new Requirement("struct" + " " + name, Requirement.Kind.AS_JAVA_DATATYPE);
