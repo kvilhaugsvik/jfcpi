@@ -15,11 +15,14 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
-public class EnumElement {
+public class EnumElement extends Formatted implements HasAtoms {
     private final String comment;
     private final String elementName;
-    private final String[] paramlist;
+    private final AValue[] paramlist;
 
     protected EnumElement(String comment, String elementName, String... params) {
         if (null == elementName)
@@ -27,15 +30,30 @@ public class EnumElement {
 
         this.comment = comment;
         this.elementName = elementName;
-        this.paramlist = params;
+        this.paramlist = new AValue[params.length];
+        for (int i = 0; i < params.length; i++)
+            this.paramlist[i] = BuiltIn.asAValue(params[i]);
     }
 
     public String getEnumValueName() {
         return elementName;
     }
 
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        to.add(new CodeAtom(elementName));
+        to.add(LPR);
+        to.joinSep(SEP, paramlist);
+        to.add(RPR);
+        if (null != comment) {
+            to.add(CCommentStart);
+            to.add(new CodeAtom(comment));
+            to.add(CCommentEnd);
+        }
+    }
+
     public String toString() {
-        return elementName + "(" + Util.joinStringArray(paramlist, ", ", "", "") + ")" + ClassWriter.ifIs(" /* ", comment, " */");
+        return this.getJavaCode();
     }
 
     public static EnumElement newEnumValue(String enumValueName) {

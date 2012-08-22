@@ -15,6 +15,8 @@
 package org.freeciv.packetgen.javaGenerator;
 
 public interface HasAtoms {
+    public static final CodeAtom CCommentStart = new CodeAtom("/*");
+    public static final CodeAtom CCommentEnd = new CodeAtom("*/");
     public static final CodeAtom EOL = new CodeAtom(";");
     public static final CodeAtom SEP = new CodeAtom(",");
     public static final CodeAtom LSC = new CodeAtom("{");
