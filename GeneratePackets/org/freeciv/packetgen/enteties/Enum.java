@@ -98,9 +98,9 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName,
                   "int number, String toStringName, boolean valid",
                   null,
-                  "this.number = number;",
-                  "this.toStringName = toStringName;",
-                  "this.valid = valid;");
+                  new Block(setFieldToVariableSameName("number"),
+                            setFieldToVariableSameName("toStringName"),
+                            setFieldToVariableSameName("valid")));
 
         addMethodPublicReadObjectState(null, "int", "getNumber",
                 new Block(BuiltIn.RETURN(this.getField("number").ref())));
