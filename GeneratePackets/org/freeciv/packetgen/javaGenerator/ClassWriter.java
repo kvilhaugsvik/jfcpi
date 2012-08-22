@@ -494,7 +494,7 @@ public class ClassWriter {
 
     public static final CodeStyle DEFAULT_STYLE;
     static {
-        final CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Action.INSERT_SPACE, 110, 10);
+        final CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Action.INSERT_SPACE);
         maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
         maker.whenAfter(HasAtoms.LSC, CodeStyle.Action.BREAK_LINE);
@@ -536,6 +536,11 @@ public class ClassWriter {
         maker.changeScopeBefore(HasAtoms.RPR, CodeStyle.Action.SCOPE_EXIT);
         maker.changeScopeAfter(HasAtoms.LSC, CodeStyle.Action.SCOPE_ENTER);
         maker.changeScopeBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
+        maker.alwaysOnState(new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
+            @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo info) {
+                return 110 <= info.getLineLength() && info.getLineBreakTry() < 10;
+            }
+        }, CodeStyle.Action.RESET_LINE);
 
         DEFAULT_STYLE = maker.getStyle();
     }

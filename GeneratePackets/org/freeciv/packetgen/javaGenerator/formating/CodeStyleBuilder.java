@@ -21,21 +21,22 @@ import java.util.*;
 
 public class CodeStyleBuilder {
     private final LinkedList<AtomCheck> triggers;
+    private final LinkedList<AtomCheck> many;
     private final HashMap<CodeAtom, CodeStyle.Action> chScopeBefore;
     private final HashMap<CodeAtom, CodeStyle.Action> chScopeAfter;
     private final AtomCheck stdIns;
-    private final int tryLineBreakAt;
-    private final int maxLineBreakAttempts;
 
-    public CodeStyleBuilder(final CodeStyle.Action standard, int tryLineBreakAt, int maxLineBreakAttempts) {
-        this.tryLineBreakAt = tryLineBreakAt;
-        this.maxLineBreakAttempts = maxLineBreakAttempts;
-
+    public CodeStyleBuilder(final CodeStyle.Action standard) {
         triggers = new LinkedList<AtomCheck>();
         this.stdIns = AtomCheck.alwaysTrue(standard);
 
         this.chScopeBefore = new HashMap<CodeAtom, CodeStyle.Action>();
         this.chScopeAfter = new HashMap<CodeAtom, CodeStyle.Action>();
+        this.many = new LinkedList<AtomCheck>();
+    }
+
+    public void alwaysOnState(Util.OneCondition<ScopeInfo> when, CodeStyle.Action doThis) {
+        many.add(AtomCheck.scopeIs(when, doThis));
     }
 
     public void changeScopeAfter(CodeAtom atom, CodeStyle.Action change) {
@@ -84,7 +85,7 @@ public class CodeStyleBuilder {
                 firstMatchOnly.add(stdIns);
             }
 
-            final ArrayList<AtomCheck> triggerMany = new ArrayList<AtomCheck>(); {
+            final ArrayList<AtomCheck> triggerMany = new ArrayList<AtomCheck>(many); {
                 for (CodeAtom atom : chScopeAfter.keySet())
                     triggerMany.add(AtomCheck.leftIs(atom, chScopeAfter.get(atom)));
                 for (CodeAtom atom : chScopeBefore.keySet())
@@ -125,16 +126,22 @@ public class CodeStyleBuilder {
                     line: while (pointerAfter < atoms.length) {
                         for (CompiledAtomCheck rule : allMatchesKnowStack)
                             if (rule.isTrueFor(getOrNull(atoms, pointerAfter), getOrNull(atoms, pointerAfter + 1)))
-                                doAction(rule.getToInsert(), scopeStack);
+                                switch (rule.getToInsert()) {
+                                    case SCOPE_ENTER:
+                                        scopeStack.open();
+                                        break;
+                                    case SCOPE_EXIT:
+                                        scopeStack.close();
+                                        break;
+                                    case RESET_LINE:
+                                        pointerAfter = lineBeganAt;
+                                        scopeStack.get().lineBreakTry++;
+                                        line = new StringBuilder();
+                                        continue line;
+                                }
 
                         line.append(atoms[pointerAfter].get());
-
-                        if (tryLineBreakAt < line.length() && scopeStack.get().lineBreakTry < maxLineBreakAttempts) {
-                            pointerAfter = lineBeganAt;
-                            scopeStack.get().lineBreakTry++;
-                            line = new StringBuilder();
-                            continue;
-                        }
+                        scopeStack.get().lineLength = line.length();
 
                         switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck>getFirstFound(
                                 firstMatchOnlyKnowStack,
@@ -166,16 +173,6 @@ public class CodeStyleBuilder {
                 }
             }
 
-            private void doAction(Action action, CodeStyle.ScopeStack<ScopeInfo> scopeStack) {
-                switch (action) {
-                    case SCOPE_ENTER:
-                        scopeStack.open();
-                        break;
-                    case SCOPE_EXIT:
-                        scopeStack.close();
-                        break;
-                }
-            }
         };
     }
 
@@ -287,13 +284,27 @@ public class CodeStyleBuilder {
                 }
             }, toInsert, ignoresScope);
         }
+
+        public static AtomCheck scopeIs(Util.OneCondition<ScopeInfo> when, CodeStyle.Action doThis) {
+            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+                @Override
+                public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                    return true;
+                }
+            }, doThis, when);
+        }
     }
 
     public static class ScopeInfo {
         private int lineBreakTry = 0;
+        private int lineLength = 0;
 
         public int getLineBreakTry() {
             return lineBreakTry;
+        }
+
+        public int getLineLength() {
+            return lineLength;
         }
     }
 }

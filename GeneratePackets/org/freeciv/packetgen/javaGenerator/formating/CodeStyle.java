@@ -28,6 +28,7 @@ public interface CodeStyle {
         DO_NOTHING,
         INSERT_SPACE,
         BREAK_LINE,
+        RESET_LINE,
         SCOPE_ENTER,
         SCOPE_EXIT
     }
