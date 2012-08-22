@@ -24,15 +24,12 @@ import java.util.List;
 public interface CodeStyle {
     public List<String> asFormattedLines(CodeAtoms from);
 
-    enum Insert {
-        NOTHING,
-        SPACE,
-        LINE_BREAK
-    }
-
-    public enum ChangeScope {
-        ENTER,
-        EXIT
+    enum Action {
+        DO_NOTHING,
+        INSERT_SPACE,
+        BREAK_LINE,
+        SCOPE_ENTER,
+        SCOPE_EXIT
     }
 
     public static class ScopeStack<Scope> {

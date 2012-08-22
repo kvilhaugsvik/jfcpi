@@ -494,48 +494,48 @@ public class ClassWriter {
 
     public static final CodeStyle DEFAULT_STYLE;
     static {
-        final CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Insert.SPACE, 110, 10);
-        maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Insert.SPACE);
-        maker.whenAfter(HasAtoms.EOL, CodeStyle.Insert.LINE_BREAK);
-        maker.whenAfter(HasAtoms.LSC, CodeStyle.Insert.LINE_BREAK);
-        maker.whenAfter(HasAtoms.RSC, CodeStyle.Insert.LINE_BREAK);
-        maker.whenBefore(HasAtoms.EOL, CodeStyle.Insert.NOTHING);
-        maker.whenBefore(HasAtoms.FORSEP, CodeStyle.Insert.NOTHING);
-        maker.whenAfter(HasAtoms.HAS, CodeStyle.Insert.NOTHING);
-        maker.whenBefore(HasAtoms.HAS, CodeStyle.Insert.NOTHING);
-        maker.whenBefore(HasAtoms.RSC, CodeStyle.Insert.NOTHING);
-        maker.whenBefore(HasAtoms.RPR, CodeStyle.Insert.NOTHING);
-        maker.whenAfter(HasAtoms.SEP, CodeStyle.Insert.LINE_BREAK, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
+        final CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Action.INSERT_SPACE, 110, 10);
+        maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
+        maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
+        maker.whenAfter(HasAtoms.LSC, CodeStyle.Action.BREAK_LINE);
+        maker.whenAfter(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
+        maker.whenBefore(HasAtoms.EOL, CodeStyle.Action.DO_NOTHING);
+        maker.whenBefore(HasAtoms.FORSEP, CodeStyle.Action.DO_NOTHING);
+        maker.whenAfter(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
+        maker.whenBefore(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
+        maker.whenBefore(HasAtoms.RSC, CodeStyle.Action.DO_NOTHING);
+        maker.whenBefore(HasAtoms.RPR, CodeStyle.Action.DO_NOTHING);
+        maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
             @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
                 return 1 < argument.getLineBreakTry();
             }
         });
-        maker.whenAfter(HasAtoms.ALS, CodeStyle.Insert.LINE_BREAK, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
+        maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
             @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
                 return 0 < argument.getLineBreakTry();
             }
         });
-        maker.whenBefore(HasAtoms.ALE, CodeStyle.Insert.LINE_BREAK, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
+        maker.whenBefore(HasAtoms.ALE, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<CodeStyleBuilder.ScopeInfo>() {
             @Override public boolean isTrueFor(CodeStyleBuilder.ScopeInfo argument) {
                 return 0 < argument.getLineBreakTry();
             }
         });
-        maker.whenAfter(HasAtoms.ALS, CodeStyle.Insert.NOTHING);
-        maker.whenBefore(HasAtoms.ALE, CodeStyle.Insert.NOTHING);
-        maker.whenBefore(HasAtoms.SEP, CodeStyle.Insert.NOTHING);
-        maker.whenBetween(HasAtoms.WHILE, HasAtoms.LPR, CodeStyle.Insert.SPACE);
-        maker.whenBetween(HasAtoms.IF, HasAtoms.LPR, CodeStyle.Insert.SPACE);
-        maker.whenBetween(HasAtoms.FOR, HasAtoms.LPR, CodeStyle.Insert.SPACE);
-        maker.whenBefore(HasAtoms.LPR, CodeStyle.Insert.NOTHING);
-        maker.whenAfter(HasAtoms.LPR, CodeStyle.Insert.NOTHING);
-        maker.atTheEnd(CodeStyle.Insert.NOTHING);
+        maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.DO_NOTHING);
+        maker.whenBefore(HasAtoms.ALE, CodeStyle.Action.DO_NOTHING);
+        maker.whenBefore(HasAtoms.SEP, CodeStyle.Action.DO_NOTHING);
+        maker.whenBetween(HasAtoms.WHILE, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
+        maker.whenBetween(HasAtoms.IF, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
+        maker.whenBetween(HasAtoms.FOR, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
+        maker.whenBefore(HasAtoms.LPR, CodeStyle.Action.DO_NOTHING);
+        maker.whenAfter(HasAtoms.LPR, CodeStyle.Action.DO_NOTHING);
+        maker.atTheEnd(CodeStyle.Action.DO_NOTHING);
 
-        maker.changeScopeAfter(HasAtoms.ALS, CodeStyle.ChangeScope.ENTER);
-        maker.changeScopeBefore(HasAtoms.ALE, CodeStyle.ChangeScope.EXIT);
-        maker.changeScopeAfter(HasAtoms.LPR, CodeStyle.ChangeScope.ENTER);
-        maker.changeScopeBefore(HasAtoms.RPR, CodeStyle.ChangeScope.EXIT);
-        maker.changeScopeAfter(HasAtoms.LSC, CodeStyle.ChangeScope.ENTER);
-        maker.changeScopeBefore(HasAtoms.RSC, CodeStyle.ChangeScope.EXIT);
+        maker.changeScopeAfter(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
+        maker.changeScopeBefore(HasAtoms.ALE, CodeStyle.Action.SCOPE_EXIT);
+        maker.changeScopeAfter(HasAtoms.LPR, CodeStyle.Action.SCOPE_ENTER);
+        maker.changeScopeBefore(HasAtoms.RPR, CodeStyle.Action.SCOPE_EXIT);
+        maker.changeScopeAfter(HasAtoms.LSC, CodeStyle.Action.SCOPE_ENTER);
+        maker.changeScopeBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
 
         DEFAULT_STYLE = maker.getStyle();
     }

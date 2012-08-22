@@ -21,13 +21,13 @@ import java.util.*;
 
 public class CodeStyleBuilder {
     private final LinkedList<AtomCheck> triggers;
-    private final HashMap<CodeAtom, CodeStyle.ChangeScope> chScopeBefore;
-    private final HashMap<CodeAtom, CodeStyle.ChangeScope> chScopeAfter;
+    private final HashMap<CodeAtom, CodeStyle.Action> chScopeBefore;
+    private final HashMap<CodeAtom, CodeStyle.Action> chScopeAfter;
     private final AtomCheck stdIns;
     private final int tryLineBreakAt;
     private final int maxLineBreakAttempts;
 
-    public CodeStyleBuilder(final CodeStyle.Insert standard, int tryLineBreakAt, int maxLineBreakAttempts) {
+    public CodeStyleBuilder(final CodeStyle.Action standard, int tryLineBreakAt, int maxLineBreakAttempts) {
         this.tryLineBreakAt = tryLineBreakAt;
         this.maxLineBreakAttempts = maxLineBreakAttempts;
 
@@ -38,23 +38,23 @@ public class CodeStyleBuilder {
             }
         }, standard, ignoresScope);
 
-        this.chScopeBefore = new HashMap<CodeAtom, CodeStyle.ChangeScope>();
-        this.chScopeAfter = new HashMap<CodeAtom, CodeStyle.ChangeScope>();
+        this.chScopeBefore = new HashMap<CodeAtom, CodeStyle.Action>();
+        this.chScopeAfter = new HashMap<CodeAtom, CodeStyle.Action>();
     }
 
-    public void changeScopeAfter(CodeAtom atom, CodeStyle.ChangeScope change) {
+    public void changeScopeAfter(CodeAtom atom, CodeStyle.Action change) {
         chScopeAfter.put(atom, change);
     }
 
-    public void changeScopeBefore(CodeAtom atom, CodeStyle.ChangeScope change) {
+    public void changeScopeBefore(CodeAtom atom, CodeStyle.Action change) {
         chScopeBefore.put(atom, change);
     }
 
-    public void whenAfter(final CodeAtom atom, CodeStyle.Insert toInsert) {
+    public void whenAfter(final CodeAtom atom, CodeStyle.Action toInsert) {
         whenAfter(atom, toInsert, ignoresScope);
     }
 
-    public void whenAfter(final CodeAtom atom, CodeStyle.Insert toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
+    public void whenAfter(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
         triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                 return null != before && atom.equals(before);
@@ -62,11 +62,11 @@ public class CodeStyleBuilder {
         }, toInsert, scopeCond));
     }
 
-    public void whenBefore(final CodeAtom atom, CodeStyle.Insert toInsert) {
+    public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert) {
         whenBefore(atom, toInsert, ignoresScope);
     }
 
-    public void whenBefore(final CodeAtom atom, CodeStyle.Insert toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
+    public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
         triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                 return null != after && atom.equals(after);
@@ -74,11 +74,11 @@ public class CodeStyleBuilder {
         }, toInsert, scopeCond));
     }
 
-    public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Insert toInsert) {
+    public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
         whenBetween(before, after, toInsert, ignoresScope);
     }
 
-    public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Insert toInsert,
+    public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert,
                             Util.OneCondition<ScopeInfo> scopeCond) {
         triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override public boolean isTrueFor(CodeAtom left, CodeAtom right) {
@@ -87,7 +87,7 @@ public class CodeStyleBuilder {
         }, toInsert, scopeCond));
     }
 
-    public void atTheEnd(CodeStyle.Insert toInsert) {
+    public void atTheEnd(CodeStyle.Action toInsert) {
         triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom before, CodeAtom after) {
@@ -148,14 +148,14 @@ public class CodeStyleBuilder {
                                 getOrNull(atoms, pointerAfter),
                                 getOrNull(atoms, pointerAfter + 1)
                         ).getToInsert()) {
-                            case SPACE:
+                            case INSERT_SPACE:
                                 pointerAfter++;
                                 line.append(" ");
                                 break;
-                            case LINE_BREAK:
+                            case BREAK_LINE:
                                 pointerAfter++;
                                 break line;
-                            case NOTHING:
+                            case DO_NOTHING:
                                 pointerAfter++;
                                 break;
                         }
@@ -173,14 +173,14 @@ public class CodeStyleBuilder {
                 }
             }
 
-            private void checkScopeChange(CodeAtom atom, HashMap<CodeAtom, CodeStyle.ChangeScope> chScope,
+            private void checkScopeChange(CodeAtom atom, HashMap<CodeAtom, CodeStyle.Action> chScope,
                                           CodeStyle.ScopeStack<ScopeInfo> scopeStack) {
                 if (chScope.containsKey(atom))
                     switch (chScope.get(atom)) {
-                        case ENTER:
+                        case SCOPE_ENTER:
                             scopeStack.open();
                             break;
-                        case EXIT:
+                        case SCOPE_EXIT:
                             scopeStack.close();
                             break;
                     }
@@ -197,7 +197,7 @@ public class CodeStyleBuilder {
             this.stack = stack;
         }
 
-        public CodeStyle.Insert getToInsert() {
+        public CodeStyle.Action getToInsert() {
             return check.getToInsert();
         }
 
@@ -214,10 +214,10 @@ public class CodeStyleBuilder {
 
     private class AtomCheck {
         private final Util.TwoConditions<CodeAtom, CodeAtom> test;
-        private final CodeStyle.Insert toInsert;
+        private final CodeStyle.Action toInsert;
         private final Util.OneCondition<ScopeInfo> scopeTest;
 
-        public AtomCheck(Util.TwoConditions<CodeAtom, CodeAtom> positionTest, CodeStyle.Insert toInsert,
+        public AtomCheck(Util.TwoConditions<CodeAtom, CodeAtom> positionTest, CodeStyle.Action toInsert,
                          Util.OneCondition<ScopeInfo> scopeTest) {
             this.test = positionTest;
             this.scopeTest = scopeTest;
@@ -228,7 +228,7 @@ public class CodeStyleBuilder {
             return new CompiledAtomCheck(this, scope);
         }
 
-        public CodeStyle.Insert getToInsert() {
+        public CodeStyle.Action getToInsert() {
             return toInsert;
         }
 
