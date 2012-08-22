@@ -47,4 +47,10 @@ public class MethodCallStatic extends Formatted implements HasAtoms {
             to.add(CCommentEnd);
         }
     }
+
+    public static class AReturnable extends MethodCallStatic implements Returnable {
+        public AReturnable(String comment, String name, String... params) {
+            super(comment, name, params);
+        }
+    }
 }
