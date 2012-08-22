@@ -32,11 +32,7 @@ public class CodeStyleBuilder {
         this.maxLineBreakAttempts = maxLineBreakAttempts;
 
         triggers = new LinkedList<AtomCheck>();
-        this.stdIns = new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom codeAtom, CodeAtom codeAtom1) {
-                return true;
-            }
-        }, standard, ignoresScope);
+        this.stdIns = AtomCheck.alwaysTrue(standard);
 
         this.chScopeBefore = new HashMap<CodeAtom, CodeStyle.Action>();
         this.chScopeAfter = new HashMap<CodeAtom, CodeStyle.Action>();
@@ -51,49 +47,32 @@ public class CodeStyleBuilder {
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Action toInsert) {
-        whenAfter(atom, toInsert, ignoresScope);
+        triggers.add(AtomCheck.leftIs(atom, toInsert));
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
-        triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-                return null != before && atom.equals(before);
-            }
-        }, toInsert, scopeCond));
+        triggers.add(AtomCheck.leftIs(atom, toInsert, scopeCond));
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert) {
-        whenBefore(atom, toInsert, ignoresScope);
+        triggers.add(AtomCheck.rightIs(atom, toInsert));
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
-        triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-                return null != after && atom.equals(after);
-            }
-        }, toInsert, scopeCond));
+        triggers.add(AtomCheck.rightIs(atom, toInsert, scopeCond));
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
-        whenBetween(before, after, toInsert, ignoresScope);
+        triggers.add(AtomCheck.leftAndRightIs(before, after, toInsert));
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert,
                             Util.OneCondition<ScopeInfo> scopeCond) {
-        triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override public boolean isTrueFor(CodeAtom left, CodeAtom right) {
-                return null != left && null != right && before.equals(left) && after.equals(right);
-            }
-        }, toInsert, scopeCond));
+        triggers.add(AtomCheck.leftAndRightIs(before, after, toInsert, scopeCond));
     }
 
     public void atTheEnd(CodeStyle.Action toInsert) {
-        triggers.add(new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
-            @Override
-            public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-                return null == after;
-            }
-        }, toInsert, ignoresScope));
+        triggers.add(AtomCheck.atTheEnd(toInsert));
     }
 
     public CodeStyle getStyle() {
@@ -188,7 +167,7 @@ public class CodeStyleBuilder {
         };
     }
 
-    private class CompiledAtomCheck implements Util.TwoConditions<CodeAtom, CodeAtom> {
+    private static class CompiledAtomCheck implements Util.TwoConditions<CodeAtom, CodeAtom> {
         private final AtomCheck check;
         private final CodeStyle.ScopeStack<ScopeInfo> stack;
 
@@ -206,13 +185,13 @@ public class CodeStyleBuilder {
         }
     }
 
-    private final Util.OneCondition<ScopeInfo> ignoresScope = new Util.OneCondition<ScopeInfo>() {
-        @Override public boolean isTrueFor(ScopeInfo argument) {
-            return true;
-        }
-    };
+    private static class AtomCheck {
+        private static final Util.OneCondition<ScopeInfo> ignoresScope = new Util.OneCondition<ScopeInfo>() {
+            @Override public boolean isTrueFor(ScopeInfo argument) {
+                return true;
+            }
+        };
 
-    private class AtomCheck {
         private final Util.TwoConditions<CodeAtom, CodeAtom> test;
         private final CodeStyle.Action toInsert;
         private final Util.OneCondition<ScopeInfo> scopeTest;
@@ -238,6 +217,63 @@ public class CodeStyleBuilder {
 
         public Util.OneCondition<ScopeInfo> getScopeTest() {
             return scopeTest;
+        }
+
+        public static AtomCheck leftIs(final CodeAtom atom, CodeStyle.Action toInsert) {
+            return leftIs(atom, toInsert, ignoresScope);
+        }
+
+        public static AtomCheck leftIs(final CodeAtom atom, CodeStyle.Action toInsert,
+                                          Util.OneCondition<ScopeInfo> scopeCond) {
+            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+                @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                    return null != before && atom.equals(before);
+                }
+            }, toInsert, scopeCond);
+        }
+
+        public static AtomCheck rightIs(final CodeAtom atom, CodeStyle.Action toInsert) {
+            return rightIs(atom, toInsert, ignoresScope);
+        }
+
+        public static AtomCheck rightIs(final CodeAtom atom, CodeStyle.Action toInsert,
+                                        Util.OneCondition<ScopeInfo> scopeCond) {
+            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+                @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                    return null != after && atom.equals(after);
+                }
+            }, toInsert, scopeCond);
+        }
+
+        public static AtomCheck leftAndRightIs(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
+            return leftAndRightIs(before, after, toInsert, ignoresScope);
+        }
+
+        public static AtomCheck leftAndRightIs(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert,
+                                Util.OneCondition<ScopeInfo> scopeCond) {
+            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+                @Override public boolean isTrueFor(CodeAtom left, CodeAtom right) {
+                    return null != left && null != right && before.equals(left) && after.equals(right);
+                }
+            }, toInsert, scopeCond);
+        }
+
+        public static AtomCheck atTheEnd(CodeStyle.Action toInsert) {
+            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+                @Override
+                public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                    return null == after;
+                }
+            }, toInsert, ignoresScope);
+        }
+
+        public static AtomCheck alwaysTrue(CodeStyle.Action toInsert) {
+            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+                @Override
+                public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                    return true;
+                }
+            }, toInsert, ignoresScope);
         }
     }
 
