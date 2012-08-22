@@ -38,8 +38,7 @@ public class ClassWriter {
     private final String parent;
     private final String implementsInterface;
 
-    private final LinkedList<Var> constants = new LinkedList<Var>();
-    private final LinkedList<Var> stateVars = new LinkedList<Var>();
+    private final LinkedList<Var> fields = new LinkedList<Var>();
 
     private final LinkedList<Method> methods = new LinkedList<Method>();
     protected final LinkedHashMap<String, EnumElement> enums = new LinkedHashMap<String, EnumElement>();
@@ -75,28 +74,28 @@ public class ClassWriter {
     }
 
     public void addClassConstant(String type, String name, String value) {
-        constants.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
+        fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
                 asAValue(value)));
     }
 
     public void addClassConstant(Visibility visibility, String type, String name, String value) {
-        constants.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, asAValue(value)));
+        fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, asAValue(value)));
     }
 
     public void addClassConstant(String type, String name, AValue value) {
-        constants.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
+        fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
     public void addClassConstant(Visibility visibility, String type, String name, AValue value) {
-        constants.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
+        fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
     public void addObjectConstant(String type, String name) {
-        stateVars.add(Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
+        fields.add(Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addPublicObjectConstant(String type, String name) {
-        stateVars.add(Var.field(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
+        fields.add(Var.field(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addObjectConstantAndGetter(String type, String name) {
@@ -104,7 +103,7 @@ public class ClassWriter {
     }
 
     public void addObjectConstantAndGetter(Var field) {
-        stateVars.add(field);
+        fields.add(field);
         addMethodPublicReadObjectState(
                         null,
                         field.getType(),
@@ -247,8 +246,14 @@ public class ClassWriter {
     private static String formatVariableDeclarations(List<Var> variables) {
         String out = "";
 
+        Scope scopeOfPrevious = (0 < variables.size()?
+                variables.get(0).getScope():
+                null);
         for (Var variable : variables) {
+            if (!variable.getScope().equals(scopeOfPrevious))
+                out += "\n";
             out += variable.getJavaCodeIndented("\t");
+            scopeOfPrevious = variable.getScope();
         }
         if (!variables.isEmpty()) out += "\n";
 
@@ -268,7 +273,7 @@ public class ClassWriter {
     private String constructorFromFields() {
         Block body = new Block();
         LinkedList<Map.Entry<String, String>> args = new LinkedList<Map.Entry<String, String>>();
-        for (Var dec : stateVars) {
+        for (Var dec : fields) {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.getType(), dec.getName()));
         }
@@ -293,8 +298,7 @@ public class ClassWriter {
         if (ClassKind.ENUM == kind)
             out += formatEnumeratedElements();
 
-        out += formatVariableDeclarations(constants);
-        out += formatVariableDeclarations(stateVars);
+        out += formatVariableDeclarations(fields);
 
         if (constructorFromAllFields)
             out += constructorFromFields();
@@ -317,8 +321,8 @@ public class ClassWriter {
     }
 
     public Var getField(String name) {
-        HashSet<Var> allFields = new HashSet<Var>(constants);
-        allFields.addAll(stateVars);
+        HashSet<Var> allFields = new HashSet<Var>(fields);
+        allFields.addAll(fields);
         for (Var field : allFields) {
             if (field.getName().equals(name)) return field;
         }
