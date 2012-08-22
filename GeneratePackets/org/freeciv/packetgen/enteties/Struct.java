@@ -38,7 +38,7 @@ public class Struct extends ClassWriter implements IDependency {
         for (Map.Entry<String, String> field: fields) {
             addObjectConstant(field.getKey(), field.getValue());
             addMethodPublicReadObjectState(null, field.getKey(), "get" + field.getValue(),
-                    "return " + field.getValue() + ";");
+                    "return " + "this." + field.getValue() + ";");
         }
 
         String[] varNames = new String[fields.size()];
