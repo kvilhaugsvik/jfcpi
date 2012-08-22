@@ -712,7 +712,7 @@ public enum test implements FCEnum {
 	}
 
 	public String toString() {
-		return toStringName;
+		return this.toStringName;
 	}
 
 	/**

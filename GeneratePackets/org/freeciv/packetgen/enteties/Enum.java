@@ -102,7 +102,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
 
         addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
         addMethodPublicReadObjectState(null, "boolean", "isValid", "return valid;");
-        addMethodPublicReadObjectState(null, "String", "toString", "return toStringName;");
+        addMethodPublicReadObjectState(null, "String", "toString", "return this.toStringName;");
 
         addMethodReadClassState("/**" + "\n" +
                                         " * Is the enum bitwise? An enum is bitwise if it's number increase by two's"

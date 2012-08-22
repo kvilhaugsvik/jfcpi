@@ -43,7 +43,8 @@ public class Struct extends ClassWriter implements IDependency {
 
         String[] varNames = new String[fields.size()];
         for (int index = 0; index < fields.size(); index++) {
-            varNames[index] = "\"" + fields.get(index).getValue() + ": \"" + " + " + fields.get(index).getValue();
+            varNames[index] = "\"" + fields.get(index).getValue() + ": \"" + " + " +
+                    "this." + fields.get(index).getValue();
         }
         addMethodPublicReadObjectState(null, "String", "toString",
                 "return " + Util.joinStringArray(varNames, " + \", \" + ", "\"(\" + ", " + \")\"") + ";");
