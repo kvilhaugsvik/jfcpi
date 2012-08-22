@@ -3,6 +3,7 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.javaGenerator.MethodCallStatic;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
@@ -43,7 +44,8 @@ public class TerminatedArray extends FieldTypeBasic {
                                                 IF(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
                                                         new Block(current.assign(asAnInt("from.readByte()"))),
                                                         new Block(asVoid("break"))))),
-                                to.assign((asAValue("java.util.Arrays.copyOf(buffer, pos)"))));
+                                to.assign(new MethodCallStatic.RetAValue(null, "java.util.Arrays.copyOf",
+                                        buf.ref(), pos.ref())));
                     }
                 },
               "to.write(value);\n" +
@@ -54,7 +56,8 @@ public class TerminatedArray extends FieldTypeBasic {
               new ExprFrom1<AString, AValue>() {
                   @Override
                   public AString x(AValue arg1) {
-                      return asAString("org.freeciv.Util.joinStringArray(" + arg1 + ", \" \")");
+                      return new MethodCallStatic.RetAString(null, "org.freeciv.Util.joinStringArray",
+                              arg1, literalString(" "));
                   }
               },
               true, Arrays.asList(maxSizeConstant, terminator));
