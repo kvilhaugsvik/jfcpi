@@ -75,6 +75,10 @@ public class BuiltIn {
         };
     }
 
+    public static AString literalString(String javaCode) {
+        return new WrappedString("\"" + javaCode + "\"");
+    }
+
     public static final ExprFrom1<AString, AValue> TO_STRING_OBJECT =
             new ExprFrom1<AString, AValue>() {
                 @Override
@@ -83,6 +87,14 @@ public class BuiltIn {
                 }
             };
 
+    public static AValue sum(final AValue... values) {
+        return new Formatted.FormattedAValue() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.joinSep(ADD, values);
+            }
+        };
+    }
 
     public static AString asAString(String javaCode) {
         return new WrappedString(javaCode);
