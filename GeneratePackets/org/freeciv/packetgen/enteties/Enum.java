@@ -19,6 +19,8 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
@@ -100,9 +102,12 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                   "this.toStringName = toStringName;",
                   "this.valid = valid;");
 
-        addMethodPublicReadObjectState(null, "int", "getNumber", "return this.number;");
-        addMethodPublicReadObjectState(null, "boolean", "isValid", "return this.valid;");
-        addMethodPublicReadObjectState(null, "String", "toString", "return this.toStringName;");
+        addMethodPublicReadObjectState(null, "int", "getNumber",
+                new Block(BuiltIn.RETURN(this.getField("number").ref())));
+        addMethodPublicReadObjectState(null, "boolean", "isValid",
+                new Block(BuiltIn.RETURN(this.getField("valid").ref())));
+        addMethodPublicReadObjectState(null, "String", "toString",
+                new Block(BuiltIn.RETURN(this.getField("toStringName").ref())));
 
         addMethodReadClassState("/**" + "\n" +
                                         " * Is the enum bitwise? An enum is bitwise if it's number increase by two's"
