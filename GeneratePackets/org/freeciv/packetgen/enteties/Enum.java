@@ -100,8 +100,8 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                   "this.toStringName = toStringName;",
                   "this.valid = valid;");
 
-        addMethodPublicReadObjectState(null, "int", "getNumber", "return number;");
-        addMethodPublicReadObjectState(null, "boolean", "isValid", "return valid;");
+        addMethodPublicReadObjectState(null, "int", "getNumber", "return this.number;");
+        addMethodPublicReadObjectState(null, "boolean", "isValid", "return this.valid;");
         addMethodPublicReadObjectState(null, "String", "toString", "return this.toStringName;");
 
         addMethodReadClassState("/**" + "\n" +

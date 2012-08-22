@@ -704,11 +704,11 @@ public enum test implements FCEnum {
 	}
 
 	public int getNumber() {
-		return number;
+		return this.number;
 	}
 
 	public boolean isValid() {
-		return valid;
+		return this.valid;
 	}
 
 	public String toString() {
