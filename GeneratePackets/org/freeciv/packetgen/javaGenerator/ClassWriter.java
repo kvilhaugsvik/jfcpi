@@ -283,8 +283,7 @@ public class ClassWriter {
     public String toString() {
         String out = "";
 
-        if (null != where) out = packageDeclaration(where) + "\n" +
-                "\n";
+        if (null != where) out = "package " + where.getJavaCode() + ";" + "\n" + "\n";
 
         if (null != imports) out += formatImports();
 
@@ -340,10 +339,6 @@ public class ClassWriter {
         Var.SetTo comments =
                 Var.SetTo.strToVal("comments", asAString("\"Auto generated from " + from + "\""));
         return new Annotate("Generated", comments, value);
-    }
-
-    static String packageDeclaration(TargetPackage inPackage) {
-        return "package " + inPackage.getJavaCode() + ";";
     }
 
     private static String indent(String code) {
