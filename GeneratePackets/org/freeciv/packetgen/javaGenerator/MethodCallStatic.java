@@ -25,14 +25,23 @@ public class MethodCallStatic extends Formatted implements HasAtoms {
     private final AValue[] parameters;
 
     public MethodCallStatic(String comment, String name, String... params) {
+        this(comment, name, paramListIsAValue(params));
+    }
+
+    public MethodCallStatic(String comment, String name, AValue... params) {
         if (null == name)
             throw new IllegalArgumentException("No method name given to method call");
 
         this.comment = comment;
         this.method = name;
-        this.parameters = new AValue[params.length];
-        for (int i = 0; i < params.length; i++)
-            this.parameters[i] = BuiltIn.asAValue(params[i]);
+        this.parameters = params;
+    }
+
+    private static AValue[] paramListIsAValue(String[] parameterList) {
+        AValue[] parameters = new AValue[parameterList.length];
+        for (int i = 0; i < parameterList.length; i++)
+            parameters[i] = BuiltIn.asAValue(parameterList[i]);
+        return parameters;
     }
 
     @Override
