@@ -201,7 +201,11 @@ public class Hardcoded {
         handRolledUniversal.addPublicObjectConstant("int", "value");
         handRolledUniversal.addConstructorFields();
         handRolledUniversal.addMethodPublicReadObjectState(null, "String", "toString",
-                "return \"(\" + this.kind + \":\" + this.value + \")\";");
+                new Block(RETURN(sum(literalString("("),
+                        handRolledUniversal.getField("kind").ref(),
+                        literalString(":"),
+                        handRolledUniversal.getField("value").ref(),
+                        literalString(")")))));
         toStorage.addDependency(handRolledUniversal);
     }
 
