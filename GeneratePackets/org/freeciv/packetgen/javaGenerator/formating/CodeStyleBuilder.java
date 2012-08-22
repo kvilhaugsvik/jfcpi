@@ -99,10 +99,10 @@ public class CodeStyleBuilder {
     public CodeStyle getStyle() {
         return new CodeStyle() {
             // Prevent rules added to the builder after style construction from being added to the style
-            final ArrayList<AtomCheck> rules;
+            final ArrayList<AtomCheck> firstMatchOnly;
             {
-                rules = new ArrayList<AtomCheck>(triggers);
-                rules.add(stdIns);
+                firstMatchOnly = new ArrayList<AtomCheck>(triggers);
+                firstMatchOnly.add(stdIns);
             }
 
             @Override
@@ -121,9 +121,9 @@ public class CodeStyleBuilder {
                     throw new Error("Could not initialize ScopeStack", e);
                 }
 
-                ArrayList<CompiledAtomCheck> rulesKnowStack = new ArrayList<CompiledAtomCheck>();
-                for (AtomCheck rule : rules) {
-                    rulesKnowStack.add(rule.forStack(scopeStack));
+                ArrayList<CompiledAtomCheck> firstMatchOnlyKnowStack = new ArrayList<CompiledAtomCheck>();
+                for (AtomCheck rule : firstMatchOnly) {
+                    firstMatchOnlyKnowStack.add(rule.forStack(scopeStack));
                 }
 
                 int pointerAfter = 0;
@@ -144,7 +144,7 @@ public class CodeStyleBuilder {
                         }
 
                         switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck>getFirstFound(
-                                rulesKnowStack,
+                                firstMatchOnlyKnowStack,
                                 getOrNull(atoms, pointerAfter),
                                 getOrNull(atoms, pointerAfter + 1)
                         ).getToInsert()) {
