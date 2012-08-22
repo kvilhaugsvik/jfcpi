@@ -19,24 +19,26 @@ import org.freeciv.packetgen.javaGenerator.*;
 
 import java.util.*;
 
-public class CodeStyleBuilder {
-    private final LinkedList<AtomCheck> triggers;
-    private final LinkedList<AtomCheck> many;
+public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> {
+    private final LinkedList<AtomCheck<ScopeInfoKind>> triggers;
+    private final LinkedList<AtomCheck<ScopeInfoKind>> many;
     private final HashMap<CodeAtom, CodeStyle.Action> chScopeBefore;
     private final HashMap<CodeAtom, CodeStyle.Action> chScopeAfter;
-    private final AtomCheck stdIns;
+    private final Class<ScopeInfoKind> scopeMaker;
+    private final AtomCheck<ScopeInfoKind> stdIns;
 
-    public CodeStyleBuilder(final CodeStyle.Action standard) {
-        triggers = new LinkedList<AtomCheck>();
+    public CodeStyleBuilder(final CodeStyle.Action standard, Class<ScopeInfoKind> scopeMaker) {
+        triggers = new LinkedList<AtomCheck<ScopeInfoKind>>();
+        this.scopeMaker = scopeMaker;
         this.stdIns = AtomCheck.alwaysTrue(standard);
 
         this.chScopeBefore = new HashMap<CodeAtom, CodeStyle.Action>();
         this.chScopeAfter = new HashMap<CodeAtom, CodeStyle.Action>();
-        this.many = new LinkedList<AtomCheck>();
+        this.many = new LinkedList<AtomCheck<ScopeInfoKind>>();
     }
 
-    public void alwaysOnState(Util.OneCondition<ScopeInfo> when, CodeStyle.Action doThis) {
-        many.add(AtomCheck.scopeIs(when, doThis));
+    public void alwaysOnState(Util.OneCondition<ScopeInfoKind> when, CodeStyle.Action doThis) {
+        many.add(AtomCheck.<ScopeInfoKind>scopeIs(when, doThis));
     }
 
     public void changeScopeAfter(CodeAtom atom, CodeStyle.Action change) {
@@ -48,48 +50,48 @@ public class CodeStyleBuilder {
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Action toInsert) {
-        triggers.add(AtomCheck.leftIs(atom, toInsert));
+        triggers.add(AtomCheck.<ScopeInfoKind>leftIs(atom, toInsert));
     }
 
-    public void whenAfter(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
-        triggers.add(AtomCheck.leftIs(atom, toInsert, scopeCond));
+    public void whenAfter(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfoKind> scopeCond) {
+        triggers.add(AtomCheck.<ScopeInfoKind>leftIs(atom, toInsert, scopeCond));
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert) {
-        triggers.add(AtomCheck.rightIs(atom, toInsert));
+        triggers.add(AtomCheck.<ScopeInfoKind>rightIs(atom, toInsert));
     }
 
-    public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfo> scopeCond) {
-        triggers.add(AtomCheck.rightIs(atom, toInsert, scopeCond));
+    public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfoKind> scopeCond) {
+        triggers.add(AtomCheck.<ScopeInfoKind>rightIs(atom, toInsert, scopeCond));
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
-        triggers.add(AtomCheck.leftAndRightIs(before, after, toInsert));
+        triggers.add(AtomCheck.<ScopeInfoKind>leftAndRightIs(before, after, toInsert));
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert,
-                            Util.OneCondition<ScopeInfo> scopeCond) {
-        triggers.add(AtomCheck.leftAndRightIs(before, after, toInsert, scopeCond));
+                            Util.OneCondition<ScopeInfoKind> scopeCond) {
+        triggers.add(AtomCheck.<ScopeInfoKind>leftAndRightIs(before, after, toInsert, scopeCond));
     }
 
     public void atTheEnd(CodeStyle.Action toInsert) {
-        triggers.add(AtomCheck.atTheEnd(toInsert));
+        triggers.add(AtomCheck.<ScopeInfoKind>atTheEnd(toInsert));
     }
 
     public CodeStyle getStyle() {
         return new CodeStyle() {
             // Prevent rules added to the builder after style construction from being added to the style
-            final ArrayList<AtomCheck> firstMatchOnly;
+            final ArrayList<AtomCheck<ScopeInfoKind>> firstMatchOnly;
             {
-                firstMatchOnly = new ArrayList<AtomCheck>(triggers);
+                firstMatchOnly = new ArrayList<AtomCheck<ScopeInfoKind>>(triggers);
                 firstMatchOnly.add(stdIns);
             }
 
-            final ArrayList<AtomCheck> triggerMany = new ArrayList<AtomCheck>(many); {
+            final ArrayList<AtomCheck<ScopeInfoKind>> triggerMany = new ArrayList<AtomCheck<ScopeInfoKind>>(many); {
                 for (CodeAtom atom : chScopeAfter.keySet())
-                    triggerMany.add(AtomCheck.leftIs(atom, chScopeAfter.get(atom)));
+                    triggerMany.add(AtomCheck.<ScopeInfoKind>leftIs(atom, chScopeAfter.get(atom)));
                 for (CodeAtom atom : chScopeBefore.keySet())
-                    triggerMany.add(AtomCheck.rightIs(atom, chScopeBefore.get(atom)));
+                    triggerMany.add(AtomCheck.<ScopeInfoKind>rightIs(atom, chScopeBefore.get(atom)));
             }
 
             @Override
@@ -97,9 +99,9 @@ public class CodeStyleBuilder {
                 final CodeAtom[] atoms = from.getAtoms();
                 LinkedList<String> out = new LinkedList<String>();
 
-                ScopeStack<ScopeInfo> scopeStack = null;
+                ScopeStack<ScopeInfoKind> scopeStack = null;
                 try {
-                    scopeStack = new ScopeStack<ScopeInfo>(ScopeInfo.class);
+                    scopeStack = new ScopeStack<ScopeInfoKind>(scopeMaker);
                 } catch (NoSuchMethodException e) {
                     throw new Error("Could not initialize ScopeStack", e);
                 } catch (IllegalAccessException e) {
@@ -108,13 +110,14 @@ public class CodeStyleBuilder {
                     throw new Error("Could not initialize ScopeStack", e);
                 }
 
-                ArrayList<CompiledAtomCheck> firstMatchOnlyKnowStack = new ArrayList<CompiledAtomCheck>();
-                for (AtomCheck rule : firstMatchOnly) {
+                ArrayList<CompiledAtomCheck<ScopeInfoKind>> firstMatchOnlyKnowStack =
+                        new ArrayList<CompiledAtomCheck<ScopeInfoKind>>();
+                for (AtomCheck<ScopeInfoKind> rule : firstMatchOnly) {
                     firstMatchOnlyKnowStack.add(rule.forStack(scopeStack));
                 }
 
                 ArrayList<CompiledAtomCheck> allMatchesKnowStack = new ArrayList<CompiledAtomCheck>();
-                for (AtomCheck rule : triggerMany) {
+                for (AtomCheck<ScopeInfoKind> rule : triggerMany) {
                     allMatchesKnowStack.add(rule.forStack(scopeStack));
                 }
 
@@ -135,15 +138,16 @@ public class CodeStyleBuilder {
                                         break;
                                     case RESET_LINE:
                                         pointerAfter = lineBeganAt;
-                                        scopeStack.get().lineBreakTry++;
+                                        ScopeInfoKind scopeInfo = scopeStack.get();
+                                        scopeInfo.setLineBreakTry(scopeInfo.getLineBreakTry() + 1);
                                         line = new StringBuilder();
                                         continue line;
                                 }
 
                         line.append(atoms[pointerAfter].get());
-                        scopeStack.get().lineLength = line.length();
+                        scopeStack.get().setLineLength(line.length());
 
-                        switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck>getFirstFound(
+                        switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
                                 firstMatchOnlyKnowStack,
                                 getOrNull(atoms, pointerAfter),
                                 getOrNull(atoms, pointerAfter + 1)
@@ -176,11 +180,12 @@ public class CodeStyleBuilder {
         };
     }
 
-    private static class CompiledAtomCheck implements Util.TwoConditions<CodeAtom, CodeAtom> {
-        private final AtomCheck check;
-        private final CodeStyle.ScopeStack<ScopeInfo> stack;
+    private static class CompiledAtomCheck<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo>
+            implements Util.TwoConditions<CodeAtom, CodeAtom> {
+        private final AtomCheck<ScopeInfoKind> check;
+        private final CodeStyle.ScopeStack<ScopeInfoKind> stack;
 
-        private CompiledAtomCheck(AtomCheck check, CodeStyle.ScopeStack stack) {
+        private CompiledAtomCheck(AtomCheck<ScopeInfoKind> check, CodeStyle.ScopeStack<ScopeInfoKind> stack) {
             this.check = check;
             this.stack = stack;
         }
@@ -194,26 +199,28 @@ public class CodeStyleBuilder {
         }
     }
 
-    private static class AtomCheck {
-        private static final Util.OneCondition<ScopeInfo> ignoresScope = new Util.OneCondition<ScopeInfo>() {
-            @Override public boolean isTrueFor(ScopeInfo argument) {
-                return true;
-            }
-        };
+    private static class AtomCheck<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> {
+        private static <ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> Util.OneCondition<ScopeInfoKind> ignoresScope() {
+            return new Util.OneCondition<ScopeInfoKind>() {
+                @Override public boolean isTrueFor(ScopeInfoKind argument) {
+                    return true;
+                }
+            };
+        }
 
         private final Util.TwoConditions<CodeAtom, CodeAtom> test;
         private final CodeStyle.Action toInsert;
-        private final Util.OneCondition<ScopeInfo> scopeTest;
+        private final Util.OneCondition<ScopeInfoKind> scopeTest;
 
         public AtomCheck(Util.TwoConditions<CodeAtom, CodeAtom> positionTest, CodeStyle.Action toInsert,
-                         Util.OneCondition<ScopeInfo> scopeTest) {
+                         Util.OneCondition<ScopeInfoKind> scopeTest) {
             this.test = positionTest;
             this.scopeTest = scopeTest;
             this.toInsert = toInsert;
         }
 
-        public CompiledAtomCheck forStack(CodeStyle.ScopeStack scope) {
-            return new CompiledAtomCheck(this, scope);
+        public CompiledAtomCheck<ScopeInfoKind> forStack(CodeStyle.ScopeStack<ScopeInfoKind> scope) {
+            return new CompiledAtomCheck<ScopeInfoKind>(this, scope);
         }
 
         public CodeStyle.Action getToInsert() {
@@ -224,69 +231,71 @@ public class CodeStyleBuilder {
             return test;
         }
 
-        public Util.OneCondition<ScopeInfo> getScopeTest() {
+        public Util.OneCondition<ScopeInfoKind> getScopeTest() {
             return scopeTest;
         }
 
-        public static AtomCheck leftIs(final CodeAtom atom, CodeStyle.Action toInsert) {
-            return leftIs(atom, toInsert, ignoresScope);
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftIs(final CodeAtom atom,
+                                                                        CodeStyle.Action toInsert) {
+            return leftIs(atom, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
         }
 
-        public static AtomCheck leftIs(final CodeAtom atom, CodeStyle.Action toInsert,
-                                          Util.OneCondition<ScopeInfo> scopeCond) {
-            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftIs(final CodeAtom atom, CodeStyle.Action toInsert,
+                                          Util.OneCondition<ScopeInfoKind> scopeCond) {
+            return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return null != before && atom.equals(before);
                 }
             }, toInsert, scopeCond);
         }
 
-        public static AtomCheck rightIs(final CodeAtom atom, CodeStyle.Action toInsert) {
-            return rightIs(atom, toInsert, ignoresScope);
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> rightIs(final CodeAtom atom, CodeStyle.Action toInsert) {
+            return rightIs(atom, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
         }
 
-        public static AtomCheck rightIs(final CodeAtom atom, CodeStyle.Action toInsert,
-                                        Util.OneCondition<ScopeInfo> scopeCond) {
-            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> rightIs(final CodeAtom atom, CodeStyle.Action toInsert,
+                                        Util.OneCondition<ScopeInfoKind> scopeCond) {
+            return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return null != after && atom.equals(after);
                 }
             }, toInsert, scopeCond);
         }
 
-        public static AtomCheck leftAndRightIs(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
-            return leftAndRightIs(before, after, toInsert, ignoresScope);
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftAndRightIs(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
+            return leftAndRightIs(before, after, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
         }
 
-        public static AtomCheck leftAndRightIs(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert,
-                                Util.OneCondition<ScopeInfo> scopeCond) {
-            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftAndRightIs(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert,
+                                Util.OneCondition<ScopeInfoKind> scopeCond) {
+            return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override public boolean isTrueFor(CodeAtom left, CodeAtom right) {
                     return null != left && null != right && before.equals(left) && after.equals(right);
                 }
             }, toInsert, scopeCond);
         }
 
-        public static AtomCheck atTheEnd(CodeStyle.Action toInsert) {
-            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> atTheEnd(CodeStyle.Action toInsert) {
+            return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return null == after;
                 }
-            }, toInsert, ignoresScope);
+            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
         }
 
-        public static AtomCheck alwaysTrue(CodeStyle.Action toInsert) {
-            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> alwaysTrue(CodeStyle.Action toInsert) {
+            return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return true;
                 }
-            }, toInsert, ignoresScope);
+            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
         }
 
-        public static AtomCheck scopeIs(Util.OneCondition<ScopeInfo> when, CodeStyle.Action doThis) {
-            return new AtomCheck(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> scopeIs(Util.OneCondition<ScopeInfoKind> when,
+                                                                       CodeStyle.Action doThis) {
+            return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return true;
@@ -305,6 +314,14 @@ public class CodeStyleBuilder {
 
         public int getLineLength() {
             return lineLength;
+        }
+
+        void setLineBreakTry(int number) {
+            lineBreakTry = number;
+        }
+
+        void setLineLength(int length) {
+            lineLength = length;
         }
     }
 }

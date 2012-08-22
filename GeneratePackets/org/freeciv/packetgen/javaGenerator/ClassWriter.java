@@ -494,7 +494,11 @@ public class ClassWriter {
 
     public static final CodeStyle DEFAULT_STYLE;
     static {
-        final CodeStyleBuilder maker = new CodeStyleBuilder(CodeStyle.Action.INSERT_SPACE);
+        final CodeStyleBuilder<CodeStyleBuilder.ScopeInfo> maker =
+                new CodeStyleBuilder<CodeStyleBuilder.ScopeInfo>(
+                        CodeStyle.Action.INSERT_SPACE,
+                        CodeStyleBuilder.ScopeInfo.class);
+
         maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
         maker.whenAfter(HasAtoms.LSC, CodeStyle.Action.BREAK_LINE);
