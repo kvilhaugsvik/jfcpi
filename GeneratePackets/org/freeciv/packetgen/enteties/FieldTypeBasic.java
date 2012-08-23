@@ -131,9 +131,9 @@ public class FieldTypeBasic implements IDependency {
             }
             addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
             addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
-            addMethodPublicReadObjectState(null, javaType, "getValue", "return this.value;");
+            addMethodPublicReadObjectState(null, javaType, "getValue", new Block(RETURN(getField("value").ref())));
             addMethodPublicReadObjectState(null, "String", "toString",
-                    new Block(RETURN(value2String.x(asAString("this.value")))));
+                    new Block(RETURN(value2String.x(getField("value").ref()))));
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
                     new Block(IF(
                             asBool("other instanceof " + name),
