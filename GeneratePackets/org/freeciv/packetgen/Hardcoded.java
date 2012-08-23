@@ -48,7 +48,7 @@ public class Hardcoded {
                                "return 4;",
                                false, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("requirement", "struct requirement", "requirement",
-                    "this.value = new requirement(\n" +
+                    "this.value = new requirement(" +
                             "new universal(universals_n.valueOf(from.readUnsignedByte()),\n" +
                             "from.readInt()),\n" +
                             "req_range.valueOf(from.readUnsignedByte()),\n" +
