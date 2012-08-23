@@ -33,7 +33,7 @@ public interface CodeStyle {
         SCOPE_EXIT
     }
 
-    public static class ScopeStack<Scope> {
+    public static class ScopeStack<Scope extends CodeStyleBuilder.ScopeInfo> {
         private final Constructor<Scope> kind;
         private final LinkedList<Scope> stack;
 
