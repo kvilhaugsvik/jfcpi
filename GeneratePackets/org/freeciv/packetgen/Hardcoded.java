@@ -20,11 +20,10 @@ import org.freeciv.packetgen.enteties.BitVector;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
-import org.freeciv.packetgen.javaGenerator.TargetClass;
-import org.freeciv.packetgen.javaGenerator.TargetPackage;
-import org.freeciv.packetgen.javaGenerator.Var;
+import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 import java.util.*;
@@ -75,12 +74,11 @@ public class Hardcoded {
                             return new Block(arg1.assign(asAValue("value")));
                         }
                     },
-                    new ExprFrom1<Block, Var>() {
+                    new ExprFrom2<Block, Var, Var>() {
                                    @Override
-                                   public Block x(Var to) {
+                                   public Block x(Var to, Var from) {
                                        TargetClass universal = new TargetClass("org.freeciv.types.universal");
-                                       Var len = Var.local("int", "length",
-                                               asAnInt("from.readUnsignedByte()"));
+                                       Var len = Var.local("int", "length", from.call("readUnsignedByte"));
                                        Var counter = Var.local("int", "i",
                                                asAnInt("0"));
                                        return new Block(
@@ -95,8 +93,11 @@ public class Hardcoded {
                                                                to,
                                                                counter.ref(),
                                                                universal.newInstance(
-                                                               asAValue("universals_n.valueOf(from.readUnsignedByte())"),
-                                                               asAValue("from.readUnsignedByte()")
+                                                                       new MethodCall.RetAValue(
+                                                                               null,
+                                                                               "universals_n.valueOf",
+                                                                               from.call("readUnsignedByte")),
+                                                                       from.call("readUnsignedByte")
                                                        )))));
                                    }
                     },
@@ -125,15 +126,14 @@ public class Hardcoded {
                                                to.assign(asAValue("value")));
                                    }
                                },
-                               new ExprFrom1<Block, Var>() {
+                               new ExprFrom2<Block, Var, Var>() {
                                    @Override
-                                   public Block x(Var to) {
+                                   public Block x(Var to, Var from) {
                                        TargetClass sb = new TargetClass(StringBuffer.class);
                                        Var buf =
                                                Var.local("StringBuffer", "buf",
                                                        sb.newInstance());
-                                       Var letter = Var.local("byte", "letter",
-                                               asAValue("from.readByte()"));
+                                       Var letter = Var.local("byte", "letter", from.call("readByte"));
                                        Var read = Var.local("int", "read",
                                                asAnInt("0"));
                                        return new Block(
@@ -144,7 +144,7 @@ public class Hardcoded {
                                                        asVoid("read++"),
                                                        arrayEaterScopeCheck("arraySize < read"),
                                                        asVoid("buf.append((char)letter)"),
-                                                       letter.assign(asAnInt("from.readByte()")))),
+                                                       letter.assign(from.call("readByte")))),
                                                IF(asBool("buf.length() == 0"),
                                                        new Block(to.assign(asAString("\"\""))),
                                                        new Block(to.assign(asAString("buf.toString()")))));
@@ -173,14 +173,14 @@ public class Hardcoded {
                                                to.assign(asAValue("value")));
                                    }
                                },
-                               new ExprFrom1<Block, Var>() {
+                               new ExprFrom2<Block, Var, Var>() {
                                    @Override
-                                   public Block x(Var to) {
+                                   public Block x(Var to, Var from) {
                                        Var innBuf =
                                                Var.local("byte[]", "innBuffer",
                                                        asAValue("new byte[arraySize]"));
                                        Block reader = new Block(innBuf);
-                                       reader.addStatement(asVoid("from.readFully(innBuffer)"));
+                                       reader.addStatement(from.call("readFully", innBuf.ref()));
                                        reader.addStatement(to.assign(innBuf.ref()));
                                        return reader;
                                    }

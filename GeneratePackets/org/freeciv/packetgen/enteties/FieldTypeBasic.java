@@ -21,6 +21,7 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.util.Collection;
@@ -61,15 +62,17 @@ public class FieldTypeBasic implements IDependency {
 
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
                           ExprFrom1<Block, Var>  constructorBody,
-                          ExprFrom1<Block, Var> decode, String encode, String encodedSize,
+                          ExprFrom2<Block, Var, Var> decode, String encode, String encodedSize,
                           ExprFrom1<AString, AValue> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
+        Var from = Var.local(java.io.DataInput.class, "from", null);
         Var value =
                 Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
+
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         this.javaType = javaType;
-        this.decode = ClassWriter.newToOld(decode.x(value));
+        this.decode = ClassWriter.newToOld(decode.x(value, from));
         this.encode = encode.split("\n");
         this.encodedSize = encodedSize.split("\n");
         this.arrayEater = arrayEater;

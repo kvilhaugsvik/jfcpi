@@ -8,6 +8,8 @@ import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
@@ -28,21 +30,20 @@ public class TerminatedArray extends FieldTypeBasic {
                                 to.assign(asAValue("value")));
                     }
                 },
-                new ExprFrom1<Block, Var>() {
+                new ExprFrom2<Block, Var, Var>() {
                     @Override
-                    public Block x(Var to) {
+                    public Block x(Var to, Var from) {
                         Var buf = Var.local("byte[]", "buffer",
                                 asAValue("new byte[" +
                                         Constant.referToInJavaCode(maxSizeConstant) + "]"));
-                        Var current = Var.local("byte", "current",
-                                asAValue("from.readByte()"));
+                        Var current = Var.local("byte", "current", from.call("readByte"));
                         Var pos = Var.local("int", "pos", asAnInt("0"));
                         return new Block(buf, current, pos,
                                 WHILE(asBool("((byte)" + Constant.referToInJavaCode(terminator) + ") != current"),
                                         new Block(asVoid("buffer[pos] = current"),
                                                 asVoid("pos++"),
                                                 IF(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
-                                                        new Block(current.assign(asAnInt("from.readByte()"))),
+                                                        new Block(current.assign(from.call("readByte"))),
                                                         new Block(asVoid("break"))))),
                                 to.assign(new MethodCall.RetAValue(null, "java.util.Arrays.copyOf",
                                         buf.ref(), pos.ref())));
