@@ -70,12 +70,6 @@ public class Packet extends ClassWriter implements IDependency {
 
         addClassConstant("int", "number", number + "");
 
-        addConstructorFromFields(fields, headerKind);
-
-        addConstructorFromJavaTypes(fields, headerKind);
-
-        addConstructorFromDataInput(name, fields, headerKind);
-
         addEncoder(fields);
         addCalcBodyLen(fields);
 
@@ -87,6 +81,12 @@ public class Packet extends ClassWriter implements IDependency {
             addObjectConstantAndGetter(field);
             addJavaGetter(field);
         }
+
+        addConstructorFromFields(fields, headerKind);
+
+        addConstructorFromJavaTypes(fields, headerKind);
+
+        addConstructorFromDataInput(name, fields, headerKind);
     }
 
     private void addConstructorFromFields(Field[] fields, String headerKind) throws UndefinedException {
