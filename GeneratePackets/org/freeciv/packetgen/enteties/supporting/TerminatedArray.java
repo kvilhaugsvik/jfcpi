@@ -49,11 +49,11 @@ public class TerminatedArray extends FieldTypeBasic {
                                         buf.ref(), pos.ref())));
                     }
                 },
-              "to.write(value);\n" +
-                      "if (value.length < " + Constant.referToInJavaCode(maxSizeConstant) + ") {" + "\n" +
+              "to.write(this.value);\n" +
+                      "if (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + ") {" + "\n" +
                       "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
                       "}",
-              "return " + "value.length + (value.length < " + Constant.referToInJavaCode(maxSizeConstant) + "?1:0);",
+              "return " + "this.value.length + (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + "?1:0);",
               new ExprFrom1<AString, AValue>() {
                   @Override
                   public AString x(AValue arg1) {

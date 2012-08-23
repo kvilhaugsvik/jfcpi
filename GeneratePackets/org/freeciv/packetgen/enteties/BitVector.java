@@ -77,16 +77,16 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                                           io.getRead(size[0] + realBitVector  + size[1]) :
                                           "int size = from.readUnsignedShort();" + "\n" +
                                                   io.getRead(size[0] + "size"  + size[1]))
-                                          + "value = new " + getName() + "(innBuffer" + (knowsSize ?
+                                          + "this.value = new " + getName() + "(innBuffer" + (knowsSize ?
                                           "" :
                                           ", size") + ");",
                                   (knowsSize ?
                                           "":
-                                          "to.writeShort(" + "value" + ".size" + ");\n")
-                                          + io.getWrite("value.getAsByteArray()"),
+                                          "to.writeShort(" + "this." + "value" + ".size" + ");\n")
+                                          + io.getWrite("this.value.getAsByteArray()"),
                                   "return " + (knowsSize ?
                                           size[0] + realBitVector + size[1] :
-                                          "2 + " + size[0] + "value" + ".size" + size[1]) + ";",
+                                          "2 + " + size[0] + "this." + "value" + ".size" + size[1]) + ";",
                                   arrayEater,
                                   Arrays.asList(iProvide));
     }

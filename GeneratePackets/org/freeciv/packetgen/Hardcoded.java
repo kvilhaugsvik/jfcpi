@@ -37,28 +37,28 @@ public class Hardcoded {
                                "Long",
                                "int bufferValue = from.readInt();" + "\n" +
                                        "if (0 <= bufferValue) {" + "\n" +
-                                       "value = (long)bufferValue;" + "\n" +
+                                       "this.value = (long)bufferValue;" + "\n" +
                                        "} else {" + "\n" +
                                        "final long removedByCast = (-1L * Integer.MIN_VALUE) + Integer.MAX_VALUE + " +
                                        "1L;" + "\n" +
-                                       "value = (long)bufferValue + removedByCast;" + "\n" +
+                                       "this.value = (long)bufferValue + removedByCast;" + "\n" +
                                        "}",
-                               "to.writeInt(value.intValue()); // int is two's compliment so a uint32 don't lose " +
+                               "to.writeInt(this.value.intValue()); // int is two's compliment so a uint32 don't lose " +
                                        "information",
                                "return 4;",
                                false, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("requirement", "struct requirement", "requirement",
-                    "value = new requirement(\n" +
+                    "this.value = new requirement(\n" +
                             "new universal(universals_n.valueOf(from.readUnsignedByte()),\n" +
                             "from.readInt()),\n" +
                             "req_range.valueOf(from.readUnsignedByte()),\n" +
                             "from.readBoolean(),\n" +
                             "from.readBoolean());\n",
-                    "to.writeByte(value.getsource().kind.getNumber());\n" +
-                            "to.writeInt(value.getsource().value);\n" +
-                            "to.writeByte(value.getrange().getNumber());\n" +
-                            "to.writeBoolean(value.getsurvives());\n" +
-                            "to.writeBoolean(value.getnegated());",
+                    "to.writeByte(this.value.getsource().kind.getNumber());\n" +
+                            "to.writeInt(this.value.getsource().value);\n" +
+                            "to.writeByte(this.value.getrange().getNumber());\n" +
+                            "to.writeBoolean(this.value.getsurvives());\n" +
+                            "to.writeBoolean(this.value.getnegated());",
                     "return 8;",
                     false,
                     Arrays.asList(
@@ -101,12 +101,12 @@ public class Hardcoded {
                                                        )))));
                                    }
                     },
-                    "to.writeByte(value.length);\n" +
-                            "for (universal element : value) {" + "\n" +
+                    "to.writeByte(this.value.length);\n" +
+                            "for (universal element : this.value) {" + "\n" +
                             "to.writeByte(element.kind.getNumber());" + "\n" +
                             "to.writeByte(element.value);" + "\n" +
                             "}",
-                    "return value.length;",
+                    "return this.value.length;",
                     TO_STRING_OBJECT,
                     false,
                     Arrays.asList(
@@ -150,9 +150,9 @@ public class Hardcoded {
                                                        new Block(to.assign(asAString("buf.toString()")))));
                                    }
                                },
-                               "to.writeBytes(" + "value" + ");\n" +
+                               "to.writeBytes(" + "this." + "value" + ");\n" +
                                        "to.writeByte(0);",
-                               "return " + "value" + ".length() + 1;",
+                               "return " + "this." + "value" + ".length() + 1;",
                                TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new TerminatedArray("tech_list", "int",
                                 new Requirement("MAX_NUM_TECH_LIST", Requirement.Kind.VALUE),
@@ -185,13 +185,13 @@ public class Hardcoded {
                                        return reader;
                                    }
                                },
-                               "to.write(" + "value" + ");\n",
-                               "return " + "value" + ".length;",
+                               "to.write(" + "this." + "value" + ");\n",
+                               "return " + "this." + "value" + ".length;",
                                TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("bool8", "bool",
                                "Boolean",
-                               "value = from.readBoolean();",
-                               "to.writeBoolean(value);",
+                               "this.value = from.readBoolean();",
+                               "to.writeBoolean(this.value);",
                                "return 1;",
                                false, Collections.<Requirement>emptySet()),
 
@@ -248,8 +248,8 @@ public class Hardcoded {
     private static FieldTypeBasic getFloat(String times) {
         return new FieldTypeBasic("float" + times, "float",
                                   "Float",
-                                  "value = from.readFloat() / " + times + ";",
-                                  "to.writeFloat(value * " + times + ");",
+                                  "this.value = from.readFloat() / " + times + ";",
+                                  "to.writeFloat(this.value * " + times + ");",
                                   "return 4;",
                                   false, Collections.<Requirement>emptySet());
     }

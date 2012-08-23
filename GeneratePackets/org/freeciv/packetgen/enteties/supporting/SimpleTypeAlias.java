@@ -35,9 +35,9 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(),
                                   typeInJava,
-                                  "value = " + (willRequire.isEmpty() ? io.getRead() : typeInJava + ".valueOf(" + io
+                                  "this.value = " + (willRequire.isEmpty() ? io.getRead() : typeInJava + ".valueOf(" + io
                                           .getRead() + ")") + ";",
-                                  io.getWrite((willRequire.isEmpty() ? "value" : "value.getNumber()")),
+                                  io.getWrite((willRequire.isEmpty() ? "this.value" : "this.value.getNumber()")),
                                   io.getSize(),
                                   false, willRequire);
     }
