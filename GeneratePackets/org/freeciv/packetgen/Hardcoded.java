@@ -48,18 +48,33 @@ public class Hardcoded {
                                "return 4;",
                                false, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("requirement", "struct requirement", "requirement",
-                    "this.value = new requirement(" +
-                            "new universal(universals_n.valueOf(from.readUnsignedByte()),\n" +
-                            "from.readInt()),\n" +
-                            "req_range.valueOf(from.readUnsignedByte()),\n" +
-                            "from.readBoolean(),\n" +
-                            "from.readBoolean());\n",
+                    new ExprFrom1<Block, Var>() {
+                        @Override
+                        public Block x(Var arg1) {
+                            return new Block(arg1.assign(asAValue("value")));
+                        }
+                    },
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var to, Var from) {
+                            return new Block(to.assign((new TargetClass("requirement")).newInstance(
+                                    new TargetClass("universal").newInstance(
+                                            new MethodCall.RetAValue(null, "universals_n.valueOf",
+                                                    from.call("readUnsignedByte")),
+                                            from.call("readInt")),
+                                    new MethodCall.RetAValue(null, "req_range.valueOf",
+                                            from.call("readUnsignedByte")),
+                                    from.call("readBoolean"),
+                                    from.call("readBoolean"))));
+                        }
+                    },
                     "to.writeByte(this.value.getsource().kind.getNumber());\n" +
                             "to.writeInt(this.value.getsource().value);\n" +
                             "to.writeByte(this.value.getrange().getNumber());\n" +
                             "to.writeBoolean(this.value.getsurvives());\n" +
                             "to.writeBoolean(this.value.getnegated());",
                     "return 8;",
+                    TO_STRING_OBJECT,
                     false,
                     Arrays.asList(
                             new Requirement("struct requirement", Requirement.Kind.AS_JAVA_DATATYPE),
