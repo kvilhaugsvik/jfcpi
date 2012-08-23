@@ -19,6 +19,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 
@@ -214,8 +215,8 @@ public class ClassWriter {
      * @param field Name of the field (and variable)
      * @return a line of Java setting the field's value to the value of the variable with the same name
      */
-    protected static NoValue setFieldToVariableSameName(String field) {
-        return asVoid("this." + field + " = " + field);
+    protected Returnable setFieldToVariableSameName(String field) {
+        return getField(field).assign(asAValue(field));
     }
 
     private String formatImports() {
