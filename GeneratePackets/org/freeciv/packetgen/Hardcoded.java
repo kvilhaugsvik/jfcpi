@@ -69,19 +69,44 @@ public class Hardcoded {
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
             new FieldTypeBasic("worklist", "struct worklist", "universal[]",
-                    "int length = from.readUnsignedByte();" + "\n" +
-                            "this.value = new universal[length];" + "\n" +
-                            "for (int i = 0; i < length; i++) {" + "\n" +
-                            "this.value[i] = new universal(" +
-                            "universals_n.valueOf(from.readUnsignedByte())," + "\n" +
-                            "from.readUnsignedByte());" + "\n" +
-                            "}",
+                    new ExprFrom1<Block, Var>() {
+                        @Override
+                        public Block x(Var arg1) {
+                            return new Block(arg1.assign(asAValue("value")));
+                        }
+                    },
+                    new ExprFrom1<Block, Var>() {
+                                   @Override
+                                   public Block x(Var to) {
+                                       TargetClass universal = new TargetClass("org.freeciv.types.universal");
+                                       Var len = Var.local("int", "length",
+                                               asAnInt("from.readUnsignedByte()"));
+                                       Var counter = Var.local("int", "i",
+                                               asAnInt("0"));
+                                       return new Block(
+                                               len,
+                                               to.assign(asAValue("new universal[length]")),
+                                               FOR(
+                                                       counter,
+                                                       asBool(counter.ref().getJavaCode() + " < " +
+                                                               len.ref().getJavaCode()),
+                                                       inc(counter),
+                                                       new Block(arraySetElement(
+                                                               to,
+                                                               counter.ref(),
+                                                               universal.newInstance(
+                                                               asAValue("universals_n.valueOf(from.readUnsignedByte())"),
+                                                               asAValue("from.readUnsignedByte()")
+                                                       )))));
+                                   }
+                    },
                     "to.writeByte(value.length);\n" +
                             "for (universal element : value) {" + "\n" +
                             "to.writeByte(element.kind.getNumber());" + "\n" +
                             "to.writeByte(element.value);" + "\n" +
                             "}",
                     "return value.length;",
+                    TO_STRING_OBJECT,
                     false,
                     Arrays.asList(
                             new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
