@@ -271,7 +271,7 @@ public class Field extends Var {
 
             ref.addStatement(FOR(count,
                     asBool(count.ref().getJavaCode() + " < " + "this." + this.getFieldName() + replaceWith + ".length"),
-                    asVoid(getCounterNumber(counter) + "++"),
+                    inc(count),
                     inner));
             ref = inner;
 
