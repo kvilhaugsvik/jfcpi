@@ -70,9 +70,9 @@ public class Hardcoded {
             ),
             new FieldTypeBasic("worklist", "struct worklist", "universal[]",
                     "int length = from.readUnsignedByte();" + "\n" +
-                            "value = new universal[length];" + "\n" +
+                            "this.value = new universal[length];" + "\n" +
                             "for (int i = 0; i < length; i++) {" + "\n" +
-                            "value[i] = new universal(" + "\n" +
+                            "this.value[i] = new universal(" +
                             "universals_n.valueOf(from.readUnsignedByte())," + "\n" +
                             "from.readUnsignedByte());" + "\n" +
                             "}",
