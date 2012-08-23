@@ -20,6 +20,7 @@ import org.freeciv.packetgen.enteties.BitVector;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
+import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
@@ -102,9 +103,10 @@ public class Hardcoded {
                                new ExprFrom1<Block, Var>() {
                                    @Override
                                    public Block x(Var to) {
+                                       TargetClass sb = new TargetClass(StringBuffer.class);
                                        Var buf =
                                                Var.local("StringBuffer", "buf",
-                                                       asAValue("new StringBuffer()"));
+                                                       sb.newInstance());
                                        Var letter = Var.local("byte", "letter",
                                                asAValue("from.readByte()"));
                                        Var read = Var.local("int", "read",
