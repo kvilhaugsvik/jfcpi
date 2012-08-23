@@ -23,7 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 public class MethodCall extends Formatted implements HasAtoms {
     private final String comment;
     protected final String method;
-    private final AValue[] parameters;
+    protected final AValue[] parameters;
 
     public MethodCall(String comment, String name, String... params) {
         this(comment, name, paramListIsAValue(params));

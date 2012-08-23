@@ -17,8 +17,11 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 public class TargetClass extends Address {
+    private final CodeAtom name;
+
     public TargetClass(String fullPath) {
         super(fullPath.split("\\."));
+        name = super.components[super.components.length - 1];
     }
 
     public TargetClass(Class wrapped) {
@@ -35,6 +38,20 @@ public class TargetClass extends Address {
                 parent.writeAtoms(to);
                 to.add(HAS);
                 to.add(typeClassField);
+            }
+        };
+    }
+
+    private final static CodeAtom newInst = new CodeAtom("new");
+    public MethodCall.RetAValue newInstance(AValue... parameterList) {
+        return new MethodCall.RetAValue(null, "new " + name.get(), parameterList) {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(newInst);
+                to.add(name);
+                to.add(LPR);
+                to.joinSep(SEP, parameters);
+                to.add(RPR);
             }
         };
     }

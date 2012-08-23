@@ -19,7 +19,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import java.util.*;
 
 public class Address extends Formatted implements HasAtoms {
-    private final CodeAtom[] components;
+    protected final CodeAtom[] components;
 
     public Address(String... parts) {
         ArrayList<CodeAtom> build = new ArrayList<CodeAtom>(parts.length);
