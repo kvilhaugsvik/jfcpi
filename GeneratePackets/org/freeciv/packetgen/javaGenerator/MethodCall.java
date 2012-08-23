@@ -20,16 +20,16 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
-public class MethodCallStatic extends Formatted implements HasAtoms {
+public class MethodCall extends Formatted implements HasAtoms {
     private final String comment;
     protected final String method;
     private final AValue[] parameters;
 
-    public MethodCallStatic(String comment, String name, String... params) {
+    public MethodCall(String comment, String name, String... params) {
         this(comment, name, paramListIsAValue(params));
     }
 
-    public MethodCallStatic(String comment, String name, AValue... params) {
+    public MethodCall(String comment, String name, AValue... params) {
         if (null == name)
             throw new IllegalArgumentException("No method name given to method call");
 
@@ -58,19 +58,19 @@ public class MethodCallStatic extends Formatted implements HasAtoms {
         }
     }
 
-    public static class AReturnable extends MethodCallStatic implements Returnable {
+    public static class AReturnable extends MethodCall implements Returnable {
         public AReturnable(String comment, String name, String... params) {
             super(comment, name, params);
         }
     }
 
-    public static class RetAValue extends MethodCallStatic implements AValue {
+    public static class RetAValue extends MethodCall implements AValue {
         public RetAValue(String comment, String name, AValue... params) {
             super(comment, name, params);
         }
     }
 
-    public static class RetAString extends MethodCallStatic implements AString {
+    public static class RetAString extends MethodCall implements AString {
         public RetAString(String comment, String name, AValue... params) {
             super(comment, name, params);
         }

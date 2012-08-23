@@ -94,7 +94,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName, "int number, String toStringName", null,
-                  new Block(new MethodCallStatic.AReturnable(null, "this", "number", "toStringName", "true")));
+                  new Block(new MethodCall.AReturnable(null, "this", "number", "toStringName", "true")));
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName,
                   "int number, String toStringName, boolean valid",
                   null,

@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public class EnumElement extends MethodCallStatic {
+public class EnumElement extends MethodCall {
     protected EnumElement(String comment, String elementName, String... params) {
         super(comment, elementName, params);
     }

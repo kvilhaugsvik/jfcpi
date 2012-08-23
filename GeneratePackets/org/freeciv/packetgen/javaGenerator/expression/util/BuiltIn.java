@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.MethodCallStatic;
+import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
@@ -97,8 +97,8 @@ public class BuiltIn {
         };
     }
 
-    public static MethodCallStatic.RetAValue inc(final Var var) {
-        return new MethodCallStatic.RetAValue(null, "++") {
+    public static MethodCall.RetAValue inc(final Var var) {
+        return new MethodCall.RetAValue(null, "++") {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 var.ref().writeAtoms(to);
