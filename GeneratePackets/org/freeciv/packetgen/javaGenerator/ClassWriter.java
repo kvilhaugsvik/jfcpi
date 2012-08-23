@@ -302,7 +302,16 @@ public class ClassWriter {
         if (constructorFromAllFields)
             out += constructorFromFields();
 
-        out += formatMethods(methods);
+        LinkedList<Method> constructors = new LinkedList<Method>();
+        LinkedList<Method> other = new LinkedList<Method>();
+        for (Method toSort : methods)
+            if (name.equals(toSort.name))
+                constructors.add(toSort);
+            else
+                other.add(toSort);
+
+        out += formatMethods(constructors);
+        out += formatMethods(other);
 
         out = removeBlankLine(out);
 
