@@ -530,6 +530,7 @@ public class ClassWriter {
         maker.whenBetween(HasAtoms.WHILE, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
         maker.whenBetween(HasAtoms.IF, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
         maker.whenBetween(HasAtoms.FOR, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
+        maker.whenBefore(HasAtoms.INC, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.LPR, CodeStyle.Action.DO_NOTHING);
         maker.whenAfter(HasAtoms.LPR, CodeStyle.Action.DO_NOTHING);
         maker.atTheEnd(CodeStyle.Action.DO_NOTHING);
