@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
+import org.freeciv.packetgen.javaGenerator.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
@@ -103,6 +104,20 @@ public class BuiltIn {
             public void writeAtoms(CodeAtoms to) {
                 var.ref().writeAtoms(to);
                 to.add(INC);
+            }
+        };
+    }
+
+    public static MethodCall.RetAValue arraySetElement(final Var on, final AValue number, final AValue val) {
+        return new MethodCall.RetAValue(null, "[]=", on.ref(), val) {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                on.ref().writeAtoms(to);
+                to.add(ARRAY_ACCESS_START);
+                number.writeAtoms(to);
+                to.add(ARRAY_ACCESS_END);
+                to.add(ASSIGN);
+                val.writeAtoms(to);
             }
         };
     }
