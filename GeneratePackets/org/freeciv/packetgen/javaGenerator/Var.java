@@ -27,14 +27,20 @@ public class Var extends Formatted implements Returnable {
     private final Visibility visibility;
     private final Scope scope;
     private final Modifiable modifiable;
-    private final String type;
+    private final TargetClass type;
     private final String name;
     private final AValue value;
 
     private final CodeAtom referName;
 
+    @Deprecated
     protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
                 String type, String name, AValue value) {
+        this(annotations, visibility, scope, modifiable, new TargetClass(type), name, value);
+    }
+
+    protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
+                TargetClass type, String name, AValue value) {
         this.annotations = annotations;
         this.visibility = visibility;
         this.scope = scope;
@@ -59,7 +65,7 @@ public class Var extends Formatted implements Returnable {
     }
 
     public String getType() {
-        return type;
+        return type.getJavaCode();
     }
 
     public String getName() {
@@ -87,7 +93,7 @@ public class Var extends Formatted implements Returnable {
             visibility.writeAtoms(to);
         scope.writeAtoms(to);
         modifiable.writeAtoms(to);
-        to.add(new CodeAtom(type));
+        type.writeAtoms(to);
         to.add(new CodeAtom(name));
         if (null != value) {
             to.add(ASSIGN);
@@ -112,6 +118,10 @@ public class Var extends Formatted implements Returnable {
         return new SetTo(referName, value);
     }
 
+
+    public static Var local(TargetClass type, String name, AValue value) {
+        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
+    }
 
     public static Var local(String type, String name, AValue value) {
         return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
