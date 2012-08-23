@@ -543,7 +543,7 @@ public class ClassWriter {
         maker.changeScopeBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
         maker.alwaysOnState(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo info) {
-                boolean toLong = 110 <= info.getLineLength() && info.getLineBreakTry() < 10;
+                boolean toLong = 100 <= info.getLineLength() && info.getLineBreakTry() < 10;
                 if (toLong) info.lineBreakTry++; //TODO: Stop doing as a side effect
                 return toLong;
             }
