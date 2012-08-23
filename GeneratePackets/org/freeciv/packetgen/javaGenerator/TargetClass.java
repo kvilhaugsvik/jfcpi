@@ -16,8 +16,12 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+
 public class TargetClass extends Address {
     private final CodeAtom name;
+    private final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
 
     public TargetClass(String fullPath) {
         super(fullPath.split("\\."));
@@ -26,6 +30,15 @@ public class TargetClass extends Address {
 
     public TargetClass(Class wrapped) {
         this(wrapped.getCanonicalName());
+        for (Method has : wrapped.getMethods())
+            methods.put(has.getName(), new TargetMethod(has));
+    }
+
+    public MethodCall.RetAValue call(String method, AValue... parameters) {
+        if (!methods.containsKey(method))
+            throw new IllegalArgumentException("No method named " + method + " on " + name.get());
+
+        return methods.get(method).call(parameters);
     }
 
     // TODO: Should this be seen as a function called on the type?

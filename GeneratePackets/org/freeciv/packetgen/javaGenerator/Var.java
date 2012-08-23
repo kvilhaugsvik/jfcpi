@@ -114,13 +114,28 @@ public class Var extends Formatted implements Returnable {
         };
     }
 
+    // TODO: When fixing type system permit returning AValue
+    public MethodCall.RetAValue call(String method, AValue... params) {
+        final Var onVar = this;
+        final MethodCall.RetAValue toCall = type.call(method, params);
+        return new MethodCall.RetAValue(null, method, params) {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                onVar.ref().writeAtoms(to);
+                to.add(HAS);
+                toCall.writeAtoms(to);
+            }
+        };
+    }
+
     public SetTo assign(final AValue value) {
         return new SetTo(referName, value);
     }
 
 
-    public static Var local(TargetClass type, String name, AValue value) {
-        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
+    public static Var local(Class type, String name, AValue value) {
+        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES,
+                new TargetClass(type), name, value);
     }
 
     public static Var local(String type, String name, AValue value) {
