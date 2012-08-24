@@ -22,8 +22,6 @@ import java.util.*;
 public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> {
     private final LinkedList<AtomCheck<ScopeInfoKind>> triggers;
     private final LinkedList<AtomCheck<ScopeInfoKind>> many;
-    private final HashMap<CodeAtom, CodeStyle.Action> chScopeBefore;
-    private final HashMap<CodeAtom, CodeStyle.Action> chScopeAfter;
     private final Class<ScopeInfoKind> scopeMaker;
     private final AtomCheck<ScopeInfoKind> stdIns;
 
@@ -32,8 +30,6 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
         this.scopeMaker = scopeMaker;
         this.stdIns = AtomCheck.alwaysTrue(standard);
 
-        this.chScopeBefore = new HashMap<CodeAtom, CodeStyle.Action>();
-        this.chScopeAfter = new HashMap<CodeAtom, CodeStyle.Action>();
         this.many = new LinkedList<AtomCheck<ScopeInfoKind>>();
     }
 
@@ -41,12 +37,12 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
         many.add(AtomCheck.<ScopeInfoKind>scopeIs(when, doThis));
     }
 
-    public void changeScopeAfter(CodeAtom atom, CodeStyle.Action change) {
-        chScopeAfter.put(atom, change);
+    public void alwaysAfter(CodeAtom atom, CodeStyle.Action change) {
+        many.add(AtomCheck.<ScopeInfoKind>leftIs(atom, change));
     }
 
-    public void changeScopeBefore(CodeAtom atom, CodeStyle.Action change) {
-        chScopeBefore.put(atom, change);
+    public void alwaysBefore(CodeAtom atom, CodeStyle.Action change) {
+        many.add(AtomCheck.<ScopeInfoKind>rightIs(atom, change));
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Action toInsert) {
@@ -87,12 +83,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                 firstMatchOnly.add(stdIns);
             }
 
-            final ArrayList<AtomCheck<ScopeInfoKind>> triggerMany = new ArrayList<AtomCheck<ScopeInfoKind>>(many); {
-                for (CodeAtom atom : chScopeAfter.keySet())
-                    triggerMany.add(AtomCheck.<ScopeInfoKind>leftIs(atom, chScopeAfter.get(atom)));
-                for (CodeAtom atom : chScopeBefore.keySet())
-                    triggerMany.add(AtomCheck.<ScopeInfoKind>rightIs(atom, chScopeBefore.get(atom)));
-            }
+            final ArrayList<AtomCheck<ScopeInfoKind>> triggerMany = new ArrayList<AtomCheck<ScopeInfoKind>>(many);
 
             @Override
             public List<String> asFormattedLines(CodeAtoms from) {

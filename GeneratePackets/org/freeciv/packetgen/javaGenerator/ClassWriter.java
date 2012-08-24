@@ -548,12 +548,12 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.ARRAY_ACCESS_END, CodeStyle.Action.DO_NOTHING);
         maker.atTheEnd(CodeStyle.Action.DO_NOTHING);
 
-        maker.changeScopeAfter(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
-        maker.changeScopeBefore(HasAtoms.ALE, CodeStyle.Action.SCOPE_EXIT);
-        maker.changeScopeAfter(HasAtoms.LPR, CodeStyle.Action.SCOPE_ENTER);
-        maker.changeScopeBefore(HasAtoms.RPR, CodeStyle.Action.SCOPE_EXIT);
-        maker.changeScopeAfter(HasAtoms.LSC, CodeStyle.Action.SCOPE_ENTER);
-        maker.changeScopeBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
+        maker.alwaysAfter(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
+        maker.alwaysBefore(HasAtoms.ALE, CodeStyle.Action.SCOPE_EXIT);
+        maker.alwaysAfter(HasAtoms.LPR, CodeStyle.Action.SCOPE_ENTER);
+        maker.alwaysBefore(HasAtoms.RPR, CodeStyle.Action.SCOPE_EXIT);
+        maker.alwaysAfter(HasAtoms.LSC, CodeStyle.Action.SCOPE_ENTER);
+        maker.alwaysBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
         maker.alwaysOnState(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo info) {
                 boolean toLong = 100 <= info.getLineLength() && info.getLineBreakTry() < 10;
