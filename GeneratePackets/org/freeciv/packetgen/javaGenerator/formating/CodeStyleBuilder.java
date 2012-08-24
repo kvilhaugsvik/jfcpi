@@ -117,6 +117,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                 while (pointerAfter < atoms.length) {
                     StringBuilder line = new StringBuilder();
                     lineBeganAt = pointerAfter;
+                    boolean addBlank = false;
                     line: while (pointerAfter < atoms.length) {
                         for (CompiledAtomCheck rule : allMatchesKnowStack)
                             if (rule.isTrueFor(getOrNull(atoms, pointerAfter), getOrNull(atoms, pointerAfter + 1)))
@@ -145,6 +146,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                                 pointerAfter++;
                                 line.append(" ");
                                 break;
+                            case BREAK_LINE_BLOCK:
+                                pointerAfter++;
+                                addBlank = true;
+                                break line;
                             case BREAK_LINE:
                                 pointerAfter++;
                                 break line;
@@ -154,6 +159,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                         }
                     }
                     out.add(line.toString());
+                    if (addBlank) {
+                        out.add("");
+                    }
                 }
                 return out;
             }

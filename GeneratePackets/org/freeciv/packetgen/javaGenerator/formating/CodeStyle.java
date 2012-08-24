@@ -27,6 +27,7 @@ public interface CodeStyle {
     enum Action {
         DO_NOTHING,
         INSERT_SPACE,
+        BREAK_LINE_BLOCK,
         BREAK_LINE,
         RESET_LINE,
         SCOPE_ENTER,

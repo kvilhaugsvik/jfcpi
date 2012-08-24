@@ -14,6 +14,9 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.Util;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -33,5 +36,32 @@ public class TypedCodeTest {
         assertEquals("final", asAtoms.get(2).get());
         assertEquals("int", asAtoms.get(3).get());
         assertEquals("number", asAtoms.get(4).get());
+    }
+
+    @Test public void breakLineBlock() {
+        CodeStyleBuilder<CodeStyleBuilder.ScopeInfo> builder =
+                new CodeStyleBuilder<CodeStyleBuilder.ScopeInfo>(CodeStyle.Action.INSERT_SPACE,
+                        CodeStyleBuilder.ScopeInfo.class);
+
+        builder.whenBetween(HasAtoms.EOL, HasAtoms.CCommentStart, CodeStyle.Action.BREAK_LINE_BLOCK);
+        builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
+        builder.whenBefore(HasAtoms.EOL, CodeStyle.Action.DO_NOTHING);
+
+        CodeAtoms toRunOn = new CodeAtoms();
+        toRunOn.add(new CodeAtom("A"));
+        toRunOn.add(new CodeAtom("b"));
+        toRunOn.add(HasAtoms.EOL);
+        toRunOn.add(new CodeAtom("C"));
+        toRunOn.add(new CodeAtom("d"));
+        toRunOn.add(HasAtoms.EOL);
+        toRunOn.add(HasAtoms.CCommentStart);
+        toRunOn.add(new CodeAtom("comment"));
+        toRunOn.add(HasAtoms.CCommentEnd);
+        toRunOn.add(new CodeAtom("E"));
+        toRunOn.add(new CodeAtom("f"));
+        toRunOn.add(HasAtoms.EOL);
+
+        assertEquals("A b;\nC d;\n\n/* comment */ E f;",
+                Util.joinStringArray(builder.getStyle().asFormattedLines(toRunOn).toArray(), "\n", "", ""));
     }
 }
