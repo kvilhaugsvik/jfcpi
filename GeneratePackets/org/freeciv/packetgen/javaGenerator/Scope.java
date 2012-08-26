@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+
 public enum Scope implements HasAtoms {
     CLASS("static"),
     OBJECT(null),

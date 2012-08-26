@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+
 public interface HasAtoms {
     public static final CodeAtom CCommentStart = new CodeAtom("/*");
     public static final CodeAtom CCommentEnd = new CodeAtom("*/");

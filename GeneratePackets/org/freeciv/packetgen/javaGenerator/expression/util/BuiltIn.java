@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;

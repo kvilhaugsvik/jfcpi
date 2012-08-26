@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
 public class Annotate extends Formatted implements HasAtoms {
     private final String annotation;

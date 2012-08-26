@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator.formating;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
 import java.util.*;
 

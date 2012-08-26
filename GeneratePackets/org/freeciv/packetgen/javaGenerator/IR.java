@@ -14,19 +14,22 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public class CodeAtom implements HasAtoms {
-    private final String atom;
+public interface IR {
 
-    public CodeAtom(String atom) {
-        this.atom = atom;
-    }
+    public static class CodeAtom implements HasAtoms, IR {
+        private final String atom;
 
-    public String get() {
-        return atom;
-    }
+        public CodeAtom(String atom) {
+            this.atom = atom;
+        }
 
-    @Override
-    public void writeAtoms(CodeAtoms to) {
-        to.add(this);
+        public String get() {
+            return atom;
+        }
+
+        @Override
+        public void writeAtoms(CodeAtoms to) {
+            to.add(this);
+        }
     }
 }

@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.lang.reflect.Method;

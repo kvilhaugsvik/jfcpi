@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+
 public class TargetPackage extends Address {
     public TargetPackage(String... parts) {
         super(parts);
