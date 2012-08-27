@@ -75,6 +75,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
         triggers.add(AtomCheck.<ScopeInfoKind>atTheEnd(toInsert));
     }
 
+    public void atTheBeginning(CodeStyle.Action toInsert) {
+        triggers.add(AtomCheck.<ScopeInfoKind>atTheBeginning(toInsert));
+    }
+
     public CodeStyle getStyle() {
         return new CodeStyle() {
             // Prevent rules added to the builder after style construction from being added to the style
@@ -113,7 +117,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                     allMatchesKnowStack.add(rule.forStack(scopeStack));
                 }
 
-                int pointerAfter = 0;
+                int pointerAfter = -1;
                 int lineBeganAt;
                 while (pointerAfter < atoms.length) {
                     StringBuilder line = new StringBuilder();
@@ -135,7 +139,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                                         continue line;
                                 }
 
-                        line.append(atoms[pointerAfter].get());
+                        if (0 <= pointerAfter)
+                            line.append(atoms[pointerAfter].get());
                         scopeStack.get().setLineLength(line.length());
 
                         switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
@@ -278,6 +283,15 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                 @Override
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return null == after;
+                }
+            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
+        }
+
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> atTheBeginning(CodeStyle.Action toInsert) {
+            return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
+                @Override
+                public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+                    return null == before;
                 }
             }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
         }

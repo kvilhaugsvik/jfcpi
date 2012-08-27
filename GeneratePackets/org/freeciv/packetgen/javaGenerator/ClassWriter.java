@@ -546,6 +546,7 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
         maker.whenAfter(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.ARRAY_ACCESS_END, CodeStyle.Action.DO_NOTHING);
+        maker.atTheBeginning(CodeStyle.Action.DO_NOTHING);
         maker.atTheEnd(CodeStyle.Action.DO_NOTHING);
 
         maker.alwaysAfter(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
