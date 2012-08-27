@@ -232,16 +232,15 @@ public class ClassWriter {
         return out;
     }
 
+    // TODO: Change enum.values in a later step
     private String formatEnumeratedElements() {
-        String out = "";
+        EnumElements out = new EnumElements();
 
         for (EnumElement element : enums.values()) {
-            out += "\t" + element + "," + "\n";
+            out.add(element);
         }
-        if (!enums.isEmpty())
-            out = out.substring(0, out.length() - 2) + ";" + "\n" + "\n";
 
-        return out;
+        return out.getJavaCodeIndented("\t") + "\n";
     }
 
     private static String formatVariableDeclarations(List<Var> variables) {
@@ -295,7 +294,7 @@ public class ClassWriter {
                                                                                            implementsInterface,
                                                                                            "") + " {" + "\n";
 
-        if (ClassKind.ENUM == kind)
+        if (ClassKind.ENUM == kind && !enums.isEmpty())
             out += formatEnumeratedElements();
 
         out += formatVariableDeclarations(fields);
@@ -519,6 +518,16 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.RSC, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.RPR, CodeStyle.Action.DO_NOTHING);
+        maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                return EnumElements.class.getName().equals(argument.seeTopHint());
+            }
+        });
+        maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                return EnumElements.class.getName().equals(argument.seeTopHint());
+            }
+        });
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 1 < argument.getLineBreakTry();
