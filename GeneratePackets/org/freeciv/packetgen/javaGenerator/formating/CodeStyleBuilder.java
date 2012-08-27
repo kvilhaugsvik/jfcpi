@@ -122,6 +122,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                 while (pointerAfter < atoms.length) {
                     StringBuilder line = new StringBuilder();
                     lineBeganAt = pointerAfter;
+                    boolean addBreak = false;
                     boolean addBlank = false;
                     line: while (pointerAfter < atoms.length) {
                         for (CompiledAtomCheck rule : allMatchesKnowStack)
@@ -154,15 +155,20 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                                 break;
                             case BREAK_LINE_BLOCK:
                                 pointerAfter++;
+                                addBreak = true;
                                 addBlank = true;
-                                break line;
+                                break;
                             case BREAK_LINE:
                                 pointerAfter++;
-                                break line;
+                                addBreak = true;
+                                break;
                             case DO_NOTHING:
                                 pointerAfter++;
                                 break;
                         }
+
+                        if (addBreak)
+                            break line;
                     }
                     out.add(line.toString());
                     if (addBlank) {
