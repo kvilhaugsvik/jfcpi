@@ -118,28 +118,14 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                 }
 
                 int pointerAfter = -1;
-                int lineBeganAt;
+                scopeStack.get().setBeganAt(pointerAfter);
+                scopeStack.get().setBeganAtLine(out.size());
+                scopeStack.get().setLineUpToScope("");
                 while (pointerAfter < atoms.length) {
                     StringBuilder line = new StringBuilder();
-                    lineBeganAt = pointerAfter;
                     boolean addBreak = false;
                     boolean addBlank = false;
                     line: while (pointerAfter < atoms.length) {
-                        for (CompiledAtomCheck rule : allMatchesKnowStack)
-                            if (rule.isTrueFor(getOrNull(atoms, pointerAfter), getOrNull(atoms, pointerAfter + 1)))
-                                switch (rule.getToInsert()) {
-                                    case SCOPE_ENTER:
-                                        scopeStack.open();
-                                        break;
-                                    case SCOPE_EXIT:
-                                        scopeStack.close();
-                                        break;
-                                    case RESET_LINE:
-                                        pointerAfter = lineBeganAt;
-                                        line = new StringBuilder();
-                                        continue line;
-                                }
-
                         if (0 <= pointerAfter)
                             line.append(atoms[pointerAfter].get());
                         scopeStack.get().setLineLength(line.length());
@@ -162,6 +148,28 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                             case DO_NOTHING:
                                 break;
                         }
+
+                        for (CompiledAtomCheck rule : allMatchesKnowStack)
+                            if (rule.isTrueFor(getOrNull(atoms, pointerAfter), getOrNull(atoms, pointerAfter + 1)))
+                                switch (rule.getToInsert()) {
+                                    case SCOPE_ENTER:
+                                        scopeStack.open();
+                                        scopeStack.get().setBeganAt(pointerAfter + 1);
+                                        scopeStack.get().setBeganAtLine(out.size());
+                                        scopeStack.get().setLineUpToScope(line.toString());
+                                        break;
+                                    case SCOPE_EXIT:
+                                        scopeStack.close();
+                                        break;
+                                    case RESET_LINE:
+                                        pointerAfter = scopeStack.get().getBeganAt();
+                                        int lineNumber = scopeStack.get().getBeganAtLine();
+                                        while(lineNumber < out.size())
+                                            out.removeLast();
+                                        line = new StringBuilder(scopeStack.get().getLineUpToScope());
+                                        scopeStack.get().setLineLength(line.length());
+                                        continue line;
+                                }
 
                         pointerAfter++;
                         if (addBreak)
@@ -320,7 +328,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
     }
 
     public static class ScopeInfo {
+        private int beganAt = 0;
+        private int beganAtLine = 0;
         private int lineLength = 0;
+        private String lineUpToScope = "";
 
         public int getLineLength() {
             return lineLength;
@@ -328,6 +339,30 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
 
         void setLineLength(int length) {
             lineLength = length;
+        }
+
+        public void setBeganAt(int atomNumber) {
+            beganAt = atomNumber;
+        }
+
+        public int getBeganAt() {
+            return beganAt;
+        }
+
+        public void setLineUpToScope(String line) {
+            lineUpToScope = line;
+        }
+
+        public String getLineUpToScope() {
+            return lineUpToScope;
+        }
+
+        public void setBeganAtLine(int number) {
+            beganAtLine = number;
+        }
+
+        public int getBeganAtLine() {
+            return beganAtLine;
         }
     }
 }

@@ -42,16 +42,16 @@ public interface CodeStyle {
                 throws NoSuchMethodException, IllegalAccessException, InstantiationException {
             this.kind = kind.getConstructor();
             this.stack = new LinkedList<Scope>();
-            this.stack.push(kind.newInstance());
+            this.stack.addFirst(kind.newInstance());
         }
 
         public Scope get() {
-            return stack.peekLast();
+            return stack.peekFirst();
         }
 
         public void open() {
             try {
-                this.stack.push(kind.newInstance());
+                this.stack.addFirst(kind.newInstance());
             } catch (InstantiationException e) {
                 throw new Error("Exception thrown after initialization but not during?", e);
             } catch (IllegalAccessException e) {
