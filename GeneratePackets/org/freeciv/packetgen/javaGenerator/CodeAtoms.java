@@ -17,15 +17,18 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
-import java.util.LinkedList;
+import java.util.*;
 
 public class CodeAtoms {
-    private final LinkedList<CodeAtom> atoms;
+    //TODO: Rename atoms
+    private final LinkedList<IR> atoms;
     private Util.OneCondition<CodeAtom> reason;
+    private List<IR.Hint> onNext;
 
     public CodeAtoms(HasAtoms... start) {
-        atoms = new LinkedList<CodeAtom>();
+        atoms = new LinkedList<IR>();
         reason = null;
+        onNext = new LinkedList<IR.Hint>();
 
         for (HasAtoms owner : start)
             owner.writeAtoms(this);
@@ -33,20 +36,36 @@ public class CodeAtoms {
 
     public void add(CodeAtom atom) {
         if (null == reason || !reason.isTrueFor(atom))
-            atoms.add(atom);
+            atoms.add(new IR(atom));
         reason = null;
+
+        for (IR.Hint hint : onNext)
+            atoms.peekLast().addHint(hint);
+        onNext = new LinkedList<IR.Hint>();
+    }
+
+    public void hintStart(String name) {
+        onNext.add(IR.Hint.begin(name));
+    }
+
+    public void hintEnd(String name) {
+        assert !atoms.isEmpty() : "Tried to end a hint before an element was added";
+        assert onNext.isEmpty() : "Can't add hint after accepting hints for next element";
+
+        atoms.peekLast().addHint(IR.Hint.end(name));
     }
 
     public void refuseNextIf(Util.OneCondition<CodeAtom> reason) {
         this.reason = reason;
     }
 
-    public CodeAtom get(int number) {
+    public IR get(int number) {
         return atoms.get(number);
     }
 
-    public CodeAtom[] getAtoms() {
-        return atoms.toArray(new CodeAtom[0]);
+    public IR[] toArray() {
+        assert onNext.isEmpty() : "Tried to read when the last element was half finished (start hints but no code)";
+        return atoms.toArray(new IR[atoms.size()]);
     }
 
     public void joinSep(HasAtoms separator, HasAtoms[] toJoin) {

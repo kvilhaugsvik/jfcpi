@@ -92,7 +92,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
 
             @Override
             public List<String> asFormattedLines(CodeAtoms from) {
-                final CodeAtom[] atoms = from.getAtoms();
+                final IR[] atoms = from.toArray();
                 LinkedList<String> out = new LinkedList<String>();
 
                 ScopeStack<ScopeInfoKind> scopeStack = null;
@@ -127,7 +127,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                     boolean addBlank = false;
                     line: while (pointerAfter < atoms.length) {
                         if (0 <= pointerAfter)
-                            line.append(atoms[pointerAfter].get());
+                            line.append(atoms[pointerAfter].getAtom().get());
+                        if (pointerAfter + 1 < atoms.length)
+                            updateHintsBefore(scopeStack, atoms[pointerAfter + 1]);
                         scopeStack.get().setLineLength(line.length());
 
                         switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
@@ -172,6 +174,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                                 }
 
                         pointerAfter++;
+                        if (pointerAfter < atoms.length)
+                            updateHintsAfter(scopeStack, atoms[pointerAfter]);
                         if (addBreak)
                             break line;
                     }
@@ -183,9 +187,19 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                 return out;
             }
 
-            private CodeAtom getOrNull(CodeAtom[] atoms, int pos) {
+            private void updateHintsBefore(ScopeStack<ScopeInfoKind> scopeStack, IR element) {
+                for (IR.Hint hint : element.getHintsBefore())
+                    scopeStack.get().addHint(hint.get());
+            }
+
+            private void updateHintsAfter(ScopeStack<ScopeInfoKind> scopeStack, IR element) {
+                for (IR.Hint hint : element.getHintsAfter())
+                    scopeStack.get().removeTopHint(hint.get());
+            }
+
+            private CodeAtom getOrNull(IR[] atoms, int pos) {
                 try {
-                    return atoms[pos];
+                    return atoms[pos].getAtom();
                 } catch (ArrayIndexOutOfBoundsException e) {
                     return null;
                 }
@@ -333,6 +347,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
         private int lineLength = 0;
         private String lineUpToScope = "";
 
+        private final LinkedList<String> hints = new LinkedList<String>();
+
         public int getLineLength() {
             return lineLength;
         }
@@ -363,6 +379,22 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
 
         public int getBeganAtLine() {
             return beganAtLine;
+        }
+
+        final public String seeTopHint() {
+            return hints.peekFirst();
+        }
+
+        final void addHint(String hint) {
+            hints.addFirst(hint);
+        }
+
+        final void removeTopHint(String hint) {
+            assert !hints.isEmpty() : "Tried to remove the top hint when no hints are there";
+            if (hints.peekFirst().equals(hint))
+                hints.removeFirst();
+            else
+                throw new IllegalArgumentException("Asked to remove a different hint than the top one");
         }
     }
 }

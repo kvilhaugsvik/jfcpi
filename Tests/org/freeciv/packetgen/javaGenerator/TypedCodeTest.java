@@ -32,11 +32,11 @@ public class TypedCodeTest {
                               "int", "number", null);
         CodeAtoms asAtoms = new CodeAtoms(field);
 
-        assertEquals("@IsAField", asAtoms.get(0).get());
-        assertEquals("private", asAtoms.get(1).get());
-        assertEquals("final", asAtoms.get(2).get());
-        assertEquals("int", asAtoms.get(3).get());
-        assertEquals("number", asAtoms.get(4).get());
+        assertEquals("@IsAField", asAtoms.get(0).getAtom().get());
+        assertEquals("private", asAtoms.get(1).getAtom().get());
+        assertEquals("final", asAtoms.get(2).getAtom().get());
+        assertEquals("int", asAtoms.get(3).getAtom().get());
+        assertEquals("number", asAtoms.get(4).getAtom().get());
     }
 
     @Test public void breakLineBlock() {

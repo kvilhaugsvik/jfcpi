@@ -14,9 +14,65 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public interface IR {
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-    public static class CodeAtom implements HasAtoms, IR {
+public class IR {
+    private final CodeAtom atom;
+    private final List<Hint> hintsBefore;
+    private final List<Hint> hintsAfter;
+
+    public IR(CodeAtom atom) {
+        this.atom = atom;
+        this.hintsBefore = new LinkedList<Hint>();
+        this.hintsAfter = new LinkedList<Hint>();
+    }
+
+    public CodeAtom getAtom() {
+        return atom;
+    }
+
+    public List<Hint> getHintsBefore() {
+        return Collections.unmodifiableList(hintsBefore);
+    }
+
+    public List<Hint> getHintsAfter() {
+        return Collections.unmodifiableList(hintsAfter);
+    }
+
+    public void addHint(Hint hint) {
+        if (hint.isStart)
+            hintsBefore.add(hint);
+        else
+            hintsAfter.add(hint);
+    }
+
+
+    public static class Hint {
+        private final boolean isStart;
+        private final String hint;
+
+        private Hint(String hint, boolean isStart) {
+            this.isStart = isStart;
+            this.hint = hint;
+        }
+
+
+        public static Hint begin(String hint) {
+            return new Hint(hint, true);
+        }
+
+        public static Hint end(String hint) {
+            return new Hint(hint, false);
+        }
+
+        public String get() {
+            return hint;
+        }
+    }
+
+    public static class CodeAtom implements HasAtoms {
         private final String atom;
 
         public CodeAtom(String atom) {
