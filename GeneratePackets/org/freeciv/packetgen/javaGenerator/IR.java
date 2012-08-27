@@ -31,5 +31,9 @@ public interface IR {
         public void writeAtoms(CodeAtoms to) {
             to.add(this);
         }
+
+        public String toString() {
+            return atom;
+        }
     }
 }
