@@ -549,12 +549,6 @@ public class ClassWriter {
         maker.atTheBeginning(CodeStyle.Action.DO_NOTHING);
         maker.atTheEnd(CodeStyle.Action.DO_NOTHING);
 
-        maker.alwaysAfter(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
-        maker.alwaysBefore(HasAtoms.ALE, CodeStyle.Action.SCOPE_EXIT);
-        maker.alwaysAfter(HasAtoms.LPR, CodeStyle.Action.SCOPE_ENTER);
-        maker.alwaysBefore(HasAtoms.RPR, CodeStyle.Action.SCOPE_EXIT);
-        maker.alwaysAfter(HasAtoms.LSC, CodeStyle.Action.SCOPE_ENTER);
-        maker.alwaysBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
         maker.alwaysOnState(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo info) {
                 boolean toLong = 100 <= info.getLineLength() && info.getLineBreakTry() < 10;
@@ -562,6 +556,12 @@ public class ClassWriter {
                 return toLong;
             }
         }, CodeStyle.Action.RESET_LINE);
+        maker.alwaysBefore(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
+        maker.alwaysAfter(HasAtoms.ALE, CodeStyle.Action.SCOPE_EXIT);
+        maker.alwaysBefore(HasAtoms.LPR, CodeStyle.Action.SCOPE_ENTER);
+        maker.alwaysAfter(HasAtoms.RPR, CodeStyle.Action.SCOPE_EXIT);
+        maker.alwaysBefore(HasAtoms.LSC, CodeStyle.Action.SCOPE_ENTER);
+        maker.alwaysAfter(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
 
         DEFAULT_STYLE = maker.getStyle();
     }
