@@ -150,23 +150,20 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                                 getOrNull(atoms, pointerAfter + 1)
                         ).getToInsert()) {
                             case INSERT_SPACE:
-                                pointerAfter++;
                                 line.append(" ");
                                 break;
                             case BREAK_LINE_BLOCK:
-                                pointerAfter++;
                                 addBreak = true;
                                 addBlank = true;
                                 break;
                             case BREAK_LINE:
-                                pointerAfter++;
                                 addBreak = true;
                                 break;
                             case DO_NOTHING:
-                                pointerAfter++;
                                 break;
                         }
 
+                        pointerAfter++;
                         if (addBreak)
                             break line;
                     }
