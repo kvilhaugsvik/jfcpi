@@ -18,7 +18,6 @@ import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
@@ -42,7 +41,7 @@ public class ClassWriter {
     private final LinkedList<Var> fields = new LinkedList<Var>();
 
     private final LinkedList<Method> methods = new LinkedList<Method>();
-    protected final LinkedHashMap<String, EnumElement> enums = new LinkedHashMap<String, EnumElement>();
+    protected final EnumElements enums = new EnumElements();
 
     private boolean constructorFromAllFields = false;
 
@@ -191,7 +190,7 @@ public class ClassWriter {
     protected void addEnumerated(EnumElement element) {
         assert kind.equals(ClassKind.ENUM);
 
-        enums.put(element.getEnumValueName(), element);
+        enums.add(element);
     }
 
     /**
@@ -230,17 +229,6 @@ public class ClassWriter {
         if (0 < imports.size()) out += "\n";
 
         return out;
-    }
-
-    // TODO: Change enum.values in a later step
-    private String formatEnumeratedElements() {
-        EnumElements out = new EnumElements();
-
-        for (EnumElement element : enums.values()) {
-            out.add(element);
-        }
-
-        return out.getJavaCodeIndented("\t") + "\n";
     }
 
     private static String formatVariableDeclarations(List<Var> variables) {
@@ -295,7 +283,7 @@ public class ClassWriter {
                                                                                            "") + " {" + "\n";
 
         if (ClassKind.ENUM == kind && !enums.isEmpty())
-            out += formatEnumeratedElements();
+            out += enums.getJavaCodeIndented("\t") + "\n";
 
         out += formatVariableDeclarations(fields);
 

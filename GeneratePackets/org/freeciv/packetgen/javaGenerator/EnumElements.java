@@ -16,20 +16,32 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
-import java.util.LinkedList;
+import java.util.*;
 
 public class EnumElements extends Formatted implements HasAtoms {
-    private final LinkedList<EnumElement> enumerations = new LinkedList<EnumElement>();
+    private final LinkedHashMap<String, EnumElement> enumerations = new LinkedHashMap<String, EnumElement>();
 
     public void add(EnumElement element) {
-        enumerations.add(element);
+        enumerations.put(element.getEnumValueName(), element);
+    }
+
+    public EnumElement getElement(String name) {
+        return enumerations.get(name);
+    }
+
+    public Set<String> getElementNames() {
+        return Collections.unmodifiableSet(enumerations.keySet());
+    }
+
+    public boolean isEmpty() {
+        return enumerations.isEmpty();
     }
 
     @Override
     public void writeAtoms(CodeAtoms to) {
         if (!enumerations.isEmpty()) {
             to.hintStart(EnumElements.class.getName());
-            to.joinSep(SEP, enumerations.toArray(new HasAtoms[enumerations.size()]));
+            to.joinSep(SEP, enumerations.values().toArray(new HasAtoms[enumerations.size()]));
             to.add(EOL);
             to.hintEnd(EnumElements.class.getName());
         }
