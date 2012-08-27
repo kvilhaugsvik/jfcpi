@@ -19,6 +19,7 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
@@ -104,6 +105,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 } catch (IllegalAccessException e) {
                     throw new Error("Could not initialize ScopeStack", e);
                 } catch (InstantiationException e) {
+                    throw new Error("Could not initialize ScopeStack", e);
+                } catch (InvocationTargetException e) {
                     throw new Error("Could not initialize ScopeStack", e);
                 }
 

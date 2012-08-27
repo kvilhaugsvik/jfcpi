@@ -39,10 +39,10 @@ public interface CodeStyle {
         private final LinkedList<Scope> stack;
 
         public ScopeStack(Class<Scope> kind)
-                throws NoSuchMethodException, IllegalAccessException, InstantiationException {
+                throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
             this.kind = kind.getConstructor();
             this.stack = new LinkedList<Scope>();
-            this.stack.addFirst(kind.newInstance());
+            addNewScopeFrame();
         }
 
         public Scope get() {
@@ -51,7 +51,7 @@ public interface CodeStyle {
 
         public void open() {
             try {
-                this.stack.addFirst(kind.newInstance());
+                addNewScopeFrame();
             } catch (InstantiationException e) {
                 throw new Error("Exception thrown after initialization but not during?", e);
             } catch (IllegalAccessException e) {
@@ -59,6 +59,10 @@ public interface CodeStyle {
             } catch (InvocationTargetException e) {
                 throw new Error("Exception thrown after initialization but not during?", e);
             }
+        }
+
+        private void addNewScopeFrame() throws InstantiationException, IllegalAccessException, InvocationTargetException {
+            this.stack.addFirst(kind.newInstance());
         }
 
         public void close() {
