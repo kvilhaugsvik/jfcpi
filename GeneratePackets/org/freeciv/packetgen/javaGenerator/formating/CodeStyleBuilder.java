@@ -16,11 +16,12 @@ package org.freeciv.packetgen.javaGenerator.formating;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
 import java.util.*;
 
-public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> {
+public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     private final LinkedList<AtomCheck<ScopeInfoKind>> triggers;
     private final LinkedList<AtomCheck<ScopeInfoKind>> many;
     private final Class<ScopeInfoKind> scopeMaker;
@@ -208,7 +209,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
         };
     }
 
-    private static class CompiledAtomCheck<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo>
+    private static class CompiledAtomCheck<ScopeInfoKind extends ScopeInfo>
             implements Util.TwoConditions<CodeAtom, CodeAtom> {
         private final AtomCheck<ScopeInfoKind> check;
         private final CodeStyle.ScopeStack<ScopeInfoKind> stack;
@@ -227,8 +228,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
         }
     }
 
-    private static class AtomCheck<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> {
-        private static <ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> Util.OneCondition<ScopeInfoKind> ignoresScope() {
+    private static class AtomCheck<ScopeInfoKind extends ScopeInfo> {
+        private static <ScopeInfoKind extends ScopeInfo> Util.OneCondition<ScopeInfoKind> ignoresScope() {
             return new Util.OneCondition<ScopeInfoKind>() {
                 @Override public boolean isTrueFor(ScopeInfoKind argument) {
                     return true;
@@ -338,63 +339,6 @@ public class CodeStyleBuilder<ScopeInfoKind extends CodeStyleBuilder.ScopeInfo> 
                     return true;
                 }
             }, doThis, when);
-        }
-    }
-
-    public static class ScopeInfo {
-        private int beganAt = 0;
-        private int beganAtLine = 0;
-        private int lineLength = 0;
-        private String lineUpToScope = "";
-
-        private final LinkedList<String> hints = new LinkedList<String>();
-
-        public int getLineLength() {
-            return lineLength;
-        }
-
-        void setLineLength(int length) {
-            lineLength = length;
-        }
-
-        public void setBeganAt(int atomNumber) {
-            beganAt = atomNumber;
-        }
-
-        public int getBeganAt() {
-            return beganAt;
-        }
-
-        public void setLineUpToScope(String line) {
-            lineUpToScope = line;
-        }
-
-        public String getLineUpToScope() {
-            return lineUpToScope;
-        }
-
-        public void setBeganAtLine(int number) {
-            beganAtLine = number;
-        }
-
-        public int getBeganAtLine() {
-            return beganAtLine;
-        }
-
-        final public String seeTopHint() {
-            return hints.peekFirst();
-        }
-
-        final void addHint(String hint) {
-            hints.addFirst(hint);
-        }
-
-        final void removeTopHint(String hint) {
-            assert !hints.isEmpty() : "Tried to remove the top hint when no hints are there";
-            if (hints.peekFirst().equals(hint))
-                hints.removeFirst();
-            else
-                throw new IllegalArgumentException("Asked to remove a different hint than the top one");
         }
     }
 }

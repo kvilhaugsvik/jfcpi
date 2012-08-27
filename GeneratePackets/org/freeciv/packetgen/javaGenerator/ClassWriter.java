@@ -563,7 +563,7 @@ public class ClassWriter {
         DEFAULT_STYLE = maker.getStyle();
     }
 
-    public static class DefaultStyleScopeInfo extends CodeStyleBuilder.ScopeInfo {
+    public static class DefaultStyleScopeInfo extends CodeStyle.ScopeStack.ScopeInfo {
         private int lineBreakTry = 0;
 
         public int getLineBreakTry() {

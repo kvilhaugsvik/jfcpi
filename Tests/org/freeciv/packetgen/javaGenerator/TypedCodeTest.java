@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 import org.junit.Test;
 
@@ -40,9 +41,9 @@ public class TypedCodeTest {
     }
 
     @Test public void breakLineBlock() {
-        CodeStyleBuilder<CodeStyleBuilder.ScopeInfo> builder =
-                new CodeStyleBuilder<CodeStyleBuilder.ScopeInfo>(CodeStyle.Action.INSERT_SPACE,
-                        CodeStyleBuilder.ScopeInfo.class);
+        CodeStyleBuilder<ScopeInfo> builder =
+                new CodeStyleBuilder<ScopeInfo>(CodeStyle.Action.INSERT_SPACE,
+                        ScopeInfo.class);
 
         builder.whenBetween(HasAtoms.EOL, HasAtoms.CCommentStart, CodeStyle.Action.BREAK_LINE_BLOCK);
         builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);

@@ -34,7 +34,7 @@ public interface CodeStyle {
         SCOPE_EXIT
     }
 
-    public static class ScopeStack<Scope extends CodeStyleBuilder.ScopeInfo> {
+    public static class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
         private final Constructor<Scope> kind;
         private final LinkedList<Scope> stack;
 
@@ -66,6 +66,63 @@ public interface CodeStyle {
                 throw new IllegalStateException("Tried to close newer opened scope");
 
             this.stack.pop();
+        }
+
+        public static class ScopeInfo {
+            private int beganAt = 0;
+            private int beganAtLine = 0;
+            private int lineLength = 0;
+            private String lineUpToScope = "";
+
+            private final LinkedList<String> hints = new LinkedList<String>();
+
+            public int getLineLength() {
+                return lineLength;
+            }
+
+            void setLineLength(int length) {
+                lineLength = length;
+            }
+
+            public void setBeganAt(int atomNumber) {
+                beganAt = atomNumber;
+            }
+
+            public int getBeganAt() {
+                return beganAt;
+            }
+
+            public void setLineUpToScope(String line) {
+                lineUpToScope = line;
+            }
+
+            public String getLineUpToScope() {
+                return lineUpToScope;
+            }
+
+            public void setBeganAtLine(int number) {
+                beganAtLine = number;
+            }
+
+            public int getBeganAtLine() {
+                return beganAtLine;
+            }
+
+            final public String seeTopHint() {
+                return hints.peekFirst();
+            }
+
+            final void addHint(String hint) {
+                hints.addFirst(hint);
+            }
+
+            final void removeTopHint(String hint) {
+                assert !hints.isEmpty() : "Tried to remove the top hint when no hints are there";
+                if (hints.peekFirst().equals(hint))
+                    hints.removeFirst();
+                else
+                    throw new IllegalArgumentException("Asked to remove a different hint than the top one");
+            }
         }
     }
 }
