@@ -47,6 +47,7 @@ public class TypedCodeTest {
         builder.whenBetween(HasAtoms.EOL, HasAtoms.CCommentStart, CodeStyle.Action.BREAK_LINE_BLOCK);
         builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
         builder.whenBefore(HasAtoms.EOL, CodeStyle.Action.DO_NOTHING);
+        builder.atTheBeginning(CodeStyle.Action.DO_NOTHING);
 
         CodeAtoms toRunOn = new CodeAtoms();
         toRunOn.add(new CodeAtom("A"));
