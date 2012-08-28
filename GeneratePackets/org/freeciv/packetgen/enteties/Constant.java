@@ -18,53 +18,47 @@ import org.freeciv.Util;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class Constant implements IDependency {
-    private final String name;
-    private final String expression;
-    private final String type;
+public class Constant extends Var implements IDependency {
     private final HashSet<Requirement> reqs = new HashSet<Requirement>();
 
     private static final String constantPrefix = Util.VERSION_DATA_CLASS + ".";
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
 
     public Constant(String name, AString expression) {
-        this.name = name;
-        this.expression = expression.getJavaCode();
-        this.type = "String";
+        super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
+                "String", name, expression);
     }
 
     public Constant(String name, ALong expression) {
-        this.name = name;
-        this.expression = expression.toString();
-        this.type = "long";
+        super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
+                "long", name, expression);
     }
 
     public Constant(String name, IntExpression expression) {
-        this.name = name;
-        this.expression = expression.toString();
-        this.type = "int";
+        super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
+                "int", name, BuiltIn.asAnInt(expression.toString()));
         reqs.addAll(expression.getReqs());
     }
 
     public String getType() {
-        return type;
+        return super.getType();
     }
 
     public String getName() {
-        return name;
+        return super.getName();
     }
 
     public String getExpression() {
-        return expression;
-    }
-
-    @Override public String toString() {
-        return type + " " + name + " " + expression;
+        return Util.joinStringArray(
+                ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(new CodeAtoms(super.getValue())).toArray(),
+                "\n", "", "");
     }
 
     @Override
@@ -74,7 +68,7 @@ public class Constant implements IDependency {
 
     @Override
     public Requirement getIFulfillReq() {
-        return new Requirement(name, Requirement.Kind.VALUE);
+        return new Requirement(super.getName(), Requirement.Kind.VALUE);
     }
 
     public static String referToInJavaCode(Requirement req) {

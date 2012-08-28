@@ -221,7 +221,7 @@ public class PacketsStore {
                                 null, null);
 
         for (Constant dep : sortedConstants)
-            constants.addClassConstant(Visibility.PUBLIC, dep.getType(), dep.getName(), dep.getExpression());
+            constants.addField(dep);
 
         AString[] understandsPackets;
         if (packetsByNumber.isEmpty()) {
