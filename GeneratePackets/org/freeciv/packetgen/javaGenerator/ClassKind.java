@@ -24,7 +24,7 @@ public enum ClassKind implements HasAtoms {
     private final CodeAtom code;
 
     ClassKind() {
-        this.code = new CodeAtom(name().toLowerCase());
+        this.code = new ClassKind.Atom(name().toLowerCase());
     }
 
     @Override
@@ -35,5 +35,11 @@ public enum ClassKind implements HasAtoms {
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(code);
+    }
+
+    public static class Atom extends CodeAtom {
+        public Atom(String atom) {
+            super(atom);
+        }
     }
 }

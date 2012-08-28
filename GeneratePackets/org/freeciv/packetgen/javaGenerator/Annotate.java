@@ -28,11 +28,17 @@ public class Annotate extends Formatted implements HasAtoms {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        to.add(new CodeAtom("@" + annotation));
+        to.add(new Annotate.Atom(annotation));
         if (0 < arguments.length) {
             to.add(LPR);
             to.joinSep(SEP, arguments);
             to.add(RPR);
+        }
+    }
+
+    public static class Atom extends CodeAtom {
+        public Atom(String atom) {
+            super("@" + atom);
         }
     }
 }

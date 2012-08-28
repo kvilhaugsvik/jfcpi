@@ -25,7 +25,7 @@ public enum Visibility implements HasAtoms {
     private final CodeAtom code;
 
     Visibility(boolean silent) {
-        this.code = (silent ? null : new CodeAtom(name().toLowerCase()));
+        this.code = (silent ? null : new Visibility.Atom(name().toLowerCase()));
     }
 
     @Override
@@ -37,5 +37,11 @@ public enum Visibility implements HasAtoms {
     public void writeAtoms(CodeAtoms to) {
         if (null != code)
             to.add(code);
+    }
+
+    public static class Atom extends CodeAtom {
+        public Atom(String atom) {
+            super(atom);
+        }
     }
 }
