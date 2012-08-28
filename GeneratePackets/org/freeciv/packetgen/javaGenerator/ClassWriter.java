@@ -385,10 +385,6 @@ public class ClassWriter {
         return new Annotate("Generated", comments, value);
     }
 
-    private static String indent(String code) {
-        return "\t" + code.replace("\n", "\n\t");
-    }
-
     private static final Pattern scopeEndFirst = Pattern.compile("\\A\\}+");
     public static String indent(String[] lines, String startAt) {
         String out = "";
@@ -485,7 +481,7 @@ public class ClassWriter {
 
         @Override
         public String toString() {
-            String out = (null == comment ? "" : indent(comment) + "\n");
+            String out = (null == comment ? "" : "\t" + comment.replace("\n", "\n\t") + "\n");
             out += "\t" + ifIs("", visibility.toString(), " ") + ifIs(scope.toString(), " ") + ifIs(type, " ") +
                     name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ") + "{" + "\n";
             out += indent(body, "\t" + "\t");
