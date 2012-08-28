@@ -17,6 +17,4 @@ package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
 public interface Returnable extends HasAtoms {
-    @Override
-    public abstract String toString();
 }
