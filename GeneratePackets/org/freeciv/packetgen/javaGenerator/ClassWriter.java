@@ -17,6 +17,8 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
+import org.freeciv.packetgen.javaGenerator.expression.Statement;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
@@ -29,6 +31,8 @@ import java.util.regex.Pattern;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class ClassWriter {
+    private static final String OUTER_LEVEL = "Outside";
+
     private final TargetPackage where;
     private final List<Import> imports;
     private final Visibility visibility;
@@ -218,17 +222,20 @@ public class ClassWriter {
         return getField(field).assign(asAValue(field));
     }
 
-    private String formatImports() {
-        String out = "";
+    private void formatImports(CodeAtoms to) {
+        if (!imports.isEmpty()) {
+            to.hintStart("Group");
 
-        for (Import anImport : imports) {
-            if ((null != anImport))
-                out += anImport.getJavaCode();
-            out += "\n";
+            for (Import anImport : imports) {
+                if (null != anImport)
+                    anImport.writeAtoms(to);
+                else {
+                    to.hintEnd("Group");
+                    to.hintStart("Group");
+                }
+            }
+            to.hintEnd("Group");
         }
-        if (0 < imports.size()) out += "\n";
-
-        return out;
     }
 
     private static String formatVariableDeclarations(List<Var> variables) {
@@ -270,17 +277,35 @@ public class ClassWriter {
 
     public String toString() {
         String out = "";
+        CodeAtoms typedStart = new CodeAtoms();
+        typedStart.hintStart(OUTER_LEVEL);
 
-        if (null != where) out = "package " + where.getJavaCode() + ";" + "\n" + "\n";
+        if (null != where) {
+            typedStart.add(new IR.CodeAtom("package"));
+            where.writeAtoms(typedStart);
+            typedStart.add(HasAtoms.EOL);
+        }
 
-        if (null != imports) out += formatImports();
+        formatImports(typedStart);
 
         for (Annotate ann : classAnnotate)
-            out += ann.getJavaCodeIndented("");
+            ann.writeAtoms(typedStart);
 
-        out += visibility + " " + kind + " " + name + ifIs(" extends ", parent, "") + ifIs(" implements ",
-                                                                                           implementsInterface,
-                                                                                           "") + " {" + "\n";
+        visibility.writeAtoms(typedStart);
+        kind.writeAtoms(typedStart);
+        typedStart.add(new ClassWriter.Atom(name));
+        if (null != parent) {
+            typedStart.add(new IR.CodeAtom("extends"));
+            typedStart.add(new IR.CodeAtom(parent));
+        }
+        if (null != implementsInterface) {
+            typedStart.add(new IR.CodeAtom("implements"));
+            typedStart.add(new IR.CodeAtom(implementsInterface));
+        }
+
+        typedStart.hintEnd(OUTER_LEVEL);
+        out += indent(DEFAULT_STYLE.asFormattedLines(typedStart).toArray(new String[0]), "");
+        out = out.substring(0, out.length() - 1) + " {\n";
 
         if (ClassKind.ENUM == kind && !enums.isEmpty())
             out += enums.getJavaCodeIndented("\t") + "\n";
@@ -497,6 +522,40 @@ public class ClassWriter {
                         DefaultStyleScopeInfo.class);
 
         maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
+        maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override
+            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                return OUTER_LEVEL.equals(argument.seeTopHint());
+            }
+        });
+        maker.whenBefore(Annotate.Atom.class, CodeStyle.Action.BREAK_LINE,
+                new Util.OneCondition<DefaultStyleScopeInfo>() {
+                    @Override
+                    public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                        return OUTER_LEVEL.equals(argument.seeTopHint());
+                    }
+                });
+        maker.whenBefore(Visibility.Atom.class, CodeStyle.Action.BREAK_LINE,
+                new Util.OneCondition<DefaultStyleScopeInfo>() {
+                    @Override
+                    public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                        return OUTER_LEVEL.equals(argument.seeTopHint());
+                    }
+                });
+        maker.whenAfter(Visibility.Atom.class, CodeStyle.Action.INSERT_SPACE,
+                new Util.OneCondition<DefaultStyleScopeInfo>() {
+                    @Override
+                    public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                        return OUTER_LEVEL.equals(argument.seeTopHint());
+                    }
+                });
+        maker.whenBefore(ClassKind.Atom.class, CodeStyle.Action.BREAK_LINE,
+                new Util.OneCondition<DefaultStyleScopeInfo>() {
+                    @Override
+                    public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                        return OUTER_LEVEL.equals(argument.seeTopHint());
+                    }
+                });
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
         maker.whenAfter(HasAtoms.LSC, CodeStyle.Action.BREAK_LINE);
         maker.whenAfter(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
@@ -568,6 +627,12 @@ public class ClassWriter {
 
         public int getLineBreakTry() {
             return lineBreakTry;
+        }
+    }
+
+    public static class Atom extends IR.CodeAtom {
+        public Atom(String atom) {
+            super(atom);
         }
     }
 }
