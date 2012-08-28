@@ -148,7 +148,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 scopeStack.get().setBeganAtLine(out.size());
                 scopeStack.get().setLineUpToScope("");
                 while (pointerAfter < atoms.length) {
-                    StringBuilder line = new StringBuilder();
+                    StringBuilder line = newLine(scopeStack);
                     boolean addBreak = false;
                     boolean addBlank = false;
                     line: while (pointerAfter < atoms.length) {
@@ -197,6 +197,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                         line = new StringBuilder(scopeStack.get().getLineUpToScope());
                                         scopeStack.get().setLineLength(line.length());
                                         continue line;
+                                    case INDENT:
+                                        scopeStack.get().setExtraIndent(1);
+                                        break;
                                 }
 
                         pointerAfter++;
@@ -221,6 +224,17 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             private void updateHintsAfter(ScopeStack<ScopeInfoKind> scopeStack, IR element) {
                 for (IR.Hint hint : element.getHintsAfter())
                     scopeStack.get().removeTopHint(hint.get());
+            }
+
+            private StringBuilder newLine(ScopeStack<ScopeInfoKind> scopeStack) {
+                int toInd = scopeStack.getIndentSum();
+
+                if (toInd < 1)
+                    return new StringBuilder();
+
+                char[] indention = new char[toInd];
+                Arrays.fill(indention, '\t');
+                return new StringBuilder(new String(indention));
             }
 
             private CodeAtom getOrNull(IR[] atoms, int pos) {

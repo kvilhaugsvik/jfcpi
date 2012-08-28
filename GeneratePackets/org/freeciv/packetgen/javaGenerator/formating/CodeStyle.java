@@ -30,6 +30,7 @@ public interface CodeStyle {
         BREAK_LINE_BLOCK,
         BREAK_LINE,
         RESET_LINE,
+        INDENT,
         SCOPE_ENTER,
         SCOPE_EXIT
     }
@@ -47,6 +48,14 @@ public interface CodeStyle {
 
         public Scope get() {
             return stack.peekFirst();
+        }
+
+        public int getIndentSum() {
+            int toInd = 0;
+            for (Scope info : stack)
+                toInd += info.getExtraIndent();
+
+            return toInd;
         }
 
         public void open() {
@@ -78,6 +87,7 @@ public interface CodeStyle {
             private int lineLength = 0;
             private String lineUpToScope = "";
 
+            private int extraIndent = 0;
             private final LinkedList<String> hints = new LinkedList<String>();
 
             public int getLineLength() {
@@ -128,6 +138,14 @@ public interface CodeStyle {
                     hints.removeFirst();
                 else
                     throw new IllegalArgumentException("Asked to remove a different hint than the top one");
+            }
+
+            public int getExtraIndent() {
+                return extraIndent;
+            }
+
+            public void setExtraIndent(int add) {
+                extraIndent = add;
             }
         }
     }
