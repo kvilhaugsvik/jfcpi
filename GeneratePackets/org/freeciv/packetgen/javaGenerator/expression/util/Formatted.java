@@ -22,7 +22,9 @@ import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
 public abstract class Formatted implements HasAtoms {
     public String getJavaCodeIndented(String start) {
-        return ClassWriter.indent(basicFormatBlock(), start);
+        CodeAtoms out = new CodeAtoms(this);
+        return Util.joinStringArray(ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(out).toArray(new String[0]),
+                "\n", "", "\n");
     }
 
     public String getJavaCode() {

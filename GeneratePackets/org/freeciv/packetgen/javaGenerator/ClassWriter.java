@@ -531,6 +531,7 @@ public class ClassWriter {
     }
 
     public static final CodeStyle DEFAULT_STYLE;
+    public static final CodeStyle DEFAULT_STYLE_INDENT;
     static {
         final CodeStyleBuilder<DefaultStyleScopeInfo> maker =
                 new CodeStyleBuilder<DefaultStyleScopeInfo>(
@@ -636,6 +637,11 @@ public class ClassWriter {
         maker.alwaysBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
 
         DEFAULT_STYLE = maker.getStyle();
+
+        maker.alwaysBefore(HasAtoms.ALS, CodeStyle.Action.INDENT);
+        maker.alwaysBefore(HasAtoms.LPR, CodeStyle.Action.INDENT);
+        maker.alwaysBefore(HasAtoms.LSC, CodeStyle.Action.INDENT);
+        DEFAULT_STYLE_INDENT = maker.getStyle();
     }
 
     public static class DefaultStyleScopeInfo extends CodeStyle.ScopeStack.ScopeInfo {
