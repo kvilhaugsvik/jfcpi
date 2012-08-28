@@ -54,11 +54,11 @@ public class TerminatedArray extends FieldTypeBasic {
                       "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
                       "}",
               "return " + "this.value.length + (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + "?1:0);",
-              new ExprFrom1<AString, AValue>() {
+              new ExprFrom1<AString, Var>() {
                   @Override
-                  public AString x(AValue arg1) {
+                  public AString x(Var arg1) {
                       return new MethodCall.RetAString(null, "org.freeciv.Util.joinStringArray",
-                              arg1, literalString(" "));
+                              arg1.ref(), literalString(" "));
                   }
               },
               true, Arrays.asList(maxSizeConstant, terminator));

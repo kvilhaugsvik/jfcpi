@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
@@ -120,6 +121,20 @@ public class Var extends Formatted implements Returnable {
         final Var onVar = this;
         final MethodCall.RetAValue toCall = type.call(method, params);
         return new MethodCall.RetAValue(null, method, params) {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                onVar.ref().writeAtoms(to);
+                to.add(HAS);
+                toCall.writeAtoms(to);
+            }
+        };
+    }
+
+    // TODO: Remove when type system fixed
+    public AString callRetAString(String method, AValue... params) {
+        final Var onVar = this;
+        final MethodCall.RetAValue toCall = type.call(method, params);
+        return new MethodCall.RetAString(null, method, params) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 onVar.ref().writeAtoms(to);

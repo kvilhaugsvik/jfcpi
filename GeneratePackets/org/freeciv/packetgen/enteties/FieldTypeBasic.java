@@ -36,7 +36,7 @@ public class FieldTypeBasic implements IDependency {
     private final Block constructorBody;
     private final String[] decode;
     private final String[] encode, encodedSize;
-    private final ExprFrom1<AString, AValue> value2String;
+    private final ExprFrom1<AString, Var> value2String;
     private final boolean arrayEater;
 
     private final Collection<Requirement> requirement;
@@ -63,7 +63,7 @@ public class FieldTypeBasic implements IDependency {
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
                           ExprFrom1<Block, Var>  constructorBody,
                           ExprFrom2<Block, Var, Var> decode, String encode, String encodedSize,
-                          ExprFrom1<AString, AValue> toString,
+                          ExprFrom1<AString, Var> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
         Var from = Var.local(java.io.DataInput.class, "from", null);
         Var value =
@@ -133,7 +133,7 @@ public class FieldTypeBasic implements IDependency {
             addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
             addMethodPublicReadObjectState(null, javaType, "getValue", new Block(RETURN(getField("value").ref())));
             addMethodPublicReadObjectState(null, "String", "toString",
-                    new Block(RETURN(value2String.x(getField("value").ref()))));
+                    new Block(RETURN(value2String.x(getField("value")))));
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
                     new Block(IF(
                             asBool("other instanceof " + name),

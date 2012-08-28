@@ -81,11 +81,11 @@ public class BuiltIn {
         return new WrappedString("\"" + javaCode + "\"");
     }
 
-    public static final ExprFrom1<AString, AValue> TO_STRING_OBJECT =
-            new ExprFrom1<AString, AValue>() {
+    public static final ExprFrom1<AString, Var> TO_STRING_OBJECT =
+            new ExprFrom1<AString, Var>() {
                 @Override
-                public AString x(AValue arg1) {
-                    return asAString(arg1.getJavaCode() + ".toString()");
+                public AString x(Var arg1) {
+                    return arg1.callRetAString("toString");
                 }
             };
 
