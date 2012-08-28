@@ -238,21 +238,27 @@ public class ClassWriter {
         }
     }
 
-    private static String formatVariableDeclarations(List<Var> variables) {
-        String out = "";
+    private static void formatVariableDeclarations(CodeAtoms to, final List<Var> fields) {
+        (new Formatted() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                if (!fields.isEmpty()) {
+                    to.hintStart("Group");
+                    Scope scopeOfPrevious = fields.get(0).getScope();
 
-        Scope scopeOfPrevious = (0 < variables.size()?
-                variables.get(0).getScope():
-                null);
-        for (Var variable : variables) {
-            if (!variable.getScope().equals(scopeOfPrevious))
-                out += "\n";
-            out += variable.getJavaCodeIndented("\t");
-            scopeOfPrevious = variable.getScope();
-        }
-        if (!variables.isEmpty()) out += "\n";
+                    for (Var variable : fields) {
+                        if (!variable.getScope().equals(scopeOfPrevious)) {
+                            to.hintEnd("Group");
+                            to.hintStart("Group");
+                        }
+                        new Statement(variable).writeAtoms(to);
+                        scopeOfPrevious = variable.getScope();
+                    }
 
-        return out;
+                    to.hintEnd("Group");
+                }
+            }
+        }).writeAtoms(to);
     }
 
     private static String formatMethods(List<Method> methods) {
@@ -307,10 +313,20 @@ public class ClassWriter {
         out += indent(DEFAULT_STYLE.asFormattedLines(typedStart).toArray(new String[0]), "");
         out = out.substring(0, out.length() - 1) + " {\n";
 
-        if (ClassKind.ENUM == kind && !enums.isEmpty())
-            out += enums.getJavaCodeIndented("\t") + "\n";
+        if ((ClassKind.ENUM == kind && !enums.isEmpty()) || !fields.isEmpty()) {
+            CodeAtoms typedBody = new CodeAtoms();
+            typedBody.hintStart(OUTER_LEVEL);
 
-        out += formatVariableDeclarations(fields);
+            if (ClassKind.ENUM == kind && !enums.isEmpty())
+                enums.writeAtoms(typedBody);
+
+            formatVariableDeclarations(typedBody, fields);
+
+            typedBody.hintEnd(OUTER_LEVEL);
+            out += indent(DEFAULT_STYLE.asFormattedLines(typedBody).toArray(new String[0]), "\t");
+
+            out += "\n";
+        }
 
         if (constructorFromAllFields)
             out += constructorFromFields();
