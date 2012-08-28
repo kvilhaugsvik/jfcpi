@@ -56,12 +56,34 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         triggers.add(AtomCheck.<ScopeInfoKind>leftIs(atom, toInsert, scopeCond));
     }
 
+    public void whenAfter(final Class<? extends CodeAtom> kind, CodeStyle.Action toDo,
+                           Util.OneCondition<ScopeInfoKind> scopeCond) {
+        triggers.add(new AtomCheck<ScopeInfoKind>(
+                new Util.TwoConditions<CodeAtom, CodeAtom>() {
+                    @Override
+                    public boolean isTrueFor(CodeAtom l, CodeAtom r) {
+                        return (null != l) && kind.isInstance(l);
+                    }
+                }, toDo, scopeCond));
+    }
+
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert) {
         triggers.add(AtomCheck.<ScopeInfoKind>rightIs(atom, toInsert));
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfoKind> scopeCond) {
         triggers.add(AtomCheck.<ScopeInfoKind>rightIs(atom, toInsert, scopeCond));
+    }
+
+    public void whenBefore(final Class<? extends CodeAtom> kind, CodeStyle.Action toDo,
+                           Util.OneCondition<ScopeInfoKind> scopeCond) {
+        triggers.add(new AtomCheck<ScopeInfoKind>(
+                new Util.TwoConditions<CodeAtom, CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom l, CodeAtom r) {
+                return (null != r) && kind.isInstance(r);
+            }
+        }, toDo, scopeCond));
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
