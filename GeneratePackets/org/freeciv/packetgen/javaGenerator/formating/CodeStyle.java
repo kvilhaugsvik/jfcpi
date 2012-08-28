@@ -121,7 +121,9 @@ public interface CodeStyle {
             }
 
             final void removeTopHint(String hint) {
-                assert !hints.isEmpty() : "Tried to remove the top hint when no hints are there";
+                if (hints.isEmpty())
+                    throw new UnsupportedOperationException("Tried to remove the top hint when no hints are there");
+
                 if (hints.peekFirst().equals(hint))
                     hints.removeFirst();
                 else
