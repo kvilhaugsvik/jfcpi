@@ -130,10 +130,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                     boolean addBreak = false;
                     boolean addBlank = false;
                     line: while (pointerAfter < atoms.length) {
-                        if (0 <= pointerAfter)
+                        if (0 <= pointerAfter) {
                             line.append(atoms[pointerAfter].getAtom().get());
-                        if (pointerAfter + 1 < atoms.length)
-                            updateHintsBefore(scopeStack, atoms[pointerAfter + 1]);
+                            updateHintsAfter(scopeStack, atoms[pointerAfter]);
+                        }
                         scopeStack.get().setLineLength(line.length());
 
                         switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
@@ -179,7 +179,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
                         pointerAfter++;
                         if (pointerAfter < atoms.length)
-                            updateHintsAfter(scopeStack, atoms[pointerAfter]);
+                            updateHintsBefore(scopeStack, atoms[pointerAfter]);
                         if (addBreak)
                             break line;
                     }
