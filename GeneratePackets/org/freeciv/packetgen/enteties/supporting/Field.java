@@ -21,7 +21,6 @@ import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.*;
 
@@ -287,7 +286,7 @@ public class Field extends Var {
             Block inner = new Block();
 
             ref.addStatement(FOR(count,
-                    asBool(count.ref().getJavaCode() + " < " + "this." + this.getFieldName() + replaceWith + ".length"),
+                    isSmallerThan(count.ref(), asAValue("this." + this.getFieldName() + replaceWith + ".length")),
                     inc(count),
                     inner));
             ref = inner;

@@ -101,8 +101,7 @@ public class Hardcoded {
                                                to.assign(asAValue("new universal[length]")),
                                                FOR(
                                                        counter,
-                                                       asBool(counter.ref().getJavaCode() + " < " +
-                                                               len.ref().getJavaCode()),
+                                                       isSmallerThan(counter.ref(), len.ref()),
                                                        inc(counter),
                                                        new Block(arraySetElement(
                                                                to,
