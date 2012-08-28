@@ -27,6 +27,10 @@ public class TargetClass extends Address {
     public TargetClass(String fullPath) {
         super(fullPath.split("\\."));
         name = super.components[super.components.length - 1];
+
+        // While all classes have a toString this isn't true for all types.
+        // As all types are assumed to be classes this may cause trouble
+        methods.put("toString", new TargetMethod("toString"));
     }
 
     public TargetClass(Class wrapped) {

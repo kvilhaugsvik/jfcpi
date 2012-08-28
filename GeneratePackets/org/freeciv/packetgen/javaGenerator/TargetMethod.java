@@ -21,8 +21,12 @@ import java.lang.reflect.Method;
 public class TargetMethod extends Address {
     private final String name;
 
+    public TargetMethod(String named) {
+        name = named;
+    }
+
     public TargetMethod(Method has) {
-        name = has.getName();
+        this(has.getName());
     }
 
     public String getName() {
