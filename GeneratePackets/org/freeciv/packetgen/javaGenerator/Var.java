@@ -74,8 +74,8 @@ public class Var extends Formatted implements Returnable {
         return name;
     }
 
-    public String getValue() {
-        return value.getJavaCode();
+    public AValue getValue() {
+        return value;
     }
 
     public String toString() {

@@ -19,11 +19,15 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.junit.Test;
 
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class PacketsStoreTest {
     private static PacketsStore defaultStorage() {
@@ -231,7 +235,10 @@ public class PacketsStoreTest {
     }
 
     @Test public void noPacketsAreListedWhenNoPacketsAreRegistered() {
-        assertEquals("{}", getVersionData(defaultStorage()).getField("understandsPackets").getValue());
+        CodeAtoms packList = new CodeAtoms(getVersionData(defaultStorage()).getField("understandsPackets").getValue());
+
+        assertEquals(HasAtoms.ALS, packList.get(0).getAtom());
+        assertEquals(HasAtoms.ALE, packList.get(1).getAtom());
     }
 
     @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
@@ -239,6 +246,8 @@ public class PacketsStoreTest {
         storage.registerPacket("PACKET_HELLO", 0, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
 
         assertEquals("{\"org.freeciv.packet.PACKET_HELLO\"}",
-                     getVersionData(storage).getField("understandsPackets").getValue());
+                Util.joinStringArray(ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(
+                        new CodeAtoms(getVersionData(storage).getField("understandsPackets").getValue())).toArray(),
+                        "\n", "", ""));
     }
 }
