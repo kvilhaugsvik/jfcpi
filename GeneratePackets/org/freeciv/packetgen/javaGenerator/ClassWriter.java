@@ -310,8 +310,10 @@ public class ClassWriter {
         }
 
         typedStart.hintEnd(OUTER_LEVEL);
-        out += indent(DEFAULT_STYLE.asFormattedLines(typedStart).toArray(new String[0]), "");
-        out = out.substring(0, out.length() - 1) + " {\n";
+        out += Util.joinStringArray(
+                DEFAULT_STYLE_INDENT.asFormattedLines(typedStart).toArray(new String[0]),
+                "\n", "", "");
+        out += " {\n";
 
         if ((ClassKind.ENUM == kind && !enums.isEmpty()) || !fields.isEmpty()) {
             CodeAtoms typedBody = new CodeAtoms();
@@ -323,7 +325,11 @@ public class ClassWriter {
             formatVariableDeclarations(typedBody, fields);
 
             typedBody.hintEnd(OUTER_LEVEL);
-            out += indent(DEFAULT_STYLE.asFormattedLines(typedBody).toArray(new String[0]), "\t");
+            for (String line : DEFAULT_STYLE_INDENT.asFormattedLines(typedBody)) {
+                if (0 < line.length())
+                    out += "\t" + line;
+                out += "\n";
+            }
 
             out += "\n";
         }
