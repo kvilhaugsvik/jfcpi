@@ -33,20 +33,8 @@ public abstract class WrapCodeString implements HasAtoms {
         this.javaCode = javaCode;
     }
 
-    /**
-     * Get source code for an expression that returns a value of the type of the class
-     * @return the source code
-     */
-    public String getJavaCode() {
-        return javaCode;
-    }
-
     public void writeAtoms(CodeAtoms to) {
         to.add(new CodeAtom(javaCode));
-    }
-
-    public final String toString() {
-        return getJavaCode();
     }
 
     static class WrappedAny extends WrapCodeString implements AValue {

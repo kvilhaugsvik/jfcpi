@@ -17,12 +17,6 @@ package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
 public interface Returnable extends HasAtoms {
-    /**
-     * Get source code for an expression that returns a value
-     * @return the source code
-     */
-    public abstract  String getJavaCode();
-
     @Override
     public abstract String toString();
 }

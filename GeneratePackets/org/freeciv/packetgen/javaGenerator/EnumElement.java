@@ -23,10 +23,6 @@ public class EnumElement extends MethodCall {
         return super.method;
     }
 
-    public String toString() {
-        return this.getJavaCode();
-    }
-
     public static EnumElement newEnumValue(String enumValueName) {
         return new EnumElement(null, enumValueName);
     }

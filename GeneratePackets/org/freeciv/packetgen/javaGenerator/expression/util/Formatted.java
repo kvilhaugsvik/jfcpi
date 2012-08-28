@@ -24,11 +24,11 @@ public abstract class Formatted implements HasAtoms {
     public String getJavaCodeIndented(String start) {
         CodeAtoms out = new CodeAtoms(this);
         return Util.joinStringArray(ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(out).toArray(new String[0]),
-                "\n", "", "\n");
+                "\n", "", "");
     }
 
-    public String getJavaCode() {
-        return Util.joinStringArray(basicFormatBlock(), "\n", "", "");
+    public String toString() {
+        return getJavaCodeIndented("");
     }
 
     protected String[] basicFormatBlock() {

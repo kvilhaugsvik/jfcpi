@@ -367,7 +367,7 @@ public class ClassWriter {
     }
 
     public String getPackage() {
-        return where.getJavaCode();
+        return where.getFullAddress();
     }
 
     public Var getField(String name) {

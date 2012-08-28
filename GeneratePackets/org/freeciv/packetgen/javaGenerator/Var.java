@@ -67,7 +67,7 @@ public class Var extends Formatted implements Returnable {
     }
 
     public String getType() {
-        return type.getJavaCode();
+        return type.getName();
     }
 
     public String getName() {
@@ -76,10 +76,6 @@ public class Var extends Formatted implements Returnable {
 
     public AValue getValue() {
         return value;
-    }
-
-    public String toString() {
-        return (new Statement(this)).getJavaCode();
     }
 
     @Override
