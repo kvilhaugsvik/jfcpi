@@ -77,6 +77,13 @@ public class ClassWriter {
         }
     }
 
+    public void addField(Var field) {
+        if (field.getScope().equals(Scope.CODE_BLOCK))
+            throw new IllegalArgumentException("Can't add a local variable declaration as a field");
+
+        fields.add(field);
+    }
+
     public void addClassConstant(String type, String name, String value) {
         fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
                 asAValue(value)));
