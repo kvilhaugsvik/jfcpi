@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
@@ -33,6 +34,10 @@ public class Address extends Formatted implements HasAtoms {
         this.components = new CodeAtom[start.components.length + parts.length];
         System.arraycopy(start.components, 0, this.components, 0, start.components.length);
         System.arraycopy(parts, 0, this.components, start.components.length, parts.length);
+    }
+
+    public String getFullAddress() {
+        return Util.joinStringArray(components, ".", "", "");
     }
 
     @Override
