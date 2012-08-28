@@ -39,6 +39,10 @@ public class TargetClass extends Address {
             methods.put(has.getName(), new TargetMethod(has));
     }
 
+    public String getName() {
+        return name.get();
+    }
+
     public MethodCall.RetAValue call(String method, AValue... parameters) {
         if (!methods.containsKey(method))
             throw new IllegalArgumentException("No method named " + method + " on " + name.get());
