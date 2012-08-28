@@ -20,6 +20,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.*;
@@ -207,6 +208,22 @@ public class Field extends Var {
             return 1; // needs to check that it is small enough to use as int
         else
             return -1; // not supported
+    }
+
+    public void appendValidationTo(boolean testArrayLength, Block to) throws UndefinedException {
+        String transferTypesAreSafe = transferTypeCheck();
+        String sizeChecks = this.getLegalSize(testArrayLength);
+
+        if (!"".equals(transferTypesAreSafe))
+            // TODO: make sure it will cause a compile time error or throw an error here
+            to.addStatement(asAValue("assert " + transferTypesAreSafe + " : " +
+                    "\"Can't prove that index value will stay in the range Java's signed integers can represent.\""));
+
+        if (!"".equals(sizeChecks)) {
+            to.addStatement(BuiltIn.IF(asBool(sizeChecks.substring(0, sizeChecks.length() - 2)),
+                    Block.fromStrings("throw new IllegalArgumentException(\"Array " + this.getFieldName() +
+                            " constructed with value out of scope in packet " + onPacket + "\")")));
+        }
     }
 
     public String[] validate(boolean testArrayLength) throws UndefinedException {
