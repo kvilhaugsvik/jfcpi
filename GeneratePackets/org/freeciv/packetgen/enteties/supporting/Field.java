@@ -220,7 +220,7 @@ public class Field extends Var {
                     "\"Can't prove that index value will stay in the range Java's signed integers can represent.\";");
 
         if (!"".equals(sizeChecks)) {
-            out.add("if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ")" + "{");
+            out.add("if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ") {");
             out.add("throw new IllegalArgumentException(\"Array " + this.getFieldName() +
                         " constructed with value out of scope in packet " + onPacket + "\");");
             out.add("}");
