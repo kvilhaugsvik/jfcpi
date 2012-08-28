@@ -49,11 +49,13 @@ public class MethodCall extends Formatted implements HasAtoms {
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(new CodeAtom(method));
-        to.hintStart("CallArgs");
         to.add(LPR);
-        to.joinSep(SEP, parameters);
+        if (0 < parameters.length) {
+            to.hintStart("CallArgs");
+            to.joinSep(SEP, parameters);
+            to.hintEnd("CallArgs");
+        }
         to.add(RPR);
-        to.hintEnd("CallArgs");
         if (null != comment) {
             to.add(CCommentStart);
             to.add(new CodeAtom(comment));
