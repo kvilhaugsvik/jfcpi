@@ -31,6 +31,7 @@ public interface HasAtoms {
     public static final CodeAtom ALS = new CodeAtom("{");
     public static final CodeAtom ALE = new CodeAtom("}");
     public static final CodeAtom ASSIGN = new CodeAtom("=");
+    public static final CodeAtom IS_SMALLER = new CodeAtom("<");
     public static final CodeAtom ADD = new CodeAtom("+");
     public static final CodeAtom INC = new CodeAtom("++");
 

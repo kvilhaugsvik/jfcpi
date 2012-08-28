@@ -108,6 +108,17 @@ public class BuiltIn {
         };
     }
 
+    public static ABool isSmallerThan(final AValue small, final AValue largerThan) {
+        return new Formatted.FormattedBool() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                small.writeAtoms(to);
+                to.add(IS_SMALLER);
+                largerThan.writeAtoms(to);
+            }
+        };
+    }
+
     public static MethodCall.RetAValue arraySetElement(final Var on, final AValue number, final AValue val) {
         return new MethodCall.RetAValue(null, "[]=", on.ref(), val) {
             @Override

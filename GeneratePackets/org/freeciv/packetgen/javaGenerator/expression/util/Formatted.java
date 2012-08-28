@@ -41,4 +41,5 @@ public abstract class Formatted implements HasAtoms {
     static abstract class FormattedVoid extends Formatted implements NoValue {}
     public static abstract class FormattedAValue extends Formatted implements AValue {}
     static abstract class FormattedString extends Formatted implements AString {}
+    public static abstract class FormattedBool extends Formatted implements ABool {}
 }
