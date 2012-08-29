@@ -105,7 +105,7 @@ public class Var extends Formatted implements Typed<Returnable> {
      * @return variable name access
      */
     public Typed<AValue> ref() {
-        return new FormattedAValue() {
+        return new Formatted.Type<AValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(referName);
@@ -151,7 +151,7 @@ public class Var extends Formatted implements Typed<Returnable> {
     }
 
 
-    public static class SetTo extends FormattedAValue {
+    public static class SetTo extends Formatted.Type<AValue> {
         private final CodeAtom referName;
         private final Typed<? extends AValue> value;
 

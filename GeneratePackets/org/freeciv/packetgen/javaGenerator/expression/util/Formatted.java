@@ -38,9 +38,5 @@ public abstract class Formatted implements HasAtoms {
         return ClassWriter.DEFAULT_STYLE.asFormattedLines(out).toArray(new String[0]);
     }
 
-    public static abstract class FormattedReturnable extends Formatted implements Typed<Returnable> {}
-    static abstract class FormattedVoid extends Formatted implements Typed<NoValue> {}
-    public static abstract class FormattedAValue extends Formatted implements Typed<AValue> {}
-    static abstract class FormattedString extends Formatted implements Typed<AString> {}
-    public static abstract class FormattedBool extends Formatted implements Typed<ABool> {}
+    public static abstract class Type<Return extends Returnable> extends Formatted implements Typed<Return> {}
 }

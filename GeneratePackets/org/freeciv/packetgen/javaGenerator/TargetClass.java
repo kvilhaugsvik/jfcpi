@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.lang.reflect.Method;
@@ -55,7 +56,7 @@ public class TargetClass extends Address {
     private final static CodeAtom typeClassField = new CodeAtom("class");
     public Typed<AValue> classVal() {
         final TargetClass parent = this;
-        return new FormattedAValue() {
+        return new Formatted.Type<AValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 parent.writeAtoms(to);

@@ -27,7 +27,7 @@ public class BuiltIn {
     public static final Typed<ABool> FALSE = asBool("false");
 
     public static Typed<NoValue> RETURN(final Typed<? extends AValue> arg1) {
-            return new Formatted.FormattedVoid() {
+            return new Formatted.Type<NoValue>() {
                 @Override
                 public void writeAtoms(CodeAtoms to) {
                     to.add(RET);
@@ -45,7 +45,7 @@ public class BuiltIn {
     }
 
     public static Typed<NoValue> WHILE(final Typed<ABool> cond, final Block rep) {
-        return new Formatted.FormattedVoid() {
+        return new Formatted.Type<NoValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(WHILE);
@@ -59,7 +59,7 @@ public class BuiltIn {
 
     public static Typed<NoValue> FOR(final Var count, final Typed<ABool> cond, final Typed<? extends Returnable> changer,
                               final Block body) {
-        return new Formatted.FormattedVoid() {
+        return new Formatted.Type<NoValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(FOR);
@@ -88,7 +88,7 @@ public class BuiltIn {
             };
 
     public static Typed<? extends AValue> sum(final Typed<? extends AValue>... values) {
-        return new Formatted.FormattedAValue() {
+        return new Formatted.Type<AValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.joinSep(ADD, values);
@@ -107,7 +107,7 @@ public class BuiltIn {
     }
 
     public static Typed<ABool> isSmallerThan(final Typed<AValue> small, final Typed<AValue> largerThan) {
-        return new Formatted.FormattedBool() {
+        return new Formatted.Type<ABool>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 small.writeAtoms(to);

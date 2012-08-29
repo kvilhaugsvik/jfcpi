@@ -30,7 +30,7 @@ class If implements From2or3<Typed<NoValue>, Typed<ABool>, Block, Block>, ExprFr
 
     @Override
     public Typed<NoValue> x(final Typed<ABool> cond, final Block then, final Block ifNot) {
-        return new Formatted.FormattedVoid() {
+        return new Formatted.Type<NoValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(IF);
