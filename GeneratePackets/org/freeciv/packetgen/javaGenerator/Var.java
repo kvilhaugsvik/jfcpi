@@ -113,25 +113,10 @@ public class Var extends Formatted implements Typed<Returnable> {
         };
     }
 
-    // TODO: When fixing type system permit returning AValue
-    public MethodCall<AValue> call(String method, Typed<AValue>... params) {
+    public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<AValue>... params) {
         final Var onVar = this;
         final MethodCall<AValue> toCall = type.call(method, params);
-        return new MethodCall<AValue>(null, method, params) {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                onVar.ref().writeAtoms(to);
-                to.add(HAS);
-                toCall.writeAtoms(to);
-            }
-        };
-    }
-
-    // TODO: Remove when type system fixed
-    public Typed<AString> callRetAString(String method, Typed<AValue>... params) {
-        final Var onVar = this;
-        final MethodCall<AValue> toCall = type.call(method, params);
-        return new MethodCall<AString>(null, method, params) {
+        return new MethodCall<Ret>(null, method, params) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 onVar.ref().writeAtoms(to);

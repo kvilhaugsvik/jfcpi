@@ -62,12 +62,12 @@ public class Hardcoded {
                             return new Block(to.assign((new TargetClass("requirement")).newInstance(
                                     new TargetClass("universal").newInstance(
                                             new MethodCall<AValue>(null, "universals_n.valueOf",
-                                                    from.call("readUnsignedByte")),
-                                            from.call("readInt")),
+                                                    from.<AValue>call("readUnsignedByte")),
+                                            from.<AValue>call("readInt")),
                                     new MethodCall<AValue>(null, "req_range.valueOf",
-                                            from.call("readUnsignedByte")),
-                                    from.call("readBoolean"),
-                                    from.call("readBoolean"))));
+                                            from.<AValue>call("readUnsignedByte")),
+                                    from.<AValue>call("readBoolean"),
+                                    from.<AValue>call("readBoolean"))));
                         }
                     },
                     "to.writeByte(this.value.getsource().kind.getNumber());\n" +
@@ -95,7 +95,7 @@ public class Hardcoded {
                                    @Override
                                    public Block x(Var to, Var from) {
                                        TargetClass universal = new TargetClass("org.freeciv.types.universal");
-                                       Var len = Var.local("int", "length", from.call("readUnsignedByte"));
+                                       Var len = Var.local("int", "length", from.<AValue>call("readUnsignedByte"));
                                        Var counter = Var.local("int", "i",
                                                asAnInt("0"));
                                        return new Block(
@@ -112,8 +112,8 @@ public class Hardcoded {
                                                                        new MethodCall<AValue>(
                                                                                null,
                                                                                "universals_n.valueOf",
-                                                                               from.call("readUnsignedByte")),
-                                                                       from.call("readUnsignedByte")
+                                                                               from.<AValue>call("readUnsignedByte")),
+                                                                       from.<AValue>call("readUnsignedByte")
                                                        )))));
                                    }
                     },
@@ -149,7 +149,7 @@ public class Hardcoded {
                                        Var buf =
                                                Var.local("StringBuffer", "buf",
                                                        sb.newInstance());
-                                       Var letter = Var.local("byte", "letter", from.call("readByte"));
+                                       Var letter = Var.local("byte", "letter", from.<AValue>call("readByte"));
                                        Var read = Var.local("int", "read",
                                                asAnInt("0"));
                                        return new Block(
@@ -160,7 +160,7 @@ public class Hardcoded {
                                                        asVoid("read++"),
                                                        arrayEaterScopeCheck("arraySize < read"),
                                                        asVoid("buf.append((char)letter)"),
-                                                       letter.assign(from.call("readByte")))),
+                                                       letter.assign(from.<AValue>call("readByte")))),
                                                IF(asBool("buf.length() == 0"),
                                                        new Block(to.assign(asAString("\"\""))),
                                                        new Block(to.assign(asAString("buf.toString()")))));

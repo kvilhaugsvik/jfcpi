@@ -83,7 +83,7 @@ public class BuiltIn {
             new ExprFrom1<Typed<AString>, Var>() {
                 @Override
                 public Typed<AString> x(Var arg1) {
-                    return arg1.callRetAString("toString");
+                    return arg1.<AString>call("toString");
                 }
             };
 

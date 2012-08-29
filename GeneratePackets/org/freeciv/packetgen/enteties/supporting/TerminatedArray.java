@@ -37,14 +37,14 @@ public class TerminatedArray extends FieldTypeBasic {
                         Var buf = Var.local("byte[]", "buffer",
                                 asAValue("new byte[" +
                                         Constant.referToInJavaCode(maxSizeConstant) + "]"));
-                        Var current = Var.local("byte", "current", from.call("readByte"));
+                        Var current = Var.local("byte", "current", from.<AValue>call("readByte"));
                         Var pos = Var.local("int", "pos", asAnInt("0"));
                         return new Block(buf, current, pos,
                                 WHILE(asBool("((byte)" + Constant.referToInJavaCode(terminator) + ") != current"),
                                         new Block(asVoid("buffer[pos] = current"),
                                                 asVoid("pos++"),
                                                 IF(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
-                                                        new Block(current.assign(from.call("readByte"))),
+                                                        new Block(current.assign(from.<AValue>call("readByte"))),
                                                         new Block(asVoid("break"))))),
                                 to.assign(new MethodCall<AValue>(null, "java.util.Arrays.copyOf",
                                         buf.ref(), pos.ref())));
