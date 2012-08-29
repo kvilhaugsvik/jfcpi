@@ -22,8 +22,6 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString.*;
-
 public class BuiltIn {
     public static final Typed<ABool> TRUE = asBool("true");
     public static final Typed<ABool> FALSE = asBool("false");
@@ -78,7 +76,7 @@ public class BuiltIn {
     }
 
     public static Typed<AString> literalString(String javaCode) {
-        return new WrappedString("\"" + javaCode + "\"");
+        return new WrapCodeString<AString>("\"" + javaCode + "\"");
     }
 
     public static final ExprFrom1<Typed<AString>, Var> TO_STRING_OBJECT =
@@ -134,26 +132,26 @@ public class BuiltIn {
     }
 
     public static Typed<AString> asAString(String javaCode) {
-        return new WrappedString(javaCode);
+        return new WrapCodeString<AString>(javaCode);
     }
 
     public static Typed<ABool> asBool(String javaCode) {
-        return new WrappedBool(javaCode);
+        return new WrapCodeString<ABool>(javaCode);
     }
 
     public static Typed<AnInt> asAnInt(String javaCode) {
-        return new WrappedInt(javaCode);
+        return new WrapCodeString<AnInt>(javaCode);
     }
 
     public static Typed<ALong> asALong(String javaCode) {
-        return new WrappedLong(javaCode);
+        return new WrapCodeString<ALong>(javaCode);
     }
 
     public static Typed<AValue> asAValue(String javaCode) {
-        return new WrappedAny(javaCode);
+        return new WrapCodeString<AValue>(javaCode);
     }
 
     public static Typed<NoValue> asVoid(String javaCode) {
-        return new WrappedVoid(javaCode);
+        return new WrapCodeString<NoValue>(javaCode);
     }
 }

@@ -23,7 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 /**
  * Wrap a string of source code by declaring what it is
  */
-public abstract class WrapCodeString implements HasAtoms {
+public class WrapCodeString<Returns extends Returnable> implements HasAtoms, Typed<Returns> {
     private final String javaCode;
 
     /**
@@ -36,41 +36,5 @@ public abstract class WrapCodeString implements HasAtoms {
 
     public void writeAtoms(CodeAtoms to) {
         to.add(new CodeAtom(javaCode));
-    }
-
-    static class WrappedAny extends WrapCodeString implements Typed<AValue> {
-        protected WrappedAny(String javaCode) {
-            super(javaCode);
-        }
-    }
-
-    static class WrappedLong extends WrapCodeString implements Typed<ALong> {
-        public WrappedLong(String javaCode) {
-            super(javaCode);
-        }
-    }
-
-    static class WrappedInt extends WrapCodeString implements Typed<AnInt> {
-        public WrappedInt(String javaCode) {
-            super(javaCode);
-        }
-    }
-
-    static class WrappedString extends WrapCodeString implements Typed<AString> {
-        public WrappedString(String javaCode) {
-            super(javaCode);
-        }
-    }
-
-    static class WrappedVoid extends WrapCodeString implements Typed<NoValue> {
-        public WrappedVoid(String javaCode) {
-            super(javaCode);
-        }
-    }
-
-    static class WrappedBool extends WrapCodeString implements Typed<ABool> {
-        public WrappedBool(String javaCode) {
-            super(javaCode);
-        }
     }
 }
