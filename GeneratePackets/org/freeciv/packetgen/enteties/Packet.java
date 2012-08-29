@@ -110,21 +110,20 @@ public class Packet extends ClassWriter implements IDependency {
     private void addConstructorFromJavaTypes(Field[] fields, String headerKind) throws UndefinedException {
         if (0 < fields.length) {
             LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
-            LinkedList<String> constructorBodyJ = new LinkedList<String>();
+            Block constructorBodyJ = new Block();
             for (Field field : fields) {
-                params.add(new AbstractMap
-                        .SimpleImmutableEntry<String, String>(field.getJType() + field.getArrayDeclaration(),
-                                                              field.getFieldName()));
-                constructorBodyJ.addAll(Arrays.asList(field.validate(true)));
-                constructorBodyJ.addAll(
-                        Arrays.asList(field.forElementsInField("this." + field.getFieldName() + " = new " + field
-                                                                 .getFType() + field.getNewCreation() + ";",
-                                                         "this." + field.getFieldName() + "[i] = " + field
-                                                                 .getNewFromJavaType(),
-                                                         "")));
+                params.add(new AbstractMap.SimpleImmutableEntry<String, String>(
+                        field.getJType() + field.getArrayDeclaration(),
+                        field.getFieldName()));
+                field.appendValidationTo(true, constructorBodyJ);
+                if (field.hasDeclarations())
+                    constructorBodyJ.addStatement(
+                            field.assign(asAValue("new " + field.getFType() + field.getNewCreation())));
+                field.forElementsInField("this." + field.getFieldName() + "[i] = " +
+                        field.getNewFromJavaType(), constructorBodyJ);
             }
-            constructorBodyJ.add(generateHeader(headerKind) + ";");
-            addConstructorPublic(null, createParameterList(params), constructorBodyJ.toArray(new String[0]));
+            constructorBodyJ.addStatement(asAValue(generateHeader(headerKind)));
+            addConstructorPublic(null, createParameterList(params), constructorBodyJ);
         }
     }
 

@@ -144,7 +144,7 @@ public class Field extends Var {
     public String getNewFromJavaType() throws UndefinedException {
         return "new " + this.getFType() + "(" + this.getFieldName() + "[i]" +
                 (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getSize() : "") + ");";
+                        ", " + declarations[declarations.length - 1].getSize() : "") + ")";
     }
 
     private String getLegalSize(boolean testArrayLength) throws UndefinedException {
