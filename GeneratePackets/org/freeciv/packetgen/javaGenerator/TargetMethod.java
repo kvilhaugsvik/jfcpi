@@ -35,7 +35,7 @@ public class TargetMethod extends Address {
     }
 
     // TODO: Make return <? extends Returnable> when type system is fixed
-    public MethodCall.RetAValue call(Typed<AValue>[] parameters) {
-        return new MethodCall.RetAValue(null, name, parameters);
+    public MethodCall<AValue> call(Typed<AValue>[] parameters) {
+        return new MethodCall<AValue>(null, name, parameters);
     }
 }

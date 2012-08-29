@@ -14,7 +14,9 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-public class EnumElement extends MethodCall {
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
+
+public class EnumElement extends MethodCall<NoValue> {
     protected EnumElement(String comment, String elementName, String... params) {
         super(comment, elementName, params);
     }

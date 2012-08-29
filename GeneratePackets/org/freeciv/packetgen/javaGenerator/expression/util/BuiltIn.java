@@ -98,8 +98,8 @@ public class BuiltIn {
         };
     }
 
-    public static MethodCall.RetAValue inc(final Var var) {
-        return new MethodCall.RetAValue(null, "++", var.ref()) {
+    public static MethodCall<AValue> inc(final Var var) {
+        return new MethodCall<AValue>(null, "++", var.ref()) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 var.ref().writeAtoms(to);
@@ -119,8 +119,8 @@ public class BuiltIn {
         };
     }
 
-    public static MethodCall.RetAValue arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
-        return new MethodCall.RetAValue(null, "[]=", on.ref(), val) {
+    public static MethodCall<AValue> arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
+        return new MethodCall<AValue>(null, "[]=", on.ref(), val) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 on.ref().writeAtoms(to);

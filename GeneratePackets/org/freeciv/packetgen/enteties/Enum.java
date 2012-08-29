@@ -21,6 +21,7 @@ import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
@@ -94,7 +95,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName, "int number, String toStringName", null,
-                  new Block(new MethodCall.AReturnable(null, "this", "number", "toStringName", "true")));
+                  new Block(new MethodCall<Returnable>(null, "this", "number", "toStringName", "true")));
         addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName,
                   "int number, String toStringName, boolean valid",
                   null,

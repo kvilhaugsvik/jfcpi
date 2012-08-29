@@ -44,7 +44,7 @@ public class TargetClass extends Address {
         return name.get();
     }
 
-    public MethodCall.RetAValue call(String method, Typed<AValue>... parameters) {
+    public MethodCall<AValue> call(String method, Typed<AValue>... parameters) {
         if (!methods.containsKey(method))
             throw new IllegalArgumentException("No method named " + method + " on " + name.get());
 
@@ -66,8 +66,8 @@ public class TargetClass extends Address {
     }
 
     private final static CodeAtom newInst = new CodeAtom("new");
-    public MethodCall.RetAValue newInstance(Typed<AValue>... parameterList) {
-        return new MethodCall.RetAValue(null, "new " + name.get(), parameterList) {
+    public MethodCall<AValue> newInstance(Typed<AValue>... parameterList) {
+        return new MethodCall<AValue>(null, "new " + name.get(), parameterList) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(newInst);

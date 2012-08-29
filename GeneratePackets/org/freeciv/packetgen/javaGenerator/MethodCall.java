@@ -22,7 +22,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
-public class MethodCall extends Formatted implements HasAtoms {
+public class MethodCall<Returns extends Returnable> extends Formatted implements HasAtoms, Typed<Returns> {
     private final String comment;
     protected final String method;
     protected final Typed<? extends AValue>[] parameters;
@@ -61,24 +61,6 @@ public class MethodCall extends Formatted implements HasAtoms {
             to.add(CCommentStart);
             to.add(new CodeAtom(comment));
             to.add(CCommentEnd);
-        }
-    }
-
-    public static class AReturnable extends MethodCall implements Typed<Returnable> {
-        public AReturnable(String comment, String name, String... params) {
-            super(comment, name, params);
-        }
-    }
-
-    public static class RetAValue extends MethodCall implements Typed<AValue> {
-        public RetAValue(String comment, String name, Typed<? extends AValue>... params) {
-            super(comment, name, params);
-        }
-    }
-
-    public static class RetAString extends MethodCall implements Typed<AString> {
-        public RetAString(String comment, String name, Typed<? extends AValue>... params) {
-            super(comment, name, params);
         }
     }
 }

@@ -25,6 +25,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 import java.util.*;
@@ -60,10 +61,10 @@ public class Hardcoded {
                         public Block x(Var to, Var from) {
                             return new Block(to.assign((new TargetClass("requirement")).newInstance(
                                     new TargetClass("universal").newInstance(
-                                            new MethodCall.RetAValue(null, "universals_n.valueOf",
+                                            new MethodCall<AValue>(null, "universals_n.valueOf",
                                                     from.call("readUnsignedByte")),
                                             from.call("readInt")),
-                                    new MethodCall.RetAValue(null, "req_range.valueOf",
+                                    new MethodCall<AValue>(null, "req_range.valueOf",
                                             from.call("readUnsignedByte")),
                                     from.call("readBoolean"),
                                     from.call("readBoolean"))));
@@ -108,7 +109,7 @@ public class Hardcoded {
                                                                to,
                                                                counter.ref(),
                                                                universal.newInstance(
-                                                                       new MethodCall.RetAValue(
+                                                                       new MethodCall<AValue>(
                                                                                null,
                                                                                "universals_n.valueOf",
                                                                                from.call("readUnsignedByte")),
