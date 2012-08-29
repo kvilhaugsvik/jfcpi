@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.Util;
 import org.freeciv.packet.fieldtype.*;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -39,7 +40,7 @@ public class Field extends Var {
     public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket, List<WeakFlag> flags,
                  WeakField.ArrayDeclaration... declarations) {
         super(fieldFlagsToAnnotations(flags), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-              typeAlias.getName() + getArrayDeclaration(typeAlias, decWeakToStrong(declarations, onPacket, fieldName)),
+              typeAlias.getName() + getArrayDeclaration(typeAlias, declarations.length),
               fieldName, null);
 
         if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
@@ -115,16 +116,15 @@ public class Field extends Var {
         return getNumberOfDeclarations(type, declarations);
     }
 
-    public static String getArrayDeclaration(FieldTypeBasic.FieldTypeAlias type, ArrayDeclaration[] declarations) {
-        String out = "";
-        for (int i = 0; i < getNumberOfDeclarations(type, declarations); i++) {
-            out += "[]";
-        }
-        return out;
+    public static String getArrayDeclaration(FieldTypeBasic.FieldTypeAlias type, int rawDeclarations) {
+        int unhandledArrays = rawDeclarations;
+        if (type.getBasicType().isArrayEater())
+            unhandledArrays--;
+        return Util.repeat("[]", unhandledArrays);
     }
 
     public String getArrayDeclaration() {
-        return getArrayDeclaration(type, declarations);
+        return getArrayDeclaration(type, declarations.length);
     }
 
     public String getNewCreation() throws UndefinedException {
