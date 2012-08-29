@@ -247,9 +247,6 @@ public class ClassWriter {
     }
 
     private static void formatVariableDeclarations(CodeAtoms to, final List<Var> fields) {
-        (new Formatted() {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
                 if (!fields.isEmpty()) {
                     to.hintStart("Group");
                     Scope scopeOfPrevious = fields.get(0).getScope();
@@ -265,8 +262,6 @@ public class ClassWriter {
 
                     to.hintEnd("Group");
                 }
-            }
-        }).writeAtoms(to);
     }
 
     private static String formatMethods(List<Method> methods) {
