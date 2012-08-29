@@ -56,6 +56,14 @@ public class Util {
         return joinStringArrayGeneric(elements, separator, "(", ")");
     }
 
+    public static String repeat(String toRepeat, int times) {
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < times; i++)
+            out.append(toRepeat);
+
+        return out.toString();
+    }
+
     public static <Argument1, Argument2, Cond extends TwoConditions<Argument1, Argument2>> Cond getFirstFound(
             List<Cond> lookedAt,
             Argument1 arg1,
