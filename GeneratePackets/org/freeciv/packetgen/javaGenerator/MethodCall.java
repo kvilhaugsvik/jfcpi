@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
@@ -24,13 +25,13 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 public class MethodCall extends Formatted implements HasAtoms {
     private final String comment;
     protected final String method;
-    protected final AValue[] parameters;
+    protected final Typed<? extends AValue>[] parameters;
 
     public MethodCall(String comment, String name, String... params) {
         this(comment, name, paramListIsAValue(params));
     }
 
-    public MethodCall(String comment, String name, AValue... params) {
+    public MethodCall(String comment, String name, Typed<? extends AValue>... params) {
         if (null == name)
             throw new IllegalArgumentException("No method name given to method call");
 
@@ -39,8 +40,8 @@ public class MethodCall extends Formatted implements HasAtoms {
         this.parameters = params;
     }
 
-    private static AValue[] paramListIsAValue(String[] parameterList) {
-        AValue[] parameters = new AValue[parameterList.length];
+    private static Typed<AValue>[] paramListIsAValue(String[] parameterList) {
+        Typed<AValue>[] parameters = new Typed[parameterList.length];
         for (int i = 0; i < parameterList.length; i++)
             parameters[i] = BuiltIn.asAValue(parameterList[i]);
         return parameters;
@@ -63,20 +64,20 @@ public class MethodCall extends Formatted implements HasAtoms {
         }
     }
 
-    public static class AReturnable extends MethodCall implements Returnable {
+    public static class AReturnable extends MethodCall implements Typed<Returnable> {
         public AReturnable(String comment, String name, String... params) {
             super(comment, name, params);
         }
     }
 
-    public static class RetAValue extends MethodCall implements AValue {
-        public RetAValue(String comment, String name, AValue... params) {
+    public static class RetAValue extends MethodCall implements Typed<AValue> {
+        public RetAValue(String comment, String name, Typed<? extends AValue>... params) {
             super(comment, name, params);
         }
     }
 
-    public static class RetAString extends MethodCall implements AString {
-        public RetAString(String comment, String name, AValue... params) {
+    public static class RetAString extends MethodCall implements Typed<AString> {
+        public RetAString(String comment, String name, Typed<? extends AValue>... params) {
             super(comment, name, params);
         }
     }

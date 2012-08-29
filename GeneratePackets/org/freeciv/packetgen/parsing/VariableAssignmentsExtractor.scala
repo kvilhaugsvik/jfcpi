@@ -17,6 +17,7 @@ package org.freeciv.packetgen.parsing
 import org.freeciv.packetgen.javaGenerator.expression.willReturn._
 import org.freeciv.packetgen.enteties.Constant
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn._
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed
 
 object ParseVariableAssignments extends ExtractableParser {
   protected def isNewLineIgnored(source: CharSequence, offset: Int) = false
@@ -26,7 +27,7 @@ object ParseVariableAssignments extends ExtractableParser {
   // TODO: Should concatenation be supported?
   def strExpr = quotedString.r ^^ {a => asAString(a)}
 
-  def value: Parser[AValue] = strExpr
+  def value: Parser[Typed[AString]] = strExpr
 
   // TODO: Error if next item isn't EOL to avoid subtle bugs
   def assignment = (identifierRegEx <~ "=") ~ value
@@ -34,7 +35,7 @@ object ParseVariableAssignments extends ExtractableParser {
   def expr = assignment
 
   def assignmentConverted = assignment ^^ {
-    case name ~ (value: AString) => Constant.isString(name, value)
+    case name ~ (value: Typed[AString]) => Constant.isString(name, value)
     case _ => throw new IllegalArgumentException("Internal error: Asked to interpret unknown type")
   }
 

@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
@@ -23,9 +24,9 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
  * Represents a complete statement
  */
 public class Statement extends Formatted implements HasAtoms {
-    private final Returnable statement;
+    private final Typed<? extends Returnable> statement;
 
-    public Statement(Returnable statement) {
+    public Statement(Typed<? extends Returnable> statement) {
         this.statement = statement;
     }
 

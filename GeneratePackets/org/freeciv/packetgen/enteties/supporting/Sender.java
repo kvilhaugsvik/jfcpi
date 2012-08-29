@@ -17,6 +17,7 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packet.Sent;
 import org.freeciv.packetgen.javaGenerator.Annotate;
 import org.freeciv.packetgen.javaGenerator.Var;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
@@ -25,7 +26,7 @@ public class Sender extends Annotate {
         super(Sent.class.getSimpleName(), Var.SetTo.strToVal("value", sender(number)));
     }
 
-    private static AValue sender(int number) {
+    private static Typed<AValue> sender(int number) {
         switch (number) {
             case 0:
                 return BuiltIn.asAValue("Sent.From.UNKNOWN");

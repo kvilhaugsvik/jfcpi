@@ -17,6 +17,7 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packet.Cancel;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.ArrayLiteral;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.util.List;
@@ -26,8 +27,8 @@ public class Canceler extends Annotate {
         super(Cancel.class.getSimpleName(), Var.SetTo.strToVal("value", formatArray(canceled)));
     }
 
-    public static AValue formatArray(List<String> canceled) {
-        AValue[] toCancel = new AValue[canceled.size()];
+    public static Typed<AValue> formatArray(List<String> canceled) {
+        Typed<AValue>[] toCancel = new Typed[canceled.size()];
 
         for (int i = 0; i < canceled.size(); i++)
             toCancel[i] = (new TargetClass(canceled.get(i))).classVal();

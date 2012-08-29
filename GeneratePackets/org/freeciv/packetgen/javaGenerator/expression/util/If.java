@@ -22,14 +22,14 @@ import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
-class If implements From2or3<NoValue, ABool, Block, Block>, ExprFrom2<NoValue, ABool, Block> {
+class If implements From2or3<Typed<NoValue>, Typed<ABool>, Block, Block>, ExprFrom2<Typed<NoValue>, Typed<ABool>, Block> {
     @Override
-    public NoValue x(ABool cond, Block then) {
+    public Typed<NoValue> x(Typed<ABool> cond, Block then) {
         return x(cond, then, null);
     }
 
     @Override
-    public NoValue x(final ABool cond, final Block then, final Block ifNot) {
+    public Typed<NoValue> x(final Typed<ABool> cond, final Block then, final Block ifNot) {
         return new Formatted.FormattedVoid() {
             @Override
             public void writeAtoms(CodeAtoms to) {

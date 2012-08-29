@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.lang.reflect.Method;
@@ -43,7 +44,7 @@ public class TargetClass extends Address {
         return name.get();
     }
 
-    public MethodCall.RetAValue call(String method, AValue... parameters) {
+    public MethodCall.RetAValue call(String method, Typed<AValue>... parameters) {
         if (!methods.containsKey(method))
             throw new IllegalArgumentException("No method named " + method + " on " + name.get());
 
@@ -52,7 +53,7 @@ public class TargetClass extends Address {
 
     // TODO: Should this be seen as a function called on the type?
     private final static CodeAtom typeClassField = new CodeAtom("class");
-    public AValue classVal() {
+    public Typed<AValue> classVal() {
         final TargetClass parent = this;
         return new FormattedAValue() {
             @Override
@@ -65,7 +66,7 @@ public class TargetClass extends Address {
     }
 
     private final static CodeAtom newInst = new CodeAtom("new");
-    public MethodCall.RetAValue newInstance(AValue... parameterList) {
+    public MethodCall.RetAValue newInstance(Typed<AValue>... parameterList) {
         return new MethodCall.RetAValue(null, "new " + name.get(), parameterList) {
             @Override
             public void writeAtoms(CodeAtoms to) {

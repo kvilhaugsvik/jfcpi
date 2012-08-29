@@ -14,5 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.willReturn;
 
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+
 public interface NoValue extends Returnable {
 }

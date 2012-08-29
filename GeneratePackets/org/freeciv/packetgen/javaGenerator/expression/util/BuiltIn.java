@@ -25,10 +25,10 @@ import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import static org.freeciv.packetgen.javaGenerator.expression.util.WrapCodeString.*;
 
 public class BuiltIn {
-    public static final ABool TRUE = asBool("true");
-    public static final ABool FALSE = asBool("false");
+    public static final Typed<ABool> TRUE = asBool("true");
+    public static final Typed<ABool> FALSE = asBool("false");
 
-    public static NoValue RETURN(final AValue arg1) {
+    public static Typed<NoValue> RETURN(final Typed<? extends AValue> arg1) {
             return new Formatted.FormattedVoid() {
                 @Override
                 public void writeAtoms(CodeAtoms to) {
@@ -38,15 +38,15 @@ public class BuiltIn {
             };
     }
 
-    private static final From2or3<NoValue, ABool, Block, Block> ifImpl = new If();
-    public static NoValue IF (ABool cond, Block then) {
+    private static final From2or3<Typed<NoValue>, Typed<ABool>, Block, Block> ifImpl = new If();
+    public static Typed<NoValue> IF (Typed<ABool> cond, Block then) {
         return ifImpl.x(cond, then);
     }
-    public static NoValue IF (ABool cond, Block then, Block ifNot) {
+    public static Typed<NoValue> IF (Typed<ABool> cond, Block then, Block ifNot) {
         return ifImpl.x(cond, then, ifNot);
     }
 
-    public static NoValue WHILE(final ABool cond, final Block rep) {
+    public static Typed<NoValue> WHILE(final Typed<ABool> cond, final Block rep) {
         return new Formatted.FormattedVoid() {
             @Override
             public void writeAtoms(CodeAtoms to) {
@@ -59,7 +59,7 @@ public class BuiltIn {
         };
     }
 
-    public static NoValue FOR(final Var count, final ABool cond, final Returnable changer,
+    public static Typed<NoValue> FOR(final Var count, final Typed<ABool> cond, final Typed<? extends Returnable> changer,
                               final Block body) {
         return new Formatted.FormattedVoid() {
             @Override
@@ -77,19 +77,19 @@ public class BuiltIn {
         };
     }
 
-    public static AString literalString(String javaCode) {
+    public static Typed<AString> literalString(String javaCode) {
         return new WrappedString("\"" + javaCode + "\"");
     }
 
-    public static final ExprFrom1<AString, Var> TO_STRING_OBJECT =
-            new ExprFrom1<AString, Var>() {
+    public static final ExprFrom1<Typed<AString>, Var> TO_STRING_OBJECT =
+            new ExprFrom1<Typed<AString>, Var>() {
                 @Override
-                public AString x(Var arg1) {
+                public Typed<AString> x(Var arg1) {
                     return arg1.callRetAString("toString");
                 }
             };
 
-    public static AValue sum(final AValue... values) {
+    public static Typed<? extends AValue> sum(final Typed<? extends AValue>... values) {
         return new Formatted.FormattedAValue() {
             @Override
             public void writeAtoms(CodeAtoms to) {
@@ -108,7 +108,7 @@ public class BuiltIn {
         };
     }
 
-    public static ABool isSmallerThan(final AValue small, final AValue largerThan) {
+    public static Typed<ABool> isSmallerThan(final Typed<AValue> small, final Typed<AValue> largerThan) {
         return new Formatted.FormattedBool() {
             @Override
             public void writeAtoms(CodeAtoms to) {
@@ -119,7 +119,7 @@ public class BuiltIn {
         };
     }
 
-    public static MethodCall.RetAValue arraySetElement(final Var on, final AValue number, final AValue val) {
+    public static MethodCall.RetAValue arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
         return new MethodCall.RetAValue(null, "[]=", on.ref(), val) {
             @Override
             public void writeAtoms(CodeAtoms to) {
@@ -133,27 +133,27 @@ public class BuiltIn {
         };
     }
 
-    public static AString asAString(String javaCode) {
+    public static Typed<AString> asAString(String javaCode) {
         return new WrappedString(javaCode);
     }
 
-    public static ABool asBool(String javaCode) {
+    public static Typed<ABool> asBool(String javaCode) {
         return new WrappedBool(javaCode);
     }
 
-    public static AnInt asAnInt(String javaCode) {
+    public static Typed<AnInt> asAnInt(String javaCode) {
         return new WrappedInt(javaCode);
     }
 
-    public static ALong asALong(String javaCode) {
+    public static Typed<ALong> asALong(String javaCode) {
         return new WrappedLong(javaCode);
     }
 
-    public static AValue asAValue(String javaCode) {
+    public static Typed<AValue> asAValue(String javaCode) {
         return new WrappedAny(javaCode);
     }
 
-    public static NoValue asVoid(String javaCode) {
+    public static Typed<NoValue> asVoid(String javaCode) {
         return new WrappedVoid(javaCode);
     }
 }

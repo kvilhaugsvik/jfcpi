@@ -19,6 +19,7 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.types.FCEnum;
 
@@ -43,7 +44,7 @@ public class Struct extends ClassWriter implements IDependency {
                     new Block(RETURN(getField(field.getValue()).ref())));
         }
 
-        AValue varsToString = literalString("(");
+        Typed<? extends AValue> varsToString = literalString("(");
         for (int i = 0; i < fields.size(); i++) {
             if (0 != i)
                 varsToString = sum(varsToString, literalString(", "));

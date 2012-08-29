@@ -24,6 +24,7 @@ import org.freeciv.packetgen.enteties.Packet;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.ArrayLiteral;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 
@@ -223,11 +224,11 @@ public class PacketsStore {
         for (Constant dep : sortedConstants)
             constants.addField(dep);
 
-        AString[] understandsPackets;
+        Typed<AString>[] understandsPackets;
         if (packetsByNumber.isEmpty()) {
-            understandsPackets = new AString[0];
+            understandsPackets = new Typed[0];
         } else {
-            understandsPackets = new AString[packetsByNumber.lastKey() + 1];
+            understandsPackets = new Typed[packetsByNumber.lastKey() + 1];
             for (int number = 0; number <= packetsByNumber.lastKey(); number++) {
                 if (packetsByNumber.containsKey(number) && requirements.dependenciesFound(packets.get(packetsByNumber.get(number)))) {
                     Packet packet = packets.get(packetsByNumber.get(number));

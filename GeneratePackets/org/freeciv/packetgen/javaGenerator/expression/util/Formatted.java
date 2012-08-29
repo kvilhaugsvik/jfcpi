@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
@@ -37,9 +38,9 @@ public abstract class Formatted implements HasAtoms {
         return ClassWriter.DEFAULT_STYLE.asFormattedLines(out).toArray(new String[0]);
     }
 
-    public static abstract class FormattedReturnable extends Formatted implements Returnable {}
-    static abstract class FormattedVoid extends Formatted implements NoValue {}
-    public static abstract class FormattedAValue extends Formatted implements AValue {}
-    static abstract class FormattedString extends Formatted implements AString {}
-    public static abstract class FormattedBool extends Formatted implements ABool {}
+    public static abstract class FormattedReturnable extends Formatted implements Typed<Returnable> {}
+    static abstract class FormattedVoid extends Formatted implements Typed<NoValue> {}
+    public static abstract class FormattedAValue extends Formatted implements Typed<AValue> {}
+    static abstract class FormattedString extends Formatted implements Typed<AString> {}
+    public static abstract class FormattedBool extends Formatted implements Typed<ABool> {}
 }

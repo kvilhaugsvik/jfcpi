@@ -16,13 +16,14 @@ package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
-public class ArrayLiteral extends Formatted implements AValue {
-    private final AValue[] elements;
+public class ArrayLiteral extends Formatted implements Typed<AValue> {
+    private final Typed<? extends AValue>[] elements;
 
-    public ArrayLiteral(AValue... elements) {
+    public ArrayLiteral(Typed<? extends AValue>... elements) {
         this.elements = elements;
     }
 

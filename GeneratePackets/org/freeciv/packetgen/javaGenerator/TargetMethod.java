@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.lang.reflect.Method;
@@ -34,7 +35,7 @@ public class TargetMethod extends Address {
     }
 
     // TODO: Make return <? extends Returnable> when type system is fixed
-    public MethodCall.RetAValue call(AValue[] parameters) {
+    public MethodCall.RetAValue call(Typed<AValue>[] parameters) {
         return new MethodCall.RetAValue(null, name, parameters);
     }
 }

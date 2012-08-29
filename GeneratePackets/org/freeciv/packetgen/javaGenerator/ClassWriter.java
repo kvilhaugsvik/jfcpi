@@ -18,6 +18,7 @@ import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
@@ -93,11 +94,11 @@ public class ClassWriter {
         fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, asAValue(value)));
     }
 
-    public void addClassConstant(String type, String name, AValue value) {
+    public void addClassConstant(String type, String name, Typed<AValue> value) {
         fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
-    public void addClassConstant(Visibility visibility, String type, String name, AValue value) {
+    public void addClassConstant(Visibility visibility, String type, String name, Typed<AValue> value) {
         fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
@@ -225,7 +226,7 @@ public class ClassWriter {
      * @param field Name of the field (and variable)
      * @return a line of Java setting the field's value to the value of the variable with the same name
      */
-    protected Returnable setFieldToVariableSameName(String field) {
+    protected Typed<? extends Returnable> setFieldToVariableSameName(String field) {
         return getField(field).assign(asAValue(field));
     }
 

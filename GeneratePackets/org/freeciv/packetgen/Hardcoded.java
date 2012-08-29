@@ -24,6 +24,7 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 import java.util.*;
@@ -226,7 +227,7 @@ public class Hardcoded {
             (IDependency)(new SimpleTypeAlias("int", "Integer", Collections.<Requirement>emptySet()))
     );
 
-    public static NoValue arrayEaterScopeCheck(String check) {
+    public static Typed<NoValue> arrayEaterScopeCheck(String check) {
         return IF(asBool(check), Block.fromStrings("throw new IllegalArgumentException(\"Value out of scope\")"));
     }
 

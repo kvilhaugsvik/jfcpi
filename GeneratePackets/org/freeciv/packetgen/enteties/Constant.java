@@ -19,6 +19,7 @@ import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
@@ -31,7 +32,7 @@ public class Constant extends Var implements IDependency {
     private static final String constantPrefix = Util.VERSION_DATA_CLASS + ".";
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
 
-    private Constant(String name, AValue expression, String typeName) {
+    private Constant(String name, Typed<? extends AValue> expression, String typeName) {
         super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
                 typeName, name, expression);
     }
@@ -76,11 +77,11 @@ public class Constant extends Var implements IDependency {
         return FIND_CONSTANTS_CLASS.matcher(constantName).replaceAll("");
     }
 
-    public static Constant isString(String name, AString expression) {
+    public static Constant isString(String name, Typed<AString> expression) {
         return new Constant(name, expression, "String");
     }
 
-    public static Constant isLong(String name, ALong expression) {
+    public static Constant isLong(String name, Typed<ALong> expression) {
         return new Constant(name, expression, "long");
     }
 }

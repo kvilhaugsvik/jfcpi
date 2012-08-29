@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
@@ -24,25 +25,25 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import java.util.Collections;
 import java.util.List;
 
-public class Var extends Formatted implements Returnable {
+public class Var extends Formatted implements Typed<Returnable> {
     private final List<Annotate> annotations;
     private final Visibility visibility;
     private final Scope scope;
     private final Modifiable modifiable;
     private final TargetClass type;
     private final String name;
-    private final AValue value;
+    private final Typed<? extends AValue> value;
 
     private final CodeAtom referName;
 
     @Deprecated
     protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                String type, String name, AValue value) {
+                String type, String name, Typed<? extends AValue> value) {
         this(annotations, visibility, scope, modifiable, new TargetClass(type), name, value);
     }
 
     protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                TargetClass type, String name, AValue value) {
+                TargetClass type, String name, Typed<? extends AValue> value) {
         this.annotations = annotations;
         this.visibility = visibility;
         this.scope = scope;
@@ -74,7 +75,7 @@ public class Var extends Formatted implements Returnable {
         return name;
     }
 
-    public AValue getValue() {
+    public Typed<? extends AValue> getValue() {
         return value;
     }
 
@@ -103,7 +104,7 @@ public class Var extends Formatted implements Returnable {
      * Get the name read from a local scope
      * @return variable name access
      */
-    public AValue ref() {
+    public Typed<AValue> ref() {
         return new FormattedAValue() {
             @Override
             public void writeAtoms(CodeAtoms to) {
@@ -113,7 +114,7 @@ public class Var extends Formatted implements Returnable {
     }
 
     // TODO: When fixing type system permit returning AValue
-    public MethodCall.RetAValue call(String method, AValue... params) {
+    public MethodCall.RetAValue call(String method, Typed<AValue>... params) {
         final Var onVar = this;
         final MethodCall.RetAValue toCall = type.call(method, params);
         return new MethodCall.RetAValue(null, method, params) {
@@ -127,7 +128,7 @@ public class Var extends Formatted implements Returnable {
     }
 
     // TODO: Remove when type system fixed
-    public AString callRetAString(String method, AValue... params) {
+    public Typed<AString> callRetAString(String method, Typed<AValue>... params) {
         final Var onVar = this;
         final MethodCall.RetAValue toCall = type.call(method, params);
         return new MethodCall.RetAString(null, method, params) {
@@ -140,36 +141,36 @@ public class Var extends Formatted implements Returnable {
         };
     }
 
-    public SetTo assign(final AValue value) {
+    public SetTo assign(final Typed<? extends AValue> value) {
         return new SetTo(referName, value);
     }
 
 
-    public static Var local(Class type, String name, AValue value) {
+    public static Var local(Class type, String name, Typed<? extends AValue> value) {
         return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES,
                 new TargetClass(type), name, value);
     }
 
-    public static Var local(String type, String name, AValue value) {
+    public static Var local(String type, String name, Typed<? extends AValue> value) {
         return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
     }
 
     public static Var field(Visibility visibility, Scope scope, Modifiable modifiable,
-                                            String type, String name, AValue value) {
+                                            String type, String name, Typed<? extends AValue> value) {
         return field(Collections.<Annotate>emptyList(), visibility, scope, modifiable, type, name, value);
     }
 
     public static Var field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                            String type, String name, AValue value) {
+                            String type, String name, Typed<? extends AValue> value) {
         return new Var(annotations, visibility, scope, modifiable, type, name, value);
     }
 
 
     public static class SetTo extends FormattedAValue {
         private final CodeAtom referName;
-        private final AValue value;
+        private final Typed<? extends AValue> value;
 
-        private SetTo(CodeAtom referName, AValue value) {
+        private SetTo(CodeAtom referName, Typed<? extends AValue> value) {
             this.referName = referName;
             this.value = value;
         }
@@ -181,7 +182,7 @@ public class Var extends Formatted implements Returnable {
             value.writeAtoms(to);
         }
 
-        public static SetTo strToVal(String variable, AValue value) {
+        public static SetTo strToVal(String variable, Typed<? extends AValue> value) {
             return new SetTo(new CodeAtom(variable), value);
         }
     }

@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.creators;
 
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
@@ -23,7 +24,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
  * @param <Argument1>
  * @param <Argument2>
  */
-public interface ExprFrom2<Returns extends Returnable, Argument1 extends Returnable, Argument2 extends Returnable> {
+public interface ExprFrom2<Returns extends HasAtoms, Argument1 extends HasAtoms, Argument2 extends HasAtoms> {
     /**
      * Source code for an expression that will return a value of the type represented by Returns
      * @param arg1 the first argument taken

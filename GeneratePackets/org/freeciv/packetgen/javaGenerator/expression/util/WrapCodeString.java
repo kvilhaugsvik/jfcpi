@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 /**
@@ -37,37 +38,37 @@ public abstract class WrapCodeString implements HasAtoms {
         to.add(new CodeAtom(javaCode));
     }
 
-    static class WrappedAny extends WrapCodeString implements AValue {
+    static class WrappedAny extends WrapCodeString implements Typed<AValue> {
         protected WrappedAny(String javaCode) {
             super(javaCode);
         }
     }
 
-    static class WrappedLong extends WrapCodeString implements ALong {
+    static class WrappedLong extends WrapCodeString implements Typed<ALong> {
         public WrappedLong(String javaCode) {
             super(javaCode);
         }
     }
 
-    static class WrappedInt extends WrapCodeString implements AnInt {
+    static class WrappedInt extends WrapCodeString implements Typed<AnInt> {
         public WrappedInt(String javaCode) {
             super(javaCode);
         }
     }
 
-    static class WrappedString extends WrapCodeString implements AString {
+    static class WrappedString extends WrapCodeString implements Typed<AString> {
         public WrappedString(String javaCode) {
             super(javaCode);
         }
     }
 
-    static class WrappedVoid extends WrapCodeString implements NoValue {
+    static class WrappedVoid extends WrapCodeString implements Typed<NoValue> {
         public WrappedVoid(String javaCode) {
             super(javaCode);
         }
     }
 
-    static class WrappedBool extends WrapCodeString implements ABool {
+    static class WrappedBool extends WrapCodeString implements Typed<ABool> {
         public WrappedBool(String javaCode) {
             super(javaCode);
         }
