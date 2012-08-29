@@ -314,7 +314,7 @@ public class ClassWriter {
 
         typedStart.hintEnd(OUTER_LEVEL);
         out += Util.joinStringArray(
-                DEFAULT_STYLE_INDENT.asFormattedLines(typedStart).toArray(new String[0]),
+                DEFAULT_STYLE_INDENT.asFormattedLines(typedStart).toArray(),
                 "\n", "", "");
         out += " {\n";
 
