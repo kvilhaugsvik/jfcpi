@@ -99,7 +99,7 @@ public class BuiltIn {
     }
 
     public static MethodCall.RetAValue inc(final Var var) {
-        return new MethodCall.RetAValue(null, "++") {
+        return new MethodCall.RetAValue(null, "++", var.ref()) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 var.ref().writeAtoms(to);
