@@ -18,7 +18,6 @@ import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
@@ -34,7 +33,7 @@ public class Var extends Formatted implements Typed<Returnable> {
     private final String name;
     private final Typed<? extends AValue> value;
 
-    private final CodeAtom referName;
+    private final Address referName;
 
     @Deprecated
     protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
@@ -52,7 +51,7 @@ public class Var extends Formatted implements Typed<Returnable> {
         this.name = name;
         this.value = value;
 
-        this.referName = new CodeAtom((Scope.CODE_BLOCK.equals(scope) ? "" : "this.") + name);
+        this.referName = new Address((Scope.CODE_BLOCK.equals(scope) ? "" : "this.") + name);
     }
 
     public Visibility getVisibility() {
@@ -104,26 +103,12 @@ public class Var extends Formatted implements Typed<Returnable> {
      * Get the name read from a local scope
      * @return variable name access
      */
-    public Typed<AValue> ref() {
-        return new Formatted.Type<AValue>() {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                to.add(referName);
-            }
-        };
+    public Reference<AValue> ref() {
+        return new Reference<AValue>(this);
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<AValue>... params) {
-        final Var onVar = this;
-        final MethodCall<AValue> toCall = type.call(method, params);
-        return new MethodCall<Ret>(null, method, params) {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                onVar.ref().writeAtoms(to);
-                to.add(HAS);
-                toCall.writeAtoms(to);
-            }
-        };
+        return ref().<Ret>call(method, params);
     }
 
     public SetTo assign(final Typed<? extends AValue> value) {
@@ -152,23 +137,44 @@ public class Var extends Formatted implements Typed<Returnable> {
 
 
     public static class SetTo extends Formatted.Type<AValue> {
-        private final CodeAtom referName;
+        private final Address referName;
         private final Typed<? extends AValue> value;
 
-        private SetTo(CodeAtom referName, Typed<? extends AValue> value) {
+        private SetTo(Address referName, Typed<? extends AValue> value) {
             this.referName = referName;
             this.value = value;
         }
 
         @Override
         public void writeAtoms(CodeAtoms to) {
-            to.add(referName);
+            referName.writeAtoms(to);
             to.add(ASSIGN);
             value.writeAtoms(to);
         }
 
         public static SetTo strToVal(String variable, Typed<? extends AValue> value) {
-            return new SetTo(new CodeAtom(variable), value);
+            return new SetTo(new Address(variable), value);
+        }
+    }
+
+    public static class Reference<Contains extends AValue> extends Address implements Typed<Contains> {
+        private final Var of;
+
+        public Reference(Var of, CodeAtom... followedBy) {
+            super(of.referName, followedBy);
+            this.of = of;
+        }
+
+        public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<AValue>... params) {
+            final MethodCall<AValue> toCall = of.type.call(method, params);
+            return new MethodCall<Ret>(null, method, params) {
+                @Override
+                public void writeAtoms(CodeAtoms to) {
+                    of.ref().writeAtoms(to);
+                    to.add(HAS);
+                    toCall.writeAtoms(to);
+                }
+            };
         }
     }
 }
