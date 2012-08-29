@@ -31,14 +31,9 @@ public class Constant extends Var implements IDependency {
     private static final String constantPrefix = Util.VERSION_DATA_CLASS + ".";
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
 
-    public Constant(String name, AString expression) {
+    private Constant(String name, AValue expression, String typeName) {
         super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
-                "String", name, expression);
-    }
-
-    public Constant(String name, ALong expression) {
-        super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
-                "long", name, expression);
+                typeName, name, expression);
     }
 
     public Constant(String name, IntExpression expression) {
@@ -79,5 +74,13 @@ public class Constant extends Var implements IDependency {
 
     public static String stripJavaCodeFromReference(String constantName) {
         return FIND_CONSTANTS_CLASS.matcher(constantName).replaceAll("");
+    }
+
+    public static Constant isString(String name, AString expression) {
+        return new Constant(name, expression, "String");
+    }
+
+    public static Constant isLong(String name, ALong expression) {
+        return new Constant(name, expression, "long");
     }
 }
