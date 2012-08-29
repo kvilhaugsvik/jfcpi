@@ -112,7 +112,7 @@ public class Var extends Formatted implements Typed<Returnable> {
     }
 
     public SetTo assign(final Typed<? extends AValue> value) {
-        return new SetTo(referName, value);
+        return ref().assign(value);
     }
 
 
@@ -175,6 +175,10 @@ public class Var extends Formatted implements Typed<Returnable> {
                     toCall.writeAtoms(to);
                 }
             };
+        }
+
+        public SetTo assign(final Typed<? extends AValue> value) {
+            return new SetTo(of.referName, value);
         }
     }
 }
