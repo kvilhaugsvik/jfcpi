@@ -108,12 +108,8 @@ public class Field extends Var {
         return (0 < getNumberOfDeclarations());
     }
 
-    public static int getNumberOfDeclarations(FieldTypeBasic.FieldTypeAlias type, ArrayDeclaration[] declarations) {
-        return (type.getBasicType().isArrayEater()) ? declarations.length - 1 : declarations.length;
-    }
-
     public int getNumberOfDeclarations() {
-        return getNumberOfDeclarations(type, declarations);
+        return (type.getBasicType().isArrayEater()) ? declarations.length - 1 : declarations.length;
     }
 
     public static String getArrayDeclaration(FieldTypeBasic.FieldTypeAlias type, int rawDeclarations) {
