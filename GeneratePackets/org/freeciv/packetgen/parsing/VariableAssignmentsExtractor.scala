@@ -34,7 +34,6 @@ object ParseVariableAssignments extends ExtractableParser {
   def expr = assignment
 
   def assignmentConverted = assignment ^^ {
-    case name ~ (value: ALong) => Constant.isLong(name, value)
     case name ~ (value: AString) => Constant.isString(name, value)
     case _ => throw new IllegalArgumentException("Internal error: Asked to interpret unknown type")
   }
