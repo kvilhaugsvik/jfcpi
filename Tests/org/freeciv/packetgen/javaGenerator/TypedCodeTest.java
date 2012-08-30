@@ -16,6 +16,8 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
@@ -66,6 +68,52 @@ public class TypedCodeTest {
         toRunOn.add(HasAtoms.EOL);
 
         assertEquals("A b;\nC d;\n\n/* comment */ E f;",
+                Util.joinStringArray(builder.getStyle().asFormattedLines(toRunOn).toArray(), "\n", "", ""));
+    }
+
+    @Test public void breakLineGroupedBlock() {
+        CodeStyleBuilder<ScopeInfo> builder =
+                new CodeStyleBuilder<ScopeInfo>(CodeStyle.Action.INSERT_SPACE,
+                        ScopeInfo.class);
+
+        builder.whenBetween(HasAtoms.EOL, HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
+        builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<ScopeInfo>() {
+            @Override
+            public boolean isTrueFor(ScopeInfo argument) {
+                return "Group".equals(argument.seeTopHint());
+            }
+        });
+        builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK);
+        builder.whenAfter(HasAtoms.LSC, CodeStyle.Action.BREAK_LINE);
+        builder.whenAfter(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
+        builder.whenBefore(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
+        builder.whenBefore(HasAtoms.EOL, CodeStyle.Action.DO_NOTHING);
+        builder.atTheBeginning(CodeStyle.Action.DO_NOTHING);
+
+        Block haveStatementGroup = new Block();
+        Var i = Var.local("int", "i", null);
+        Var j = Var.local("int", "j", null);
+
+        haveStatementGroup.groupBoundary(); // redundant. Causes exception unless handled
+
+        haveStatementGroup.addStatement(i);
+        haveStatementGroup.addStatement(j);
+
+        haveStatementGroup.groupBoundary();
+        haveStatementGroup.groupBoundary(); // twice in a row. Disables the next boundary unless handled
+
+        haveStatementGroup.addStatement(i.assign(BuiltIn.asAValue("0")));
+        haveStatementGroup.addStatement(BuiltIn.inc(i));
+
+        haveStatementGroup.groupBoundary();
+
+        haveStatementGroup.addStatement(j.assign(BuiltIn.sum(i.ref(), i.ref())));
+
+        haveStatementGroup.groupBoundary(); // redundant. Causes exception unless handled
+
+        CodeAtoms toRunOn = new CodeAtoms(haveStatementGroup);
+
+        assertEquals("{\nint i;\nint j;\n\ni = 0;\ni ++;\n\nj = i + i;\n}",
                 Util.joinStringArray(builder.getStyle().asFormattedLines(toRunOn).toArray(), "\n", "", ""));
     }
 

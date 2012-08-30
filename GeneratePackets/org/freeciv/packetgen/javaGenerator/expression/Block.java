@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.Util;
+import org.freeciv.packetgen.javaGenerator.IR;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
@@ -36,6 +37,7 @@ public class Block extends Formatted implements Typed<NoValue> {
     };
 
     private final LinkedList<Statement> statements = new LinkedList<Statement>();
+    private final LinkedList<Integer> differentGroupsAt = new LinkedList<Integer>();
 
     public Block(Typed<? extends Returnable>... firstStatements) {
         for (Typed<? extends Returnable> statement : firstStatements)
@@ -50,6 +52,11 @@ public class Block extends Formatted implements Typed<NoValue> {
         statements.add(new Statement(statement));
     }
 
+    public void groupBoundary() {
+        if (differentGroupsAt.isEmpty() || differentGroupsAt.peekLast() != statements.size())
+            differentGroupsAt.add(statements.size());
+    }
+
     public String[] getJavaCodeLines() {
         return basicFormatBlock();
     }
@@ -57,9 +64,20 @@ public class Block extends Formatted implements Typed<NoValue> {
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(LSC);
-        for (HasAtoms statement : statements) {
-            statement.writeAtoms(to);
+        to.hintStart("Group");
+        for (int i = 0; i < statements.size(); i++) {
+            if (!differentGroupsAt.isEmpty() && i == differentGroupsAt.peekFirst()) {
+                differentGroupsAt.removeFirst();
+
+                // Before the first and after the last line are already grouped
+                if (0 < i) {
+                    to.hintEnd("Group");
+                    to.hintStart("Group");
+                }
+            }
+            statements.get(i).writeAtoms(to);
         }
+        to.hintEnd("Group");
         to.add(RSC);
         to.refuseNextIf(eolKiller);
     }
