@@ -22,6 +22,7 @@ import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.*;
 
@@ -66,5 +67,14 @@ public class TypedCodeTest {
 
         assertEquals("A b;\nC d;\n\n/* comment */ E f;",
                 Util.joinStringArray(builder.getStyle().asFormattedLines(toRunOn).toArray(), "\n", "", ""));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addLocalAsFieldWhileAskingForGetter() {
+        Var notAField = Var.local(Integer.class, "i", null);
+        ClassWriter testcase = new ClassWriter(ClassKind.CLASS, new TargetPackage("top"), null, null,
+                Collections.<Annotate>emptyList(), "Testcase", null, null);
+
+        testcase.addObjectConstantAndGetter(notAField);
     }
 }

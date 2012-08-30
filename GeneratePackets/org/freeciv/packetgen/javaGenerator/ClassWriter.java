@@ -115,7 +115,7 @@ public class ClassWriter {
     }
 
     public void addObjectConstantAndGetter(Var field) {
-        fields.add(field);
+        addField(field);
         addMethodPublicReadObjectState(
                         null,
                         field.getType(),
