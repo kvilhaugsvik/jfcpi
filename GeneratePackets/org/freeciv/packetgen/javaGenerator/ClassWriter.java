@@ -599,7 +599,18 @@ public class ClassWriter {
         });
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return 1 < argument.getLineBreakTry();
+                return 1 < argument.getLineBreakTry() && argument.approachingTheEdge();
+            }
+        });
+        maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                return 2 < argument.getLineBreakTry();
+            }
+        });
+        maker.whenBefore(HasAtoms.ADD, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override
+            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                return 3 < argument.getLineBreakTry() && argument.approachingTheEdge();
             }
         });
         maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
@@ -630,7 +641,11 @@ public class ClassWriter {
         maker.alwaysOnState(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo info) {
                 boolean toLong = 100 <= info.getLineLength() && info.getLineBreakTry() < 10;
-                if (toLong) info.lineBreakTry++; //TODO: Stop doing as a side effect
+                //TODO: Stop doing as a side effect
+                if (toLong) {
+                    info.lineBreakTry++;
+                    info.toFar.add(info.getNowAt());
+                }
                 return toLong;
             }
         }, CodeStyle.Action.RESET_LINE);
@@ -651,9 +666,14 @@ public class ClassWriter {
 
     public static class DefaultStyleScopeInfo extends CodeStyle.ScopeStack.ScopeInfo {
         private int lineBreakTry = 0;
+        private LinkedList<Integer> toFar = new LinkedList<Integer>();
 
         public int getLineBreakTry() {
             return lineBreakTry;
+        }
+
+        public boolean approachingTheEdge() {
+            return 100 < getLineLength() + getNextLen() + 1 || toFar.contains(getNowAt());
         }
     }
 
