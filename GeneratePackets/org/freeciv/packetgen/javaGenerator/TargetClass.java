@@ -67,7 +67,7 @@ public class TargetClass extends Address {
     }
 
     private final static CodeAtom newInst = new CodeAtom("new");
-    public MethodCall<AValue> newInstance(Typed<AValue>... parameterList) {
+    public MethodCall<AValue> newInstance(Typed<? extends AValue>... parameterList) {
         return new MethodCall<AValue>(null, "new " + name.get(), parameterList) {
             @Override
             public void writeAtoms(CodeAtoms to) {
