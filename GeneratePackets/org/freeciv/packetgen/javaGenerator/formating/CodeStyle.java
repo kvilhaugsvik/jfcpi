@@ -83,6 +83,7 @@ public interface CodeStyle {
 
         public static class ScopeInfo {
             private int beganAt = 0;
+            private int nowAt = 0;
             private int beganAtLine = 0;
             private int lineLength = 0;
             private int nextLen = 0;
@@ -155,6 +156,14 @@ public interface CodeStyle {
 
             public int getNextLen() {
                 return nextLen;
+            }
+
+            void setNowAt(int at) {
+                nowAt = at;
+            }
+
+            public int getNowAt() {
+                return nowAt;
             }
         }
     }
