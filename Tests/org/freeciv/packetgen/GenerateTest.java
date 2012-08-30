@@ -36,6 +36,10 @@ public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
     public static void main(String[] args) throws IOException, UndefinedException {
+        new GenerateTest(args);
+    }
+
+    public GenerateTest(String[] args) throws IOException, UndefinedException {
         String targetFolder;
         if (args.length < 1)
             targetFolder = GeneratorDefaults.GENERATED_SOURCE_FOLDER;
