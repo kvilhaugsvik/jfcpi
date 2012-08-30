@@ -142,6 +142,10 @@ public interface CodeStyle {
                     throw new IllegalArgumentException("Asked to remove a different hint than the top one");
             }
 
+            final void resetHints() {
+                hints.clear();
+            }
+
             public int getExtraIndent() {
                 return extraIndent;
             }
