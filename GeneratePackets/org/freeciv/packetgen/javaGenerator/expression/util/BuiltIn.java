@@ -26,6 +26,16 @@ public class BuiltIn {
     public static final Typed<ABool> TRUE = asBool("true");
     public static final Typed<ABool> FALSE = asBool("false");
 
+    public static Typed<NoValue> THROW(final Typed<? extends AValue> error) {
+        return new Formatted.Type<NoValue>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(THR);
+                error.writeAtoms(to);
+            }
+        };
+    }
+
     public static Typed<NoValue> RETURN(final Typed<? extends AValue> arg1) {
             return new Formatted.Type<NoValue>() {
                 @Override
