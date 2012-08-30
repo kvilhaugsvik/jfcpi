@@ -25,6 +25,8 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 
+import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -37,7 +39,7 @@ public class Block extends Formatted implements Typed<NoValue> {
     };
 
     private final LinkedList<Statement> statements = new LinkedList<Statement>();
-    private final LinkedList<Integer> differentGroupsAt = new LinkedList<Integer>();
+    private final BitSet differentGroupsAt = new BitSet();
 
     public Block(Typed<? extends Returnable>... firstStatements) {
         for (Typed<? extends Returnable> statement : firstStatements)
@@ -53,8 +55,7 @@ public class Block extends Formatted implements Typed<NoValue> {
     }
 
     public void groupBoundary() {
-        if (differentGroupsAt.isEmpty() || differentGroupsAt.peekLast() != statements.size())
-            differentGroupsAt.add(statements.size());
+        differentGroupsAt.set(statements.size());
     }
 
     public String[] getJavaCodeLines() {
@@ -66,9 +67,7 @@ public class Block extends Formatted implements Typed<NoValue> {
         to.add(LSC);
         to.hintStart("Group");
         for (int i = 0; i < statements.size(); i++) {
-            if (!differentGroupsAt.isEmpty() && i == differentGroupsAt.peekFirst()) {
-                differentGroupsAt.removeFirst();
-
+            if (!differentGroupsAt.isEmpty() && differentGroupsAt.get(i)) {
                 // Before the first and after the last line are already grouped
                 if (0 < i) {
                     to.hintEnd("Group");
