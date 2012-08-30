@@ -97,6 +97,17 @@ public class BuiltIn {
                 }
             };
 
+    public static Typed<? extends AValue> GROUP(final Typed<? extends AValue> expr) {
+        return new Formatted.Type<AValue>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(LPR);
+                expr.writeAtoms(to);
+                to.add(RPR);
+            }
+        };
+    }
+
     public static Typed<? extends AValue> sum(final Typed<? extends AValue>... values) {
         return new Formatted.Type<AValue>() {
             @Override
