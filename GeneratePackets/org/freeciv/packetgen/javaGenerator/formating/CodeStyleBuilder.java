@@ -157,6 +157,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                             updateHintsAfter(scopeStack, atoms[pointerAfter]);
                         }
                         scopeStack.get().setLineLength(line.length());
+                        if (0 <= pointerAfter && pointerAfter + 1 < atoms.length)
+                            scopeStack.get().setNextLen(atoms[pointerAfter + 1].getAtom().get().length());
+                        else
+                            scopeStack.get().setNextLen(0);
 
                         switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
                                 firstMatchOnlyKnowStack,

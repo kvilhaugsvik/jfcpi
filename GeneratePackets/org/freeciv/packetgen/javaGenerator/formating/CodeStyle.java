@@ -85,6 +85,7 @@ public interface CodeStyle {
             private int beganAt = 0;
             private int beganAtLine = 0;
             private int lineLength = 0;
+            private int nextLen = 0;
             private String lineUpToScope = "";
 
             private int extraIndent = 0;
@@ -146,6 +147,14 @@ public interface CodeStyle {
 
             public void setExtraIndent(int add) {
                 extraIndent = add;
+            }
+
+            void setNextLen(int length) {
+                nextLen = length;
+            }
+
+            public int getNextLen() {
+                return nextLen;
             }
         }
     }
