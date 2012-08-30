@@ -546,6 +546,19 @@ public class ClassWriter {
         maker.atTheBeginning(CodeStyle.Action.DO_NOTHING);
         maker.atTheEnd(CodeStyle.Action.DO_NOTHING);
         maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
+        maker.whenBefore(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
+        maker.whenAfter(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override
+            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                return null == argument.seeTopHint();
+            }
+        });
+        maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override
+            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                return null == argument.seeTopHint();
+            }
+        });
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
@@ -587,7 +600,6 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.FORSEP, CodeStyle.Action.DO_NOTHING);
         maker.whenAfter(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.RSC, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.RPR, CodeStyle.Action.DO_NOTHING);
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
