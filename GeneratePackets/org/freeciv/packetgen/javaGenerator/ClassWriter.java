@@ -543,6 +543,8 @@ public class ClassWriter {
                         CodeStyle.Action.INSERT_SPACE,
                         DefaultStyleScopeInfo.class);
 
+        maker.atTheBeginning(CodeStyle.Action.DO_NOTHING);
+        maker.atTheEnd(CodeStyle.Action.DO_NOTHING);
         maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
@@ -635,8 +637,6 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
         maker.whenAfter(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.ARRAY_ACCESS_END, CodeStyle.Action.DO_NOTHING);
-        maker.atTheBeginning(CodeStyle.Action.DO_NOTHING);
-        maker.atTheEnd(CodeStyle.Action.DO_NOTHING);
 
         maker.alwaysOnState(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo info) {
