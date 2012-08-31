@@ -134,7 +134,7 @@ public class Field extends Var {
     public String getNewFromDataStream(String streamName) throws UndefinedException {
         return "new " + this.getFType() + "(" + streamName +
                 (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getSize() : "") + ");";
+                        ", " + declarations[declarations.length - 1].getSize() : "") + ")";
     }
 
     public String getNewFromJavaType() throws UndefinedException {

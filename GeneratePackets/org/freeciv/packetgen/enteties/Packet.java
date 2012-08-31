@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.Util;
+import org.freeciv.packet.PacketHeader;
 import org.freeciv.packetgen.GeneratorDefaults;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
@@ -23,7 +24,12 @@ import org.freeciv.packetgen.enteties.supporting.Field;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
+import java.io.DataInput;
+import java.io.IOException;
 import java.util.*;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
@@ -128,48 +134,52 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addConstructorFromDataInput(String name, Field[] fields, String headerKind) throws UndefinedException {
-        LinkedList<String> constructorBodyStream = new LinkedList<String>();
-        constructorBodyStream.add("this.header = header;");
-        final String streamName = "from";
+        Var argHeader = Var.local(PacketHeader.class, "header", null);
+        final Var streamName = Var.local(DataInput.class, "from", null);
+
+        Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
         for (Field field : fields) {
-            constructorBodyStream.addAll(Arrays.asList(field.validate(false)));
-            constructorBodyStream.addAll(Arrays.asList(field.forElementsInField(
-                            "this." + field.getFieldName() + " = new " + field.getFType() +
-                                    field.getNewCreation() + ";",
-                            "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName),
-                            "")));
+            field.appendValidationTo(false, constructorBodyStream);
+            if (field.hasDeclarations())
+                constructorBodyStream.addStatement(
+                        field.assign(asAValue("new " + field.getFType() + field.getNewCreation())));
+            field.forElementsInField(
+                    "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName.getName()),
+                    constructorBodyStream);
         }
 
-        constructorBodyStream.add("");
-        constructorBodyStream.add("if (number != header.getPacketKind()) {");
-        constructorBodyStream.add("throw new IOException(\"Tried to create package " +
-                                          name + " but packet number was \" + header.getPacketKind());");
-        constructorBodyStream.add("}");
+        constructorBodyStream.groupBoundary();
 
-        constructorBodyStream.add("assert (header instanceof " + headerKind +
-                                          ") : \"Packet not generated for this kind of header\";");
+        constructorBodyStream.addStatement(IF(asBool("number != header.getPacketKind()"),
+                Block.fromStrings("throw new IOException(\"Tried to create package " +
+                                          name + " but packet number was \" + header.getPacketKind())")));
 
-        constructorBodyStream.add("if (header.getHeaderSize() + calcBodyLen() != header.getTotalSize()) {");
-        constructorBodyStream.add("Logger.getLogger(" + logger + ").warning(" +
+        constructorBodyStream.addStatement(asVoid("assert (header instanceof " + headerKind +
+                ") : \"Packet not generated for this kind of header\""));
+
+        Block wrongSize = new Block();
+        constructorBodyStream.addStatement(IF(asBool("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),
+                wrongSize));
+        wrongSize.addStatement(asVoid("Logger.getLogger(" + logger + ").warning(" +
                 "\"Probable misinterpretation: \" + " +
                 "\"interpreted packet size (\" + (header.getHeaderSize() + calcBodyLen()) + \")" +
                 " don't match header packet size (\" + header.getTotalSize() + \")" +
-                " for \" + this.toString());");
-        constructorBodyStream.add("throw new IOException(\"Packet size in header and Java packet not the same.\"" +
-                " + \" Header packet size: \"");
-        constructorBodyStream.add("+ header.getTotalSize()" + " + \" Header size: \" + header.getHeaderSize()" +
-                " + \" Packet body size: \" + calcBodyLen());");
-        constructorBodyStream.add("}");
+                " for \" + this.toString())"));
+        wrongSize.addStatement(THROW((new TargetClass(IOException.class)).newInstance(sum(
+                literalString("Packet size in header and Java packet not the same."),
+                literalString(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
+                literalString(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
+                literalString(" Packet body size: "), asAValue("calcBodyLen()")))));
         addConstructorPublicWithExceptions("/***\n" +
                                                    " * Construct an object from a DataInput\n" +
-                                                   " * @param " + streamName + " data stream that is at the start of " +
+                                                   " * @param " + streamName.getName() + " data stream that is at the start of " +
                                                    "the package body  \n" +
                                                    " * @param header header data. Must contain size and number\n" +
                                                    " * @throws IOException if the DataInput has a problem\n" +
                                                    " */",
-                                           "DataInput " + streamName + ", PacketHeader header",
+                                           "DataInput " + streamName.getName() + ", PacketHeader header",
                                            "IOException",
-                                           constructorBodyStream.toArray(new String[0]));
+                                           constructorBodyStream);
     }
 
     private void addEncoder(Field[] fields) {
