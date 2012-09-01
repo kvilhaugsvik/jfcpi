@@ -76,17 +76,17 @@ public class Packet extends ClassWriter implements IDependency {
 
         addClassConstant("int", "number", number + "");
 
-        addEncoder(fields);
-        addCalcBodyLen(fields);
-
-        addToString(name, fields);
-
         addObjectConstantAndGetter("PacketHeader", "header");
 
         for (Field field : fields) {
             addObjectConstantAndGetter(field);
             addJavaGetter(field);
         }
+
+        addEncoder(fields);
+        addCalcBodyLen(fields);
+
+        addToString(name, fields);
 
         addConstructorFromFields(fields, headerKind);
 
