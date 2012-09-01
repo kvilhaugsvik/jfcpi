@@ -110,7 +110,7 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private String generateHeader(String headerKind) {
-        return "header = new " + headerKind + "(calcBodyLen() + " + headerKind + ".HEADER_SIZE" + ", number)";
+        return "this.header = new " + headerKind + "(calcBodyLen() + " + headerKind + ".HEADER_SIZE" + ", number)";
     }
 
     private void addConstructorFromJavaTypes(Field[] fields, String headerKind) throws UndefinedException {
@@ -184,7 +184,7 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addEncoder(Field[] fields) {
         LinkedList<String> encodeFields = new LinkedList<String>();
-        encodeFields.add("header.encodeTo(to);");
+        encodeFields.add("this.header.encodeTo(to);");
         if (0 < fields.length) {
             for (Field field : fields)
                 encodeFields.addAll(Arrays.asList(field.forElementsInField("",
