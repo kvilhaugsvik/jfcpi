@@ -76,7 +76,7 @@ public class Packet extends ClassWriter implements IDependency {
 
         addClassConstant("int", "number", number + "");
 
-        addObjectConstantAndGetter("PacketHeader", "header");
+        addObjectConstantAndGetter("org.freeciv.packet.PacketHeader", "header");
 
         for (Field field : fields) {
             addObjectConstantAndGetter(field);
