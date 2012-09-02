@@ -54,6 +54,34 @@ public class BuiltIn {
         return ifImpl.x(cond, then, ifNot);
     }
 
+    public static <Kind extends AValue> Typed<Kind> R_IF(final Typed<ABool> cond, final Typed<Kind> then,
+                                                          final Typed<Kind> ifNot) {
+        return new Formatted.Type<Kind>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(LPR);
+                cond.writeAtoms(to);
+                to.add(RIF_THEN);
+                then.writeAtoms(to);
+                to.add(ELSE2);
+                ifNot.writeAtoms(to);
+                to.add(RPR);
+            }
+        };
+    }
+
+    public static Typed<NoValue> ASSERT(final Typed<ABool> cond, final Typed<? extends AValue> ifNot) {
+        return new Formatted.Type<NoValue>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(ASSRT);
+                cond.writeAtoms(to);
+                to.add(ELSE2);
+                ifNot.writeAtoms(to);
+            }
+        };
+    }
+
     public static Typed<NoValue> WHILE(final Typed<ABool> cond, final Block rep) {
         return new Formatted.Type<NoValue>() {
             @Override
