@@ -11,8 +11,10 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 
 import java.util.Arrays;
 
@@ -54,7 +56,16 @@ public class TerminatedArray extends FieldTypeBasic {
                       "if (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + ") {" + "\n" +
                       "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
                       "}",
-              "return " + "this.value.length + (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + " ? 1 : 0);",
+              new ExprFrom1<Typed<AnInt>, Var>() {
+                    @Override
+                    public Typed<AnInt> x(Var value) {
+                        return BuiltIn.<AnInt>sum(
+                                asAnInt("this.value.length"),
+                                R_IF(asBool("this.value.length < " + Constant.referToInJavaCode(maxSizeConstant)),
+                                        asAnInt("1"),
+                                        asAnInt("0")));
+                    }
+              },
               new ExprFrom1<Typed<AString>, Var>() {
                   @Override
                   public Typed<AString> x(Var arg1) {

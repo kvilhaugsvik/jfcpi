@@ -8,7 +8,9 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +18,7 @@ import java.util.Collections;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.TO_STRING_OBJECT;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAnInt;
 
 public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final Collection<Requirement> iRequire;
@@ -101,9 +104,19 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                                           "":
                                           "to.writeShort(" + "this." + "value" + ".size" + ");\n")
                                           + io.getWrite("this.value.getAsByteArray()"),
-                                  "return " + (knowsSize ?
-                                          size[0] + realBitVector + size[1] :
-                                          "2 + " + size[0] + "this." + "value" + ".size" + size[1]) + ";",
+                (knowsSize ?
+                        new ExprFrom1<Typed<AnInt>, Var>() {
+                            @Override
+                            public Typed<AnInt> x(Var value) {
+                                return asAnInt(size[0] + realBitVector + size[1]);
+                            }
+                        } :
+                        new ExprFrom1<Typed<AnInt>, Var>() {
+                            @Override
+                            public Typed<AnInt> x(Var value) {
+                                return asAnInt("2 + " + size[0] + "this." + "value" + ".size" + size[1]);
+                            }
+                        }),
                 TO_STRING_OBJECT,
                                   arrayEater,
                                   Arrays.asList(iProvide));

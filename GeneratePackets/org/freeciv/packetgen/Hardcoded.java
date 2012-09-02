@@ -142,7 +142,12 @@ public class Hardcoded {
                             "to.writeByte(element.kind.getNumber());" + "\n" +
                             "to.writeByte(element.value);" + "\n" +
                             "}",
-                    "return this.value.length;",
+                    new ExprFrom1<Typed<AnInt>, Var>() {
+                        @Override
+                        public Typed<AnInt> x(Var value) {
+                            return asAnInt("this.value.length");
+                        }
+                    },
                     TO_STRING_OBJECT,
                     false,
                     Arrays.asList(
@@ -188,7 +193,12 @@ public class Hardcoded {
                                },
                                "to.writeBytes(" + "this." + "value" + ");\n" +
                                        "to.writeByte(0);",
-                               "return " + "this." + "value" + ".length() + 1;",
+                    new ExprFrom1<Typed<AnInt>, Var>() {
+                        @Override
+                        public Typed<AnInt> x(Var value) {
+                            return sum(asAnInt("this.value.length()"), asAnInt("1"));
+                        }
+                    },
                                TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new TerminatedArray("tech_list", "int",
                                 new Requirement("MAX_NUM_TECH_LIST", Requirement.Kind.VALUE),
@@ -222,7 +232,12 @@ public class Hardcoded {
                                    }
                                },
                                "to.write(" + "this." + "value" + ");\n",
-                               "return " + "this." + "value" + ".length;",
+                    new ExprFrom1<Typed<AnInt>, Var>() {
+                        @Override
+                        public Typed<AnInt> x(Var value) {
+                            return asAnInt("this.value.length");
+                        }
+                    },
                                TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("bool8", "bool",
                                "Boolean",
