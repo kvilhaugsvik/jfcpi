@@ -33,6 +33,7 @@ public interface HasAtoms {
     public static final CodeAtom ASSIGN = new CodeAtom("=");
     public static final CodeAtom IS_SMALLER = new CodeAtom("<");
     public static final CodeAtom ADD = new CodeAtom("+");
+    public static final CodeAtom DIV = new CodeAtom("/");
     public static final CodeAtom INC = new CodeAtom("++");
 
     public static final CodeAtom IF = new CodeAtom("if");

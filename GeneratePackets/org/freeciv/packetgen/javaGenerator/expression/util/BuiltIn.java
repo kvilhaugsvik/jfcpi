@@ -117,6 +117,17 @@ public class BuiltIn {
         };
     }
 
+    public static Typed<? extends AValue> divide(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
+        return new Formatted.Type<AValue>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                a.writeAtoms(to);
+                to.add(DIV);
+                b.writeAtoms(to);
+            }
+        };
+    }
+
     public static MethodCall<AValue> inc(final Var var) {
         return new MethodCall<AValue>(null, "++", var.ref()) {
             @Override
