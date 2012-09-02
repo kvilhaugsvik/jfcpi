@@ -125,8 +125,8 @@ public class BuiltIn {
                 }
             };
 
-    public static Typed<? extends AValue> GROUP(final Typed<? extends AValue> expr) {
-        return new Formatted.Type<AValue>() {
+    public static <Kind extends AValue> Typed<Kind> GROUP(final Typed<Kind> expr) {
+        return new Formatted.Type<Kind>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(LPR);
