@@ -16,6 +16,12 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,15 +31,13 @@ import java.util.Collections;
 public class NetworkIO implements IDependency {
     private final Requirement me;
     private final String size;
-    private final String[] read;
+    private final Typed<? extends AValue> readNoArgs;
     private final String write;
 
-    private NetworkIO(String type, String size, String write, Requirement.Kind kind, String... read) {
-        assert null == read || 0 < read.length: "If defined read need at least 1 element";
-
+    private NetworkIO(String type, String size, String write, Requirement.Kind kind, Typed<? extends AValue> readNoArgs) {
         this.me = new Requirement(type, kind);
         this.size = size;
-        this.read = read;
+        this.readNoArgs = readNoArgs;
         this.write = write;
     }
 
@@ -41,14 +45,13 @@ public class NetworkIO implements IDependency {
         return "return " + size + ";";
     }
 
-    public String getRead(String... arguments) {
-        switch (arguments.length) {
-            case (0):
-                return read[0];
-            case (1):
-                return read[0] + arguments[0] + read[1];
-        }
-        throw new UnsupportedOperationException("No support for generating from " + arguments.length + " arguments.");
+    public String getRead(String argument) {
+        return "byte[] innBuffer = new byte[" + argument + "]" + ";\n" +
+                "from.readFully(innBuffer)" + ";\n";
+    }
+
+    public Typed<? extends AValue> getRead() {
+        return readNoArgs;
     }
 
     public String getWrite(String toWrite) {
@@ -73,7 +76,7 @@ public class NetworkIO implements IDependency {
      * @param write code to write an integer provided in braces right after to a DataOutput named "to"
      */
     public static NetworkIO witIntAsIntermediate(String type, String size, String read, String write) {
-        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT, read);
+        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT, BuiltIn.asAnInt(read));
     }
 
     /**
@@ -85,7 +88,6 @@ public class NetworkIO implements IDependency {
              null,
              "to.write",
              Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES,
-             "byte[] innBuffer = new byte[", "];\n" +
-                "from.readFully(innBuffer);\n");
+             null);
     }
 }
