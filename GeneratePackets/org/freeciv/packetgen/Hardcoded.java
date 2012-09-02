@@ -25,6 +25,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
@@ -215,9 +216,21 @@ public class Hardcoded {
                                TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("bool8", "bool",
                                "Boolean",
-                               "this.value = from.readBoolean();",
+                    new ExprFrom1<Block, Var>() {
+                        @Override
+                        public Block x(Var arg1) {
+                            return new Block(arg1.assign(asAValue("value")));
+                        }
+                    },
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var to, Var from) {
+                            return new Block(to.assign(from.<ABool>call("readBoolean")));
+                        }
+                    },
                                "to.writeBoolean(this.value);",
                                "return 1;",
+                               TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
 
             /************************************************************************************************
