@@ -20,11 +20,16 @@ import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
+
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
 
 public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final boolean bitwise;
@@ -172,15 +177,27 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
     }
 
     @Override
-    public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
-        String named = this.getName();
+    public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
+        final String named = this.getName();
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement("enum " + named, Requirement.Kind.AS_JAVA_DATATYPE));
         return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named,
                                   named,
-                                  "this.value = " + named + ".valueOf(" + io.getRead() + ");",
+                new ExprFrom1<Block, Var>() {
+                    @Override
+                    public Block x(Var arg1) {
+                        return new Block(arg1.assign(asAValue("value")));
+                    }
+                },
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var to, Var from) {
+                        return new Block(to.assign(new MethodCall<AValue>(null, named + ".valueOf", io.getRead())));
+                    }
+                },
                                   io.getWrite("this.value.getNumber()"),
                                   io.getSize(),
+                BuiltIn.TO_STRING_OBJECT,
                                   false, req);
     }
 
