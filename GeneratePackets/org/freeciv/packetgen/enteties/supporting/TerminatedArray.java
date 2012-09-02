@@ -54,7 +54,7 @@ public class TerminatedArray extends FieldTypeBasic {
                       "if (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + ") {" + "\n" +
                       "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
                       "}",
-              "return " + "this.value.length + (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + "?1:0);",
+              "return " + "this.value.length + (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + " ? 1 : 0);",
               new ExprFrom1<Typed<AString>, Var>() {
                   @Override
                   public Typed<AString> x(Var arg1) {
