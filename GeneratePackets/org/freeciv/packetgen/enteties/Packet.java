@@ -155,8 +155,8 @@ public class Packet extends ClassWriter implements IDependency {
                 Block.fromStrings("throw new IOException(\"Tried to create package " +
                                           name + " but packet number was \" + header.getPacketKind())")));
 
-        constructorBodyStream.addStatement(asVoid("assert (header instanceof " + headerKind +
-                ") : \"Packet not generated for this kind of header\""));
+        constructorBodyStream.addStatement(asVoid("assert header instanceof " + headerKind +
+                " : \"Packet not generated for this kind of header\""));
 
         Block wrongSize = new Block();
         constructorBodyStream.addStatement(IF(asBool("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),

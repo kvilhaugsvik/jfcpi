@@ -178,7 +178,7 @@ public class Field extends Var {
                     case 0:
                         break;
                     case 1:
-                        out += "(" + dec.getMaxSize() + " < " + "Integer.MAX_VALUE" + ")";
+                        out += dec.getMaxSize() + " < " + "Integer.MAX_VALUE";
                         break;
                     case -1:
                         throw notSupportedIndex(onPacket, getFieldName(), dec);
