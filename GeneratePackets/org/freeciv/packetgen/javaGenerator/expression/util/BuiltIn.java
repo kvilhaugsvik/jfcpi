@@ -145,6 +145,15 @@ public class BuiltIn {
         };
     }
 
+    public static <Kind extends AValue> Typed<Kind> multiply(final Typed<? extends AValue>... values) {
+        return new Formatted.Type<Kind>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.joinSep(MUL, values);
+            }
+        };
+    }
+
     public static Typed<? extends AValue> divide(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
         return new Formatted.Type<AValue>() {
             @Override
