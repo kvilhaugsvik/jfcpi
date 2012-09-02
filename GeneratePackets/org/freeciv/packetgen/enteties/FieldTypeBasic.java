@@ -44,6 +44,7 @@ public class FieldTypeBasic implements IDependency {
     private final Collection<Requirement> requirement;
     private final FieldTypeBasic basicType = this;
 
+    @Deprecated
     public FieldTypeBasic(String dataIOType, String publicType, String javaType,
                           ExprFrom1<Block, Var>  constructorBody,
                           ExprFrom2<Block, Var, Var> decode, String encode,
@@ -59,6 +60,31 @@ public class FieldTypeBasic implements IDependency {
         this.javaType = javaType;
         this.decode = decode.x(value, from);
         this.encode = encode.split("\n");
+        this.encodedSize = new Block(RETURN(encodedSize.x(value)));
+        this.arrayEater = arrayEater;
+        this.value2String = toString;
+        this.constructorBody = constructorBody.x(value);
+
+        requirement = needs;
+    }
+
+    public FieldTypeBasic(String dataIOType, String publicType, String javaType,
+                          ExprFrom1<Block, Var> constructorBody,
+                          ExprFrom2<Block, Var, Var> decode,
+                          ExprFrom2<Block, Var, Var> encode,
+                          ExprFrom1<Typed<AnInt>, Var> encodedSize,
+                          ExprFrom1<Typed<AString>, Var> toString,
+                          boolean arrayEater, Collection<Requirement> needs) {
+        Var from = Var.local(java.io.DataInput.class, "from", null);
+        Var to = Var.local(java.io.DataOutput.class, "to", null);
+        Var value =
+                Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
+
+        this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
+        this.publicType = publicType;
+        this.javaType = javaType;
+        this.decode = decode.x(value, from);
+        this.encode = ClassWriter.newToOld(encode.x(value, to));
         this.encodedSize = new Block(RETURN(encodedSize.x(value)));
         this.arrayEater = arrayEater;
         this.value2String = toString;
