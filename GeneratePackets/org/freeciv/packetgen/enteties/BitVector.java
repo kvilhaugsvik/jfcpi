@@ -6,11 +6,16 @@ import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
+import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.TO_STRING_OBJECT;
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
 
 public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final Collection<Requirement> iRequire;
@@ -69,19 +74,29 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
     }
 
     @Override
-    public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io) {
+    public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
         final String bvName = iProvide.getName();
         final String[] size = new String[]{"1 + (", " - 1) / 8"};
         final String realBitVector =  bvName + ".size";
         return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName,
                                   getName(),
-                                  (knowsSize ?
-                                          io.getRead(size[0] + realBitVector  + size[1]) :
-                                          "int size = from.readUnsignedShort();" + "\n" +
-                                                  io.getRead(size[0] + "size"  + size[1]))
-                                          + "this.value = new " + getName() + "(innBuffer" + (knowsSize ?
-                                          "" :
-                                          ", size") + ");",
+                new ExprFrom1<Block, Var>() {
+                    @Override
+                    public Block x(Var arg1) {
+                        return new Block(arg1.assign(asAValue("value")));
+                    }
+                },
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var to, Var from) {
+                        return (knowsSize ?
+                                        io.getRead(size[0] + realBitVector + size[1], null,
+                                                asAValue("this.value = new " + getName() + "(innBuffer)")) :
+                                        io.getRead(size[0] + "size"  + size[1],
+                                                asAValue("int size = from.readUnsignedShort()"),
+                                                asAValue("this.value = new " + getName() + "(innBuffer" + ", size)")));
+                    }
+                },
                                   (knowsSize ?
                                           "":
                                           "to.writeShort(" + "this." + "value" + ".size" + ");\n")
@@ -89,6 +104,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                                   "return " + (knowsSize ?
                                           size[0] + realBitVector + size[1] :
                                           "2 + " + size[0] + "this." + "value" + ".size" + size[1]) + ";",
+                TO_STRING_OBJECT,
                                   arrayEater,
                                   Arrays.asList(iProvide));
     }

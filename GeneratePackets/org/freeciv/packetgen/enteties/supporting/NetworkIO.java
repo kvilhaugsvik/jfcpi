@@ -26,6 +26,8 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import java.util.Collection;
 import java.util.Collections;
 
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
+
 // TODO: Quick: Split based on kind of fulfillment so a dummy don't have get for the nulls or throw excpetion on null
 // TODO: Long term: Split code in a better way between NetworkIO and java type. Some argument passing may fix all.
 public class NetworkIO implements IDependency {
@@ -45,9 +47,13 @@ public class NetworkIO implements IDependency {
         return "return " + size + ";";
     }
 
-    public String getRead(String argument) {
-        return "byte[] innBuffer = new byte[" + argument + "]" + ";\n" +
-                "from.readFully(innBuffer)" + ";\n";
+    public Block getRead(String argument, Typed<AValue> pre, Typed<AValue> post) {
+        Block out = new Block();
+        if (null != pre) out.addStatement(pre);
+        out.addStatement(asAValue("byte[] innBuffer = new byte[" + argument + "]"));
+        out.addStatement(asAValue("from.readFully(innBuffer)"));
+        if (null != post) out.addStatement(post);
+        return out;
     }
 
     public Typed<? extends AValue> getRead() {
