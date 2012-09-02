@@ -162,6 +162,15 @@ public class ClassWriter {
         methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, body));
     }
 
+    public void addMethodPublicDynamic(String comment,
+                                       String type,
+                                       String name,
+                                       String paramList,
+                                       String exceptionList,
+                                       Block body) {
+        methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, newToOld(body)));
+    }
+
     public void addMethodPublicReadObjectState(String comment,
                                                String type,
                                                String name,
