@@ -56,7 +56,12 @@ public class Hardcoded {
                     },
                                "to.writeInt(this.value.intValue()); // int is two's compliment so a uint32 don't lose " +
                                        "information",
-                               "return 4;",
+                    new ExprFrom1<Typed<AnInt>, Var>() {
+                        @Override
+                        public Typed<AnInt> x(Var arg1) {
+                            return asAnInt("4");
+                        }
+                    },
                     TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("requirement", "struct requirement", "requirement",
@@ -85,7 +90,12 @@ public class Hardcoded {
                             "to.writeByte(this.value.getrange().getNumber());\n" +
                             "to.writeBoolean(this.value.getsurvives());\n" +
                             "to.writeBoolean(this.value.getnegated());",
-                    "return 8;",
+                    new ExprFrom1<Typed<AnInt>, Var>() {
+                        @Override
+                        public Typed<AnInt> x(Var arg1) {
+                            return asAnInt("8");
+                        }
+                    },
                     TO_STRING_OBJECT,
                     false,
                     Arrays.asList(
@@ -229,7 +239,12 @@ public class Hardcoded {
                         }
                     },
                                "to.writeBoolean(this.value);",
-                               "return 1;",
+                    new ExprFrom1<Typed<AnInt>, Var>() {
+                        @Override
+                        public Typed<AnInt> x(Var arg1) {
+                            return asAnInt("1");
+                        }
+                    },
                                TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
 
@@ -299,7 +314,12 @@ public class Hardcoded {
                     }
                 },
                                   "to.writeFloat(this.value * " + times + ");",
-                                  "return 4;",
+                new ExprFrom1<Typed<AnInt>, Var>() {
+                    @Override
+                    public Typed<AnInt> x(Var arg1) {
+                        return asAnInt("4");
+                    }
+                },
                 TO_STRING_OBJECT,
                                   false, Collections.<Requirement>emptySet());
     }
