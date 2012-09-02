@@ -132,6 +132,11 @@ public class Var extends Formatted implements Typed<Returnable> {
 
     public static Var field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
                             String type, String name, Typed<? extends AValue> value) {
+        return field(annotations, visibility, scope, modifiable, new TargetClass(type), name, value);
+    }
+
+    public static Var field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
+                            TargetClass type, String name, Typed<? extends AValue> value) {
         return new Var(annotations, visibility, scope, modifiable, type, name, value);
     }
 
