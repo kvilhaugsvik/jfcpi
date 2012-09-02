@@ -283,12 +283,24 @@ public class Hardcoded {
         return out;
     }
 
-    private static FieldTypeBasic getFloat(String times) {
+    private static FieldTypeBasic getFloat(final String times) {
         return new FieldTypeBasic("float" + times, "float",
                                   "Float",
-                                  "this.value = from.readFloat() / " + times + ";",
+                new ExprFrom1<Block, Var>() {
+                    @Override
+                    public Block x(Var arg1) {
+                        return new Block(arg1.assign(asAValue("value")));
+                    }
+                },
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var out, Var inn) {
+                        return new Block(out.assign(divide(inn.<AValue>call("readFloat"), asAValue(times))));
+                    }
+                },
                                   "to.writeFloat(this.value * " + times + ");",
                                   "return 4;",
+                TO_STRING_OBJECT,
                                   false, Collections.<Requirement>emptySet());
     }
 }
