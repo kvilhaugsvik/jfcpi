@@ -4,10 +4,9 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
-import org.freeciv.packetgen.javaGenerator.ClassKind;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
-import org.freeciv.packetgen.javaGenerator.TargetPackage;
-import org.freeciv.packetgen.javaGenerator.Visibility;
+import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,9 +26,9 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
         knowsSize = true;
 
-        addConstructorPublic("", "byte[] from", "super(size, " + "from);");
-        addConstructorPublic("", "boolean[] from", "super(from);");
-        addConstructorPublic("", "boolean setAllTo", "super(size, " + "setAllTo);");
+        addConstructorPublic("", "byte[] from", Block.fromStrings("super(size, " + "from)"));
+        addConstructorPublic("", "boolean[] from", Block.fromStrings("super(from)"));
+        addConstructorPublic("", "boolean setAllTo", Block.fromStrings("super(size, " + "setAllTo)"));
 
         iRequire = bits.getReqs();
         iProvide = new Requirement(getName(), Requirement.Kind.AS_JAVA_DATATYPE);
@@ -43,13 +42,16 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addPublicObjectConstant("int", "size");
         knowsSize = false;
 
-        final String setSize = "this.size = ";
-        addConstructorPublic("", "byte[] from, int sizeInBits",
-                "super(sizeInBits, " + "from);", setSize + "sizeInBits;");
-        addConstructorPublic("", "boolean[] from", "super(from);",
-                setSize + "from.length;");
-        addConstructorPublic("", "boolean setAllTo, int size",
-                "super(size, " + "setAllTo);", setSize + "size;");
+        Var size = getField("size");
+        addConstructorPublic("", "byte[] from, int sizeInBits", new Block(
+                BuiltIn.asAValue("super(sizeInBits, " + "from)"),
+                getField("size").assign(BuiltIn.asAValue("sizeInBits"))));
+        addConstructorPublic("", "boolean[] from", new Block(
+                BuiltIn.asAValue("super(from)"),
+                size.assign(BuiltIn.asAValue("from.length"))));
+        addConstructorPublic("", "boolean setAllTo, int size", new Block(
+                BuiltIn.asAValue("super(size, " + "setAllTo)"),
+                size.assign(BuiltIn.asAValue("size"))));
 
         iRequire = Collections.<Requirement>emptySet();
         iProvide = new Requirement("char", Requirement.Kind.AS_JAVA_DATATYPE);
