@@ -211,8 +211,8 @@ public class Field extends Var {
 
         if (!"".equals(transferTypesAreSafe))
             // TODO: make sure it will cause a compile time error or throw an error here
-            to.addStatement(asAValue("assert " + transferTypesAreSafe + " : " +
-                    "\"Can't prove that index value will stay in the range Java's signed integers can represent.\""));
+            to.addStatement(ASSERT(asBool(transferTypesAreSafe),
+                    literalString("Can't prove that index value will stay in the range Java's signed integers can represent.")));
 
         if (!"".equals(sizeChecks)) {
             to.addStatement(BuiltIn.IF(asBool(sizeChecks.substring(0, sizeChecks.length() - 2)),

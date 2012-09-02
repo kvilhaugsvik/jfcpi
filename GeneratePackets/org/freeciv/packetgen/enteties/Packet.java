@@ -24,6 +24,8 @@ import org.freeciv.packetgen.enteties.supporting.Field;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
@@ -155,8 +157,8 @@ public class Packet extends ClassWriter implements IDependency {
                 Block.fromStrings("throw new IOException(\"Tried to create package " +
                                           name + " but packet number was \" + header.getPacketKind())")));
 
-        constructorBodyStream.addStatement(asVoid("assert header instanceof " + headerKind +
-                " : \"Packet not generated for this kind of header\""));
+        constructorBodyStream.addStatement(ASSERT(asBool("header instanceof " + headerKind),
+                literalString("Packet not generated for this kind of header")));
 
         Block wrongSize = new Block();
         constructorBodyStream.addStatement(IF(asBool("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),
