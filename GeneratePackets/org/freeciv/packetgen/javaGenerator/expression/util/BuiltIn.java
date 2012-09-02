@@ -108,8 +108,8 @@ public class BuiltIn {
         };
     }
 
-    public static Typed<? extends AValue> sum(final Typed<? extends AValue>... values) {
-        return new Formatted.Type<AValue>() {
+    public static <Kind extends AValue> Typed<Kind> sum(final Typed<? extends AValue>... values) {
+        return new Formatted.Type<Kind>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.joinSep(ADD, values);
