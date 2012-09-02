@@ -76,7 +76,8 @@ public class Packet extends ClassWriter implements IDependency {
 
         addClassConstant("int", "number", number + "");
 
-        addObjectConstantAndGetter("org.freeciv.packet.PacketHeader", "header");
+        addObjectConstantAndGetter(Var.field(Collections.<Annotate>emptyList(),
+                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, new TargetClass(PacketHeader.class), "header", null));
 
         for (Field field : fields) {
             addObjectConstantAndGetter(field);
@@ -183,17 +184,13 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addEncoder(Field[] fields) {
-        LinkedList<String> encodeFields = new LinkedList<String>();
-        encodeFields.add("this.header.encodeTo(to);");
+        Block body = new Block();
+        body.addStatement(getField("header").call("encodeTo", asAValue("to")));
         if (0 < fields.length) {
             for (Field field : fields)
-                encodeFields.addAll(Arrays.asList(field.forElementsInField("",
-                                                                     "this." + field
-                                                                             .getFieldName() + "[i].encodeTo(to);",
-                                                                     "")));
+                field.forElementsInField("this." + field.getFieldName() + "[i].encodeTo(to)", body);
         }
-        addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException",
-                               encodeFields.toArray(new String[0]));
+        addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", body);
     }
 
     private void addCalcBodyLen(Field[] fields) {
