@@ -26,6 +26,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 import java.util.*;
@@ -35,19 +36,27 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 //TODO: Move data to file
 public class Hardcoded {
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
-            new FieldTypeBasic("uint32", "int",
-                               "Long",
-                               "int bufferValue = from.readInt();" + "\n" +
-                                       "if (0 <= bufferValue) {" + "\n" +
-                                       "this.value = (long)bufferValue;" + "\n" +
-                                       "} else {" + "\n" +
-                                       "final long removedByCast = (-1L * Integer.MIN_VALUE) + Integer.MAX_VALUE + " +
-                                       "1L;" + "\n" +
-                                       "this.value = (long)bufferValue + removedByCast;" + "\n" +
-                                       "}",
+            new FieldTypeBasic("uint32", "int", "Long",
+                    new ExprFrom1<Block, Var>() {
+                        @Override
+                        public Block x(Var arg1) {
+                            return new Block(arg1.assign(asAValue("value")));
+                        }
+                    },
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var to, Var from) {
+                            Var buf = Var.local("int", "bufferValue", from.<AnInt>call("readInt"));
+                            return new Block(buf, IF(asBool("0 <= bufferValue"), new Block(
+                                    to.assign(asAValue("(long)bufferValue"))), Block.fromStrings(
+                                    "final long removedByCast = (-1L * Integer.MIN_VALUE) + Integer.MAX_VALUE + " + "1L",
+                                    "this.value = (long)bufferValue + removedByCast")));
+                        }
+                    },
                                "to.writeInt(this.value.intValue()); // int is two's compliment so a uint32 don't lose " +
                                        "information",
                                "return 4;",
+                    TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("requirement", "struct requirement", "requirement",
                     new ExprFrom1<Block, Var>() {
