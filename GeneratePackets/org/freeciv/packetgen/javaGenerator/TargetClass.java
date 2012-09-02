@@ -18,6 +18,7 @@ import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class TargetClass extends Address {
         return name.get();
     }
 
-    public MethodCall<AValue> call(String method, Typed<AValue>... parameters) {
+    public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
         if (!methods.containsKey(method))
             throw new IllegalArgumentException("No method named " + method + " on " + name.get());
 

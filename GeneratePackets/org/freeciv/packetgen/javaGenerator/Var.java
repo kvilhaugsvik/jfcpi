@@ -107,7 +107,7 @@ public class Var extends Formatted implements Typed<Returnable> {
         return new Reference<AValue>(this);
     }
 
-    public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<AValue>... params) {
+    public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
         return ref().<Ret>call(method, params);
     }
 
@@ -170,7 +170,7 @@ public class Var extends Formatted implements Typed<Returnable> {
             this.of = of;
         }
 
-        public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<AValue>... params) {
+        public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
             final MethodCall<AValue> toCall = of.type.call(method, params);
             return new MethodCall<Ret>(null, method, params) {
                 @Override
