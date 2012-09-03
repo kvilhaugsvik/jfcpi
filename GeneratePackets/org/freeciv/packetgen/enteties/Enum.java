@@ -126,7 +126,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                                 "boolean", "isBitWise", new Block(RETURN(asBool(bitwise + ""))));
 
         addMethod("", Visibility.PUBLIC, Scope.CLASS, this.getName(), "valueOf", "int number", null,
-                  "for (" + this.getName() + " element: values()) {",
+                  "for (" + this.getName() + " element : values()) {",
                   "if (element.getNumber() == number) {",
                   "return element;",
                   "}",

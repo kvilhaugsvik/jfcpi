@@ -727,7 +727,7 @@ public enum test implements FCEnum {
 """ + "\t" // Work around bug adding a tab on a blank line
 + """
 	public static test valueOf(int number) {
-		for (test element: values()) {
+		for (test element : values()) {
 			if (element.getNumber() == number) {
 				return element;
 			}
