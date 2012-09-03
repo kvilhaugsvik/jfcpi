@@ -158,24 +158,8 @@ public class ClassWriter {
                                        String name,
                                        String paramList,
                                        String exceptionList,
-                                       String... body) {
-        methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, body));
-    }
-
-    public void addMethodPublicDynamic(String comment,
-                                       String type,
-                                       String name,
-                                       String paramList,
-                                       String exceptionList,
                                        Block body) {
         methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, newToOld(body)));
-    }
-
-    public void addMethodPublicReadObjectState(String comment,
-                                               String type,
-                                               String name,
-                                               String... body) {
-        methods.add(Method.newPublicReadObjectState(comment, type, name, body));
     }
 
     public void addMethodPublicReadObjectState(String comment,
@@ -188,21 +172,8 @@ public class ClassWriter {
     public void addConstructorPublicWithExceptions(String comment,
                                                    String paramList,
                                                    String exceptionList,
-                                                   String... body) {
-        methods.add(Method.newPublicConstructorWithException(comment, getName(), paramList, exceptionList, body));
-    }
-
-    public void addConstructorPublicWithExceptions(String comment,
-                                                   String paramList,
-                                                   String exceptionList,
                                                    Block body) {
-        addConstructorPublicWithExceptions(comment, paramList, exceptionList, newToOld(body));
-    }
-
-    public void addConstructorPublic(String comment,
-                                     String paramList,
-                                     String... body) {
-        methods.add(Method.newPublicConstructor(comment, getName(), paramList, body));
+        methods.add(Method.newPublicConstructorWithException(comment, getName(), paramList, exceptionList, newToOld(body)));
     }
 
     public void addConstructorPublic(String comment,
