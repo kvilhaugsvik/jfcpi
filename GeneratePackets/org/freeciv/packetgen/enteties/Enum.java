@@ -29,7 +29,9 @@ import org.freeciv.types.FCEnum;
 
 import java.util.*;
 
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.RETURN;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asBool;
 
 public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final boolean bitwise;
@@ -121,7 +123,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                                         " * exponent." + "\n" +
                                         " * @return true if the enum is bitwise" + "\n" +
                                         " */",
-                                "boolean", "isBitWise", "return " + bitwise + ";");
+                                "boolean", "isBitWise", new Block(RETURN(asBool(bitwise + ""))));
 
         addMethod("", Visibility.PUBLIC, Scope.CLASS, this.getName(), "valueOf", "int number", null,
                   "for (" + this.getName() + " element: values()) {",

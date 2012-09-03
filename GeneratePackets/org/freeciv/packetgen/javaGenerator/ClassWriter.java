@@ -149,8 +149,8 @@ public class ClassWriter {
     public void addMethodReadClassState(String comment,
                                         String type,
                                         String name,
-                                        String... body) {
-        methods.add(Method.newReadClassState(comment, type, name, body));
+                                        Block body) {
+        methods.add(Method.newReadClassState(comment, type, name, newToOld(body)));
     }
 
     public void addMethodPublicDynamic(String comment,
