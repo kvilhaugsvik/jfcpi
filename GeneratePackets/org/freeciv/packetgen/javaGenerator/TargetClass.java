@@ -46,6 +46,17 @@ public class TargetClass extends Address {
         return name.get();
     }
 
+    public <Kind extends AValue> Typed<Kind> read(final String field) {
+        return new Typed<Kind>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(name);
+                to.add(HAS);
+                to.add(new CodeAtom(field));
+            }
+        };
+    }
+
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
         if (!methods.containsKey(method))
             throw new IllegalArgumentException("No method named " + method + " on " + name.get());

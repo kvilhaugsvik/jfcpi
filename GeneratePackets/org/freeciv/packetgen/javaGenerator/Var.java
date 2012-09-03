@@ -140,6 +140,17 @@ public class Var extends Formatted implements Typed<Returnable> {
         return new Var(annotations, visibility, scope, modifiable, type, name, value);
     }
 
+    public <Kind extends AValue> Typed<Kind> read(final String field) {
+        return new Typed<Kind>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                referName.writeAtoms(to);
+                to.add(HAS);
+                to.add(new CodeAtom(field));
+            }
+        };
+    }
+
 
     public static class SetTo extends Formatted.Type<AValue> {
         private final Address referName;
