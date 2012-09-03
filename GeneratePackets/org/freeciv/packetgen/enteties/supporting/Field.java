@@ -221,26 +221,6 @@ public class Field extends Var {
         }
     }
 
-    public String[] validate(boolean testArrayLength) throws UndefinedException {
-        String transferTypesAreSafe = transferTypeCheck();
-        String sizeChecks = this.getLegalSize(testArrayLength);
-
-        ArrayList<String> out = new ArrayList<String>(3);
-        if (!"".equals(transferTypesAreSafe))
-            // TODO: make sure it will cause a compile time error or throw an error here
-            out.add("assert " + transferTypesAreSafe + " : " +
-                    "\"Can't prove that index value will stay in the range Java's signed integers can represent.\";");
-
-        if (!"".equals(sizeChecks)) {
-            out.add("if " + "(" + sizeChecks.substring(0, sizeChecks.length() - 2) + ") {");
-            out.add("throw new IllegalArgumentException(\"Array " + this.getFieldName() +
-                        " constructed with value out of scope in packet " + onPacket + "\");");
-            out.add("}");
-        }
-
-        return out.toArray(new String[0]);
-    }
-
     public String[] forElementsInField(String before, String in, String after) {
         assert (null != in && !in.isEmpty());
 
