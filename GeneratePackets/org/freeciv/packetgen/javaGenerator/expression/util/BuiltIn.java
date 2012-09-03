@@ -175,7 +175,8 @@ public class BuiltIn {
         };
     }
 
-    public static Typed<ABool> isSmallerThan(final Typed<AValue> small, final Typed<AValue> largerThan) {
+    public static Typed<ABool> isSmallerThan(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
         return new Formatted.Type<ABool>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
