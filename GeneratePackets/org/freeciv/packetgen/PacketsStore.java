@@ -55,10 +55,10 @@ public class PacketsStore {
 
         switch (bytesInPacketNumber) {
             case 1:
-                packetHeaderType = Header_2_1.class.getCanonicalName();
+                packetHeaderType = Header_2_1.class.getSimpleName();
                 break;
             case 2:
-                packetHeaderType = Header_2_2.class.getCanonicalName();
+                packetHeaderType = Header_2_2.class.getSimpleName();
                 break;
             default: throw new IllegalArgumentException("No other sizes than one or two bytes are supported" +
                                                                 "for packet kind field in packet header");
