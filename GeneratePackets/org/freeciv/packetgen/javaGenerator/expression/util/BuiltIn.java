@@ -113,6 +113,22 @@ public class BuiltIn {
         };
     }
 
+    public static Typed<NoValue> FOR(final Var element, final Typed<? extends AValue> elements,
+                              final Block body) {
+        return new Formatted.Type<NoValue>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(FOR);
+                to.add(LPR);
+                element.writeAtoms(to);
+                to.add(FOR_EACH_SEP);
+                elements.writeAtoms(to);
+                to.add(RPR);
+                body.writeAtoms(to);
+            }
+        };
+    }
+
     public static Typed<AString> literalString(String javaCode) {
         return new WrapCodeString<AString>("\"" + javaCode + "\"");
     }
