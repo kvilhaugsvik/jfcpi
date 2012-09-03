@@ -22,9 +22,11 @@ import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
@@ -37,7 +39,7 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 //TODO: Move data to file
 public class Hardcoded {
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
-            new FieldTypeBasic("uint32", "int", "Long",
+            new FieldTypeBasic("uint32", "int", new TargetClass(Long.class),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -54,8 +56,15 @@ public class Hardcoded {
                                     "this.value = (long)bufferValue + removedByCast")));
                         }
                     },
-                               "/* int is two's compliment so a uint32 don't lose information */\n" +
-                                       "to.writeInt(this.value.intValue());",
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var val, Var to) {
+                            Block out = new Block();
+                            out.addStatement(new Statement(to.call("writeInt", val.<AnInt>call("intValue")),
+                                    "int is two's compliment so a uint32 don't lose information"));
+                            return out;
+                        }
+                    },
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
@@ -209,8 +218,7 @@ public class Hardcoded {
             new TerminatedArray("building_list", "int",
                                 new Requirement("MAX_NUM_BUILDING_LIST", Requirement.Kind.VALUE),
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
-            new FieldTypeBasic("memory", "unsigned char",
-                               "byte[]",
+            new FieldTypeBasic("memory", "unsigned char", new TargetClass("byte[]"),
                                new ExprFrom1<Block, Var>() {
                                    @Override
                                    public Block x(Var to) {
@@ -231,7 +239,12 @@ public class Hardcoded {
                                        return reader;
                                    }
                                },
-                               "to.write(" + "this." + "value" + ");\n",
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var value, Var to) {
+                            return new Block(to.call("write", value.ref()));
+                        }
+                    },
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
@@ -239,8 +252,7 @@ public class Hardcoded {
                         }
                     },
                                TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
-            new FieldTypeBasic("bool8", "bool",
-                               "Boolean",
+            new FieldTypeBasic("bool8", "bool",  new TargetClass(Boolean.class),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -253,7 +265,12 @@ public class Hardcoded {
                             return new Block(to.assign(from.<ABool>call("readBoolean")));
                         }
                     },
-                               "to.writeBoolean(this.value);",
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var value, Var to) {
+                            return new Block(to.call("writeBoolean", value.ref()));
+                        }
+                    },
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
@@ -314,8 +331,7 @@ public class Hardcoded {
     }
 
     private static FieldTypeBasic getFloat(final String times) {
-        return new FieldTypeBasic("float" + times, "float",
-                                  "Float",
+        return new FieldTypeBasic("float" + times, "float",  new TargetClass(Float.class),
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
@@ -328,7 +344,12 @@ public class Hardcoded {
                         return new Block(out.assign(divide(inn.<AValue>call("readFloat"), asAValue(times))));
                     }
                 },
-                                  "to.writeFloat(this.value * " + times + ");",
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var value, Var to) {
+                        return new Block(to.call("writeFloat", BuiltIn.<AnInt>multiply(value.ref(), asAnInt(times))));
+                    }
+                },
                 new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var arg1) {
