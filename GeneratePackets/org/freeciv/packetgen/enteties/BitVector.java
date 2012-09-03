@@ -81,8 +81,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         final String bvName = iProvide.getName();
         final String[] size = new String[]{"1 + (", " - 1) / 8"};
         final String realBitVector =  bvName + ".size";
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName,
-                                  getName(),
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName, new TargetClass(getName()),
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
@@ -100,10 +99,16 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                                                 asAValue("this.value = new " + getName() + "(innBuffer" + ", size)")));
                     }
                 },
-                                  (knowsSize ?
-                                          "":
-                                          "to.writeShort(" + "this." + "value" + ".size" + ");\n")
-                                          + io.getWrite("this.value.getAsByteArray()"),
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var val, Var to) {
+                        Block out = new Block();
+                        if (!knowsSize)
+                            out.addStatement(to.call("writeShort", val.read("size")));
+                        out.addStatement(asAValue(io.getWrite("this.value.getAsByteArray()")));
+                        return out;
+                    }
+                },
                 (knowsSize ?
                         new ExprFrom1<Typed<AnInt>, Var>() {
                             @Override

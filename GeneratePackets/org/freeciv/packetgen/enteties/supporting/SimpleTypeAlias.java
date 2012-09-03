@@ -18,6 +18,7 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.MethodCall;
+import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
@@ -42,8 +43,7 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
 
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(),
-                                  typeInJava,
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), new TargetClass(typeInJava),
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
@@ -59,7 +59,13 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
                                         new MethodCall<AValue>(null, typeInJava + ".valueOf", io.getRead())));
                     }
                 },
-                                  io.getWrite((willRequire.isEmpty() ? "this.value" : "this.value.getNumber()")),
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var val, Var to) {
+                        return Block.fromStrings(
+                                io.getWrite((willRequire.isEmpty() ? "this.value" : "this.value.getNumber()")));
+                    }
+                },
                                   io.getSize(),
                 BuiltIn.TO_STRING_OBJECT,
                                   false, willRequire);

@@ -69,7 +69,7 @@ public class NetworkIO implements IDependency {
     }
 
     public String getWrite(String toWrite) {
-        return write + "(" + toWrite + ");";
+        return write + "(" + toWrite + ")";
     }
 
     @Override

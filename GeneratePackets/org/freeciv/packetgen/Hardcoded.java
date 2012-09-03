@@ -73,7 +73,7 @@ public class Hardcoded {
                     },
                     TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
-            new FieldTypeBasic("requirement", "struct requirement", "requirement",
+            new FieldTypeBasic("requirement", "struct requirement", new TargetClass("requirement"),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -94,11 +94,17 @@ public class Hardcoded {
                                     from.<AValue>call("readBoolean"))));
                         }
                     },
-                    "to.writeByte(this.value.getsource().kind.getNumber());\n" +
-                            "to.writeInt(this.value.getsource().value);\n" +
-                            "to.writeByte(this.value.getrange().getNumber());\n" +
-                            "to.writeBoolean(this.value.getsurvives());\n" +
-                            "to.writeBoolean(this.value.getnegated());",
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var val, Var to) {
+                            return Block.fromStrings(
+                                    "to.writeByte(this.value.getsource().kind.getNumber())",
+                                    "to.writeInt(this.value.getsource().value)",
+                                    "to.writeByte(this.value.getrange().getNumber())",
+                                    "to.writeBoolean(this.value.getsurvives())",
+                                    "to.writeBoolean(this.value.getnegated())");
+                        }
+                    },
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
@@ -113,7 +119,7 @@ public class Hardcoded {
                             new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
-            new FieldTypeBasic("worklist", "struct worklist", "universal[]",
+            new FieldTypeBasic("worklist", "struct worklist", new TargetClass("universal[]"),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -146,11 +152,17 @@ public class Hardcoded {
                                                        )))));
                                    }
                     },
-                    "to.writeByte(this.value.length);\n" +
-                            "for (universal element : this.value) {" + "\n" +
-                            "to.writeByte(element.kind.getNumber());" + "\n" +
-                            "to.writeByte(element.value);" + "\n" +
-                            "}",
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var val, Var to) {
+                            Var elem = Var.local("universal", "element", null);
+                            return new Block(
+                                    to.call("writeByte", val.read("length")),
+                                    FOR(elem, val.ref(),
+                                            new Block(to.call("writeByte", asAnInt("element.kind.getNumber()")),
+                                                    to.call("writeByte", elem.read("value")))));
+                        }
+                    },
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
@@ -166,8 +178,7 @@ public class Hardcoded {
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
-            new FieldTypeBasic("string", "char",
-                               "String",
+            new FieldTypeBasic("string", "char", new TargetClass(String.class),
                                new ExprFrom1<Block, Var>() {
                                    @Override
                                    public Block x(Var to) {
@@ -200,8 +211,14 @@ public class Hardcoded {
                                                        new Block(to.assign(asAString("buf.toString()")))));
                                    }
                                },
-                               "to.writeBytes(" + "this." + "value" + ");\n" +
-                                       "to.writeByte(0);",
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var val, Var to) {
+                            return new Block(
+                                    to.call("writeBytes", val.ref()),
+                                    to.call("writeByte", asAnInt("0")));
+                        }
+                    },
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {

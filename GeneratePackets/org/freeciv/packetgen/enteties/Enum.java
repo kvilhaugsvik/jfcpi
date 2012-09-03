@@ -181,8 +181,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         final String named = this.getName();
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement("enum " + named, Requirement.Kind.AS_JAVA_DATATYPE));
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named,
-                                  named,
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named, new TargetClass(named),
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
@@ -195,7 +194,12 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                         return new Block(to.assign(new MethodCall<AValue>(null, named + ".valueOf", io.getRead())));
                     }
                 },
-                                  io.getWrite("this.value.getNumber()"),
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var val, Var to) {
+                        return Block.fromStrings(io.getWrite("this.value.getNumber()"));
+                    }
+                },
                                   io.getSize(),
                 BuiltIn.TO_STRING_OBJECT,
                                   false, req);

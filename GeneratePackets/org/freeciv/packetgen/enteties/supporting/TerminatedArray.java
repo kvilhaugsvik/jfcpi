@@ -4,6 +4,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.MethodCall;
+import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
@@ -24,7 +25,7 @@ import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {
     public TerminatedArray(String dataIOType, String publicType, final Requirement maxSizeConstant, final Requirement terminator) {
-        super(dataIOType, publicType, "byte[]",
+        super(dataIOType, publicType, new TargetClass("byte[]"),
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
@@ -52,10 +53,15 @@ public class TerminatedArray extends FieldTypeBasic {
                                         buf.ref(), pos.ref())));
                     }
                 },
-              "to.write(this.value);\n" +
-                      "if (this.value.length < " + Constant.referToInJavaCode(maxSizeConstant) + ") {" + "\n" +
-                      "to.writeByte(" + Constant.referToInJavaCode(terminator) + ");" + "\n" +
-                      "}",
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var val, Var to) {
+                        return new Block(
+                                to.call("write", val.ref()),
+                                IF(isSmallerThan(val.<AnInt>read("length"), asAnInt(Constant.referToInJavaCode(maxSizeConstant))),
+                                        new Block(to.call("writeByte", asAValue(Constant.referToInJavaCode(terminator))))));
+                    }
+                },
               new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var value) {
