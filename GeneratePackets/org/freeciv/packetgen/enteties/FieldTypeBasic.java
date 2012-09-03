@@ -68,7 +68,7 @@ public class FieldTypeBasic implements IDependency {
         requirement = needs;
     }
 
-    public FieldTypeBasic(String dataIOType, String publicType, String javaType,
+    public FieldTypeBasic(String dataIOType, String publicType, TargetClass javaType,
                           ExprFrom1<Block, Var> constructorBody,
                           ExprFrom2<Block, Var, Var> decode,
                           ExprFrom2<Block, Var, Var> encode,
@@ -77,12 +77,12 @@ public class FieldTypeBasic implements IDependency {
                           boolean arrayEater, Collection<Requirement> needs) {
         Var from = Var.local(java.io.DataInput.class, "from", null);
         Var to = Var.local(java.io.DataOutput.class, "to", null);
-        Var value =
-                Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
+        Var value = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+                        javaType, "value", null);
 
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
-        this.javaType = javaType;
+        this.javaType = javaType.getName();
         this.decode = decode.x(value, from);
         this.encode = ClassWriter.newToOld(encode.x(value, to));
         this.encodedSize = new Block(RETURN(encodedSize.x(value)));
