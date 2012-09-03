@@ -54,8 +54,8 @@ public class Hardcoded {
                                     "this.value = (long)bufferValue + removedByCast")));
                         }
                     },
-                               "to.writeInt(this.value.intValue()); // int is two's compliment so a uint32 don't lose " +
-                                       "information",
+                               "/* int is two's compliment so a uint32 don't lose information */\n" +
+                                       "to.writeInt(this.value.intValue());",
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {

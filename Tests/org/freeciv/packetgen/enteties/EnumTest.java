@@ -264,7 +264,7 @@ public class EnumTest {
 
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
-                "ONE(1, \"one\") /* An integer */",
+                "/* An integer */ ONE(1, \"one\")",
                 newEnumValue("An integer", "ONE", 1, "\"one\"").toString());
     }
 

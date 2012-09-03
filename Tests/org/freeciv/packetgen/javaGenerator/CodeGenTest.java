@@ -402,7 +402,7 @@ public class CodeGenTest {
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
                         "\t" + "ONE(1)," + "\n" +
-                        "\t" + "TWO(2) /* Not a prime number */," + "\n" +
+                        "\t" + "/* Not a prime number */ TWO(2)," + "\n" +
                         "\t" + "THREE(3);" + "\n" +
                         "}" + "\n",
                 toWrite.toString());

@@ -49,6 +49,11 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
 
     @Override
     public void writeAtoms(CodeAtoms to) {
+        if (null != comment) {
+            to.add(CCommentStart);
+            to.add(new CodeAtom(comment));
+            to.add(CCommentEnd);
+        }
         to.add(new CodeAtom(method));
         to.add(LPR);
         if (0 < parameters.length) {
@@ -57,10 +62,5 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
             to.hintEnd("CallArgs");
         }
         to.add(RPR);
-        if (null != comment) {
-            to.add(CCommentStart);
-            to.add(new CodeAtom(comment));
-            to.add(CCommentEnd);
-        }
     }
 }
