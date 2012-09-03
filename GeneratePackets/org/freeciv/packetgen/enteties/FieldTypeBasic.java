@@ -33,40 +33,16 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 public class FieldTypeBasic implements IDependency {
     private final String fieldTypeBasic;
     private final String publicType;
-    private final String javaType;
+    private final TargetClass javaType;
     private final Block constructorBody;
     private final Block decode;
-    private final String[] encode;
+    private final Block encode;
     private final Block encodedSize;
     private final ExprFrom1<Typed<AString>, Var> value2String;
     private final boolean arrayEater;
 
     private final Collection<Requirement> requirement;
     private final FieldTypeBasic basicType = this;
-
-    @Deprecated
-    public FieldTypeBasic(String dataIOType, String publicType, String javaType,
-                          ExprFrom1<Block, Var>  constructorBody,
-                          ExprFrom2<Block, Var, Var> decode, String encode,
-                          ExprFrom1<Typed<AnInt>, Var> encodedSize,
-                          ExprFrom1<Typed<AString>, Var> toString,
-                          boolean arrayEater, Collection<Requirement> needs) {
-        Var from = Var.local(java.io.DataInput.class, "from", null);
-        Var value =
-                Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, javaType, "value", null);
-
-        this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
-        this.publicType = publicType;
-        this.javaType = javaType;
-        this.decode = decode.x(value, from);
-        this.encode = encode.split("\n");
-        this.encodedSize = new Block(RETURN(encodedSize.x(value)));
-        this.arrayEater = arrayEater;
-        this.value2String = toString;
-        this.constructorBody = constructorBody.x(value);
-
-        requirement = needs;
-    }
 
     public FieldTypeBasic(String dataIOType, String publicType, TargetClass javaType,
                           ExprFrom1<Block, Var> constructorBody,
@@ -82,9 +58,9 @@ public class FieldTypeBasic implements IDependency {
 
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
-        this.javaType = javaType.getName();
+        this.javaType = javaType;
         this.decode = decode.x(value, from);
-        this.encode = ClassWriter.newToOld(encode.x(value, to));
+        this.encode = encode.x(value, to);
         this.encodedSize = new Block(RETURN(encodedSize.x(value)));
         this.arrayEater = arrayEater;
         this.value2String = toString;
@@ -129,20 +105,20 @@ public class FieldTypeBasic implements IDependency {
                                       Import.classIn(java.io.IOException.class),
                                       null,
                                       Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()))
-                              }, "Freeciv's protocol definition", name, null, "FieldType<" + javaType + ">");
+                              }, "Freeciv's protocol definition", name, null, "FieldType<" + javaType.getName() + ">");
 
-            addObjectConstant(javaType, "value");
+            addObjectConstant(javaType.getName(), "value");
             if (arrayEater) {
-                addConstructorPublic(null, javaType + " value" + ", int arraySize", constructorBody);
+                addConstructorPublic(null, javaType.getName() + " value" + ", int arraySize", constructorBody);
                 addConstructorPublicWithExceptions(null, "DataInput from" + ", int arraySize", "IOException",
                                                    decode);
             } else {
-                addConstructorPublic(null, javaType + " value", constructorBody);
+                addConstructorPublic(null, javaType.getName() + " value", constructorBody);
                 addConstructorPublicWithExceptions(null, "DataInput from", "IOException", decode);
             }
             addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
             addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
-            addMethodPublicReadObjectState(null, javaType, "getValue", new Block(RETURN(getField("value").ref())));
+            addMethodPublicReadObjectState(null, javaType.getName(), "getValue", new Block(RETURN(getField("value").ref())));
             addMethodPublicReadObjectState(null, "String", "toString",
                     new Block(RETURN(value2String.x(getField("value")))));
             addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
@@ -157,7 +133,7 @@ public class FieldTypeBasic implements IDependency {
         }
 
         public String getJavaType() {
-            return javaType;
+            return javaType.getName();
         }
 
         @Override
