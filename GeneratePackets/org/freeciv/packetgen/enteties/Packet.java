@@ -24,11 +24,9 @@ import org.freeciv.packetgen.enteties.supporting.Field;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -46,10 +44,10 @@ public class Packet extends ClassWriter implements IDependency {
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
     @Deprecated public Packet(String name, int number, String headerKind, Field... fields) throws UndefinedException {
-        this(name, number, headerKind, GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), fields);
+        this(name, number, new TargetClass(headerKind), GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), fields);
     }
 
-    public Packet(String name, int number, String headerKind, String logger,
+    public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new Import[]{
                               Import.allIn(new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage())),
@@ -98,7 +96,7 @@ public class Packet extends ClassWriter implements IDependency {
         addConstructorFromDataInput(name, fields, headerKind);
     }
 
-    private void addConstructorFromFields(Field[] fields, String headerKind) throws UndefinedException {
+    private void addConstructorFromFields(Field[] fields, TargetClass headerKind) throws UndefinedException {
         Block constructorBody = new Block();
         LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
         for (Field field : fields) {
@@ -108,15 +106,17 @@ public class Packet extends ClassWriter implements IDependency {
             field.appendValidationTo(true, constructorBody);
             constructorBody.addStatement(setFieldToVariableSameName(field.getFieldName()));
         }
-        constructorBody.addStatement(asAValue(generateHeader(headerKind)));
+        constructorBody.addStatement(generateHeader(headerKind));
         addConstructorPublic(null, createParameterList(params), constructorBody);
     }
 
-    private String generateHeader(String headerKind) {
-        return "this.header = new " + headerKind + "(calcBodyLen() + " + headerKind + ".HEADER_SIZE" + ", number)";
+    private Typed<AValue> generateHeader(TargetClass headerKind) {
+        return getField("header").assign(headerKind.newInstance(
+                sum(asAValue("calcBodyLen()"), headerKind.read("HEADER_SIZE")),
+                asAValue("number")));
     }
 
-    private void addConstructorFromJavaTypes(Field[] fields, String headerKind) throws UndefinedException {
+    private void addConstructorFromJavaTypes(Field[] fields, TargetClass headerKind) throws UndefinedException {
         if (0 < fields.length) {
             LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
             Block constructorBodyJ = new Block();
@@ -131,12 +131,12 @@ public class Packet extends ClassWriter implements IDependency {
                 field.forElementsInField("this." + field.getFieldName() + "[i] = " +
                         field.getNewFromJavaType(), constructorBodyJ);
             }
-            constructorBodyJ.addStatement(asAValue(generateHeader(headerKind)));
+            constructorBodyJ.addStatement(generateHeader(headerKind));
             addConstructorPublic(null, createParameterList(params), constructorBodyJ);
         }
     }
 
-    private void addConstructorFromDataInput(String name, Field[] fields, String headerKind) throws UndefinedException {
+    private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind) throws UndefinedException {
         Var argHeader = Var.local(PacketHeader.class, "header", null);
         final Var streamName = Var.local(DataInput.class, "from", null);
 
@@ -157,7 +157,7 @@ public class Packet extends ClassWriter implements IDependency {
                 Block.fromStrings("throw new IOException(\"Tried to create package " +
                                           name + " but packet number was \" + header.getPacketKind())")));
 
-        constructorBodyStream.addStatement(ASSERT(asBool("header instanceof " + headerKind),
+        constructorBodyStream.addStatement(ASSERT(asBool("header instanceof " + headerKind.getName()),
                 literalString("Packet not generated for this kind of header")));
 
         Block wrongSize = new Block();
