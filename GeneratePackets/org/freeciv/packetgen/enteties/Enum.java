@@ -22,16 +22,16 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.RETURN;
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asBool;
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final boolean bitwise;
@@ -125,13 +125,11 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                                         " */",
                                 "boolean", "isBitWise", new Block(RETURN(asBool(bitwise + ""))));
 
-        addMethod("", Visibility.PUBLIC, Scope.CLASS, this.getName(), "valueOf", "int number", null,
-                  "for (" + this.getName() + " element : values()) {",
-                  "if (element.getNumber() == number) {",
-                  "return element;",
-                  "}",
-                  "}",
-                  "return INVALID;");
+        Var element = Var.local(this.getName(), "element", null);
+        addMethod("", Visibility.PUBLIC, Scope.CLASS, this.getName(), "valueOf", "int number", null, new Block(
+                FOR(element, new MethodCall<AValue>(null, "values", new Typed[0]),
+                        new Block(IF(asBool("element.getNumber() == number"), new Block(RETURN(element.ref()))))),
+                RETURN(asAValue("INVALID"))));
     }
 
     public void addEnumerated(String comment,
