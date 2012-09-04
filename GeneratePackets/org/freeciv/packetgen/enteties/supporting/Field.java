@@ -221,36 +221,6 @@ public class Field extends Var {
         }
     }
 
-    public String[] forElementsInField(String before, String in, String after) {
-        assert (null != in && !in.isEmpty());
-
-        LinkedList<String> out = new LinkedList<String>();
-        final int level = this.getNumberOfDeclarations();
-
-        if (0 < level && null != before && !before.isEmpty()) {
-            out.add(before);
-        }
-
-        String[] wrappedInFor = new String[1 + level * 2];
-        String replaceWith = "";
-        for (int counter = 0; counter < level; counter++) {
-            wrappedInFor[counter] = "for (int " + getCounterNumber(counter) + " = 0; " +
-                    getCounterNumber(counter) + " < " + "this." + this.getFieldName() + replaceWith + ".length; " +
-                    getCounterNumber(counter) + "++) {";
-            wrappedInFor[1 + counter + level] = "}";
-            replaceWith += "[" + getCounterNumber(counter) + "]";
-        }
-        wrappedInFor[level] = in.replaceAll("\\[i\\]", replaceWith);
-
-        out.addAll(Arrays.asList(wrappedInFor));
-
-        if (0 < level && null != after && !after.isEmpty()) {
-            out.add(after);
-        }
-
-        return out.toArray(new String[0]);
-    }
-
     // TODO: in should be a ExprFrom1
     public void forElementsInField(String in, Block out) {
         final int level = this.getNumberOfDeclarations();
