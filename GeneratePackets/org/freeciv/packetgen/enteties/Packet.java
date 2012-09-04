@@ -208,9 +208,11 @@ public class Packet extends ClassWriter implements IDependency {
             build.append(calcBodyLen(fields[0]));
             boolean broken = false;
             for (int i = 1; i < fields.length; i++) {
-                if (true) {
+                if (100 < build.length() + 1 + 1) {
                     encodeFieldsLen.add(build.toString());
                     build = new StringBuilder();
+                } else {
+                    build.append(" ");
                 }
                 build.append("+ ");
                 build.append(calcBodyLen(fields[i]));
