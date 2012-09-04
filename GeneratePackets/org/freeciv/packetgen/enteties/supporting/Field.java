@@ -40,8 +40,8 @@ public class Field extends Var {
     public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket, List<WeakFlag> flags,
                  WeakField.ArrayDeclaration... declarations) {
         super(fieldFlagsToAnnotations(flags), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-              typeAlias.getName() + getArrayDeclaration(typeAlias, declarations.length),
-              fieldName, null);
+                new TargetClass(typeAlias.getName() + getArrayDeclaration(typeAlias, declarations.length)),
+                fieldName, null);
 
         if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
             throw new IllegalArgumentException("Array eaters needs array declarations");

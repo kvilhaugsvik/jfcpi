@@ -35,12 +35,6 @@ public class Var extends Formatted implements Typed<Returnable> {
 
     private final Address referName;
 
-    @Deprecated
-    protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                String type, String name, Typed<? extends AValue> value) {
-        this(annotations, visibility, scope, modifiable, new TargetClass(type), name, value);
-    }
-
     protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
                 TargetClass type, String name, Typed<? extends AValue> value) {
         this.annotations = annotations;
@@ -122,7 +116,7 @@ public class Var extends Formatted implements Typed<Returnable> {
     }
 
     public static Var local(String type, String name, Typed<? extends AValue> value) {
-        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
+        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, new TargetClass(type), name, value);
     }
 
     public static Var field(Visibility visibility, Scope scope, Modifiable modifiable,
