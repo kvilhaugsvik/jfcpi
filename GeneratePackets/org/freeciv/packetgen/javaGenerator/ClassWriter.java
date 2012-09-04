@@ -318,7 +318,7 @@ public class ClassWriter {
         LinkedList<Method> constructors = new LinkedList<Method>();
         LinkedList<Method> other = new LinkedList<Method>();
         for (Method toSort : methods)
-            if (name.equals(toSort.name))
+            if (name.equals(toSort.getName()))
                 constructors.add(toSort);
             else
                 other.add(toSort);
@@ -399,6 +399,10 @@ public class ClassWriter {
             this.paramList = paramList;
             this.exceptionList = exceptionList;
             this.body = body;
+        }
+
+        public String getName() {
+            return name;
         }
 
         @Override
