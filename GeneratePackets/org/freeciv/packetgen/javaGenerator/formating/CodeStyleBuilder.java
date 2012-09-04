@@ -202,6 +202,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                         line = new StringBuilder(scopeStack.get().getLineUpToScope());
                                         scopeStack.get().setLineLength(line.length());
                                         scopeStack.get().resetHints();
+                                        addBreak = false;
+                                        addBlank = false;
                                         continue line;
                                     case INDENT:
                                         scopeStack.get().setExtraIndent(1);
