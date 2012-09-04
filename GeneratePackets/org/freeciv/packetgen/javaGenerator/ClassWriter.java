@@ -25,8 +25,6 @@ import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
@@ -377,78 +375,6 @@ public class ClassWriter {
 
     private static String removeBlankLine(String out) {
         return out.substring(0, out.length() - 1);
-    }
-
-    static class Method {
-        private final String comment;
-        private final Visibility visibility;
-        private final Scope scope;
-        private final String type;
-        private final String name;
-        private final String paramList;
-        private final String exceptionList;
-        private final Block body;
-
-        public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
-                      String exceptionList, Block body) {
-            this.comment = comment;
-            this.visibility = visibility;
-            this.scope = scope;
-            this.type = type;
-            this.name = name;
-            this.paramList = paramList;
-            this.exceptionList = exceptionList;
-            this.body = body;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String toString() {
-            String out = (null == comment ? "" : "\t" + comment.replace("\n", "\n\t") + "\n");
-            out += "\t" + ifIs("", visibility.toString(), " ") + ifIs(scope.toString(), " ") + ifIs(type, " ") +
-                    name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ");
-            out += body.getJavaCodeIndented("\t").substring(1);
-            out += "\n";
-            return out;
-        }
-
-        static Method newPublicConstructorWithException(String comment,
-                                                        String name,
-                                                        String paramList,
-                                                        String exceptionList,
-                                                        Block body) {
-            return newPublicDynamicMethod(comment, null, name, paramList, exceptionList, body);
-        }
-
-        static Method newPublicConstructor(String comment,
-                                           String name,
-                                           String paramList,
-                                           Block body) {
-            return newPublicConstructorWithException(comment, name, paramList, null, body);
-        }
-
-        static Method newPublicReadObjectState(String comment,
-                                               String type,
-                                               String name,
-                                               Block body) {
-            return newPublicDynamicMethod(comment, type, name, null, null, body);
-        }
-
-        static Method newPublicDynamicMethod(String comment,
-                                             String type,
-                                             String name,
-                                             String paramList,
-                                             String exceptionList,
-                                             Block body) {
-            return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
-        }
-
-        public static Method newReadClassState(String comment, String type, String name, Block body) {
-            return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
-        }
     }
 
     public static final CodeStyle DEFAULT_STYLE_INDENT;
