@@ -132,14 +132,14 @@ public class ClassWriter {
                           String exceptionList,
                           Block body) {
         methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList,
-                newToOld(body)));
+                body));
     }
 
     public void addMethodReadClassState(String comment,
                                         String type,
                                         String name,
                                         Block body) {
-        methods.add(Method.newReadClassState(comment, type, name, newToOld(body)));
+        methods.add(Method.newReadClassState(comment, type, name, body));
     }
 
     public void addMethodPublicDynamic(String comment,
@@ -148,7 +148,7 @@ public class ClassWriter {
                                        String paramList,
                                        String exceptionList,
                                        Block body) {
-        methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, newToOld(body)));
+        methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, body));
     }
 
     public void addMethodPublicReadObjectState(String comment,
@@ -162,13 +162,13 @@ public class ClassWriter {
                                                    String paramList,
                                                    String exceptionList,
                                                    Block body) {
-        methods.add(Method.newPublicConstructorWithException(comment, getName(), paramList, exceptionList, newToOld(body)));
+        methods.add(Method.newPublicConstructorWithException(comment, getName(), paramList, exceptionList, body));
     }
 
     public void addConstructorPublic(String comment,
                                      String paramList,
                                      Block body) {
-        methods.add(Method.newPublicConstructor(comment, getName(), paramList, newToOld(body)));
+        methods.add(Method.newPublicConstructor(comment, getName(), paramList, body));
     }
 
     public void addConstructorFields() {
@@ -257,7 +257,7 @@ public class ClassWriter {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.getType(), dec.getName()));
         }
-        return Method.newPublicConstructor(null, name, createParameterList(args), newToOld(body)) + "\n";
+        return Method.newPublicConstructor(null, name, createParameterList(args), body) + "\n";
     }
 
     public String toString() {
@@ -431,11 +431,6 @@ public class ClassWriter {
         return out.substring(0, out.length() - 1);
     }
 
-    public static String[] newToOld(Block body) {
-        String[] all = body.getJavaCodeLines();
-        return Arrays.copyOfRange(all, 1, all.length - 1);
-    }
-
     static class Method {
         private final String comment;
         private final Visibility visibility;
@@ -444,22 +439,10 @@ public class ClassWriter {
         private final String name;
         private final String paramList;
         private final String exceptionList;
-        private final String[] body;
+        private final Block body;
 
         public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
                       String exceptionList, Block body) {
-            this.comment = comment;
-            this.visibility = visibility;
-            this.scope = scope;
-            this.type = type;
-            this.name = name;
-            this.paramList = paramList;
-            this.exceptionList = exceptionList;
-            this.body = newToOld(body);
-        }
-
-        public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
-                      String exceptionList, String... body) {
             this.comment = comment;
             this.visibility = visibility;
             this.scope = scope;
@@ -474,9 +457,8 @@ public class ClassWriter {
         public String toString() {
             String out = (null == comment ? "" : "\t" + comment.replace("\n", "\n\t") + "\n");
             out += "\t" + ifIs("", visibility.toString(), " ") + ifIs(scope.toString(), " ") + ifIs(type, " ") +
-                    name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ") + "{" + "\n";
-            out += indent(body, "\t" + "\t");
-            out += "\t" + "}" + "\n";
+                    name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ");
+            out += indent(body.getJavaCodeLines(), "\t").substring(1);
             return out;
         }
 
@@ -485,14 +467,6 @@ public class ClassWriter {
                                                         String paramList,
                                                         String exceptionList,
                                                         Block body) {
-            return newPublicDynamicMethod(comment, null, name, paramList, exceptionList, newToOld(body));
-        }
-
-        static Method newPublicConstructorWithException(String comment,
-                                                        String name,
-                                                        String paramList,
-                                                        String exceptionList,
-                                                        String... body) {
             return newPublicDynamicMethod(comment, null, name, paramList, exceptionList, body);
         }
 
@@ -503,24 +477,10 @@ public class ClassWriter {
             return newPublicConstructorWithException(comment, name, paramList, null, body);
         }
 
-        static Method newPublicConstructor(String comment,
-                                           String name,
-                                           String paramList,
-                                           String... body) {
-            return newPublicConstructorWithException(comment, name, paramList, null, body);
-        }
-
         static Method newPublicReadObjectState(String comment,
                                                String type,
                                                String name,
                                                Block body) {
-            return newPublicDynamicMethod(comment, type, name, null, null, newToOld(body));
-        }
-
-        private static Method newPublicReadObjectState(String comment,
-                                               String type,
-                                               String name,
-                                               String... body) {
             return newPublicDynamicMethod(comment, type, name, null, null, body);
         }
 
@@ -529,15 +489,11 @@ public class ClassWriter {
                                              String name,
                                              String paramList,
                                              String exceptionList,
-                                             String... body) {
+                                             Block body) {
             return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
         }
 
         public static Method newReadClassState(String comment, String type, String name, Block body) {
-            return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, newToOld(body));
-        }
-
-        public static Method newReadClassState(String comment, String type, String name, String... body) {
             return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
         }
     }
