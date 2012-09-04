@@ -543,6 +543,12 @@ public class ClassWriter {
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 3 < argument.getLineBreakTry() && argument.approachingTheEdge();
             }
+        },
+        new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+            @Override
+            public void run(DefaultStyleScopeInfo context) {
+                context.statementBroken = true;
+            }
         });
         maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
@@ -584,9 +590,17 @@ public class ClassWriter {
                     public void run(DefaultStyleScopeInfo context) {
                         context.lineBreakTry++;
                         context.toFar.add(context.getNowAt());
+                        context.statementBroken = false;
                     }
                 }
         );
+        maker.alwaysAfter(HasAtoms.EOL,
+                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                    @Override
+                    public void run(DefaultStyleScopeInfo context) {
+                        context.statementBroken = false;
+                    }
+                });
         maker.alwaysBefore(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
         maker.alwaysBefore(HasAtoms.ALE, CodeStyle.Action.SCOPE_EXIT);
         maker.alwaysBefore(HasAtoms.LPR, CodeStyle.Action.SCOPE_ENTER);
@@ -604,6 +618,7 @@ public class ClassWriter {
 
     public static class DefaultStyleScopeInfo extends CodeStyle.ScopeStack.ScopeInfo {
         private int lineBreakTry = 0;
+        private boolean statementBroken = false;
         private LinkedList<Integer> toFar = new LinkedList<Integer>();
 
         public int getLineBreakTry() {
@@ -612,6 +627,11 @@ public class ClassWriter {
 
         public boolean approachingTheEdge() {
             return 100 < getLineLength() + getNextLen() + 1 || toFar.contains(getNowAt());
+        }
+
+        @Override
+        public int getExtraIndent() {
+            return super.getExtraIndent() + (statementBroken ? 1 : 0);
         }
     }
 
