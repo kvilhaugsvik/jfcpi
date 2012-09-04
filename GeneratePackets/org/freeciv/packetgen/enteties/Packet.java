@@ -212,7 +212,7 @@ public class Packet extends ClassWriter implements IDependency {
                     encodeFieldsLen.add(build.toString());
                     build = new StringBuilder();
                 }
-                build.append("\t+ ");
+                build.append("+ ");
                 build.append(calcBodyLen(fields[i]));
             }
             build.append(");");
