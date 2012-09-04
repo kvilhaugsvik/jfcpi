@@ -14,7 +14,6 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.Util;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.*;
@@ -34,7 +33,7 @@ public class Struct extends ClassWriter implements IDependency {
     public Struct(String name, List<Map.Entry<String, String>> fields, Set<Requirement> willNeed) {
         super(ClassKind.CLASS,
                 new TargetPackage(FCEnum.class.getPackage()),
-                null, "Freeciv C code", name, null, null);
+                null, "Freeciv C code", Collections.<Annotate>emptyList(), name, null, null);
 
         addConstructorFields();
 

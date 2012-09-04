@@ -29,7 +29,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
 
     public BitVector(String name, IntExpression bits) {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.types.BitVector.class.getPackage()), null,
-              "Freeciv C code", name, "BitVector", null);
+                "Freeciv C code", Collections.<Annotate>emptyList(), name, "BitVector", null);
 
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
         knowsSize = true;
@@ -45,7 +45,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
 
     public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.types.BitVector.class.getPackage()), null,
-                "Freeciv C code", "BitString", "BitVector", null);
+                "Freeciv C code", Collections.<Annotate>emptyList(), "BitString", "BitVector", null);
 
         addPublicObjectConstant("int", "size");
         knowsSize = false;

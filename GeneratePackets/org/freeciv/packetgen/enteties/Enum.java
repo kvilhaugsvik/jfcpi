@@ -24,7 +24,6 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.types.FCEnum;
@@ -57,8 +56,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
 
     protected Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs,
                 List<EnumElementFC> values) {
-        super(ClassKind.ENUM, new TargetPackage(FCEnum.class.getPackage()), null, "Freeciv C code", enumName, null,
-              "FCEnum");
+        super(ClassKind.ENUM, new TargetPackage(FCEnum.class.getPackage()), null, "Freeciv C code", Collections.<Annotate>emptyList(), enumName, null, "FCEnum");
 
         this.bitwise = bitwise;
         this.iRequire = reqs;

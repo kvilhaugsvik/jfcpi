@@ -98,14 +98,13 @@ public class FieldTypeBasic implements IDependency {
     public class FieldTypeAlias extends ClassWriter implements IDependency {
 
         private FieldTypeAlias(String name) {
-            super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
-                              new Import[]{
-                                      Import.classIn(java.io.DataInput.class),
-                                      Import.classIn(java.io.DataOutput.class),
-                                      Import.classIn(java.io.IOException.class),
-                                      null,
-                                      Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()))
-                              }, "Freeciv's protocol definition", name, null, "FieldType<" + javaType.getName() + ">");
+            super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()), new Import[]{
+                                                  Import.classIn(java.io.DataInput.class),
+                                                  Import.classIn(java.io.DataOutput.class),
+                                                  Import.classIn(java.io.IOException.class),
+                                                  null,
+                                                  Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()))
+                                          }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name, null, "FieldType<" + javaType.getName() + ">");
 
             addObjectConstant(javaType.getName(), "value");
             if (arrayEater) {

@@ -47,12 +47,6 @@ public class ClassWriter {
 
     private boolean constructorFromAllFields = false;
 
-    @Deprecated
-    public ClassWriter(ClassKind kind, TargetPackage where, Import[] imports, String madeFrom, String name,
-                       String parent, String implementsInterface) {
-        this(kind, where, imports, madeFrom, Collections.<Annotate>emptyList(), name, parent, implementsInterface);
-    }
-
     public ClassWriter(ClassKind kind, TargetPackage where, Import[] imports,
                        String madeFrom, List<Annotate> classAnnotate,
                        String name,

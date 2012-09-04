@@ -216,10 +216,9 @@ public class PacketsStore {
 
         int border = Util.VERSION_DATA_CLASS.lastIndexOf('.');
         ClassWriter constants =
-                new ClassWriter(ClassKind.CLASS, new TargetPackage(
-                        Util.VERSION_DATA_CLASS.substring(0, border)), null,
-                                "Freeciv C code", Util.VERSION_DATA_CLASS.substring(border + 1),
-                                null, null);
+                new ClassWriter(ClassKind.CLASS, new TargetPackage(Util.VERSION_DATA_CLASS.substring(0, border)), null,
+                        "Freeciv C code", Collections.<Annotate>emptyList(), Util.VERSION_DATA_CLASS.substring(border + 1),
+                        null, null);
 
         for (Constant dep : sortedConstants)
             constants.addField(dep);

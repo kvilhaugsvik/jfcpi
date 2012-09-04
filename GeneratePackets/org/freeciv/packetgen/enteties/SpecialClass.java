@@ -16,11 +16,13 @@ package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.javaGenerator.Annotate;
 import org.freeciv.packetgen.javaGenerator.ClassKind;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.TargetPackage;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 public class SpecialClass extends ClassWriter implements IDependency {
@@ -29,7 +31,7 @@ public class SpecialClass extends ClassWriter implements IDependency {
 
     public SpecialClass(TargetPackage where, String madeFrom, String name,
                         Requirement iProvide, Set<Requirement> iRequire) {
-        super(ClassKind.CLASS, where, null, madeFrom, name, null, null);
+        super(ClassKind.CLASS, where, null, madeFrom, Collections.<Annotate>emptyList(), name, null, null);
 
         this.iProvide = iProvide;
         this.iRequire = iRequire;
