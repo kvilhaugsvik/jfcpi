@@ -44,7 +44,7 @@ class Method {
 
     @Override
     public String toString() {
-        String out = (null == comment ? "" : "\t" + comment.replace("\n", "\n\t") + "\n");
+        String out = (null == comment || "".equals(comment) ? "" : "\t" + comment.replace("\n", "\n\t") + "\n");
         out += "\t" + ClassWriter.ifIs("", visibility.toString(), " ") + ClassWriter.ifIs(scope.toString(), " ") + ClassWriter.ifIs(type, " ") +
                 name + "(" + ClassWriter.ifIs(paramList) + ") " + ClassWriter.ifIs("throws ", exceptionList, " ");
         out += body.getJavaCodeIndented("\t").substring(1);
