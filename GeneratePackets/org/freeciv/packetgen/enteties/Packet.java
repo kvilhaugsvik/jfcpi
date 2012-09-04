@@ -154,8 +154,9 @@ public class Packet extends ClassWriter implements IDependency {
         constructorBodyStream.groupBoundary();
 
         constructorBodyStream.addStatement(IF(asBool("number != header.getPacketKind()"),
-                Block.fromStrings("throw new IOException(\"Tried to create package " +
-                                          name + " but packet number was \" + header.getPacketKind())")));
+                new Block(THROW((new TargetClass(IOException.class)).newInstance(sum(
+                        literalString("Tried to create package " + name + " but packet number was "),
+                        argHeader.<AnInt>call("getPacketKind")))))));
 
         constructorBodyStream.addStatement(ASSERT(asBool("header instanceof " + headerKind.getName()),
                 literalString("Packet not generated for this kind of header")));
@@ -163,11 +164,12 @@ public class Packet extends ClassWriter implements IDependency {
         Block wrongSize = new Block();
         constructorBodyStream.addStatement(IF(asBool("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),
                 wrongSize));
-        wrongSize.addStatement(asVoid("Logger.getLogger(" + logger + ").warning(" +
-                "\"Probable misinterpretation: \" + " +
-                "\"interpreted packet size (\" + (header.getHeaderSize() + calcBodyLen()) + \")" +
-                " don't match header packet size (\" + header.getTotalSize() + \")" +
-                " for \" + this.toString())"));
+        wrongSize.addStatement(new MethodCall<NoValue>(null, "Logger.getLogger(" + logger + ").warning", sum(
+                literalString("Probable misinterpretation: "),
+                literalString("interpreted packet size ("),
+                GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), asAnInt("calcBodyLen()"))),
+                literalString(") don't match header packet size ("), argHeader.<AnInt>call("getTotalSize"),
+                literalString(") for "), asAString("this.toString()"))));
         wrongSize.addStatement(THROW((new TargetClass(IOException.class)).newInstance(sum(
                 literalString("Packet size in header and Java packet not the same."),
                 literalString(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
