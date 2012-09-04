@@ -45,6 +45,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         many.add(AtomCheck.<ScopeInfoKind>leftIs(atom, change));
     }
 
+    public void alwaysAfter(CodeAtom atom, Triggered<ScopeInfoKind> andRun) {
+        many.add(AtomCheck.<ScopeInfoKind>leftIs(atom, andRun));
+    }
+
     public void alwaysBefore(CodeAtom atom, CodeStyle.Action change) {
         many.add(AtomCheck.<ScopeInfoKind>rightIs(atom, change));
     }
@@ -74,6 +78,11 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfoKind> scopeCond) {
         triggers.add(AtomCheck.<ScopeInfoKind>rightIs(atom, toInsert, scopeCond));
+    }
+
+    public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert,
+                           Util.OneCondition<ScopeInfoKind> scopeCond, Triggered<ScopeInfoKind> toRun) {
+        triggers.add(AtomCheck.<ScopeInfoKind>rightIs(atom, toInsert, scopeCond, toRun));
     }
 
     public void whenBefore(final Class<? extends CodeAtom> kind, CodeStyle.Action toDo,
@@ -331,12 +340,27 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftIs(final CodeAtom atom, CodeStyle.Action toInsert,
-                                          Util.OneCondition<ScopeInfoKind> scopeCond) {
+                                                                                        Util.OneCondition<ScopeInfoKind> scopeCond) {
+            return leftIs(atom, toInsert, scopeCond, null);
+        }
+
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftIs(final CodeAtom atom, CodeStyle.Action toInsert,
+                                                                                        Triggered<ScopeInfoKind> toRun) {
+            return leftIs(atom, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope(), toRun);
+        }
+
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftIs(final CodeAtom atom, CodeStyle.Action toInsert,
+                                          Util.OneCondition<ScopeInfoKind> scopeCond, Triggered<ScopeInfoKind> toRun) {
             return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return null != before && atom.equals(before);
                 }
-            }, toInsert, scopeCond);
+            }, toInsert, scopeCond, toRun);
+        }
+
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftIs(final CodeAtom atom,
+                                                                                        Triggered<ScopeInfoKind> toRun) {
+            return leftIs(atom, CodeStyle.Action.DO_NOTHING, AtomCheck.<ScopeInfoKind>ignoresScope(), toRun);
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> rightIs(final CodeAtom atom, CodeStyle.Action toInsert) {
@@ -345,11 +369,16 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> rightIs(final CodeAtom atom, CodeStyle.Action toInsert,
                                         Util.OneCondition<ScopeInfoKind> scopeCond) {
+            return rightIs(atom, toInsert, scopeCond, null);
+        }
+
+        public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> rightIs(final CodeAtom atom, CodeStyle.Action toInsert,
+                                        Util.OneCondition<ScopeInfoKind> scopeCond, Triggered<ScopeInfoKind> toRun) {
             return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return null != after && atom.equals(after);
                 }
-            }, toInsert, scopeCond);
+            }, toInsert, scopeCond, toRun);
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftAndRightIs(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
