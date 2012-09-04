@@ -45,11 +45,5 @@ public abstract class Formatted implements HasAtoms {
         return getJavaCodeIndented("");
     }
 
-    protected String[] basicFormatBlock() {
-        CodeAtoms out = new CodeAtoms();
-        writeAtoms(out);
-        return ClassWriter.DEFAULT_STYLE.asFormattedLines(out).toArray(new String[0]);
-    }
-
     public static abstract class Type<Return extends Returnable> extends Formatted implements Typed<Return> {}
 }

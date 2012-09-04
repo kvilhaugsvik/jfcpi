@@ -58,10 +58,6 @@ public class Block extends Formatted implements Typed<NoValue> {
         differentGroupsAt.set(statements.size());
     }
 
-    public String[] getJavaCodeLines() {
-        return basicFormatBlock();
-    }
-
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(LSC);
