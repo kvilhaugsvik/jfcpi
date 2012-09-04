@@ -196,45 +196,33 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addCalcBodyLen(Field[] fields) {
-        LinkedList<String> encodeFieldsLen = new LinkedList<String>();
+        Block encodeFieldsLen = new Block();
         for (Field field : fields)
-            if (field.hasDeclarations())
-                encodeFieldsLen.addAll(Arrays.asList(field.forElementsInField(
-                        "int " + field.getFieldName() + "Len" + " = " + "0;",
-                        field.getFieldName() + "Len" + "+=" +
-                                "this." + field.getFieldName() + "[i].encodedLength();", "")));
-        if (1 < fields.length) {
-            StringBuilder build = new StringBuilder("return (");
-            build.append(calcBodyLen(fields[0]));
-            boolean broken = false;
-            for (int i = 1; i < fields.length; i++) {
-                if (100 < build.length() + 1 + 1) {
-                    encodeFieldsLen.add(build.toString());
-                    build = new StringBuilder();
-                } else {
-                    build.append(" ");
-                }
-                build.append("+ ");
-                build.append(calcBodyLen(fields[i]));
+            if (field.hasDeclarations()) {
+                encodeFieldsLen.addStatement(asVoid("int " + field.getFieldName() + "Len" + " = " + "0"));
+                field.forElementsInField(field.getFieldName() + "Len" + "+=" +
+                        "this." + field.getFieldName() + "[i].encodedLength()", encodeFieldsLen);
             }
-            build.append(");");
-            encodeFieldsLen.add(build.toString());
-        } else if (1 == fields.length) {
-            encodeFieldsLen.add("return " + calcBodyLen(fields[0]) + ";");
-
+        if (0 < fields.length) {
+            Typed<? extends AValue> summing = calcBodyLen(fields[0]);
+            for (int i = 1; i < fields.length; i++)
+                summing = sum(summing, calcBodyLen(fields[i]));
+            if (1 < fields.length)
+                summing = GROUP(summing);
+            encodeFieldsLen.addStatement(RETURN(summing));
         } else {
-            encodeFieldsLen.add("return 0;");
+            encodeFieldsLen.addStatement(RETURN(asAnInt("0")));
         }
         addMethod(null,
-                Visibility.PRIVATE, Scope.OBJECT,
-                "int", "calcBodyLen", null, null,
-                encodeFieldsLen.toArray(new String[0]));
+                  Visibility.PRIVATE, Scope.OBJECT,
+                  "int", "calcBodyLen", null, null,
+                  encodeFieldsLen);
     }
 
-    private static String calcBodyLen(Field field) {
+    private static Typed<? extends AValue> calcBodyLen(Field field) {
         return (field.hasDeclarations() ?
-                field.getFieldName() + "Len" :
-                "this." + field.getFieldName() + ".encodedLength()");
+                asAValue(field.getFieldName() + "Len") :
+                asAValue("this." + field.getFieldName() + ".encodedLength()"));
     }
 
     private void addToString(String name, Field[] fields) {
