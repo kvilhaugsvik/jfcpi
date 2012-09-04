@@ -207,8 +207,6 @@ public class Packet extends ClassWriter implements IDependency {
             Typed<? extends AValue> summing = calcBodyLen(fields[0]);
             for (int i = 1; i < fields.length; i++)
                 summing = sum(summing, calcBodyLen(fields[i]));
-            if (1 < fields.length)
-                summing = GROUP(summing);
             encodeFieldsLen.addStatement(RETURN(summing));
         } else {
             encodeFieldsLen.addStatement(RETURN(asAnInt("0")));
