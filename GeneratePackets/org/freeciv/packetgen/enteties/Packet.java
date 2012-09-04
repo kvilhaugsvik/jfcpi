@@ -204,7 +204,7 @@ public class Packet extends ClassWriter implements IDependency {
                         field.getFieldName() + "Len" + "+=" +
                                 "this." + field.getFieldName() + "[i].encodedLength();", "")));
         if (1 < fields.length) {
-            StringBuilder build = new StringBuilder("return ");
+            StringBuilder build = new StringBuilder("return (");
             build.append(calcBodyLen(fields[0]));
             boolean broken = false;
             for (int i = 1; i < fields.length; i++) {
@@ -212,10 +212,10 @@ public class Packet extends ClassWriter implements IDependency {
                     encodeFieldsLen.add(build.toString());
                     build = new StringBuilder();
                 }
-                build.append("\t\t+ ");
+                build.append("\t+ ");
                 build.append(calcBodyLen(fields[i]));
             }
-            build.append(";");
+            build.append(");");
             encodeFieldsLen.add(build.toString());
         } else if (1 == fields.length) {
             encodeFieldsLen.add("return " + calcBodyLen(fields[0]) + ";");
