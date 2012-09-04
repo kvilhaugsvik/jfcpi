@@ -529,8 +529,8 @@ public class CodeGenTest {
                         "\t" + "\t" + "}" + "\n" +
                         "\n" +
                         "\t" + "\t" + "if (getEncodedSize() != headerLen) {\n" +
-                        "\t" + "\t" + "\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen + \" Packet: \"\n" +
-                        "\t" + "\t" + "\t" + "\t" + "+ getEncodedSize());\n" +
+                        "\t" + "\t" + "\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen\n" +
+                        "\t" + "\t" + "\t" + "\t" + "+ \" Packet: \" + getEncodedSize());\n" +
                         "\t" + "\t" + "}" + "\n" +
                         "\t" + "}" + "\n",
                 result);

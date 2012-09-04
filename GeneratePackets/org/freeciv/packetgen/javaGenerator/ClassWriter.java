@@ -19,7 +19,6 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
@@ -364,57 +363,6 @@ public class ClassWriter {
         return new Annotate("Generated", comments, value);
     }
 
-    private static final Pattern scopeEndFirst = Pattern.compile("\\A\\}+");
-    public static String indent(String[] lines, String startAt) {
-        String out = "";
-        int extraIndention = 0;
-        for (String line : lines) {
-            if (null != line) {
-                char[] addIndention;
-                Matcher scopeEndFirstInLine = scopeEndFirst.matcher(line);
-                if (scopeEndFirstInLine.find()) {
-                    final int numberOfScopes = extraIndention - scopeEndFirstInLine.end();
-                    if (0 > numberOfScopes) throw endOfScopeNotBegan(line);
-                    addIndention = new char[numberOfScopes];
-                } else
-                    addIndention = new char[extraIndention];
-                extraIndention = updateIndention(extraIndention, line);
-                Arrays.fill(addIndention, '\t');
-                out += !line.isEmpty() ? (startAt + new String(addIndention) + line) : "";
-            }
-            out += "\n";
-            if (0 > extraIndention)
-                throw endOfScopeNotBegan(line);
-        }
-        if (0 < extraIndention)
-            throw new IllegalArgumentException("Code to be indented don't end it's scope");
-        return out;
-    }
-
-    private static IllegalArgumentException endOfScopeNotBegan(String offendingCode) {
-        return new IllegalArgumentException("Code to be indented ends scope it didn't define: " + offendingCode);
-    }
-
-    private static int updateIndention(int extraIndention, String line) {
-        for (int position = 0; position < line.length(); position++) {
-            switch (line.charAt(position)) {
-                case '{':
-                    extraIndention++;
-                    break;
-                case '}':
-                    extraIndention--;
-                    break;
-                case '(':
-                    extraIndention++;
-                    break;
-                case ')':
-                    extraIndention--;
-                    break;
-            }
-        }
-        return extraIndention;
-    }
-
     static String ifIs(String element) {
         return ifIs("", element, "");
     }
@@ -458,7 +406,8 @@ public class ClassWriter {
             String out = (null == comment ? "" : "\t" + comment.replace("\n", "\n\t") + "\n");
             out += "\t" + ifIs("", visibility.toString(), " ") + ifIs(scope.toString(), " ") + ifIs(type, " ") +
                     name + "(" + ifIs(paramList) + ") " + ifIs("throws ", exceptionList, " ");
-            out += indent(body.getJavaCodeLines(), "\t").substring(1);
+            out += body.getJavaCodeIndented("\t").substring(1);
+            out += "\n";
             return out;
         }
 

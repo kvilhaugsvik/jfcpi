@@ -21,11 +21,24 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
+import java.util.List;
+
 public abstract class Formatted implements HasAtoms {
     public String getJavaCodeIndented(String start) {
-        CodeAtoms out = new CodeAtoms(this);
-        return Util.joinStringArray(ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(out).toArray(new String[0]),
-                "\n", "", "");
+        List<String> lines = ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(new CodeAtoms(this));
+        if (0 == lines.size())
+            return "";
+        StringBuilder out = new StringBuilder(start);
+        out.append(lines.get(0));
+        for (int i = 1; i < lines.size(); i++) {
+            out.append("\n");
+            String line = lines.get(i);
+            if (!"".equals(line)) {
+                out.append(start);
+                out.append(line);
+            }
+        }
+        return out.toString();
     }
 
     public String toString() {
