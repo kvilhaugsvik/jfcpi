@@ -622,17 +622,22 @@ public class ClassWriter {
         maker.whenAfter(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.ARRAY_ACCESS_END, CodeStyle.Action.DO_NOTHING);
 
-        maker.alwaysOnState(new Util.OneCondition<DefaultStyleScopeInfo>() {
-            @Override public boolean isTrueFor(DefaultStyleScopeInfo info) {
-                boolean toLong = 100 <= info.getLineLength() && info.getLineBreakTry() < 10;
-                //TODO: Stop doing as a side effect
-                if (toLong) {
-                    info.lineBreakTry++;
-                    info.toFar.add(info.getNowAt());
+        maker.alwaysOnState(
+                new Util.OneCondition<DefaultStyleScopeInfo>() {
+                    @Override
+                    public boolean isTrueFor(DefaultStyleScopeInfo info) {
+                        return 100 <= info.getLineLength() && info.getLineBreakTry() < 10;
+                    }
+                },
+                CodeStyle.Action.RESET_LINE,
+                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                    @Override
+                    public void run(DefaultStyleScopeInfo context) {
+                        context.lineBreakTry++;
+                        context.toFar.add(context.getNowAt());
+                    }
                 }
-                return toLong;
-            }
-        }, CodeStyle.Action.RESET_LINE);
+        );
         maker.alwaysBefore(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
         maker.alwaysBefore(HasAtoms.ALE, CodeStyle.Action.SCOPE_EXIT);
         maker.alwaysBefore(HasAtoms.LPR, CodeStyle.Action.SCOPE_ENTER);

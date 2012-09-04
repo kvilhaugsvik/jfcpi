@@ -36,8 +36,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         this.many = new LinkedList<AtomCheck<ScopeInfoKind>>();
     }
 
-    public void alwaysOnState(Util.OneCondition<ScopeInfoKind> when, CodeStyle.Action doThis) {
-        many.add(AtomCheck.<ScopeInfoKind>scopeIs(when, doThis));
+    public void alwaysOnState(Util.OneCondition<ScopeInfoKind> when, CodeStyle.Action doThis,
+                              Triggered<ScopeInfoKind> andRun) {
+        many.add(AtomCheck.<ScopeInfoKind>scopeIs(when, doThis, andRun));
     }
 
     public void alwaysAfter(CodeAtom atom, CodeStyle.Action change) {
@@ -267,6 +268,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         }
 
         public CodeStyle.Action getToInsert() {
+            if (null != check.getToRun())
+                check.getToRun().run(stack.get());
             return check.getToInsert();
         }
 
@@ -287,12 +290,19 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         private final Util.TwoConditions<CodeAtom, CodeAtom> test;
         private final CodeStyle.Action toInsert;
         private final Util.OneCondition<ScopeInfoKind> scopeTest;
+        private final Triggered<ScopeInfoKind> toRun;
 
         public AtomCheck(Util.TwoConditions<CodeAtom, CodeAtom> positionTest, CodeStyle.Action toInsert,
                          Util.OneCondition<ScopeInfoKind> scopeTest) {
+            this(positionTest, toInsert, scopeTest, null);
+        }
+
+        public AtomCheck(Util.TwoConditions<CodeAtom, CodeAtom> positionTest, CodeStyle.Action toInsert,
+                         Util.OneCondition<ScopeInfoKind> scopeTest, Triggered<ScopeInfoKind> toRun) {
             this.test = positionTest;
             this.scopeTest = scopeTest;
             this.toInsert = toInsert;
+            this.toRun = toRun;
         }
 
         public CompiledAtomCheck<ScopeInfoKind> forStack(CodeStyle.ScopeStack<ScopeInfoKind> scope) {
@@ -301,6 +311,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
         public CodeStyle.Action getToInsert() {
             return toInsert;
+        }
+
+        public Triggered<ScopeInfoKind> getToRun() {
+            return toRun;
         }
 
         public Util.TwoConditions<CodeAtom, CodeAtom> getCheck() {
@@ -379,13 +393,18 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> scopeIs(Util.OneCondition<ScopeInfoKind> when,
-                                                                       CodeStyle.Action doThis) {
+                                                                       CodeStyle.Action doThis,
+                                                                       Triggered<ScopeInfoKind> andRun) {
             return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return true;
                 }
-            }, doThis, when);
+            }, doThis, when, andRun);
         }
+    }
+
+    public static interface Triggered<ScopeInfoKind extends ScopeInfo> {
+        public void run(ScopeInfoKind context);
     }
 }
