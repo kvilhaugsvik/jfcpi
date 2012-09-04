@@ -17,10 +17,13 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.Util;
 import org.freeciv.packet.fieldtype.FieldType;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.freeciv.packetgen.javaGenerator.ClassWriter.*;
 import static org.junit.Assert.assertEquals;
@@ -33,7 +36,7 @@ public class CodeGenTest {
 
     @Test public void testMethodEverything() {
         String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
-                "Throwable", "return 5;")).toString();
+                "Throwable", Block.fromStrings("return 5"))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
@@ -45,7 +48,7 @@ public class CodeGenTest {
 
     @Test public void testMethodNoComment() {
         String result = (new Method(null, Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a", "Throwable",
-                "return 5;")).toString();
+                Block.fromStrings("return 5"))).toString();
 
         assertEquals("Generated source not as expected",
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
@@ -56,7 +59,7 @@ public class CodeGenTest {
 
     @Test public void testMethodNoParams() {
         String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null,
-                "Throwable", "return 5;")).toString();
+                "Throwable", Block.fromStrings("return 5"))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
@@ -68,23 +71,19 @@ public class CodeGenTest {
 
     @Test public void testMethodManyLevelsOfIndention() {
         String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
-                "while(true) {",
-                "while(true) {",
-                "while(true) {",
-                "while(true) {",
-                "return 5;",
-                "}",
-                "}",
-                "}",
-                "}")).toString();
+                new Block(WHILE(TRUE,
+                        new Block(WHILE(TRUE,
+                                new Block(WHILE(TRUE,
+                                        new Block(WHILE(TRUE,
+                                                new Block(RETURN(asAnInt("5"))))))))))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
                         "\t" + "public static int testMethod() {" + "\n" +
-                        "\t" + "\t" + "while(true) {" + "\n" +
-                        "\t" + "\t" + "\t" + "while(true) {" + "\n" +
-                        "\t" + "\t" + "\t" + "\t" + "while(true) {" + "\n" +
-                        "\t" + "\t" + "\t" + "\t" + "\t" + "while(true) {" + "\n" +
+                        "\t" + "\t" + "while (true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "while (true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "while (true) {" + "\n" +
+                        "\t" + "\t" + "\t" + "\t" + "\t" + "while (true) {" + "\n" +
                         "\t" + "\t" + "\t" + "\t" + "\t" + "\t" + "return 5;\n" +
                         "\t" + "\t" + "\t" + "\t" + "\t" + "}" + "\n" +
                         "\t" + "\t" + "\t" + "\t" + "}" + "\n" +
@@ -94,57 +93,49 @@ public class CodeGenTest {
                 result);
     }
 
-    @Test public void testMethodManyLevelsOfIndentionScopeEndTogether() {
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
-                "while(true) {",
-                "while(true) {",
-                "while(true) {",
-                "while(true) {",
-                "return 5;",
-                "}}}}")).toString();
-
-        assertEquals("Generated source not as expected",
-                "\t" + "// comment" + "\n" +
-                        "\t" + "public static int testMethod() {" + "\n" +
-                        "\t" + "\t" + "while(true) {" + "\n" +
-                        "\t" + "\t" + "\t" + "while(true) {" + "\n" +
-                        "\t" + "\t" + "\t" + "\t" + "while(true) {" + "\n" +
-                        "\t" + "\t" + "\t" + "\t" + "\t" + "while(true) {" + "\n" +
-                        "\t" + "\t" + "\t" + "\t" + "\t" + "\t" + "return 5;\n" +
-                        "\t" + "\t" + "}}}}" + "\n" +
-                        "\t" + "}" + "\n",
-                result);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void methodShouldNotEscapeToClassScope() {
+        Block closesScopeNotOpened = new Block(WHILE(TRUE, new Block(RETURN(asAnInt("5"))))) {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                super.writeAtoms(to);
+                to.add(HasAtoms.RSC);
+            }
+        };
         String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
-                "while(true) {",
-                "return 5;",
-                "}",
-                "}")).toString();
+                closesScopeNotOpened)).toString();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void methodShouldNotEscapeToClassScopeEvenIfTextBeforeIt() {
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
-                "int i = 0;",
-                "while(i < 10) {",
-                "i = i + 1;",
-                "}",
-                "return(i);}")).toString();
-    }
-
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void methodShouldFinishScope() {
+        Block forgetsToCloseScope = new Block() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(LSC);
+                to.add(HasAtoms.WHILE);
+                to.add(HasAtoms.LPR);
+                to.add(new IR.CodeAtom("true"));
+                to.add(HasAtoms.RPR);
+                to.add(HasAtoms.RSC);
+                to.add(HasAtoms.RET);
+                to.add(new IR.CodeAtom("5"));
+                to.add(HasAtoms.EOL);
+                to.add(RSC);
+                to.refuseNextIf(new Util.OneCondition<IR.CodeAtom>() {
+                    @Override
+                    public boolean isTrueFor(IR.CodeAtom argument) {
+                        return HasAtoms.EOL.equals(argument);
+                    }
+                });
+            }
+        };
         String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
-                "while(true) {",
-                "return 5;")).toString();
+                forgetsToCloseScope)).toString();
     }
 
     @Test public void testMethodEverythingTwoLineComment() {
         String result = (new Method("/** comment\n * more comment\n */",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod",
-                "String a", "Throwable", "return 5;")).toString();
+                "String a", "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/** comment" + "\n" +
@@ -156,23 +147,13 @@ public class CodeGenTest {
                 result);
     }
 
-    @Test public void testMethodEverythingBodyWithBlankSymbolEmptyString() {
+    @Test public void testMethodEverythingBodyWithBlank() {
+        Block isSeparated = new Block();
+        isSeparated.addStatement(asAValue("int a = 5"));
+        isSeparated.groupBoundary();
+        isSeparated.addStatement(asAValue("return a"));
         String result = (new Method("// comment",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
-                "Throwable", "int a = 5;", "", "return a;")).toString();
-
-        assertEquals("Generated source not as expected",
-                "\t" + "// comment" + "\n" +
-                        "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
-                        "\t" + "\t" + "int a = 5;" + "\n" +
-                        "\n" +
-                        "\t" + "\t" + "return a;" + "\n" +
-                        "\t" + "}" + "\n",
-                result);
-    }
-
-    @Test public void testMethodEverythingBodyWithBlankSymbolNull() {
-        String result = (new Method("// comment",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
-                "Throwable", "int a = 5;", null, "return a;")).toString();
+                "Throwable", isSeparated)).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
@@ -185,7 +166,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodClassStateReader() {
-        Method toTest = Method.newReadClassState(null, "boolean", "isTrue", "return true;");
+        Method toTest = Method.newReadClassState(null, "boolean", "isTrue", Block.fromStrings("return true"));
         assertEquals("Generated Class state reader source code not as espected",
                 "\t" + "public static boolean isTrue() {" + "\n" +
                         "\t\t" + "return true;" + "\n" +
@@ -503,7 +484,7 @@ public class CodeGenTest {
     @Test public void testPublicConstructorNoExceptions() {
         String result = Method.newPublicConstructor(null,
                 "PACKET_CITY_NAME_SUGGESTION_REQ", "Integer unit_id",
-                "this.unit_id = new UNIT(unit_id);").toString();
+                Block.fromStrings("this.unit_id = new UNIT(unit_id)")).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "public PACKET_CITY_NAME_SUGGESTION_REQ(Integer unit_id) {" + "\n" +
@@ -513,6 +494,17 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicConstructor() {
+        Block body = new Block(
+                asAValue("this.unit_id = new UNIT(from)"),
+                IF(asBool("getNumber() != packet"),
+                        Block.fromStrings("throw new IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet)")));
+        body.groupBoundary();
+        body.addStatement(IF(asBool("getEncodedSize() != headerLen"), new Block(THROW((new TargetClass(IOException.class))
+                        .newInstance(sum(
+                                literalString("Package size in header and Java packet not the same. Header: "),
+                                asAValue("headerLen"),
+                                literalString(" Packet: "),
+                                asAValue("getEncodedSize()")))))));
         String result = Method.newPublicConstructorWithException("/***" + "\n" +
                 " * Construct an object from a DataInput" + "\n" +
                 " * @param from data stream that is at the start of the package body" + "\n" +
@@ -520,16 +512,7 @@ public class CodeGenTest {
                 " * @param packet the number of the packet specified in the header" + "\n" +
                 " * @throws IOException if the DataInput has a problem" + "\n" +
                 " */",
-                "PACKET_CITY_NAME_SUGGESTION_REQ", "DataInput from, int headerLen, int packet", "IOException",
-                "this.unit_id = new UNIT(from);",
-                "if (getNumber() != packet) {",
-                "throw new IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet);",
-                "}",
-                "",
-                "if (getEncodedSize() != headerLen) {",
-                "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen",
-                "+ \" Packet: \" + getEncodedSize());",
-                "}").toString();
+                "PACKET_CITY_NAME_SUGGESTION_REQ", "DataInput from, int headerLen, int packet", "IOException", body).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/***" + "\n" +
@@ -546,8 +529,8 @@ public class CodeGenTest {
                         "\t" + "\t" + "}" + "\n" +
                         "\n" +
                         "\t" + "\t" + "if (getEncodedSize() != headerLen) {\n" +
-                        "\t" + "\t" + "\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen\n" +
-                        "\t" + "\t" + "\t" + "\t" + "+ \" Packet: \" + getEncodedSize());\n" +
+                        "\t" + "\t" + "\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen + \" Packet: \"\n" +
+                        "\t" + "\t" + "\t" + "\t" + "+ getEncodedSize());\n" +
                         "\t" + "\t" + "}" + "\n" +
                         "\t" + "}" + "\n",
                 result);

@@ -447,6 +447,18 @@ public class ClassWriter {
         private final String[] body;
 
         public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
+                      String exceptionList, Block body) {
+            this.comment = comment;
+            this.visibility = visibility;
+            this.scope = scope;
+            this.type = type;
+            this.name = name;
+            this.paramList = paramList;
+            this.exceptionList = exceptionList;
+            this.body = newToOld(body);
+        }
+
+        public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
                       String exceptionList, String... body) {
             this.comment = comment;
             this.visibility = visibility;
@@ -472,8 +484,23 @@ public class ClassWriter {
                                                         String name,
                                                         String paramList,
                                                         String exceptionList,
+                                                        Block body) {
+            return newPublicDynamicMethod(comment, null, name, paramList, exceptionList, newToOld(body));
+        }
+
+        static Method newPublicConstructorWithException(String comment,
+                                                        String name,
+                                                        String paramList,
+                                                        String exceptionList,
                                                         String... body) {
             return newPublicDynamicMethod(comment, null, name, paramList, exceptionList, body);
+        }
+
+        static Method newPublicConstructor(String comment,
+                                           String name,
+                                           String paramList,
+                                           Block body) {
+            return newPublicConstructorWithException(comment, name, paramList, null, body);
         }
 
         static Method newPublicConstructor(String comment,
@@ -504,6 +531,10 @@ public class ClassWriter {
                                              String exceptionList,
                                              String... body) {
             return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
+        }
+
+        public static Method newReadClassState(String comment, String type, String name, Block body) {
+            return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, newToOld(body));
         }
 
         public static Method newReadClassState(String comment, String type, String name, String... body) {
