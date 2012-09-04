@@ -20,13 +20,23 @@ class Method {
     private final String comment;
     private final Visibility visibility;
     private final Scope scope;
-    private final String type;
+    private final TargetClass type;
     private final String name;
     private final String paramList;
     private final String exceptionList;
     private final Block body;
 
+    @Deprecated
     public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
+                  String exceptionList, Block body) {
+        this(comment, visibility, scope, stringTypeToTargetClass(type), name, paramList, exceptionList, body);
+    }
+
+    private static TargetClass stringTypeToTargetClass(String type) {
+        return (null == type ? TargetClass.INSTANCE : new TargetClass(type));
+    }
+
+    public Method(String comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
                   String exceptionList, Block body) {
         this.comment = comment;
         this.visibility = visibility;
@@ -45,7 +55,8 @@ class Method {
     @Override
     public String toString() {
         String out = (null == comment || "".equals(comment) ? "" : "\t" + comment.replace("\n", "\n\t") + "\n");
-        out += "\t" + ClassWriter.ifIs("", visibility.toString(), " ") + ClassWriter.ifIs(scope.toString(), " ") + ClassWriter.ifIs(type, " ") +
+        out += "\t" + ClassWriter.ifIs("", visibility.toString(), " ") + ClassWriter.ifIs(scope.toString(), " ") +
+                (null == type ? "" : type.getName() + " ") +
                 name + "(" + ClassWriter.ifIs(paramList) + ") " + ClassWriter.ifIs("throws ", exceptionList, " ");
         out += body.getJavaCodeIndented("\t").substring(1);
         out += "\n";
@@ -57,7 +68,7 @@ class Method {
                                                     String paramList,
                                                     String exceptionList,
                                                     Block body) {
-        return newPublicDynamicMethod(comment, null, name, paramList, exceptionList, body);
+        return newPublicDynamicMethod(comment, TargetClass.INSTANCE, name, paramList, exceptionList, body);
     }
 
     static Method newPublicConstructor(String comment,
@@ -67,15 +78,33 @@ class Method {
         return newPublicConstructorWithException(comment, name, paramList, null, body);
     }
 
+    @Deprecated
     static Method newPublicReadObjectState(String comment,
                                            String type,
+                                           String name,
+                                           Block body) {
+        return newPublicReadObjectState(comment, stringTypeToTargetClass(type), name, body);
+    }
+
+    static Method newPublicReadObjectState(String comment,
+                                           TargetClass type,
                                            String name,
                                            Block body) {
         return newPublicDynamicMethod(comment, type, name, null, null, body);
     }
 
+    @Deprecated
     static Method newPublicDynamicMethod(String comment,
                                          String type,
+                                         String name,
+                                         String paramList,
+                                         String exceptionList,
+                                         Block body) {
+        return newPublicDynamicMethod(comment, stringTypeToTargetClass(type), name, paramList, exceptionList, body);
+    }
+
+    static Method newPublicDynamicMethod(String comment,
+                                         TargetClass type,
                                          String name,
                                          String paramList,
                                          String exceptionList,
@@ -83,7 +112,12 @@ class Method {
         return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
     }
 
+    @Deprecated
     public static Method newReadClassState(String comment, String type, String name, Block body) {
+        return newReadClassState(comment, stringTypeToTargetClass(type), name, body);
+    }
+
+    public static Method newReadClassState(String comment, TargetClass type, String name, Block body) {
         return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
     }
 }

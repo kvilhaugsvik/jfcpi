@@ -91,4 +91,6 @@ public class TargetClass extends Address {
             }
         };
     }
+
+    public static final TargetClass INSTANCE = null;
 }
