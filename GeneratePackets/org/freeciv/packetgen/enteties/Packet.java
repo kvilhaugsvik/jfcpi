@@ -203,22 +203,36 @@ public class Packet extends ClassWriter implements IDependency {
                         "int " + field.getFieldName() + "Len" + " = " + "0;",
                         field.getFieldName() + "Len" + "+=" +
                                 "this." + field.getFieldName() + "[i].encodedLength();", "")));
-        if (0 < fields.length) {
-            String[] toSum = new String[fields.length];
-            for (int i = 0; i < fields.length; i++) {
-                toSum[i] = (fields[i].hasDeclarations()) ?
-                        fields[i].getFieldName() + "Len" :
-                        "this." + fields[i].getFieldName() + ".encodedLength()";
+        if (1 < fields.length) {
+            StringBuilder build = new StringBuilder("return ");
+            build.append(calcBodyLen(fields[0]));
+            boolean broken = false;
+            for (int i = 1; i < fields.length; i++) {
+                if (true) {
+                    encodeFieldsLen.add(build.toString());
+                    build = new StringBuilder();
+                }
+                build.append("\t\t+ ");
+                build.append(calcBodyLen(fields[i]));
             }
-            encodeFieldsLen.addAll(Arrays.asList(
-                    ("return " + Util.joinStringArray(toSum, "\n\t\t+ ", "", "") + ";").split("\n")));
+            build.append(";");
+            encodeFieldsLen.add(build.toString());
+        } else if (1 == fields.length) {
+            encodeFieldsLen.add("return " + calcBodyLen(fields[0]) + ";");
+
         } else {
             encodeFieldsLen.add("return 0;");
         }
         addMethod(null,
-                  Visibility.PRIVATE, Scope.OBJECT,
-                  "int", "calcBodyLen", null, null,
-                  encodeFieldsLen.toArray(new String[0]));
+                Visibility.PRIVATE, Scope.OBJECT,
+                "int", "calcBodyLen", null, null,
+                encodeFieldsLen.toArray(new String[0]));
+    }
+
+    private static String calcBodyLen(Field field) {
+        return (field.hasDeclarations() ?
+                field.getFieldName() + "Len" :
+                "this." + field.getFieldName() + ".encodedLength()");
     }
 
     private void addToString(String name, Field[] fields) {
