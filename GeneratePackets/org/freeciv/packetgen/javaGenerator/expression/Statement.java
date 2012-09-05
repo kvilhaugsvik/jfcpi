@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.Comment;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.IR;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
@@ -26,24 +27,25 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
  */
 public class Statement extends Formatted implements HasAtoms {
     private final Typed<? extends Returnable> statement;
-    private final String comment;
+    private final Comment comment;
 
     public Statement(Typed<? extends Returnable> statement) {
-        this(statement, null);
+        this(statement, Comment.no());
     }
 
+    @Deprecated
     public Statement(Typed<? extends Returnable> statement, String comment) {
+        this(statement, Comment.oldCompat(comment));
+    }
+
+    public Statement(Typed<? extends Returnable> statement, Comment comment) {
         this.statement = statement;
         this.comment = comment;
     }
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        if (null != comment) {
-            to.add(HasAtoms.CCommentStart);
-            to.add(new IR.CodeAtom(comment));
-            to.add(HasAtoms.CCommentEnd);
-        }
+        comment.writeAtoms(to);
         statement.writeAtoms(to);
         to.add(HasAtoms.EOL);
     }
