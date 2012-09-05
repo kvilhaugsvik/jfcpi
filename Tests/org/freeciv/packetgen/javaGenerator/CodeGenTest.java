@@ -36,8 +36,9 @@ public class CodeGenTest {
     private static final String generatorname = ",\n\tvalue = \"org.freeciv.packetgen.javaGenerator.ClassWriter\")";
 
     @Test public void testMethodEverything() {
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
-                "Throwable", Block.fromStrings("return 5"))).toString();
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+                new TargetClass("int"), "testMethod", "String a",
+                "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
@@ -48,8 +49,9 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoComment() {
-        String result = (new Method(null, Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a", "Throwable",
-                Block.fromStrings("return 5"))).toString();
+        String result = (new Method(null, Visibility.PUBLIC, Scope.CLASS,
+                new TargetClass("int"), "testMethod", "String a",
+                "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
@@ -59,8 +61,9 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoParams() {
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null,
-                "Throwable", Block.fromStrings("return 5"))).toString();
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+                new TargetClass("int"), "testMethod", null,
+                "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "// comment" + "\n" +
@@ -71,7 +74,9 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodManyLevelsOfIndention() {
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+                new TargetClass("int"), "testMethod", null,
+                null,
                 new Block(WHILE(TRUE,
                         new Block(WHILE(TRUE,
                                 new Block(WHILE(TRUE,
@@ -103,8 +108,9 @@ public class CodeGenTest {
                 to.add(HasAtoms.RSC);
             }
         };
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
-                closesScopeNotOpened)).toString();
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+                new TargetClass("int"), "testMethod", null,
+                null, closesScopeNotOpened)).toString();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -130,13 +136,15 @@ public class CodeGenTest {
                 });
             }
         };
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", null, null,
-                forgetsToCloseScope)).toString();
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+                new TargetClass("int"), "testMethod", null,
+                null, forgetsToCloseScope)).toString();
     }
 
     @Test public void testMethodEverythingTwoLineComment() {
-        String result = (new Method("/** comment\n * more comment\n */",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod",
-                "String a", "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
+        String result = (new Method("/** comment\n * more comment\n */", Visibility.PUBLIC, Scope.CLASS,
+                new TargetClass("int"), "testMethod", "String a",
+                "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/** comment" + "\n" +
@@ -153,7 +161,8 @@ public class CodeGenTest {
         isSeparated.addStatement(asAValue("int a = 5"));
         isSeparated.groupBoundary();
         isSeparated.addStatement(asAValue("return a"));
-        String result = (new Method("// comment",  Visibility.PUBLIC, Scope.CLASS, "int", "testMethod", "String a",
+        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+                new TargetClass("int"), "testMethod", "String a",
                 "Throwable", isSeparated)).toString();
 
         assertEquals("Generated source not as expected",
@@ -167,7 +176,9 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodClassStateReader() {
-        Method toTest = Method.newReadClassState(null, "boolean", "isTrue", Block.fromStrings("return true"));
+        Method toTest = Method.newReadClassState(null,
+                new TargetClass("boolean"), "isTrue",
+                Block.fromStrings("return true"));
         assertEquals("Generated Class state reader source code not as espected",
                 "\t" + "public static boolean isTrue() {" + "\n" +
                         "\t\t" + "return true;" + "\n" +
@@ -511,7 +522,8 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicReadObjectState() {
-        String result = Method.newPublicReadObjectState(null, "String", "toString",
+        String result = Method.newPublicReadObjectState(null,
+                new TargetClass("String"), "toString",
                 new Block(RETURN(asAString("value.toString()")))).toString();
 
         assertEquals("Generated source not as expected",
