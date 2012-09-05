@@ -16,7 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 
-class Method {
+public class Method {
     private final String comment;
     private final Visibility visibility;
     private final Scope scope;
@@ -53,7 +53,7 @@ class Method {
         return out;
     }
 
-    static Method newPublicConstructorWithException(String comment,
+    public static Method newPublicConstructorWithException(String comment,
                                                     String name,
                                                     String paramList,
                                                     String exceptionList,
@@ -61,21 +61,21 @@ class Method {
         return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
     }
 
-    static Method newPublicConstructor(String comment,
+    public static Method newPublicConstructor(String comment,
                                        String name,
                                        String paramList,
                                        Block body) {
         return newPublicConstructorWithException(comment, name, paramList, null, body);
     }
 
-    static Method newPublicReadObjectState(String comment,
+    public static Method newPublicReadObjectState(String comment,
                                            TargetClass type,
                                            String name,
                                            Block body) {
         return newPublicDynamicMethod(comment, type, name, null, null, body);
     }
 
-    static Method newPublicDynamicMethod(String comment,
+    public static Method newPublicDynamicMethod(String comment,
                                          TargetClass type,
                                          String name,
                                          String paramList,
