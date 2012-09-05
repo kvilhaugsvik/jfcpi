@@ -20,13 +20,24 @@ import java.util.*;
 
 public class Comment extends Formatted implements HasAtoms {
     private final boolean isDoc;
-    private final List<String> comment;
+    private final List<HasAtoms> comment;
 
     private Comment(boolean doc, String... comment) {
         isDoc = doc;
-        this.comment = new ArrayList<String>();
-        for (String commentLine : comment)
-            this.comment.add(commentLine);
+        this.comment = wrapWords(comment);
+    }
+
+    private static List<HasAtoms> wrapWords(String... words) {
+        List<HasAtoms> out = new LinkedList<HasAtoms>();
+        for (String commentLine : words)
+            out.add(new Word(commentLine));
+        return out;
+    }
+
+    public static class Word extends IR.CodeAtom {
+        public Word(String word) {
+            super(word);
+        }
     }
 
     @Override
@@ -38,8 +49,8 @@ public class Comment extends Formatted implements HasAtoms {
             to.add(JDocStart);
         else
             to.add(CCommentStart);
-        for (String part : comment)
-            to.add(new IR.CodeAtom(part));
+        for (HasAtoms part : comment)
+            part.writeAtoms(to);
         to.add(CCommentEnd);
     }
 
