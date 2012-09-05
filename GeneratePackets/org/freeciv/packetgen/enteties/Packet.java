@@ -162,7 +162,7 @@ public class Packet extends ClassWriter implements IDependency {
         Block wrongSize = new Block();
         constructorBodyStream.addStatement(IF(asBool("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),
                 wrongSize));
-        wrongSize.addStatement(new MethodCall<NoValue>(null, "Logger.getLogger(" + logger + ").warning", sum(
+        wrongSize.addStatement(new MethodCall<NoValue>("Logger.getLogger(" + logger + ").warning", sum(
                 literalString("Probable misinterpretation: "),
                 literalString("interpreted packet size ("),
                 GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), asAnInt("calcBodyLen()"))),

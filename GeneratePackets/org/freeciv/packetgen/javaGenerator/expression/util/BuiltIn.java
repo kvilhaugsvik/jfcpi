@@ -182,7 +182,7 @@ public class BuiltIn {
     }
 
     public static MethodCall<AValue> inc(final Var var) {
-        return new MethodCall<AValue>(null, "++", var.ref()) {
+        return new MethodCall<AValue>("++", var.ref()) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 var.ref().writeAtoms(to);
@@ -204,7 +204,7 @@ public class BuiltIn {
     }
 
     public static MethodCall<AValue> arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
-        return new MethodCall<AValue>(null, "[]=", on.ref(), val) {
+        return new MethodCall<AValue>("[]=", on.ref(), val) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 on.ref().writeAtoms(to);

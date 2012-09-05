@@ -56,7 +56,7 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
                     public Block x(Var to, Var from) {
                         return new Block(to.assign(willRequire.isEmpty() ?
                                         io.getRead() :
-                                        new MethodCall<AValue>(null, typeInJava + ".valueOf", io.getRead())));
+                                        new MethodCall<AValue>(typeInJava + ".valueOf", io.getRead())));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {

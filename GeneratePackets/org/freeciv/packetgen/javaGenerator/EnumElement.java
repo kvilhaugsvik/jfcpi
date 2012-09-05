@@ -18,7 +18,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 public class EnumElement extends MethodCall<NoValue> {
     protected EnumElement(String comment, String elementName, String... params) {
-        super(comment, elementName, params);
+        super(Comment.oldCompat(comment), elementName, params);
     }
 
     public String getEnumValueName() {

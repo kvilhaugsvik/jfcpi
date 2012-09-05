@@ -85,10 +85,10 @@ public class Hardcoded {
                         public Block x(Var to, Var from) {
                             return new Block(to.assign((new TargetClass("requirement")).newInstance(
                                     new TargetClass("universal").newInstance(
-                                            new MethodCall<AValue>(null, "universals_n.valueOf",
+                                            new MethodCall<AValue>("universals_n.valueOf",
                                                     from.<AValue>call("readUnsignedByte")),
                                             from.<AValue>call("readInt")),
-                                    new MethodCall<AValue>(null, "req_range.valueOf",
+                                    new MethodCall<AValue>("req_range.valueOf",
                                             from.<AValue>call("readUnsignedByte")),
                                     from.<AValue>call("readBoolean"),
                                     from.<AValue>call("readBoolean"))));
@@ -145,7 +145,6 @@ public class Hardcoded {
                                                                counter.ref(),
                                                                universal.newInstance(
                                                                        new MethodCall<AValue>(
-                                                                               null,
                                                                                "universals_n.valueOf",
                                                                                from.<AValue>call("readUnsignedByte")),
                                                                        from.<AValue>call("readUnsignedByte")

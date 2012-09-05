@@ -177,7 +177,7 @@ public class Var extends Formatted implements Typed<Returnable> {
 
         public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
             final MethodCall<AValue> toCall = of.type.call(method, params);
-            return new MethodCall<Ret>(null, method, params) {
+            return new MethodCall<Ret>(method, params) {
                 @Override
                 public void writeAtoms(CodeAtoms to) {
                     of.ref().writeAtoms(to);

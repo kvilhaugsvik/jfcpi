@@ -101,7 +101,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
         addMethod(new Method("", Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName(null), enumName, "int number, String toStringName",
-                null, new Block(new MethodCall<Returnable>(null, "this", "number", "toStringName", "true"))));
+                null, new Block(new MethodCall<Returnable>("this", "number", "toStringName", "true"))));
         addMethod(new Method("", Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName(null), enumName, "int number, String toStringName, boolean valid",
                 null,
@@ -128,7 +128,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         addMethod(new Method("", Visibility.PUBLIC, Scope.CLASS,
                 TargetClass.fromName(this.getName()), "valueOf", "int number",
                 null, new Block(
-                FOR(element, new MethodCall<AValue>(null, "values", new Typed[0]),
+                FOR(element, new MethodCall<AValue>("values", new Typed[0]),
                         new Block(IF(asBool("element.getNumber() == number"), new Block(RETURN(element.ref()))))),
                 RETURN(asAValue("INVALID")))));
     }
@@ -192,7 +192,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        return new Block(to.assign(new MethodCall<AValue>(null, named + ".valueOf", io.getRead())));
+                        return new Block(to.assign(new MethodCall<AValue>(named + ".valueOf", io.getRead())));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {

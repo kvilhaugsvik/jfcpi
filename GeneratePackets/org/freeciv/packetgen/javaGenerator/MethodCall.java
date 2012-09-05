@@ -23,15 +23,23 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 public class MethodCall<Returns extends Returnable> extends Formatted implements HasAtoms, Typed<Returns> {
-    private final String comment;
+    private final Comment comment;
     protected final String method;
     protected final Typed<? extends AValue>[] parameters;
 
-    public MethodCall(String comment, String name, String... params) {
+    public MethodCall(String name, String... params) {
+        this(Comment.no(), name, params);
+    }
+
+    public MethodCall(Comment comment, String name, String... params) {
         this(comment, name, paramListIsAValue(params));
     }
 
-    public MethodCall(String comment, String name, Typed<? extends AValue>... params) {
+    public MethodCall(String name, Typed<? extends AValue>... params) {
+        this(Comment.no(), name, params);
+    }
+
+    public MethodCall(Comment comment, String name, Typed<? extends AValue>... params) {
         if (null == name)
             throw new IllegalArgumentException("No method name given to method call");
 
@@ -49,11 +57,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        if (null != comment) {
-            to.add(CCommentStart);
-            to.add(new CodeAtom(comment));
-            to.add(CCommentEnd);
-        }
+        comment.writeAtoms(to);
         to.add(new CodeAtom(method));
         to.add(LPR);
         if (0 < parameters.length) {

@@ -49,7 +49,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                                 IF(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
                                                         new Block(current.assign(from.<AValue>call("readByte"))),
                                                         new Block(asVoid("break"))))),
-                                to.assign(new MethodCall<AValue>(null, "java.util.Arrays.copyOf",
+                                to.assign(new MethodCall<AValue>("java.util.Arrays.copyOf",
                                         buf.ref(), pos.ref())));
                     }
                 },
@@ -75,7 +75,7 @@ public class TerminatedArray extends FieldTypeBasic {
               new ExprFrom1<Typed<AString>, Var>() {
                   @Override
                   public Typed<AString> x(Var arg1) {
-                      return new MethodCall<AString>(null, "org.freeciv.Util.joinStringArray",
+                      return new MethodCall<AString>("org.freeciv.Util.joinStringArray",
                               arg1.ref(), literalString(" "));
                   }
               },
