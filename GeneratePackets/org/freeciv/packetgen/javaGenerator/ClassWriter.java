@@ -411,6 +411,13 @@ public class ClassWriter {
                 return 1 < argument.getLineBreakTry();
             }
         });
+        maker.whenBefore(Comment.Word.class, CodeStyle.Action.BREAK_LINE,
+                new Util.OneCondition<DefaultStyleScopeInfo>() {
+                    @Override
+                    public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                        return 2 < argument.getLineBreakTry() && argument.approachingTheEdge();
+                    }
+                });
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 2 < argument.getLineBreakTry();
