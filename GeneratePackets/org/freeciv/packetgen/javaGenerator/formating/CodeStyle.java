@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator.formating;
 
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.IR;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -38,10 +39,12 @@ public interface CodeStyle {
     public static class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
         private final Constructor<Scope> kind;
         private final LinkedList<Scope> stack;
+        private IR leftToken = null;
+        private IR rightToken = null;
 
         public ScopeStack(Class<Scope> kind)
                 throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
-            this.kind = kind.getConstructor();
+            this.kind = kind.getConstructor(this.getClass());
             this.stack = new LinkedList<Scope>();
             addNewScopeFrame();
         }
@@ -71,7 +74,7 @@ public interface CodeStyle {
         }
 
         private void addNewScopeFrame() throws InstantiationException, IllegalAccessException, InvocationTargetException {
-            this.stack.addFirst(kind.newInstance());
+            this.stack.addFirst(kind.newInstance(this));
         }
 
         public void close() {
@@ -82,15 +85,20 @@ public interface CodeStyle {
         }
 
         public static class ScopeInfo {
+            private final ScopeStack<? extends ScopeInfo> inStack;
+
             private int beganAt = 0;
             private int nowAt = 0;
             private int beganAtLine = 0;
             private int lineLength = 0;
-            private int nextLen = 0;
             private String lineUpToScope = "";
 
             private int extraIndent = 0;
             private final LinkedList<String> hints = new LinkedList<String>();
+
+            public ScopeInfo(ScopeStack inStack) {
+                this.inStack = inStack;
+            }
 
             public int getLineLength() {
                 return lineLength;
@@ -154,12 +162,36 @@ public interface CodeStyle {
                 extraIndent = add;
             }
 
-            void setNextLen(int length) {
-                nextLen = length;
+            public int getRLen() {
+                return (null == inStack.rightToken ? 0 : inStack.rightToken.getAtom().get().length());
             }
 
-            public int getNextLen() {
-                return nextLen;
+            void setRightToken(IR rightToken) {
+                inStack.rightToken = rightToken;
+            }
+
+            public IR getRight() {
+                return inStack.rightToken;
+            }
+
+            public IR.CodeAtom getRightAtom() {
+                return (null == inStack.rightToken ? null : inStack.rightToken.getAtom());
+            }
+
+            public int getLLen() {
+                return (null == inStack.leftToken ? 0 : inStack.leftToken.getAtom().get().length());
+            }
+
+            void setLeftToken(IR leftToken) {
+                inStack.leftToken = leftToken;
+            }
+
+            public IR getLeft() {
+                return inStack.leftToken;
+            }
+
+            public IR.CodeAtom getLeftAtom() {
+                return (null == inStack.leftToken ? null : inStack.leftToken.getAtom());
             }
 
             void setNowAt(int at) {

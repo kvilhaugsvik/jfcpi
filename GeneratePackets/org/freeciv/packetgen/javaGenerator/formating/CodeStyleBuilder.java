@@ -162,21 +162,19 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                     boolean addBreak = false;
                     boolean addBlank = false;
                     line: while (pointerAfter < atoms.length) {
+                        scopeStack.get().setNowAt(pointerAfter);
+                        scopeStack.get().setLeftToken(getOrNull(atoms, pointerAfter));
+                        scopeStack.get().setRightToken(getOrNull(atoms, pointerAfter + 1));
                         if (0 <= pointerAfter) {
-                            line.append(atoms[pointerAfter].getAtom().get());
-                            updateHintsAfter(scopeStack, atoms[pointerAfter]);
+                            line.append(scopeStack.get().getLeftAtom().get());
+                            updateHintsAfter(scopeStack, scopeStack.get().getLeft());
                         }
                         scopeStack.get().setLineLength(line.length());
-                        scopeStack.get().setNowAt(pointerAfter);
-                        if (0 <= pointerAfter && pointerAfter + 1 < atoms.length)
-                            scopeStack.get().setNextLen(atoms[pointerAfter + 1].getAtom().get().length());
-                        else
-                            scopeStack.get().setNextLen(0);
 
                         switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
                                 firstMatchOnlyKnowStack,
-                                getOrNull(atoms, pointerAfter),
-                                getOrNull(atoms, pointerAfter + 1)
+                                scopeStack.get().getLeftAtom(),
+                                scopeStack.get().getRightAtom()
                         ).getToInsert()) {
                             case INSERT_SPACE:
                                 line.append(" ");
@@ -193,7 +191,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                         }
 
                         for (CompiledAtomCheck rule : allMatchesKnowStack)
-                            if (rule.isTrueFor(getOrNull(atoms, pointerAfter), getOrNull(atoms, pointerAfter + 1)))
+                            if (rule.isTrueFor(scopeStack.get().getLeftAtom(), scopeStack.get().getRightAtom()))
                                 switch (rule.getToInsert()) {
                                     case SCOPE_ENTER:
                                         scopeStack.open();
@@ -220,9 +218,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                         break;
                                 }
 
+                        if (pointerAfter + 1 < atoms.length)
+                            updateHintsBefore(scopeStack, scopeStack.get().getRight());
                         pointerAfter++;
-                        if (pointerAfter < atoms.length)
-                            updateHintsBefore(scopeStack, atoms[pointerAfter]);
                         if (addBreak)
                             break line;
                     }
@@ -255,9 +253,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 return new StringBuilder(new String(indention));
             }
 
-            private CodeAtom getOrNull(IR[] atoms, int pos) {
+            private IR getOrNull(IR[] atoms, int pos) {
                 try {
-                    return atoms[pos].getAtom();
+                    return atoms[pos];
                 } catch (ArrayIndexOutOfBoundsException e) {
                     return null;
                 }

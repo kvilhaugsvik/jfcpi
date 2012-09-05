@@ -503,12 +503,16 @@ public class ClassWriter {
         private boolean statementBroken = false;
         private LinkedList<Integer> toFar = new LinkedList<Integer>();
 
+        public DefaultStyleScopeInfo(CodeStyle.ScopeStack inStack) {
+            super(inStack);
+        }
+
         public int getLineBreakTry() {
             return lineBreakTry;
         }
 
         public boolean approachingTheEdge() {
-            return 100 < getLineLength() + getNextLen() + 1 || toFar.contains(getNowAt());
+            return 100 < getLineLength() + getRLen() + 1 || toFar.contains(getNowAt());
         }
 
         @Override
