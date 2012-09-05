@@ -48,6 +48,23 @@ public class IR {
             hintsAfter.add(hint);
     }
 
+    public String toString() {
+        StringBuilder out = new StringBuilder("IR[");
+        for (Hint hint : hintsBefore) {
+            out.append(hint.get());
+            out.append(" ");
+        }
+        out.append(":");
+        out.append(atom.get());
+        out.append(":");
+        for (Hint hint : hintsAfter) {
+            out.append(" ");
+            out.append(hint.get());
+        }
+        out.append("]");
+        return out.toString();
+    }
+
 
     public static class Hint {
         private final boolean isStart;
