@@ -42,11 +42,11 @@ public interface CodeStyle {
         private IR leftToken = null;
         private IR rightToken = null;
 
-        public ScopeStack(Class<Scope> kind)
+        public ScopeStack(Class<Scope> kind, int beganAt, int beganAtLine, String lineUpToScope)
                 throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
-            this.kind = kind.getConstructor(this.getClass());
+            this.kind = kind.getConstructor(this.getClass(), int.class, int.class, String.class);
             this.stack = new LinkedList<Scope>();
-            addNewScopeFrame();
+            addNewScopeFrame(beganAt, beganAtLine, lineUpToScope);
         }
 
         public Scope get() {
@@ -61,9 +61,9 @@ public interface CodeStyle {
             return toInd;
         }
 
-        public void open() {
+        public void open(int beganAt, int beganAtLine, String lineUpToScope) {
             try {
-                addNewScopeFrame();
+                addNewScopeFrame(beganAt, beganAtLine, lineUpToScope);
             } catch (InstantiationException e) {
                 throw new Error("Exception thrown after initialization but not during?", e);
             } catch (IllegalAccessException e) {
@@ -73,8 +73,8 @@ public interface CodeStyle {
             }
         }
 
-        private void addNewScopeFrame() throws InstantiationException, IllegalAccessException, InvocationTargetException {
-            this.stack.addFirst(kind.newInstance(this));
+        private void addNewScopeFrame(int beganAt, int beganAtLine, String lineUpToScope) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+            this.stack.addFirst(kind.newInstance(this, beganAt, beganAtLine, lineUpToScope));
         }
 
         public void close() {
@@ -86,18 +86,21 @@ public interface CodeStyle {
 
         public static class ScopeInfo {
             private final ScopeStack<? extends ScopeInfo> inStack;
+            private final int beganAt;
+            private final int beganAtLine;
+            private final String lineUpToScope;
 
-            private int beganAt = 0;
             private int nowAt = 0;
-            private int beganAtLine = 0;
             private int lineLength = 0;
-            private String lineUpToScope = "";
 
             private int extraIndent = 0;
             private final LinkedList<String> hints = new LinkedList<String>();
 
-            public ScopeInfo(ScopeStack inStack) {
+            public ScopeInfo(ScopeStack inStack, int beganAt, int beganAtLine, String lineUpToScope) {
                 this.inStack = inStack;
+                this.beganAt = beganAt;
+                this.beganAtLine = beganAtLine;
+                this.lineUpToScope = lineUpToScope;
             }
 
             public int getLineLength() {
@@ -108,24 +111,12 @@ public interface CodeStyle {
                 lineLength = length;
             }
 
-            public void setBeganAt(int atomNumber) {
-                beganAt = atomNumber;
-            }
-
             public int getBeganAt() {
                 return beganAt;
             }
 
-            public void setLineUpToScope(String line) {
-                lineUpToScope = line;
-            }
-
             public String getLineUpToScope() {
                 return lineUpToScope;
-            }
-
-            public void setBeganAtLine(int number) {
-                beganAtLine = number;
             }
 
             public int getBeganAtLine() {

@@ -503,8 +503,8 @@ public class ClassWriter {
         private boolean statementBroken = false;
         private LinkedList<Integer> toFar = new LinkedList<Integer>();
 
-        public DefaultStyleScopeInfo(CodeStyle.ScopeStack inStack) {
-            super(inStack);
+        public DefaultStyleScopeInfo(CodeStyle.ScopeStack inStack, int beganAt, int beganAtLine, String lineUpToScope) {
+            super(inStack, beganAt, beganAtLine, lineUpToScope);
         }
 
         public int getLineBreakTry() {

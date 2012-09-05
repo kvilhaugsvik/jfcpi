@@ -129,9 +129,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 final IR[] atoms = from.toArray();
                 LinkedList<String> out = new LinkedList<String>();
 
+                int pointerAfter = -1;
                 ScopeStack<ScopeInfoKind> scopeStack = null;
                 try {
-                    scopeStack = new ScopeStack<ScopeInfoKind>(scopeMaker);
+                    scopeStack = new ScopeStack<ScopeInfoKind>(scopeMaker, pointerAfter, out.size(), "");
                 } catch (NoSuchMethodException e) {
                     throw new Error("Could not initialize ScopeStack", e);
                 } catch (IllegalAccessException e) {
@@ -153,10 +154,6 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                     allMatchesKnowStack.add(rule.forStack(scopeStack));
                 }
 
-                int pointerAfter = -1;
-                scopeStack.get().setBeganAt(pointerAfter);
-                scopeStack.get().setBeganAtLine(out.size());
-                scopeStack.get().setLineUpToScope("");
                 while (pointerAfter < atoms.length) {
                     StringBuilder line = newLine(scopeStack);
                     boolean addBreak = false;
@@ -194,10 +191,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                             if (rule.isTrueFor(scopeStack.get().getLeftAtom(), scopeStack.get().getRightAtom()))
                                 switch (rule.getToInsert()) {
                                     case SCOPE_ENTER:
-                                        scopeStack.open();
-                                        scopeStack.get().setBeganAt(pointerAfter + 1);
-                                        scopeStack.get().setBeganAtLine(out.size());
-                                        scopeStack.get().setLineUpToScope(line.toString());
+                                        scopeStack.open(pointerAfter + 1, out.size(), line.toString());
                                         break;
                                     case SCOPE_EXIT:
                                         scopeStack.close();
