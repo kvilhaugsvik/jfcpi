@@ -17,19 +17,19 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 public class EnumElement extends MethodCall<NoValue> {
-    protected EnumElement(String comment, String elementName, String... params) {
-        super(Comment.oldCompat(comment), elementName, params);
+    protected EnumElement(Comment comment, String elementName, String... params) {
+        super(comment, elementName, params);
     }
 
     public String getEnumValueName() {
         return super.method;
     }
 
-    public static EnumElement newEnumValue(String enumValueName) {
-        return new EnumElement(null, enumValueName);
+    public static EnumElement newEnumValue(String enumValueName, String... params) {
+        return new EnumElement(Comment.no(), enumValueName, params);
     }
 
-    public static EnumElement newEnumValue(String comment, String enumValueName, String... params) {
+    public static EnumElement newEnumValue(Comment comment, String enumValueName, String... params) {
         return new EnumElement(comment, enumValueName, params);
     }
 }

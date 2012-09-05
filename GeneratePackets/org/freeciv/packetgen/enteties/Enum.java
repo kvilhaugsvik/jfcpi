@@ -275,7 +275,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         private final boolean valid;
 
         protected EnumElementFC(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
-            super(comment, elementName, parList(valueGen, toStringName, valid));
+            super(Comment.oldCompat(comment), elementName, parList(valueGen, toStringName, valid));
 
             // Look up numbers in a uniform way
             if (null == toStringName)
