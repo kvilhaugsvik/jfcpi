@@ -67,9 +67,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 new Util.TwoConditions<CodeAtom, CodeAtom>() {
                     @Override
                     public boolean isTrueFor(CodeAtom l, CodeAtom r) {
-                        return (null != l) && kind.isInstance(l);
+                        return kind.isInstance(l);
                     }
-                }, toDo, scopeCond));
+                }, toDo, scopeCond, null, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN)));
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert) {
@@ -91,9 +91,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 new Util.TwoConditions<CodeAtom, CodeAtom>() {
             @Override
             public boolean isTrueFor(CodeAtom l, CodeAtom r) {
-                return (null != r) && kind.isInstance(r);
+                return kind.isInstance(r);
             }
-        }, toDo, scopeCond));
+        }, toDo, scopeCond, null, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN)));
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
@@ -266,14 +266,21 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         };
     }
 
+    private enum DependsOn {
+        LEFT_TOKEN,
+        RIGHT_TOKEN
+    }
+
     private static class CompiledAtomCheck<ScopeInfoKind extends ScopeInfo>
             implements Util.TwoConditions<CodeAtom, CodeAtom> {
         private final AtomCheck<ScopeInfoKind> check;
         private final CodeStyle.ScopeStack<ScopeInfoKind> stack;
+        private final EnumSet<DependsOn> preConds;
 
         private CompiledAtomCheck(AtomCheck<ScopeInfoKind> check, CodeStyle.ScopeStack<ScopeInfoKind> stack) {
             this.check = check;
             this.stack = stack;
+            this.preConds = check.getPreConds();
         }
 
         public CodeStyle.Action getToInsert() {
@@ -283,6 +290,15 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         }
 
         public boolean isTrueFor(CodeAtom before, CodeAtom after) {
+            for (DependsOn preCond : preConds)
+                switch (preCond) {
+                    case LEFT_TOKEN:
+                        if (null == before) return false;
+                        break;
+                    case RIGHT_TOKEN:
+                        if (null == after) return false;
+                        break;
+                }
             return check.getCheck().isTrueFor(before, after) && check.getScopeTest().isTrueFor(stack.get());
         }
     }
@@ -296,22 +312,20 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             };
         }
 
+        private final EnumSet<DependsOn> preConds;
         private final Util.TwoConditions<CodeAtom, CodeAtom> test;
         private final CodeStyle.Action toInsert;
         private final Util.OneCondition<ScopeInfoKind> scopeTest;
         private final Triggered<ScopeInfoKind> toRun;
 
         public AtomCheck(Util.TwoConditions<CodeAtom, CodeAtom> positionTest, CodeStyle.Action toInsert,
-                         Util.OneCondition<ScopeInfoKind> scopeTest) {
-            this(positionTest, toInsert, scopeTest, null);
-        }
-
-        public AtomCheck(Util.TwoConditions<CodeAtom, CodeAtom> positionTest, CodeStyle.Action toInsert,
-                         Util.OneCondition<ScopeInfoKind> scopeTest, Triggered<ScopeInfoKind> toRun) {
+                         Util.OneCondition<ScopeInfoKind> scopeTest, Triggered<ScopeInfoKind> toRun,
+                         EnumSet<DependsOn> reqs) {
             this.test = positionTest;
             this.scopeTest = scopeTest;
             this.toInsert = toInsert;
             this.toRun = toRun;
+            this.preConds = reqs;
         }
 
         public CompiledAtomCheck<ScopeInfoKind> forStack(CodeStyle.ScopeStack<ScopeInfoKind> scope) {
@@ -353,9 +367,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                           Util.OneCondition<ScopeInfoKind> scopeCond, Triggered<ScopeInfoKind> toRun) {
             return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-                    return null != before && atom.equals(before);
+                    return atom.equals(before);
                 }
-            }, toInsert, scopeCond, toRun);
+            }, toInsert, scopeCond, toRun, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN));
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftIs(final CodeAtom atom,
@@ -376,9 +390,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                         Util.OneCondition<ScopeInfoKind> scopeCond, Triggered<ScopeInfoKind> toRun) {
             return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override public boolean isTrueFor(CodeAtom before, CodeAtom after) {
-                    return null != after && atom.equals(after);
+                    return atom.equals(after);
                 }
-            }, toInsert, scopeCond, toRun);
+            }, toInsert, scopeCond, toRun,  EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN));
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> leftAndRightIs(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
@@ -389,9 +403,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                 Util.OneCondition<ScopeInfoKind> scopeCond) {
             return new AtomCheck<ScopeInfoKind>(new Util.TwoConditions<CodeAtom, CodeAtom>() {
                 @Override public boolean isTrueFor(CodeAtom left, CodeAtom right) {
-                    return null != left && null != right && before.equals(left) && after.equals(right);
+                    return before.equals(left) && after.equals(right);
                 }
-            }, toInsert, scopeCond);
+            }, toInsert, scopeCond, null, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN, DependsOn.RIGHT_TOKEN));
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> atTheEnd(CodeStyle.Action toInsert) {
@@ -400,7 +414,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return null == after;
                 }
-            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
+            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope(), null,  EnumSet.<DependsOn>noneOf(DependsOn.class));
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> atTheBeginning(CodeStyle.Action toInsert) {
@@ -409,7 +423,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return null == before;
                 }
-            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
+            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope(), null, EnumSet.<DependsOn>noneOf(DependsOn.class));
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> alwaysTrue(CodeStyle.Action toInsert) {
@@ -418,7 +432,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return true;
                 }
-            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope());
+            }, toInsert, AtomCheck.<ScopeInfoKind>ignoresScope(), null, EnumSet.<DependsOn>noneOf(DependsOn.class));
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> scopeIs(Util.OneCondition<ScopeInfoKind> when,
@@ -429,7 +443,11 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 public boolean isTrueFor(CodeAtom before, CodeAtom after) {
                     return true;
                 }
-            }, doThis, when, andRun);
+            }, doThis, when, andRun, EnumSet.<DependsOn>noneOf(DependsOn.class));
+        }
+
+        public EnumSet<DependsOn> getPreConds() {
+            return preConds;
         }
     }
 
