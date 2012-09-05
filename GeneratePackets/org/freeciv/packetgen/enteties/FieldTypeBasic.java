@@ -108,23 +108,26 @@ public class FieldTypeBasic implements IDependency {
 
             addObjectConstant(javaType.getName(), "value");
             if (arrayEater) {
-                addConstructorPublic(null, javaType.getName() + " value" + ", int arraySize", constructorBody);
-                addConstructorPublicWithExceptions(null, "DataInput from" + ", int arraySize", "IOException",
-                                                   decode);
+                addMethod(Method.newPublicConstructor(null,
+                        getName(), javaType.getName() + " value" + ", int arraySize",
+                        constructorBody));
+                addMethod(Method.newPublicConstructorWithException(null,
+                        getName(), "DataInput from" + ", int arraySize",
+                        "IOException", decode));
             } else {
-                addConstructorPublic(null, javaType.getName() + " value", constructorBody);
-                addConstructorPublicWithExceptions(null, "DataInput from", "IOException", decode);
+                addMethod(Method.newPublicConstructor(null, getName(), javaType.getName() + " value", constructorBody));
+                addMethod(Method.newPublicConstructorWithException(null, getName(), "DataInput from", "IOException", decode));
             }
-            addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", encode);
-            addMethodPublicReadObjectState(null, "int", "encodedLength", encodedSize);
-            addMethodPublicReadObjectState(null, javaType.getName(), "getValue", new Block(RETURN(getField("value").ref())));
-            addMethodPublicReadObjectState(null, "String", "toString",
-                    new Block(RETURN(value2String.x(getField("value")))));
-            addMethod(null, Visibility.PUBLIC, Scope.OBJECT, "boolean", "equals", "Object other", null,
-                    new Block(IF(
+            addMethod(Method.newPublicDynamicMethod(null, TargetClass.fromName("void"), "encodeTo", "DataOutput to", "IOException", encode));
+            addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("int"), "encodedLength", encodedSize));
+            addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName(javaType.getName()), "getValue", new Block(RETURN(getField("value").ref()))));
+            addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("String"), "toString", new Block(RETURN(value2String.x(getField("value"))))));
+            addMethod(new Method(null, Visibility.PUBLIC, Scope.OBJECT,
+                    TargetClass.fromName("boolean"), "equals", "Object other",
+                    null, new Block(IF(
                             asBool("other instanceof " + name),
                             new Block(RETURN(asBool("this.value == ((" + name + ")other).getValue()"))),
-                            new Block(RETURN(FALSE)))));
+                            new Block(RETURN(FALSE))))));
         }
 
         public FieldTypeBasic getBasicType() {

@@ -99,35 +99,38 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         addObjectConstant("String", "toStringName");
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
-        addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName, "int number, String toStringName", null,
-                  new Block(new MethodCall<Returnable>(null, "this", "number", "toStringName", "true")));
-        addMethod(null, Visibility.PRIVATE, Scope.OBJECT, null, enumName,
-                  "int number, String toStringName, boolean valid",
-                  null,
-                  new Block(setFieldToVariableSameName("number"),
-                            setFieldToVariableSameName("toStringName"),
-                            setFieldToVariableSameName("valid")));
+        addMethod(new Method(null, Visibility.PRIVATE, Scope.OBJECT,
+                TargetClass.fromName(null), enumName, "int number, String toStringName",
+                null, new Block(new MethodCall<Returnable>(null, "this", "number", "toStringName", "true"))));
+        addMethod(new Method(null, Visibility.PRIVATE, Scope.OBJECT,
+                TargetClass.fromName(null), enumName, "int number, String toStringName, boolean valid",
+                null,
+                new Block(setFieldToVariableSameName("number"),
+                        setFieldToVariableSameName("toStringName"),
+                        setFieldToVariableSameName("valid"))));
 
-        addMethodPublicReadObjectState(null, "int", "getNumber",
-                new Block(BuiltIn.RETURN(this.getField("number").ref())));
-        addMethodPublicReadObjectState(null, "boolean", "isValid",
-                new Block(BuiltIn.RETURN(this.getField("valid").ref())));
-        addMethodPublicReadObjectState(null, "String", "toString",
-                new Block(BuiltIn.RETURN(this.getField("toStringName").ref())));
+        addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("int"), "getNumber",
+                new Block(BuiltIn.RETURN(this.getField("number").ref()))));
+        addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("boolean"), "isValid",
+                new Block(BuiltIn.RETURN(this.getField("valid").ref()))));
+        addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("String"), "toString",
+                new Block(BuiltIn.RETURN(this.getField("toStringName").ref()))));
 
-        addMethodReadClassState("/**" + "\n" +
+        addMethod(Method.newReadClassState("/**" + "\n" +
                                         " * Is the enum bitwise? An enum is bitwise if it's number increase by two's"
                                         + "\n" +
                                         " * exponent." + "\n" +
                                         " * @return true if the enum is bitwise" + "\n" +
                                         " */",
-                                "boolean", "isBitWise", new Block(RETURN(asBool(bitwise + ""))));
+                TargetClass.fromName("boolean"), "isBitWise", new Block(RETURN(asBool(bitwise + "")))));
 
         Var element = Var.local(this.getName(), "element", null);
-        addMethod("", Visibility.PUBLIC, Scope.CLASS, this.getName(), "valueOf", "int number", null, new Block(
+        addMethod(new Method("", Visibility.PUBLIC, Scope.CLASS,
+                TargetClass.fromName(this.getName()), "valueOf", "int number",
+                null, new Block(
                 FOR(element, new MethodCall<AValue>(null, "values", new Typed[0]),
                         new Block(IF(asBool("element.getNumber() == number"), new Block(RETURN(element.ref()))))),
-                RETURN(asAValue("INVALID"))));
+                RETURN(asAValue("INVALID")))));
     }
 
     public void addEnumerated(String comment,

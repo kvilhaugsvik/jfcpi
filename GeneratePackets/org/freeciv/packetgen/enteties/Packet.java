@@ -14,7 +14,6 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.Util;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packetgen.GeneratorDefaults;
 import org.freeciv.packetgen.UndefinedException;
@@ -25,7 +24,6 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.io.DataInput;
@@ -107,7 +105,7 @@ public class Packet extends ClassWriter implements IDependency {
             constructorBody.addStatement(setFieldToVariableSameName(field.getFieldName()));
         }
         constructorBody.addStatement(generateHeader(headerKind));
-        addConstructorPublic(null, createParameterList(params), constructorBody);
+        addMethod(Method.newPublicConstructor(null, getName(), createParameterList(params), constructorBody));
     }
 
     private Typed<AValue> generateHeader(TargetClass headerKind) {
@@ -132,7 +130,7 @@ public class Packet extends ClassWriter implements IDependency {
                         field.getNewFromJavaType(), constructorBodyJ);
             }
             constructorBodyJ.addStatement(generateHeader(headerKind));
-            addConstructorPublic(null, createParameterList(params), constructorBodyJ);
+            addMethod(Method.newPublicConstructor(null, getName(), createParameterList(params), constructorBodyJ));
         }
     }
 
@@ -175,16 +173,16 @@ public class Packet extends ClassWriter implements IDependency {
                 literalString(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
                 literalString(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
                 literalString(" Packet body size: "), asAValue("calcBodyLen()")))));
-        addConstructorPublicWithExceptions("/***\n" +
+        addMethod(Method.newPublicConstructorWithException("/***\n" +
                                                    " * Construct an object from a DataInput\n" +
                                                    " * @param " + streamName.getName() + " data stream that is at the start of " +
                                                    "the package body  \n" +
                                                    " * @param header header data. Must contain size and number\n" +
                                                    " * @throws IOException if the DataInput has a problem\n" +
                                                    " */",
-                                           "DataInput " + streamName.getName() + ", PacketHeader header",
-                                           "IOException",
-                                           constructorBodyStream);
+                getName(), "DataInput " + streamName.getName() + ", PacketHeader header",
+                "IOException",
+                constructorBodyStream));
     }
 
     private void addEncoder(Field[] fields) {
@@ -194,7 +192,7 @@ public class Packet extends ClassWriter implements IDependency {
             for (Field field : fields)
                 field.forElementsInField("this." + field.getFieldName() + "[i].encodeTo(to)", body);
         }
-        addMethodPublicDynamic(null, "void", "encodeTo", "DataOutput to", "IOException", body);
+        addMethod(Method.newPublicDynamicMethod(null, TargetClass.fromName("void"), "encodeTo", "DataOutput to", "IOException", body));
     }
 
     private void addCalcBodyLen(Field[] fields) {
@@ -213,10 +211,10 @@ public class Packet extends ClassWriter implements IDependency {
         } else {
             encodeFieldsLen.addStatement(RETURN(asAnInt("0")));
         }
-        addMethod(null,
-                  Visibility.PRIVATE, Scope.OBJECT,
-                  "int", "calcBodyLen", null, null,
-                  encodeFieldsLen);
+        addMethod(new Method(null, Visibility.PRIVATE, Scope.OBJECT,
+                TargetClass.fromName("int"), "calcBodyLen", null,
+                null,
+                encodeFieldsLen));
     }
 
     private static Typed<? extends AValue> calcBodyLen(Field field) {
@@ -236,7 +234,7 @@ public class Packet extends ClassWriter implements IDependency {
                             ", \"(\", \")\"" + ")" :
                     "this." + field.getFieldName() + ".toString()")));
         body.addStatement(RETURN(buildOutput.ref()));
-        addMethodPublicReadObjectState(null, "String", "toString", body);
+        addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("String"), "toString", body));
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {
@@ -252,9 +250,10 @@ public class Packet extends ClassWriter implements IDependency {
             body = new Block(RETURN(asAValue("this." + field.getFieldName() + ".getValue()")));
         }
 
-        addMethodPublicReadObjectState(null, field.getJType() + field.getArrayDeclaration(),
+        addMethod(Method.newPublicReadObjectState(null,
+                TargetClass.fromName(field.getJType() + field.getArrayDeclaration()),
                 "get" + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1) + "Value",
-                body);
+                body));
     }
 
     public int getNumber() {

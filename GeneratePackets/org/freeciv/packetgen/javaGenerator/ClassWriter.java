@@ -107,70 +107,14 @@ public class ClassWriter {
 
     public void addObjectConstantAndGetter(Var field) {
         addField(field);
-        addMethodPublicReadObjectState(
-                        null,
-                        field.getType(),
-                        "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1),
-                        new Block(RETURN(field.ref())));
+        addMethod(Method.newPublicReadObjectState(null,
+                TargetClass.fromName(field.getType()),
+                "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1),
+                new Block(RETURN(field.ref()))));
     }
 
     public void addMethod(Method toAdd) {
         methods.add(toAdd);
-    }
-
-    @Deprecated
-    public void addMethod(String comment,
-                          Visibility visibility,
-                          Scope scope,
-                          String type,
-                          String name,
-                          String paramList,
-                          String exceptionList,
-                          Block body) {
-        addMethod(new Method(comment, visibility, scope,
-                TargetClass.fromName(type), name, paramList,
-                exceptionList, body));
-    }
-
-    @Deprecated
-    public void addMethodReadClassState(String comment,
-                                        String type,
-                                        String name,
-                                        Block body) {
-        addMethod(Method.newReadClassState(comment, TargetClass.fromName(type), name, body));
-    }
-
-    @Deprecated
-    public void addMethodPublicDynamic(String comment,
-                                       String type,
-                                       String name,
-                                       String paramList,
-                                       String exceptionList,
-                                       Block body) {
-        addMethod(Method.newPublicDynamicMethod(comment, TargetClass.fromName(type), name, paramList, exceptionList, body));
-    }
-
-    @Deprecated
-    public void addMethodPublicReadObjectState(String comment,
-                                               String type,
-                                               String name,
-                                               Block body) {
-        addMethod(Method.newPublicReadObjectState(comment, TargetClass.fromName(type), name, body));
-    }
-
-    @Deprecated
-    public void addConstructorPublicWithExceptions(String comment,
-                                                   String paramList,
-                                                   String exceptionList,
-                                                   Block body) {
-        addMethod(Method.newPublicConstructorWithException(comment, getName(), paramList, exceptionList, body));
-    }
-
-    @Deprecated
-    public void addConstructorPublic(String comment,
-                                     String paramList,
-                                     Block body) {
-        addMethod(Method.newPublicConstructor(comment, getName(), paramList, body));
     }
 
     public void addConstructorFields() {

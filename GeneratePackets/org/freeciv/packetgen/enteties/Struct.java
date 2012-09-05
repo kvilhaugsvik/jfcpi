@@ -39,8 +39,9 @@ public class Struct extends ClassWriter implements IDependency {
 
         for (Map.Entry<String, String> field: fields) {
             addObjectConstant(field.getKey(), field.getValue());
-            addMethodPublicReadObjectState(null, field.getKey(), "get" + field.getValue(),
-                    new Block(RETURN(getField(field.getValue()).ref())));
+            addMethod(Method.newPublicReadObjectState(null,
+                    TargetClass.fromName(field.getKey()), "get" + field.getValue(),
+                    new Block(RETURN(getField(field.getValue()).ref()))));
         }
 
         Typed<? extends AValue> varsToString = literalString("(");
@@ -53,8 +54,9 @@ public class Struct extends ClassWriter implements IDependency {
                     getField(fields.get(i).getValue()).ref());
         }
         varsToString = sum(varsToString, literalString(")"));
-        addMethodPublicReadObjectState(null, "String", "toString",
-                new Block(RETURN(varsToString)));
+        addMethod(Method.newPublicReadObjectState(null,
+                TargetClass.fromName("String"), "toString",
+                new Block(RETURN(varsToString))));
 
         iRequire = willNeed;
         iProvide = new Requirement("struct" + " " + name, Requirement.Kind.AS_JAVA_DATATYPE);
