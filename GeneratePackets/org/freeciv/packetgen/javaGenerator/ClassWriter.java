@@ -122,15 +122,16 @@ public class ClassWriter {
                           String paramList,
                           String exceptionList,
                           Block body) {
-        methods.add(new Method(comment, visibility, scope, type, name, paramList, exceptionList,
-                body));
+        methods.add(new Method(comment, visibility, scope,
+                TargetClass.fromName(type), name, paramList,
+                exceptionList, body));
     }
 
     public void addMethodReadClassState(String comment,
                                         String type,
                                         String name,
                                         Block body) {
-        methods.add(Method.newReadClassState(comment, type, name, body));
+        methods.add(Method.newReadClassState(comment, TargetClass.fromName(type), name, body));
     }
 
     public void addMethodPublicDynamic(String comment,
@@ -139,14 +140,14 @@ public class ClassWriter {
                                        String paramList,
                                        String exceptionList,
                                        Block body) {
-        methods.add(Method.newPublicDynamicMethod(comment, type, name, paramList, exceptionList, body));
+        methods.add(Method.newPublicDynamicMethod(comment, TargetClass.fromName(type), name, paramList, exceptionList, body));
     }
 
     public void addMethodPublicReadObjectState(String comment,
                                                String type,
                                                String name,
                                                Block body) {
-        methods.add(Method.newPublicReadObjectState(comment, type, name, body));
+        methods.add(Method.newPublicReadObjectState(comment, TargetClass.fromName(type), name, body));
     }
 
     public void addConstructorPublicWithExceptions(String comment,

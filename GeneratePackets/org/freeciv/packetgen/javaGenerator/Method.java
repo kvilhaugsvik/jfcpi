@@ -26,16 +26,6 @@ class Method {
     private final String exceptionList;
     private final Block body;
 
-    @Deprecated
-    public Method(String comment, Visibility visibility, Scope scope, String type, String name, String paramList,
-                  String exceptionList, Block body) {
-        this(comment, visibility, scope, stringTypeToTargetClass(type), name, paramList, exceptionList, body);
-    }
-
-    private static TargetClass stringTypeToTargetClass(String type) {
-        return TargetClass.fromName(type);
-    }
-
     public Method(String comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
                   String exceptionList, Block body) {
         this.comment = comment;
@@ -78,29 +68,11 @@ class Method {
         return newPublicConstructorWithException(comment, name, paramList, null, body);
     }
 
-    @Deprecated
-    static Method newPublicReadObjectState(String comment,
-                                           String type,
-                                           String name,
-                                           Block body) {
-        return newPublicReadObjectState(comment, stringTypeToTargetClass(type), name, body);
-    }
-
     static Method newPublicReadObjectState(String comment,
                                            TargetClass type,
                                            String name,
                                            Block body) {
         return newPublicDynamicMethod(comment, type, name, null, null, body);
-    }
-
-    @Deprecated
-    static Method newPublicDynamicMethod(String comment,
-                                         String type,
-                                         String name,
-                                         String paramList,
-                                         String exceptionList,
-                                         Block body) {
-        return newPublicDynamicMethod(comment, stringTypeToTargetClass(type), name, paramList, exceptionList, body);
     }
 
     static Method newPublicDynamicMethod(String comment,
@@ -110,11 +82,6 @@ class Method {
                                          String exceptionList,
                                          Block body) {
         return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
-    }
-
-    @Deprecated
-    public static Method newReadClassState(String comment, String type, String name, Block body) {
-        return newReadClassState(comment, stringTypeToTargetClass(type), name, body);
     }
 
     public static Method newReadClassState(String comment, TargetClass type, String name, Block body) {
