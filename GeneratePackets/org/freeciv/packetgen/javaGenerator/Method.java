@@ -33,7 +33,7 @@ class Method {
     }
 
     private static TargetClass stringTypeToTargetClass(String type) {
-        return (null == type ? TargetClass.INSTANCE : new TargetClass(type));
+        return TargetClass.fromName(type);
     }
 
     public Method(String comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
@@ -68,7 +68,7 @@ class Method {
                                                     String paramList,
                                                     String exceptionList,
                                                     Block body) {
-        return newPublicDynamicMethod(comment, TargetClass.INSTANCE, name, paramList, exceptionList, body);
+        return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
     }
 
     static Method newPublicConstructor(String comment,

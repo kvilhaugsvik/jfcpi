@@ -92,5 +92,11 @@ public class TargetClass extends Address {
         };
     }
 
-    public static final TargetClass INSTANCE = null;
+    public static TargetClass fromName(String name) {
+        if (null == name)
+            // TODO: Find a different way to mark constructors than giving them the return type null
+            return null;
+        else
+            return new TargetClass(name);
+    }
 }
