@@ -49,7 +49,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoComment() {
-        String result = (new Method(null, Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method("", Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
@@ -176,7 +176,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodClassStateReader() {
-        Method toTest = Method.newReadClassState(null,
+        Method toTest = Method.newReadClassState("",
                 new TargetClass("boolean"), "isTrue",
                 Block.fromStrings("return true"));
         assertEquals("Generated Class state reader source code not as espected",
@@ -467,7 +467,7 @@ public class CodeGenTest {
     // Tests based on real examples
 
     @Test public void testPublicConstructorNoExceptions() {
-        String result = Method.newPublicConstructor(null,
+        String result = Method.newPublicConstructor("",
                 "PACKET_CITY_NAME_SUGGESTION_REQ", "Integer unit_id",
                 Block.fromStrings("this.unit_id = new UNIT(unit_id)")).toString();
 
@@ -522,7 +522,7 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicReadObjectState() {
-        String result = Method.newPublicReadObjectState(null,
+        String result = Method.newPublicReadObjectState("",
                 new TargetClass("String"), "toString",
                 new Block(RETURN(asAString("value.toString()")))).toString();
 

@@ -39,7 +39,7 @@ public class Struct extends ClassWriter implements IDependency {
 
         for (Map.Entry<String, String> field: fields) {
             addObjectConstant(field.getKey(), field.getValue());
-            addMethod(Method.newPublicReadObjectState(null,
+            addMethod(Method.newPublicReadObjectState("",
                     TargetClass.fromName(field.getKey()), "get" + field.getValue(),
                     new Block(RETURN(getField(field.getValue()).ref()))));
         }
@@ -54,7 +54,7 @@ public class Struct extends ClassWriter implements IDependency {
                     getField(fields.get(i).getValue()).ref());
         }
         varsToString = sum(varsToString, literalString(")"));
-        addMethod(Method.newPublicReadObjectState(null,
+        addMethod(Method.newPublicReadObjectState("",
                 TargetClass.fromName("String"), "toString",
                 new Block(RETURN(varsToString))));
 

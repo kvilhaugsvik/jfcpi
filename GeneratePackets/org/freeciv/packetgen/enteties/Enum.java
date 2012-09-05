@@ -99,21 +99,21 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         addObjectConstant("String", "toStringName");
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
-        addMethod(new Method(null, Visibility.PRIVATE, Scope.OBJECT,
+        addMethod(new Method("", Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName(null), enumName, "int number, String toStringName",
                 null, new Block(new MethodCall<Returnable>(null, "this", "number", "toStringName", "true"))));
-        addMethod(new Method(null, Visibility.PRIVATE, Scope.OBJECT,
+        addMethod(new Method("", Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName(null), enumName, "int number, String toStringName, boolean valid",
                 null,
                 new Block(setFieldToVariableSameName("number"),
                         setFieldToVariableSameName("toStringName"),
                         setFieldToVariableSameName("valid"))));
 
-        addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("int"), "getNumber",
+        addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("int"), "getNumber",
                 new Block(BuiltIn.RETURN(this.getField("number").ref()))));
-        addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("boolean"), "isValid",
+        addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("boolean"), "isValid",
                 new Block(BuiltIn.RETURN(this.getField("valid").ref()))));
-        addMethod(Method.newPublicReadObjectState(null, TargetClass.fromName("String"), "toString",
+        addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("String"), "toString",
                 new Block(BuiltIn.RETURN(this.getField("toStringName").ref()))));
 
         addMethod(Method.newReadClassState("/**" + "\n" +
