@@ -24,6 +24,8 @@ import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.*;
 import java.util.HashMap;
@@ -36,49 +38,27 @@ public class GenerateTest {
     private static final LinkedList<String> writtenPackets = new LinkedList<String>();
 
     public static void main(String[] args) throws IOException, UndefinedException {
-        new GenerateTest(args);
+        (new GenerateTest()).generate(args);
     }
 
-    public GenerateTest(String[] args) throws IOException, UndefinedException {
-        String targetFolder;
+    public void generate(String[] args) throws IOException, UndefinedException {
+        final String targetFolder;
         if (args.length < 1)
-            targetFolder = GeneratorDefaults.GENERATED_SOURCE_FOLDER;
+            targetFolder = GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER;
         else
             targetFolder = args[0];
 
-        for (Package pack: new Package[]{
-                org.freeciv.types.FCEnum.class.getPackage(),
-                org.freeciv.packet.Packet.class.getPackage(),
-                org.freeciv.packet.fieldtype.FieldType.class.getPackage()
-        }) {
-            (new File(targetFolder + "/" + pack.getName().replace('.', '/'))).mkdirs();
-        }
+        prepareFolder(targetFolder);
 
-        Enum test = Enum.fromArray("test", false,
-                newEnumValue("one", 1),
-                newEnumValue("two", 2, "\"2nd\""),
-                newEnumValue("three", 3),
-                newInvalidEnum(-3));
-        Enum testDefaultInvalid = Enum.fromArray("testDefaultInvalid", false,
-                newEnumValue("one", 1),
-                newEnumValue("two", 2, "\"2nd\""),
-                newEnumValue("three", 3));
-        Enum testCount = Enum.fromArray("testCount", "COUNT", "\"numbers listed\"",
-                newEnumValue("zero", 0),
-                newEnumValue("one", 1),
-                newEnumValue("two", 2, "\"2nd\""),
-                newEnumValue("three", 3));
-        Enum bitwise = Enum.fromArray("bitwise", true,
-                newEnumValue("one", 1),
-                newEnumValue("two", 2),
-                newEnumValue("four", 4));
+        writeEnumSimple(targetFolder);
+        writeEnumDefaultInvalid(targetFolder);
+        writeEnumNamedCount(targetFolder);
+        writeEnumBitwise(targetFolder);
 
+        remaining(targetFolder);
+    }
 
-        writeJavaFile(test, targetFolder);
-        writeJavaFile(testDefaultInvalid, targetFolder);
-        writeJavaFile(bitwise, targetFolder);
-        writeJavaFile(testCount, targetFolder);
-
+    public void remaining(String targetFolder) throws IOException, UndefinedException {
         HashMap<String, FieldTypeBasic> primitiveTypes = new HashMap<String, FieldTypeBasic>();
         HashMap<String, FieldTypeBasic.Generator> generators = new HashMap<String, FieldTypeBasic.Generator>();
         HashMap<String, NetworkIO> network = new HashMap<String, NetworkIO>();
@@ -179,6 +159,84 @@ public class GenerateTest {
                 new Field("theArray", string, "StringArray",
                           new WeakField.ArrayDeclaration(IntExpression.integer("3"), null),
                         new WeakField.ArrayDeclaration(IntExpression.integer("10"), null))), targetFolder);
+    }
+
+    @Test
+    public void generateRemaining() throws IOException, UndefinedException {
+        remaining(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    @BeforeClass
+    public static void prepareFolder() {
+        prepareFolder(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    public static void prepareFolder(String targetFolder) {
+        for (Package pack: new Package[]{
+                org.freeciv.types.FCEnum.class.getPackage(),
+                org.freeciv.packet.Packet.class.getPackage(),
+                org.freeciv.packet.fieldtype.FieldType.class.getPackage()
+        }) {
+            (new File(targetFolder + "/" + pack.getName().replace('.', '/'))).mkdirs();
+        }
+    }
+
+    @Test
+    public void writeEnumSimple() throws IOException {
+        writeEnumSimple(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    public static void writeEnumSimple(String targetFolder) throws IOException {
+        Enum test = Enum.fromArray("test", false,
+                newEnumValue("one", 1),
+                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("three", 3),
+                newInvalidEnum(-3));
+
+                writeJavaFile(test, targetFolder);
+    }
+
+    @Test
+    public void writeEnumDefaultInvalid() throws IOException {
+        writeEnumDefaultInvalid(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    public static void writeEnumDefaultInvalid(String targetFolder) throws IOException {
+        Enum testDefaultInvalid = Enum.fromArray("testDefaultInvalid", false,
+                newEnumValue("one", 1),
+                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("three", 3));
+
+        writeJavaFile(testDefaultInvalid, targetFolder);
+    }
+
+    @Test
+    public void writeEnumNamedCount() throws IOException {
+        writeEnumNamedCount(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    public static void writeEnumNamedCount(String targetFolder) throws IOException {
+        Enum testCount = Enum.fromArray("testCount", "COUNT", "\"numbers listed\"",
+                newEnumValue("zero", 0),
+                newEnumValue("one", 1),
+                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("three", 3));
+
+        writeJavaFile(testCount, targetFolder);
+    }
+
+    @Test
+    public void writeEnumBitwise() throws IOException {
+        writeEnumBitwise(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    public static void writeEnumBitwise(String targetFolder) throws IOException {
+        Enum bitwise = Enum.fromArray("bitwise", true,
+                newEnumValue("one", 1),
+                newEnumValue("two", 2),
+                newEnumValue("four", 4));
+
+        writeJavaFile(bitwise, targetFolder);
     }
 
     private static FieldTypeBasic.FieldTypeAlias getPrimitiveFieldType(HashMap<String, FieldTypeBasic> primitiveTypes,

@@ -48,6 +48,7 @@ sourceDefaultsForGenerator:
 	echo "package org.freeciv.packetgen;" > ${GENERATORDEFAULTS}
 	echo "public class GeneratorDefaults {" >> ${GENERATORDEFAULTS}
 	echo "  public static final String GENERATED_SOURCE_FOLDER = \"${GENERATED_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final String GENERATED_TEST_SOURCE_FOLDER = \"${GENERATED_TEST_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final boolean DEVMODE = ${DEVMODE};" >> ${GENERATORDEFAULTS}
@@ -70,11 +71,18 @@ compileFromFreeciv: sourceFromFreeciv
 	${JAVAC} -d ${COMPILED_PROTOCOL_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find ${GENERATED_SOURCE_FOLDER} -iname "*.java"`
 	touch compileFromFreeciv
 
-sourceTestPeers: compileBasicProtocol compileCodeGenerator
-	mkdir -p ${COMPILED_TESTS_FOLDER}
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} Tests/org/freeciv/packetgen/GenerateTest.java
+compileTestPeerGenerator: compileBasicProtocol compileCodeGenerator folderTestOut
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT} Tests/org/freeciv/packetgen/GenerateTest.java
+	touch compileTestPeerGenerator
+
+sourceTestPeers: compileTestPeerGenerator
 	${JAVA} -cp ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} org.freeciv.packetgen.GenerateTest ${GENERATED_TEST_SOURCE_FOLDER}
 	touch sourceTestPeers
+
+# not included in tests since make will run the code when generating test peers
+runTestPeerCreationAsTests: compileTestPeerGenerator
+	${JAVA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.GenerateTest
+	touch runTestPeerCreationAsTests
 
 compileTestPeers: compileCodeGenerator compileBasicProtocol sourceTestPeers
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find ${GENERATED_TEST_SOURCE_FOLDER} -iname "*.java"`
@@ -139,9 +147,11 @@ clean:
 	rm -rf ${COMPILED_PROTOCOL_FOLDER} compileBasicProtocol
 	rm -rf runPacketTest compilePacketTest
 	rm -rf ${PACKETGENOUT} compileCodeGenerator
+	rm -rf compileTestPeerGenerator
 	rm -rf compileTestPeers
 	rm -rf compileTestGeneratedCode
 	rm -rf compileTestsOfGenerator
+	rm -rf runTestPeerCreationAsTests
 	rm -rf runTestsOfGenerator
 	rm -rf runTests tests
 	rm -rf folderTestOut ${COMPILED_TESTS_FOLDER}
