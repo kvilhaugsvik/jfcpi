@@ -180,14 +180,23 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean
 
+  protected def isLineWSIgnored(source: CharSequence, offset: Int): Boolean
+
   protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean
 
   private val space = (spaceBetweenWords + "+").r
+
+  private val matchNothing = """$^""".r
+
+  private val matchComment = regExOr(cStyleComment, cXXStyleComment).r
 
   private val matchSpaceComment: String =
     regExOr(regExOr(spaceBetweenWords, cStyleComment) + "+" + "(" + cXXStyleComment + ")?", cXXStyleComment)
 
   private val spaceOrComment = matchSpaceComment.r
+
+  private val commentOrNewLine = (regExOr(cStyleComment, cXXStyleComment + "\n",  cXXStyleComment + "\r",
+    "\n", "\r") + "+").r
 
   private val spaceCommentOrNewLine = (regExOr(matchSpaceComment, "\n", "\r") + "+").r
 
@@ -199,13 +208,22 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       super.handleWhiteSpace(source, offset)
     else {
       val found =
-        (if (!isNewLineIgnored(source, offset) && areCommentsIgnored(source, offset))
-          spaceOrComment
-        else if (!isNewLineIgnored(source, offset) && !areCommentsIgnored(source, offset))
-          space
-        else
-          spaceCommentOrNewLine
-        ).findPrefixMatchOf(source.subSequence(offset, source.length()))
+        (if (!isNewLineIgnored(source, offset) && areCommentsIgnored(source, offset)) {
+          if (isLineWSIgnored(source, offset))
+            spaceOrComment
+          else
+            matchComment
+        } else if (!isNewLineIgnored(source, offset) && !areCommentsIgnored(source, offset)) {
+          if (isLineWSIgnored(source, offset))
+            space
+          else
+            matchNothing
+        } else {
+          if (isLineWSIgnored(source, offset))
+            spaceCommentOrNewLine
+          else
+            commentOrNewLine
+        }).findPrefixMatchOf(source.subSequence(offset, source.length()))
       if (found.isEmpty)
         return offset
       else

@@ -198,9 +198,13 @@ object ParseCCode extends ExtractableParser {
 
   private var ignoreNewLinesFlag = true
 
+  private var ignoreLineWSFlag = true
+
   private var ignoreCommentsFlag = false
 
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
+
+  protected def isLineWSIgnored(source: CharSequence, offset: Int): Boolean = ignoreLineWSFlag
 
   protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean = ignoreCommentsFlag
 
