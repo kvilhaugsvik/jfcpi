@@ -81,14 +81,15 @@ object ParseCCode extends ExtractableParser {
     }
   }
 
-  @inline private def se(kind: String) =
-    defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
+  @inline private def se(kind: String, followedBy: Parser[String]): Parser[(String, String)] =
+    se(kind, start => start ~ followedBy ^^ {case a ~ b => a -> b})
 
-  //TODO: join the se above and the one below. Only difference is taking followBy as a parameter and use it
-  @inline private def se[Ret](kind: String, followedBy: Parser[Ret]) =
-    defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}) ~ followedBy)
+  @inline private def se(kind: String,
+                         followedBy: (Parser[String] => Parser[(String, String)]) = start => start ^^ {_ -> ""}):
+  Parser[(String, String)] =
+    defineLine(DEFINE, followedBy(regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
 
-  def specEnumOrName(kind: String) = se(kind + NAME, quotedString.r) |
+  def specEnumOrName(kind: String): Parser[(String, String)] = se(kind + NAME, quotedString.r) |
     se(kind, identifierRegEx)
 
   def specEnumDef: Parser[~[String, Map[String, String]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
@@ -97,7 +98,7 @@ object ParseCCode extends ExtractableParser {
       specEnumOrName("COUNT") |
       se("INVALID", sInteger)) ^^ {parsed => (parsed._1 -> parsed._2)} |
       CComment ^^ {comment => "comment" -> comment} |
-      se("BITWISE") ^^ {bitwise => bitwise -> bitwise}
+      se("BITWISE") ^^ {bitwise => bitwise._1 -> bitwise._1}
     ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
 
