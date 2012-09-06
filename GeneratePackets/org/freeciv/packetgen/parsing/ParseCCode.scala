@@ -28,8 +28,6 @@ import org.freeciv.packetgen.UndefinedException
 import java.util.AbstractMap.SimpleImmutableEntry
 
 object ParseCCode extends ExtractableParser {
-  def enumElemCode = identifierRegEx
-
   private final val DEFINE: String = "#define"
   private final val SPECENUM: String = "SPECENUM_"
   private final val NAME: String = "NAME"
@@ -91,7 +89,7 @@ object ParseCCode extends ExtractableParser {
     defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}) ~ followedBy)
 
   def specEnumOrName(kind: String) = se(kind + NAME, quotedString.r) |
-    se(kind, enumElemCode)
+    se(kind, identifierRegEx)
 
   def specEnumDef: Parser[~[String, Map[String, String]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
     (rep((specEnumOrName("VALUE\\d+") |
@@ -147,7 +145,7 @@ object ParseCCode extends ExtractableParser {
 
   def enumValue = intExpr
 
-  def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment) ^^ {
+  def cEnum = opt(CComment) ~> identifierRegEx ~ opt("=" ~> enumValue) <~ opt(CComment) ^^ {
     case element ~ value => (element -> value)
   }
 
