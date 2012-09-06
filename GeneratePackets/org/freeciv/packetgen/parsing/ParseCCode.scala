@@ -60,11 +60,13 @@ object ParseCCode extends ExtractableParser {
         // Save old state
         val oldIgnoreCommentsFlag = ignoreCommentsFlag
         val oldIgnoreNewLinesFlag = ignoreNewLinesFlag
+        val oldIgnoreLineWSFlag = ignoreLineWSFlag
 
         // Look for the start of a define ignoring comments and newlines
         ignoreCommentsFlag = true
-        ignoreNewLinesFlag = true
-        val beginning = regex(start.r)(in)
+        ignoreLineWSFlag = false
+        val beginning = regex(("\\s*" + start + "\\s+").r)(in)
+        ignoreLineWSFlag = oldIgnoreLineWSFlag
 
         val result = if (beginning.successful) {
           ignoreNewLinesFlag = false
