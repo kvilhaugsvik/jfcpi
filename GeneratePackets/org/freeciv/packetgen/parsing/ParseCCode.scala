@@ -93,7 +93,7 @@ object ParseCCode extends ExtractableParser {
   def specEnumOrName(kind: String) = se(kind + NAME, quotedString.r) |
     se(kind, enumElemCode)
 
-  def specEnumDef = defineLine(startOfSpecEnum, regex(identifier.r)) ~
+  def specEnumDef: Parser[~[String, Map[String, String]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
