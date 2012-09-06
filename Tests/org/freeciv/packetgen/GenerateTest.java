@@ -28,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -54,6 +55,7 @@ public class GenerateTest {
         writeEnumDefaultInvalid(targetFolder);
         writeEnumNamedCount(targetFolder);
         writeEnumBitwise(targetFolder);
+        writeEnumWithSettableName(targetFolder);
 
         remaining(targetFolder);
     }
@@ -237,6 +239,21 @@ public class GenerateTest {
                 newEnumValue("four", 4));
 
         writeJavaFile(bitwise, targetFolder);
+    }
+
+    @Test
+    public void writeEnumWithSettableName() throws IOException {
+        writeEnumWithSettableName(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    public static void writeEnumWithSettableName(String targetFolder) throws IOException {
+        Enum result = new Enum("UserMod", true, false, Arrays.asList(
+                Enum.EnumElementFC.newEnumValue("user1", "1"),
+                Enum.EnumElementFC.newEnumValue("user2", "2"),
+                Enum.EnumElementFC.newEnumValue("user3", "3"),
+                Enum.EnumElementFC.newEnumValue("user4", "4")
+        ));
+        writeJavaFile(result, targetFolder);
     }
 
     private static FieldTypeBasic.FieldTypeAlias getPrimitiveFieldType(HashMap<String, FieldTypeBasic> primitiveTypes,

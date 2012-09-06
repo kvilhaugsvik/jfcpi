@@ -87,4 +87,13 @@ public class GeneratedEnumTest {
     @Test public void getValueIntGetsINVALIDForUnused() {
         assertEquals("Failed to retrieve enum by number", test.INVALID, test.valueOf(98));
     }
+
+    @Test public void settableNameCanBeRead() {
+        assertEquals("user1", UserMod.user1.toString());
+    }
+
+    @Test public void settableNameCanBeSet() {
+        UserMod.user2.setName("TWO");
+        assertEquals("TWO", UserMod.user2.toString());
+    }
 }

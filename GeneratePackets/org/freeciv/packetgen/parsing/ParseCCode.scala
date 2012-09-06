@@ -100,6 +100,8 @@ object ParseCCode extends ExtractableParser {
       specEnumOrName("COUNT") |
       se("INVALID", sInteger)) ^^ {parsed => (parsed._1 -> parsed._2)} |
       CComment ^^ {comment => "comment" -> comment} |
+      se("NAMEOVERRIDE") ^^ {nameOverride => nameOverride._1 ->
+        "override element names (probably from the ruleset)"} |
       se("BITWISE") ^^ {bitwise => bitwise._1 -> bitwise._1}
     ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
@@ -111,6 +113,7 @@ object ParseCCode extends ExtractableParser {
 
       @inline def enumerations: Map[String, String] = asStructures._2
       val bitwise = enumerations.contains("BITWISE")
+      val nameOverride = enumerations.contains("NAMEOVERRIDE")
 
       val outEnumValues: ListBuffer[Enum.EnumElementKnowsNumber] = ListBuffer[Enum.EnumElementKnowsNumber](
         enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
@@ -138,12 +141,13 @@ object ParseCCode extends ExtractableParser {
       val sortedEnumValues: List[EnumElementFC] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
       if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
-          new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
+          new Enum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             enumerations.get("COUNT" + NAME).get, sortedEnumValues.asJava)
         else
-          new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, sortedEnumValues.asJava)
+          new Enum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
+            sortedEnumValues.asJava)
       else
-        new Enum(asStructures._1.asInstanceOf[String], bitwise, sortedEnumValues.asJava)
+        new Enum(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)
   }
 
   def enumValue = intExpr

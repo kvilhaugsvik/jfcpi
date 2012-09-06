@@ -38,23 +38,24 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
     private final EnumElementFC invalidDefault;
     private final EnumElementFC countElement;
 
-    public Enum(String enumName, boolean bitwise, List<EnumElementFC> values) {
-        this(enumName, bitwise, null, null, Collections.<Requirement>emptySet(), values);
+    public Enum(String enumName, boolean nameOverride, boolean bitwise, List<EnumElementFC> values) {
+        this(enumName, nameOverride, bitwise, null, null, Collections.<Requirement>emptySet(), values);
     }
 
-    public Enum(String enumName, String cntCode, List<EnumElementFC> values) {
-        this(enumName, cntCode, null, values);
+    public Enum(String enumName, boolean nameOverride, String cntCode, List<EnumElementFC> values) {
+        this(enumName, nameOverride, cntCode, null, values);
     }
 
-    public Enum(String enumName, String cntCode, String cntString, List<EnumElementFC> values) {
-        this(enumName, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
+    public Enum(String enumName, boolean nameOverride, String cntCode, String cntString, List<EnumElementFC> values) {
+        this(enumName, nameOverride, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
     }
 
     public Enum(String enumName, Collection<Requirement> reqs, List<EnumElementFC> values) {
-        this(enumName, false, null, null, reqs, values);
+        this(enumName, false, false, null, null, reqs, values);
     }
 
-    protected Enum(String enumName, boolean bitwise, String cntCode, String cntString, Collection<Requirement> reqs,
+    protected Enum(String enumName, boolean nameOverride, boolean bitwise,
+                   String cntCode, String cntString, Collection<Requirement> reqs,
                 List<EnumElementFC> values) {
         super(ClassKind.ENUM, new TargetPackage(FCEnum.class.getPackage()), null, "Freeciv C code", Collections.<Annotate>emptyList(), enumName, null, "FCEnum");
 
@@ -96,7 +97,11 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
 
         addObjectConstant("int", "number");
         addObjectConstant("boolean", "valid");
-        addObjectConstant("String", "toStringName");
+        if (nameOverride)
+            addField(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES,
+                    new TargetClass("String"), "toStringName", null));
+        else
+            addObjectConstant("String", "toStringName");
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
         addMethod(new Method("", Visibility.PRIVATE, Scope.OBJECT,
@@ -115,6 +120,9 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                 new Block(BuiltIn.RETURN(this.getField("valid").ref()))));
         addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("String"), "toString",
                 new Block(BuiltIn.RETURN(this.getField("toStringName").ref()))));
+        if (nameOverride)
+            addMethod(Method.newPublicDynamicMethod("", new TargetClass(void.class), "setName", "String name", null,
+                    new Block(this.getField("toStringName").assign(asAValue("name")))));
 
         addMethod(Method.newReadClassState("/**" + "\n" +
                                         " * Is the enum bitwise? An enum is bitwise if it's number increase by two's"
@@ -211,16 +219,19 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         return Requirement.Kind.FROM_NETWORK_TO_INT;
     }
 
+    @Deprecated
     public static Enum fromArray(String enumName, boolean bitwise, EnumElementFC... values) {
-        return new Enum(enumName, bitwise, Arrays.asList(values));
+        return new Enum(enumName, false, bitwise, Arrays.asList(values));
     }
 
+    @Deprecated
     public static Enum fromArray(String enumName, String cntCode, EnumElementFC... values) {
-        return new Enum(enumName, cntCode, Arrays.asList(values));
+        return new Enum(enumName, false, cntCode, Arrays.asList(values));
     }
 
+    @Deprecated
     public static Enum fromArray(String enumName, String cntCode, String cntString, EnumElementFC... values) {
-        return new Enum(enumName, cntCode, cntString, Arrays.asList(values));
+        return new Enum(enumName, false, cntCode, cntString, Arrays.asList(values));
     }
 
     public static Enum fromArray(String enumName, Collection<Requirement> reqs, EnumElementFC... values) {
