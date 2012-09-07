@@ -194,102 +194,109 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             @Override
             public List<String> asFormattedLines(CodeAtoms from) {
                 final IR[] atoms = from.toArray();
-                LinkedList<String> out = new LinkedList<String>();
+                final LinkedList<String> out = new LinkedList<String>();
 
-                int pointerAfter = -1;
-                ScopeStack<ScopeInfoKind> scopeStack = null;
-                try {
-                    scopeStack = new ScopeStack<ScopeInfoKind>(scopeMaker, pointerAfter, out.size(), "");
-                } catch (NoSuchMethodException e) {
-                    throw new Error("Could not initialize ScopeStack", e);
-                } catch (IllegalAccessException e) {
-                    throw new Error("Could not initialize ScopeStack", e);
-                } catch (InstantiationException e) {
-                    throw new Error("Could not initialize ScopeStack", e);
-                } catch (InvocationTargetException e) {
-                    throw new Error("Could not initialize ScopeStack", e);
-                }
-
-                ArrayList<CompiledAtomCheck<ScopeInfoKind>> firstMatchOnlyKnowStack =
-                        new ArrayList<CompiledAtomCheck<ScopeInfoKind>>();
-                for (AtomCheck<ScopeInfoKind> rule : firstMatchOnly) {
-                    firstMatchOnlyKnowStack.add(rule.forStack(scopeStack));
-                }
-
-                ArrayList<CompiledAtomCheck> allMatchesKnowStack = new ArrayList<CompiledAtomCheck>();
-                for (AtomCheck<ScopeInfoKind> rule : triggerMany) {
-                    allMatchesKnowStack.add(rule.forStack(scopeStack));
-                }
-
-                while (pointerAfter < atoms.length) {
-                    StringBuilder line = newLine(scopeStack);
-                    boolean addBreak = false;
-                    boolean addBlank = false;
-                    line: while (pointerAfter < atoms.length) {
-                        scopeStack.get().setNowAt(pointerAfter);
-                        scopeStack.get().setLeftToken(getOrNull(atoms, pointerAfter));
-                        scopeStack.get().setRightToken(getOrNull(atoms, pointerAfter + 1));
-                        if (0 <= pointerAfter) {
-                            line.append(scopeStack.get().getLeftAtom().get());
-                            updateHintsAfter(scopeStack, scopeStack.get().getLeft());
-                        }
-                        scopeStack.get().setLineLength(line.length());
-
-                        switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
-                                firstMatchOnlyKnowStack,
-                                scopeStack.get().getLeftAtom(),
-                                scopeStack.get().getRightAtom()
-                        ).getToInsert()) {
-                            case INSERT_SPACE:
-                                line.append(" ");
-                                break;
-                            case BREAK_LINE_BLOCK:
-                                addBreak = true;
-                                addBlank = true;
-                                break;
-                            case BREAK_LINE:
-                                addBreak = true;
-                                break;
-                            case DO_NOTHING:
-                                break;
+                FormattingProcess formatting = new FormattingProcess() {
+                    @Override
+                    public void start() {
+                        int pointerAfter = -1;
+                        ScopeStack<ScopeInfoKind> scopeStack = null;
+                        try {
+                            scopeStack = new ScopeStack<ScopeInfoKind>(scopeMaker, pointerAfter, out.size(), "");
+                        } catch (NoSuchMethodException e) {
+                            throw new Error("Could not initialize ScopeStack", e);
+                        } catch (IllegalAccessException e) {
+                            throw new Error("Could not initialize ScopeStack", e);
+                        } catch (InstantiationException e) {
+                            throw new Error("Could not initialize ScopeStack", e);
+                        } catch (InvocationTargetException e) {
+                            throw new Error("Could not initialize ScopeStack", e);
                         }
 
-                        for (CompiledAtomCheck rule : allMatchesKnowStack)
-                            if (rule.isTrueFor(scopeStack.get().getLeftAtom(), scopeStack.get().getRightAtom()))
-                                switch (rule.getToInsert()) {
-                                    case SCOPE_ENTER:
-                                        scopeStack.open(pointerAfter + 1, out.size(), line.toString());
+                        ArrayList<CompiledAtomCheck<ScopeInfoKind>> firstMatchOnlyKnowStack =
+                                new ArrayList<CompiledAtomCheck<ScopeInfoKind>>();
+                        for (AtomCheck<ScopeInfoKind> rule : firstMatchOnly) {
+                            firstMatchOnlyKnowStack.add(rule.forStack(scopeStack));
+                        }
+
+                        ArrayList<CompiledAtomCheck> allMatchesKnowStack = new ArrayList<CompiledAtomCheck>();
+                        for (AtomCheck<ScopeInfoKind> rule : triggerMany) {
+                            allMatchesKnowStack.add(rule.forStack(scopeStack));
+                        }
+
+                        while (pointerAfter < atoms.length) {
+                            StringBuilder line = newLine(scopeStack);
+                            boolean addBreak = false;
+                            boolean addBlank = false;
+                            line: while (pointerAfter < atoms.length) {
+                                scopeStack.get().setNowAt(pointerAfter);
+                                scopeStack.get().setLeftToken(getOrNull(atoms, pointerAfter));
+                                scopeStack.get().setRightToken(getOrNull(atoms, pointerAfter + 1));
+                                if (0 <= pointerAfter) {
+                                    line.append(scopeStack.get().getLeftAtom().get());
+                                    updateHintsAfter(scopeStack, scopeStack.get().getLeft());
+                                }
+                                scopeStack.get().setLineLength(line.length());
+
+                                switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
+                                        firstMatchOnlyKnowStack,
+                                        scopeStack.get().getLeftAtom(),
+                                        scopeStack.get().getRightAtom()
+                                ).getToInsert()) {
+                                    case INSERT_SPACE:
+                                        line.append(" ");
                                         break;
-                                    case SCOPE_EXIT:
-                                        scopeStack.close();
+                                    case BREAK_LINE_BLOCK:
+                                        addBreak = true;
+                                        addBlank = true;
                                         break;
-                                    case RESET_LINE:
-                                        pointerAfter = scopeStack.get().getBeganAt();
-                                        int lineNumber = scopeStack.get().getBeganAtLine();
-                                        while(lineNumber < out.size())
-                                            out.removeLast();
-                                        line = new StringBuilder(scopeStack.get().getLineUpToScope());
-                                        scopeStack.get().setLineLength(line.length());
-                                        scopeStack.get().resetHints();
-                                        addBreak = false;
-                                        addBlank = false;
-                                        continue line;
-                                    case INDENT:
-                                        scopeStack.get().setExtraIndent(1);
+                                    case BREAK_LINE:
+                                        addBreak = true;
+                                        break;
+                                    case DO_NOTHING:
                                         break;
                                 }
 
-                        if (pointerAfter + 1 < atoms.length)
-                            updateHintsBefore(scopeStack, scopeStack.get().getRight());
-                        pointerAfter++;
-                        if (addBreak)
-                            break line;
+                                for (CompiledAtomCheck rule : allMatchesKnowStack)
+                                    if (rule.isTrueFor(scopeStack.get().getLeftAtom(), scopeStack.get().getRightAtom()))
+                                        switch (rule.getToInsert()) {
+                                            case SCOPE_ENTER:
+                                                scopeStack.open(pointerAfter + 1, out.size(), line.toString());
+                                                break;
+                                            case SCOPE_EXIT:
+                                                scopeStack.close();
+                                                break;
+                                            case RESET_LINE:
+                                                pointerAfter = scopeStack.get().getBeganAt();
+                                                int lineNumber = scopeStack.get().getBeganAtLine();
+                                                while(lineNumber < out.size())
+                                                    out.removeLast();
+                                                line = new StringBuilder(scopeStack.get().getLineUpToScope());
+                                                scopeStack.get().setLineLength(line.length());
+                                                scopeStack.get().resetHints();
+                                                addBreak = false;
+                                                addBlank = false;
+                                                continue line;
+                                            case INDENT:
+                                                scopeStack.get().setExtraIndent(1);
+                                                break;
+                                        }
+
+                                if (pointerAfter + 1 < atoms.length)
+                                    updateHintsBefore(scopeStack, scopeStack.get().getRight());
+                                pointerAfter++;
+                                if (addBreak)
+                                    break line;
+                            }
+                            out.add(line.toString());
+                            if (addBlank) {
+                                out.add("");
+                            }
+                        }
                     }
-                    out.add(line.toString());
-                    if (addBlank) {
-                        out.add("");
-                    }
-                }
+                };
+
+                formatting.start();
                 return out;
             }
 

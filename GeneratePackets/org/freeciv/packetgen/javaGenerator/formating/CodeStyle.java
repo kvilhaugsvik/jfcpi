@@ -36,6 +36,10 @@ public interface CodeStyle {
         SCOPE_EXIT
     }
 
+    public interface FormattingProcess {
+        void start();
+    }
+
     public static class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
         private final Constructor<Scope> kind;
         private final LinkedList<Scope> stack;
