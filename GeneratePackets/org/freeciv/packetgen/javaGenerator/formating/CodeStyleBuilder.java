@@ -445,14 +445,6 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     }
 
     private static class AtomCheck<ScopeInfoKind extends ScopeInfo> {
-        private static <ScopeInfoKind extends ScopeInfo> Util.OneCondition<ScopeInfoKind> ignoresScope() {
-            return new Util.OneCondition<ScopeInfoKind>() {
-                @Override public boolean isTrueFor(ScopeInfoKind argument) {
-                    return true;
-                }
-            };
-        }
-
         private final EnumSet<DependsOn> preConds;
         private final Util.OneCondition<ScopeInfoKind>[] tests;
         private final Triggered<ScopeInfoKind>[] toRun;
