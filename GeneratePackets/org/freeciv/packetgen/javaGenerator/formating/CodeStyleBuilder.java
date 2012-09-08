@@ -197,10 +197,14 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 final LinkedList<String> out = new LinkedList<String>();
 
                 FormattingProcess formatting = new FormattingProcess() {
+                    private StringBuilder line;
+                    private boolean addBreak = false;
+                    private boolean addBlank = false;
+                    private int pointerAfter = -1;
+                    private ScopeStack<ScopeInfoKind> scopeStack = null;
+
                     @Override
                     public void start() {
-                        int pointerAfter = -1;
-                        ScopeStack<ScopeInfoKind> scopeStack = null;
                         try {
                             scopeStack = new ScopeStack<ScopeInfoKind>(scopeMaker, pointerAfter, out.size(), "");
                         } catch (NoSuchMethodException e) {
@@ -225,9 +229,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                         }
 
                         while (pointerAfter < atoms.length) {
-                            StringBuilder line = newLine(scopeStack);
-                            boolean addBreak = false;
-                            boolean addBlank = false;
+                            line = newLine(scopeStack);
+                            addBreak = false;
+                            addBlank = false;
                             line: while (pointerAfter < atoms.length) {
                                 scopeStack.get().setNowAt(pointerAfter);
                                 scopeStack.get().setLeftToken(getOrNull(atoms, pointerAfter));
@@ -244,14 +248,13 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                         scopeStack.get().getRightAtom()
                                 ).getToInsert()) {
                                     case INSERT_SPACE:
-                                        line.append(" ");
+                                        this.insertSpace();
                                         break;
                                     case BREAK_LINE_BLOCK:
-                                        addBreak = true;
-                                        addBlank = true;
+                                        this.breakLineBlock();
                                         break;
                                     case BREAK_LINE:
-                                        addBreak = true;
+                                        this.breakLine();
                                         break;
                                     case DO_NOTHING:
                                         break;
@@ -261,24 +264,16 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                     if (rule.isTrueFor(scopeStack.get().getLeftAtom(), scopeStack.get().getRightAtom()))
                                         switch (rule.getToInsert()) {
                                             case SCOPE_ENTER:
-                                                scopeStack.open(pointerAfter + 1, out.size(), line.toString());
+                                                this.scopeEnter();
                                                 break;
                                             case SCOPE_EXIT:
-                                                scopeStack.close();
+                                                this.scopeExit();
                                                 break;
                                             case RESET_LINE:
-                                                pointerAfter = scopeStack.get().getBeganAt();
-                                                int lineNumber = scopeStack.get().getBeganAtLine();
-                                                while(lineNumber < out.size())
-                                                    out.removeLast();
-                                                line = new StringBuilder(scopeStack.get().getLineUpToScope());
-                                                scopeStack.get().setLineLength(line.length());
-                                                scopeStack.get().resetHints();
-                                                addBreak = false;
-                                                addBlank = false;
+                                                this.scopeReset();
                                                 continue line;
                                             case INDENT:
-                                                scopeStack.get().setExtraIndent(1);
+                                                this.indent();
                                                 break;
                                         }
 
@@ -293,6 +288,50 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                 out.add("");
                             }
                         }
+                    }
+
+                    @Override
+                    public void insertSpace() {
+                        line.append(" ");
+                    }
+
+                    @Override
+                    public void breakLineBlock() {
+                        addBreak = true;
+                        addBlank = true;
+                    }
+
+                    @Override
+                    public void breakLine() {
+                        addBreak = true;
+                    }
+
+                    @Override
+                    public void indent() {
+                        scopeStack.get().setExtraIndent(1);
+                    }
+
+                    @Override
+                    public void scopeReset() {
+                        pointerAfter = scopeStack.get().getBeganAt();
+                        int lineNumber = scopeStack.get().getBeganAtLine();
+                        while(lineNumber < out.size())
+                            out.removeLast();
+                        line = new StringBuilder(scopeStack.get().getLineUpToScope());
+                        scopeStack.get().setLineLength(line.length());
+                        scopeStack.get().resetHints();
+                        addBreak = false;
+                        addBlank = false;
+                    }
+
+                    @Override
+                    public void scopeEnter() {
+                        scopeStack.open(pointerAfter + 1, out.size(), line.toString());
+                    }
+
+                    @Override
+                    public void scopeExit() {
+                        scopeStack.close();
                     }
                 };
 

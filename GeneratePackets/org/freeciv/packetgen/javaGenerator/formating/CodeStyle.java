@@ -38,6 +38,13 @@ public interface CodeStyle {
 
     public interface FormattingProcess {
         void start();
+        void insertSpace();
+        void breakLineBlock();
+        void breakLine();
+        void indent();
+        void scopeReset();
+        void scopeEnter();
+        void scopeExit();
     }
 
     public static class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
