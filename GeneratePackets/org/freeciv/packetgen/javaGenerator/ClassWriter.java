@@ -169,21 +169,21 @@ public class ClassWriter {
     }
 
     private static void formatVariableDeclarations(CodeAtoms to, final List<Var> fields) {
-                if (!fields.isEmpty()) {
-                    to.hintStart("Group");
-                    Scope scopeOfPrevious = fields.get(0).getScope();
+        if (!fields.isEmpty()) {
+            to.hintStart("Group");
+            Scope scopeOfPrevious = fields.get(0).getScope();
 
-                    for (Var variable : fields) {
-                        if (!variable.getScope().equals(scopeOfPrevious)) {
-                            to.hintEnd("Group");
-                            to.hintStart("Group");
-                        }
-                        new Statement(variable).writeAtoms(to);
-                        scopeOfPrevious = variable.getScope();
-                    }
-
+            for (Var variable : fields) {
+                if (!variable.getScope().equals(scopeOfPrevious)) {
                     to.hintEnd("Group");
+                    to.hintStart("Group");
                 }
+                new Statement(variable).writeAtoms(to);
+                scopeOfPrevious = variable.getScope();
+            }
+
+            to.hintEnd("Group");
+        }
     }
 
     private static String formatMethods(List<Method> methods) {
@@ -424,17 +424,17 @@ public class ClassWriter {
             }
         });
         maker.whenBefore(HasAtoms.ADD, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
-            @Override
-            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return 3 < argument.getLineBreakTry() && argument.approachingTheEdge();
-            }
-        },
-        new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
-            @Override
-            public void run(DefaultStyleScopeInfo context) {
-                context.statementBroken = true;
-            }
-        });
+                    @Override
+                    public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                        return 3 < argument.getLineBreakTry() && argument.approachingTheEdge();
+                    }
+                },
+                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                    @Override
+                    public void run(DefaultStyleScopeInfo context) {
+                        context.statementBroken = true;
+                    }
+                });
         maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 0 < argument.getLineBreakTry();

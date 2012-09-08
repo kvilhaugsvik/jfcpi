@@ -111,7 +111,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     }
 
     public void whenAfter(final Class<? extends CodeAtom> kind, CodeStyle.Action toDo,
-                           Util.OneCondition<ScopeInfoKind> scopeCond) {
+                          Util.OneCondition<ScopeInfoKind> scopeCond) {
         whenTrueAndNoHigherPriority(new Util.OneCondition[]{scopeCond, condLeftIs(kind)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
                 new Triggered[]{CodeStyleBuilder.<ScopeInfoKind>action2Triggered(toDo)});
     }
