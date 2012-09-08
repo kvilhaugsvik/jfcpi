@@ -19,6 +19,7 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
+import javax.naming.OperationNotSupportedException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -197,6 +198,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                 final LinkedList<String> out = new LinkedList<String>();
 
                 FormattingProcess formatting = new FormattingProcess() {
+                    private boolean alreadyStarted = false;
+
                     private StringBuilder line;
                     private boolean addBreak = false;
                     private boolean addBlank = false;
@@ -204,7 +207,12 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                     private ScopeStack<ScopeInfoKind> scopeStack = null;
 
                     @Override
-                    public void start() {
+                    public void start() throws OperationNotSupportedException {
+                        if (alreadyStarted)
+                            throw new OperationNotSupportedException("Can't start alread started formatting");
+                        else
+                            alreadyStarted = true;
+
                         try {
                             scopeStack = new ScopeStack<ScopeInfoKind>(scopeMaker, pointerAfter, out.size(), "");
                         } catch (NoSuchMethodException e) {
@@ -335,7 +343,11 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                     }
                 };
 
-                formatting.start();
+                try {
+                    formatting.start();
+                } catch (OperationNotSupportedException e) {
+                    throw new Error("Bug: A developer didn't check things properly after a change.", e);
+                }
                 return out;
             }
 

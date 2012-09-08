@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator.formating;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.IR;
 
+import javax.naming.OperationNotSupportedException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
@@ -37,7 +38,7 @@ public interface CodeStyle {
     }
 
     public interface FormattingProcess {
-        void start();
+        void start() throws OperationNotSupportedException;
         void insertSpace();
         void breakLineBlock();
         void breakLine();
