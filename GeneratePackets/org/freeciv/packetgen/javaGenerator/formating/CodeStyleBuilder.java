@@ -37,6 +37,39 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         this.many = new LinkedList<AtomCheck<ScopeInfoKind>>();
     }
 
+    public static <ScopeInfoKind extends ScopeInfo> Triggered<ScopeInfoKind> action2Triggered(final CodeStyle.Action action) {
+        return new Triggered<ScopeInfoKind>() {
+            @Override
+            public void run(ScopeInfoKind context) {
+                switch (action) {
+                    case INSERT_SPACE:
+                        context.getRunningFormatting().insertSpace();
+                        break;
+                    case BREAK_LINE_BLOCK:
+                        context.getRunningFormatting().breakLineBlock();
+                        break;
+                    case BREAK_LINE:
+                        context.getRunningFormatting().breakLine();
+                        break;
+                    case DO_NOTHING:
+                        break;
+                    case SCOPE_ENTER:
+                        context.getRunningFormatting().scopeEnter();
+                        break;
+                    case SCOPE_EXIT:
+                        context.getRunningFormatting().scopeExit();
+                        break;
+                    case RESET_LINE:
+                        context.getRunningFormatting().scopeReset();
+                        break;
+                    case INDENT:
+                        context.getRunningFormatting().indent();
+                        break;
+                }
+            }
+        };
+    }
+
     public void alwaysOnState(Util.OneCondition<ScopeInfoKind> when, CodeStyle.Action doThis,
                               Triggered<ScopeInfoKind> andRun) {
         many.add(AtomCheck.<ScopeInfoKind>runAndAct(doThis, andRun, EnumSet.<DependsOn>noneOf(DependsOn.class), when));
@@ -204,6 +237,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                     private boolean addBreak = false;
                     private boolean addBlank = false;
                     private int pointerAfter = -1;
+                    private boolean reset = false;
                     private ScopeStack<ScopeInfoKind> scopeStack = null;
 
                     @Override
@@ -214,7 +248,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                             alreadyStarted = true;
 
                         try {
-                            scopeStack = new ScopeStack<ScopeInfoKind>(scopeMaker, pointerAfter, out.size(), "");
+                            scopeStack = new ScopeStack<ScopeInfoKind>(this, scopeMaker,
+                                    pointerAfter, out.size(), "");
                         } catch (NoSuchMethodException e) {
                             throw new Error("Could not initialize ScopeStack", e);
                         } catch (IllegalAccessException e) {
@@ -250,40 +285,25 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                 }
                                 scopeStack.get().setLineLength(line.length());
 
-                                switch (Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
+                                Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
                                         firstMatchOnlyKnowStack,
                                         scopeStack.get().getLeftAtom(),
                                         scopeStack.get().getRightAtom()
-                                ).getToInsert()) {
-                                    case INSERT_SPACE:
-                                        this.insertSpace();
-                                        break;
-                                    case BREAK_LINE_BLOCK:
-                                        this.breakLineBlock();
-                                        break;
-                                    case BREAK_LINE:
-                                        this.breakLine();
-                                        break;
-                                    case DO_NOTHING:
-                                        break;
+                                ).run();
+                                if (reset) {
+                                    reset = false;
+                                    continue line;
                                 }
 
-                                for (CompiledAtomCheck rule : allMatchesKnowStack)
-                                    if (rule.isTrueFor(scopeStack.get().getLeftAtom(), scopeStack.get().getRightAtom()))
-                                        switch (rule.getToInsert()) {
-                                            case SCOPE_ENTER:
-                                                this.scopeEnter();
-                                                break;
-                                            case SCOPE_EXIT:
-                                                this.scopeExit();
-                                                break;
-                                            case RESET_LINE:
-                                                this.scopeReset();
-                                                continue line;
-                                            case INDENT:
-                                                this.indent();
-                                                break;
+                                for (CompiledAtomCheck rule : allMatchesKnowStack) {
+                                    if (rule.isTrueFor(scopeStack.get().getLeftAtom(), scopeStack.get().getRightAtom())) {
+                                        rule.run();
+                                        if (reset) {
+                                            reset = false;
+                                            continue line;
                                         }
+                                    }
+                                }
 
                                 if (pointerAfter + 1 < atoms.length)
                                     updateHintsBefore(scopeStack, scopeStack.get().getRight());
@@ -330,6 +350,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                         scopeStack.get().resetHints();
                         addBreak = false;
                         addBlank = false;
+                        reset = true;
                     }
 
                     @Override
@@ -400,10 +421,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             this.preConds = check.getPreConds();
         }
 
-        public CodeStyle.Action getToInsert() {
-            if (null != check.getToRun())
-                check.getToRun().run(stack.get());
-            return check.getToInsert();
+        public void run() {
+            for (Triggered<ScopeInfoKind> consequenze : check.getToRun())
+                consequenze.run(stack.get());
         }
 
         public boolean isTrueFor(CodeAtom before, CodeAtom after) {
@@ -435,15 +455,12 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
         private final EnumSet<DependsOn> preConds;
         private final Util.OneCondition<ScopeInfoKind>[] tests;
-        private final CodeStyle.Action toInsert;
-        private final Triggered<ScopeInfoKind> toRun;
+        private final Triggered<ScopeInfoKind>[] toRun;
 
-        public AtomCheck(CodeStyle.Action toInsert,
-                         Triggered<ScopeInfoKind> toRun,
+        public AtomCheck(Triggered<ScopeInfoKind>[] toRun,
                          EnumSet<DependsOn> reqs,
                          Util.OneCondition<ScopeInfoKind>... tests) {
             this.tests = tests;
-            this.toInsert = toInsert;
             this.toRun = toRun;
             this.preConds = reqs;
         }
@@ -452,11 +469,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             return new CompiledAtomCheck<ScopeInfoKind>(this, scope);
         }
 
-        public CodeStyle.Action getToInsert() {
-            return toInsert;
-        }
-
-        public Triggered<ScopeInfoKind> getToRun() {
+        public Triggered<ScopeInfoKind>[] getToRun() {
             return toRun;
         }
 
@@ -471,20 +484,28 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> act(CodeStyle.Action toInsert,
                                                                                      EnumSet<DependsOn> reqs,
                                                                                      Util.OneCondition<ScopeInfoKind>... tests) {
-            return new AtomCheck<ScopeInfoKind>(toInsert, null, reqs, tests);
+            return new AtomCheck<ScopeInfoKind>(
+                    new Triggered[]{CodeStyleBuilder.<ScopeInfoKind>action2Triggered(toInsert)},
+                    reqs, tests);
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> run(Triggered<ScopeInfoKind> toRun,
                                                                                      EnumSet<DependsOn> reqs,
                                                                                      Util.OneCondition<ScopeInfoKind>... tests) {
-            return new AtomCheck<ScopeInfoKind>(CodeStyle.Action.DO_NOTHING, toRun, reqs, tests);
+            return new AtomCheck<ScopeInfoKind>(
+                    new Triggered[]{CodeStyleBuilder.<ScopeInfoKind>action2Triggered(CodeStyle.Action.DO_NOTHING),
+                            toRun},
+                    reqs, tests);
         }
 
         public static <ScopeInfoKind extends ScopeInfo> AtomCheck<ScopeInfoKind> runAndAct(CodeStyle.Action toInsert,
                                                                                            Triggered<ScopeInfoKind> toRun,
                                                                                            EnumSet<DependsOn> reqs,
                                                                                            Util.OneCondition<ScopeInfoKind>... tests) {
-            return new AtomCheck<ScopeInfoKind>(toInsert, toRun, reqs, tests);
+            return new AtomCheck<ScopeInfoKind>(
+                    new Triggered[]{CodeStyleBuilder.<ScopeInfoKind>action2Triggered(toInsert),
+                            toRun},
+                    reqs, tests);
         }
     }
 

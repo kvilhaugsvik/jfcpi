@@ -49,15 +49,19 @@ public interface CodeStyle {
     }
 
     public static class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
+        private final FormattingProcess process;
         private final Constructor<Scope> kind;
         private final LinkedList<Scope> stack;
         private IR leftToken = null;
         private IR rightToken = null;
 
-        public ScopeStack(Class<Scope> kind, int beganAt, int beganAtLine, String lineUpToScope)
+        public ScopeStack(FormattingProcess process, Class<Scope> kind,
+                          int beganAt, int beganAtLine, String lineUpToScope)
                 throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
-            this.kind = kind.getConstructor(this.getClass(), int.class, int.class, String.class);
+            this.kind = kind.getConstructor(FormattingProcess.class, this.getClass(),
+                    int.class, int.class, String.class);
             this.stack = new LinkedList<Scope>();
+            this.process = process;
             addNewScopeFrame(beganAt, beganAtLine, lineUpToScope);
         }
 
@@ -86,7 +90,7 @@ public interface CodeStyle {
         }
 
         private void addNewScopeFrame(int beganAt, int beganAtLine, String lineUpToScope) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-            this.stack.addFirst(kind.newInstance(this, beganAt, beganAtLine, lineUpToScope));
+            this.stack.addFirst(kind.newInstance(process, this, beganAt, beganAtLine, lineUpToScope));
         }
 
         public void close() {
@@ -107,12 +111,15 @@ public interface CodeStyle {
 
             private int extraIndent = 0;
             private final LinkedList<String> hints = new LinkedList<String>();
+            private final FormattingProcess runningFormatting;
 
-            public ScopeInfo(ScopeStack inStack, int beganAt, int beganAtLine, String lineUpToScope) {
+            public ScopeInfo(FormattingProcess runningFormatting, ScopeStack inStack,
+                             int beganAt, int beganAtLine, String lineUpToScope) {
                 this.inStack = inStack;
                 this.beganAt = beganAt;
                 this.beganAtLine = beganAtLine;
                 this.lineUpToScope = lineUpToScope;
+                this.runningFormatting = runningFormatting;
             }
 
             public int getLineLength() {
@@ -203,6 +210,10 @@ public interface CodeStyle {
 
             public int getNowAt() {
                 return nowAt;
+            }
+
+            public FormattingProcess getRunningFormatting() {
+                return runningFormatting;
             }
         }
     }

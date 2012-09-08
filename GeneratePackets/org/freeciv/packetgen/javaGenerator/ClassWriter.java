@@ -503,8 +503,9 @@ public class ClassWriter {
         private boolean statementBroken = false;
         private LinkedList<Integer> toFar = new LinkedList<Integer>();
 
-        public DefaultStyleScopeInfo(CodeStyle.ScopeStack inStack, int beganAt, int beganAtLine, String lineUpToScope) {
-            super(inStack, beganAt, beganAtLine, lineUpToScope);
+        public DefaultStyleScopeInfo(CodeStyle.FormattingProcess process, CodeStyle.ScopeStack inStack,
+                                     int beganAt, int beganAtLine, String lineUpToScope) {
+            super(process, inStack, beganAt, beganAtLine, lineUpToScope);
         }
 
         public int getLineBreakTry() {
