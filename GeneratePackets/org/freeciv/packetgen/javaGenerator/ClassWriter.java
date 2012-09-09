@@ -437,6 +437,38 @@ public class ClassWriter {
                             }
                         }));
         maker.whenFirst(
+                Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(
+                        maker.condRightIs(Annotate.Atom.class),
+                        maker.condLeftIs(Comment.Word.class),
+                        new Util.OneCondition<DefaultStyleScopeInfo>() {
+                            @Override
+                            public boolean isTrueFor(DefaultStyleScopeInfo context) {
+                                return context.getLineBreakTry() <= 2;
+                            }
+                        }),
+                EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN, DependsOn.RIGHT_TOKEN),
+                Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
+                        new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                            @Override
+                            public void run(DefaultStyleScopeInfo context) {
+                                context.lineBreakTry = 3;
+                                context.getRunningFormatting().scopeReset();
+                            }
+                        }));
+        maker.whenFirst(
+                Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(
+                        maker.condRightIs(Annotate.Atom.class),
+                        maker.condLeftIs(Comment.Word.class)),
+                EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN, DependsOn.RIGHT_TOKEN),
+                Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
+                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                            @Override
+                            public void run(DefaultStyleScopeInfo context) {
+                                context.getRunningFormatting().insertStar();
+                            }
+                        }));
+        maker.whenFirst(
                 Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(maker.condRightIs(HasAtoms.CCommentEnd),
                         new Util.OneCondition<DefaultStyleScopeInfo>() {
                             @Override
