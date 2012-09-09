@@ -375,7 +375,8 @@ public class ClassWriter {
         maker.whenFirst(
                 Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(
                         new Util.OneCondition<DefaultStyleScopeInfo>() {
-                            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                            @Override
+                            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                                 return OUTER_LEVEL.equals(argument.seeTopHint());
                             }
                         },
@@ -400,12 +401,14 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.RPR, CodeStyle.Action.DO_NOTHING);
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
-            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+            @Override
+            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return EnumElements.class.getName().equals(argument.seeTopHint());
             }
         });
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
-            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+            @Override
+            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return EnumElements.class.getName().equals(argument.seeTopHint());
             }
         });
@@ -414,18 +417,61 @@ public class ClassWriter {
                 return 1 < argument.getLineBreakTry() && argument.approachingTheEdge();
             }
         });
+        maker.whenFirst(
+                Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(
+                        new Util.OneCondition<DefaultStyleScopeInfo>() {
+                            @Override
+                            public boolean isTrueFor(DefaultStyleScopeInfo context) {
+                                return 2 < context.getLineBreakTry() &&
+                                        (context.getLeftAtom().equals(HasAtoms.CCommentStart) ||
+                                                context.getLeftAtom().equals(HasAtoms.JDocStart));
+                            }
+                        }),
+                EnumSet.<CodeStyleBuilder.DependsOn>of(DependsOn.LEFT_TOKEN),
+                Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
+                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                            @Override
+                            public void run(DefaultStyleScopeInfo context) {
+                                context.getRunningFormatting().insertStar();
+                            }
+                        }));
+        maker.whenFirst(
+                Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(maker.condRightIs(HasAtoms.CCommentEnd),
+                        new Util.OneCondition<DefaultStyleScopeInfo>() {
+                            @Override
+                            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                                return 2 < argument.getLineBreakTry();
+                            }
+                        }),
+                EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
+                Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
+                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        maker.action2Triggered(CodeStyle.Action.INSERT_SPACE)));
         maker.whenAfter(HasAtoms.CCommentEnd, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
-            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+            @Override
+            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 1 < argument.getLineBreakTry();
             }
         });
-        maker.whenBefore(Comment.Word.class, CodeStyle.Action.BREAK_LINE,
-                new Util.OneCondition<DefaultStyleScopeInfo>() {
-                    @Override
-                    public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                        return 2 < argument.getLineBreakTry() && argument.approachingTheEdge();
-                    }
-                });
+        maker.whenFirst(
+                Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(
+                        maker.condRightIs(Comment.Word.class),
+                        new Util.OneCondition<DefaultStyleScopeInfo>() {
+                            @Override
+                            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                                return 2 < argument.getLineBreakTry() && argument.approachingTheEdge();
+                            }
+                        }),
+                EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.RIGHT_TOKEN),
+                Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
+                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                            @Override
+                            public void run(DefaultStyleScopeInfo context) {
+                                context.getRunningFormatting().insertStar();
+                            }
+                        }));
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 2 < argument.getLineBreakTry();

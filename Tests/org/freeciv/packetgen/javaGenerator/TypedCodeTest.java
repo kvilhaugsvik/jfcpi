@@ -125,4 +125,15 @@ public class TypedCodeTest {
 
         testcase.addObjectConstantAndGetter(notAField);
     }
+
+    @Test public void longComment() {
+        String[] asText = new String[25];
+        Arrays.fill(asText, "deliver");
+        assertEquals("/*\n" +
+                " * deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver\n" +
+                " * deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver\n" +
+                " * deliver\n" +
+                " */",
+                Comment.c(asText).toString());
+    }
 }
