@@ -298,7 +298,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
                     @Override
                     public void insertSpace() {
-                        line.append(" ");
+                        write(" ");
                     }
 
                     @Override
@@ -344,10 +344,14 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
                     @Override
                     public void insertStar() {
+                        write(" * ");
+                    }
+
+                    private void write(String toWrite) {
                         if (addBreak)
-                            startOfNext = (null == startOfNext ? "" : startOfNext) + " * ";
+                            startOfNext = (null == startOfNext ? "" : startOfNext) + toWrite;
                         else
-                            line.append(" * ");
+                            line.append(toWrite);
                     }
                 };
 
