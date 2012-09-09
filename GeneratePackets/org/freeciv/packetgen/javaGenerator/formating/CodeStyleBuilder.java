@@ -71,91 +71,91 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         };
     }
 
-    public void whenTrue(Util.OneCondition[] isTrue, EnumSet<DependsOn> deps, Triggered<ScopeInfoKind>[] actions) {
+    public void alwaysWhen(Util.OneCondition[] isTrue, EnumSet<DependsOn> deps, Triggered<ScopeInfoKind>[] actions) {
         many.add(new AtomCheck<ScopeInfoKind>(isTrue, deps, actions));
     }
 
     public void alwaysOnState(Util.OneCondition<ScopeInfoKind> when, CodeStyle.Action doThis,
                               Triggered<ScopeInfoKind> andRun) {
-        whenTrue(new Util.OneCondition[]{when}, EnumSet.<DependsOn>noneOf(DependsOn.class),
+        alwaysWhen(new Util.OneCondition[]{when}, EnumSet.<DependsOn>noneOf(DependsOn.class),
                 new Triggered[]{action2Triggered(doThis), andRun});
     }
 
     public void alwaysAfter(CodeAtom atom, CodeStyle.Action change) {
-        whenTrue(new Util.OneCondition[]{condLeftIs(atom)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
+        alwaysWhen(new Util.OneCondition[]{condLeftIs(atom)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
                 new Triggered[]{action2Triggered(change)});
     }
 
     public void alwaysAfter(CodeAtom atom, Triggered<ScopeInfoKind> andRun) {
-        whenTrue(new Util.OneCondition[]{condLeftIs(atom)},
+        alwaysWhen(new Util.OneCondition[]{condLeftIs(atom)},
                 EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN), new Triggered[]{andRun});
     }
 
     public void alwaysBefore(CodeAtom atom, CodeStyle.Action change) {
-        whenTrue(new Util.OneCondition[]{condRightIs(atom)}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
+        alwaysWhen(new Util.OneCondition[]{condRightIs(atom)}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
                 new Triggered[]{action2Triggered(change)});
     }
 
-    public void whenTrueAndNoHigherPriority(Util.OneCondition[] isTrue, EnumSet<DependsOn> deps, Triggered<ScopeInfoKind>[] actions) {
+    public void whenFirst(Util.OneCondition[] isTrue, EnumSet<DependsOn> deps, Triggered<ScopeInfoKind>[] actions) {
         triggers.add(new AtomCheck<ScopeInfoKind>(isTrue, deps, actions));
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Action toDo) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{condLeftIs(atom)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
+        whenFirst(new Util.OneCondition[]{condLeftIs(atom)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
                 new Triggered[]{action2Triggered(toDo)});
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Action toDo, Util.OneCondition<ScopeInfoKind> scopeCond) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{scopeCond, condLeftIs(atom)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
+        whenFirst(new Util.OneCondition[]{scopeCond, condLeftIs(atom)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
                 new Triggered[]{action2Triggered(toDo)});
     }
 
     public void whenAfter(final Class<? extends CodeAtom> kind, CodeStyle.Action toDo,
                           Util.OneCondition<ScopeInfoKind> scopeCond) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{scopeCond, condLeftIs(kind)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
+        whenFirst(new Util.OneCondition[]{scopeCond, condLeftIs(kind)}, EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
                 new Triggered[]{action2Triggered(toDo)});
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{condRightIs(atom)}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
+        whenFirst(new Util.OneCondition[]{condRightIs(atom)}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
                 new Triggered[]{action2Triggered(toInsert)});
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert, Util.OneCondition<ScopeInfoKind> scopeCond) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{condRightIs(atom), scopeCond}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
+        whenFirst(new Util.OneCondition[]{condRightIs(atom), scopeCond}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
                 new Triggered[]{action2Triggered(toInsert)});
     }
 
     public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert,
                            Util.OneCondition<ScopeInfoKind> scopeCond, Triggered<ScopeInfoKind> toRun) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{condRightIs(atom), scopeCond}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
+        whenFirst(new Util.OneCondition[]{condRightIs(atom), scopeCond}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
                 new Triggered[]{action2Triggered(toInsert), toRun});
     }
 
     public void whenBefore(final Class<? extends CodeAtom> kind, CodeStyle.Action toDo,
                            Util.OneCondition<ScopeInfoKind> scopeCond) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{condRightIs(kind), scopeCond}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
+        whenFirst(new Util.OneCondition[]{condRightIs(kind), scopeCond}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
                 new Triggered[]{action2Triggered(toDo)});
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{condLeftIs(before), condRightIs(after)}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN, DependsOn.LEFT_TOKEN),
+        whenFirst(new Util.OneCondition[]{condLeftIs(before), condRightIs(after)}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN, DependsOn.LEFT_TOKEN),
                 new Triggered[]{action2Triggered(toInsert)});
     }
 
     public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert,
                             Util.OneCondition<ScopeInfoKind> scopeCond) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{scopeCond, condLeftIs(before), condRightIs(after)}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN, DependsOn.LEFT_TOKEN),
+        whenFirst(new Util.OneCondition[]{scopeCond, condLeftIs(before), condRightIs(after)}, EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN, DependsOn.LEFT_TOKEN),
                 new Triggered[]{action2Triggered(toInsert)});
     }
 
     public void atTheEnd(CodeStyle.Action toInsert) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{condAtTheEnd()}, EnumSet.<DependsOn>noneOf(DependsOn.class),
+        whenFirst(new Util.OneCondition[]{condAtTheEnd()}, EnumSet.<DependsOn>noneOf(DependsOn.class),
                 new Triggered[]{action2Triggered(toInsert)});
     }
 
     public void atTheBeginning(CodeStyle.Action toInsert) {
-        whenTrueAndNoHigherPriority(new Util.OneCondition[]{condAtTheBeginning()}, EnumSet.<DependsOn>noneOf(DependsOn.class),
+        whenFirst(new Util.OneCondition[]{condAtTheBeginning()}, EnumSet.<DependsOn>noneOf(DependsOn.class),
                 new Triggered[]{action2Triggered(toInsert)});
     }
 
@@ -412,7 +412,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         };
     }
 
-    private enum DependsOn {
+    public static enum DependsOn {
         LEFT_TOKEN,
         RIGHT_TOKEN
     }
