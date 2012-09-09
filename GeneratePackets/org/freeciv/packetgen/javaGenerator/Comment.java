@@ -88,7 +88,48 @@ public class Comment extends Formatted implements HasAtoms {
         return new Comment(false, new TextBlock(comment));
     }
 
-    public static Comment doc(String... comment) {
-        return new Comment(true, new TextBlock(comment));
+    public static Comment doc(String summary, String description, JDocTag... tags) {
+        if (summaryIsInvalid(summary))
+            throw new IllegalArgumentException("The summary can only contain one sentence.");
+
+        HasAtoms[] body = new HasAtoms[2 + tags.length];
+        body[0] = new TextBlock(summary);
+        body[1] = new TextBlock(description);
+        System.arraycopy(tags, 0, body, 2, tags.length);
+
+        return new Comment(true, body);
+    }
+
+    private static boolean summaryIsInvalid(String summary) {
+        return null == summary || summary.contains(".");
+    }
+
+    public static JDocTag param(Var parameter, String description) {
+        return new JDocTag(new Annotate.Atom("param"), parameter.ref(), new TextBlock(description));
+    }
+
+    public static JDocTag docThrows(TargetClass throwz, String description) {
+        return new JDocTag(new Annotate.Atom("throws"), throwz, new TextBlock(description));
+    }
+
+    public static JDocTag docReturns(String description) {
+        return new JDocTag(new Annotate.Atom("return"), new TextBlock(description));
+    }
+
+    public static class JDocTag implements HasAtoms {
+        private final Annotate.Atom tag;
+        private final HasAtoms[] params;
+
+        private JDocTag(Annotate.Atom tag, HasAtoms... params) {
+            this.tag = tag;
+            this.params = params;
+        }
+
+        @Override
+        public void writeAtoms(CodeAtoms to) {
+            tag.writeAtoms(to);
+            for (HasAtoms param : params)
+                param.writeAtoms(to);
+        }
     }
 }
