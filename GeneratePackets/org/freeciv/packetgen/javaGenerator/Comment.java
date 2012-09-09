@@ -22,16 +22,28 @@ public class Comment extends Formatted implements HasAtoms {
     private final boolean isDoc;
     private final List<HasAtoms> comment;
 
-    private Comment(boolean doc, String... comment) {
+    private Comment(boolean doc, HasAtoms... body) {
         isDoc = doc;
-        this.comment = wrapWords(comment);
+        this.comment = Arrays.asList(body);
     }
 
-    private static List<HasAtoms> wrapWords(String... words) {
-        List<HasAtoms> out = new LinkedList<HasAtoms>();
-        for (String commentLine : words)
-            out.add(new Word(commentLine));
-        return out;
+    public static class TextBlock implements HasAtoms {
+        private final List<Word> text;
+
+        public TextBlock(String... description) {
+            text = new LinkedList<Word>();
+            for (String part : description) {
+                String[] desc = part.split(" \n");
+                for (String word : desc)
+                    text.add(new Word(word));
+            }
+        }
+
+        @Override
+        public void writeAtoms(CodeAtoms to) {
+            for (Word word : text)
+                word.writeAtoms(to);
+        }
     }
 
     public static class Word extends IR.CodeAtom {
@@ -63,7 +75,7 @@ public class Comment extends Formatted implements HasAtoms {
         if (null == comment || "".equals(comment))
             return Comment.no();
         else
-            return Comment.c(comment.split("\n"));
+            return Comment.c(comment);
     }
 
     public static Comment no() {
@@ -71,10 +83,10 @@ public class Comment extends Formatted implements HasAtoms {
     }
 
     public static Comment c(String... comment) {
-        return new Comment(false, comment);
+        return new Comment(false, new TextBlock(comment));
     }
 
     public static Comment doc(String... comment) {
-        return new Comment(true, comment);
+        return new Comment(true, new TextBlock(comment));
     }
 }
