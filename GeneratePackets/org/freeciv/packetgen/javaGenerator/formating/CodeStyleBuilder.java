@@ -24,19 +24,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
-    private final LinkedList<AtomCheck<ScopeInfoKind>> triggers;
-    private final LinkedList<AtomCheck<ScopeInfoKind>> many;
+    private final LinkedList<FormattingRule<ScopeInfoKind>> triggers;
+    private final LinkedList<FormattingRule<ScopeInfoKind>> many;
     private final Class<ScopeInfoKind> scopeMaker;
-    private final AtomCheck<ScopeInfoKind> stdIns;
+    private final FormattingRule<ScopeInfoKind> stdIns;
 
     public CodeStyleBuilder(final CodeStyle.Action standard, Class<ScopeInfoKind> scopeMaker) {
-        triggers = new LinkedList<AtomCheck<ScopeInfoKind>>();
+        triggers = new LinkedList<FormattingRule<ScopeInfoKind>>();
         this.scopeMaker = scopeMaker;
-        this.stdIns = new AtomCheck<ScopeInfoKind>(Collections.<Util.OneCondition<ScopeInfoKind>>emptyList(),
+        this.stdIns = new FormattingRule<ScopeInfoKind>(Collections.<Util.OneCondition<ScopeInfoKind>>emptyList(),
                 EnumSet.<DependsOn>noneOf(DependsOn.class),
                 Arrays.asList(action2Triggered(standard)));
 
-        this.many = new LinkedList<AtomCheck<ScopeInfoKind>>();
+        this.many = new LinkedList<FormattingRule<ScopeInfoKind>>();
     }
 
     public Triggered<ScopeInfoKind> action2Triggered(final CodeStyle.Action action) {
@@ -74,7 +74,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
     public void alwaysWhen(List<Util.OneCondition<ScopeInfoKind>> isTrue, EnumSet<DependsOn> deps,
                            List<Triggered<ScopeInfoKind>> actions) {
-        many.add(new AtomCheck<ScopeInfoKind>(isTrue, deps, actions));
+        many.add(new FormattingRule<ScopeInfoKind>(isTrue, deps, actions));
     }
 
     public void alwaysOnState(Util.OneCondition<ScopeInfoKind> when, CodeStyle.Action doThis,
@@ -101,7 +101,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
     public void whenFirst(List<Util.OneCondition<ScopeInfoKind>> isTrue, EnumSet<DependsOn> deps,
                           List<Triggered<ScopeInfoKind>> actions) {
-        triggers.add(new AtomCheck<ScopeInfoKind>(isTrue, deps, actions));
+        triggers.add(new FormattingRule<ScopeInfoKind>(isTrue, deps, actions));
     }
 
     public void whenAfter(final CodeAtom atom, CodeStyle.Action toDo) {
@@ -240,13 +240,13 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     public CodeStyle getStyle() {
         return new CodeStyle() {
             // Prevent rules added to the builder after style construction from being added to the style
-            final ArrayList<AtomCheck<ScopeInfoKind>> firstMatchOnly;
+            final ArrayList<FormattingRule<ScopeInfoKind>> firstMatchOnly;
             {
-                firstMatchOnly = new ArrayList<AtomCheck<ScopeInfoKind>>(triggers);
+                firstMatchOnly = new ArrayList<FormattingRule<ScopeInfoKind>>(triggers);
                 firstMatchOnly.add(stdIns);
             }
 
-            final ArrayList<AtomCheck<ScopeInfoKind>> triggerMany = new ArrayList<AtomCheck<ScopeInfoKind>>(many);
+            final ArrayList<FormattingRule<ScopeInfoKind>> triggerMany = new ArrayList<FormattingRule<ScopeInfoKind>>(many);
 
             @Override
             public List<String> asFormattedLines(CodeAtoms from) {
@@ -283,14 +283,14 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                             throw new Error("Could not initialize ScopeStack", e);
                         }
 
-                        ArrayList<CompiledAtomCheck<ScopeInfoKind>> firstMatchOnlyKnowStack =
-                                new ArrayList<CompiledAtomCheck<ScopeInfoKind>>();
-                        for (AtomCheck<ScopeInfoKind> rule : firstMatchOnly) {
+                        ArrayList<ActiveRule<ScopeInfoKind>> firstMatchOnlyKnowStack =
+                                new ArrayList<ActiveRule<ScopeInfoKind>>();
+                        for (FormattingRule<ScopeInfoKind> rule : firstMatchOnly) {
                             firstMatchOnlyKnowStack.add(rule.forStack(scopeStack));
                         }
 
-                        ArrayList<CompiledAtomCheck> allMatchesKnowStack = new ArrayList<CompiledAtomCheck>();
-                        for (AtomCheck<ScopeInfoKind> rule : triggerMany) {
+                        ArrayList<ActiveRule> allMatchesKnowStack = new ArrayList<ActiveRule>();
+                        for (FormattingRule<ScopeInfoKind> rule : triggerMany) {
                             allMatchesKnowStack.add(rule.forStack(scopeStack));
                         }
 
@@ -308,7 +308,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                 }
                                 scopeStack.get().setLineLength(line.length());
 
-                                Util.<CodeAtom, CodeAtom, CompiledAtomCheck<ScopeInfoKind>>getFirstFound(
+                                Util.<CodeAtom, CodeAtom, ActiveRule<ScopeInfoKind>>getFirstFound(
                                         firstMatchOnlyKnowStack,
                                         scopeStack.get().getLeftAtom(),
                                         scopeStack.get().getRightAtom()
@@ -318,7 +318,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                                     continue line;
                                 }
 
-                                for (CompiledAtomCheck rule : allMatchesKnowStack) {
+                                for (ActiveRule rule : allMatchesKnowStack) {
                                     if (rule.isTrueFor(scopeStack.get().getLeftAtom(), scopeStack.get().getRightAtom())) {
                                         rule.run();
                                         if (reset) {
@@ -432,13 +432,13 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         RIGHT_TOKEN
     }
 
-    private static class CompiledAtomCheck<ScopeInfoKind extends ScopeInfo>
+    private static class ActiveRule<ScopeInfoKind extends ScopeInfo>
             implements Util.TwoConditions<CodeAtom, CodeAtom> {
-        private final AtomCheck<ScopeInfoKind> check;
+        private final FormattingRule<ScopeInfoKind> check;
         private final CodeStyle.ScopeStack<ScopeInfoKind> stack;
         private final EnumSet<DependsOn> preConds;
 
-        private CompiledAtomCheck(AtomCheck<ScopeInfoKind> check, CodeStyle.ScopeStack<ScopeInfoKind> stack) {
+        private ActiveRule(FormattingRule<ScopeInfoKind> check, CodeStyle.ScopeStack<ScopeInfoKind> stack) {
             this.check = check;
             this.stack = stack;
             this.preConds = check.getPreConds();
@@ -467,21 +467,21 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         }
     }
 
-    private static class AtomCheck<ScopeInfoKind extends ScopeInfo> {
+    private static class FormattingRule<ScopeInfoKind extends ScopeInfo> {
         private final EnumSet<DependsOn> preConds;
         private final List<Util.OneCondition<ScopeInfoKind>> tests;
         private final List<Triggered<ScopeInfoKind>> toRun;
 
-        public AtomCheck(List<Util.OneCondition<ScopeInfoKind>> tests,
-                         EnumSet<DependsOn> reqs,
-                         List<Triggered<ScopeInfoKind>> toRun) {
+        public FormattingRule(List<Util.OneCondition<ScopeInfoKind>> tests,
+                              EnumSet<DependsOn> reqs,
+                              List<Triggered<ScopeInfoKind>> toRun) {
             this.tests = tests;
             this.toRun = toRun;
             this.preConds = reqs;
         }
 
-        public CompiledAtomCheck<ScopeInfoKind> forStack(CodeStyle.ScopeStack<ScopeInfoKind> scope) {
-            return new CompiledAtomCheck<ScopeInfoKind>(this, scope);
+        public ActiveRule<ScopeInfoKind> forStack(CodeStyle.ScopeStack<ScopeInfoKind> scope) {
+            return new ActiveRule<ScopeInfoKind>(this, scope);
         }
 
         public List<Triggered<ScopeInfoKind>> getToRun() {
