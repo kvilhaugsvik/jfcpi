@@ -716,8 +716,7 @@ public enum test implements FCEnum {
 	}
 
 	/**
-	 * Is the enum bitwise? An enum is bitwise if it's number increase by two's
-	 * exponent.
+	 * Is the enum bitwise? An enum is bitwise if it's number increase by two's exponent.
 	 * @return true if the enum is bitwise
 	 */
 	public static boolean isBitWise() {

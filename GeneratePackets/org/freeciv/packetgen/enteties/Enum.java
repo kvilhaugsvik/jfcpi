@@ -117,9 +117,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                 new Block(BuiltIn.RETURN(this.getField("toStringName").ref()))));
 
         addMethod(Method.newReadClassState("/**" + "\n" +
-                                        " * Is the enum bitwise? An enum is bitwise if it's number increase by two's"
-                                        + "\n" +
-                                        " * exponent." + "\n" +
+                                        " * Is the enum bitwise? An enum is bitwise if it's number increase by two's exponent." + "\n" +
                                         " * @return true if the enum is bitwise" + "\n" +
                                         " */",
                 TargetClass.fromName("boolean"), "isBitWise", new Block(RETURN(asBool(bitwise + "")))));

@@ -173,10 +173,10 @@ public class Packet extends ClassWriter implements IDependency {
                 literalString(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
                 literalString(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
                 literalString(" Packet body size: "), asAValue("calcBodyLen()")))));
-        addMethod(Method.newPublicConstructorWithException("/***\n" +
+        addMethod(Method.newPublicConstructorWithException("/**\n" +
                                                    " * Construct an object from a DataInput\n" +
                                                    " * @param " + streamName.getName() + " data stream that is at the start of " +
-                                                   "the package body  \n" +
+                                                   "the package body\n" +
                                                    " * @param header header data. Must contain size and number\n" +
                                                    " * @throws IOException if the DataInput has a problem\n" +
                                                    " */",

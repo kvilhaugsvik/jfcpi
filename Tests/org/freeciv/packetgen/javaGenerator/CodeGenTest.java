@@ -36,12 +36,12 @@ public class CodeGenTest {
     private static final String generatorname = ",\n\tvalue = \"org.freeciv.packetgen.javaGenerator.ClassWriter\")";
 
     @Test public void testMethodEverything() {
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
-                "\t" + "// comment" + "\n" +
+                "\t" + "/* comment */" + "\n" +
                 "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
                 "\t" + "\t" + "return 5;\n" +
                 "\t" + "}" + "\n",
@@ -61,12 +61,12 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoParams() {
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
-                "\t" + "// comment" + "\n" +
+                "\t" + "/* comment */" + "\n" +
                         "\t" + "public static int testMethod() throws Throwable {" + "\n" +
                         "\t" + "\t" + "return 5;\n" +
                         "\t" + "}" + "\n",
@@ -74,7 +74,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodManyLevelsOfIndention() {
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null,
                 new Block(WHILE(TRUE,
@@ -84,7 +84,7 @@ public class CodeGenTest {
                                                 new Block(RETURN(asAnInt("5"))))))))))))).toString();
 
         assertEquals("Generated source not as expected",
-                "\t" + "// comment" + "\n" +
+                "\t" + "/* comment */" + "\n" +
                         "\t" + "public static int testMethod() {" + "\n" +
                         "\t" + "\t" + "while (true) {" + "\n" +
                         "\t" + "\t" + "\t" + "while (true) {" + "\n" +
@@ -108,7 +108,7 @@ public class CodeGenTest {
                 to.add(HasAtoms.RSC);
             }
         };
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null, closesScopeNotOpened)).toString();
     }
@@ -136,18 +136,22 @@ public class CodeGenTest {
                 });
             }
         };
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null, forgetsToCloseScope)).toString();
     }
 
     @Test public void testMethodEverythingTwoLineComment() {
-        String result = (new Method("/** comment\n * more comment\n */", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method("/*\n * " + "comment comment comment comment comment comment " +
+                "comment comment comment comment comment comment" +
+                "\n * " + "more comment" + "\n */",
+                Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
-                "\t" + "/** comment" + "\n" +
+                "\t" + "/*" + "\n" +
+                        "\t" + " * comment comment comment comment comment comment comment comment comment comment comment comment" + "\n" +
                         "\t" + " * more comment" + "\n" +
                         "\t" + " */" + "\n" +
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
@@ -161,12 +165,12 @@ public class CodeGenTest {
         isSeparated.addStatement(asAValue("int a = 5"));
         isSeparated.groupBoundary();
         isSeparated.addStatement(asAValue("return a"));
-        String result = (new Method("// comment", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", isSeparated)).toString();
 
         assertEquals("Generated source not as expected",
-                "\t" + "// comment" + "\n" +
+                "\t" + "/* comment */" + "\n" +
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
                         "\t" + "\t" + "int a = 5;" + "\n" +
                         "\n" +
@@ -490,7 +494,7 @@ public class CodeGenTest {
                                 asAValue("headerLen"),
                                 literalString(" Packet: "),
                                 asAValue("getEncodedSize()")))))));
-        String result = Method.newPublicConstructorWithException("/***" + "\n" +
+        String result = Method.newPublicConstructorWithException("/**" + "\n" +
                 " * Construct an object from a DataInput" + "\n" +
                 " * @param from data stream that is at the start of the package body" + "\n" +
                 " * @param headerLen length from header package" + "\n" +
@@ -500,7 +504,7 @@ public class CodeGenTest {
                 "PACKET_CITY_NAME_SUGGESTION_REQ", "DataInput from, int headerLen, int packet", "IOException", body).toString();
 
         assertEquals("Generated source not as expected",
-                "\t" + "/***" + "\n" +
+                "\t" + "/**" + "\n" +
                         "\t" + " * Construct an object from a DataInput" + "\n" +
                         "\t" + " * @param from data stream that is at the start of the package body" + "\n" +
                         "\t" + " * @param headerLen length from header package" + "\n" +
