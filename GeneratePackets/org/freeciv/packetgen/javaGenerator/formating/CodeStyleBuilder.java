@@ -207,6 +207,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                     private boolean alreadyStarted = false;
 
                     private StringBuilder line;
+                    private String startOfNext = null;
                     private boolean addBreak = false;
                     private boolean addBlank = false;
                     private int pointerAfter = -1;
@@ -246,6 +247,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
 
                         while (pointerAfter < atoms.length) {
                             line = newLine(scopeStack);
+                            if (null != startOfNext) {
+                                line.append(startOfNext);
+                                startOfNext = null;
+                            }
                             addBreak = false;
                             addBlank = false;
                             line: while (pointerAfter < atoms.length) {
@@ -319,6 +324,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                         while(lineNumber < out.size())
                             out.removeLast();
                         line = new StringBuilder(scopeStack.get().getLineUpToScope());
+                        startOfNext = null;
                         scopeStack.get().setLineLength(line.length());
                         scopeStack.get().resetHints();
                         addBreak = false;
@@ -334,6 +340,14 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
                     @Override
                     public void scopeExit() {
                         scopeStack.close();
+                    }
+
+                    @Override
+                    public void insertStar() {
+                        if (addBreak)
+                            startOfNext = (null == startOfNext ? "" : startOfNext) + " * ";
+                        else
+                            line.append(" * ");
                     }
                 };
 

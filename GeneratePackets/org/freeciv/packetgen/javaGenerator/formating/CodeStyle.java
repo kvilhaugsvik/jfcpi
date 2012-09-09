@@ -46,6 +46,7 @@ public interface CodeStyle {
         void scopeReset();
         void scopeEnter();
         void scopeExit();
+        void insertStar();
     }
 
     public static class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
