@@ -534,7 +534,7 @@ public class ClassWriter {
         }
 
         public boolean approachingTheEdge() {
-            return 100 < getLineLength() + getRLen() + 1 || toFar.contains(getNowAt());
+            return 100 < getLineLength() + getRLen() + 1 || toFar.contains(getNowAt() + 1);
         }
 
         @Override
