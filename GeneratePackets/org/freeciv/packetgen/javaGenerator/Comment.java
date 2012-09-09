@@ -33,7 +33,9 @@ public class Comment extends Formatted implements HasAtoms {
         public TextBlock(String... description) {
             text = new LinkedList<Word>();
             for (String part : description) {
-                String[] desc = part.split(" \n");
+                if ("".equals(part))
+                    break;
+                String[] desc = part.split("\\s+");
                 for (String word : desc)
                     text.add(new Word(word));
             }
