@@ -39,7 +39,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     private final ClassKind kind;
     private final LinkedList<Annotate> classAnnotate;
     private final String name;
-    private final String parent;
+    private final TargetClass parent;
     //TODO: Make typed
     private final String implementsInterface;
 
@@ -60,7 +60,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         this.imports = null == imports ? new LinkedList<Import>() : new ArrayList<Import>(Arrays.asList(imports));
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
         this.name = name;
-        this.parent = parent;
+        this.parent = (null == parent ? null : new TargetClass(parent));
         this.implementsInterface = implementsInterface;
         this.kind = kind;
 
@@ -224,7 +224,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         to.add(new ClassWriter.Atom(name));
         if (null != parent) {
             to.add(new IR.CodeAtom("extends"));
-            to.add(new IR.CodeAtom(parent));
+            parent.writeAtoms(to);
         }
         if (null != implementsInterface) {
             to.add(new IR.CodeAtom("implements"));
