@@ -15,14 +15,17 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
-public class Method {
+public class Method extends Formatted implements HasAtoms {
     private final Comment comment;
     private final Visibility visibility;
     private final Scope scope;
     private final TargetClass type;
     private final String name;
+    // TODO: Make typed
     private final String paramList;
+    // TODO: Make typed
     private final String exceptionList;
     private final Block body;
 
@@ -50,13 +53,24 @@ public class Method {
 
     @Override
     public String toString() {
-        String out = (comment.isEmpty() ? "" : comment.getJavaCodeIndented("\t") + "\n");
-        out += "\t" + ClassWriter.ifIs("", visibility.toString(), " ") + ClassWriter.ifIs(scope.toString(), " ") +
-                (null == type ? "" : type.getName() + " ") +
-                name + "(" + ClassWriter.ifIs(paramList) + ") " + ClassWriter.ifIs("throws ", exceptionList, " ");
-        out += body.getJavaCodeIndented("\t").substring(1);
-        out += "\n";
-        return out;
+        return this.getJavaCodeIndented("\t") + "\n";
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        comment.writeAtoms(to);
+        visibility.writeAtoms(to);
+        scope.writeAtoms(to);
+        if (null != type) type.writeAtoms(to);
+        to.add(new IR.CodeAtom(name));
+        to.add(HasAtoms.LPR);
+        if (null != paramList) to.add(new IR.CodeAtom(paramList));
+        to.add(HasAtoms.RPR);
+        if (null != exceptionList) {
+            to.add(new IR.CodeAtom("throws"));
+            to.add(new IR.CodeAtom(exceptionList));
+        }
+        body.writeAtoms(to);
     }
 
     @Deprecated
