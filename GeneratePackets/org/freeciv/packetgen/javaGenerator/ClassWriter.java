@@ -558,6 +558,12 @@ public class ClassWriter {
         maker.whenBefore(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
         maker.whenAfter(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
         maker.whenBefore(HasAtoms.ARRAY_ACCESS_END, CodeStyle.Action.DO_NOTHING);
+        maker.whenAfter(HasAtoms.CCommentEnd, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+            @Override
+            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                return null == argument.seeTopHint();
+            }
+        });
 
         maker.alwaysWhen(
                 Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(
