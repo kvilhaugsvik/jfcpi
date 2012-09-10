@@ -19,6 +19,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
@@ -29,7 +30,7 @@ import java.util.*;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
-public class ClassWriter {
+public class ClassWriter extends Formatted implements HasAtoms {
     private static final String OUTER_LEVEL = "Outside";
 
     private final TargetPackage where;
@@ -39,6 +40,7 @@ public class ClassWriter {
     private final LinkedList<Annotate> classAnnotate;
     private final String name;
     private final String parent;
+    //TODO: Make typed
     private final String implementsInterface;
 
     private final LinkedList<Var> fields = new LinkedList<Var>();
@@ -187,81 +189,57 @@ public class ClassWriter {
         }
     }
 
-    private static String formatMethods(List<Method> methods) {
-        String out = "";
-
-        for (Method method : methods) {
-            out += method + "\n";
-        }
-
-        return out;
-    }
-
-    private String constructorFromFields() {
+    private void constructorFromFields(CodeAtoms to) {
         Block body = new Block();
         LinkedList<Map.Entry<String, String>> args = new LinkedList<Map.Entry<String, String>>();
         for (Var dec : fields) {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.getType(), dec.getName()));
         }
-        return Method.newPublicConstructor("", name, createParameterList(args), body) + "\n";
+        Method.newPublicConstructor("", name, createParameterList(args), body).writeAtoms(to);
     }
 
+    @Override
     public String toString() {
-        String out = "";
-        CodeAtoms typedStart = new CodeAtoms();
-        typedStart.hintStart(OUTER_LEVEL);
+        return super.toString() + "\n";
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        to.hintStart(OUTER_LEVEL);
 
         if (null != where) {
-            typedStart.add(new IR.CodeAtom("package"));
-            where.writeAtoms(typedStart);
-            typedStart.add(HasAtoms.EOL);
+            to.add(new IR.CodeAtom("package"));
+            where.writeAtoms(to);
+            to.add(HasAtoms.EOL);
         }
 
-        formatImports(typedStart);
+        formatImports(to);
 
         for (Annotate ann : classAnnotate)
-            ann.writeAtoms(typedStart);
+            ann.writeAtoms(to);
 
-        visibility.writeAtoms(typedStart);
-        kind.writeAtoms(typedStart);
-        typedStart.add(new ClassWriter.Atom(name));
+        visibility.writeAtoms(to);
+        kind.writeAtoms(to);
+        to.add(new ClassWriter.Atom(name));
         if (null != parent) {
-            typedStart.add(new IR.CodeAtom("extends"));
-            typedStart.add(new IR.CodeAtom(parent));
+            to.add(new IR.CodeAtom("extends"));
+            to.add(new IR.CodeAtom(parent));
         }
         if (null != implementsInterface) {
-            typedStart.add(new IR.CodeAtom("implements"));
-            typedStart.add(new IR.CodeAtom(implementsInterface));
+            to.add(new IR.CodeAtom("implements"));
+            to.add(new IR.CodeAtom(implementsInterface));
         }
 
-        typedStart.hintEnd(OUTER_LEVEL);
-        out += Util.joinStringArray(
-                DEFAULT_STYLE_INDENT.asFormattedLines(typedStart).toArray(),
-                "\n", "", "");
-        out += " {\n";
+        to.add(HasAtoms.LSC);
 
-        if ((ClassKind.ENUM == kind && !enums.isEmpty()) || !fields.isEmpty()) {
-            CodeAtoms typedBody = new CodeAtoms();
-            typedBody.hintStart(OUTER_LEVEL);
+        if (ClassKind.ENUM == kind && !enums.isEmpty())
+            enums.writeAtoms(to);
 
-            if (ClassKind.ENUM == kind && !enums.isEmpty())
-                enums.writeAtoms(typedBody);
-
-            formatVariableDeclarations(typedBody, fields);
-
-            typedBody.hintEnd(OUTER_LEVEL);
-            for (String line : DEFAULT_STYLE_INDENT.asFormattedLines(typedBody)) {
-                if (0 < line.length())
-                    out += "\t" + line;
-                out += "\n";
-            }
-
-            out += "\n";
-        }
+        formatVariableDeclarations(to, fields);
 
         if (constructorFromAllFields)
-            out += constructorFromFields();
+            constructorFromFields(to);
 
         LinkedList<Method> constructors = new LinkedList<Method>();
         LinkedList<Method> other = new LinkedList<Method>();
@@ -271,14 +249,14 @@ public class ClassWriter {
             else
                 other.add(toSort);
 
-        out += formatMethods(constructors);
-        out += formatMethods(other);
+        for (Method method : constructors)
+            method.writeAtoms(to);
+        for (Method method : other)
+            method.writeAtoms(to);
 
-        out = removeBlankLine(out);
+        to.add(HasAtoms.RSC);
 
-        out += "}" + "\n";
-
-        return out;
+        to.hintEnd(OUTER_LEVEL);
     }
 
     public String getName() {
@@ -323,10 +301,6 @@ public class ClassWriter {
         return (null == element ? "" : before + element + after);
     }
 
-    private static String removeBlankLine(String out) {
-        return out.substring(0, out.length() - 1);
-    }
-
     public static final CodeStyle DEFAULT_STYLE_INDENT;
     static {
         final CodeStyleBuilder<DefaultStyleScopeInfo> maker =
@@ -338,6 +312,7 @@ public class ClassWriter {
         maker.whenFirst(Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(maker.condAtTheEnd()),
                 EnumSet.<CodeStyleBuilder.DependsOn>noneOf(CodeStyleBuilder.DependsOn.class),
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(maker.action2Triggered(CodeStyle.Action.DO_NOTHING)));
+        maker.whenBetween(HasAtoms.LSC, HasAtoms.RSC, CodeStyle.Action.DO_NOTHING);
         maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
         maker.whenBefore(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
         maker.whenAfter(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
