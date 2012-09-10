@@ -57,6 +57,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
 
     @Override
     public void writeAtoms(CodeAtoms to) {
+        to.hintStart(MethodCall.class.getCanonicalName());
         comment.writeAtoms(to);
         to.add(new CodeAtom(method));
         to.add(LPR);
@@ -66,5 +67,6 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
             to.hintEnd("CallArgs");
         }
         to.add(RPR);
+        to.hintEnd(MethodCall.class.getCanonicalName());
     }
 }
