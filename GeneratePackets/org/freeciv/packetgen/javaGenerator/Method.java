@@ -17,6 +17,8 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
+import java.util.List;
+
 public class Method extends Formatted implements HasAtoms {
     private final Comment comment;
     private final Visibility visibility;
@@ -25,8 +27,7 @@ public class Method extends Formatted implements HasAtoms {
     private final String name;
     // TODO: Make typed
     private final String paramList;
-    // TODO: Make typed
-    private final String exceptionList;
+    private final List<TargetClass> exceptionList;
     private final Block body;
 
     @Deprecated
@@ -43,7 +44,7 @@ public class Method extends Formatted implements HasAtoms {
         this.type = type;
         this.name = name;
         this.paramList = paramList;
-        this.exceptionList = exceptionList;
+        this.exceptionList = (null == exceptionList ? null : ClassWriter.oldClassList2newClassList(exceptionList));
         this.body = body;
     }
 
@@ -68,7 +69,7 @@ public class Method extends Formatted implements HasAtoms {
         to.add(HasAtoms.RPR);
         if (null != exceptionList) {
             to.add(new IR.CodeAtom("throws"));
-            to.add(new IR.CodeAtom(exceptionList));
+            to.joinSep(SEP, exceptionList.toArray(new HasAtoms[exceptionList.size()]));
         }
         body.writeAtoms(to);
     }
