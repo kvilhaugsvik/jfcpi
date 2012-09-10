@@ -289,18 +289,6 @@ public class ClassWriter extends Formatted implements HasAtoms {
         return new Annotate("Generated", comments, value);
     }
 
-    static String ifIs(String element) {
-        return ifIs("", element, "");
-    }
-
-    static String ifIs(String element, String after) {
-        return ifIs("", element, after);
-    }
-
-    static String ifIs(String before, String element, String after) {
-        return (null == element ? "" : before + element + after);
-    }
-
     public static final CodeStyle DEFAULT_STYLE_INDENT;
     static {
         final CodeStyleBuilder<DefaultStyleScopeInfo> maker =
