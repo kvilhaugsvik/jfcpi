@@ -23,6 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.junit.Test;
 
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,7 @@ public class CodeGenTest {
     private static final String generatorname = ",\n\tvalue = \"org.freeciv.packetgen.javaGenerator.ClassWriter\")";
 
     @Test public void testMethodEverything() {
-        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
@@ -61,7 +62,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoParams() {
-        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
@@ -74,7 +75,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodManyLevelsOfIndention() {
-        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null,
                 new Block(WHILE(TRUE,
@@ -108,7 +109,7 @@ public class CodeGenTest {
                 to.add(HasAtoms.RSC);
             }
         };
-        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null, closesScopeNotOpened)).toString();
     }
@@ -136,16 +137,15 @@ public class CodeGenTest {
                 });
             }
         };
-        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null, forgetsToCloseScope)).toString();
     }
 
     @Test public void testMethodEverythingTwoLineComment() {
-        String result = (new Method("/*\n * " + "comment comment comment comment comment comment " +
-                "comment comment comment comment comment comment" +
-                "\n * " + "more comment" + "\n */",
-                Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method(Comment.c("comment comment comment comment comment comment " +
+                "comment comment comment comment comment comment " +
+                "more comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
@@ -165,7 +165,7 @@ public class CodeGenTest {
         isSeparated.addStatement(asAValue("int a = 5"));
         isSeparated.groupBoundary();
         isSeparated.addStatement(asAValue("return a"));
-        String result = (new Method("/* " + "comment" + " */", Visibility.PUBLIC, Scope.CLASS,
+        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", isSeparated)).toString();
 
@@ -494,13 +494,11 @@ public class CodeGenTest {
                                 asAValue("headerLen"),
                                 literalString(" Packet: "),
                                 asAValue("getEncodedSize()")))))));
-        String result = Method.newPublicConstructorWithException("/**" + "\n" +
-                " * Construct an object from a DataInput" + "\n" +
-                " * @param from data stream that is at the start of the package body" + "\n" +
-                " * @param headerLen length from header package" + "\n" +
-                " * @param packet the number of the packet specified in the header" + "\n" +
-                " * @throws IOException if the DataInput has a problem" + "\n" +
-                " */",
+        String result = Method.newPublicConstructorWithException(Comment.doc("Construct an object from a DataInput", "",
+                Comment.param(Var.local(DataInput.class, "from", null), "data stream that is at the start of the package body"),
+                Comment.param(Var.local(int.class, "headerLen", null), "length from header package"),
+                Comment.param(Var.local(int.class, "packet", null), "the number of the packet specified in the header"),
+                Comment.docThrows(new TargetClass("IOException"), "if the DataInput has a problem")),
                 "PACKET_CITY_NAME_SUGGESTION_REQ", "DataInput from, int headerLen, int packet", "IOException", body).toString();
 
         assertEquals("Generated source not as expected",

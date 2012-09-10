@@ -17,7 +17,7 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 
 public class Method {
-    private final String comment;
+    private final Comment comment;
     private final Visibility visibility;
     private final Scope scope;
     private final TargetClass type;
@@ -26,7 +26,13 @@ public class Method {
     private final String exceptionList;
     private final Block body;
 
+    @Deprecated
     public Method(String comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
+                  String exceptionList, Block body) {
+        this(Comment.oldCompat(comment), visibility, scope, type, name, paramList, exceptionList, body);
+    }
+
+    public Method(Comment comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
                   String exceptionList, Block body) {
         this.comment = comment;
         this.visibility = visibility;
@@ -44,7 +50,7 @@ public class Method {
 
     @Override
     public String toString() {
-        String out = (null == comment || "".equals(comment) ? "" : "\t" + comment.replace("\n", "\n\t") + "\n");
+        String out = (comment.isEmpty() ? "" : comment.getJavaCodeIndented("\t") + "\n");
         out += "\t" + ClassWriter.ifIs("", visibility.toString(), " ") + ClassWriter.ifIs(scope.toString(), " ") +
                 (null == type ? "" : type.getName() + " ") +
                 name + "(" + ClassWriter.ifIs(paramList) + ") " + ClassWriter.ifIs("throws ", exceptionList, " ");
@@ -53,7 +59,16 @@ public class Method {
         return out;
     }
 
+    @Deprecated
     public static Method newPublicConstructorWithException(String comment,
+                                                           String name,
+                                                           String paramList,
+                                                           String exceptionList,
+                                                           Block body) {
+        return newPublicConstructorWithException(Comment.oldCompat(comment), name, paramList, exceptionList, body);
+    }
+
+    public static Method newPublicConstructorWithException(Comment comment,
                                                     String name,
                                                     String paramList,
                                                     String exceptionList,
@@ -61,21 +76,47 @@ public class Method {
         return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
     }
 
+    @Deprecated
     public static Method newPublicConstructor(String comment,
+                                              String name,
+                                              String paramList,
+                                              Block body) {
+        return newPublicConstructor(Comment.oldCompat(comment), name, paramList, body);
+    }
+
+    public static Method newPublicConstructor(Comment comment,
                                        String name,
                                        String paramList,
                                        Block body) {
         return newPublicConstructorWithException(comment, name, paramList, null, body);
     }
 
+    @Deprecated
     public static Method newPublicReadObjectState(String comment,
+                                                  TargetClass type,
+                                                  String name,
+                                                  Block body) {
+        return newPublicReadObjectState(Comment.oldCompat(comment), type, name, body);
+    }
+
+    public static Method newPublicReadObjectState(Comment comment,
                                            TargetClass type,
                                            String name,
                                            Block body) {
         return newPublicDynamicMethod(comment, type, name, null, null, body);
     }
 
+    @Deprecated
     public static Method newPublicDynamicMethod(String comment,
+                                                            TargetClass type,
+                                                            String name,
+                                                            String paramList,
+                                                            String exceptionList,
+                                                            Block body) {
+        return newPublicDynamicMethod(Comment.oldCompat(comment), type, name, paramList, exceptionList, body);
+    }
+
+    public static Method newPublicDynamicMethod(Comment comment,
                                          TargetClass type,
                                          String name,
                                          String paramList,
@@ -84,7 +125,12 @@ public class Method {
         return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
     }
 
+    @Deprecated
     public static Method newReadClassState(String comment, TargetClass type, String name, Block body) {
+        return newReadClassState(Comment.oldCompat(comment), type, name, body);
+    }
+
+    public static Method newReadClassState(Comment comment, TargetClass type, String name, Block body) {
         return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
     }
 }
