@@ -260,4 +260,8 @@ public class PacketsStore {
     public void requestConstant(String constant) {
         requirements.demand(new Requirement(constant, Requirement.Kind.VALUE));
     }
+
+    public void requestType(String type) {
+        requirements.demand(new Requirement(type, Requirement.Kind.AS_JAVA_DATATYPE));
+    }
 }

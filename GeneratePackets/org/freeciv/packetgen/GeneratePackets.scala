@@ -37,6 +37,7 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
   private val Parser = new ParsePacketsDef(storage)
 
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
+  requested.filter(item => "type".equals(item._1)).foreach(cons => storage.requestType(cons._2))
 
   GeneratePackets.checkFilesCanRead(packetsDefPath :: versionPath :: cPaths)
 
