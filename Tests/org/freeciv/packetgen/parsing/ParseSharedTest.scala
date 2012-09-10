@@ -24,6 +24,8 @@ class ParseSharedTest {
 
     protected def isNewLineIgnored(source: CharSequence, offset: Int) = true
 
+    protected def isLineWSIgnored(source: CharSequence, offset: Int) = true
+
     protected def areCommentsIgnored(source: CharSequence, offset: Int) = false
   }
 

@@ -109,5 +109,7 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
 
   protected def isNewLineIgnored(source: CharSequence, offset: Int) = true
 
+  protected def isLineWSIgnored(source: CharSequence, offset: Int) = true
+
   protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean = false
 }

@@ -21,6 +21,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.Typed
 
 object ParseVariableAssignments extends ExtractableParser {
   protected def isNewLineIgnored(source: CharSequence, offset: Int) = false
+  protected def isLineWSIgnored(source: CharSequence, offset: Int) = true
   protected def areCommentsIgnored(source: CharSequence, offset: Int) = true
   def startsOfExtractable = List(identifier + "\\s*" + "=")
 

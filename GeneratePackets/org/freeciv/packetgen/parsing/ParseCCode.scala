@@ -28,8 +28,6 @@ import org.freeciv.packetgen.UndefinedException
 import java.util.AbstractMap.SimpleImmutableEntry
 
 object ParseCCode extends ExtractableParser {
-  def enumElemCode = identifierRegEx
-
   private final val DEFINE: String = "#define"
   private final val SPECENUM: String = "SPECENUM_"
   private final val NAME: String = "NAME"
@@ -62,11 +60,13 @@ object ParseCCode extends ExtractableParser {
         // Save old state
         val oldIgnoreCommentsFlag = ignoreCommentsFlag
         val oldIgnoreNewLinesFlag = ignoreNewLinesFlag
+        val oldIgnoreLineWSFlag = ignoreLineWSFlag
 
         // Look for the start of a define ignoring comments and newlines
         ignoreCommentsFlag = true
-        ignoreNewLinesFlag = true
-        val beginning = regex(start.r)(in)
+        ignoreLineWSFlag = false
+        val beginning = regex(("\\s*" + start + "\\s+").r)(in)
+        ignoreLineWSFlag = oldIgnoreLineWSFlag
 
         val result = if (beginning.successful) {
           ignoreNewLinesFlag = false
@@ -83,23 +83,26 @@ object ParseCCode extends ExtractableParser {
     }
   }
 
-  @inline private def se(kind: String) =
-    defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
+  @inline private def se(kind: String, followedBy: Parser[String]): Parser[(String, String)] =
+    se(kind, start => start ~ followedBy ^^ {case a ~ b => a -> b})
 
-  //TODO: join the se above and the one below. Only difference is taking followBy as a parameter and use it
-  @inline private def se[Ret](kind: String, followedBy: Parser[Ret]) =
-    defineLine(DEFINE, (regex((SPECENUM + kind).r) ^^ {_.substring(9)}) ~ followedBy)
+  @inline private def se(kind: String,
+                         followedBy: (Parser[String] => Parser[(String, String)]) = start => start ^^ {_ -> ""}):
+  Parser[(String, String)] =
+    defineLine(DEFINE, followedBy(regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
 
-  def specEnumOrName(kind: String) = se(kind + NAME, quotedString.r) |
-    se(kind, enumElemCode)
+  def specEnumOrName(kind: String): Parser[(String, String)] = se(kind + NAME, quotedString.r) |
+    se(kind, identifierRegEx)
 
-  def specEnumDef = defineLine(startOfSpecEnum, regex(identifier.r)) ~
+  def specEnumDef: Parser[~[String, Map[String, String]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
       se("INVALID", sInteger)) ^^ {parsed => (parsed._1 -> parsed._2)} |
       CComment ^^ {comment => "comment" -> comment} |
-      se("BITWISE") ^^ {bitwise => bitwise -> bitwise}
+      se("NAMEOVERRIDE") ^^ {nameOverride => nameOverride._1 ->
+        "override element names (probably from the ruleset)"} |
+      se("BITWISE") ^^ {bitwise => bitwise._1 -> bitwise._1}
     ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
 
@@ -110,6 +113,7 @@ object ParseCCode extends ExtractableParser {
 
       @inline def enumerations: Map[String, String] = asStructures._2
       val bitwise = enumerations.contains("BITWISE")
+      val nameOverride = enumerations.contains("NAMEOVERRIDE")
 
       val outEnumValues: ListBuffer[Enum.EnumElementKnowsNumber] = ListBuffer[Enum.EnumElementKnowsNumber](
         enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
@@ -137,17 +141,18 @@ object ParseCCode extends ExtractableParser {
       val sortedEnumValues: List[EnumElementFC] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
       if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
-          new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get,
+          new Enum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             enumerations.get("COUNT" + NAME).get, sortedEnumValues.asJava)
         else
-          new Enum(asStructures._1.asInstanceOf[String], enumerations.get("COUNT").get, sortedEnumValues.asJava)
+          new Enum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
+            sortedEnumValues.asJava)
       else
-        new Enum(asStructures._1.asInstanceOf[String], bitwise, sortedEnumValues.asJava)
+        new Enum(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)
   }
 
   def enumValue = intExpr
 
-  def cEnum = opt(CComment) ~> enumElemCode ~ opt("=" ~> enumValue) <~ opt(CComment) ^^ {
+  def cEnum = opt(CComment) ~> identifierRegEx ~ opt("=" ~> enumValue) <~ opt(CComment) ^^ {
     case element ~ value => (element -> value)
   }
 
@@ -199,9 +204,13 @@ object ParseCCode extends ExtractableParser {
 
   private var ignoreNewLinesFlag = true
 
+  private var ignoreLineWSFlag = true
+
   private var ignoreCommentsFlag = false
 
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean = ignoreNewLinesFlag
+
+  protected def isLineWSIgnored(source: CharSequence, offset: Int): Boolean = ignoreLineWSFlag
 
   protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean = ignoreCommentsFlag
 

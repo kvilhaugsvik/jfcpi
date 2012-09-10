@@ -18,6 +18,8 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.javaGenerator.Modifiable;
+import org.freeciv.packetgen.javaGenerator.Var;
 import org.junit.Test;
 
 import java.util.*;
@@ -185,7 +187,7 @@ public class EnumTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void enumCountBitwiseSpecified() {
-        Enum result = new Enum("test", true, "ELEMENTS", "\"the elements\"", Collections.<Requirement>emptySet(),
+        Enum result = new Enum("test", false, true, "ELEMENTS", "\"the elements\"", Collections.<Requirement>emptySet(),
                 Arrays.<Enum.EnumElementFC>asList(newEnumValue("ONE", 1)));
     }
 
