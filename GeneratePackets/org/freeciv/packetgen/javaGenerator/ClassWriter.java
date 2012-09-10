@@ -40,8 +40,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     private final LinkedList<Annotate> classAnnotate;
     private final String name;
     private final TargetClass parent;
-    //TODO: Make typed
-    private final String implementsInterface;
+    private final List<TargetClass> implementsInterface;
 
     private final LinkedList<Var> fields = new LinkedList<Var>();
 
@@ -49,6 +48,13 @@ public class ClassWriter extends Formatted implements HasAtoms {
     protected final EnumElements enums = new EnumElements();
 
     private boolean constructorFromAllFields = false;
+
+    public static List<TargetClass> oldClassList2newClassList(String classes) {
+        List<TargetClass> out = new LinkedList<TargetClass>();
+        for (String target : classes.split(", "))
+            out.add(new TargetClass(target));
+        return out;
+    }
 
     public ClassWriter(ClassKind kind, TargetPackage where, Import[] imports,
                        String madeFrom, List<Annotate> classAnnotate,
@@ -61,7 +67,9 @@ public class ClassWriter extends Formatted implements HasAtoms {
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
         this.name = name;
         this.parent = (null == parent ? null : new TargetClass(parent));
-        this.implementsInterface = implementsInterface;
+        this.implementsInterface = (null == implementsInterface ?
+                null :
+                oldClassList2newClassList(implementsInterface));
         this.kind = kind;
 
         visibility = Visibility.PUBLIC;
@@ -228,7 +236,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         }
         if (null != implementsInterface) {
             to.add(new IR.CodeAtom("implements"));
-            to.add(new IR.CodeAtom(implementsInterface));
+            to.joinSep(HasAtoms.SEP, implementsInterface.toArray(new HasAtoms[implementsInterface.size()]));
         }
 
         to.add(HasAtoms.LSC);
