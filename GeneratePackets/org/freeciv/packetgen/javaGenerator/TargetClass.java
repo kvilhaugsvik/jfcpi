@@ -23,7 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-public class TargetClass extends Address {
+public class TargetClass extends Address implements AValue {
     private final CodeAtom name;
     private final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
 
