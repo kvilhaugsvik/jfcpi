@@ -24,9 +24,11 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
@@ -40,6 +42,8 @@ public class Packet extends ClassWriter implements IDependency {
 
     private final Requirement iFulfill;
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
+
+    private final TargetClass ioexception = new TargetClass(IOException.class, true);
 
     @Deprecated public Packet(String name, int number, String headerKind, Field... fields) throws UndefinedException {
         this(name, number, new TargetClass(headerKind), GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), fields);
@@ -97,16 +101,16 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addConstructorFromFields(Field[] fields, TargetClass headerKind) throws UndefinedException {
         Block constructorBody = new Block();
-        LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
+        LinkedList<Var> params = new LinkedList<Var>();
         for (Field field : fields) {
-            params.add(new AbstractMap
-                    .SimpleImmutableEntry<String, String>(field.getFType() + field.getArrayDeclaration(),
-                                                          field.getFieldName()));
+            params.add(Var.param(
+                    new TargetClass(field.getFType() + field.getArrayDeclaration(), true),
+                    field.getFieldName()));
             field.appendValidationTo(true, constructorBody);
             constructorBody.addStatement(setFieldToVariableSameName(field.getFieldName()));
         }
         constructorBody.addStatement(generateHeader(headerKind));
-        addMethod(Method.newPublicConstructor(Comment.no(), getName(), createParameterList(params), constructorBody));
+        addMethod(Method.newPublicConstructor(Comment.no(), getName(), params, constructorBody));
     }
 
     private Typed<AValue> generateHeader(TargetClass headerKind) {
@@ -117,11 +121,11 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addConstructorFromJavaTypes(Field[] fields, TargetClass headerKind) throws UndefinedException {
         if (0 < fields.length) {
-            LinkedList<Map.Entry<String, String>> params = new LinkedList<Map.Entry<String, String>>();
+            LinkedList<Var> params = new LinkedList<Var>();
             Block constructorBodyJ = new Block();
             for (Field field : fields) {
-                params.add(new AbstractMap.SimpleImmutableEntry<String, String>(
-                        field.getJType() + field.getArrayDeclaration(),
+                params.add(Var.param(
+                        new TargetClass(field.getJType() + field.getArrayDeclaration(), true),
                         field.getFieldName()));
                 field.appendValidationTo(true, constructorBodyJ);
                 if (field.hasDeclarations())
@@ -131,14 +135,13 @@ public class Packet extends ClassWriter implements IDependency {
                         field.getNewFromJavaType(), constructorBodyJ);
             }
             constructorBodyJ.addStatement(generateHeader(headerKind));
-            addMethod(Method.newPublicConstructor(Comment.no(), getName(), createParameterList(params), constructorBodyJ));
+            addMethod(Method.newPublicConstructor(Comment.no(), getName(), params, constructorBodyJ));
         }
     }
 
     private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind) throws UndefinedException {
-        Var argHeader = Var.local(PacketHeader.class, "header", null);
-        final Var streamName = Var.local(DataInput.class, "from", null);
-        final TargetClass ioexception = new TargetClass(IOException.class, true);
+        Var argHeader = Var.param(new TargetClass(PacketHeader.class, true), "header");
+        final Var streamName = Var.param(new TargetClass(DataInput.class, true), "from");
 
         Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
         for (Field field : fields) {
@@ -180,12 +183,13 @@ public class Packet extends ClassWriter implements IDependency {
                 Comment.param(streamName, "data stream that is at the start of the package body"),
                 Comment.param(argHeader, "header data. Must contain size and number"),
                 Comment.docThrows(ioexception, "if the DataInput has a problem")),
-                getName(), "DataInput " + streamName.getName() + ", PacketHeader header",
-                "IOException",
+                getName(), Arrays.asList(streamName, argHeader),
+                Arrays.asList(ioexception),
                 constructorBodyStream));
     }
 
     private void addEncoder(Field[] fields) {
+        Var pTo = Var.param(new TargetClass(DataOutput.class, true), "to");
         Block body = new Block();
         body.addStatement(getField("header").call("encodeTo", asAValue("to")));
         if (0 < fields.length) {
@@ -193,8 +197,8 @@ public class Packet extends ClassWriter implements IDependency {
                 field.forElementsInField("this." + field.getFieldName() + "[i].encodeTo(to)", body);
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                TargetClass.fromName("void"), "encodeTo", "DataOutput to",
-                "IOException", body));
+                TargetClass.fromName("void"), "encodeTo", Arrays.asList(pTo),
+                Arrays.asList(ioexception), body));
     }
 
     private void addCalcBodyLen(Field[] fields) {
@@ -227,17 +231,18 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addToString(String name, Field[] fields) {
-        Var buildOutput = Var.local("String", "out",
-                asAString("\"" + name + "\" + \"(\" + number + \")\""));
+        Var buildOutput = Var.local(String.class, "out",
+                sum(literalString(name), literalString("("), getField("number").ref(), literalString(")")));
         Block body = new Block(buildOutput);
         for (Field field : fields)
-            body.addStatement(asVoid("out += \"\\n\\t" + field.getFieldName() + " = \" + " + (field.hasDeclarations() ?
-                    "Util.joinStringArray(" + "this." + field.getFieldName() + ", " +
-                            "\", \"" +
-                            ", \"(\", \")\"" + ")" :
-                    "this." + field.getFieldName() + ".toString()")));
+            body.addStatement(BuiltIn.inc(buildOutput, sum(
+                    literalString("\\n\\t" + field.getFieldName() + " = "),
+                    (field.hasDeclarations() ?
+                            new MethodCall<AString>("Util.joinStringArray", field.ref(), literalString(", "),
+                                    literalString("("), literalString(")")) :
+                            field.<AString>call("toString")))));
         body.addStatement(RETURN(buildOutput.ref()));
-        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("String"), "toString", body));
+        addMethod(Method.newPublicReadObjectState(Comment.no(), new TargetClass(String.class), "toString", body));
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {
