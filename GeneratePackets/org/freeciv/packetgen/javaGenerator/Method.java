@@ -33,12 +33,6 @@ public class Method extends Formatted implements HasAtoms {
     private final Block body;
 
     @Deprecated
-    public Method(String comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
-                  String exceptionList, Block body) {
-        this(Comment.oldCompat(comment), visibility, scope, type, name, paramList, exceptionList, body);
-    }
-
-    @Deprecated
     public static List<Var> oldParmanList2newParamList(String classes) {
         if (null == classes || "".equals(classes))
             return Collections.<Var>emptyList();
@@ -50,7 +44,7 @@ public class Method extends Formatted implements HasAtoms {
         return out;
     }
 
-    public Method(Comment comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
+    protected Method(Comment comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
                   String exceptionList, Block body) {
         this.comment = comment;
         this.visibility = visibility;
@@ -155,7 +149,7 @@ public class Method extends Formatted implements HasAtoms {
                                          String paramList,
                                          String exceptionList,
                                          Block body) {
-        return new Method(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
+        return custom(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
     }
 
     @Deprecated
@@ -164,6 +158,18 @@ public class Method extends Formatted implements HasAtoms {
     }
 
     public static Method newReadClassState(Comment comment, TargetClass type, String name, Block body) {
-        return new Method(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
+        return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
+    }
+
+    public static Method custom(Visibility visibility, Scope scope,
+                                TargetClass type, String name, String paramList,
+                                String exceptionList, Block body) {
+        return custom(Comment.no(), visibility, scope, type, name, paramList, exceptionList, body);
+    }
+
+    public static Method custom(Comment comment, Visibility visibility, Scope scope,
+                                TargetClass type, String name, String paramList,
+                                String exceptionList, Block body) {
+        return new Method(comment, visibility, scope, type, name, paramList, exceptionList, body);
     }
 }

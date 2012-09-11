@@ -104,10 +104,10 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
             addObjectConstant("String", "toStringName");
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
-        addMethod(new Method("", Visibility.PRIVATE, Scope.OBJECT,
+        addMethod(Method.custom(Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName(null), enumName, "int number, String toStringName",
                 null, new Block(new MethodCall<Returnable>("this", "number", "toStringName", "true"))));
-        addMethod(new Method("", Visibility.PRIVATE, Scope.OBJECT,
+        addMethod(Method.custom(Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName(null), enumName, "int number, String toStringName, boolean valid",
                 null,
                 new Block(setFieldToVariableSameName("number"),
@@ -130,7 +130,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                 TargetClass.fromName("boolean"), "isBitWise", new Block(RETURN(asBool(bitwise + "")))));
 
         Var element = Var.local(this.getName(), "element", null);
-        addMethod(new Method("", Visibility.PUBLIC, Scope.CLASS,
+        addMethod(Method.custom(Visibility.PUBLIC, Scope.CLASS,
                 TargetClass.fromName(this.getName()), "valueOf", "int number",
                 null, new Block(
                 FOR(element, new MethodCall<AValue>("values", new Typed[0]),

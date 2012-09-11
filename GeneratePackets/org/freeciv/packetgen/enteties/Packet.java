@@ -209,7 +209,7 @@ public class Packet extends ClassWriter implements IDependency {
         } else {
             encodeFieldsLen.addStatement(RETURN(asAnInt("0")));
         }
-        addMethod(new Method("", Visibility.PRIVATE, Scope.OBJECT,
+        addMethod(Method.custom(Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName("int"), "calcBodyLen", null,
                 null,
                 encodeFieldsLen));

@@ -122,7 +122,7 @@ public class FieldTypeBasic implements IDependency {
             addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("int"), "encodedLength", encodedSize));
             addMethod(Method.newPublicReadObjectState("", TargetClass.fromName(javaType.getName()), "getValue", new Block(RETURN(getField("value").ref()))));
             addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("String"), "toString", new Block(RETURN(value2String.x(getField("value"))))));
-            addMethod(new Method("", Visibility.PUBLIC, Scope.OBJECT,
+            addMethod(Method.custom(Visibility.PUBLIC, Scope.OBJECT,
                     TargetClass.fromName("boolean"), "equals", "Object other",
                     null, new Block(IF(
                             asBool("other instanceof " + name),

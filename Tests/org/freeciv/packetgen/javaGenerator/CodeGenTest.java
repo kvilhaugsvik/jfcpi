@@ -37,7 +37,7 @@ public class CodeGenTest {
     private static final String generatorname = ",\n\tvalue = \"org.freeciv.packetgen.javaGenerator.ClassWriter\")";
 
     @Test public void testMethodEverything() {
-        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
@@ -50,7 +50,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoComment() {
-        String result = (new Method("", Visibility.PUBLIC, Scope.CLASS,
+        String result = (Method.custom(Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
@@ -62,7 +62,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoParams() {
-        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
@@ -75,7 +75,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodManyLevelsOfIndention() {
-        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null,
                 new Block(WHILE(TRUE,
@@ -109,7 +109,7 @@ public class CodeGenTest {
                 to.add(HasAtoms.RSC);
             }
         };
-        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null, closesScopeNotOpened)).toString();
     }
@@ -137,13 +137,13 @@ public class CodeGenTest {
                 });
             }
         };
-        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", null,
                 null, forgetsToCloseScope)).toString();
     }
 
     @Test public void testMethodEverythingTwoLineComment() {
-        String result = (new Method(Comment.c("comment comment comment comment comment comment " +
+        String result = (Method.custom(Comment.c("comment comment comment comment comment comment " +
                 "comment comment comment comment comment comment " +
                 "more comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
@@ -165,7 +165,7 @@ public class CodeGenTest {
         isSeparated.addStatement(asAValue("int a = 5"));
         isSeparated.groupBoundary();
         isSeparated.addStatement(asAValue("return a"));
-        String result = (new Method(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
                 "Throwable", isSeparated)).toString();
 
