@@ -382,10 +382,30 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 return EnumElements.class.getName().equals(argument.seeTopHint());
             }
         });
+        maker.whenFirst(
+                Arrays.asList(
+                        maker.condLeftIs(HasAtoms.SEP),
+                        new Util.OneCondition<DefaultStyleScopeInfo>() {
+                            @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
+                                return 1 < argument.getLineBreakTry() &&
+                                        argument.approachingTheEdge() &&
+                                        CodeStyle.ARGUMENTS.equals(argument.seeTopHint());
+                            }
+                        }
+                ),
+                EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
+                Arrays.asList(
+                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        new Triggered<DefaultStyleScopeInfo>() {
+                            @Override
+                            public void run(DefaultStyleScopeInfo context) {
+                                context.statementBroken = true;
+                            }
+                        }
+                ));
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return 1 < argument.getLineBreakTry() && argument.approachingTheEdge() &&
-                        !CodeStyle.ARGUMENTS.equals(argument.seeTopHint());
+                return 1 < argument.getLineBreakTry() && argument.approachingTheEdge();
             }
         });
         maker.whenFirst(
