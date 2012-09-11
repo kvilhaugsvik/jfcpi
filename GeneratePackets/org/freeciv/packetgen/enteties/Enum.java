@@ -25,6 +25,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.types.FCEnum;
 
@@ -103,31 +104,40 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         else
             addObjectConstant("String", "toStringName");
 
+        Var fieldToStringName = this.getField("toStringName");
+        Var fieldNumber = this.getField("number");
+        Var fieldValid = this.getField("valid");
+
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
+        Var paramNumber = Var.param(int.class, "number");
+        Var paramToStrName = Var.param("String", "toStringName");
+        Var paramValid = Var.param(boolean.class, "valid");
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
-                TargetClass.fromName(null), enumName, "int number, String toStringName",
-                null,
-                new Block(new MethodCall<Returnable>("this", "number", "toStringName", "true"))));
+                TargetClass.fromName(null), enumName, Arrays.asList(paramNumber, paramToStrName),
+                Collections.<TargetClass>emptyList(),
+                new Block(new MethodCall<Returnable>("this", paramNumber.ref(), paramToStrName.ref(), TRUE))));
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
-                TargetClass.fromName(null), enumName, "int number, String toStringName, boolean valid",
-                null,
-                new Block(setFieldToVariableSameName("number"),
-                        setFieldToVariableSameName("toStringName"),
-                        setFieldToVariableSameName("valid"))));
+                TargetClass.fromName(null), enumName, Arrays.asList(paramNumber, paramToStrName, paramValid),
+                Collections.<TargetClass>emptyList(),
+                new Block(fieldNumber.assign(paramNumber.ref()),
+                        fieldToStringName.assign(paramToStrName.ref()),
+                        fieldValid.assign(paramValid.ref()))));
 
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("int"), "getNumber",
-                new Block(BuiltIn.RETURN(this.getField("number").ref()))));
+                new Block(BuiltIn.RETURN(fieldNumber.ref()))));
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("boolean"), "isValid",
-                new Block(BuiltIn.RETURN(this.getField("valid").ref()))));
+                new Block(BuiltIn.RETURN(fieldValid.ref()))));
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("String"), "toString",
-                new Block(BuiltIn.RETURN(this.getField("toStringName").ref()))));
-        if (nameOverride)
+                new Block(BuiltIn.RETURN(fieldToStringName.ref()))));
+        if (nameOverride) {
+            Var paramName = Var.param("String", "name");
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                    new TargetClass(void.class), "setName", "String name",
-                    null,
-                    new Block(this.getField("toStringName").assign(asAValue("name")))));
+                    new TargetClass(void.class), "setName", Arrays.asList(paramName),
+                    Collections.<TargetClass>emptyList(),
+                    new Block(fieldToStringName.assign(paramName.ref()))));
+        }
 
         addMethod(Method.newReadClassState(Comment.doc("Is the enum bitwise?",
                 "An enum is bitwise if it's number increase by two's exponent.",
@@ -137,8 +147,8 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         Var element = Var.local(this.getName(), "element", null);
         addMethod(Method.custom(Comment.no(),
                 Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromName(this.getName()), "valueOf", "int number",
-                null,
+                TargetClass.fromName(this.getName()), "valueOf", Arrays.asList(paramNumber),
+                Collections.<TargetClass>emptyList(),
                 new Block(
                         FOR(element, new MethodCall<AValue>("values", new Typed[0]),
                                 new Block(IF(asBool("element.getNumber() == number"), new Block(RETURN(element.ref()))))),
