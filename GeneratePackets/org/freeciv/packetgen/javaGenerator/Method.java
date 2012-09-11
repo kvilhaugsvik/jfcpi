@@ -17,6 +17,8 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Method extends Formatted implements HasAtoms {
@@ -25,8 +27,7 @@ public class Method extends Formatted implements HasAtoms {
     private final Scope scope;
     private final TargetClass type;
     private final String name;
-    // TODO: Make typed
-    private final String paramList;
+    private final List<Var> paramList;
     private final List<TargetClass> exceptionList;
     private final Block body;
 
@@ -36,6 +37,18 @@ public class Method extends Formatted implements HasAtoms {
         this(Comment.oldCompat(comment), visibility, scope, type, name, paramList, exceptionList, body);
     }
 
+    @Deprecated
+    public static List<Var> oldParmanList2newParamList(String classes) {
+        if (null == classes || "".equals(classes))
+            return Collections.<Var>emptyList();
+        List<Var> out = new LinkedList<Var>();
+        for (String target : classes.split(", ")) {
+            String[] typeAndName = target.split(" ");
+            out.add(Var.param(typeAndName[0], typeAndName[1]));
+        }
+        return out;
+    }
+
     public Method(Comment comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
                   String exceptionList, Block body) {
         this.comment = comment;
@@ -43,7 +56,7 @@ public class Method extends Formatted implements HasAtoms {
         this.scope = scope;
         this.type = type;
         this.name = name;
-        this.paramList = paramList;
+        this.paramList = oldParmanList2newParamList(paramList);
         this.exceptionList = ClassWriter.oldClassList2newClassList(exceptionList);
         this.body = body;
     }
@@ -65,7 +78,11 @@ public class Method extends Formatted implements HasAtoms {
         if (null != type) type.writeAtoms(to);
         to.add(new IR.CodeAtom(name));
         to.add(HasAtoms.LPR);
-        if (null != paramList) to.add(new IR.CodeAtom(paramList));
+        if (!paramList.isEmpty()) {
+            to.hintStart("Arguments");
+            to.joinSep(SEP, paramList.toArray(new HasAtoms[paramList.size()]));
+            to.hintEnd("Arguments");
+        }
         to.add(HasAtoms.RPR);
         if (!exceptionList.isEmpty()) {
             to.add(new IR.CodeAtom("throws"));
