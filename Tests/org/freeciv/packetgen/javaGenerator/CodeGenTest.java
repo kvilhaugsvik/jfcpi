@@ -50,9 +50,10 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoComment() {
-        String result = (Method.custom(Visibility.PUBLIC, Scope.CLASS,
+        String result = (Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", "String a",
-                "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
+                "Throwable",
+                new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
@@ -180,7 +181,7 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodClassStateReader() {
-        Method toTest = Method.newReadClassState("",
+        Method toTest = Method.newReadClassState(Comment.no(),
                 new TargetClass("boolean"), "isTrue",
                 Block.fromStrings("return true"));
         assertEquals("Generated Class state reader source code not as espected",
@@ -471,7 +472,7 @@ public class CodeGenTest {
     // Tests based on real examples
 
     @Test public void testPublicConstructorNoExceptions() {
-        String result = Method.newPublicConstructor("",
+        String result = Method.newPublicConstructor(Comment.no(),
                 "PACKET_CITY_NAME_SUGGESTION_REQ", "Integer unit_id",
                 Block.fromStrings("this.unit_id = new UNIT(unit_id)")).toString();
 
@@ -524,7 +525,7 @@ public class CodeGenTest {
     }
 
     @Test public void testPublicReadObjectState() {
-        String result = Method.newPublicReadObjectState("",
+        String result = Method.newPublicReadObjectState(Comment.no(),
                 new TargetClass("String"), "toString",
                 new Block(RETURN(asAString("value.toString()")))).toString();
 

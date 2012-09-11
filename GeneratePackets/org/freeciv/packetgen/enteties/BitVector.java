@@ -34,9 +34,9 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
         knowsSize = true;
 
-        addMethod(Method.newPublicConstructor("", getName(), "byte[] from", Block.fromStrings("super(size, " + "from)")));
-        addMethod(Method.newPublicConstructor("", getName(), "boolean[] from", Block.fromStrings("super(from)")));
-        addMethod(Method.newPublicConstructor("", getName(), "boolean setAllTo", Block.fromStrings("super(size, " + "setAllTo)")));
+        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "byte[] from", Block.fromStrings("super(size, " + "from)")));
+        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "boolean[] from", Block.fromStrings("super(from)")));
+        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "boolean setAllTo", Block.fromStrings("super(size, " + "setAllTo)")));
 
         iRequire = bits.getReqs();
         iProvide = new Requirement(getName(), Requirement.Kind.AS_JAVA_DATATYPE);
@@ -51,13 +51,13 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         knowsSize = false;
 
         Var size = getField("size");
-        addMethod(Method.newPublicConstructor("", getName(), "byte[] from, int sizeInBits", new Block(
+        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "byte[] from, int sizeInBits", new Block(
                 BuiltIn.asAValue("super(sizeInBits, " + "from)"),
                 getField("size").assign(BuiltIn.asAValue("sizeInBits")))));
-        addMethod(Method.newPublicConstructor("", getName(), "boolean[] from", new Block(
+        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "boolean[] from", new Block(
                 BuiltIn.asAValue("super(from)"),
                 size.assign(BuiltIn.asAValue("from.length")))));
-        addMethod(Method.newPublicConstructor("", getName(), "boolean setAllTo, int size", new Block(
+        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "boolean setAllTo, int size", new Block(
                 BuiltIn.asAValue("super(size, " + "setAllTo)"),
                 size.assign(BuiltIn.asAValue("size")))));
 

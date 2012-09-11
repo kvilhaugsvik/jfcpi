@@ -105,7 +105,7 @@ public class Packet extends ClassWriter implements IDependency {
             constructorBody.addStatement(setFieldToVariableSameName(field.getFieldName()));
         }
         constructorBody.addStatement(generateHeader(headerKind));
-        addMethod(Method.newPublicConstructor("", getName(), createParameterList(params), constructorBody));
+        addMethod(Method.newPublicConstructor(Comment.no(), getName(), createParameterList(params), constructorBody));
     }
 
     private Typed<AValue> generateHeader(TargetClass headerKind) {
@@ -130,7 +130,7 @@ public class Packet extends ClassWriter implements IDependency {
                         field.getNewFromJavaType(), constructorBodyJ);
             }
             constructorBodyJ.addStatement(generateHeader(headerKind));
-            addMethod(Method.newPublicConstructor("", getName(), createParameterList(params), constructorBodyJ));
+            addMethod(Method.newPublicConstructor(Comment.no(), getName(), createParameterList(params), constructorBodyJ));
         }
     }
 
@@ -190,7 +190,9 @@ public class Packet extends ClassWriter implements IDependency {
             for (Field field : fields)
                 field.forElementsInField("this." + field.getFieldName() + "[i].encodeTo(to)", body);
         }
-        addMethod(Method.newPublicDynamicMethod("", TargetClass.fromName("void"), "encodeTo", "DataOutput to", "IOException", body));
+        addMethod(Method.newPublicDynamicMethod(Comment.no(),
+                TargetClass.fromName("void"), "encodeTo", "DataOutput to",
+                "IOException", body));
     }
 
     private void addCalcBodyLen(Field[] fields) {
@@ -209,7 +211,8 @@ public class Packet extends ClassWriter implements IDependency {
         } else {
             encodeFieldsLen.addStatement(RETURN(asAnInt("0")));
         }
-        addMethod(Method.custom(Visibility.PRIVATE, Scope.OBJECT,
+        addMethod(Method.custom(Comment.no(),
+                Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName("int"), "calcBodyLen", null,
                 null,
                 encodeFieldsLen));
@@ -232,7 +235,7 @@ public class Packet extends ClassWriter implements IDependency {
                             ", \"(\", \")\"" + ")" :
                     "this." + field.getFieldName() + ".toString()")));
         body.addStatement(RETURN(buildOutput.ref()));
-        addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("String"), "toString", body));
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("String"), "toString", body));
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {
@@ -248,7 +251,7 @@ public class Packet extends ClassWriter implements IDependency {
             body = new Block(RETURN(asAValue("this." + field.getFieldName() + ".getValue()")));
         }
 
-        addMethod(Method.newPublicReadObjectState("",
+        addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.fromName(field.getJType() + field.getArrayDeclaration()),
                 "get" + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1) + "Value",
                 body));

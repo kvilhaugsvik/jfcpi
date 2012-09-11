@@ -328,7 +328,8 @@ public class Hardcoded {
         handRolledUniversal.addPublicObjectConstant("universals_n", "kind");
         handRolledUniversal.addPublicObjectConstant("int", "value");
         handRolledUniversal.addConstructorFields();
-        handRolledUniversal.addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("String"), "toString",
+        handRolledUniversal.addMethod(Method.newPublicReadObjectState(Comment.no(),
+                TargetClass.fromName("String"), "toString",
                 new Block(RETURN(sum(literalString("("),
                         handRolledUniversal.getField("kind").ref(),
                         literalString(":"),

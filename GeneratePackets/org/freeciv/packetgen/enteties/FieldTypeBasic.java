@@ -108,23 +108,37 @@ public class FieldTypeBasic implements IDependency {
 
             addObjectConstant(javaType.getName(), "value");
             if (arrayEater) {
-                addMethod(Method.newPublicConstructor("",
+                addMethod(Method.newPublicConstructor(Comment.no(),
                         getName(), javaType.getName() + " value" + ", int arraySize",
                         constructorBody));
-                addMethod(Method.newPublicConstructorWithException("",
+                addMethod(Method.newPublicConstructorWithException(Comment.no(),
                         getName(), "DataInput from" + ", int arraySize",
                         "IOException", decode));
             } else {
-                addMethod(Method.newPublicConstructor("", getName(), javaType.getName() + " value", constructorBody));
-                addMethod(Method.newPublicConstructorWithException("", getName(), "DataInput from", "IOException", decode));
+                addMethod(Method.newPublicConstructor(Comment.no(),
+                        getName(), javaType.getName() + " value",
+                        constructorBody));
+                addMethod(Method.newPublicConstructorWithException(Comment.no(),
+                        getName(), "DataInput from", "IOException",
+                        decode));
             }
-            addMethod(Method.newPublicDynamicMethod("", TargetClass.fromName("void"), "encodeTo", "DataOutput to", "IOException", encode));
-            addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("int"), "encodedLength", encodedSize));
-            addMethod(Method.newPublicReadObjectState("", TargetClass.fromName(javaType.getName()), "getValue", new Block(RETURN(getField("value").ref()))));
-            addMethod(Method.newPublicReadObjectState("", TargetClass.fromName("String"), "toString", new Block(RETURN(value2String.x(getField("value"))))));
-            addMethod(Method.custom(Visibility.PUBLIC, Scope.OBJECT,
+            addMethod(Method.newPublicDynamicMethod(Comment.no(),
+                    TargetClass.fromName("void"), "encodeTo", "DataOutput to",
+                    "IOException", encode));
+            addMethod(Method.newPublicReadObjectState(Comment.no(),
+                    TargetClass.fromName("int"), "encodedLength",
+                    encodedSize));
+            addMethod(Method.newPublicReadObjectState(Comment.no(),
+                    TargetClass.fromName(javaType.getName()), "getValue",
+                    new Block(RETURN(getField("value").ref()))));
+            addMethod(Method.newPublicReadObjectState(Comment.no(),
+                    TargetClass.fromName("String"), "toString",
+                    new Block(RETURN(value2String.x(getField("value"))))));
+            addMethod(Method.custom(Comment.no(),
+                    Visibility.PUBLIC, Scope.OBJECT,
                     TargetClass.fromName("boolean"), "equals", "Object other",
-                    null, new Block(IF(
+                    null,
+                    new Block(IF(
                             asBool("other instanceof " + name),
                             new Block(RETURN(asBool("this.value == ((" + name + ")other).getValue()"))),
                             new Block(RETURN(FALSE))))));

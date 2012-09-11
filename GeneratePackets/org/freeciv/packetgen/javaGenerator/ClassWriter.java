@@ -116,7 +116,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     public void addObjectConstantAndGetter(Var field) {
         addField(field);
-        addMethod(Method.newPublicReadObjectState("",
+        addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.fromName(field.getType()),
                 "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1),
                 new Block(RETURN(field.ref()))));
@@ -202,7 +202,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.getType(), dec.getName()));
         }
-        Method.newPublicConstructor("", name, createParameterList(args), body).writeAtoms(to);
+        Method.newPublicConstructor(Comment.no(), name, createParameterList(args), body).writeAtoms(to);
     }
 
     @Override

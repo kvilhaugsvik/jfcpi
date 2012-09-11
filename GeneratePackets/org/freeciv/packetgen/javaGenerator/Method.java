@@ -86,29 +86,12 @@ public class Method extends Formatted implements HasAtoms {
         body.writeAtoms(to);
     }
 
-    @Deprecated
-    public static Method newPublicConstructorWithException(String comment,
-                                                           String name,
-                                                           String paramList,
-                                                           String exceptionList,
-                                                           Block body) {
-        return newPublicConstructorWithException(Comment.oldCompat(comment), name, paramList, exceptionList, body);
-    }
-
     public static Method newPublicConstructorWithException(Comment comment,
                                                     String name,
                                                     String paramList,
                                                     String exceptionList,
                                                     Block body) {
         return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
-    }
-
-    @Deprecated
-    public static Method newPublicConstructor(String comment,
-                                              String name,
-                                              String paramList,
-                                              Block body) {
-        return newPublicConstructor(Comment.oldCompat(comment), name, paramList, body);
     }
 
     public static Method newPublicConstructor(Comment comment,
@@ -118,29 +101,11 @@ public class Method extends Formatted implements HasAtoms {
         return newPublicConstructorWithException(comment, name, paramList, null, body);
     }
 
-    @Deprecated
-    public static Method newPublicReadObjectState(String comment,
-                                                  TargetClass type,
-                                                  String name,
-                                                  Block body) {
-        return newPublicReadObjectState(Comment.oldCompat(comment), type, name, body);
-    }
-
     public static Method newPublicReadObjectState(Comment comment,
                                            TargetClass type,
                                            String name,
                                            Block body) {
         return newPublicDynamicMethod(comment, type, name, null, null, body);
-    }
-
-    @Deprecated
-    public static Method newPublicDynamicMethod(String comment,
-                                                            TargetClass type,
-                                                            String name,
-                                                            String paramList,
-                                                            String exceptionList,
-                                                            Block body) {
-        return newPublicDynamicMethod(Comment.oldCompat(comment), type, name, paramList, exceptionList, body);
     }
 
     public static Method newPublicDynamicMethod(Comment comment,
@@ -152,19 +117,8 @@ public class Method extends Formatted implements HasAtoms {
         return custom(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
     }
 
-    @Deprecated
-    public static Method newReadClassState(String comment, TargetClass type, String name, Block body) {
-        return newReadClassState(Comment.oldCompat(comment), type, name, body);
-    }
-
     public static Method newReadClassState(Comment comment, TargetClass type, String name, Block body) {
         return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
-    }
-
-    public static Method custom(Visibility visibility, Scope scope,
-                                TargetClass type, String name, String paramList,
-                                String exceptionList, Block body) {
-        return custom(Comment.no(), visibility, scope, type, name, paramList, exceptionList, body);
     }
 
     public static Method custom(Comment comment, Visibility visibility, Scope scope,
