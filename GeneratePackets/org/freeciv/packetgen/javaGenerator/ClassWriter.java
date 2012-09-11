@@ -217,7 +217,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         to.hintStart(OUTER_LEVEL);
 
         if (null != where) {
-            to.add(new IR.CodeAtom("package"));
+            to.add(HasAtoms.PACKAGE);
             where.writeAtoms(to);
             to.add(HasAtoms.EOL);
         }
@@ -231,11 +231,11 @@ public class ClassWriter extends Formatted implements HasAtoms {
         kind.writeAtoms(to);
         to.add(new ClassWriter.Atom(name));
         if (null != parent) {
-            to.add(new IR.CodeAtom("extends"));
+            to.add(EXTENDS);
             parent.writeAtoms(to);
         }
         if (!implementsInterface.isEmpty()) {
-            to.add(new IR.CodeAtom("implements"));
+            to.add(IMPLEMENTS);
             to.joinSep(HasAtoms.SEP, implementsInterface.toArray(new HasAtoms[implementsInterface.size()]));
         }
 

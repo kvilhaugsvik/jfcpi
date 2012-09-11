@@ -21,8 +21,6 @@ import org.freeciv.packetgen.javaGenerator.TargetPackage;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
 public class Import extends Formatted implements HasAtoms {
-    private static final CodeAtom IMPORT = new CodeAtom("import");
-
     private final HasAtoms target;
 
     private Import(HasAtoms target) {

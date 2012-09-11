@@ -85,7 +85,7 @@ public class Method extends Formatted implements HasAtoms {
         }
         to.add(HasAtoms.RPR);
         if (!exceptionList.isEmpty()) {
-            to.add(new IR.CodeAtom("throws"));
+            to.add(THROWS);
             to.joinSep(SEP, exceptionList.toArray(new HasAtoms[exceptionList.size()]));
         }
         body.writeAtoms(to);

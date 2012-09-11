@@ -50,5 +50,11 @@ public interface HasAtoms {
     public static final CodeAtom FORSEP = new CodeAtom(";");
     public static final CodeAtom FOR_EACH_SEP = new CodeAtom(":");
 
+    public static final CodeAtom PACKAGE = new IR.CodeAtom("package");
+    public static final CodeAtom IMPORT = new CodeAtom("import");
+    public static final CodeAtom EXTENDS = new IR.CodeAtom("extends");
+    public static final CodeAtom IMPLEMENTS = new IR.CodeAtom("implements");
+    public static final CodeAtom THROWS = new IR.CodeAtom("throws");
+
     public void writeAtoms(CodeAtoms to);
 }
