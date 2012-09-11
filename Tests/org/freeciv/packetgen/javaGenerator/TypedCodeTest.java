@@ -80,7 +80,7 @@ public class TypedCodeTest {
         builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<ScopeInfo>() {
             @Override
             public boolean isTrueFor(ScopeInfo argument) {
-                return "Group".equals(argument.seeTopHint());
+                return CodeStyle.GROUP.equals(argument.seeTopHint());
             }
         });
         builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK);

@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -79,9 +80,9 @@ public class Method extends Formatted implements HasAtoms {
         to.add(new IR.CodeAtom(name));
         to.add(HasAtoms.LPR);
         if (!paramList.isEmpty()) {
-            to.hintStart("Arguments");
+            to.hintStart(CodeStyle.ARGUMENTS);
             to.joinSep(SEP, paramList.toArray(new HasAtoms[paramList.size()]));
-            to.hintEnd("Arguments");
+            to.hintEnd(CodeStyle.ARGUMENTS);
         }
         to.add(HasAtoms.RPR);
         if (!exceptionList.isEmpty()) {

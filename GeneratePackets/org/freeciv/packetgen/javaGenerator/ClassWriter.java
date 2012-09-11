@@ -31,8 +31,6 @@ import java.util.*;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class ClassWriter extends Formatted implements HasAtoms {
-    private static final String OUTER_LEVEL = "Outside";
-
     private final TargetPackage where;
     private final List<Import> imports;
     private final Visibility visibility;
@@ -165,35 +163,35 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     private void formatImports(CodeAtoms to) {
         if (!imports.isEmpty()) {
-            to.hintStart("Group");
+            to.hintStart(CodeStyle.GROUP);
 
             for (Import anImport : imports) {
                 if (null != anImport)
                     anImport.writeAtoms(to);
                 else {
-                    to.hintEnd("Group");
-                    to.hintStart("Group");
+                    to.hintEnd(CodeStyle.GROUP);
+                    to.hintStart(CodeStyle.GROUP);
                 }
             }
-            to.hintEnd("Group");
+            to.hintEnd(CodeStyle.GROUP);
         }
     }
 
     private static void formatVariableDeclarations(CodeAtoms to, final List<Var> fields) {
         if (!fields.isEmpty()) {
-            to.hintStart("Group");
+            to.hintStart(CodeStyle.GROUP);
             Scope scopeOfPrevious = fields.get(0).getScope();
 
             for (Var variable : fields) {
                 if (!variable.getScope().equals(scopeOfPrevious)) {
-                    to.hintEnd("Group");
-                    to.hintStart("Group");
+                    to.hintEnd(CodeStyle.GROUP);
+                    to.hintStart(CodeStyle.GROUP);
                 }
                 new Statement(variable).writeAtoms(to);
                 scopeOfPrevious = variable.getScope();
             }
 
-            to.hintEnd("Group");
+            to.hintEnd(CodeStyle.GROUP);
         }
     }
 
@@ -214,7 +212,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        to.hintStart(OUTER_LEVEL);
+        to.hintStart(CodeStyle.OUTER_LEVEL);
 
         if (null != where) {
             to.add(HasAtoms.PACKAGE);
@@ -264,7 +262,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
         to.add(HasAtoms.RSC);
 
-        to.hintEnd(OUTER_LEVEL);
+        to.hintEnd(CodeStyle.OUTER_LEVEL);
     }
 
     public String getName() {
@@ -298,6 +296,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     public static final CodeStyle DEFAULT_STYLE_INDENT;
+
     static {
         final CodeStyleBuilder<DefaultStyleScopeInfo> maker =
                 new CodeStyleBuilder<DefaultStyleScopeInfo>(
@@ -326,21 +325,21 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return OUTER_LEVEL.equals(argument.seeTopHint());
+                return CodeStyle.OUTER_LEVEL.equals(argument.seeTopHint());
             }
         });
         maker.whenBefore(Annotate.Atom.class, CodeStyle.Action.BREAK_LINE,
                 new Util.OneCondition<DefaultStyleScopeInfo>() {
                     @Override
                     public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                        return OUTER_LEVEL.equals(argument.seeTopHint());
+                        return CodeStyle.OUTER_LEVEL.equals(argument.seeTopHint());
                     }
                 });
         maker.whenBefore(Visibility.Atom.class, CodeStyle.Action.BREAK_LINE,
                 new Util.OneCondition<DefaultStyleScopeInfo>() {
                     @Override
                     public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                        return OUTER_LEVEL.equals(argument.seeTopHint());
+                        return CodeStyle.OUTER_LEVEL.equals(argument.seeTopHint());
                     }
                 });
         maker.whenFirst(
@@ -348,7 +347,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         new Util.OneCondition<DefaultStyleScopeInfo>() {
                             @Override
                             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                                return OUTER_LEVEL.equals(argument.seeTopHint());
+                                return CodeStyle.OUTER_LEVEL.equals(argument.seeTopHint());
                             }
                         },
                         maker.condLeftIs(Visibility.Atom.class)
@@ -360,7 +359,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 new Util.OneCondition<DefaultStyleScopeInfo>() {
                     @Override
                     public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                        return OUTER_LEVEL.equals(argument.seeTopHint());
+                        return CodeStyle.OUTER_LEVEL.equals(argument.seeTopHint());
                     }
                 });
         maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
@@ -386,7 +385,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 1 < argument.getLineBreakTry() && argument.approachingTheEdge() &&
-                        !"Arguments".equals(argument.seeTopHint());
+                        !CodeStyle.ARGUMENTS.equals(argument.seeTopHint());
             }
         });
         maker.whenFirst(
@@ -479,7 +478,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 2 < argument.getLineBreakTry() &&
-                        !"Arguments".equals(argument.seeTopHint());
+                        !CodeStyle.ARGUMENTS.equals(argument.seeTopHint());
             }
         });
         maker.whenFirst(
