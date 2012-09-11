@@ -32,18 +32,6 @@ public class Method extends Formatted implements HasAtoms {
     private final List<TargetClass> exceptionList;
     private final Block body;
 
-    @Deprecated
-    public static List<Var> oldParmanList2newParamList(String classes) {
-        if (null == classes || "".equals(classes))
-            return Collections.<Var>emptyList();
-        List<Var> out = new LinkedList<Var>();
-        for (String target : classes.split(", ")) {
-            String[] typeAndName = target.split(" ");
-            out.add(Var.param(typeAndName[0], typeAndName[1]));
-        }
-        return out;
-    }
-
     protected Method(Comment comment, Visibility visibility, Scope scope,
                      TargetClass type, String name, List<Var> paramList,
                      List<TargetClass> exceptionList, Block body) {
@@ -95,29 +83,11 @@ public class Method extends Formatted implements HasAtoms {
         return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
     }
 
-    @Deprecated
-    public static Method newPublicConstructorWithException(Comment comment,
-                                                    String name,
-                                                    String paramList,
-                                                    String exceptionList,
-                                                    Block body) {
-        return newPublicConstructorWithException(comment, name, oldParmanList2newParamList(paramList),
-                ClassWriter.oldClassList2newClassList(exceptionList), body);
-    }
-
     public static Method newPublicConstructor(Comment comment,
                                        String name,
                                        List<Var> paramList,
                                        Block body) {
         return newPublicConstructorWithException(comment, name, paramList, Collections.<TargetClass>emptyList(), body);
-    }
-
-    @Deprecated
-    public static Method newPublicConstructor(Comment comment,
-                                       String name,
-                                       String paramList,
-                                       Block body) {
-        return newPublicConstructor(comment, name, oldParmanList2newParamList(paramList), body);
     }
 
     public static Method newPublicReadObjectState(Comment comment,
@@ -126,18 +96,6 @@ public class Method extends Formatted implements HasAtoms {
                                            Block body) {
         return newPublicDynamicMethod(comment, type, name, Collections.<Var>emptyList(),
                 Collections.<TargetClass>emptyList(), body);
-    }
-
-    @Deprecated
-    public static Method newPublicDynamicMethod(Comment comment,
-                                         TargetClass type,
-                                         String name,
-                                         String paramList,
-                                         String exceptionList,
-                                         Block body) {
-        return newPublicDynamicMethod(comment,
-                type, name, oldParmanList2newParamList(paramList),
-                ClassWriter.oldClassList2newClassList(exceptionList), body);
     }
 
     public static Method newPublicDynamicMethod(Comment comment,
@@ -152,14 +110,6 @@ public class Method extends Formatted implements HasAtoms {
     public static Method newReadClassState(Comment comment, TargetClass type, String name, Block body) {
         return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, Collections.<Var>emptyList(),
                 Collections.<TargetClass>emptyList(), body);
-    }
-
-    @Deprecated
-    public static Method custom(Comment comment, Visibility visibility, Scope scope,
-                                TargetClass type, String name, String paramList,
-                                String exceptionList, Block body) {
-        return custom(comment, visibility, scope, type, name, oldParmanList2newParamList(paramList),
-                ClassWriter.oldClassList2newClassList(exceptionList), body);
     }
 
     public static Method custom(Comment comment, Visibility visibility, Scope scope,
