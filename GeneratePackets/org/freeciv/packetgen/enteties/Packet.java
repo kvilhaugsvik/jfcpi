@@ -50,6 +50,7 @@ public class Packet extends ClassWriter implements IDependency {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new Import[]{
                               Import.allIn(new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage())),
                               Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage())),
+                              Import.classIn(org.freeciv.Util.class),
                               null,
                               Import.classIn(java.io.DataInput.class),
                               Import.classIn(java.io.DataOutput.class),
@@ -231,7 +232,7 @@ public class Packet extends ClassWriter implements IDependency {
         Block body = new Block(buildOutput);
         for (Field field : fields)
             body.addStatement(asVoid("out += \"\\n\\t" + field.getFieldName() + " = \" + " + (field.hasDeclarations() ?
-                    "org.freeciv.Util.joinStringArray(" + "this." + field.getFieldName() + ", " +
+                    "Util.joinStringArray(" + "this." + field.getFieldName() + ", " +
                             "\", \"" +
                             ", \"(\", \")\"" + ")" :
                     "this." + field.getFieldName() + ".toString()")));
