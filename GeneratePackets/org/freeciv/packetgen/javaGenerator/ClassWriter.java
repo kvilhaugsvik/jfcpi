@@ -137,22 +137,6 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     /**
-     * Create a parameter list
-     * @param parameters the parameters given as a list of map entry that maps from type to name
-     * @return the parameter list
-     */
-    protected static String createParameterList(List<Map.Entry<String, String>> parameters) {
-        String argumentsList = "";
-        if (0 < parameters.size()) {
-            for (Map.Entry<String, String> field : parameters) {
-                argumentsList += field.getKey() + " " + field.getValue() + ", ";
-            }
-            argumentsList = argumentsList.substring(0, argumentsList.length() - 2);
-        }
-        return argumentsList;
-    }
-
-    /**
      * Get a line that sets a field's value to the value of the variable of the same name.
      * @param field Name of the field (and variable)
      * @return a line of Java setting the field's value to the value of the variable with the same name
@@ -197,12 +181,12 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     private void constructorFromFields(CodeAtoms to) {
         Block body = new Block();
-        LinkedList<Map.Entry<String, String>> args = new LinkedList<Map.Entry<String, String>>();
+        LinkedList<Var> args = new LinkedList<Var>();
         for (Var dec : fields) {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
-            args.add(new AbstractMap.SimpleImmutableEntry<String, String>(dec.getType(), dec.getName()));
+            args.add(Var.param(dec.getType(), dec.getName()));
         }
-        Method.newPublicConstructor(Comment.no(), name, createParameterList(args), body).writeAtoms(to);
+        Method.newPublicConstructor(Comment.no(), name, args, body).writeAtoms(to);
     }
 
     @Override
