@@ -234,7 +234,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         }
         if (!implementsInterface.isEmpty()) {
             to.add(IMPLEMENTS);
-            to.joinSep(HasAtoms.SEP, implementsInterface.toArray(new HasAtoms[implementsInterface.size()]));
+            to.joinSep(HasAtoms.SEP, implementsInterface);
         }
 
         to.add(HasAtoms.LSC);

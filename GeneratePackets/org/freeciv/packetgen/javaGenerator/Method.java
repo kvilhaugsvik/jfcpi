@@ -76,13 +76,13 @@ public class Method extends Formatted implements HasAtoms {
         to.add(HasAtoms.LPR);
         if (!paramList.isEmpty()) {
             to.hintStart(CodeStyle.ARGUMENTS);
-            to.joinSep(SEP, paramList.toArray(new HasAtoms[paramList.size()]));
+            to.joinSep(SEP, paramList);
             to.hintEnd(CodeStyle.ARGUMENTS);
         }
         to.add(HasAtoms.RPR);
         if (!exceptionList.isEmpty()) {
             to.add(THROWS);
-            to.joinSep(SEP, exceptionList.toArray(new HasAtoms[exceptionList.size()]));
+            to.joinSep(SEP, exceptionList);
         }
         body.writeAtoms(to);
     }

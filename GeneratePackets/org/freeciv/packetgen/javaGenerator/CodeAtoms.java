@@ -68,6 +68,10 @@ public class CodeAtoms {
         return atoms.toArray(new IR[atoms.size()]);
     }
 
+    public void joinSep(HasAtoms separator, Collection<? extends HasAtoms> toJoin) {
+        joinSep(separator, toJoin.toArray(new HasAtoms[toJoin.size()]));
+    }
+
     public void joinSep(HasAtoms separator, HasAtoms[] toJoin) {
         if (toJoin.length < 1)
             return;

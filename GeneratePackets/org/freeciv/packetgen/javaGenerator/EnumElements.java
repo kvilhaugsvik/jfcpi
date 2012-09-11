@@ -41,7 +41,7 @@ public class EnumElements extends Formatted implements HasAtoms {
     public void writeAtoms(CodeAtoms to) {
         if (!enumerations.isEmpty()) {
             to.hintStart(EnumElements.class.getName());
-            to.joinSep(SEP, enumerations.values().toArray(new HasAtoms[enumerations.size()]));
+            to.joinSep(SEP, enumerations.values());
             to.add(EOL);
             to.hintEnd(EnumElements.class.getName());
         }
