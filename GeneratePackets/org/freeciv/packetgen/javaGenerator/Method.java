@@ -44,7 +44,7 @@ public class Method extends Formatted implements HasAtoms {
         this.type = type;
         this.name = name;
         this.paramList = paramList;
-        this.exceptionList = (null == exceptionList ? null : ClassWriter.oldClassList2newClassList(exceptionList));
+        this.exceptionList = ClassWriter.oldClassList2newClassList(exceptionList);
         this.body = body;
     }
 
@@ -67,7 +67,7 @@ public class Method extends Formatted implements HasAtoms {
         to.add(HasAtoms.LPR);
         if (null != paramList) to.add(new IR.CodeAtom(paramList));
         to.add(HasAtoms.RPR);
-        if (null != exceptionList) {
+        if (!exceptionList.isEmpty()) {
             to.add(new IR.CodeAtom("throws"));
             to.joinSep(SEP, exceptionList.toArray(new HasAtoms[exceptionList.size()]));
         }

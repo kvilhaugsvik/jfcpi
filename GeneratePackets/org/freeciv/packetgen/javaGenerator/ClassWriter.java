@@ -50,6 +50,8 @@ public class ClassWriter extends Formatted implements HasAtoms {
     private boolean constructorFromAllFields = false;
 
     public static List<TargetClass> oldClassList2newClassList(String classes) {
+        if (null == classes || "".equals(classes))
+            return Collections.<TargetClass>emptyList();
         List<TargetClass> out = new LinkedList<TargetClass>();
         for (String target : classes.split(", "))
             out.add(new TargetClass(target));
@@ -67,9 +69,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
         this.name = name;
         this.parent = (null == parent ? null : new TargetClass(parent));
-        this.implementsInterface = (null == implementsInterface ?
-                null :
-                oldClassList2newClassList(implementsInterface));
+        this.implementsInterface = oldClassList2newClassList(implementsInterface);
         this.kind = kind;
 
         visibility = Visibility.PUBLIC;
@@ -234,7 +234,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
             to.add(new IR.CodeAtom("extends"));
             parent.writeAtoms(to);
         }
-        if (null != implementsInterface) {
+        if (!implementsInterface.isEmpty()) {
             to.add(new IR.CodeAtom("implements"));
             to.joinSep(HasAtoms.SEP, implementsInterface.toArray(new HasAtoms[implementsInterface.size()]));
         }
