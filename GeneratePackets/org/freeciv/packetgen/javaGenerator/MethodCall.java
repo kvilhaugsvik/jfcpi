@@ -21,6 +21,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 
 public class MethodCall<Returns extends Returnable> extends Formatted implements HasAtoms, Typed<Returns> {
     private final Comment comment;
@@ -62,9 +63,9 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         to.add(new CodeAtom(method));
         to.add(LPR);
         if (0 < parameters.length) {
-            to.hintStart("CallArgs");
+            to.hintStart(CodeStyle.ARGUMENTS);
             to.joinSep(SEP, parameters);
-            to.hintEnd("CallArgs");
+            to.hintEnd(CodeStyle.ARGUMENTS);
         }
         to.add(RPR);
         to.hintEnd(MethodCall.class.getCanonicalName());
