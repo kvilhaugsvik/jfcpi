@@ -119,6 +119,18 @@ public class Var extends Formatted implements Typed<Returnable> {
         return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, new TargetClass(type), name, value);
     }
 
+    public static Var param(TargetClass kind, String name) {
+        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, kind, name, null);
+    }
+
+    public static Var param(Class kind, String name) {
+        return Var.param(new TargetClass(kind), name);
+    }
+
+    public static Var param(String kind, String name) {
+        return Var.param(new TargetClass(kind), name);
+    }
+
     public static Var field(Visibility visibility, Scope scope, Modifiable modifiable,
                                             String type, String name, Typed<? extends AValue> value) {
         return field(Collections.<Annotate>emptyList(), visibility, scope, modifiable, type, name, value);
