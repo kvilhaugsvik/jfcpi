@@ -44,14 +44,15 @@ public class Method extends Formatted implements HasAtoms {
         return out;
     }
 
-    protected Method(Comment comment, Visibility visibility, Scope scope, TargetClass type, String name, String paramList,
-                  String exceptionList, Block body) {
+    protected Method(Comment comment, Visibility visibility, Scope scope,
+                     TargetClass type, String name, List<Var> paramList,
+                     String exceptionList, Block body) {
         this.comment = comment;
         this.visibility = visibility;
         this.scope = scope;
         this.type = type;
         this.name = name;
-        this.paramList = oldParmanList2newParamList(paramList);
+        this.paramList = paramList;
         this.exceptionList = ClassWriter.oldClassList2newClassList(exceptionList);
         this.body = body;
     }
@@ -88,42 +89,81 @@ public class Method extends Formatted implements HasAtoms {
 
     public static Method newPublicConstructorWithException(Comment comment,
                                                     String name,
-                                                    String paramList,
+                                                    List<Var> paramList,
                                                     String exceptionList,
                                                     Block body) {
         return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
     }
 
+    @Deprecated
+    public static Method newPublicConstructorWithException(Comment comment,
+                                                    String name,
+                                                    String paramList,
+                                                    String exceptionList,
+                                                    Block body) {
+        return newPublicConstructorWithException(comment, name, oldParmanList2newParamList(paramList),
+                exceptionList, body);
+    }
+
+    public static Method newPublicConstructor(Comment comment,
+                                       String name,
+                                       List<Var> paramList,
+                                       Block body) {
+        return newPublicConstructorWithException(comment, name, paramList, null, body);
+    }
+
+    @Deprecated
     public static Method newPublicConstructor(Comment comment,
                                        String name,
                                        String paramList,
                                        Block body) {
-        return newPublicConstructorWithException(comment, name, paramList, null, body);
+        return newPublicConstructor(comment, name, oldParmanList2newParamList(paramList), body);
     }
 
     public static Method newPublicReadObjectState(Comment comment,
                                            TargetClass type,
                                            String name,
                                            Block body) {
-        return newPublicDynamicMethod(comment, type, name, null, null, body);
+        return newPublicDynamicMethod(comment, type, name, Collections.<Var>emptyList(), null, body);
     }
 
+    @Deprecated
     public static Method newPublicDynamicMethod(Comment comment,
                                          TargetClass type,
                                          String name,
                                          String paramList,
                                          String exceptionList,
                                          Block body) {
+        return newPublicDynamicMethod(comment,
+                type, name, oldParmanList2newParamList(paramList),
+                exceptionList, body);
+    }
+
+    public static Method newPublicDynamicMethod(Comment comment,
+                                         TargetClass type,
+                                         String name,
+                                         List<Var> paramList,
+                                         String exceptionList,
+                                         Block body) {
         return custom(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
     }
 
     public static Method newReadClassState(Comment comment, TargetClass type, String name, Block body) {
-        return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, null, null, body);
+        return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, Collections.<Var>emptyList(), null, body);
     }
 
+    @Deprecated
     public static Method custom(Comment comment, Visibility visibility, Scope scope,
                                 TargetClass type, String name, String paramList,
                                 String exceptionList, Block body) {
-        return new Method(comment, visibility, scope, type, name, paramList, exceptionList, body);
+        return custom(comment, visibility, scope, type, name, oldParmanList2newParamList(paramList),
+                exceptionList, body);
+    }
+
+    public static Method custom(Comment comment, Visibility visibility, Scope scope,
+                                      TargetClass type, String name, List<Var> paramList,
+                                      String exceptionList, Block body) {
+        return new Method(comment, visibility, scope, type, name, paramList,
+                exceptionList, body);
     }
 }

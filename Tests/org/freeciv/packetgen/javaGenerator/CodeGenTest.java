@@ -64,7 +64,7 @@ public class CodeGenTest {
 
     @Test public void testMethodNoParams() {
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                new TargetClass("int"), "testMethod", null,
+                new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
                 "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
@@ -77,7 +77,7 @@ public class CodeGenTest {
 
     @Test public void testMethodManyLevelsOfIndention() {
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                new TargetClass("int"), "testMethod", null,
+                new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
                 null,
                 new Block(WHILE(TRUE,
                         new Block(WHILE(TRUE,
@@ -111,7 +111,7 @@ public class CodeGenTest {
             }
         };
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                new TargetClass("int"), "testMethod", null,
+                new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
                 null, closesScopeNotOpened)).toString();
     }
 
@@ -139,7 +139,7 @@ public class CodeGenTest {
             }
         };
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                new TargetClass("int"), "testMethod", null,
+                new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
                 null, forgetsToCloseScope)).toString();
     }
 
