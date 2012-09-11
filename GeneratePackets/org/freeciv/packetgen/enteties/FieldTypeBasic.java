@@ -25,8 +25,12 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
@@ -41,6 +45,10 @@ public class FieldTypeBasic implements IDependency {
     private final ExprFrom1<Typed<AString>, Var> value2String;
     private final boolean arrayEater;
 
+    private final Var fValue;
+    private final Var pTo;
+    private final Var pFromStream;
+
     private final Collection<Requirement> requirement;
     private final FieldTypeBasic basicType = this;
 
@@ -51,20 +59,20 @@ public class FieldTypeBasic implements IDependency {
                           ExprFrom1<Typed<AnInt>, Var> encodedSize,
                           ExprFrom1<Typed<AString>, Var> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
-        Var from = Var.local(java.io.DataInput.class, "from", null);
-        Var to = Var.local(java.io.DataOutput.class, "to", null);
-        Var value = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-                        javaType, "value", null);
+        pFromStream = Var.param(new TargetClass(DataInput.class, true), "from");
+        pTo = Var.param(new TargetClass(DataOutput.class, true), "to");
+        fValue = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+                javaType, "value", null);
 
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
         this.publicType = publicType;
         this.javaType = javaType;
-        this.decode = decode.x(value, from);
-        this.encode = encode.x(value, to);
-        this.encodedSize = new Block(RETURN(encodedSize.x(value)));
+        this.decode = decode.x(fValue, pFromStream);
+        this.encode = encode.x(fValue, pTo);
+        this.encodedSize = new Block(RETURN(encodedSize.x(fValue)));
         this.arrayEater = arrayEater;
         this.value2String = toString;
-        this.constructorBody = constructorBody.x(value);
+        this.constructorBody = constructorBody.x(fValue);
 
         requirement = needs;
     }
@@ -107,37 +115,43 @@ public class FieldTypeBasic implements IDependency {
                                           }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name, null, "FieldType<" + javaType.getName() + ">");
 
             addObjectConstant(javaType.getName(), "value");
+
+            List<TargetClass> tIOExcept = Arrays.asList(new TargetClass("IOException"));
+            Var pValue = Var.param(javaType, "value");
+            Var pArraySize = Var.param(int.class, "arraySize");
+
             if (arrayEater) {
                 addMethod(Method.newPublicConstructor(Comment.no(),
-                        getName(), javaType.getName() + " value" + ", int arraySize",
+                        getName(), Arrays.asList(pValue, pArraySize),
                         constructorBody));
                 addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                        getName(), "DataInput from" + ", int arraySize",
-                        "IOException", decode));
+                        getName(), Arrays.asList(pFromStream, pArraySize),
+                        tIOExcept, decode));
             } else {
                 addMethod(Method.newPublicConstructor(Comment.no(),
-                        getName(), javaType.getName() + " value",
+                        getName(), Arrays.asList(pValue),
                         constructorBody));
                 addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                        getName(), "DataInput from", "IOException",
+                        getName(), Arrays.asList(pFromStream), tIOExcept,
                         decode));
             }
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                    TargetClass.fromName("void"), "encodeTo", "DataOutput to",
-                    "IOException", encode));
+                    new TargetClass(void.class, true), "encodeTo", Arrays.asList(pTo),
+                    tIOExcept, encode));
             addMethod(Method.newPublicReadObjectState(Comment.no(),
                     TargetClass.fromName("int"), "encodedLength",
                     encodedSize));
             addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    TargetClass.fromName(javaType.getName()), "getValue",
+                    javaType, "getValue",
                     new Block(RETURN(getField("value").ref()))));
             addMethod(Method.newPublicReadObjectState(Comment.no(),
                     TargetClass.fromName("String"), "toString",
                     new Block(RETURN(value2String.x(getField("value"))))));
+            Var paramOther = Var.param(new TargetClass(Object.class), "other");
             addMethod(Method.custom(Comment.no(),
                     Visibility.PUBLIC, Scope.OBJECT,
-                    TargetClass.fromName("boolean"), "equals", "Object other",
-                    null,
+                    TargetClass.fromName("boolean"), "equals", Arrays.asList(paramOther),
+                    Collections.<TargetClass>emptyList(),
                     new Block(IF(
                             asBool("other instanceof " + name),
                             new Block(RETURN(asBool("this.value == ((" + name + ")other).getValue()"))),
