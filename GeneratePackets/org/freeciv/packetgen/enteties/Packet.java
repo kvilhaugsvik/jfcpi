@@ -137,6 +137,7 @@ public class Packet extends ClassWriter implements IDependency {
     private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind) throws UndefinedException {
         Var argHeader = Var.local(PacketHeader.class, "header", null);
         final Var streamName = Var.local(DataInput.class, "from", null);
+        final TargetClass ioexception = new TargetClass(IOException.class, true);
 
         Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
         for (Field field : fields) {
@@ -152,7 +153,7 @@ public class Packet extends ClassWriter implements IDependency {
         constructorBodyStream.groupBoundary();
 
         constructorBodyStream.addStatement(IF(asBool("number != header.getPacketKind()"),
-                new Block(THROW((new TargetClass(IOException.class)).newInstance(sum(
+                new Block(THROW((ioexception).newInstance(sum(
                         literalString("Tried to create package " + name + " but packet number was "),
                         argHeader.<AnInt>call("getPacketKind")))))));
 
@@ -168,7 +169,7 @@ public class Packet extends ClassWriter implements IDependency {
                 GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), asAnInt("calcBodyLen()"))),
                 literalString(") don't match header packet size ("), argHeader.<AnInt>call("getTotalSize"),
                 literalString(") for "), asAString("this.toString()"))));
-        wrongSize.addStatement(THROW((new TargetClass(IOException.class)).newInstance(sum(
+        wrongSize.addStatement(THROW(ioexception.newInstance(sum(
                 literalString("Packet size in header and Java packet not the same."),
                 literalString(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
                 literalString(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
@@ -177,7 +178,7 @@ public class Packet extends ClassWriter implements IDependency {
                 "Construct an object from a DataInput", new String(),
                 Comment.param(streamName, "data stream that is at the start of the package body"),
                 Comment.param(argHeader, "header data. Must contain size and number"),
-                Comment.docThrows(new TargetClass("IOException"), "if the DataInput has a problem")),
+                Comment.docThrows(ioexception, "if the DataInput has a problem")),
                 getName(), "DataInput " + streamName.getName() + ", PacketHeader header",
                 "IOException",
                 constructorBodyStream));

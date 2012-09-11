@@ -22,14 +22,22 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class TargetClass extends Address implements AValue {
+    private final boolean isInScope;
     private final CodeAtom name;
     private final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
 
-    public TargetClass(String fullPath) {
+    public TargetClass(String fullPath, boolean isInScope) {
         super(fullPath.split("\\."));
         name = super.components[super.components.length - 1];
+        this.isInScope = isInScope;
+    }
+
+    private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w");
+    public TargetClass(String fullPath) {
+        this(fullPath, inJavaLang.matcher(fullPath).matches());
 
         // While all classes have a toString this isn't true for all types.
         // As all types are assumed to be classes this may cause trouble
@@ -37,7 +45,11 @@ public class TargetClass extends Address implements AValue {
     }
 
     public TargetClass(Class wrapped) {
-        this(wrapped.getCanonicalName());
+        this(wrapped, Package.getPackage("java.lang").equals(wrapped.getPackage()));
+    }
+
+    public TargetClass(Class wrapped, boolean isInScope) {
+        this(wrapped.getCanonicalName(), isInScope);
         for (Method has : wrapped.getMethods())
             methods.put(has.getName(), new TargetMethod(has));
     }
@@ -47,10 +59,14 @@ public class TargetClass extends Address implements AValue {
     }
 
     public <Kind extends AValue> Typed<Kind> read(final String field) {
+        final TargetClass parent = this;
         return new Typed<Kind>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
-                to.add(name);
+                if (isInScope)
+                    to.add(name);
+                else
+                    parent.writeAtoms(to);
                 to.add(HAS);
                 to.add(new CodeAtom(field));
             }
@@ -71,7 +87,10 @@ public class TargetClass extends Address implements AValue {
         return new Formatted.Type<AValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
-                parent.writeAtoms(to);
+                if (isInScope)
+                    to.add(name);
+                else
+                    parent.writeAtoms(to);
                 to.add(HAS);
                 to.add(typeClassField);
             }
@@ -80,16 +99,28 @@ public class TargetClass extends Address implements AValue {
 
     private final static CodeAtom newInst = new CodeAtom("new");
     public MethodCall<AValue> newInstance(Typed<? extends AValue>... parameterList) {
+        final TargetClass parent = this;
         return new MethodCall<AValue>("new " + name.get(), parameterList) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(newInst);
-                to.add(name);
+                if (isInScope)
+                    to.add(name);
+                else
+                    parent.writeAtoms(to);
                 to.add(LPR);
                 to.joinSep(SEP, parameters);
                 to.add(RPR);
             }
         };
+    }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        if (isInScope)
+            name.writeAtoms(to);
+        else
+            super.writeAtoms(to);
     }
 
     public static TargetClass fromName(String name) {

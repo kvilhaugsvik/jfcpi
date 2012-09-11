@@ -490,7 +490,8 @@ public class CodeGenTest {
                 IF(asBool("getNumber() != packet"),
                         Block.fromStrings("throw new IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet)")));
         body.groupBoundary();
-        body.addStatement(IF(asBool("getEncodedSize() != headerLen"), new Block(THROW((new TargetClass(IOException.class))
+        body.addStatement(IF(asBool("getEncodedSize() != headerLen"),
+                new Block(THROW((new TargetClass(IOException.class, true))
                         .newInstance(sum(
                                 literalString("Package size in header and Java packet not the same. Header: "),
                                 asAValue("headerLen"),

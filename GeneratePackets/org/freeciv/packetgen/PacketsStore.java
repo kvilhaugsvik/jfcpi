@@ -55,10 +55,10 @@ public class PacketsStore {
 
         switch (bytesInPacketNumber) {
             case 1:
-                packetHeaderType = new TargetClass(Header_2_1.class);
+                packetHeaderType = new TargetClass(Header_2_1.class, true);
                 break;
             case 2:
-                packetHeaderType = new TargetClass(Header_2_2.class);
+                packetHeaderType = new TargetClass(Header_2_2.class, true);
                 break;
             default: throw new IllegalArgumentException("No other sizes than one or two bytes are supported" +
                                                                 "for packet kind field in packet header");

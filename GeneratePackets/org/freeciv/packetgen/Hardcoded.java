@@ -129,7 +129,7 @@ public class Hardcoded {
                     new ExprFrom2<Block, Var, Var>() {
                                    @Override
                                    public Block x(Var to, Var from) {
-                                       TargetClass universal = new TargetClass("org.freeciv.types.universal");
+                                       TargetClass universal = new TargetClass("org.freeciv.types.universal", true);
                                        Var len = Var.local("int", "length", from.<AValue>call("readUnsignedByte"));
                                        Var counter = Var.local("int", "i",
                                                asAnInt("0"));
