@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
+import org.freeciv.packetgen.javaGenerator.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.Var;
@@ -177,6 +178,17 @@ public class BuiltIn {
                 a.writeAtoms(to);
                 to.add(DIV);
                 b.writeAtoms(to);
+            }
+        };
+    }
+
+    public static MethodCall<AValue> inc(final Var var, final Typed<? extends AValue> toAdd) {
+        return new MethodCall<AValue>("+=", var.ref()) {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                var.ref().writeAtoms(to);
+                to.add(INC_USING);
+                toAdd.writeAtoms(to);
             }
         };
     }
