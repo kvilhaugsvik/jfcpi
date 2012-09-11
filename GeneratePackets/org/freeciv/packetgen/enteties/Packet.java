@@ -214,7 +214,7 @@ public class Packet extends ClassWriter implements IDependency {
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName("int"), "calcBodyLen", Collections.<Var>emptyList(),
-                null,
+                Collections.<TargetClass>emptyList(),
                 encodeFieldsLen));
     }
 

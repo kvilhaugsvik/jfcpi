@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class CodeGenTest {
     @Test public void testMethodNoParams() {
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
-                "Throwable", new Block(RETURN(asAnInt("5"))))).toString();
+                Arrays.<TargetClass>asList(new TargetClass("Throwable")), new Block(RETURN(asAnInt("5"))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
@@ -78,7 +79,7 @@ public class CodeGenTest {
     @Test public void testMethodManyLevelsOfIndention() {
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
-                null,
+                Collections.<TargetClass>emptyList(),
                 new Block(WHILE(TRUE,
                         new Block(WHILE(TRUE,
                                 new Block(WHILE(TRUE,
@@ -112,7 +113,7 @@ public class CodeGenTest {
         };
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
-                null, closesScopeNotOpened)).toString();
+                Collections.<TargetClass>emptyList(), closesScopeNotOpened)).toString();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -140,7 +141,7 @@ public class CodeGenTest {
         };
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
-                null, forgetsToCloseScope)).toString();
+                Collections.<TargetClass>emptyList(), forgetsToCloseScope)).toString();
     }
 
     @Test public void testMethodEverythingTwoLineComment() {

@@ -46,14 +46,14 @@ public class Method extends Formatted implements HasAtoms {
 
     protected Method(Comment comment, Visibility visibility, Scope scope,
                      TargetClass type, String name, List<Var> paramList,
-                     String exceptionList, Block body) {
+                     List<TargetClass> exceptionList, Block body) {
         this.comment = comment;
         this.visibility = visibility;
         this.scope = scope;
         this.type = type;
         this.name = name;
         this.paramList = paramList;
-        this.exceptionList = ClassWriter.oldClassList2newClassList(exceptionList);
+        this.exceptionList = exceptionList;
         this.body = body;
     }
 
@@ -90,7 +90,7 @@ public class Method extends Formatted implements HasAtoms {
     public static Method newPublicConstructorWithException(Comment comment,
                                                     String name,
                                                     List<Var> paramList,
-                                                    String exceptionList,
+                                                    List<TargetClass> exceptionList,
                                                     Block body) {
         return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
     }
@@ -102,14 +102,14 @@ public class Method extends Formatted implements HasAtoms {
                                                     String exceptionList,
                                                     Block body) {
         return newPublicConstructorWithException(comment, name, oldParmanList2newParamList(paramList),
-                exceptionList, body);
+                ClassWriter.oldClassList2newClassList(exceptionList), body);
     }
 
     public static Method newPublicConstructor(Comment comment,
                                        String name,
                                        List<Var> paramList,
                                        Block body) {
-        return newPublicConstructorWithException(comment, name, paramList, null, body);
+        return newPublicConstructorWithException(comment, name, paramList, Collections.<TargetClass>emptyList(), body);
     }
 
     @Deprecated
@@ -124,7 +124,8 @@ public class Method extends Formatted implements HasAtoms {
                                            TargetClass type,
                                            String name,
                                            Block body) {
-        return newPublicDynamicMethod(comment, type, name, Collections.<Var>emptyList(), null, body);
+        return newPublicDynamicMethod(comment, type, name, Collections.<Var>emptyList(),
+                Collections.<TargetClass>emptyList(), body);
     }
 
     @Deprecated
@@ -136,20 +137,21 @@ public class Method extends Formatted implements HasAtoms {
                                          Block body) {
         return newPublicDynamicMethod(comment,
                 type, name, oldParmanList2newParamList(paramList),
-                exceptionList, body);
+                ClassWriter.oldClassList2newClassList(exceptionList), body);
     }
 
     public static Method newPublicDynamicMethod(Comment comment,
                                          TargetClass type,
                                          String name,
                                          List<Var> paramList,
-                                         String exceptionList,
+                                         List<TargetClass> exceptionList,
                                          Block body) {
         return custom(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
     }
 
     public static Method newReadClassState(Comment comment, TargetClass type, String name, Block body) {
-        return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, Collections.<Var>emptyList(), null, body);
+        return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, Collections.<Var>emptyList(),
+                Collections.<TargetClass>emptyList(), body);
     }
 
     @Deprecated
@@ -157,12 +159,12 @@ public class Method extends Formatted implements HasAtoms {
                                 TargetClass type, String name, String paramList,
                                 String exceptionList, Block body) {
         return custom(comment, visibility, scope, type, name, oldParmanList2newParamList(paramList),
-                exceptionList, body);
+                ClassWriter.oldClassList2newClassList(exceptionList), body);
     }
 
     public static Method custom(Comment comment, Visibility visibility, Scope scope,
                                       TargetClass type, String name, List<Var> paramList,
-                                      String exceptionList, Block body) {
+                                      List<TargetClass> exceptionList, Block body) {
         return new Method(comment, visibility, scope, type, name, paramList,
                 exceptionList, body);
     }
