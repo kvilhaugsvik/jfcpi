@@ -47,27 +47,18 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     private boolean constructorFromAllFields = false;
 
-    public static List<TargetClass> oldClassList2newClassList(String classes) {
-        if (null == classes || "".equals(classes))
-            return Collections.<TargetClass>emptyList();
-        List<TargetClass> out = new LinkedList<TargetClass>();
-        for (String target : classes.split(", "))
-            out.add(new TargetClass(target));
-        return out;
-    }
-
     public ClassWriter(ClassKind kind, TargetPackage where, Import[] imports,
                        String madeFrom, List<Annotate> classAnnotate,
                        String name,
-                       String parent, String implementsInterface) {
+                       TargetClass parent, List<TargetClass> implementsInterface) {
         if (null == name) throw new IllegalArgumentException("No name for class to be generated");
 
         this.where = where;
         this.imports = null == imports ? new LinkedList<Import>() : new ArrayList<Import>(Arrays.asList(imports));
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
         this.name = name;
-        this.parent = (null == parent ? null : new TargetClass(parent));
-        this.implementsInterface = oldClassList2newClassList(implementsInterface);
+        this.parent = parent;
+        this.implementsInterface = implementsInterface;
         this.kind = kind;
 
         visibility = Visibility.PUBLIC;

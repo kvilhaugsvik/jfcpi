@@ -121,7 +121,8 @@ public class TypedCodeTest {
     public void addLocalAsFieldWhileAskingForGetter() {
         Var notAField = Var.local(Integer.class, "i", null);
         ClassWriter testcase = new ClassWriter(ClassKind.CLASS, new TargetPackage("top"), null, null,
-                Collections.<Annotate>emptyList(), "Testcase", null, null);
+                Collections.<Annotate>emptyList(), "Testcase",
+                TargetClass.fromName(null), Collections.<TargetClass>emptyList());
 
         testcase.addObjectConstantAndGetter(notAField);
     }

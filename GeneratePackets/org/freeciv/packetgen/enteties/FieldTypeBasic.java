@@ -112,7 +112,8 @@ public class FieldTypeBasic implements IDependency {
                                                   Import.classIn(java.io.IOException.class),
                                                   null,
                                                   Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()))
-                                          }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name, null, "FieldType<" + javaType.getName() + ">");
+                                          }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
+                                          TargetClass.fromName(null), Arrays.asList(new TargetClass("FieldType<" + javaType.getName() + ">")));
 
             addObjectConstant(javaType.getName(), "value");
 
