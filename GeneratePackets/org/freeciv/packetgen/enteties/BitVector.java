@@ -11,6 +11,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,9 +35,18 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
         knowsSize = true;
 
-        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "byte[] from", Block.fromStrings("super(size, " + "from)")));
-        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "boolean[] from", Block.fromStrings("super(from)")));
-        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "boolean setAllTo", Block.fromStrings("super(size, " + "setAllTo)")));
+        Var pFromByte = Var.param("byte[]", "from");
+        Var pFromBits = Var.param("boolean[]", "from");
+        Var pFromBit = Var.param(boolean.class, "setAllTo");
+        addMethod(Method.newPublicConstructor(Comment.no(),
+                getName(), Arrays.asList(pFromByte),
+                new Block(new MethodCall<Returnable>("super", getField("size").ref(), pFromByte.ref()))));
+        addMethod(Method.newPublicConstructor(Comment.no(),
+                getName(), Arrays.asList(pFromBits),
+                new Block(new MethodCall<Returnable>("super", pFromBits.ref()))));
+        addMethod(Method.newPublicConstructor(Comment.no(),
+                getName(), Arrays.asList(pFromBit),
+                new Block(new MethodCall<Returnable>("super", getField("size").ref(), pFromBit.ref()))));
 
         iRequire = bits.getReqs();
         iProvide = new Requirement(getName(), Requirement.Kind.AS_JAVA_DATATYPE);
@@ -50,16 +60,28 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addPublicObjectConstant("int", "size");
         knowsSize = false;
 
+        Var pFromByte = Var.param("byte[]", "from");
+        Var pFromBits = Var.param("boolean[]", "from");
+        Var pFromBit = Var.param(boolean.class, "setAllTo");
+        Var pSize = Var.param(int.class, "size");
+        Var pSizeB = Var.param(int.class, "sizeInBits");
         Var size = getField("size");
-        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "byte[] from, int sizeInBits", new Block(
-                BuiltIn.asAValue("super(sizeInBits, " + "from)"),
-                getField("size").assign(BuiltIn.asAValue("sizeInBits")))));
-        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "boolean[] from", new Block(
-                BuiltIn.asAValue("super(from)"),
-                size.assign(BuiltIn.asAValue("from.length")))));
-        addMethod(Method.newPublicConstructor(Comment.no(), getName(), "boolean setAllTo, int size", new Block(
-                BuiltIn.asAValue("super(size, " + "setAllTo)"),
-                size.assign(BuiltIn.asAValue("size")))));
+
+        addMethod(Method.newPublicConstructor(Comment.no(),
+                getName(), Arrays.asList(pFromByte, pSizeB),
+                new Block(
+                        new MethodCall("super", pSizeB.ref(), pFromByte.ref()),
+                        size.assign(pSizeB.ref()))));
+        addMethod(Method.newPublicConstructor(Comment.no(),
+                getName(), Arrays.asList(pFromBits),
+                new Block(
+                        new MethodCall<Returnable>("super", pFromBits.ref()),
+                        size.assign(pFromBits.read("length")))));
+        addMethod(Method.newPublicConstructor(Comment.no(),
+                getName(), Arrays.asList(pFromBit, pSize),
+                new Block(
+                        new MethodCall<Returnable>("super", pSize.ref(), pFromBit.ref()),
+                        size.assign(pSize.ref()))));
 
         iRequire = Collections.<Requirement>emptySet();
         iProvide = new Requirement("char", Requirement.Kind.AS_JAVA_DATATYPE);
