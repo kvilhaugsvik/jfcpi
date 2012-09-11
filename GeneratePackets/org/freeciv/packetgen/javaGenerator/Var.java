@@ -45,7 +45,20 @@ public class Var extends Formatted implements Typed<Returnable> {
         this.name = name;
         this.value = value;
 
-        this.referName = new Address((Scope.CODE_BLOCK.equals(scope) ? "" : "this.") + name);
+        this.referName = new Address(accessLook(name));
+    }
+
+    private String accessLook(String name) {
+        switch (scope) {
+            case CLASS:
+                // TODO: Append class name
+                break;
+            case OBJECT:
+                return "this." + name;
+            case CODE_BLOCK:
+                break;
+        }
+        return name;
     }
 
     public Visibility getVisibility() {
