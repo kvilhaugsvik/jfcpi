@@ -14,43 +14,29 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
-import java.util.Collections;
 import java.util.List;
 
-public class WeakField {
-    private final String name, type;
-    private final ArrayDeclaration[] declarations;
+public class WeakField extends WeakVarDec {
     private final List<WeakFlag> flags;
 
     public WeakField(String name, String kind, List<WeakFlag> flags, ArrayDeclaration... declarations) {
-        this.name = name;
-        this.type = kind;
-        this.declarations = declarations;
+        super(kind, name, declarations);
         this.flags = flags;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public ArrayDeclaration[] getDeclarations() {
-        return declarations;
     }
 
     public List<WeakFlag> getFlags() {
         return flags;
     }
 
-    public static class ArrayDeclaration {
-        public final IntExpression maxSize;
+    public ArrayDeclaration[] getDeclarations() {
+        return (ArrayDeclaration[])super.getDeclarations();
+    }
+
+    public static class ArrayDeclaration extends WeakVarDec.ArrayDeclaration {
         public final String elementsToTransfer;
 
         public ArrayDeclaration(IntExpression maxSize, String elementsToTransfer) {
-            this.maxSize = maxSize;
+            super(maxSize);
             this.elementsToTransfer = elementsToTransfer;
         }
     }
