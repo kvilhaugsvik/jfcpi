@@ -152,11 +152,16 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
         normalizedInt.reduce(_ + " " + _) + " a valid C integer?");
     }
 
-    def isIntIsh(cTypeDecs: List[String]): Boolean =
-      List("unsigned", "signed", "long", "short", "int", "char", "sint", "uint").contains(cTypeDecs.head)
+    object Intish {
+      def unapply(term: List[String]): Option[List[String]] =
+        if (List("unsigned", "signed", "long", "short", "int", "char", "sint", "uint").contains(term.head))
+          Some(normalizeCIntDeclaration(term))
+        else
+          None
+    }
 
-    if (isIntIsh(cTypeDecs))
-      normalizeCIntDeclaration(cTypeDecs) match { // signed is default for int. The compiler choose for char.
+    cTypeDecs match {
+      case Intish(anInteger) => anInteger match { // signed is default for int. The compiler choose for char.
         case "unsigned" :: tail =>
           (pickJavaInt(normalizedIntSize(tail), false), nativeJava)
         case "signed" :: tail =>
@@ -164,7 +169,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
         case signed =>
           (pickJavaInt(normalizedIntSize(signed), true), nativeJava)
       }
-    else cTypeDecs match {
+
       case "bool" :: Nil => ("Boolean", nativeJava)
       case "float" :: Nil => ("Float", nativeJava)
       case "double" :: Nil => ("Double", nativeJava)
