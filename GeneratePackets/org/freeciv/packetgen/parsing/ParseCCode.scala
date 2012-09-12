@@ -231,11 +231,13 @@ object ParseCCode extends ExtractableParser {
   def bitVectorDefConverted = bitVectorDef ^^ {vec => new BitVector(vec._1, vec._2)}
 
   def varDec: Parser[(WeakVarDec, java.util.Set[Requirement])] =
-    (cType ~ identifierRegEx <~ ";") ^^ {
-      case cTypeDecs ~ name =>
+    (cType ~ identifierRegEx ~ rep("[" ~> intExpr <~ "]") <~ ";") ^^ {
+      case cTypeDecs ~ name ~ arrayDecs =>
         val typeNotArray = cTypeDecsToJava(cTypeDecs)
-        new WeakVarDec(typeNotArray._1, name) ->
-          typeNotArray._2
+        val reqs = new java.util.HashSet(typeNotArray._2)
+        arrayDecs.foreach(req => reqs.addAll(req.getReqs))
+        new WeakVarDec(typeNotArray._1, name, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*) ->
+          reqs
   }
 
   def struct: Parser[(String, List[(WeakVarDec, java.util.Set[Requirement])])] = {

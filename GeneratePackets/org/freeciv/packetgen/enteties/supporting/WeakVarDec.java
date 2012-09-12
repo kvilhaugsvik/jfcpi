@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.Util;
+
 public class WeakVarDec {
     protected final String name;
     protected final String type;
@@ -27,6 +29,10 @@ public class WeakVarDec {
 
     public String getType() {
         return type;
+    }
+
+    public String getTypeIncludingArrayBraces() {
+        return type + Util.repeat("[]", declarations.length);
     }
 
     public String getName() {

@@ -397,6 +397,9 @@ struct two {
 };
     """,
       ParseCCode)
+
+  @Test def structArrayOnField =
+    parsesCorrectly("""struct two {bool value1; int value2[7];};""", ParseCCode)
 }
 
 class CParserSemanticTest {
@@ -857,6 +860,13 @@ struct two {
       result.get.getReqs.contains(new Requirement("enum test", Requirement.Kind.AS_JAVA_DATATYPE)))
     assertTrue("The enum bitwise should be needed here",
       result.get.getReqs.contains(new Requirement("enum bitwise", Requirement.Kind.AS_JAVA_DATATYPE)))
+  }
+
+  @Test def structArraySizeIsConstant {
+    val parser = ParseCCode
+    val result = parsesCorrectly("""struct two {bool value1; int value2[STANT];};""", parser, parser.structConverted)
+    assertTrue("The constant STANT should be needed here",
+      result.get.getReqs.contains(new Requirement("STANT", Requirement.Kind.VALUE)))
   }
 }
 

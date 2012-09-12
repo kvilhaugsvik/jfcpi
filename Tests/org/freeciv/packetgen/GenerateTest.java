@@ -20,6 +20,7 @@ package org.freeciv.packetgen;
 import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
@@ -29,6 +30,7 @@ import org.junit.Test;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -56,6 +58,8 @@ public class GenerateTest {
         writeEnumNamedCount(targetFolder);
         writeEnumBitwise(targetFolder);
         writeEnumWithSettableName(targetFolder);
+
+        writeStructThatHasAnArrayField(targetFolder);
 
         remaining(targetFolder);
     }
@@ -253,6 +257,20 @@ public class GenerateTest {
                 Enum.EnumElementFC.newEnumValue("user3", "3"),
                 Enum.EnumElementFC.newEnumValue("user4", "4")
         ));
+        writeJavaFile(result, targetFolder);
+    }
+
+    @Test
+    public void writeStructThatHasAnArrayField() throws IOException {
+        writeStructThatHasAnArrayField(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    private static void writeStructThatHasAnArrayField(String targetFolder) throws IOException {
+        LinkedList<WeakVarDec> fields = new LinkedList<WeakVarDec>();
+        fields.add(new WeakVarDec("int", "aNumber"));
+        fields.add(new WeakVarDec("int", "theArray", new WeakVarDec.ArrayDeclaration(IntExpression.integer("5"))));
+        Struct result = new Struct("StructArrayField", fields, Collections.<Requirement>emptySet());
+
         writeJavaFile(result, targetFolder);
     }
 
