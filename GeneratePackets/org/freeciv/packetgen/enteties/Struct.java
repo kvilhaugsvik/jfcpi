@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.WeakVarDec;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
@@ -30,7 +31,7 @@ public class Struct extends ClassWriter implements IDependency {
     private final Set<Requirement> iRequire;
     private final Requirement iProvide;
 
-    public Struct(String name, List<Map.Entry<String, String>> fields, Set<Requirement> willNeed) {
+    public Struct(String name, List<WeakVarDec> fields, Set<Requirement> willNeed) {
         super(ClassKind.CLASS,
                 new TargetPackage(FCEnum.class.getPackage()),
                 null, "Freeciv C code", Collections.<Annotate>emptyList(), name,
@@ -38,11 +39,11 @@ public class Struct extends ClassWriter implements IDependency {
 
         addConstructorFields();
 
-        for (Map.Entry<String, String> field: fields) {
-            addObjectConstant(field.getKey(), field.getValue());
+        for (WeakVarDec field: fields) {
+            addObjectConstant(field.getType(), field.getName());
             addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    TargetClass.fromName(field.getKey()), "get" + field.getValue(),
-                    new Block(RETURN(getField(field.getValue()).ref()))));
+                    TargetClass.fromName(field.getType()), "get" + field.getName(),
+                    new Block(RETURN(getField(field.getName()).ref()))));
         }
 
         Typed<? extends AValue> varsToString = literalString("(");
@@ -51,8 +52,8 @@ public class Struct extends ClassWriter implements IDependency {
                 varsToString = sum(varsToString, literalString(", "));
             varsToString = sum(
                     varsToString,
-                    literalString(fields.get(i).getValue() + ": "),
-                    getField(fields.get(i).getValue()).ref());
+                    literalString(fields.get(i).getName() + ": "),
+                    getField(fields.get(i).getName()).ref());
         }
         varsToString = sum(varsToString, literalString(")"));
         addMethod(Method.newPublicReadObjectState(Comment.no(),

@@ -20,12 +20,13 @@ import org.freeciv.packetgen.javaGenerator.ClassWriter
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import org.freeciv.packetgen.enteties.{Struct, Enum, Constant, BitVector}
 import org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}
-import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, IntExpression}
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.freeciv.packetgen.UndefinedException
 import java.util.AbstractMap.SimpleImmutableEntry
+import org.freeciv.packetgen.enteties.supporting.{WeakVarDec, SimpleTypeAlias, IntExpression}
+import org.freeciv.packetgen.enteties.supporting.WeakVarDec.ArrayDeclaration
 
 object ParseCCode extends ExtractableParser {
   private final val DEFINE: String = "#define"
@@ -229,16 +230,22 @@ object ParseCCode extends ExtractableParser {
 
   def bitVectorDefConverted = bitVectorDef ^^ {vec => new BitVector(vec._1, vec._2)}
 
-  def struct: Parser[(String, List[(List[String], String)])] = {
-    val me = startOfStruct ~> identifierRegEx ~ ("{" ~>
-      rep1(cType ~ identifierRegEx <~ ";" ^^ {element => element._1 -> element._2}) <~
-      "}" ~ ";") ^^ {struct => struct._1 -> struct._2}
+  def varDec: Parser[(WeakVarDec, java.util.Set[Requirement])] =
+    (cType ~ identifierRegEx <~ ";") ^^ {
+      case cTypeDecs ~ name =>
+        val typeNotArray = cTypeDecsToJava(cTypeDecs)
+        new WeakVarDec(typeNotArray._1, name) ->
+          typeNotArray._2
+  }
 
-    new Parser[(String, List[(List[String], String)])] {
-      def apply(in: ParseCCode.this.type#Input): ParseResult[(String, List[(List[String], String)])] = {
+  def struct: Parser[(String, List[(WeakVarDec, java.util.Set[Requirement])])] = {
+    val me = (startOfStruct ~> identifierRegEx ~ ("{" ~> rep1(varDec)) <~ "}" ~ ";") ^^ {id => id._1 -> id._2}
+
+    new Parser[(String, List[(WeakVarDec, java.util.Set[Requirement])])] {
+      def apply(in: ParseCCode.this.type#Input): ParseResult[(String, List[(WeakVarDec, java.util.Set[Requirement])])] = {
         val oldIgnoreCommentsFlag = ignoreCommentsFlag
         ignoreCommentsFlag = true
-        val result: ParseResult[(String, List[(List[String], String)])] = me(in)
+        val result: ParseResult[(String, List[(WeakVarDec, java.util.Set[Requirement])])] = me(in)
         ignoreCommentsFlag = oldIgnoreCommentsFlag
         return result
       }
@@ -248,10 +255,8 @@ object ParseCCode extends ExtractableParser {
   def structConverted = struct ^^ {
     val willRequire = new java.util.HashSet[Requirement]()
     struct => new Struct(struct._1, struct._2.map(entry => {
-      val fieldType = cTypeDecsToJava(entry._1)
-      willRequire.addAll(fieldType._2)
-      new SimpleImmutableEntry[String, String](fieldType._1,
-        entry._2): java.util.Map.Entry[String, String]
+      willRequire.addAll(entry._2)
+      entry._1
     }).asJava,
       willRequire)
   }
