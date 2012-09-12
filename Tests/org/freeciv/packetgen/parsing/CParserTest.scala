@@ -398,6 +398,16 @@ struct two {
     """,
       ParseCCode)
 
+  @Test def structTwoLineCommented =
+    parsesCorrectly("""
+struct two {
+  int value1; /* a multi line C style
+               * comment */
+  int value2;
+};
+    """,
+      ParseCCode)
+
   @Test def structArrayOnField =
     parsesCorrectly("""struct two {bool value1; int value2[7];};""", ParseCCode)
 }

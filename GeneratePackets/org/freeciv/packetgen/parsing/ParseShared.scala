@@ -198,7 +198,8 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   private val commentOrNewLine = (regExOr(cStyleComment, cXXStyleComment + "\n",  cXXStyleComment + "\r",
     "\n", "\r") + "+").r
 
-  private val spaceCommentOrNewLine = (regExOr(matchSpaceComment, "\n", "\r") + "+").r
+  private val spaceCommentOrNewLine = ("(?m)" + regExOr(matchSpaceComment, "\\s+",
+    cStyleStart + regExOr("\\s+", cStyleMiddle) + "+" + cStyleEnd) + "+").r
 
   override protected def handleWhiteSpace(source: CharSequence, offset: Int): Int = {
     if (0 == source.length())
