@@ -96,6 +96,14 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       processed
   }
 
+  object Intish {
+    def unapply(term: List[String]): Option[List[String]] =
+      if (List("unsigned", "signed", "long", "short", "int", "char", "sint", "uint").contains(term.head))
+        Some(normalizeCIntDeclaration(term))
+      else
+        None
+  }
+
   /**
    * Almost normalize a C integer type. "signed" isn't normalized. Only use this if you fix "signed" your self.
    * @param tokens a list of tokens that represent a C int type
@@ -150,14 +158,6 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       case "long" :: "long" :: "int" :: Nil => 64 // at least 64 bits
       case _ => throw new Exception("Could not normalize. Is " +
         normalizedInt.reduce(_ + " " + _) + " a valid C integer?");
-    }
-
-    object Intish {
-      def unapply(term: List[String]): Option[List[String]] =
-        if (List("unsigned", "signed", "long", "short", "int", "char", "sint", "uint").contains(term.head))
-          Some(normalizeCIntDeclaration(term))
-        else
-          None
     }
 
     cTypeDecs match {
