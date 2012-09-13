@@ -78,51 +78,43 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   // If a need to be more strict arises only accept identifiers in struct/union/enum and use built in type names
   // TODO: if needed: support defining an anonymous enum, struct or union
   def cType: Parser[List[String]] =
-    ("struct" | "union" | "enum") ~ cType ^^ {found => found._1 :: found._2} |
-      ("unsigned" | "signed") ~ cType ^^ {found => found._1 :: found._2} |
+    ("struct" | "union" | "enum") ~ identifierRegEx ^^ {found => List(found._1, found._2)} |
+      cTypeIntegerNumber |
       identifierRegEx ^^ {List(_)}
 
+  def cTypeIsSigned: Parser[Boolean] = "unsigned" ^^^ false | "signed" ^^^ true
+
   /**
-   * Normalize a C integer type to easier to process.
+   * Parse a C integer type and normalize it to be easier to process.
    * In other words make "signed short" and "short" the same list, here "short int".
-   * @param tokens a list of tokens that represent a C int type
-   * @return the tokens in a standard form
    */
-  def normalizeCIntDeclaration(tokens: List[String]): List[String] = {
-    val processed = expandCIntDeclaration(tokens);
-    if ("signed".equals(processed.head))
-      processed.tail // signed is default so remove it
-    else
-      processed
-  }
+  def cTypeIntegerNumber: Parser[List[String]] =
+    "sint" ^^^ List("int") | // C extension. Signed is default so remove it
+      "uint" ^^^ List("unsigned", "int") | // C extension
+      opt(cTypeIsSigned) ~ rep1("long" | "short" | "int" | "char") ^^ {found =>
+        val normalized = found._2.lastOption match {
+          case Some("short") => found._2 :+ "int"
+          case Some("long") => found._2 :+ "int"
+          case _ => found._2
+        }
+        if (found._1.getOrElse(true))
+          normalized  // Signed is default so remove it
+        else
+          "unsigned" :: normalized  // signed is default so remove it
+      } |
+      cTypeIsSigned ^^ {sign =>
+        if (sign)
+          List("int")  // Signed is default so remove it
+        else
+          List("unsigned", "int")
+      }
 
   object Intish {
     def unapply(term: List[String]): Option[List[String]] =
       if (List("unsigned", "signed", "long", "short", "int", "char", "sint", "uint").contains(term.head))
-        Some(normalizeCIntDeclaration(term))
+        Some(term)
       else
         None
-  }
-
-  /**
-   * Almost normalize a C integer type. "signed" isn't normalized. Only use this if you fix "signed" your self.
-   * @param tokens a list of tokens that represent a C int type
-   * @return the tokens in a standard form
-   */
-  protected def expandCIntDeclaration(tokens: List[String]): List[String] = tokens match {
-    case Nil => Nil
-    case "uint" :: (tail: List[String]) => "unsigned" :: "int" :: expandCIntDeclaration(tail) // a C extension
-    case "sint" :: (tail: List[String]) => "int" :: expandCIntDeclaration(tail) // a C extension. Signed is default
-    case (lastToken: String) :: Nil => expandLastInt(lastToken) // last token isn't sin or uint so expand if needed
-    case token :: (tail: List[String]) => token :: expandCIntDeclaration(tail)
-  }
-
-  @inline private def expandLastInt(lastToken: String): List[String] = lastToken match {
-    case "short" => "short" :: "int" :: Nil
-    case "long" => "long" :: "int" :: Nil
-    case "unsigned" => "unsigned" :: "int" :: Nil
-    case "signed" => "int" :: Nil // signed is default for int
-    case _ => lastToken :: Nil
   }
 
   def cTypeDecsToJava(cTypeDecs: List[String]): (String, java.util.Set[Requirement]) = {

@@ -17,6 +17,7 @@ package org.freeciv.packetgen.parsing
 import org.junit.Assert._
 import org.junit.Test
 import org.freeciv.Util
+import util.parsing.input.CharArrayReader
 
 class ParseSharedTest {
   def parserShared = new ParseShared {
@@ -142,28 +143,51 @@ class ParseSharedTest {
   /*--------------------------------------------------------------------------------------------------------------------
   Normalization of C int type declarations
   --------------------------------------------------------------------------------------------------------------------*/
-  @Test def shortIntIsShort = assertEquals(
-    parserShared.normalizeCIntDeclaration(List("short", "int")),
-    parserShared.normalizeCIntDeclaration(List("short"))
-  )
+  implicit def stringIsReader(input: String): scala.util.parsing.input.Reader[Char] =
+    new CharArrayReader(input.toCharArray)
 
-  @Test def signedIsInt = assertEquals(
-    parserShared.normalizeCIntDeclaration(List("signed")),
-    parserShared.normalizeCIntDeclaration(List("int"))
-  )
+  def failIfFailed(result: scala.util.parsing.combinator.Parsers#ParseResult[List[String]]) {
+    if (!result.successful)
+      fail(result.asInstanceOf[scala.util.parsing.combinator.Parsers#NoSuccess].msg)
+  }
 
-  @Test def signedLongIsLongInt = assertEquals(
-    parserShared.normalizeCIntDeclaration(List("signed", "long")),
-    parserShared.normalizeCIntDeclaration(List("long", "int"))
-  )
+  @Test def shortIntIsShort = {
+    val shortInt = parserShared.cTypeIntegerNumber("short int")
+    failIfFailed(shortInt)
+    val short = parserShared.cTypeIntegerNumber("short")
+    failIfFailed(short)
+    assertEquals(shortInt.get, short.get)
+  }
 
-  @Test def uintIsUnsigned = assertEquals(
-    parserShared.normalizeCIntDeclaration(List("uint")),
-    parserShared.normalizeCIntDeclaration(List("unsigned"))
-  )
+  @Test def signedIsInt = {
+    val signed = parserShared.cTypeIntegerNumber("signed")
+    failIfFailed(signed)
+    val int = parserShared.cTypeIntegerNumber("int")
+    failIfFailed(int)
+    assertEquals(signed.get, int.get)
+  }
 
-  @Test def signedLongIntIsLong = assertEquals(
-    parserShared.normalizeCIntDeclaration(List("signed", "long", "int")),
-    parserShared.normalizeCIntDeclaration(List("long"))
-  )
+  @Test def signedLongIsLongInt = {
+    val signedLong = parserShared.cTypeIntegerNumber("signed long")
+    failIfFailed(signedLong)
+    val longInt = parserShared.cTypeIntegerNumber("long int")
+    failIfFailed(longInt)
+    assertEquals(signedLong.get, longInt.get)
+  }
+
+  @Test def uintIsUnsigned = {
+    val uint = parserShared.cTypeIntegerNumber("uint")
+    failIfFailed(uint)
+    val unsigned = parserShared.cTypeIntegerNumber("unsigned")
+    failIfFailed(unsigned)
+    assertEquals(uint.get, unsigned.get)
+  }
+
+  @Test def signedLongIntIsLong = {
+    val signedLongInt = parserShared.cTypeIntegerNumber("signed long int")
+    failIfFailed(signedLongInt)
+    val long = parserShared.cTypeIntegerNumber("long")
+    failIfFailed(long)
+    assertEquals(signedLongInt.get, long.get)
+  }
 }
