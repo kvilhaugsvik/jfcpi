@@ -312,8 +312,13 @@ public class Hardcoded {
             (IDependency)(new SimpleTypeAlias("int", "Integer", Collections.<Requirement>emptySet()))
     );
 
+    @Deprecated
     public static Typed<NoValue> arrayEaterScopeCheck(String check) {
         return IF(asBool(check), Block.fromStrings("throw new IllegalArgumentException(\"Value out of scope\")"));
+    }
+
+    public static Typed<NoValue> arrayEaterScopeCheck(Typed<ABool> check) {
+        return IF(check, new Block(THROW(IllegalArgumentException.class, literalString("Value out of scope"))));
     }
 
     public static void applyManualChanges(PacketsStore toStorage) {
