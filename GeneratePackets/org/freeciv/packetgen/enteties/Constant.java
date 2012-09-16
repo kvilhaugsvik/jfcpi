@@ -39,7 +39,7 @@ public class Constant extends Var implements IDependency {
 
     public Constant(String name, IntExpression expression) {
         super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
-                new TargetClass("int"), name, BuiltIn.asAnInt(expression.toString()));
+                new TargetClass(int.class), name, BuiltIn.asAnInt(expression.toString()));
         reqs.addAll(expression.getReqs());
     }
 
