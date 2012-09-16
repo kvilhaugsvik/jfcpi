@@ -27,12 +27,18 @@ import java.util.regex.Pattern;
 public class TargetClass extends Address implements AValue {
     private final boolean isInScope;
     private final CodeAtom name;
+    private final TargetPackage where;
     private final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
 
     public TargetClass(String fullPath, boolean isInScope) {
         super(fullPath.split("\\."));
         name = super.components[super.components.length - 1];
         this.isInScope = isInScope;
+
+        if (1 < super.components.length)
+            this.where = new TargetPackage(fullPath.substring(0, fullPath.lastIndexOf(".")));
+        else
+            this.where = TargetPackage.TOP_LEVEL;
 
         // While all classes have a toString this isn't true for all types.
         // As all types are assumed to be classes this may cause trouble
@@ -49,12 +55,25 @@ public class TargetClass extends Address implements AValue {
     }
 
     public TargetClass(Class wrapped, boolean isInScope) {
-        super(wrapped.getCanonicalName().split("\\."));
-        name = super.components[super.components.length - 1];
-        this.isInScope = isInScope;
+        this(new TargetPackage(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
 
         for (Method has : wrapped.getMethods())
             methods.put(has.getName(), new TargetMethod(has));
+    }
+
+    public TargetClass(TargetPackage where, CodeAtom name, boolean isInScope) {
+        super(where, name);
+        this.where = where;
+        this.name = name;
+        this.isInScope = isInScope;
+    }
+
+    public TargetPackage getPackage() {
+        return where;
+    }
+
+    public CodeAtom getCName() {
+        return name;
     }
 
     public String getName() {

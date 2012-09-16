@@ -31,12 +31,11 @@ import java.util.*;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class ClassWriter extends Formatted implements HasAtoms {
-    private final TargetPackage where;
+    private final TargetClass myAddress;
     private final List<Import> imports;
     private final Visibility visibility;
     private final ClassKind kind;
     private final LinkedList<Annotate> classAnnotate;
-    private final String name;
     private final TargetClass parent;
     private final List<TargetClass> implementsInterface;
 
@@ -52,11 +51,12 @@ public class ClassWriter extends Formatted implements HasAtoms {
                        String name,
                        TargetClass parent, List<TargetClass> implementsInterface) {
         if (null == name) throw new IllegalArgumentException("No name for class to be generated");
+        if (null == where)
+            throw new IllegalArgumentException("null given as package. (Did you mean TargetPackage.TOP_LEVEL?)");
 
-        this.where = where;
+        this.myAddress = new TargetClass(where, new ClassWriter.Atom(name), false);
         this.imports = null == imports ? new LinkedList<Import>() : new ArrayList<Import>(Arrays.asList(imports));
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
-        this.name = name;
         this.parent = parent;
         this.implementsInterface = implementsInterface;
         this.kind = kind;
@@ -177,7 +177,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(Var.param(dec.getType(), dec.getName()));
         }
-        Method.newPublicConstructor(Comment.no(), name, args, body).writeAtoms(to);
+        Method.newPublicConstructor(Comment.no(), myAddress.getName(), args, body).writeAtoms(to);
     }
 
     @Override
@@ -189,9 +189,9 @@ public class ClassWriter extends Formatted implements HasAtoms {
     public void writeAtoms(CodeAtoms to) {
         to.hintStart(CodeStyle.OUTER_LEVEL);
 
-        if (null != where) {
+        if (!TargetPackage.TOP_LEVEL.equals(myAddress.getPackage())) {
             to.add(HasAtoms.PACKAGE);
-            where.writeAtoms(to);
+            myAddress.getPackage().writeAtoms(to);
             to.add(HasAtoms.EOL);
         }
 
@@ -202,7 +202,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
         visibility.writeAtoms(to);
         kind.writeAtoms(to);
-        to.add(new ClassWriter.Atom(name));
+        to.add(myAddress.getCName());
         if (null != parent) {
             to.add(EXTENDS);
             parent.writeAtoms(to);
@@ -225,7 +225,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         LinkedList<Method> constructors = new LinkedList<Method>();
         LinkedList<Method> other = new LinkedList<Method>();
         for (Method toSort : methods)
-            if (name.equals(toSort.getName()))
+            if (myAddress.getName().equals(toSort.getName()))
                 constructors.add(toSort);
             else
                 other.add(toSort);
@@ -241,11 +241,11 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     public String getName() {
-        return name;
+        return myAddress.getName();
     }
 
     public String getPackage() {
-        return where.getFullAddress();
+        return myAddress.getPackage().getFullAddress();
     }
 
     public Var getField(String name) {
