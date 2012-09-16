@@ -95,6 +95,10 @@ public class TargetClass extends Address implements AValue {
         };
     }
 
+    public void register(TargetMethod has) {
+        methods.put(has.getName(), has);
+    }
+
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
         if (!methods.containsKey(method))
             throw new IllegalArgumentException("No method named " + method + " on " + name.get());

@@ -115,6 +115,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     public void addMethod(Method toAdd) {
         methods.add(toAdd);
+        myAddress.register(toAdd.getAddress());
     }
 
     public void addConstructorFields() {
@@ -242,6 +243,10 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     public String getName() {
         return myAddress.getName();
+    }
+
+    public TargetClass getAddress() {
+        return myAddress;
     }
 
     public String getPackage() {

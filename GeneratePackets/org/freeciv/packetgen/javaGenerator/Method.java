@@ -49,6 +49,10 @@ public class Method extends Formatted implements HasAtoms {
         return name;
     }
 
+    public TargetMethod getAddress() {
+        return new TargetMethod(name);
+    }
+
     @Override
     public String toString() {
         return this.getJavaCodeIndented("\t") + "\n";
