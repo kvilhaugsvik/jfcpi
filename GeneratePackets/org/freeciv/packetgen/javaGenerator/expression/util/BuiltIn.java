@@ -203,16 +203,37 @@ public class BuiltIn {
         };
     }
 
-    public static Typed<ABool> isSmallerThan(final Typed<? extends AValue> small,
+    private static Typed<ABool> compareOperator(final Typed<? extends AValue> small,
+                                             final CodeAtom operator,
                                              final Typed<? extends AValue> largerThan) {
         return new Formatted.Type<ABool>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 small.writeAtoms(to);
-                to.add(IS_SMALLER);
+                to.add(operator);
                 largerThan.writeAtoms(to);
             }
         };
+    }
+
+    public static Typed<ABool> isBiggerThan(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_BIGGER, largerThan);
+    }
+
+    public static Typed<ABool> isSmallerThan(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_SMALLER, largerThan);
+    }
+
+    public static Typed<ABool> isSame(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_SAME, largerThan);
+    }
+
+    public static Typed<ABool> isNotSame(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_NOT_SAME, largerThan);
     }
 
     public static MethodCall<AValue> arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
