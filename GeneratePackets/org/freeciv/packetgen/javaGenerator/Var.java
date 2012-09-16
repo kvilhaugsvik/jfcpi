@@ -73,6 +73,10 @@ public class Var extends Formatted implements Typed<Returnable> {
         return modifiable;
     }
 
+    public TargetClass getTType() {
+        return type;
+    }
+
     public String getType() {
         return type.getName();
     }

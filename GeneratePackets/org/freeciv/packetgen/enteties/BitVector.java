@@ -17,9 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.TO_STRING_OBJECT;
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAnInt;
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
     private final Collection<Requirement> iRequire;
@@ -36,8 +34,8 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
         knowsSize = true;
 
-        Var pFromByte = Var.param("byte[]", "from");
-        Var pFromBits = Var.param("boolean[]", "from");
+        Var pFromByte = Var.param(byteArray, "from");
+        Var pFromBits = Var.param(boolArray, "from");
         Var pFromBit = Var.param(boolean.class, "setAllTo");
         addMethod(Method.newPublicConstructor(Comment.no(),
                 getName(), Arrays.asList(pFromByte),
@@ -62,8 +60,8 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addPublicObjectConstant("int", "size");
         knowsSize = false;
 
-        Var pFromByte = Var.param("byte[]", "from");
-        Var pFromBits = Var.param("boolean[]", "from");
+        Var pFromByte = Var.param(byteArray, "from");
+        Var pFromBits = Var.param(boolArray, "from");
         Var pFromBit = Var.param(boolean.class, "setAllTo");
         Var pSize = Var.param(int.class, "size");
         Var pSizeB = Var.param(int.class, "sizeInBits");

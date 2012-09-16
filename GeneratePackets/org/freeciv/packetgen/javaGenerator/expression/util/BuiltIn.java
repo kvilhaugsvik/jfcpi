@@ -24,6 +24,9 @@ public class BuiltIn {
     public static final Typed<ABool> TRUE = asBool("true");
     public static final Typed<ABool> FALSE = asBool("false");
 
+    public static final TargetArray byteArray = new TargetArray(byte[].class, true);
+    public static final TargetArray boolArray = new TargetArray(boolean[].class, true);
+
     public static Typed<NoValue> THROW(final Class error, Typed<? extends AValue>... parms) {
         return THROW((new TargetClass(error)).newInstance(parms));
     }

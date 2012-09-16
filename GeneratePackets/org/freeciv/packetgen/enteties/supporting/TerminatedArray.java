@@ -25,7 +25,7 @@ import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {
     public TerminatedArray(String dataIOType, String publicType, final Requirement maxSizeConstant, final Requirement terminator) {
-        super(dataIOType, publicType, new TargetClass("byte[]"),
+        super(dataIOType, publicType, byteArray,
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
@@ -37,9 +37,8 @@ public class TerminatedArray extends FieldTypeBasic {
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        Var buf = Var.local("byte[]", "buffer",
-                                asAValue("new byte[" +
-                                        Constant.referToInJavaCode(maxSizeConstant) + "]"));
+                        Var buf = Var.local(byteArray, "buffer",
+                                byteArray.newInstance(asAnInt(Constant.referToInJavaCode(maxSizeConstant))));
                         Var current = Var.local("byte", "current", from.<AValue>call("readByte"));
                         Var pos = Var.local("int", "pos", asAnInt("0"));
                         return new Block(buf, current, pos,

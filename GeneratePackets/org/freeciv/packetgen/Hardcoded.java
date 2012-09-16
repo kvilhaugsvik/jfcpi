@@ -119,7 +119,7 @@ public class Hardcoded {
                             new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
-            new FieldTypeBasic("worklist", "struct worklist", new TargetClass("universal[]"),
+            new FieldTypeBasic("worklist", "struct worklist", new TargetArray("universal", 1, true),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -135,7 +135,7 @@ public class Hardcoded {
                                                asAnInt("0"));
                                        return new Block(
                                                len,
-                                               to.assign(asAValue("new universal[length]")),
+                                               to.assign(to.getTType().newInstance(len.ref())),
                                                FOR(
                                                        counter,
                                                        isSmallerThan(counter.ref(), len.ref()),
@@ -234,7 +234,7 @@ public class Hardcoded {
             new TerminatedArray("building_list", "int",
                                 new Requirement("MAX_NUM_BUILDING_LIST", Requirement.Kind.VALUE),
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
-            new FieldTypeBasic("memory", "unsigned char", new TargetClass("byte[]"),
+            new FieldTypeBasic("memory", "unsigned char", byteArray,
                                new ExprFrom1<Block, Var>() {
                                    @Override
                                    public Block x(Var to) {
@@ -246,9 +246,8 @@ public class Hardcoded {
                                new ExprFrom2<Block, Var, Var>() {
                                    @Override
                                    public Block x(Var to, Var from) {
-                                       Var innBuf =
-                                               Var.local("byte[]", "innBuffer",
-                                                       asAValue("new byte[arraySize]"));
+                                       Var innBuf = Var.local(byteArray, "innBuffer",
+                                               byteArray.newInstance(asAValue("arraySize")));
                                        Block reader = new Block(innBuf);
                                        reader.addStatement(from.call("readFully", innBuf.ref()));
                                        reader.addStatement(to.assign(innBuf.ref()));

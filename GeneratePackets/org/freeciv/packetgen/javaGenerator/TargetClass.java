@@ -119,7 +119,7 @@ public class TargetClass extends Address implements AValue {
         };
     }
 
-    private final static CodeAtom newInst = new CodeAtom("new");
+    protected final static CodeAtom newInst = new CodeAtom("new");
     public MethodCall<AValue> newInstance(Typed<? extends AValue>... parameterList) {
         final TargetClass parent = this;
         return new MethodCall<AValue>("new " + name.get(), parameterList) {
