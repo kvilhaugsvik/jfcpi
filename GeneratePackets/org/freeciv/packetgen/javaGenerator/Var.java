@@ -124,12 +124,15 @@ public class Var extends Formatted implements Typed<Returnable> {
 
 
     public static Var local(Class type, String name, Typed<? extends AValue> value) {
-        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES,
-                new TargetClass(type), name, value);
+        return local(new TargetClass(type), name, value);
     }
 
     public static Var local(String type, String name, Typed<? extends AValue> value) {
-        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, new TargetClass(type), name, value);
+        return local(new TargetClass(type), name, value);
+    }
+
+    public static Var local(TargetClass type, String name, Typed<? extends AValue> value) {
+        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
     }
 
     public static Var param(TargetClass kind, String name) {
