@@ -43,7 +43,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         Var current = Var.local("byte", "current", from.<AValue>call("readByte"));
                         Var pos = Var.local("int", "pos", asAnInt("0"));
                         return new Block(buf, current, pos,
-                                WHILE(asBool("((byte)" + Constant.referToInJavaCode(terminator) + ") != current"),
+                                WHILE(asBool("((byte) " + Constant.referToInJavaCode(terminator) + ") != current"),
                                         new Block(asVoid("buffer[pos] = current"),
                                                 asVoid("pos++"),
                                                 IF(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
