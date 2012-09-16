@@ -251,6 +251,24 @@ public class BuiltIn {
         };
     }
 
+    public static Typed<? extends AValue> cast(final Class newType, final Typed<? extends AValue> val) {
+        return cast(new TargetClass(newType), val);
+    }
+
+    public static Typed<? extends AValue> cast(final TargetClass newType, final Typed<? extends AValue> val) {
+        return new Typed<AValue>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(LPR);
+                to.add(LPR);
+                newType.writeAtoms(to);
+                to.add(RPR);
+                val.writeAtoms(to);
+                to.add(RPR);
+            }
+        };
+    }
+
     public static Typed<AString> asAString(String javaCode) {
         return new WrapCodeString<AString>(javaCode);
     }
