@@ -33,15 +33,15 @@ public class TargetClass extends Address implements AValue {
         super(fullPath.split("\\."));
         name = super.components[super.components.length - 1];
         this.isInScope = isInScope;
+
+        // While all classes have a toString this isn't true for all types.
+        // As all types are assumed to be classes this may cause trouble
+        methods.put("toString", new TargetMethod("toString"));
     }
 
     private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w");
     public TargetClass(String fullPath) {
         this(fullPath, inJavaLang.matcher(fullPath).matches());
-
-        // While all classes have a toString this isn't true for all types.
-        // As all types are assumed to be classes this may cause trouble
-        methods.put("toString", new TargetMethod("toString"));
     }
 
     public TargetClass(Class wrapped) {
@@ -49,7 +49,10 @@ public class TargetClass extends Address implements AValue {
     }
 
     public TargetClass(Class wrapped, boolean isInScope) {
-        this(wrapped.getCanonicalName(), isInScope);
+        super(wrapped.getCanonicalName().split("\\."));
+        name = super.components[super.components.length - 1];
+        this.isInScope = isInScope;
+
         for (Method has : wrapped.getMethods())
             methods.put(has.getName(), new TargetMethod(has));
     }
