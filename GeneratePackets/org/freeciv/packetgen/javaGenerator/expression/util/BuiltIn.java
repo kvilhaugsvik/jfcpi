@@ -14,18 +14,19 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
-import org.freeciv.packetgen.javaGenerator.MethodCall;
-import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
-import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
 public class BuiltIn {
     public static final Typed<ABool> TRUE = asBool("true");
     public static final Typed<ABool> FALSE = asBool("false");
+
+    public static Typed<NoValue> THROW(final Class error, Typed<? extends AValue>... parms) {
+        return THROW((new TargetClass(error)).newInstance(parms));
+    }
 
     public static Typed<NoValue> THROW(final Typed<? extends AValue> error) {
         return new Formatted.Type<NoValue>() {
