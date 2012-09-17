@@ -18,6 +18,7 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.javaGenerator.Comment;
 import org.freeciv.packetgen.javaGenerator.Modifiable;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.junit.Test;
@@ -267,7 +268,7 @@ public class EnumTest {
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
                 "/* An integer */ ONE(1, \"one\")",
-                newEnumValue("An integer", "ONE", 1, "\"one\"").toString());
+                newEnumValue(Comment.c("An integer"), "ONE", 1, "\"one\"").toString());
     }
 
     @Test(expected = IllegalArgumentException.class)

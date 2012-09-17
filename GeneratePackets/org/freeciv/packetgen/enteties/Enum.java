@@ -156,7 +156,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                         RETURN(asAValue("INVALID")))));
     }
 
-    public void addEnumerated(String comment,
+    public void addEnumerated(Comment comment,
                               String enumName,
                               int number,
                               String toStringName) {
@@ -256,7 +256,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
     public static class EnumElementKnowsNumber extends EnumElementFC {
         private final int number;
 
-        EnumElementKnowsNumber(String comment, String elementName, int number, String toStringName, boolean valid) {
+        EnumElementKnowsNumber(Comment comment, String elementName, int number, String toStringName, boolean valid) {
             super(comment, elementName, number + "", toStringName, valid);
 
             if (null == elementName)
@@ -278,10 +278,10 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         }
 
         public static EnumElementKnowsNumber newEnumValue(String enumValueName, int number, String toStringName) {
-            return newEnumValue(null, enumValueName, number, toStringName);
+            return newEnumValue(Comment.no(), enumValueName, number, toStringName);
         }
 
-        public static EnumElementKnowsNumber newEnumValue(String comment, String enumValueName, int number,
+        public static EnumElementKnowsNumber newEnumValue(Comment comment, String enumValueName, int number,
                                                    String toStringName) {
             return new EnumElementKnowsNumber(comment, enumValueName, number, toStringName, true);
         }
@@ -291,7 +291,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         }
 
         public static EnumElementKnowsNumber newInvalidEnum(String nameInCode, String toStringName, int value) {
-            return new EnumElementKnowsNumber(null, nameInCode, value, toStringName, false);
+            return new EnumElementKnowsNumber(Comment.no(), nameInCode, value, toStringName, false);
         }
     }
 
@@ -300,8 +300,8 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         private final String toStringName;
         private final boolean valid;
 
-        protected EnumElementFC(String comment, String elementName, String valueGen, String toStringName, boolean valid) {
-            super(Comment.oldCompat(comment), elementName, parList(valueGen, toStringName, valid));
+        protected EnumElementFC(Comment comment, String elementName, String valueGen, String toStringName, boolean valid) {
+            super(comment, elementName, parList(valueGen, toStringName, valid));
 
             // Look up numbers in a uniform way
             if (null == toStringName)
@@ -338,14 +338,14 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         }
 
         public static EnumElementFC newEnumValue(String enumValueName, String number) {
-            return newEnumValue(null, enumValueName, number);
+            return newEnumValue(Comment.no(), enumValueName, number);
         }
 
-        public static EnumElementFC newEnumValue(String comment, String enumValueName, String number) {
+        public static EnumElementFC newEnumValue(Comment comment, String enumValueName, String number) {
             return newEnumValue(comment, enumValueName, number, "\"" + enumValueName + "\"");
         }
 
-        public static EnumElementFC newEnumValue(String comment, String enumValueName, String number, String toStringName) {
+        public static EnumElementFC newEnumValue(Comment comment, String enumValueName, String number, String toStringName) {
             return new EnumElementFC(comment, enumValueName, number, toStringName, true);
         }
     }

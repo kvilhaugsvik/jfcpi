@@ -72,14 +72,6 @@ public class Comment extends Formatted implements HasAtoms {
         return comment.isEmpty();
     }
 
-    @Deprecated
-    public static Comment oldCompat(String comment) {
-        if (null == comment || "".equals(comment))
-            return Comment.no();
-        else
-            return Comment.c(comment);
-    }
-
     public static Comment no() {
         return new Comment(false);
     }
