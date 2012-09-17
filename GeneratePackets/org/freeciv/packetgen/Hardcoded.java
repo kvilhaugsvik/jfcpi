@@ -65,7 +65,7 @@ public class Hardcoded {
                         public Block x(Var val, Var to) {
                             Block out = new Block();
                             out.addStatement(new Statement(to.call("writeInt", val.<AnInt>call("intValue")),
-                                    "int is two's compliment so a uint32 don't lose information"));
+                                    Comment.c("int is two's compliment so a uint32 don't lose information")));
                             return out;
                         }
                     },
