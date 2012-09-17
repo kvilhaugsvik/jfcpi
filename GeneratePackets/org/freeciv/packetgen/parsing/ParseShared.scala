@@ -74,13 +74,16 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   val intExpr: Parser[IntExpression] = intExprLevelBinAdd
 
+  // TODO: if needed: support defining an anonymous enum, struct or union
+  def cType: Parser[List[String]] = cTypeComplex | cTypeIntegerNumber | cTypeName
+
+  def cTypeComplex: Parser[List[String]] = ("struct" | "union" | "enum") ~ identifierRegEx ^^ {
+    found => List(found._1, found._2)
+  }
+
   // The literal names of the built in types are valid identifiers.
   // If a need to be more strict arises only accept identifiers in struct/union/enum and use built in type names
-  // TODO: if needed: support defining an anonymous enum, struct or union
-  def cType: Parser[List[String]] =
-    ("struct" | "union" | "enum") ~ identifierRegEx ^^ {found => List(found._1, found._2)} |
-      cTypeIntegerNumber |
-      identifierRegEx ^^ {List(_)}
+  def cTypeName: Parser[List[String]] = identifierRegEx ^^ {List(_)}
 
   def cTypeIsSigned: Parser[Boolean] = "unsigned" ^^^ false | "signed" ^^^ true
 
