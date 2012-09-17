@@ -358,6 +358,9 @@ class CParserSyntaxTest {
   @Test def typedefEnum =
     parsesCorrectly("typedef enum test more_complicated;", ParseCCode)
 
+  @Test def typedefPointer =
+    parsesCorrectly("typedef int *more_complicated;", ParseCCode)
+
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of typedefs
   --------------------------------------------------------------------------------------------------------------------*/
@@ -834,6 +837,18 @@ public enum test implements FCEnum {
     assertEquals("Should provide it self",
       new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
       result.getIFulfillReq)
+  }
+
+  @Test def pointToIntIsIntVarArgs = {
+    val result = parsesCorrectly("typedef int *more_complicated;", ParseCCode, ParseCCode.exprConverted).get
+
+    assertEquals("Integer...", result.asInstanceOf[org.freeciv.packetgen.enteties.supporting.SimpleTypeAlias].getJavaType)
+  }
+
+  @Test def pointToCharIsString = {
+    val result = parsesCorrectly("typedef char *more_complicated;", ParseCCode, ParseCCode.exprConverted).get
+
+    assertEquals("String", result.asInstanceOf[org.freeciv.packetgen.enteties.supporting.SimpleTypeAlias].getJavaType)
   }
 
   /*--------------------------------------------------------------------------------------------------------------------

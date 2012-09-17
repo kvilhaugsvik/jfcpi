@@ -41,6 +41,10 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
         this.willRequire = reqs;
     }
 
+    public String getJavaType() {
+        return typeInJava;
+    }
+
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), new TargetClass(typeInJava),

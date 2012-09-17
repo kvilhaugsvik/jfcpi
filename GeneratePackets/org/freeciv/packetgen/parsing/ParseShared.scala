@@ -75,7 +75,9 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   val intExpr: Parser[IntExpression] = intExprLevelBinAdd
 
   // TODO: if needed: support defining an anonymous enum, struct or union
-  def cType: Parser[ParseType] = cTypeComplex | cTypeIntegerNumber | cTypeName
+  def cType: Parser[ParseType] = cTypePointer | cTypeCanStart
+
+  def cTypeCanStart: Parser[ParseType] = cTypeComplex | cTypeIntegerNumber | cTypeName
 
   def cTypeComplex: Parser[Complex] = ("struct" | "union" | "enum") ~ identifierRegEx ^^ {
     found => Complex(found._1, found._2)
@@ -83,6 +85,8 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   // The literal names of the built in types (and other types like the bit vectors) are valid identifiers.
   def cTypeName: Parser[Simple] = identifierRegEx ^^ {Simple(_)}
+
+  def cTypePointer: Parser[Pointer] = cTypeCanStart <~ "*" ^^ {Pointer(_)}
 
   def cTypeIsSigned: Parser[Boolean] = "unsigned" ^^^ false | "signed" ^^^ true
 
@@ -148,6 +152,8 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     }
 
     cTypeDecs match {
+      case Pointer(Intish("char" :: Nil)) => ("String", nativeJava)
+
       case Intish(anInteger) => anInteger match { // signed is default for int. The compiler choose for char.
         case "unsigned" :: tail =>
           (pickJavaInt(normalizedIntSize(tail), false), nativeJava)
@@ -163,6 +169,11 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       case Complex("enum", name) => (name, needAsJava("enum" + " " + name))
       case Complex("struct", name) => (name, needAsJava("struct" + " " + name))
       case Complex("union", name) => (name, needAsJava("union" + " " + name))
+
+      case Pointer(targetType) => {
+        val targetJ = cTypeDecsToJava(targetType)
+        (targetJ._1 + "...") -> targetJ._2
+      }
 
       case _ => throw new Exception("Could not find a Java type for (alleged) C type " + cTypeDecs)
     }
