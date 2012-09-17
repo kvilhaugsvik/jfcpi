@@ -28,11 +28,6 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
     protected final String method;
     protected final Typed<? extends AValue>[] parameters;
 
-    @Deprecated
-    public MethodCall(Comment comment, String name, String... params) {
-        this(comment, name, paramListIsAValue(params));
-    }
-
     public MethodCall(String name, Typed<? extends AValue>... params) {
         this(Comment.no(), name, params);
     }
@@ -44,13 +39,6 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         this.comment = comment;
         this.method = name;
         this.parameters = params;
-    }
-
-    private static Typed<AValue>[] paramListIsAValue(String[] parameterList) {
-        Typed<AValue>[] parameters = new Typed[parameterList.length];
-        for (int i = 0; i < parameterList.length; i++)
-            parameters[i] = BuiltIn.asAValue(parameterList[i]);
-        return parameters;
     }
 
     @Override

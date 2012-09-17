@@ -19,11 +19,6 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 public class EnumElement extends MethodCall<NoValue> {
-    @Deprecated
-    protected EnumElement(Comment comment, String elementName, String... params) {
-        super(comment, elementName, params);
-    }
-
     protected EnumElement(Comment comment, String elementName, Typed<? extends AValue>... params) {
         super(comment, elementName, params);
     }
