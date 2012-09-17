@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.parsing
 
+import org.freeciv.Util
+
 abstract class ParseType(val parts: List[String]) {
   override def toString() = parts.reduce(_ + " " + _)
 }
@@ -22,3 +24,4 @@ case class Intish(normalizedType: List[String]) extends ParseType(normalizedType
 case class Simple(name: String) extends ParseType(name :: Nil)
 case class Complex(kind: String, name: String) extends ParseType(kind :: name :: Nil)
 case class Pointer(toType: ParseType) extends ParseType(toType.parts :+ "*")
+case class ArrayOf(ofType: ParseType, dimensions: Int) extends ParseType(ofType.parts :+ Util.repeat("[]", dimensions))

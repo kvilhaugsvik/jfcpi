@@ -20,10 +20,17 @@ public class WeakVarDec {
     protected final String name;
     protected final String type;
     protected final ArrayDeclaration[] declarations;
+    protected final int eatenDeclartions;
 
+    @Deprecated
     public WeakVarDec(String kind, String name, ArrayDeclaration... declarations) {
+        this(kind, name, 0, declarations);
+    }
+
+    public WeakVarDec(String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
         this.type = kind;
         this.declarations = declarations;
+        this.eatenDeclartions = eatenDeclartions;
         this.name = name;
     }
 
@@ -32,7 +39,7 @@ public class WeakVarDec {
     }
 
     public String getTypeIncludingArrayBraces() {
-        return type + Util.repeat("[]", declarations.length);
+        return type + Util.repeat("[]", declarations.length - eatenDeclartions);
     }
 
     public String getName() {

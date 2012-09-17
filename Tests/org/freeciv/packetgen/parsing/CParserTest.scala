@@ -893,6 +893,18 @@ struct two {
     assertTrue("The constant STANT should be needed here",
       result.get.getReqs.contains(new Requirement("STANT", Requirement.Kind.VALUE)))
   }
+
+  @Test def oneDimensionalArrayOfCharIsString = {
+    val result = parsesCorrectly("struct hasStr {char stringArray[5];};", ParseCCode, ParseCCode.exprConverted).get
+
+    assertEquals("String", result.asInstanceOf[org.freeciv.packetgen.enteties.Struct].getField("stringArray").getType)
+  }
+
+  @Test def twoDimensionalArrayOfCharIsArrayOfString = {
+    val result = parsesCorrectly("struct hasStr {char stringArray[5][2];};", ParseCCode, ParseCCode.exprConverted).get
+
+    assertEquals("String[]", result.asInstanceOf[org.freeciv.packetgen.enteties.Struct].getField("stringArray").getType)
+  }
 }
 
 class FromCExtractorTest {

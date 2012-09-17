@@ -116,7 +116,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       }
     ) ^^ {Intish(_)}
 
-  def cTypeDecsToJava(cTypeDecs: ParseType): (String, java.util.Set[Requirement]) = {
+  def cTypeDecsToJava(cTypeDecs: ParseType): (String, java.util.Set[Requirement], Int) = {
     def needAsJava(name: String): java.util.Set[Requirement] = {
       val out = new java.util.HashSet[Requirement]();
       out.add(new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE));
@@ -152,27 +152,34 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     }
 
     cTypeDecs match {
-      case Pointer(Intish("char" :: Nil)) => ("String", nativeJava)
+      case Pointer(Intish("char" :: Nil)) => ("String", nativeJava, 0)
+      case ArrayOf(Intish("char" :: Nil), dim) if (0 < dim) => ("String", nativeJava, 1)
 
       case Intish(anInteger) => anInteger match { // signed is default for int. The compiler choose for char.
         case "unsigned" :: tail =>
-          (pickJavaInt(normalizedIntSize(tail), false), nativeJava)
+          (pickJavaInt(normalizedIntSize(tail), false), nativeJava, 0)
         case signed =>
-          (pickJavaInt(normalizedIntSize(signed), true), nativeJava)
+          (pickJavaInt(normalizedIntSize(signed), true), nativeJava, 0)
       }
 
-      case Simple("bool") => ("Boolean", nativeJava)
-      case Simple("float") => ("Float", nativeJava)
-      case Simple("double") => ("Double", nativeJava)
-      case Simple(other) => (other, needAsJava(other))
+      case Simple("bool") => ("Boolean", nativeJava, 0)
+      case Simple("float") => ("Float", nativeJava, 0)
+      case Simple("double") => ("Double", nativeJava, 0)
+      case Simple(other) => (other, needAsJava(other), 0)
 
-      case Complex("enum", name) => (name, needAsJava("enum" + " " + name))
-      case Complex("struct", name) => (name, needAsJava("struct" + " " + name))
-      case Complex("union", name) => (name, needAsJava("union" + " " + name))
+      case Complex("enum", name) => (name, needAsJava("enum" + " " + name), 0)
+      case Complex("struct", name) => (name, needAsJava("struct" + " " + name), 0)
+      case Complex("union", name) => (name, needAsJava("union" + " " + name), 0)
 
       case Pointer(targetType) => {
         val targetJ = cTypeDecsToJava(targetType)
-        (targetJ._1 + "...") -> targetJ._2
+        (targetJ._1 + "...", targetJ._2, 0)
+      }
+
+      // TODO: Handle more of Array here
+      // for now just pass through
+      case ArrayOf(targetType, _) => {
+        cTypeDecsToJava(targetType)
       }
 
       case _ => throw new Exception("Could not find a Java type for (alleged) C type " + cTypeDecs)
