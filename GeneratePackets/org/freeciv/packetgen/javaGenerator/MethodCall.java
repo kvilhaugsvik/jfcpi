@@ -28,10 +28,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
     protected final String method;
     protected final Typed<? extends AValue>[] parameters;
 
-    public MethodCall(String name, String... params) {
-        this(Comment.no(), name, params);
-    }
-
+    @Deprecated
     public MethodCall(Comment comment, String name, String... params) {
         this(comment, name, paramListIsAValue(params));
     }
