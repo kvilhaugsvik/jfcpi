@@ -23,7 +23,7 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldTypeAlias = regex(identifierRegEx)
 
   def basicFieldType: Parser[(String, String)] = identifierRegEx ~ ("(" ~> cType <~ ")") ^^ {
-    case iotype ~ ptype => iotype -> ptype.reduce(_ + " " + _)
+    case iotype ~ ptype => iotype -> ptype.toString()
   }
 
   def fieldType: PackratParser[Any] = basicFieldType | fieldTypeAlias

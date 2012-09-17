@@ -75,14 +75,14 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   val intExpr: Parser[IntExpression] = intExprLevelBinAdd
 
   // TODO: if needed: support defining an anonymous enum, struct or union
-  def cType: Parser[List[String]] = cTypeComplex | cTypeIntegerNumber | cTypeName
+  def cType: Parser[ParseType] = cTypeComplex | cTypeIntegerNumber | cTypeName
 
-  def cTypeComplex: Parser[List[String]] = ("struct" | "union" | "enum") ~ identifierRegEx ^^ {
-    found => List(found._1, found._2)
+  def cTypeComplex: Parser[Complex] = ("struct" | "union" | "enum") ~ identifierRegEx ^^ {
+    found => Complex(found._1, found._2)
   }
 
   // The literal names of the built in types (and other types like the bit vectors) are valid identifiers.
-  def cTypeName: Parser[List[String]] = identifierRegEx ^^ {List(_)}
+  def cTypeName: Parser[Simple] = identifierRegEx ^^ {Simple(_)}
 
   def cTypeIsSigned: Parser[Boolean] = "unsigned" ^^^ false | "signed" ^^^ true
 
@@ -90,7 +90,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
    * Parse a C integer type and normalize it to be easier to process.
    * In other words make "signed short" and "short" the same list, here "short int".
    */
-  def cTypeIntegerNumber: Parser[List[String]] =
+  def cTypeIntegerNumber: Parser[Intish] = (
     "sint" ^^^ List("int") | // C extension. Signed is default so remove it
       "uint" ^^^ List("unsigned", "int") | // C extension
       opt(cTypeIsSigned) ~ rep1("long" | "short" | "int" | "char") ^^ {found =>
@@ -110,16 +110,9 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
         else
           List("unsigned", "int")
       }
+    ) ^^ {Intish(_)}
 
-  object Intish {
-    def unapply(term: List[String]): Option[List[String]] =
-      if (List("unsigned", "signed", "long", "short", "int", "char", "sint", "uint").contains(term.head))
-        Some(term)
-      else
-        None
-  }
-
-  def cTypeDecsToJava(cTypeDecs: List[String]): (String, java.util.Set[Requirement]) = {
+  def cTypeDecsToJava(cTypeDecs: ParseType): (String, java.util.Set[Requirement]) = {
     def needAsJava(name: String): java.util.Set[Requirement] = {
       val out = new java.util.HashSet[Requirement]();
       out.add(new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE));
@@ -162,16 +155,16 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
           (pickJavaInt(normalizedIntSize(signed), true), nativeJava)
       }
 
-      case "bool" :: Nil => ("Boolean", nativeJava)
-      case "float" :: Nil => ("Float", nativeJava)
-      case "double" :: Nil => ("Double", nativeJava)
-      case other :: Nil => (other, needAsJava(other))
+      case Simple("bool") => ("Boolean", nativeJava)
+      case Simple("float") => ("Float", nativeJava)
+      case Simple("double") => ("Double", nativeJava)
+      case Simple(other) => (other, needAsJava(other))
 
-      case "enum" :: name :: Nil => (name, needAsJava("enum" + " " + name))
-      case "struct" :: name :: Nil => (name, needAsJava("struct" + " " + name))
-      case "union" :: name :: Nil => (name, needAsJava("union" + " " + name))
+      case Complex("enum", name) => (name, needAsJava("enum" + " " + name))
+      case Complex("struct", name) => (name, needAsJava("struct" + " " + name))
+      case Complex("union", name) => (name, needAsJava("union" + " " + name))
 
-      case _ => throw new Exception("Could not find a Java type for (alleged) C type " + cTypeDecs.reduce(_ + " " + _))
+      case _ => throw new Exception("Could not find a Java type for (alleged) C type " + cTypeDecs)
     }
   }
 

@@ -146,7 +146,7 @@ class ParseSharedTest {
   implicit def stringIsReader(input: String): scala.util.parsing.input.Reader[Char] =
     new CharArrayReader(input.toCharArray)
 
-  def failIfFailed(result: scala.util.parsing.combinator.Parsers#ParseResult[List[String]]) {
+  def failIfFailed(result: scala.util.parsing.combinator.Parsers#ParseResult[ParseType]) {
     if (!result.successful)
       fail(result.asInstanceOf[scala.util.parsing.combinator.Parsers#NoSuccess].msg)
   }
