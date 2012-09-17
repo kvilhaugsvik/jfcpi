@@ -189,7 +189,7 @@ object ParseCCode extends ExtractableParser {
           globalNumberExpression = IntExpression.binary("+",
             IntExpression.integer("1"),
             IntExpression.handled(name + ".getNumber()"))
-          val enumVal = EnumElementFC.newEnumValue(name, number.toString)
+          val enumVal = EnumElementFC.newEnumValue(name, number)
           alreadyReadExpression.put(name, enumVal)
           enumVal
         }

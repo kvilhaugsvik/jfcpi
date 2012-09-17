@@ -257,7 +257,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         private final int number;
 
         EnumElementKnowsNumber(Comment comment, String elementName, int number, String toStringName, boolean valid) {
-            super(comment, elementName, number + "", toStringName, valid);
+            super(comment, elementName, IntExpression.integer(number + ""), toStringName, valid);
 
             if (null == elementName)
                 throw new IllegalArgumentException("All elements of enums must have names");
@@ -296,11 +296,11 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
     }
 
     public static class EnumElementFC extends EnumElement {
-        private final String valueGen;
+        private final IntExpression valueGen;
         private final String toStringName;
         private final boolean valid;
 
-        protected EnumElementFC(Comment comment, String elementName, String valueGen, String toStringName, boolean valid) {
+        protected EnumElementFC(Comment comment, String elementName, IntExpression valueGen, String toStringName, boolean valid) {
             super(comment, elementName, parList(valueGen, toStringName, valid));
 
             // Look up numbers in a uniform way
@@ -312,21 +312,21 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
             this.valid = valid;
         }
 
-        private static String[] parList(String valueGen, String toStringName, boolean valid) {
-            String[] out;
+        private static Typed<? extends AValue>[] parList(IntExpression valueGen, String toStringName, boolean valid) {
+            Typed<? extends AValue>[] out;
             if (valid) {
-                out = new String[2];
+                out = new Typed[2];
             } else {
-                out = new String[3];
-                out[2] = valid + "";
+                out = new Typed[3];
+                out[2] = valid ? BuiltIn.TRUE : BuiltIn.FALSE;
             }
-            out[0] = valueGen;
-            out[1] = toStringName;
+            out[0] = asAnInt(valueGen.toString());
+            out[1] = asAString(toStringName);
             return out;
         }
 
         public String getValueGenerator() {
-            return valueGen;
+            return valueGen.toString();
         }
 
         public String getToStringName() {
@@ -337,15 +337,15 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
             return valid;
         }
 
-        public static EnumElementFC newEnumValue(String enumValueName, String number) {
+        public static EnumElementFC newEnumValue(String enumValueName, IntExpression number) {
             return newEnumValue(Comment.no(), enumValueName, number);
         }
 
-        public static EnumElementFC newEnumValue(Comment comment, String enumValueName, String number) {
+        public static EnumElementFC newEnumValue(Comment comment, String enumValueName, IntExpression number) {
             return newEnumValue(comment, enumValueName, number, "\"" + enumValueName + "\"");
         }
 
-        public static EnumElementFC newEnumValue(Comment comment, String enumValueName, String number, String toStringName) {
+        public static EnumElementFC newEnumValue(Comment comment, String enumValueName, IntExpression number, String toStringName) {
             return new EnumElementFC(comment, enumValueName, number, toStringName, true);
         }
     }
