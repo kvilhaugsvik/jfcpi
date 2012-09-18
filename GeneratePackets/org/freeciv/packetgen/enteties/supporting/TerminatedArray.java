@@ -1,15 +1,15 @@
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.javaGenerator.MethodCall;
-import org.freeciv.packetgen.javaGenerator.TargetArray;
-import org.freeciv.packetgen.javaGenerator.TargetClass;
-import org.freeciv.packetgen.javaGenerator.Var;
+import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+import static org.freeciv.packetgen.Hardcoded.fMaxSize;
+import static org.freeciv.packetgen.Hardcoded.pMaxSize;
 
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
@@ -35,6 +35,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         return new Block(
                                 arrayEaterScopeCheck(isSmallerThan(asAnInt(Constant.referToInJavaCode(maxSizeConstant)),
                                         pValue.read("length"))),
+                                fMaxSize.assign(pMaxSize.ref()),
                                 to.assign(pValue.ref()));
                     }
                 },
@@ -52,6 +53,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                                 IF(isSmallerThan(pos.ref(), asAnInt(Constant.referToInJavaCode(maxSizeConstant))),
                                                         new Block(current.assign(from.<AValue>call("readByte"))),
                                                         new Block(asVoid("break"))))),
+                                fMaxSize.assign(pMaxSize.ref()),
                                 to.assign(new MethodCall<AValue>("java.util.Arrays.copyOf",
                                         buf.ref(), pos.ref())));
                     }

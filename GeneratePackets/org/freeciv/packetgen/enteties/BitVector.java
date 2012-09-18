@@ -13,6 +13,9 @@ import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
+import static org.freeciv.packetgen.Hardcoded.fMaxSize;
+import static org.freeciv.packetgen.Hardcoded.pMaxSize;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -107,18 +110,24 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
-                        return new Block(arg1.assign(asAValue("value")));
+                        Block body = new Block(arg1.assign(asAValue("value")));
+                        if (arrayEater)
+                            body.addStatement(fMaxSize.assign(pMaxSize.ref()));
+                        return body;
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        return (knowsSize ?
-                                        io.getRead(size[0] + realBitVector + size[1], null,
-                                                asAValue("this.value = new " + getName() + "(innBuffer)")) :
-                                        io.getRead(size[0] + "size"  + size[1],
-                                                asAValue("int size = from.readUnsignedShort()"),
-                                                asAValue("this.value = new " + getName() + "(innBuffer" + ", size)")));
+                        Block body = knowsSize ?
+                                io.getRead(size[0] + realBitVector + size[1], null,
+                                        asAValue("this.value = new " + getName() + "(innBuffer)")) :
+                                io.getRead(size[0] + "size" + size[1],
+                                        asAValue("int size = from.readUnsignedShort()"),
+                                        asAValue("this.value = new " + getName() + "(innBuffer" + ", size)"));
+                        if (arrayEater)
+                            body.addStatement(fMaxSize.assign(pMaxSize.ref()));
+                        return body;
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {

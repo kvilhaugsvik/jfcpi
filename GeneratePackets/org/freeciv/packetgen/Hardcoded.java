@@ -41,6 +41,10 @@ public class Hardcoded {
     // TODO: Make parameters in stead
     private static final Var pArraySize = Var.param(int.class, "arraySize");
     private static final Var pValue = Var.param(String.class, "value"); // can't know type
+    public static final Var pMaxSize = Var.param(int.class, "arraySize");
+    public static final Var fMaxSize = Var.field(Collections.<Annotate>emptyList(),
+            Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+            new TargetClass(int.class), "maxArraySize", null);
 
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
             new FieldTypeBasic("uint32", "int", new TargetClass(Long.class),
@@ -188,6 +192,7 @@ public class Hardcoded {
                                        return new Block(
                                                arrayEaterScopeCheck(isSmallerThan(pArraySize.ref(),
                                                        pValue.<AnInt>call("length"))),
+                                               fMaxSize.assign(pMaxSize.ref()),
                                                to.assign(pValue.ref()));
                                    }
                                },
@@ -202,6 +207,7 @@ public class Hardcoded {
                                        Var read = Var.local("int", "read",
                                                asAnInt("0"));
                                        return new Block(
+                                               fMaxSize.assign(pMaxSize.ref()),
                                                buf,
                                                letter,
                                                read,
@@ -246,6 +252,7 @@ public class Hardcoded {
                                        return new Block(
                                                arrayEaterScopeCheck(isNotSame(pArraySize.ref(),
                                                        pValue.<AnInt>read("length"))),
+                                               fMaxSize.assign(pMaxSize.ref()),
                                                to.assign(pValue.ref()));
                                    }
                                },
@@ -257,6 +264,7 @@ public class Hardcoded {
                                        Block reader = new Block(innBuf);
                                        reader.addStatement(from.call("readFully", innBuf.ref()));
                                        reader.addStatement(to.assign(innBuf.ref()));
+                                       reader.addStatement(fMaxSize.assign(pMaxSize.ref()));
                                        return reader;
                                    }
                                },

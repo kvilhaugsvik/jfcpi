@@ -122,6 +122,7 @@ public class FieldTypeBasic implements IDependency {
             Var pArraySize = Var.param(int.class, "arraySize");
 
             if (arrayEater) {
+                addObjectConstant("int", "maxArraySize");
                 addMethod(Method.newPublicConstructor(Comment.no(),
                         getName(), Arrays.asList(pValue, pArraySize),
                         constructorBody));
