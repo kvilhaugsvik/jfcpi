@@ -24,7 +24,9 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
+import org.freeciv.packetgen.javaGenerator.Annotate;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
+import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -97,7 +99,8 @@ public class GenerateTest {
         writeJavaFile(connection, targetFolder);
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
-                Header_2_1.class.getSimpleName(),
+                new TargetClass(Header_2_1.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("username", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
@@ -109,7 +112,8 @@ public class GenerateTest {
                 new Field("patch_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList())), targetFolder);
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
-                Header_2_1.class.getSimpleName(),
+                new TargetClass(Header_2_1.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("you_can_join", bool, "you_can_join", Collections.<WeakFlag>emptyList()),
                 new Field("message", string, "you_can_join", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
@@ -118,11 +122,14 @@ public class GenerateTest {
                 new Field("challenge_file", string, "you_can_join", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("conn_id", connection, "you_can_join", Collections.<WeakFlag>emptyList())), targetFolder);
-        writePacket(new Packet("CONN_PING", 88, Header_2_1.class.getSimpleName()), targetFolder);
-        writePacket(new Packet("CONN_PONG", 89, Header_2_1.class.getSimpleName()), targetFolder);
+        writePacket(new Packet("CONN_PING", 88, new TargetClass(Header_2_1.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList()), targetFolder);
+        writePacket(new Packet("CONN_PONG", 89, new TargetClass(Header_2_1.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList()), targetFolder);
         writePacket(new Packet("SERVER_JOIN_REQ2ByteKind",
                 4,
-                Header_2_2.class.getSimpleName(),
+                new TargetClass(Header_2_2.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("username", string, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("capability", string, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList(),
@@ -134,24 +141,28 @@ public class GenerateTest {
                 new Field("patch_version", uint32, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList())), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
-                Header_2_2.class.getSimpleName(),
+                new TargetClass(Header_2_2.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("theArray", uint32, "TestArray", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("2"), null))), targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
-                Header_2_2.class.getSimpleName(),
+                new TargetClass(Header_2_2.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("toTransfer", uint8, "TestArrayTransfer", Collections.<WeakFlag>emptyList()),
                 new Field("theArray", uint32, "TestArrayTransfer", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))), targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
-                Header_2_2.class.getSimpleName(),
+                new TargetClass(Header_2_2.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("theArray", uint32, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
                         new WeakField.ArrayDeclaration(IntExpression.integer("3"), null))), targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
-                Header_2_2.class.getSimpleName(),
+                new TargetClass(Header_2_2.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("toTransfer", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
                 new Field("toTransfer2", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
                 new Field("theArray", uint32, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList(),
@@ -159,7 +170,8 @@ public class GenerateTest {
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))), targetFolder);
         writePacket(new Packet("StringArray",
                 930,
-                Header_2_2.class.getSimpleName(),
+                new TargetClass(Header_2_2.class.getSimpleName()),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("notAnArray", string, "StringArray", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
                 new Field("theArray", string, "StringArray", Collections.<WeakFlag>emptyList(),

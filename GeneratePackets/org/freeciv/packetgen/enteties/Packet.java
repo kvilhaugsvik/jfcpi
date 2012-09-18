@@ -45,10 +45,6 @@ public class Packet extends ClassWriter implements IDependency {
 
     private final TargetClass ioexception = new TargetClass(IOException.class, true);
 
-    @Deprecated public Packet(String name, int number, String headerKind, Field... fields) throws UndefinedException {
-        this(name, number, new TargetClass(headerKind), GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), fields);
-    }
-
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new Import[]{
