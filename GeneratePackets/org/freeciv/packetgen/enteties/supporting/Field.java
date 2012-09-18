@@ -34,11 +34,6 @@ public class Field extends Var {
     private final FieldTypeBasic.FieldTypeAlias type;
     private final ArrayDeclaration[] declarations;
 
-    @Deprecated public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket,
-                 WeakField.ArrayDeclaration... declarations) {
-        this(fieldName, typeAlias, onPacket, Collections.<WeakFlag>emptyList(), declarations);
-    }
-
     public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket, List<WeakFlag> flags,
                  WeakField.ArrayDeclaration... declarations) {
         super(fieldFlagsToAnnotations(flags), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
