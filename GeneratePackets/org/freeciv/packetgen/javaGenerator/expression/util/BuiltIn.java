@@ -14,18 +14,22 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
-import org.freeciv.packetgen.javaGenerator.MethodCall;
-import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
-import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 
 public class BuiltIn {
     public static final Typed<ABool> TRUE = asBool("true");
     public static final Typed<ABool> FALSE = asBool("false");
+
+    public static final TargetArray byteArray = new TargetArray(byte[].class, true);
+    public static final TargetArray boolArray = new TargetArray(boolean[].class, true);
+
+    public static Typed<NoValue> THROW(final Class error, Typed<? extends AValue>... parms) {
+        return THROW((new TargetClass(error)).newInstance(parms));
+    }
 
     public static Typed<NoValue> THROW(final Typed<? extends AValue> error) {
         return new Formatted.Type<NoValue>() {
@@ -171,6 +175,24 @@ public class BuiltIn {
         };
     }
 
+    public static <Kind extends ABool> Typed<Kind> and(final Typed<? extends ABool>... values) {
+        return new Formatted.Type<Kind>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.joinSep(AND, values);
+            }
+        };
+    }
+
+    public static <Kind extends ABool> Typed<Kind> or(final Typed<? extends ABool>... values) {
+        return new Formatted.Type<Kind>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.joinSep(OR, values);
+            }
+        };
+    }
+
     public static Typed<? extends AValue> divide(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
         return new Formatted.Type<AValue>() {
             @Override
@@ -203,16 +225,42 @@ public class BuiltIn {
         };
     }
 
-    public static Typed<ABool> isSmallerThan(final Typed<? extends AValue> small,
+    private static Typed<ABool> compareOperator(final Typed<? extends AValue> small,
+                                             final CodeAtom operator,
                                              final Typed<? extends AValue> largerThan) {
         return new Formatted.Type<ABool>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 small.writeAtoms(to);
-                to.add(IS_SMALLER);
+                to.add(operator);
                 largerThan.writeAtoms(to);
             }
         };
+    }
+
+    public static Typed<ABool> isBiggerThan(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_BIGGER, largerThan);
+    }
+
+    public static Typed<ABool> isSmallerThan(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_SMALLER, largerThan);
+    }
+
+    public static Typed<ABool> isSmallerThanOrEq(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_SMALLER_OR_EQUAL, largerThan);
+    }
+
+    public static Typed<ABool> isSame(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_SAME, largerThan);
+    }
+
+    public static Typed<ABool> isNotSame(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_NOT_SAME, largerThan);
     }
 
     public static MethodCall<AValue> arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
@@ -225,6 +273,24 @@ public class BuiltIn {
                 to.add(ARRAY_ACCESS_END);
                 to.add(ASSIGN);
                 val.writeAtoms(to);
+            }
+        };
+    }
+
+    public static Typed<? extends AValue> cast(final Class newType, final Typed<? extends AValue> val) {
+        return cast(new TargetClass(newType), val);
+    }
+
+    public static Typed<? extends AValue> cast(final TargetClass newType, final Typed<? extends AValue> val) {
+        return new Typed<AValue>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(LPR);
+                to.add(LPR);
+                newType.writeAtoms(to);
+                to.add(RPR);
+                val.writeAtoms(to);
+                to.add(RPR);
             }
         };
     }

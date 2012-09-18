@@ -21,7 +21,9 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 
 import java.util.*;
 
@@ -143,49 +145,10 @@ public class Field extends Var {
                         ", " + declarations[declarations.length - 1].getSize() : "") + ")";
     }
 
-    private String getLegalSize(boolean testArrayLength) throws UndefinedException {
-        String out = "";
-        String arrayLevel = "";
-
-        if (type.getBasicType().isArrayEater())
-            out += validateElementsToTransfer(declarations[declarations.length - 1]);
-
-        for (int i = 0; i < getNumberOfDeclarations(); i++) {
-            final ArrayDeclaration element = declarations[i];
-            out += validateElementsToTransfer(element);
-            if (testArrayLength)
-                out += "(" + this.getFieldName() + arrayLevel + ".length != " + element
-                        .getSize() + ")" + "||";
-            arrayLevel += "[0]";
-        }
-        return out;
-    }
-
-    private static String validateElementsToTransfer(ArrayDeclaration element) throws UndefinedException {
+    private static void validateElementsToTransfer(ArrayDeclaration element, Collection<Typed<ABool>> to) throws UndefinedException {
         if (null != element.getElementsToTransfer())
-            return "(" + element.getMaxSize() + " <= " + element
-                .getElementsToTransfer() + ")" + "||";
-        else
-            return "";
-    }
-
-    private String transferTypeCheck() throws UndefinedException {
-        String out = "";
-        for (ArrayDeclaration dec : declarations) {
-            if (dec.hasTransfer()) {
-                String javaTypeOfTransfer = dec.getJavaTypeOfTransfer();
-                switch (intClassOf(javaTypeOfTransfer)) {
-                    case 0:
-                        break;
-                    case 1:
-                        out += dec.getMaxSize() + " < " + "Integer.MAX_VALUE";
-                        break;
-                    case -1:
-                        throw notSupportedIndex(onPacket, getFieldName(), dec);
-                }
-            }
-        }
-        return out;
+            to.add(GROUP(isSmallerThanOrEq(asAnInt(element.getMaxSizeStrictTyped().toString()),
+                    asAnInt(element.getElementsToTransfer()))));
     }
 
     private static UndefinedException notSupportedIndex(String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
@@ -206,19 +169,45 @@ public class Field extends Var {
     }
 
     public void appendValidationTo(boolean testArrayLength, Block to) throws UndefinedException {
-        String transferTypesAreSafe = transferTypeCheck();
-        String sizeChecks = this.getLegalSize(testArrayLength);
+        LinkedList<Typed<ABool>> transferTypeCheck = new LinkedList<Typed<ABool>>();
+        for (ArrayDeclaration dec : declarations) {
+            if (dec.hasTransfer()) {
+                switch (intClassOf(dec.getJavaTypeOfTransfer())) {
+                    case 0:
+                        break;
+                    case 1:
+                        transferTypeCheck.add(isSmallerThan(asAnInt(dec.getMaxSizeStrictTyped().toString()),
+                                asAnInt("Integer.MAX_VALUE")));
+                        break;
+                    case -1:
+                        throw notSupportedIndex(onPacket, getFieldName(), dec);
+                }
+            }
+        }
 
-        if (!"".equals(transferTypesAreSafe))
-            // TODO: make sure it will cause a compile time error or throw an error here
-            to.addStatement(ASSERT(asBool(transferTypesAreSafe),
+        // TODO: make sure it will cause a compile time error or throw an error here
+        if (!transferTypeCheck.isEmpty())
+            to.addStatement(ASSERT(and(transferTypeCheck.toArray(new Typed[transferTypeCheck.size()])),
                     literalString("Can't prove that index value will stay in the range Java's signed integers can represent.")));
 
-        if (!"".equals(sizeChecks)) {
-            to.addStatement(BuiltIn.IF(asBool(sizeChecks.substring(0, sizeChecks.length() - 2)),
-                    Block.fromStrings("throw new IllegalArgumentException(\"Array " + this.getFieldName() +
-                            " constructed with value out of scope in packet " + onPacket + "\")")));
+        LinkedList<Typed<ABool>> legalSize = new LinkedList<Typed<ABool>>();
+        String arrayLevel = "";
+
+        if (type.getBasicType().isArrayEater())
+            validateElementsToTransfer(declarations[declarations.length - 1], legalSize);
+
+        for (int i = 0; i < getNumberOfDeclarations(); i++) {
+            final ArrayDeclaration element = declarations[i];
+            validateElementsToTransfer(element, legalSize);
+            if (testArrayLength)
+                legalSize.add(GROUP(asBool(this.getFieldName() + arrayLevel + ".length != " + element.getSize())));
+            arrayLevel += "[0]";
         }
+
+        if (!legalSize.isEmpty())
+            to.addStatement(BuiltIn.IF(or(legalSize.toArray(new Typed[legalSize.size()])),
+                    new Block(THROW(IllegalArgumentException.class, literalString("Array " + this.getFieldName() +
+                            " constructed with value out of scope in packet " + onPacket)))));
     }
 
     // TODO: in should be a ExprFrom1
@@ -283,6 +272,10 @@ public class Field extends Var {
 
         public String getMaxSize() {
             return maxSize.toString();
+        }
+
+        public IntExpression getMaxSizeStrictTyped() {
+            return maxSize;
         }
 
         public String getElementsToTransfer() throws UndefinedException {

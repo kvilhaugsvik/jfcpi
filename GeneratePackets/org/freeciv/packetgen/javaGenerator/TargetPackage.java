@@ -17,12 +17,16 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
 public class TargetPackage extends Address {
+    public static final TargetPackage TOP_LEVEL = new TargetPackage();
+
     public TargetPackage(String... parts) {
         super(parts);
     }
 
     public TargetPackage(Package wrapped) {
-        super(wrapped.getName().split("\\."));
+        super(null == wrapped ?
+                new String[0] :
+                wrapped.getName().split("\\."));
     }
 
     public Address has(final String element) {

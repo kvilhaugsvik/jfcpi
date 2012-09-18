@@ -14,10 +14,12 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 public class EnumElement extends MethodCall<NoValue> {
-    protected EnumElement(Comment comment, String elementName, String... params) {
+    protected EnumElement(Comment comment, String elementName, Typed<? extends AValue>... params) {
         super(comment, elementName, params);
     }
 
@@ -25,11 +27,11 @@ public class EnumElement extends MethodCall<NoValue> {
         return super.method;
     }
 
-    public static EnumElement newEnumValue(String enumValueName, String... params) {
+    public static EnumElement newEnumValue(String enumValueName, Typed<? extends AValue>... params) {
         return new EnumElement(Comment.no(), enumValueName, params);
     }
 
-    public static EnumElement newEnumValue(Comment comment, String enumValueName, String... params) {
+    public static EnumElement newEnumValue(Comment comment, String enumValueName, Typed<? extends AValue>... params) {
         return new EnumElement(comment, enumValueName, params);
     }
 }

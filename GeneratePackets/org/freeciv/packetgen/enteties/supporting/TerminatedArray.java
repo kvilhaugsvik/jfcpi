@@ -4,6 +4,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.MethodCall;
+import org.freeciv.packetgen.javaGenerator.TargetArray;
 import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
@@ -24,29 +25,31 @@ import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 // TODO: Generalize to NetworkIO. Then use for String.
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {
+    private static final TargetClass byteArray = new TargetArray(byte[].class, true);
+    private static final Var pValue = Var.param(byteArray, "value");
     public TerminatedArray(String dataIOType, String publicType, final Requirement maxSizeConstant, final Requirement terminator) {
-        super(dataIOType, publicType, new TargetClass("byte[]"),
+        super(dataIOType, publicType, byteArray,
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
                         return new Block(
-                                arrayEaterScopeCheck(Constant.referToInJavaCode(maxSizeConstant) + " < value.length"),
-                                to.assign(asAValue("value")));
+                                arrayEaterScopeCheck(isSmallerThan(asAnInt(Constant.referToInJavaCode(maxSizeConstant)),
+                                        pValue.read("length"))),
+                                to.assign(pValue.ref()));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        Var buf = Var.local("byte[]", "buffer",
-                                asAValue("new byte[" +
-                                        Constant.referToInJavaCode(maxSizeConstant) + "]"));
+                        Var buf = Var.local(byteArray, "buffer",
+                                byteArray.newInstance(asAnInt(Constant.referToInJavaCode(maxSizeConstant))));
                         Var current = Var.local("byte", "current", from.<AValue>call("readByte"));
                         Var pos = Var.local("int", "pos", asAnInt("0"));
                         return new Block(buf, current, pos,
-                                WHILE(asBool("((byte)" + Constant.referToInJavaCode(terminator) + ") != current"),
-                                        new Block(asVoid("buffer[pos] = current"),
-                                                asVoid("pos++"),
-                                                IF(asBool("pos < " + Constant.referToInJavaCode(maxSizeConstant)),
+                                WHILE(isNotSame(cast(byte.class, asAnInt(Constant.referToInJavaCode(terminator))), current.ref()),
+                                        new Block(arraySetElement(buf, pos.ref(), current.ref()),
+                                                inc(pos),
+                                                IF(isSmallerThan(pos.ref(), asAnInt(Constant.referToInJavaCode(maxSizeConstant))),
                                                         new Block(current.assign(from.<AValue>call("readByte"))),
                                                         new Block(asVoid("break"))))),
                                 to.assign(new MethodCall<AValue>("java.util.Arrays.copyOf",
@@ -66,8 +69,8 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Typed<AnInt> x(Var value) {
                         return BuiltIn.<AnInt>sum(
-                                asAnInt("this.value.length"),
-                                R_IF(asBool("this.value.length < " + Constant.referToInJavaCode(maxSizeConstant)),
+                                value.read("length"),
+                                R_IF(isSmallerThan(value.<AnInt>read("length"), asAnInt(Constant.referToInJavaCode(maxSizeConstant))),
                                         asAnInt("1"),
                                         asAnInt("0")));
                     }

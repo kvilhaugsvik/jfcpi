@@ -33,11 +33,6 @@ public class Statement extends Formatted implements HasAtoms {
         this(statement, Comment.no());
     }
 
-    @Deprecated
-    public Statement(Typed<? extends Returnable> statement, String comment) {
-        this(statement, Comment.oldCompat(comment));
-    }
-
     public Statement(Typed<? extends Returnable> statement, Comment comment) {
         this.statement = statement;
         this.comment = comment;

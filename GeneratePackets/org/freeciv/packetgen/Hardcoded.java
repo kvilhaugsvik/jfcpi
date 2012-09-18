@@ -38,12 +38,16 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 //TODO: Move data to file
 public class Hardcoded {
+    // TODO: Make parameters in stead
+    private static final Var pArraySize = Var.param(int.class, "arraySize");
+    private static final Var pValue = Var.param(String.class, "value"); // can't know type
+
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
             new FieldTypeBasic("uint32", "int", new TargetClass(Long.class),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
-                            return new Block(arg1.assign(asAValue("value")));
+                            return new Block(arg1.assign(pValue.ref()));
                         }
                     },
                     new ExprFrom2<Block, Var, Var>() {
@@ -61,7 +65,7 @@ public class Hardcoded {
                         public Block x(Var val, Var to) {
                             Block out = new Block();
                             out.addStatement(new Statement(to.call("writeInt", val.<AnInt>call("intValue")),
-                                    "int is two's compliment so a uint32 don't lose information"));
+                                    Comment.c("int is two's compliment so a uint32 don't lose information")));
                             return out;
                         }
                     },
@@ -77,7 +81,7 @@ public class Hardcoded {
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
-                            return new Block(arg1.assign(asAValue("value")));
+                            return new Block(arg1.assign(pValue.ref()));
                         }
                     },
                     new ExprFrom2<Block, Var, Var>() {
@@ -119,11 +123,11 @@ public class Hardcoded {
                             new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
-            new FieldTypeBasic("worklist", "struct worklist", new TargetClass("universal[]"),
+            new FieldTypeBasic("worklist", "struct worklist", new TargetArray("universal", 1, true),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
-                            return new Block(arg1.assign(asAValue("value")));
+                            return new Block(arg1.assign(pValue.ref()));
                         }
                     },
                     new ExprFrom2<Block, Var, Var>() {
@@ -135,7 +139,7 @@ public class Hardcoded {
                                                asAnInt("0"));
                                        return new Block(
                                                len,
-                                               to.assign(asAValue("new universal[length]")),
+                                               to.assign(to.getTType().newInstance(len.ref())),
                                                FOR(
                                                        counter,
                                                        isSmallerThan(counter.ref(), len.ref()),
@@ -182,8 +186,9 @@ public class Hardcoded {
                                    @Override
                                    public Block x(Var to) {
                                        return new Block(
-                                               arrayEaterScopeCheck("arraySize < value.length()"),
-                                               to.assign(asAValue("value")));
+                                               arrayEaterScopeCheck(isSmallerThan(pArraySize.ref(),
+                                                       pValue.<AnInt>call("length"))),
+                                               to.assign(pValue.ref()));
                                    }
                                },
                                new ExprFrom2<Block, Var, Var>() {
@@ -202,7 +207,7 @@ public class Hardcoded {
                                                read,
                                                WHILE(asBool("0 != letter"), new Block(
                                                        asVoid("read++"),
-                                                       arrayEaterScopeCheck("arraySize < read"),
+                                                       arrayEaterScopeCheck(isSmallerThan(pArraySize.ref(), read.ref())),
                                                        asVoid("buf.append((char)letter)"),
                                                        letter.assign(from.<AValue>call("readByte")))),
                                                IF(asBool("buf.length() == 0"),
@@ -234,21 +239,21 @@ public class Hardcoded {
             new TerminatedArray("building_list", "int",
                                 new Requirement("MAX_NUM_BUILDING_LIST", Requirement.Kind.VALUE),
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
-            new FieldTypeBasic("memory", "unsigned char", new TargetClass("byte[]"),
+            new FieldTypeBasic("memory", "unsigned char", byteArray,
                                new ExprFrom1<Block, Var>() {
                                    @Override
                                    public Block x(Var to) {
                                        return new Block(
-                                               arrayEaterScopeCheck("arraySize != value.length"),
-                                               to.assign(asAValue("value")));
+                                               arrayEaterScopeCheck(isNotSame(pArraySize.ref(),
+                                                       pValue.<AnInt>read("length"))),
+                                               to.assign(pValue.ref()));
                                    }
                                },
                                new ExprFrom2<Block, Var, Var>() {
                                    @Override
                                    public Block x(Var to, Var from) {
-                                       Var innBuf =
-                                               Var.local("byte[]", "innBuffer",
-                                                       asAValue("new byte[arraySize]"));
+                                       Var innBuf = Var.local(byteArray, "innBuffer",
+                                               byteArray.newInstance(pArraySize.ref()));
                                        Block reader = new Block(innBuf);
                                        reader.addStatement(from.call("readFully", innBuf.ref()));
                                        reader.addStatement(to.assign(innBuf.ref()));
@@ -272,7 +277,7 @@ public class Hardcoded {
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
-                            return new Block(arg1.assign(asAValue("value")));
+                            return new Block(arg1.assign(pValue.ref()));
                         }
                     },
                     new ExprFrom2<Block, Var, Var>() {
@@ -313,8 +318,8 @@ public class Hardcoded {
             (IDependency)(new SimpleTypeAlias("int", "Integer", Collections.<Requirement>emptySet()))
     );
 
-    public static Typed<NoValue> arrayEaterScopeCheck(String check) {
-        return IF(asBool(check), Block.fromStrings("throw new IllegalArgumentException(\"Value out of scope\")"));
+    public static Typed<NoValue> arrayEaterScopeCheck(Typed<ABool> check) {
+        return IF(check, new Block(THROW(IllegalArgumentException.class, literalString("Value out of scope"))));
     }
 
     public static void applyManualChanges(PacketsStore toStorage) {
@@ -352,7 +357,7 @@ public class Hardcoded {
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
-                        return new Block(arg1.assign(asAValue("value")));
+                        return new Block(arg1.assign(pValue.ref()));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {

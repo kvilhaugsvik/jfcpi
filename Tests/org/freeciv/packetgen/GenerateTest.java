@@ -252,10 +252,10 @@ public class GenerateTest {
 
     public static void writeEnumWithSettableName(String targetFolder) throws IOException {
         Enum result = new Enum("UserMod", true, false, Arrays.asList(
-                Enum.EnumElementFC.newEnumValue("user1", "1"),
-                Enum.EnumElementFC.newEnumValue("user2", "2"),
-                Enum.EnumElementFC.newEnumValue("user3", "3"),
-                Enum.EnumElementFC.newEnumValue("user4", "4")
+                Enum.EnumElementFC.newEnumValue("user1", IntExpression.integer("1")),
+                Enum.EnumElementFC.newEnumValue("user2", IntExpression.integer("2")),
+                Enum.EnumElementFC.newEnumValue("user3", IntExpression.integer("3")),
+                Enum.EnumElementFC.newEnumValue("user4", IntExpression.integer("4"))
         ));
         writeJavaFile(result, targetFolder);
     }

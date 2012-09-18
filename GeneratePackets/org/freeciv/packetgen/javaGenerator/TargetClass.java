@@ -27,21 +27,27 @@ import java.util.regex.Pattern;
 public class TargetClass extends Address implements AValue {
     private final boolean isInScope;
     private final CodeAtom name;
+    private final TargetPackage where;
     private final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
 
     public TargetClass(String fullPath, boolean isInScope) {
         super(fullPath.split("\\."));
         name = super.components[super.components.length - 1];
         this.isInScope = isInScope;
+
+        if (1 < super.components.length)
+            this.where = new TargetPackage(fullPath.substring(0, fullPath.lastIndexOf(".")));
+        else
+            this.where = TargetPackage.TOP_LEVEL;
+
+        // While all classes have a toString this isn't true for all types.
+        // As all types are assumed to be classes this may cause trouble
+        methods.put("toString", new TargetMethod("toString"));
     }
 
     private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w");
     public TargetClass(String fullPath) {
         this(fullPath, inJavaLang.matcher(fullPath).matches());
-
-        // While all classes have a toString this isn't true for all types.
-        // As all types are assumed to be classes this may cause trouble
-        methods.put("toString", new TargetMethod("toString"));
     }
 
     public TargetClass(Class wrapped) {
@@ -49,9 +55,25 @@ public class TargetClass extends Address implements AValue {
     }
 
     public TargetClass(Class wrapped, boolean isInScope) {
-        this(wrapped.getCanonicalName(), isInScope);
+        this(new TargetPackage(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
+
         for (Method has : wrapped.getMethods())
             methods.put(has.getName(), new TargetMethod(has));
+    }
+
+    public TargetClass(TargetPackage where, CodeAtom name, boolean isInScope) {
+        super(where, name);
+        this.where = where;
+        this.name = name;
+        this.isInScope = isInScope;
+    }
+
+    public TargetPackage getPackage() {
+        return where;
+    }
+
+    public CodeAtom getCName() {
+        return name;
     }
 
     public String getName() {
@@ -71,6 +93,10 @@ public class TargetClass extends Address implements AValue {
                 to.add(new CodeAtom(field));
             }
         };
+    }
+
+    public void register(TargetMethod has) {
+        methods.put(has.getName(), has);
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
@@ -97,7 +123,7 @@ public class TargetClass extends Address implements AValue {
         };
     }
 
-    private final static CodeAtom newInst = new CodeAtom("new");
+    protected final static CodeAtom newInst = new CodeAtom("new");
     public MethodCall<AValue> newInstance(Typed<? extends AValue>... parameterList) {
         final TargetClass parent = this;
         return new MethodCall<AValue>("new " + name.get(), parameterList) {

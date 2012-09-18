@@ -18,6 +18,8 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.enteties.supporting.IntExpression;
+import org.freeciv.packetgen.javaGenerator.Comment;
 import org.freeciv.packetgen.javaGenerator.Modifiable;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.junit.Test;
@@ -229,8 +231,11 @@ public class EnumTest {
     @Test public void enumRequiresOther() {
         Requirement constantReferedTo = new Requirement("START_VALUE", Requirement.Kind.VALUE);
         Enum inNeed = Enum.fromArray("NeedOther", Arrays.asList(constantReferedTo),
-                Enum.EnumElementFC.newEnumValue("ONE", "Constants.START_VALUE"),
-                Enum.EnumElementFC.newEnumValue("TWO", "ONE.getNumber() + 1"));
+                Enum.EnumElementFC.newEnumValue("ONE", IntExpression.variable("Constants.START_VALUE")),
+                Enum.EnumElementFC.newEnumValue("TWO",
+                        IntExpression.binary("+",
+                                IntExpression.variable("ONE.getNumber()"),
+                                IntExpression.integer("1"))));
         assertTrue("Enum should require the given requirements", inNeed.getReqs().contains(constantReferedTo));
     }
 
@@ -267,7 +272,7 @@ public class EnumTest {
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
                 "/* An integer */ ONE(1, \"one\")",
-                newEnumValue("An integer", "ONE", 1, "\"one\"").toString());
+                newEnumValue(Comment.c("An integer"), "ONE", 1, "\"one\"").toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
