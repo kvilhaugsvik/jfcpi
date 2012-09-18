@@ -248,6 +248,11 @@ public class BuiltIn {
         return compareOperator(small, HasAtoms.IS_SMALLER, largerThan);
     }
 
+    public static Typed<ABool> isSmallerThanOrEq(final Typed<? extends AValue> small,
+                                             final Typed<? extends AValue> largerThan) {
+        return compareOperator(small, HasAtoms.IS_SMALLER_OR_EQUAL, largerThan);
+    }
+
     public static Typed<ABool> isSame(final Typed<? extends AValue> small,
                                              final Typed<? extends AValue> largerThan) {
         return compareOperator(small, HasAtoms.IS_SAME, largerThan);
