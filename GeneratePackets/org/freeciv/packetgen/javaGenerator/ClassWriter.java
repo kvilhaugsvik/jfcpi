@@ -536,6 +536,8 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 return null == argument.seeTopHint();
             }
         });
+        maker.whenBefore(HasAtoms.OR, CodeStyle.Action.DO_NOTHING);
+        maker.whenBefore(HasAtoms.AND, CodeStyle.Action.DO_NOTHING);
 
         maker.alwaysWhen(
                 Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(

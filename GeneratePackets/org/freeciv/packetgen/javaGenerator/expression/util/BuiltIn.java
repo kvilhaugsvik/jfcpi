@@ -175,6 +175,24 @@ public class BuiltIn {
         };
     }
 
+    public static <Kind extends ABool> Typed<Kind> and(final Typed<? extends ABool>... values) {
+        return new Formatted.Type<Kind>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.joinSep(AND, values);
+            }
+        };
+    }
+
+    public static <Kind extends ABool> Typed<Kind> or(final Typed<? extends ABool>... values) {
+        return new Formatted.Type<Kind>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.joinSep(OR, values);
+            }
+        };
+    }
+
     public static Typed<? extends AValue> divide(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
         return new Formatted.Type<AValue>() {
             @Override
