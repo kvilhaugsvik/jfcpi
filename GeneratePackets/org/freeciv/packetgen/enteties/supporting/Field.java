@@ -147,7 +147,7 @@ public class Field extends Var {
 
     private static void validateElementsToTransfer(ArrayDeclaration element, Collection<Typed<ABool>> to) throws UndefinedException {
         if (null != element.getElementsToTransfer())
-            to.add(GROUP(isSmallerThanOrEq(asAnInt(element.getMaxSizeStrictTyped().toString()),
+            to.add(GROUP(isSmallerThanOrEq(asAnInt(element.getMaxSize().toString()),
                     asAnInt(element.getElementsToTransfer()))));
     }
 
@@ -176,7 +176,7 @@ public class Field extends Var {
                     case 0:
                         break;
                     case 1:
-                        transferTypeCheck.add(isSmallerThan(asAnInt(dec.getMaxSizeStrictTyped().toString()),
+                        transferTypeCheck.add(isSmallerThan(asAnInt(dec.getMaxSize().toString()),
                                 asAnInt("Integer.MAX_VALUE")));
                         break;
                     case -1:
@@ -270,11 +270,7 @@ public class Field extends Var {
             this.onPacket = onPacket;
         }
 
-        public String getMaxSize() {
-            return maxSize.toString();
-        }
-
-        public IntExpression getMaxSizeStrictTyped() {
+        public IntExpression getMaxSize() {
             return maxSize;
         }
 
@@ -296,7 +292,7 @@ public class Field extends Var {
         private String getSize() throws UndefinedException {
             return (hasTransfer() ?
                     getElementsToTransfer() :
-                    getMaxSize());
+                    getMaxSize().toString());
         }
 
         public boolean hasTransfer() {
