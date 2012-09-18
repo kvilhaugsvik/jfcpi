@@ -237,13 +237,10 @@ public class Hardcoded {
                     },
                                TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
             new TerminatedArray("tech_list", "int",
-                                new Requirement("MAX_NUM_TECH_LIST", Requirement.Kind.VALUE),
                                 new Requirement("A_LAST", Requirement.Kind.VALUE)),
             new TerminatedArray("unit_list", "int",
-                                new Requirement("MAX_NUM_UNIT_LIST", Requirement.Kind.VALUE),
                                 new Requirement("U_LAST", Requirement.Kind.VALUE)),
             new TerminatedArray("building_list", "int",
-                                new Requirement("MAX_NUM_BUILDING_LIST", Requirement.Kind.VALUE),
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
             new FieldTypeBasic("memory", "unsigned char", byteArray,
                                new ExprFrom1<Block, Var>() {

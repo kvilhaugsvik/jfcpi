@@ -27,13 +27,13 @@ import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 public class TerminatedArray extends FieldTypeBasic {
     private static final TargetClass byteArray = new TargetArray(byte[].class, true);
     private static final Var pValue = Var.param(byteArray, "value");
-    public TerminatedArray(String dataIOType, String publicType, final Requirement maxSizeConstant, final Requirement terminator) {
+    public TerminatedArray(String dataIOType, String publicType, final Requirement terminator) {
         super(dataIOType, publicType, byteArray,
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
                         return new Block(
-                                arrayEaterScopeCheck(isSmallerThan(asAnInt(Constant.referToInJavaCode(maxSizeConstant)),
+                                arrayEaterScopeCheck(isSmallerThan(pMaxSize.<AnInt>ref(),
                                         pValue.read("length"))),
                                 fMaxSize.assign(pMaxSize.ref()),
                                 to.assign(pValue.ref()));
@@ -43,14 +43,14 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Block x(Var to, Var from) {
                         Var buf = Var.local(byteArray, "buffer",
-                                byteArray.newInstance(asAnInt(Constant.referToInJavaCode(maxSizeConstant))));
+                                byteArray.newInstance(pMaxSize.<AnInt>ref()));
                         Var current = Var.local("byte", "current", from.<AValue>call("readByte"));
                         Var pos = Var.local("int", "pos", asAnInt("0"));
                         return new Block(buf, current, pos,
                                 WHILE(isNotSame(cast(byte.class, asAnInt(Constant.referToInJavaCode(terminator))), current.ref()),
                                         new Block(arraySetElement(buf, pos.ref(), current.ref()),
                                                 inc(pos),
-                                                IF(isSmallerThan(pos.ref(), asAnInt(Constant.referToInJavaCode(maxSizeConstant))),
+                                                IF(isSmallerThan(pos.ref(), pMaxSize.<AnInt>ref()),
                                                         new Block(current.assign(from.<AValue>call("readByte"))),
                                                         new Block(asVoid("break"))))),
                                 fMaxSize.assign(pMaxSize.ref()),
@@ -63,7 +63,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     public Block x(Var val, Var to) {
                         return new Block(
                                 to.call("write", val.ref()),
-                                IF(isSmallerThan(val.<AnInt>read("length"), asAnInt(Constant.referToInJavaCode(maxSizeConstant))),
+                                IF(isSmallerThan(val.<AnInt>read("length"), fMaxSize.<AnInt>ref()),
                                         new Block(to.call("writeByte", asAValue(Constant.referToInJavaCode(terminator))))));
                     }
                 },
@@ -72,7 +72,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     public Typed<AnInt> x(Var value) {
                         return BuiltIn.<AnInt>sum(
                                 value.read("length"),
-                                R_IF(isSmallerThan(value.<AnInt>read("length"), asAnInt(Constant.referToInJavaCode(maxSizeConstant))),
+                                R_IF(isSmallerThan(value.<AnInt>read("length"), fMaxSize.<AnInt>ref()),
                                         asAnInt("1"),
                                         asAnInt("0")));
                     }
@@ -84,7 +84,7 @@ public class TerminatedArray extends FieldTypeBasic {
                               arg1.ref(), literalString(" "));
                   }
               },
-              true, Arrays.asList(maxSizeConstant, terminator));
+              true, Arrays.asList(terminator));
 
     }
 }
