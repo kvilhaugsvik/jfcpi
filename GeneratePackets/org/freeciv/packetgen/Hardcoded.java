@@ -17,6 +17,7 @@ package org.freeciv.packetgen;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.BitVector;
+import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
@@ -185,57 +186,27 @@ public class Hardcoded {
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
-            new FieldTypeBasic("string", "char", new TargetClass(String.class),
-                               new ExprFrom1<Block, Var>() {
-                                   @Override
-                                   public Block x(Var to) {
-                                       return new Block(
-                                               arrayEaterScopeCheck(isSmallerThan(pArraySize.ref(),
-                                                       pValue.<AnInt>call("length"))),
-                                               fMaxSize.assign(pMaxSize.ref()),
-                                               to.assign(pValue.ref()));
-                                   }
-                               },
-                               new ExprFrom2<Block, Var, Var>() {
-                                   @Override
-                                   public Block x(Var to, Var from) {
-                                       TargetClass sb = new TargetClass(StringBuffer.class);
-                                       Var buf =
-                                               Var.local("StringBuffer", "buf",
-                                                       sb.newInstance());
-                                       Var letter = Var.local("byte", "letter", from.<AValue>call("readByte"));
-                                       Var read = Var.local("int", "read",
-                                               asAnInt("0"));
-                                       return new Block(
-                                               fMaxSize.assign(pMaxSize.ref()),
-                                               buf,
-                                               letter,
-                                               read,
-                                               WHILE(asBool("0 != letter"), new Block(
-                                                       asVoid("read++"),
-                                                       arrayEaterScopeCheck(isSmallerThan(pArraySize.ref(), read.ref())),
-                                                       asVoid("buf.append((char)letter)"),
-                                                       letter.assign(from.<AValue>call("readByte")))),
-                                               IF(asBool("buf.length() == 0"),
-                                                       new Block(to.assign(asAString("\"\""))),
-                                                       new Block(to.assign(asAString("buf.toString()")))));
-                                   }
-                               },
-                    new ExprFrom2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var val, Var to) {
-                            return new Block(
-                                    to.call("writeBytes", val.ref()),
-                                    to.call("writeByte", asAnInt("0")));
-                        }
-                    },
+            new TerminatedArray("string", "char", new TargetClass(String.class),
+                    new Requirement("STRING_ENDER", Requirement.Kind.VALUE),
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
-                            return sum(asAnInt("this.value.length()"), asAnInt("1"));
+                            return value.call("length");
                         }
                     },
-                               TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
+                    new ExprFrom1<Typed<AValue>, Var>() {
+                        @Override
+                        public Typed<AValue> x(Var everything) {
+                            return everything.call("getBytes");
+                        }
+                    },
+                    new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                        @Override
+                        public Typed<AValue> x(Typed<AValue> bytes) {
+                            return (new TargetClass(String.class)).newInstance(bytes);
+                        }
+                    },
+                    TO_STRING_OBJECT),
             new TerminatedArray("tech_list", "int",
                                 new Requirement("A_LAST", Requirement.Kind.VALUE)),
             new TerminatedArray("unit_list", "int",
@@ -320,7 +291,12 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in types
              ************************************************************************************************/
-            (IDependency)(new SimpleTypeAlias("int", "Integer", Collections.<Requirement>emptySet()))
+            (IDependency)(new SimpleTypeAlias("int", "Integer", Collections.<Requirement>emptySet())),
+
+            /************************************************************************************************
+             * Built in constants
+             ************************************************************************************************/
+            new Constant("STRING_ENDER", IntExpression.integer("0"))
     );
 
     public static Typed<NoValue> arrayEaterScopeCheck(Typed<ABool> check) {

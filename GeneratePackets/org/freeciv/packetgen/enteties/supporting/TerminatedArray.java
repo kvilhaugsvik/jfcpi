@@ -22,19 +22,53 @@ import java.util.Arrays;
 
 import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 
-// TODO: Generalize to NetworkIO. Then use for String.
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {
     private static final TargetClass byteArray = new TargetArray(byte[].class, true);
-    private static final Var pValue = Var.param(byteArray, "value");
+
     public TerminatedArray(String dataIOType, String publicType, final Requirement terminator) {
-        super(dataIOType, publicType, byteArray,
+        this(dataIOType, publicType, byteArray, terminator,
+                new ExprFrom1<Typed<AnInt>, Var>() {
+                    @Override
+                    public Typed<AnInt> x(Var value) {
+                        return value.read("length");
+                    }
+                },
+                new ExprFrom1<Typed<AValue>, Var>() {
+                    @Override
+                    public Typed<AValue> x(Var everything) {
+                        return everything.ref();
+                    }
+                },
+                new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                    @Override
+                    public Typed<AValue> x(Typed<AValue> bytes) {
+                        return bytes;
+                    }
+                },
+                new ExprFrom1<Typed<AString>, Var>() {
+                    @Override
+                    public Typed<AString> x(Var arg1) {
+                        return new MethodCall<AString>("org.freeciv.Util.joinStringArray",
+                                arg1.ref(), literalString(" "));
+                    }
+                });
+    }
+
+    public TerminatedArray(String dataIOType, String publicType, final TargetClass javaType,
+                           final Requirement terminator,
+                           final ExprFrom1<Typed<AnInt>, Var> sizeGetter,
+                           final ExprFrom1<Typed<AValue>, Var> fullToByteArray,
+                           final ExprFrom1<Typed<AValue>, Typed<AValue>> byteArrayToFull,
+                           ExprFrom1<Typed<AString>, Var> toString) {
+        super(dataIOType, publicType, javaType,
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
+                        final Var pValue = Var.param(javaType, "value");
                         return new Block(
                                 arrayEaterScopeCheck(isSmallerThan(pMaxSize.<AnInt>ref(),
-                                        pValue.read("length"))),
+                                        sizeGetter.x(pValue))),
                                 fMaxSize.assign(pMaxSize.ref()),
                                 to.assign(pValue.ref()));
                     }
@@ -54,16 +88,16 @@ public class TerminatedArray extends FieldTypeBasic {
                                                         new Block(current.assign(from.<AValue>call("readByte"))),
                                                         new Block(asVoid("break"))))),
                                 fMaxSize.assign(pMaxSize.ref()),
-                                to.assign(new MethodCall<AValue>("java.util.Arrays.copyOf",
-                                        buf.ref(), pos.ref())));
+                                to.assign(byteArrayToFull.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
+                                        buf.ref(), pos.ref()))));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var val, Var to) {
                         return new Block(
-                                to.call("write", val.ref()),
-                                IF(isSmallerThan(val.<AnInt>read("length"), fMaxSize.<AnInt>ref()),
+                                to.call("write", fullToByteArray.x(val)),
+                                IF(isSmallerThan(sizeGetter.x(val), fMaxSize.<AnInt>ref()),
                                         new Block(to.call("writeByte", asAValue(Constant.referToInJavaCode(terminator))))));
                     }
                 },
@@ -71,19 +105,13 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Typed<AnInt> x(Var value) {
                         return BuiltIn.<AnInt>sum(
-                                value.read("length"),
-                                R_IF(isSmallerThan(value.<AnInt>read("length"), fMaxSize.<AnInt>ref()),
+                                sizeGetter.x(value),
+                                R_IF(isSmallerThan(sizeGetter.x(value), fMaxSize.<AnInt>ref()),
                                         asAnInt("1"),
                                         asAnInt("0")));
                     }
               },
-              new ExprFrom1<Typed<AString>, Var>() {
-                  @Override
-                  public Typed<AString> x(Var arg1) {
-                      return new MethodCall<AString>("org.freeciv.Util.joinStringArray",
-                              arg1.ref(), literalString(" "));
-                  }
-              },
+              toString,
               true, Arrays.asList(terminator));
 
     }

@@ -17,6 +17,7 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.Util;
 import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.dependency.IDependency;
@@ -24,9 +25,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
-import org.freeciv.packetgen.javaGenerator.Annotate;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
-import org.freeciv.packetgen.javaGenerator.TargetClass;
+import org.freeciv.packetgen.javaGenerator.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -62,6 +61,8 @@ public class GenerateTest {
         writeEnumWithSettableName(targetFolder);
 
         writeStructThatHasAnArrayField(targetFolder);
+
+        writeConstantClass(targetFolder);
 
         remaining(targetFolder);
     }
@@ -284,6 +285,23 @@ public class GenerateTest {
         Struct result = new Struct("StructArrayField", fields, Collections.<Requirement>emptySet());
 
         writeJavaFile(result, targetFolder);
+    }
+
+    @Test
+    public void writeConstantClass() throws IOException {
+        writeConstantClass(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    private static void writeConstantClass(String targetFolder) throws IOException {
+        TargetClass target = new TargetClass(Util.VERSION_DATA_CLASS);
+        ClassWriter constants = new ClassWriter(ClassKind.CLASS, target.getPackage(), null,
+                        "hard coded data", Collections.<Annotate>emptyList(), target.getName(),
+                        TargetClass.fromName(null), Collections.<TargetClass>emptyList());
+        for (IDependency stringEnd : Hardcoded.values())
+            if (stringEnd instanceof Constant && "STRING_ENDER".equals(((Constant) stringEnd).getName()))
+                constants.addField((Constant) stringEnd);
+
+        writeJavaFile(constants, targetFolder);
     }
 
     private static FieldTypeBasic.FieldTypeAlias getPrimitiveFieldType(HashMap<String, FieldTypeBasic> primitiveTypes,
