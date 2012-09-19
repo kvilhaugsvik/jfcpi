@@ -213,42 +213,7 @@ public class Hardcoded {
                                 new Requirement("U_LAST", Requirement.Kind.VALUE)),
             new TerminatedArray("building_list", "int",
                                 new Requirement("B_LAST", Requirement.Kind.VALUE)),
-            new FieldTypeBasic("memory", "unsigned char", byteArray,
-                               new ExprFrom1<Block, Var>() {
-                                   @Override
-                                   public Block x(Var to) {
-                                       return new Block(
-                                               arrayEaterScopeCheck(isNotSame(pArraySize.ref(),
-                                                       pValue.<AnInt>read("length"))),
-                                               fMaxSize.assign(pMaxSize.ref()),
-                                               to.assign(pValue.ref()));
-                                   }
-                               },
-                               new ExprFrom2<Block, Var, Var>() {
-                                   @Override
-                                   public Block x(Var to, Var from) {
-                                       Var innBuf = Var.local(byteArray, "innBuffer",
-                                               byteArray.newInstance(pArraySize.ref()));
-                                       Block reader = new Block(innBuf);
-                                       reader.addStatement(from.call("readFully", innBuf.ref()));
-                                       reader.addStatement(to.assign(innBuf.ref()));
-                                       reader.addStatement(fMaxSize.assign(pMaxSize.ref()));
-                                       return reader;
-                                   }
-                               },
-                    new ExprFrom2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var value, Var to) {
-                            return new Block(to.call("write", value.ref()));
-                        }
-                    },
-                    new ExprFrom1<Typed<AnInt>, Var>() {
-                        @Override
-                        public Typed<AnInt> x(Var value) {
-                            return asAnInt("this.value.length");
-                        }
-                    },
-                               TO_STRING_OBJECT, true, Collections.<Requirement>emptySet()),
+            new TerminatedArray("memory", "unsigned char"),
             new FieldTypeBasic("bool8", "bool",  new TargetClass(Boolean.class),
                     new ExprFrom1<Block, Var>() {
                         @Override
