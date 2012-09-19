@@ -146,6 +146,15 @@ public class BuiltIn {
                 }
             };
 
+
+    public static final ExprFrom1<Typed<AString>, Var> TO_STRING_ARRAY = new ExprFrom1<Typed<AString>, Var>() {
+        @Override
+        public Typed<AString> x(Var arg1) {
+            return new MethodCall<AString>("org.freeciv.Util.joinStringArray",
+                    arg1.ref(), literalString(" "));
+        }
+    };
+
     public static <Kind extends AValue> Typed<Kind> GROUP(final Typed<Kind> expr) {
         return new Formatted.Type<Kind>() {
             @Override

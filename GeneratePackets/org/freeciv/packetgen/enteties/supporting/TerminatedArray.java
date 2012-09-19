@@ -43,13 +43,6 @@ public class TerminatedArray extends FieldTypeBasic {
                     return bytes;
                 }
             };
-    private static final ExprFrom1<Typed<AString>, Var> arrayToString = new ExprFrom1<Typed<AString>, Var>() {
-        @Override
-        public Typed<AString> x(Var arg1) {
-            return new MethodCall<AString>("org.freeciv.Util.joinStringArray",
-                    arg1.ref(), literalString(" "));
-        }
-    };
 
     public TerminatedArray(String dataIOType, String publicType) {
         this(dataIOType, publicType, byteArray, null,
@@ -68,12 +61,12 @@ public class TerminatedArray extends FieldTypeBasic {
                 },
                 fullIsByteArray,
                 byteArrayIsFull,
-                arrayToString);
+                TO_STRING_ARRAY);
     };
 
     public TerminatedArray(String dataIOType, String publicType, final Requirement terminator) {
         this(dataIOType, publicType, byteArray, terminator,
-                arrayLen, fullIsByteArray, byteArrayIsFull, arrayToString);
+                arrayLen, fullIsByteArray, byteArrayIsFull, TO_STRING_ARRAY);
     }
 
     public TerminatedArray(String dataIOType, String publicType, final TargetClass javaType,
