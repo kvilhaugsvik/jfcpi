@@ -114,8 +114,8 @@ public class Var extends Formatted implements Typed<Returnable> {
      * Get the name read from a local scope
      * @return variable name access
      */
-    public Reference<AValue> ref() {
-        return new Reference<AValue>(this);
+    public <Ret extends AValue> Reference<Ret> ref() {
+        return new Reference<Ret>(this);
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
