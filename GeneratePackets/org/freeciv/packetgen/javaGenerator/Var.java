@@ -122,7 +122,7 @@ public class Var extends Formatted implements Typed<Returnable> {
         return ref().<Ret>call(method, params);
     }
 
-    public SetTo assign(final Typed<? extends AValue> value) {
+    public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {
         return ref().assign(value);
     }
 
@@ -178,11 +178,11 @@ public class Var extends Formatted implements Typed<Returnable> {
     }
 
 
-    public static class SetTo extends Formatted.Type<AValue> {
+    public static class SetTo<Ret extends AValue> extends Formatted.Type<Ret> {
         private final Address referName;
-        private final Typed<? extends AValue> value;
+        private final Typed<Ret> value;
 
-        private SetTo(Address referName, Typed<? extends AValue> value) {
+        private SetTo(Address referName, Typed<Ret> value) {
             this.referName = referName;
             this.value = value;
         }
@@ -194,8 +194,8 @@ public class Var extends Formatted implements Typed<Returnable> {
             value.writeAtoms(to);
         }
 
-        public static SetTo strToVal(String variable, Typed<? extends AValue> value) {
-            return new SetTo(new Address(variable), value);
+        public static <Ret extends AValue> SetTo<Ret> strToVal(String variable, Typed<Ret> value) {
+            return new SetTo<Ret>(new Address(variable), value);
         }
     }
 
@@ -219,8 +219,8 @@ public class Var extends Formatted implements Typed<Returnable> {
             };
         }
 
-        public SetTo assign(final Typed<? extends AValue> value) {
-            return new SetTo(of.referName, value);
+        public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {
+            return new SetTo<Ret>(of.referName, value);
         }
     }
 }
