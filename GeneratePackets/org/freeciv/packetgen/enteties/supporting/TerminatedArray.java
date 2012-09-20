@@ -64,7 +64,7 @@ public class TerminatedArray extends FieldTypeBasic {
     private static final ExprFrom1<Typed<? extends AValue>, Var> readByte = new ExprFrom1<Typed<? extends AValue>, Var>() {
         @Override
         public Typed<? extends AValue> x(Var from) {
-            return from.<AValue>call("readByte");
+            return from.call("readByte");
         }
     };
     private static final ExprFrom1<Typed<AnInt>, Var> currentSizeLimitIsEatenDimension =
@@ -72,6 +72,20 @@ public class TerminatedArray extends FieldTypeBasic {
                 @Override
                 public Typed<AnInt> x(Var arg1) {
                     return fMaxSize.assign(pMaxSize.ref());
+                }
+            };
+    private static final ExprFrom1<Typed<ABool>, Typed<AnInt>> addAfterIfSmallerThanMaxSize =
+            new ExprFrom1<Typed<ABool>, Typed<AnInt>>() {
+                @Override
+                public Typed<ABool> x(Typed<AnInt> size) {
+                    return isSmallerThan(size, fMaxSize.ref());
+                }
+            };
+    private static final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> wrongSizeIfToBig =
+            new ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>>() {
+                @Override
+                public Typed<ABool> x(Typed<AnInt> max, Typed<AnInt> size) {
+                    return isSmallerThan(max, size);
                 }
             };
 
@@ -105,18 +119,9 @@ public class TerminatedArray extends FieldTypeBasic {
                            ExprFrom1<Typed<AString>, Var> toString) {
         this(dataIOType, publicType, javaType, terminator, true, byteArray, sizeGetter,
                 currentSizeLimitIsEatenDimension, null,
-                new ExprFrom1<Typed<ABool>, Typed<AnInt>>() {
-                    @Override
-                    public Typed<ABool> x(Typed<AnInt> size) {
-                        return isSmallerThan(size, fMaxSize.ref());
-                    }
-                },
-                new ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>>() {
-                    @Override
-                    public Typed<ABool> x(Typed<AnInt> max, Typed<AnInt> size) {
-                        return isSmallerThan(max, size);
-                    }
-                }, fullToByteArray, byteArrayToFull,
+                addAfterIfSmallerThanMaxSize,
+                wrongSizeIfToBig,
+                fullToByteArray, byteArrayToFull,
                 elemIsByteArray, readByte, toString,
                 Arrays.asList(terminator));
     }
