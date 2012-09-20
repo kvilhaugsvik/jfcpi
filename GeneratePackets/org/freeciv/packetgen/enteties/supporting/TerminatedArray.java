@@ -6,10 +6,6 @@ import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
-import static org.freeciv.packetgen.Hardcoded.fMaxSize;
-import static org.freeciv.packetgen.Hardcoded.pMaxSize;
-
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
@@ -18,6 +14,9 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+import static org.freeciv.packetgen.Hardcoded.fMaxSize;
+import static org.freeciv.packetgen.Hardcoded.pMaxSize;
 import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
