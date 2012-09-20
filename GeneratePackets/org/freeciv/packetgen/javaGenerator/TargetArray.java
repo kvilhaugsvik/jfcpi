@@ -45,4 +45,8 @@ public class TargetArray extends TargetClass {
             }
         };
     }
+
+    public TargetClass getOf() {
+        return of;
+    }
 }
