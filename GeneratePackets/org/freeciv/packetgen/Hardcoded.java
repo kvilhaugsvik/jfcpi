@@ -59,8 +59,8 @@ public class Hardcoded {
                         @Override
                         public Block x(Var to, Var from) {
                             Var buf = Var.local("int", "bufferValue", from.<AnInt>call("readInt"));
-                            return new Block(buf, IF(asBool("0 <= bufferValue"), new Block(
-                                    to.assign(asAValue("(long)bufferValue"))), Block.fromStrings(
+                            return new Block(buf, IF(BuiltIn.<ABool>toCode("0 <= bufferValue"), new Block(
+                                    to.assign(BuiltIn.<AValue>toCode("(long)bufferValue"))), Block.fromStrings(
                                     "final long removedByCast = (-1L * Integer.MIN_VALUE) + Integer.MAX_VALUE + " + "1L",
                                     "this.value = (long)bufferValue + removedByCast")));
                         }
@@ -77,7 +77,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
-                            return asAnInt("4");
+                            return BuiltIn.<AnInt>toCode("4");
                         }
                     },
                     TO_STRING_OBJECT,
@@ -117,7 +117,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
-                            return asAnInt("8");
+                            return BuiltIn.<AnInt>toCode("8");
                         }
                     },
                     TO_STRING_OBJECT,
@@ -141,7 +141,7 @@ public class Hardcoded {
                                        TargetClass universal = new TargetClass("org.freeciv.types.universal", true);
                                        Var len = Var.local("int", "length", from.<AValue>call("readUnsignedByte"));
                                        Var counter = Var.local("int", "i",
-                                               asAnInt("0"));
+                                               BuiltIn.<AnInt>toCode("0"));
                                        return new Block(
                                                len,
                                                to.assign(to.getTType().newInstance(len.ref())),
@@ -167,14 +167,14 @@ public class Hardcoded {
                             return new Block(
                                     to.call("writeByte", val.read("length")),
                                     FOR(elem, val.ref(),
-                                            new Block(to.call("writeByte", asAnInt("element.kind.getNumber()")),
+                                            new Block(to.call("writeByte", BuiltIn.<AnInt>toCode("element.kind.getNumber()")),
                                                     to.call("writeByte", elem.read("value")))));
                         }
                     },
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
-                            return asAnInt("this.value.length");
+                            return BuiltIn.<AnInt>toCode("this.value.length");
                         }
                     },
                     TO_STRING_OBJECT,
@@ -236,7 +236,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
-                            return asAnInt("1");
+                            return BuiltIn.<AnInt>toCode("1");
                         }
                     },
                                TO_STRING_OBJECT,
@@ -309,19 +309,19 @@ public class Hardcoded {
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var out, Var inn) {
-                        return new Block(out.assign(divide(inn.<AValue>call("readFloat"), asAValue(times))));
+                        return new Block(out.assign(divide(inn.<AValue>call("readFloat"), BuiltIn.<AValue>toCode(times))));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var value, Var to) {
-                        return new Block(to.call("writeFloat", BuiltIn.<AnInt>multiply(value.ref(), asAnInt(times))));
+                        return new Block(to.call("writeFloat", BuiltIn.<AnInt>multiply(value.ref(), BuiltIn.<AnInt>toCode(times))));
                     }
                 },
                 new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var arg1) {
-                        return asAnInt("4");
+                        return BuiltIn.<AnInt>toCode("4");
                     }
                 },
                 TO_STRING_OBJECT,

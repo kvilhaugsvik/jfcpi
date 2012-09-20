@@ -24,6 +24,9 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 import java.util.*;
 
@@ -142,8 +145,8 @@ public class Field extends Var {
 
     private static void validateElementsToTransfer(ArrayDeclaration element, Collection<Typed<ABool>> to) throws UndefinedException {
         if (null != element.getElementsToTransfer())
-            to.add(GROUP(isSmallerThanOrEq(asAnInt(element.getMaxSize().toString()),
-                    asAnInt(element.getElementsToTransfer()))));
+            to.add(GROUP(isSmallerThanOrEq(BuiltIn.<AnInt>toCode(element.getMaxSize().toString()),
+                    BuiltIn.<AnInt>toCode(element.getElementsToTransfer()))));
     }
 
     private static UndefinedException notSupportedIndex(String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
@@ -171,8 +174,8 @@ public class Field extends Var {
                     case 0:
                         break;
                     case 1:
-                        transferTypeCheck.add(isSmallerThan(asAnInt(dec.getMaxSize().toString()),
-                                asAnInt("Integer.MAX_VALUE")));
+                        transferTypeCheck.add(isSmallerThan(BuiltIn.<AnInt>toCode(dec.getMaxSize().toString()),
+                                BuiltIn.<AnInt>toCode("Integer.MAX_VALUE")));
                         break;
                     case -1:
                         throw notSupportedIndex(onPacket, getFieldName(), dec);
@@ -195,7 +198,7 @@ public class Field extends Var {
             final ArrayDeclaration element = declarations[i];
             validateElementsToTransfer(element, legalSize);
             if (testArrayLength)
-                legalSize.add(GROUP(asBool(this.getFieldName() + arrayLevel + ".length != " + element.getSize())));
+                legalSize.add(GROUP(BuiltIn.<ABool>toCode(this.getFieldName() + arrayLevel + ".length != " + element.getSize())));
             arrayLevel += "[0]";
         }
 
@@ -212,18 +215,18 @@ public class Field extends Var {
         String replaceWith = "";
         Block ref = out;
         for (int counter = 0; counter < level; counter++) {
-            Var count = Var.local("int", getCounterNumber(counter) + "", asAnInt("0"));
+            Var count = Var.local("int", getCounterNumber(counter) + "", BuiltIn.<AnInt>toCode("0"));
             Block inner = new Block();
 
             ref.addStatement(FOR(count,
-                    isSmallerThan(count.ref(), asAValue("this." + this.getFieldName() + replaceWith + ".length")),
+                    isSmallerThan(count.ref(), BuiltIn.<AValue>toCode("this." + this.getFieldName() + replaceWith + ".length")),
                     inc(count),
                     inner));
             ref = inner;
 
             replaceWith += "[" + getCounterNumber(counter) + "]";
         }
-        ref.addStatement(asVoid(in.replaceAll("\\[i\\]", replaceWith)));
+        ref.addStatement(BuiltIn.<NoValue>toCode(in.replaceAll("\\[i\\]", replaceWith)));
     }
 
     private char getCounterNumber(int counter) {

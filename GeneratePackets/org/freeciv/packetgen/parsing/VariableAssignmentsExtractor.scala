@@ -26,7 +26,7 @@ object ParseVariableAssignments extends ExtractableParser {
   def startsOfExtractable = List(identifier + "\\s*" + "=")
 
   // TODO: Should concatenation be supported?
-  def strExpr = quotedString.r ^^ {a => asAString(a)}
+  def strExpr = quotedString.r ^^ {a => toCode[AString](a)}
 
   def value: Parser[Typed[AString]] = strExpr
 

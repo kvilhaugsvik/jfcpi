@@ -28,8 +28,6 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
-
 public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
@@ -52,7 +50,7 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
                     @Override
                     public Block x(Var to) {
                         return new Block(
-                                to.assign(asAValue("value")));
+                                to.assign(BuiltIn.<AValue>toCode("value")));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {

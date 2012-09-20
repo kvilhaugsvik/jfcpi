@@ -29,13 +29,13 @@ public class Sender extends Annotate {
     private static Typed<AValue> sender(int number) {
         switch (number) {
             case 0:
-                return BuiltIn.asAValue("Sent.From.UNKNOWN");
+                return BuiltIn.<AValue>toCode("Sent.From.UNKNOWN");
             case 1:
-                return BuiltIn.asAValue("Sent.From.CLIENT");
+                return BuiltIn.<AValue>toCode("Sent.From.CLIENT");
             case 2:
-                return BuiltIn.asAValue("Sent.From.SERVER");
+                return BuiltIn.<AValue>toCode("Sent.From.SERVER");
             case 3:
-                return BuiltIn.asAValue("Sent.From.BOTH");
+                return BuiltIn.<AValue>toCode("Sent.From.BOTH");
         }
         throw new Error("This code should not be reachable");
     }

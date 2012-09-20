@@ -18,6 +18,7 @@ import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
@@ -102,7 +103,7 @@ public class TypedCodeTest {
         haveStatementGroup.groupBoundary();
         haveStatementGroup.groupBoundary(); // twice in a row. Disables the next boundary unless handled
 
-        haveStatementGroup.addStatement(i.assign(BuiltIn.asAValue("0")));
+        haveStatementGroup.addStatement(i.assign(BuiltIn.<AValue>toCode("0")));
         haveStatementGroup.addStatement(BuiltIn.inc(i));
 
         haveStatementGroup.groupBoundary();

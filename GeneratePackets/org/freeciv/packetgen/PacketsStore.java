@@ -231,9 +231,9 @@ public class PacketsStore {
             for (int number = 0; number <= packetsByNumber.lastKey(); number++) {
                 if (packetsByNumber.containsKey(number) && requirements.dependenciesFound(packets.get(packetsByNumber.get(number)))) {
                     Packet packet = packets.get(packetsByNumber.get(number));
-                    understandsPackets[number] = BuiltIn.asAString("\"" + packet.getPackage() + "." + packet.getName() + "\"");
+                    understandsPackets[number] = BuiltIn.<AString>toCode("\"" + packet.getPackage() + "." + packet.getName() + "\"");
                 } else {
-                    understandsPackets[number] = BuiltIn.asAString("\"" + org.freeciv.packet.RawPacket.class.getCanonicalName() + "\""); // DEVMODE is handled elsewhere
+                    understandsPackets[number] = BuiltIn.<AString>toCode("\"" + RawPacket.class.getCanonicalName() + "\""); // DEVMODE is handled elsewhere
                 }
             }
         }

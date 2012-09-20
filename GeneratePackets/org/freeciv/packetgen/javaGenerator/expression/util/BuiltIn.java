@@ -21,8 +21,8 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 public class BuiltIn {
-    public static final Typed<ABool> TRUE = asBool("true");
-    public static final Typed<ABool> FALSE = asBool("false");
+    public static final Typed<ABool> TRUE = BuiltIn.<ABool>toCode("true");
+    public static final Typed<ABool> FALSE = BuiltIn.<ABool>toCode("false");
 
     public static final TargetArray byteArray = new TargetArray(byte[].class, true);
     public static final TargetArray boolArray = new TargetArray(boolean[].class, true);
@@ -304,27 +304,7 @@ public class BuiltIn {
         };
     }
 
-    public static Typed<AString> asAString(String javaCode) {
-        return new WrapCodeString<AString>(javaCode);
-    }
-
-    public static Typed<ABool> asBool(String javaCode) {
-        return new WrapCodeString<ABool>(javaCode);
-    }
-
-    public static Typed<AnInt> asAnInt(String javaCode) {
-        return new WrapCodeString<AnInt>(javaCode);
-    }
-
-    public static Typed<ALong> asALong(String javaCode) {
-        return new WrapCodeString<ALong>(javaCode);
-    }
-
-    public static Typed<AValue> asAValue(String javaCode) {
-        return new WrapCodeString<AValue>(javaCode);
-    }
-
-    public static Typed<NoValue> asVoid(String javaCode) {
-        return new WrapCodeString<NoValue>(javaCode);
+    public static <Kind extends Returnable> Typed<Kind> toCode(String javaCode) {
+        return new WrapCodeString<Kind>(javaCode);
     }
 }

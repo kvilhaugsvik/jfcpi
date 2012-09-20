@@ -114,12 +114,12 @@ public class TerminatedArray extends FieldTypeBasic {
                         Var buf = Var.local(byteArray, "buffer",
                                 byteArray.newInstance(pMaxSize.<AnInt>ref()));
                         Var current = Var.local("byte", "current", from.<AValue>call("readByte"));
-                        Var pos = Var.local("int", "pos", asAnInt("0"));
+                        Var pos = Var.local("int", "pos", BuiltIn.<AnInt>toCode("0"));
 
                         Typed<ABool> noTerminatorFound = (null == terminator ?
                                 TRUE :
                                 isNotSame(cast(byte.class,
-                                        asAnInt(Constant.referToInJavaCode(terminator))), current.ref()));
+                                        BuiltIn.<AnInt>toCode(Constant.referToInJavaCode(terminator))), current.ref()));
 
                         return new Block(fMaxSize.assign(pMaxSize.ref()), buf, current, pos,
                                 WHILE(noTerminatorFound,
@@ -127,7 +127,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                                 inc(pos),
                                                 IF(isSmallerThan(pos.ref(), pMaxSize.<AnInt>ref()),
                                                         new Block(current.assign(from.<AValue>call("readByte"))),
-                                                        new Block(asVoid("break"))))),
+                                                        new Block(BuiltIn.<NoValue>toCode("break"))))),
                                 to.assign(byteArrayToFull.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
                                         buf.ref(), pos.ref()))));
                     }
@@ -139,7 +139,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         Typed<ABool> addAfterResult = addAfter.x(sizeGetter.x(val));
                         if (!FALSE.equals(addAfterResult))
                             out.addStatement(IF(addAfterResult,
-                                    new Block(to.call("writeByte", asAValue(Constant.referToInJavaCode(terminator))))));
+                                    new Block(to.call("writeByte", BuiltIn.<AValue>toCode(Constant.referToInJavaCode(terminator))))));
                         return out;
                     }
                 },
@@ -152,8 +152,8 @@ public class TerminatedArray extends FieldTypeBasic {
                             length = BuiltIn.<AnInt>sum(
                                     length,
                                     R_IF(addAfterResult,
-                                            asAnInt("1"),
-                                            asAnInt("0")));
+                                            BuiltIn.<AnInt>toCode("1"),
+                                            BuiltIn.<AnInt>toCode("0")));
                         return length;
                     }
               },

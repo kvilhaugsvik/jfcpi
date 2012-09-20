@@ -24,9 +24,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
@@ -143,7 +141,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         addMethod(Method.newReadClassState(Comment.doc("Is the enum bitwise?",
                 "An enum is bitwise if it's number increase by two's exponent.",
                 Comment.docReturns("true if the enum is bitwise")),
-                TargetClass.fromName("boolean"), "isBitWise", new Block(RETURN(asBool(bitwise + "")))));
+                TargetClass.fromName("boolean"), "isBitWise", new Block(RETURN(BuiltIn.<ABool>toCode(bitwise + "")))));
 
         Var element = Var.local(this.getName(), "element", null);
         addMethod(Method.custom(Comment.no(),
@@ -152,8 +150,8 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                 Collections.<TargetClass>emptyList(),
                 new Block(
                         FOR(element, new MethodCall<AValue>("values", new Typed[0]),
-                                new Block(IF(asBool("element.getNumber() == number"), new Block(RETURN(element.ref()))))),
-                        RETURN(asAValue("INVALID")))));
+                                new Block(IF(BuiltIn.<ABool>toCode("element.getNumber() == number"), new Block(RETURN(element.ref()))))),
+                        RETURN(BuiltIn.<AValue>toCode("INVALID")))));
     }
 
     public void addEnumerated(Comment comment,
@@ -209,7 +207,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
-                        return new Block(arg1.assign(asAValue("value")));
+                        return new Block(arg1.assign(BuiltIn.<AValue>toCode("value")));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {
@@ -320,8 +318,8 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                 out = new Typed[3];
                 out[2] = valid ? BuiltIn.TRUE : BuiltIn.FALSE;
             }
-            out[0] = asAnInt(valueGen.toString());
-            out[1] = asAString(toStringName);
+            out[0] = BuiltIn.<AnInt>toCode(valueGen.toString());
+            out[1] = BuiltIn.<AString>toCode(toStringName);
             return out;
         }
 

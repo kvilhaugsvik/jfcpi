@@ -15,20 +15,17 @@
 package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.Util;
-import org.freeciv.packetgen.javaGenerator.IR;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 
-import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.LinkedList;
 
 public class Block extends Formatted implements Typed<NoValue> {
@@ -81,7 +78,7 @@ public class Block extends Formatted implements Typed<NoValue> {
     @Deprecated public static Block fromStrings(String... firstStatements) {
         Block out = new Block();
         for (String statement : firstStatements)
-            out.addStatement(asVoid(statement));
+            out.addStatement(BuiltIn.<NoValue>toCode(statement));
         return out;
     }
 }

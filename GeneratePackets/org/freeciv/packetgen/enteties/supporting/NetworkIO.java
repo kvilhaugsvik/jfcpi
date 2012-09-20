@@ -16,7 +16,6 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
@@ -27,9 +26,6 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 
 import java.util.Collection;
 import java.util.Collections;
-
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAValue;
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.asAnInt;
 
 // TODO: Quick: Split based on kind of fulfillment so a dummy don't have get for the nulls or throw excpetion on null
 // TODO: Long term: Split code in a better way between NetworkIO and java type. Some argument passing may fix all.
@@ -50,7 +46,7 @@ public class NetworkIO implements IDependency {
         return new ExprFrom1<Typed<AnInt>, Var>() {
             @Override
             public Typed<AnInt> x(Var arg1) {
-                return asAnInt(size + "");
+                return BuiltIn.<AnInt>toCode(size + "");
             }
         };
     }
@@ -58,8 +54,8 @@ public class NetworkIO implements IDependency {
     public Block getRead(String argument, Typed<AValue> pre, Typed<AValue> post) {
         Block out = new Block();
         if (null != pre) out.addStatement(pre);
-        out.addStatement(asAValue("byte[] innBuffer = new byte[" + argument + "]"));
-        out.addStatement(asAValue("from.readFully(innBuffer)"));
+        out.addStatement(BuiltIn.<AValue>toCode("byte[] innBuffer = new byte[" + argument + "]"));
+        out.addStatement(BuiltIn.<AValue>toCode("from.readFully(innBuffer)"));
         if (null != post) out.addStatement(post);
         return out;
     }
@@ -90,7 +86,7 @@ public class NetworkIO implements IDependency {
      * @param write code to write an integer provided in braces right after to a DataOutput named "to"
      */
     public static NetworkIO witIntAsIntermediate(String type, int size, String read, String write) {
-        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT, BuiltIn.asAnInt(read));
+        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT, BuiltIn.<AnInt>toCode(read));
     }
 
     /**

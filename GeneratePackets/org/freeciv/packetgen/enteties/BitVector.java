@@ -10,6 +10,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
@@ -110,7 +111,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
-                        Block body = new Block(arg1.assign(asAValue("value")));
+                        Block body = new Block(arg1.assign(BuiltIn.<AValue>toCode("value")));
                         if (arrayEater)
                             body.addStatement(fMaxSize.assign(pMaxSize.ref()));
                         return body;
@@ -121,10 +122,10 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                     public Block x(Var to, Var from) {
                         Block body = knowsSize ?
                                 io.getRead(size[0] + realBitVector + size[1], null,
-                                        asAValue("this.value = new " + getName() + "(innBuffer)")) :
+                                        BuiltIn.<AValue>toCode("this.value = new " + getName() + "(innBuffer)")) :
                                 io.getRead(size[0] + "size" + size[1],
-                                        asAValue("int size = from.readUnsignedShort()"),
-                                        asAValue("this.value = new " + getName() + "(innBuffer" + ", size)"));
+                                        BuiltIn.<AValue>toCode("int size = from.readUnsignedShort()"),
+                                        BuiltIn.<AValue>toCode("this.value = new " + getName() + "(innBuffer" + ", size)"));
                         if (arrayEater)
                             body.addStatement(fMaxSize.assign(pMaxSize.ref()));
                         return body;
@@ -136,7 +137,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                         Block out = new Block();
                         if (!knowsSize)
                             out.addStatement(to.call("writeShort", val.read("size")));
-                        out.addStatement(asAValue(io.getWrite("this.value.getAsByteArray()")));
+                        out.addStatement(BuiltIn.<AValue>toCode(io.getWrite("this.value.getAsByteArray()")));
                         return out;
                     }
                 },
@@ -144,13 +145,13 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                         new ExprFrom1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var value) {
-                                return asAnInt(size[0] + realBitVector + size[1]);
+                                return BuiltIn.<AnInt>toCode(size[0] + realBitVector + size[1]);
                             }
                         } :
                         new ExprFrom1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var value) {
-                                return asAnInt("2 + " + size[0] + "this." + "value" + ".size" + size[1]);
+                                return BuiltIn.<AnInt>toCode("2 + " + size[0] + "this." + "value" + ".size" + size[1]);
                             }
                         }),
                 TO_STRING_OBJECT,

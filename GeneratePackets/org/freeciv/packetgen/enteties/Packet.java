@@ -15,7 +15,6 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packet.PacketHeader;
-import org.freeciv.packetgen.GeneratorDefaults;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -112,8 +111,8 @@ public class Packet extends ClassWriter implements IDependency {
 
     private Typed<AValue> generateHeader(TargetClass headerKind) {
         return getField("header").assign(headerKind.newInstance(
-                sum(asAValue("calcBodyLen()"), headerKind.read("HEADER_SIZE")),
-                asAValue("number")));
+                sum(BuiltIn.<AValue>toCode("calcBodyLen()"), headerKind.read("HEADER_SIZE")),
+                BuiltIn.<AValue>toCode("number")));
     }
 
     private void addConstructorFromJavaTypes(Field[] fields, TargetClass headerKind) throws UndefinedException {
@@ -127,7 +126,7 @@ public class Packet extends ClassWriter implements IDependency {
                 field.appendValidationTo(true, constructorBodyJ);
                 if (field.hasDeclarations())
                     constructorBodyJ.addStatement(
-                            field.assign(asAValue("new " + field.getFType() + field.getNewCreation())));
+                            field.assign(BuiltIn.<AValue>toCode("new " + field.getFType() + field.getNewCreation())));
                 field.forElementsInField("this." + field.getFieldName() + "[i] = " +
                         field.getNewFromJavaType(), constructorBodyJ);
             }
@@ -145,7 +144,7 @@ public class Packet extends ClassWriter implements IDependency {
             field.appendValidationTo(false, constructorBodyStream);
             if (field.hasDeclarations())
                 constructorBodyStream.addStatement(
-                        field.assign(asAValue("new " + field.getFType() + field.getNewCreation())));
+                        field.assign(BuiltIn.<AValue>toCode("new " + field.getFType() + field.getNewCreation())));
             field.forElementsInField(
                     "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName.getName()),
                     constructorBodyStream);
@@ -153,28 +152,28 @@ public class Packet extends ClassWriter implements IDependency {
 
         constructorBodyStream.groupBoundary();
 
-        constructorBodyStream.addStatement(IF(asBool("number != header.getPacketKind()"),
+        constructorBodyStream.addStatement(IF(BuiltIn.<ABool>toCode("number != header.getPacketKind()"),
                 new Block(THROW((ioexception).newInstance(sum(
                         literalString("Tried to create package " + name + " but packet number was "),
                         argHeader.<AnInt>call("getPacketKind")))))));
 
-        constructorBodyStream.addStatement(ASSERT(asBool("header instanceof " + headerKind.getName()),
+        constructorBodyStream.addStatement(ASSERT(BuiltIn.<ABool>toCode("header instanceof " + headerKind.getName()),
                 literalString("Packet not generated for this kind of header")));
 
         Block wrongSize = new Block();
-        constructorBodyStream.addStatement(IF(asBool("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),
+        constructorBodyStream.addStatement(IF(BuiltIn.<ABool>toCode("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),
                 wrongSize));
         wrongSize.addStatement(new MethodCall<NoValue>("Logger.getLogger(" + logger + ").warning", sum(
                 literalString("Probable misinterpretation: "),
                 literalString("interpreted packet size ("),
-                GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), asAnInt("calcBodyLen()"))),
+                GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), BuiltIn.<AnInt>toCode("calcBodyLen()"))),
                 literalString(") don't match header packet size ("), argHeader.<AnInt>call("getTotalSize"),
-                literalString(") for "), asAString("this.toString()"))));
+                literalString(") for "), BuiltIn.<AString>toCode("this.toString()"))));
         wrongSize.addStatement(THROW(ioexception.newInstance(sum(
                 literalString("Packet size in header and Java packet not the same."),
                 literalString(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
                 literalString(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
-                literalString(" Packet body size: "), asAValue("calcBodyLen()")))));
+                literalString(" Packet body size: "), BuiltIn.<AValue>toCode("calcBodyLen()")))));
         addMethod(Method.newPublicConstructorWithException(Comment.doc(
                 "Construct an object from a DataInput", new String(),
                 Comment.param(streamName, "data stream that is at the start of the package body"),
@@ -188,7 +187,7 @@ public class Packet extends ClassWriter implements IDependency {
     private void addEncoder(Field[] fields) {
         Var pTo = Var.param(new TargetClass(DataOutput.class, true), "to");
         Block body = new Block();
-        body.addStatement(getField("header").call("encodeTo", asAValue("to")));
+        body.addStatement(getField("header").call("encodeTo", BuiltIn.<AValue>toCode("to")));
         if (0 < fields.length) {
             for (Field field : fields)
                 field.forElementsInField("this." + field.getFieldName() + "[i].encodeTo(to)", body);
@@ -202,7 +201,7 @@ public class Packet extends ClassWriter implements IDependency {
         Block encodeFieldsLen = new Block();
         for (Field field : fields)
             if (field.hasDeclarations()) {
-                encodeFieldsLen.addStatement(asVoid("int " + field.getFieldName() + "Len" + " = " + "0"));
+                encodeFieldsLen.addStatement(BuiltIn.<NoValue>toCode("int " + field.getFieldName() + "Len" + " = " + "0"));
                 field.forElementsInField(field.getFieldName() + "Len" + "+=" +
                         "this." + field.getFieldName() + "[i].encodedLength()", encodeFieldsLen);
             }
@@ -212,7 +211,7 @@ public class Packet extends ClassWriter implements IDependency {
                 summing = sum(summing, calcBodyLen(fields[i]));
             encodeFieldsLen.addStatement(RETURN(summing));
         } else {
-            encodeFieldsLen.addStatement(RETURN(asAnInt("0")));
+            encodeFieldsLen.addStatement(RETURN(BuiltIn.<AnInt>toCode("0")));
         }
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
@@ -223,8 +222,8 @@ public class Packet extends ClassWriter implements IDependency {
 
     private static Typed<? extends AValue> calcBodyLen(Field field) {
         return (field.hasDeclarations() ?
-                asAValue(field.getFieldName() + "Len") :
-                asAValue("this." + field.getFieldName() + ".encodedLength()"));
+                BuiltIn.<AValue>toCode(field.getFieldName() + "Len") :
+                BuiltIn.<AValue>toCode("this." + field.getFieldName() + ".encodedLength()"));
     }
 
     private void addToString(String name, Field[] fields) {
@@ -247,12 +246,12 @@ public class Packet extends ClassWriter implements IDependency {
 
         if (field.hasDeclarations()) {
             Var out = Var.local(field.getJType() + field.getArrayDeclaration(), "out",
-                    asAValue("new " + field.getJType() + field.getNewCreation()));
+                    BuiltIn.<AValue>toCode("new " + field.getJType() + field.getNewCreation()));
             body = new Block(out);
             field.forElementsInField("out[i] = " + "this." + field.getFieldName() + "[i].getValue()", body);
             body.addStatement(RETURN(out.ref()));
         } else {
-            body = new Block(RETURN(asAValue("this." + field.getFieldName() + ".getValue()")));
+            body = new Block(RETURN(BuiltIn.<AValue>toCode("this." + field.getFieldName() + ".getValue()")));
         }
 
         addMethod(Method.newPublicReadObjectState(Comment.no(),

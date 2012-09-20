@@ -23,6 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.io.DataInput;
@@ -155,8 +156,8 @@ public class FieldTypeBasic implements IDependency {
                     TargetClass.fromName("boolean"), "equals", Arrays.asList(paramOther),
                     Collections.<TargetClass>emptyList(),
                     new Block(IF(
-                            asBool("other instanceof " + name),
-                            new Block(RETURN(asBool("this.value == ((" + name + ")other).getValue()"))),
+                            BuiltIn.<ABool>toCode("other instanceof " + name),
+                            new Block(RETURN(BuiltIn.<ABool>toCode("this.value == ((" + name + ")other).getValue()"))),
                             new Block(RETURN(FALSE))))));
         }
 
