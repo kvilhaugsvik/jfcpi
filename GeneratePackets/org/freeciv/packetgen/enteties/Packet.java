@@ -97,7 +97,7 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addConstructorFromFields(Field[] fields, TargetClass headerKind) throws UndefinedException {
         Block constructorBody = new Block();
-        LinkedList<Var> params = new LinkedList<Var>();
+        LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         for (Field field : fields) {
             params.add(Var.param(
                     new TargetClass(field.getFType() + field.getArrayDeclaration(), true),
@@ -117,7 +117,7 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addConstructorFromJavaTypes(Field[] fields, TargetClass headerKind) throws UndefinedException {
         if (0 < fields.length) {
-            LinkedList<Var> params = new LinkedList<Var>();
+            LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
             Block constructorBodyJ = new Block();
             for (Field field : fields) {
                 params.add(Var.param(
@@ -136,8 +136,8 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind) throws UndefinedException {
-        Var argHeader = Var.param(new TargetClass(PacketHeader.class, true), "header");
-        final Var streamName = Var.param(new TargetClass(DataInput.class, true), "from");
+        Var<TargetClass> argHeader = Var.param(new TargetClass(PacketHeader.class, true), "header");
+        final Var<TargetClass> streamName = Var.param(new TargetClass(DataInput.class, true), "from");
 
         Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
         for (Field field : fields) {
@@ -185,7 +185,7 @@ public class Packet extends ClassWriter implements IDependency {
     }
 
     private void addEncoder(Field[] fields) {
-        Var pTo = Var.param(new TargetClass(DataOutput.class, true), "to");
+        Var<TargetClass> pTo = Var.<TargetClass>param(new TargetClass(DataOutput.class, true), "to");
         Block body = new Block();
         body.addStatement(getField("header").call("encodeTo", BuiltIn.<AValue>toCode("to")));
         if (0 < fields.length) {
@@ -215,7 +215,7 @@ public class Packet extends ClassWriter implements IDependency {
         }
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
-                TargetClass.fromName("int"), "calcBodyLen", Collections.<Var>emptyList(),
+                TargetClass.fromName("int"), "calcBodyLen", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(),
                 encodeFieldsLen));
     }

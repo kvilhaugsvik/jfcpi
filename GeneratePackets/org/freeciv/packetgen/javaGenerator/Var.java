@@ -24,7 +24,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import java.util.Collections;
 import java.util.List;
 
-public class Var extends Formatted implements Typed<Returnable> {
+public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     private final List<Annotate> annotations;
     private final Visibility visibility;
     private final Scope scope;
@@ -36,7 +36,7 @@ public class Var extends Formatted implements Typed<Returnable> {
     private final Address referName;
 
     protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                TargetClass type, String name, Typed<? extends AValue> value) {
+                TargetClass type, String name, Typed<Kind> value) {
         this.annotations = annotations;
         this.visibility = visibility;
         this.scope = scope;
@@ -114,8 +114,8 @@ public class Var extends Formatted implements Typed<Returnable> {
      * Get the name read from a local scope
      * @return variable name access
      */
-    public <Ret extends AValue> Reference<Ret> ref() {
-        return new Reference<Ret>(this);
+    public Reference<Kind> ref() {
+        return new Reference<Kind>(this);
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
@@ -127,43 +127,43 @@ public class Var extends Formatted implements Typed<Returnable> {
     }
 
 
-    public static Var local(Class type, String name, Typed<? extends AValue> value) {
-        return local(new TargetClass(type), name, value);
+    public static <Kind extends AValue> Var<Kind> local(Class type, String name, Typed<Kind> value) {
+        return Var.<Kind>local(new TargetClass(type), name, value);
     }
 
-    public static Var local(String type, String name, Typed<? extends AValue> value) {
-        return local(new TargetClass(type), name, value);
+    public static <Kind extends AValue> Var<Kind> local(String type, String name, Typed<Kind> value) {
+        return Var.<Kind>local(new TargetClass(type), name, value);
     }
 
-    public static Var local(TargetClass type, String name, Typed<? extends AValue> value) {
-        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
+    public static <Kind extends AValue> Var<Kind> local(TargetClass type, String name, Typed<Kind> value) {
+        return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
     }
 
-    public static Var param(TargetClass kind, String name) {
-        return new Var(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, kind, name, null);
+    public static <Kind extends AValue> Var<Kind> param(TargetClass kind, String name) {
+        return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, kind, name, null);
     }
 
-    public static Var param(Class kind, String name) {
-        return Var.param(new TargetClass(kind), name);
+    public static <Kind extends AValue> Var<Kind> param(Class kind, String name) {
+        return Var.<Kind>param(new TargetClass(kind), name);
     }
 
-    public static Var param(String kind, String name) {
-        return Var.param(new TargetClass(kind), name);
+    public static <Kind extends AValue> Var<Kind> param(String kind, String name) {
+        return Var.<Kind>param(new TargetClass(kind), name);
     }
 
-    public static Var field(Visibility visibility, Scope scope, Modifiable modifiable,
-                                            String type, String name, Typed<? extends AValue> value) {
-        return field(Collections.<Annotate>emptyList(), visibility, scope, modifiable, type, name, value);
+    public static <Kind extends AValue> Var<Kind> field(Visibility visibility, Scope scope, Modifiable modifiable,
+                                            String type, String name, Typed<Kind> value) {
+        return Var.<Kind>field(Collections.<Annotate>emptyList(), visibility, scope, modifiable, type, name, value);
     }
 
-    public static Var field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                            String type, String name, Typed<? extends AValue> value) {
-        return field(annotations, visibility, scope, modifiable, new TargetClass(type), name, value);
+    public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
+                            String type, String name, Typed<Kind> value) {
+        return Var.<Kind>field(annotations, visibility, scope, modifiable, new TargetClass(type), name, value);
     }
 
-    public static Var field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                            TargetClass type, String name, Typed<? extends AValue> value) {
-        return new Var(annotations, visibility, scope, modifiable, type, name, value);
+    public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
+                            TargetClass type, String name, Typed<Kind> value) {
+        return new Var<Kind>(annotations, visibility, scope, modifiable, type, name, value);
     }
 
     public <Kind extends AValue> Typed<Kind> read(final String field) {

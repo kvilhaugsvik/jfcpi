@@ -103,14 +103,14 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         else
             addObjectConstant("String", "toStringName");
 
-        Var fieldToStringName = this.getField("toStringName");
-        Var fieldNumber = this.getField("number");
-        Var fieldValid = this.getField("valid");
+        Var<AString> fieldToStringName = this.getField("toStringName");
+        Var<AnInt> fieldNumber = this.getField("number");
+        Var<ABool> fieldValid = this.getField("valid");
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
-        Var paramNumber = Var.param(int.class, "number");
-        Var paramToStrName = Var.param("String", "toStringName");
-        Var paramValid = Var.param(boolean.class, "valid");
+        Var<AnInt> paramNumber = Var.param(int.class, "number");
+        Var<AString> paramToStrName = Var.param("String", "toStringName");
+        Var<ABool> paramValid = Var.param(boolean.class, "valid");
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.fromName(null), enumName, Arrays.asList(paramNumber, paramToStrName),
@@ -131,7 +131,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("String"), "toString",
                 new Block(BuiltIn.RETURN(fieldToStringName.ref()))));
         if (nameOverride) {
-            Var paramName = Var.param("String", "name");
+            Var<AString> paramName = Var.param("String", "name");
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
                     new TargetClass(void.class), "setName", Arrays.asList(paramName),
                     Collections.<TargetClass>emptyList(),

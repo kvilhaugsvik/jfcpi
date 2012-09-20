@@ -71,7 +71,7 @@ public class CodeGenTest {
 
     @Test public void testMethodNoParams() {
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
+                new TargetClass("int"), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Arrays.<TargetClass>asList(new TargetClass("Throwable")), new Block(RETURN(BuiltIn.<AnInt>toCode("5"))))).toString();
 
         assertEquals("Generated source not as expected",
@@ -84,7 +84,7 @@ public class CodeGenTest {
 
     @Test public void testMethodManyLevelsOfIndention() {
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
+                new TargetClass("int"), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(),
                 new Block(WHILE(TRUE,
                         new Block(WHILE(TRUE,
@@ -118,7 +118,7 @@ public class CodeGenTest {
             }
         };
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
+                new TargetClass("int"), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(), closesScopeNotOpened)).toString();
     }
 
@@ -146,7 +146,7 @@ public class CodeGenTest {
             }
         };
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                new TargetClass("int"), "testMethod", Collections.<Var>emptyList(),
+                new TargetClass("int"), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(), forgetsToCloseScope)).toString();
     }
 
@@ -512,9 +512,9 @@ public class CodeGenTest {
 
     @Test public void testPublicConstructor() {
         TargetClass ioe = new TargetClass(IOException.class, true);
-        Var pFrom = Var.param(new TargetClass(DataInput.class, true), "from");
-        Var pHeaderLen = Var.param(int.class, "headerLen");
-        Var pPacket = Var.param(int.class, "packet");
+        Var<TargetClass> pFrom = Var.param(new TargetClass(DataInput.class, true), "from");
+        Var<AnInt> pHeaderLen = Var.param(int.class, "headerLen");
+        Var<AnInt> pPacket = Var.param(int.class, "packet");
         Block body = new Block(
                 BuiltIn.<AValue>toCode("this.unit_id = new UNIT(from)"),
                 IF(BuiltIn.<ABool>toCode("getNumber() != packet"),

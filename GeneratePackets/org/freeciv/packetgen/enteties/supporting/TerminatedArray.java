@@ -78,7 +78,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 new ExprFrom1<Typed<ABool>, Typed<AnInt>>() {
                     @Override
                     public Typed<ABool> x(Typed<AnInt> size) {
-                        return isSmallerThan(size, fMaxSize.<AnInt>ref());
+                        return isSmallerThan(size, fMaxSize.ref());
                     }
                 },
                 new ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>>() {
@@ -104,7 +104,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         final Var pValue = Var.param(javaType, "value");
                         return new Block(
                                 fMaxSize.assign(pMaxSize.ref()),
-                                arrayEaterScopeCheck(testSizeWrong.x(pMaxSize.<AnInt>ref(), sizeGetter.x(pValue))),
+                                arrayEaterScopeCheck(testSizeWrong.x(pMaxSize.ref(), sizeGetter.x(pValue))),
                                 to.assign(pValue.ref()));
                     }
                 },
@@ -112,7 +112,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Block x(Var to, Var from) {
                         Var buf = Var.local(byteArray, "buffer",
-                                byteArray.newInstance(pMaxSize.<AnInt>ref()));
+                                byteArray.newInstance(pMaxSize.ref()));
                         Var current = Var.local("byte", "current", from.<AValue>call("readByte"));
                         Var pos = Var.local("int", "pos", BuiltIn.<AnInt>toCode("0"));
 

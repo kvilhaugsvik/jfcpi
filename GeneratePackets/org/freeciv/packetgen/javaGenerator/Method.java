@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 
 import java.util.Collections;
@@ -28,12 +29,12 @@ public class Method extends Formatted implements HasAtoms {
     private final Scope scope;
     private final TargetClass type;
     private final String name;
-    private final List<Var> paramList;
+    private final List<? extends Var<? extends AValue>> paramList;
     private final List<TargetClass> exceptionList;
     private final Block body;
 
     protected Method(Comment comment, Visibility visibility, Scope scope,
-                     TargetClass type, String name, List<Var> paramList,
+                     TargetClass type, String name, List<? extends Var<? extends AValue>> paramList,
                      List<TargetClass> exceptionList, Block body) {
         this.comment = comment;
         this.visibility = visibility;
@@ -81,7 +82,7 @@ public class Method extends Formatted implements HasAtoms {
 
     public static Method newPublicConstructorWithException(Comment comment,
                                                     String name,
-                                                    List<Var> paramList,
+                                                    List<? extends Var<? extends AValue>> paramList,
                                                     List<TargetClass> exceptionList,
                                                     Block body) {
         return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
@@ -89,7 +90,7 @@ public class Method extends Formatted implements HasAtoms {
 
     public static Method newPublicConstructor(Comment comment,
                                        String name,
-                                       List<Var> paramList,
+                                       List<? extends Var<? extends AValue>> paramList,
                                        Block body) {
         return newPublicConstructorWithException(comment, name, paramList, Collections.<TargetClass>emptyList(), body);
     }
@@ -98,26 +99,26 @@ public class Method extends Formatted implements HasAtoms {
                                            TargetClass type,
                                            String name,
                                            Block body) {
-        return newPublicDynamicMethod(comment, type, name, Collections.<Var>emptyList(),
+        return newPublicDynamicMethod(comment, type, name, Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(), body);
     }
 
     public static Method newPublicDynamicMethod(Comment comment,
                                          TargetClass type,
                                          String name,
-                                         List<Var> paramList,
+                                         List<? extends Var<? extends AValue>> paramList,
                                          List<TargetClass> exceptionList,
                                          Block body) {
         return custom(comment, Visibility.PUBLIC, Scope.OBJECT, type, name, paramList, exceptionList, body);
     }
 
     public static Method newReadClassState(Comment comment, TargetClass type, String name, Block body) {
-        return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, Collections.<Var>emptyList(),
+        return custom(comment, Visibility.PUBLIC, Scope.CLASS, type, name, Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(), body);
     }
 
     public static Method custom(Comment comment, Visibility visibility, Scope scope,
-                                      TargetClass type, String name, List<Var> paramList,
+                                      TargetClass type, String name, List<? extends Var<? extends AValue>> paramList,
                                       List<TargetClass> exceptionList, Block body) {
         return new Method(comment, visibility, scope, type, name, paramList,
                 exceptionList, body);

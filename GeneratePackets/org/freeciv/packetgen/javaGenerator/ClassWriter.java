@@ -175,7 +175,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     private void constructorFromFields(CodeAtoms to) {
         Block body = new Block();
-        LinkedList<Var> args = new LinkedList<Var>();
+        LinkedList<Var<? extends AValue>> args = new LinkedList<Var<? extends AValue>>();
         for (Var dec : fields) {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(Var.param(dec.getType(), dec.getName()));

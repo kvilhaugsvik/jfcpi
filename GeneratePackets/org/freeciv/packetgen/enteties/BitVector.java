@@ -10,6 +10,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
@@ -38,9 +39,9 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
         knowsSize = true;
 
-        Var pFromByte = Var.param(byteArray, "from");
-        Var pFromBits = Var.param(boolArray, "from");
-        Var pFromBit = Var.param(boolean.class, "setAllTo");
+        Var<TargetArray> pFromByte = Var.param(byteArray, "from");
+        Var<TargetArray> pFromBits = Var.param(boolArray, "from");
+        Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
         addMethod(Method.newPublicConstructor(Comment.no(),
                 getName(), Arrays.asList(pFromByte),
                 new Block(new MethodCall<Returnable>("super", getField("size").ref(), pFromByte.ref()))));
@@ -64,12 +65,12 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         addPublicObjectConstant("int", "size");
         knowsSize = false;
 
-        Var pFromByte = Var.param(byteArray, "from");
-        Var pFromBits = Var.param(boolArray, "from");
-        Var pFromBit = Var.param(boolean.class, "setAllTo");
-        Var pSize = Var.param(int.class, "size");
-        Var pSizeB = Var.param(int.class, "sizeInBits");
-        Var size = getField("size");
+        Var<TargetArray> pFromByte = Var.param(byteArray, "from");
+        Var<TargetArray> pFromBits = Var.param(boolArray, "from");
+        Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
+        Var<AnInt> pSize = Var.param(int.class, "size");
+        Var<AnInt> pSizeB = Var.param(int.class, "sizeInBits");
+        Var<AnInt> size = getField("size");
 
         addMethod(Method.newPublicConstructor(Comment.no(),
                 getName(), Arrays.asList(pFromByte, pSizeB),

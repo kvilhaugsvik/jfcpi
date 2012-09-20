@@ -26,20 +26,20 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class Constant extends Var implements IDependency {
+public class Constant<Kind extends AValue> extends Var<Kind> implements IDependency {
     private final HashSet<Requirement> reqs = new HashSet<Requirement>();
 
     private static final String constantPrefix = Util.VERSION_DATA_CLASS + ".";
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
 
-    private Constant(String name, Typed<? extends AValue> expression, String typeName) {
+    private Constant(String name, Typed<Kind> expression, String typeName) {
         super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
                 new TargetClass(typeName), name, expression);
     }
 
     public Constant(String name, IntExpression expression) {
         super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
-                new TargetClass(int.class), name, BuiltIn.<AnInt>toCode(expression.toString()));
+                new TargetClass(int.class), name, BuiltIn.<Kind>toCode(expression.toString()));
         reqs.addAll(expression.getReqs());
     }
 
@@ -77,11 +77,11 @@ public class Constant extends Var implements IDependency {
         return FIND_CONSTANTS_CLASS.matcher(constantName).replaceAll("");
     }
 
-    public static Constant isString(String name, Typed<AString> expression) {
-        return new Constant(name, expression, "String");
+    public static Constant<AString> isString(String name, Typed<AString> expression) {
+        return new Constant<AString>(name, expression, "String");
     }
 
-    public static Constant isLong(String name, Typed<ALong> expression) {
-        return new Constant(name, expression, "long");
+    public static Constant<ALong> isLong(String name, Typed<ALong> expression) {
+        return new Constant<ALong>(name, expression, "long");
     }
 }

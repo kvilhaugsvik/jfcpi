@@ -46,9 +46,9 @@ public class FieldTypeBasic implements IDependency {
     private final ExprFrom1<Typed<AString>, Var> value2String;
     private final boolean arrayEater;
 
-    private final Var fValue;
-    private final Var pTo;
-    private final Var pFromStream;
+    private final Var<TargetClass> fValue;
+    private final Var<TargetClass> pTo;
+    private final Var<TargetClass> pFromStream;
 
     private final Collection<Requirement> requirement;
     private final FieldTypeBasic basicType = this;
@@ -119,8 +119,8 @@ public class FieldTypeBasic implements IDependency {
             addObjectConstant(javaType.getName(), "value");
 
             List<TargetClass> tIOExcept = Arrays.asList(new TargetClass("IOException"));
-            Var pValue = Var.param(javaType, "value");
-            Var pArraySize = Var.param(int.class, "arraySize");
+            Var<TargetClass> pValue = Var.param(javaType, "value");
+            Var<AnInt> pArraySize = Var.param(int.class, "arraySize");
 
             if (arrayEater) {
                 addObjectConstant("int", "maxArraySize");
@@ -150,7 +150,7 @@ public class FieldTypeBasic implements IDependency {
             addMethod(Method.newPublicReadObjectState(Comment.no(),
                     TargetClass.fromName("String"), "toString",
                     new Block(RETURN(value2String.x(getField("value"))))));
-            Var paramOther = Var.param(new TargetClass(Object.class), "other");
+            Var<TargetClass> paramOther = Var.param(new TargetClass(Object.class), "other");
             addMethod(Method.custom(Comment.no(),
                     Visibility.PUBLIC, Scope.OBJECT,
                     TargetClass.fromName("boolean"), "equals", Arrays.asList(paramOther),

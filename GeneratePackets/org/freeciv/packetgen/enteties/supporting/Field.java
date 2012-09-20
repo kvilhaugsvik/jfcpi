@@ -32,7 +32,7 @@ import java.util.*;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
-public class Field extends Var {
+public class Field<Kind extends AValue> extends Var<Kind> {
     private final String onPacket;
     private final FieldTypeBasic.FieldTypeAlias type;
     private final ArrayDeclaration[] declarations;
