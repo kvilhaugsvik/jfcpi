@@ -104,8 +104,8 @@ public class TerminatedArray extends FieldTypeBasic {
                     public Block x(Var to) {
                         final Var pValue = Var.param(javaType, "value");
                         return new Block(
-                                arrayEaterScopeCheck(testSizeWrong.x(pMaxSize.<AnInt>ref(), sizeGetter.x(pValue))),
                                 fMaxSize.assign(pMaxSize.ref()),
+                                arrayEaterScopeCheck(testSizeWrong.x(pMaxSize.<AnInt>ref(), sizeGetter.x(pValue))),
                                 to.assign(pValue.ref()));
                     }
                 },
@@ -122,14 +122,13 @@ public class TerminatedArray extends FieldTypeBasic {
                                 isNotSame(cast(byte.class,
                                         asAnInt(Constant.referToInJavaCode(terminator))), current.ref()));
 
-                        return new Block(buf, current, pos,
+                        return new Block(fMaxSize.assign(pMaxSize.ref()), buf, current, pos,
                                 WHILE(noTerminatorFound,
                                         new Block(arraySetElement(buf, pos.ref(), current.ref()),
                                                 inc(pos),
                                                 IF(isSmallerThan(pos.ref(), pMaxSize.<AnInt>ref()),
                                                         new Block(current.assign(from.<AValue>call("readByte"))),
                                                         new Block(asVoid("break"))))),
-                                fMaxSize.assign(pMaxSize.ref()),
                                 to.assign(byteArrayToFull.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
                                         buf.ref(), pos.ref()))));
                     }
