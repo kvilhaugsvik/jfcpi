@@ -67,13 +67,7 @@ public class TerminatedArray extends FieldTypeBasic {
             return from.call("readByte");
         }
     };
-    private static final ExprFrom1<Typed<AnInt>, Var> currentSizeLimitIsEatenDimension =
-            new ExprFrom1<Typed<AnInt>, Var>() {
-                @Override
-                public Typed<AnInt> x(Var arg1) {
-                    return fMaxSize.assign(pMaxSize.ref());
-                }
-            };
+    private static final ExprFrom1<Typed<AnInt>, Var> currentSizeLimitIsEatenDimension = null;
     private static final ExprFrom1<Typed<ABool>, Typed<AnInt>> addAfterIfSmallerThanMaxSize =
             new ExprFrom1<Typed<ABool>, Typed<AnInt>>() {
                 @Override
@@ -130,15 +124,15 @@ public class TerminatedArray extends FieldTypeBasic {
                            final Requirement terminator,
                            final boolean absoluteMaxSizeAsParameter,
                            final TargetArray buffertype,
-                           final ExprFrom1<Typed<AnInt>, Var> sizeGetter,
-                           final ExprFrom1<Typed<AnInt>, Var> readMaxSize,
-                           final ExprFrom2<Typed<ABool>, Var, Var> addBefore,
-                           final ExprFrom1<Typed<ABool>, Typed<AnInt>> addAfter,
-                           final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> testSizeWrong,
-                           final ExprFrom1<Typed<AValue>, Var> fullToByteArray,
-                           final ExprFrom1<Typed<AValue>, Typed<AValue>> byteArrayToFull,
-                           final ExprFrom2<Block, Var, Var> elemToByteArray,
-                           final ExprFrom1<Typed<? extends AValue>, Var> readElement,
+                           final ExprFrom1<Typed<AnInt>, Var> numberOfElements,
+                           final ExprFrom1<Typed<AnInt>, Var> readBeforeElements,
+                           final ExprFrom2<Typed<ABool>, Var, Var> writeBeforeElements,
+                           final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded,
+                           final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> testIfSizeIsWrong,
+                           final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray,
+                           final ExprFrom1<Typed<AValue>, Typed<AValue>> convertByteArrayToAllElements,
+                           final ExprFrom2<Block, Var, Var> writeElementTo,
+                           final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom,
                            final ExprFrom1<Typed<AString>, Var> toString,
                            final Collection<Requirement> uses) {
         super(dataIOType, publicType, javaType,
@@ -149,8 +143,8 @@ public class TerminatedArray extends FieldTypeBasic {
                         Block fromJavaTyped = new Block();
                         if (absoluteMaxSizeAsParameter) {
                             fromJavaTyped.addStatement(fMaxSize.assign(pMaxSize.ref()));
-                            fromJavaTyped.addStatement(arrayEaterScopeCheck(testSizeWrong.x(pMaxSize.ref(),
-                                    sizeGetter.x(pValue))));
+                            fromJavaTyped.addStatement(arrayEaterScopeCheck(testIfSizeIsWrong.x(pMaxSize.ref(),
+                                    numberOfElements.x(pValue))));
                         }
                         fromJavaTyped.addStatement(to.assign(pValue.ref()));
                         return fromJavaTyped;
@@ -161,7 +155,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     public Block x(Var to, Var from) {
                         Var buf = Var.local(buffertype, "buffer",
                                 buffertype.newInstance(pMaxSize.ref()));
-                        Var current = Var.local(buffertype.getOf(), "current", readElement.x(from));
+                        Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
                         Var pos = Var.local("int", "pos", BuiltIn.<AnInt>toCode("0"));
 
                         Typed<ABool> noTerminatorFound = (null == terminator ?
@@ -169,29 +163,43 @@ public class TerminatedArray extends FieldTypeBasic {
                                 isNotSame(cast(byte.class,
                                         BuiltIn.<AnInt>toCode(Constant.referToInJavaCode(terminator))), current.ref()));
 
-                        return new Block(readMaxSize.x(from), buf, current, pos,
+                        Block out = new Block();
+
+                        if (absoluteMaxSizeAsParameter)
+                            out.addStatement(fMaxSize.assign(pMaxSize.ref()));
+
+                        if (null != readBeforeElements)
+                            out.addStatement(readBeforeElements.x(from));
+
+                        out.addStatement(buf);
+                        out.addStatement(current);
+                        out.addStatement(pos);
+                        out.addStatement(
                                 WHILE(noTerminatorFound,
                                         new Block(arraySetElement(buf, pos.ref(), current.ref()),
                                                 inc(pos),
                                                 IF(isSmallerThan(pos.ref(), pMaxSize.ref()),
-                                                        new Block(current.assign(readElement.x(from))),
-                                                        new Block(BuiltIn.<NoValue>toCode("break"))))),
-                                to.assign(byteArrayToFull.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
-                                        buf.ref(), pos.ref()))));
+                                                        new Block(current.assign(readElementFrom.x(from))),
+                                                        new Block(BuiltIn.<NoValue>toCode("break"))))));
+                        out.addStatement(to.assign(convertByteArrayToAllElements.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
+                                buf.ref(), pos.ref()))));
+
+                        return out;
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var val, Var to) {
                         Block out = new Block();
-                        if (null != addBefore)
-                            out.addStatement(addBefore.x(val, to));
-                        if (null == fullToByteArray) {
+                        if (null != writeBeforeElements)
+                            out.addStatement(writeBeforeElements.x(val, to));
+                        if (null == convertAllElementsToByteArray) {
                             Var element = Var.param(buffertype.getOf(), "element");
-                            out.addStatement(FOR(element, val.ref(), elemToByteArray.x(to, element)));
-                        } else
-                            out.addStatement(to.call("write", fullToByteArray.x(val)));
-                        Typed<ABool> addAfterResult = addAfter.x(sizeGetter.x(val));
+                            out.addStatement(FOR(element, val.ref(), writeElementTo.x(to, element)));
+                        } else {
+                            out.addStatement(to.call("write", convertAllElementsToByteArray.x(val)));
+                        }
+                        Typed<ABool> addAfterResult = testIfTerminatorShouldBeAdded.x(numberOfElements.x(val));
                         if (!FALSE.equals(addAfterResult))
                             out.addStatement(IF(addAfterResult,
                                     new Block(to.call("writeByte", BuiltIn.<AValue>toCode(Constant.referToInJavaCode(terminator))))));
@@ -201,8 +209,8 @@ public class TerminatedArray extends FieldTypeBasic {
               new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var value) {
-                        Typed<AnInt> length = sizeGetter.x(value);
-                        Typed<ABool> addAfterResult = addAfter.x(sizeGetter.x(value));
+                        Typed<AnInt> length = numberOfElements.x(value);
+                        Typed<ABool> addAfterResult = testIfTerminatorShouldBeAdded.x(numberOfElements.x(value));
                         if (!FALSE.equals(addAfterResult))
                             length = BuiltIn.<AnInt>sum(
                                     length,
