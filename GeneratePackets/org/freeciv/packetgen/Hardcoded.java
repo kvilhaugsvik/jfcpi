@@ -128,61 +128,53 @@ public class Hardcoded {
                             new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
-            new FieldTypeBasic("worklist", "struct worklist", new TargetArray("universal", 1, true),
-                    new ExprFrom1<Block, Var>() {
-                        @Override
-                        public Block x(Var arg1) {
-                            return new Block(arg1.assign(pValue.ref()));
-                        }
-                    },
-                    new ExprFrom2<Block, Var, Var>() {
-                                   @Override
-                                   public Block x(Var to, Var from) {
-                                       TargetClass universal = new TargetClass("org.freeciv.types.universal", true);
-                                       Var len = Var.local("int", "length", from.<AValue>call("readUnsignedByte"));
-                                       Var counter = Var.local("int", "i",
-                                               BuiltIn.<AnInt>toCode("0"));
-                                       return new Block(
-                                               len,
-                                               to.assign(to.getTType().newInstance(len.ref())),
-                                               FOR(
-                                                       counter,
-                                                       isSmallerThan(counter.ref(), len.ref()),
-                                                       inc(counter),
-                                                       new Block(arraySetElement(
-                                                               to,
-                                                               counter.ref(),
-                                                               universal.newInstance(
-                                                                       new MethodCall<AValue>(
-                                                                               "universals_n.valueOf",
-                                                                               from.<AValue>call("readUnsignedByte")),
-                                                                       from.<AValue>call("readUnsignedByte")
-                                                       )))));
-                                   }
-                    },
-                    new ExprFrom2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var val, Var to) {
-                            Var elem = Var.local("universal", "element", null);
-                            return new Block(
-                                    to.call("writeByte", val.read("length")),
-                                    FOR(elem, val.ref(),
-                                            new Block(to.call("writeByte", BuiltIn.<AnInt>toCode("element.kind.getNumber()")),
-                                                    to.call("writeByte", elem.read("value")))));
-                        }
-                    },
+            new TerminatedArray("worklist", "struct worklist", new TargetArray("universal", 1, true),
+                    null, false, new TargetArray("universal", 1, true),
+                    TerminatedArray.arrayLen,
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
-                        public Typed<AnInt> x(Var value) {
-                            return BuiltIn.<AnInt>toCode("this.value.length");
+                        public Typed<AnInt> x(Var from) {
+                            return Var.<AnInt>local(int.class, "arraySize", from.<AnInt>call("readUnsignedByte"));
                         }
                     },
-                    TO_STRING_OBJECT,
-                    false,
-                    Arrays.asList(
-                            new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
-                            new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
-            ),
+                    new ExprFrom2<Typed<ABool>, Var, Var>() {
+                        @Override
+                        public Typed<ABool> x(Var val, Var to) {
+                            return to.call("writeByte", val.read("length"));
+                        }
+                    },
+                    TerminatedArray.neverAnythingAfter,
+                    TerminatedArray.lenShouldBeEqual,
+                    null,
+                    new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                        @Override
+                        public Typed<AValue> x(Typed<AValue> bytes) {
+                            return bytes; // TODO: Fix
+                        }
+                    },
+                    new ExprFrom2<Block, Var, Var>() {
+                        @Override
+                        public Block x(Var to, Var elem) {
+                            return new Block(
+                                    to.call("writeByte", elem.<AnInt>read("kind.getNumber()")), // TODO: stop abusing read
+                                    to.call("writeByte", elem.read("value"))
+                            );
+                        }
+                    },
+                    new ExprFrom1<Typed<? extends AValue>, Var>() {
+                        @Override
+                        public Typed<AValue> x(Var from) {
+                            TargetClass universal = new TargetClass("org.freeciv.types.universal", true);
+                            return universal.newInstance(
+                                    new MethodCall<AValue>(
+                                            "universals_n.valueOf",
+                                            from.<AValue>call("readUnsignedByte")),
+                                    from.<AValue>call("readUnsignedByte"));
+                        }
+                    },
+                    TO_STRING_ARRAY,
+                    Arrays.asList(new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
+                            new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
