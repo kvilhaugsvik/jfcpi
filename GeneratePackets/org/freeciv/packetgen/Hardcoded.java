@@ -185,7 +185,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
-                            return value.call("length");
+                            return value.read("getBytes().length");
                         }
                     },
                     null,

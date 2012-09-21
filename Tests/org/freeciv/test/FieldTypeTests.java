@@ -14,6 +14,7 @@
 
 package org.freeciv.test;
 
+import org.freeciv.packet.fieldtype.STRING;
 import org.freeciv.packet.fieldtype.UINT32;
 import org.junit.Test;
 
@@ -88,5 +89,33 @@ public class FieldTypeTests {
     }
     @Test public void UINT32_MaxAdd7RoundTrip() throws IOException {
         assertRoundTripOkUINT32(((long)Integer.MAX_VALUE) + 7L);
+    }
+
+    private void testString(String text, int maxLen) throws IOException {
+        STRING fromJava = new STRING(text, maxLen);
+        checkString(text, fromJava, maxLen);
+
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        fromJava.encodeTo(new DataOutputStream(storeTo));
+        STRING fromData = new STRING(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), maxLen);
+        checkString(text, fromData, maxLen);
+    }
+
+    private static void checkString(String text, STRING fromJava, int maxLen) {
+        assertEquals("Wrong content", text, fromJava.getValue());
+        // TODO: figure out if String has the terminator when it is at its max size
+        assertEquals("Wrong length", text.getBytes().length + 1, fromJava.encodedLength());
+    }
+
+    @Test public void STRING_ASCII() throws IOException {
+        testString("da er det for sent", 100);
+    }
+
+    @Test public void STRING_non_ASCII() throws IOException {
+        testString("Jeg råde vil alle i ungdummens dager", 100);
+    }
+
+    @Test public void STRING_non_ASCII_twice() throws IOException {
+        testString("I dag når du hører", 100);
     }
 }
