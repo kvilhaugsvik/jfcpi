@@ -20,7 +20,7 @@ import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {
-    private static final TargetArray byteArray = new TargetArray(byte[].class, true);
+    public static final TargetArray byteArray = new TargetArray(byte[].class, true);
 
     public static final ExprFrom1<Typed<AnInt>, Var> arrayLen = new ExprFrom1<Typed<AnInt>, Var>() {
         @Override
@@ -28,7 +28,7 @@ public class TerminatedArray extends FieldTypeBasic {
             return value.read("length");
         }
     };
-    private static final ExprFrom2<Block, Var, Var> elemIsByteArray = new ExprFrom2<Block, Var, Var>() {
+    public static final ExprFrom2<Block, Var, Var> elemIsByteArray = new ExprFrom2<Block, Var, Var>() {
         @Override
         public Block x(Var a, Var b) {
             return new Block(a.call("writeByte", b.ref()));
@@ -61,21 +61,20 @@ public class TerminatedArray extends FieldTypeBasic {
                     return isNotSame(max, size);
                 }
             };
-    private static final ExprFrom1<Typed<? extends AValue>, Var> readByte = new ExprFrom1<Typed<? extends AValue>, Var>() {
+    public static final ExprFrom1<Typed<? extends AValue>, Var> readByte = new ExprFrom1<Typed<? extends AValue>, Var>() {
         @Override
         public Typed<? extends AValue> x(Var from) {
             return from.call("readByte");
         }
     };
-    private static final ExprFrom1<Typed<AnInt>, Var> currentSizeLimitIsEatenDimension = null;
-    private static final ExprFrom1<Typed<ABool>, Typed<AnInt>> addAfterIfSmallerThanMaxSize =
+    public static final ExprFrom1<Typed<ABool>, Typed<AnInt>> addAfterIfSmallerThanMaxSize =
             new ExprFrom1<Typed<ABool>, Typed<AnInt>>() {
                 @Override
                 public Typed<ABool> x(Typed<AnInt> size) {
                     return isSmallerThan(size, fMaxSize.ref());
                 }
             };
-    private static final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> wrongSizeIfToBig =
+    public static final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> wrongSizeIfToBig =
             new ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>>() {
                 @Override
                 public Typed<ABool> x(Typed<AnInt> max, Typed<AnInt> size) {
@@ -88,7 +87,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 true,
                 byteArray,
                 arrayLen,
-                currentSizeLimitIsEatenDimension,
+                null,
                 null,
                 neverAnythingAfter,
                 lenShouldBeEqual,
@@ -101,23 +100,10 @@ public class TerminatedArray extends FieldTypeBasic {
     };
 
     public TerminatedArray(String dataIOType, String publicType, final Requirement terminator) {
-        this(dataIOType, publicType, byteArray, terminator,
-                arrayLen, fullIsByteArray, byteArrayIsFull, TO_STRING_ARRAY);
-    }
-
-    public TerminatedArray(String dataIOType, String publicType, final TargetClass javaType,
-                           final Requirement terminator,
-                           final ExprFrom1<Typed<AnInt>, Var> sizeGetter,
-                           final ExprFrom1<Typed<AValue>, Var> fullToByteArray,
-                           final ExprFrom1<Typed<AValue>, Typed<AValue>> byteArrayToFull,
-                           ExprFrom1<Typed<AString>, Var> toString) {
-        this(dataIOType, publicType, javaType, terminator, true, byteArray, sizeGetter,
-                currentSizeLimitIsEatenDimension, null,
-                addAfterIfSmallerThanMaxSize,
-                wrongSizeIfToBig,
-                fullToByteArray, byteArrayToFull,
-                elemIsByteArray, readByte, toString,
-                Arrays.asList(terminator));
+        this(dataIOType, publicType, byteArray, terminator, true, byteArray,
+                arrayLen, null, null, addAfterIfSmallerThanMaxSize, wrongSizeIfToBig,
+                fullIsByteArray, byteArrayIsFull, elemIsByteArray, readByte,
+                TO_STRING_ARRAY, Arrays.asList(terminator));
     }
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,

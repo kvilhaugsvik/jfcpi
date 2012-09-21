@@ -180,12 +180,18 @@ public class Hardcoded {
             getFloat("1000000"),
             new TerminatedArray("string", "char", new TargetClass(String.class),
                     new Requirement("STRING_ENDER", Requirement.Kind.VALUE),
+                    true,
+                    TerminatedArray.byteArray,
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
                             return value.call("length");
                         }
                     },
+                    null,
+                    null,
+                    TerminatedArray.addAfterIfSmallerThanMaxSize,
+                    TerminatedArray.wrongSizeIfToBig,
                     new ExprFrom1<Typed<AValue>, Var>() {
                         @Override
                         public Typed<AValue> x(Var everything) {
@@ -198,7 +204,10 @@ public class Hardcoded {
                             return (new TargetClass(String.class)).newInstance(bytes);
                         }
                     },
-                    TO_STRING_OBJECT),
+                    TerminatedArray.elemIsByteArray,
+                    TerminatedArray.readByte,
+                    TO_STRING_OBJECT,
+                    Arrays.asList(new Requirement("STRING_ENDER", Requirement.Kind.VALUE))),
             new TerminatedArray("tech_list", "int",
                                 new Requirement("A_LAST", Requirement.Kind.VALUE)),
             new TerminatedArray("unit_list", "int",
