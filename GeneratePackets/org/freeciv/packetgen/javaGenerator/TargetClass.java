@@ -80,6 +80,10 @@ public class TargetClass extends Address implements AValue {
         return name.get();
     }
 
+    public TargetClass scopeKnown() {
+        return new TargetClass(where, name, true);
+    }
+
     public <Kind extends AValue> Typed<Kind> read(final String field) {
         final TargetClass parent = this;
         return new Typed<Kind>() {
