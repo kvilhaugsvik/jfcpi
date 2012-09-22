@@ -202,15 +202,23 @@ public class BuiltIn {
         };
     }
 
-    public static Typed<? extends AValue> divide(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
+    private static Typed<? extends AValue> numBinOp(final CodeAtom op, final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
         return new Formatted.Type<AValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 a.writeAtoms(to);
-                to.add(DIV);
+                to.add(op);
                 b.writeAtoms(to);
             }
         };
+    }
+
+    public static Typed<? extends AValue> subtract(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
+        return numBinOp(HasAtoms.SUB, a, b);
+    }
+
+    public static Typed<? extends AValue> divide(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
+        return numBinOp(HasAtoms.DIV, a, b);
     }
 
     public static MethodCall<AValue> inc(final Var var, final Typed<? extends AValue> toAdd) {
