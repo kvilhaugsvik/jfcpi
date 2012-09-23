@@ -211,7 +211,7 @@ public class Packet extends ClassWriter implements IDependency {
                 summing = sum(summing, calcBodyLen(fields[i]));
             encodeFieldsLen.addStatement(RETURN(summing));
         } else {
-            encodeFieldsLen.addStatement(RETURN(BuiltIn.<AnInt>toCode("0")));
+            encodeFieldsLen.addStatement(RETURN(literal(0)));
         }
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,

@@ -77,7 +77,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
-                            return BuiltIn.<AnInt>toCode("4");
+                            return literal(4);
                         }
                     },
                     TO_STRING_OBJECT,
@@ -117,7 +117,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
-                            return BuiltIn.<AnInt>toCode("8");
+                            return literal(8);
                         }
                     },
                     TO_STRING_OBJECT,
@@ -237,7 +237,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
-                            return BuiltIn.<AnInt>toCode("1");
+                            return literal(1);
                         }
                     },
                                TO_STRING_OBJECT,

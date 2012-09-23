@@ -215,7 +215,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         String replaceWith = "";
         Block ref = out;
         for (int counter = 0; counter < level; counter++) {
-            Var count = Var.local("int", getCounterNumber(counter) + "", BuiltIn.<AnInt>toCode("0"));
+            Var count = Var.local("int", getCounterNumber(counter) + "", literal(0));
             Block inner = new Block();
 
             ref.addStatement(FOR(count,

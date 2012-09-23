@@ -46,7 +46,7 @@ public class CodeGenTest {
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Arrays.asList(Var.param(String.class, "a")),
                 Arrays.asList(new TargetClass(Throwable.class)),
-                new Block(RETURN(BuiltIn.<AnInt>toCode("5"))))).toString();
+                new Block(RETURN(literal(5))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
@@ -60,7 +60,7 @@ public class CodeGenTest {
         String result = (Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Arrays.asList(Var.param(String.class, "a")),
                 Arrays.asList(new TargetClass(Throwable.class)),
-                new Block(RETURN(BuiltIn.<AnInt>toCode("5"))))).toString();
+                new Block(RETURN(literal(5))))).toString();
 
         assertEquals("Generated source not as expected",
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
@@ -72,7 +72,7 @@ public class CodeGenTest {
     @Test public void testMethodNoParams() {
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Collections.<Var<AValue>>emptyList(),
-                Arrays.<TargetClass>asList(new TargetClass("Throwable")), new Block(RETURN(BuiltIn.<AnInt>toCode("5"))))).toString();
+                Arrays.<TargetClass>asList(new TargetClass("Throwable")), new Block(RETURN(literal(5))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
@@ -90,7 +90,7 @@ public class CodeGenTest {
                         new Block(WHILE(TRUE,
                                 new Block(WHILE(TRUE,
                                         new Block(WHILE(TRUE,
-                                                new Block(RETURN(BuiltIn.<AnInt>toCode("5"))))))))))))).toString();
+                                                new Block(RETURN(literal(5))))))))))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
@@ -110,7 +110,7 @@ public class CodeGenTest {
 
     @Test(expected = IllegalStateException.class)
     public void methodShouldNotEscapeToClassScope() {
-        Block closesScopeNotOpened = new Block(WHILE(TRUE, new Block(RETURN(BuiltIn.<AnInt>toCode("5"))))) {
+        Block closesScopeNotOpened = new Block(WHILE(TRUE, new Block(RETURN(literal(5))))) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 super.writeAtoms(to);
@@ -156,7 +156,7 @@ public class CodeGenTest {
                 "more comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass(int.class), "testMethod",  Arrays.asList(Var.param(String.class, "a")),
                 Arrays.asList(new TargetClass(Throwable.class)),
-                new Block(RETURN(BuiltIn.<AnInt>toCode("5"))))).toString();
+                new Block(RETURN(literal(5))))).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "/*" + "\n" +
@@ -202,7 +202,7 @@ public class CodeGenTest {
     @Test public void testConstantDeclaration() {
         assertEquals("Generated source not as expected",
                 "private static final int integer = 25;",
-                (Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, "int", "integer", BuiltIn.<AnInt>toCode("25"))).toString());
+                (Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, "int", "integer", literal(25))).toString());
     }
 
     @Test public void testObjectConstantDeclaration() {
@@ -325,7 +325,7 @@ public class CodeGenTest {
     @Test public void testClassWriterEnumWithOneElement() {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
-        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", BuiltIn.<AnInt>toCode("1"), literalString("one")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1), literalString("one")));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -342,9 +342,9 @@ public class CodeGenTest {
     @Test public void testClassWriterEnumWithThreeElements() {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
-        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", BuiltIn.<AnInt>toCode("1")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("TWO", BuiltIn.<AnInt>toCode("2")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("THREE", BuiltIn.<AnInt>toCode("3")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1)));
+        toWrite.addEnumerated(EnumElement.newEnumValue("TWO", literal(2)));
+        toWrite.addEnumerated(EnumElement.newEnumValue("THREE", literal(3)));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -363,11 +363,11 @@ public class CodeGenTest {
     @Test public void testClassWriterEnumWithFiveElementsSomeNegative() {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
-        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", BuiltIn.<AnInt>toCode("1")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("TWO", BuiltIn.<AnInt>toCode("2")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("THREE", BuiltIn.<AnInt>toCode("3")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("SMALLEST", BuiltIn.<AnInt>toCode("-2")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("INVALID", BuiltIn.<AnInt>toCode("-1")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1)));
+        toWrite.addEnumerated(EnumElement.newEnumValue("TWO", literal(2)));
+        toWrite.addEnumerated(EnumElement.newEnumValue("THREE", literal(3)));
+        toWrite.addEnumerated(EnumElement.newEnumValue("SMALLEST", literal(-2)));
+        toWrite.addEnumerated(EnumElement.newEnumValue("INVALID", literal(-1)));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -388,9 +388,9 @@ public class CodeGenTest {
     @Test public void testClassWriterEnumWithThreeElementsOneIsCommented() {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
-        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", BuiltIn.<AnInt>toCode("1")));
-        toWrite.addEnumerated(EnumElement.newEnumValue(Comment.c("Not a prime number"), "TWO", BuiltIn.<AnInt>toCode("2")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("THREE", BuiltIn.<AnInt>toCode("3")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1)));
+        toWrite.addEnumerated(EnumElement.newEnumValue(Comment.c("Not a prime number"), "TWO", literal(2)));
+        toWrite.addEnumerated(EnumElement.newEnumValue("THREE", literal(3)));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -409,9 +409,9 @@ public class CodeGenTest {
     @Test public void testClassWriterEnumWithThreeElementsTwoAreTheSame() {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
-        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", BuiltIn.<AnInt>toCode("1"), literalString("one")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("2nd", BuiltIn.<AnInt>toCode("2"), literalString("2nd")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("TWO", BuiltIn.<AnInt>toCode("2"), literalString("two")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1), literalString("one")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("2nd", literal(2), literalString("2nd")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("TWO", literal(2), literalString("two")));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -431,7 +431,7 @@ public class CodeGenTest {
     public void testNotEnumAddsEnumerated() {
         ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, new TargetPackage("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
-        toWrite.addEnumerated(EnumElement.newEnumValue("One", BuiltIn.<AnInt>toCode("1")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("One", literal(1)));
     }
 
     @Test public void testClassWriterEmptyTwoBlocksOfImports() {

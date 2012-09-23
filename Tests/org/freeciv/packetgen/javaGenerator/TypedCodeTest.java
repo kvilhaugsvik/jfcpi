@@ -103,7 +103,7 @@ public class TypedCodeTest {
         haveStatementGroup.groupBoundary();
         haveStatementGroup.groupBoundary(); // twice in a row. Disables the next boundary unless handled
 
-        haveStatementGroup.addStatement(i.assign(BuiltIn.<AValue>toCode("0")));
+        haveStatementGroup.addStatement(i.assign(BuiltIn.literal(0)));
         haveStatementGroup.addStatement(BuiltIn.inc(i));
 
         haveStatementGroup.groupBoundary();

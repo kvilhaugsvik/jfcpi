@@ -46,7 +46,7 @@ public class NetworkIO implements IDependency {
         return new ExprFrom1<Typed<AnInt>, Var>() {
             @Override
             public Typed<AnInt> x(Var arg1) {
-                return BuiltIn.<AnInt>toCode(size + "");
+                return BuiltIn.literal(size);
             }
         };
     }

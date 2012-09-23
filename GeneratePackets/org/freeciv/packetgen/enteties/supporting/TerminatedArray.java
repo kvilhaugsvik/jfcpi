@@ -142,7 +142,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         Var buf = Var.local(buffertype, "buffer",
                                 buffertype.newInstance(pMaxSize.ref()));
                         Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
-                        Var pos = Var.local("int", "pos", BuiltIn.<AnInt>toCode("0"));
+                        Var pos = Var.local("int", "pos", literal(0));
 
                         Typed<ABool> noTerminatorFound = (null == terminator ?
                                 TRUE :
@@ -201,8 +201,8 @@ public class TerminatedArray extends FieldTypeBasic {
                             length = BuiltIn.<AnInt>sum(
                                     length,
                                     R_IF(addAfterResult,
-                                            BuiltIn.<AnInt>toCode("1"),
-                                            BuiltIn.<AnInt>toCode("0")));
+                                            literal(1),
+                                            literal(0)));
                         return length;
                     }
               },

@@ -138,6 +138,10 @@ public class BuiltIn {
         return new WrapCodeString<AString>("\"" + javaCode + "\"");
     }
 
+    public static Typed<AnInt> literal(int inte) {
+        return BuiltIn.<AnInt>toCode(inte + "");
+    }
+
     public static final ExprFrom1<Typed<AString>, Var> TO_STRING_OBJECT =
             new ExprFrom1<Typed<AString>, Var>() {
                 @Override
