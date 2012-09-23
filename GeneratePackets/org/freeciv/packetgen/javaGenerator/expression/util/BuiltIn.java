@@ -134,8 +134,8 @@ public class BuiltIn {
         };
     }
 
-    public static Typed<AString> literalString(String javaCode) {
-        return new WrapCodeString<AString>("\"" + javaCode + "\"");
+    public static Typed<AString> literal(String javaCode) {
+        return BuiltIn.<AString>toCode("\"" + javaCode + "\"");
     }
 
     public static Typed<AnInt> literal(int inte) {
@@ -155,7 +155,7 @@ public class BuiltIn {
         @Override
         public Typed<AString> x(Var arg1) {
             return new MethodCall<AString>("org.freeciv.Util.joinStringArray",
-                    arg1.ref(), literalString(" "));
+                    arg1.ref(), literal(" "));
         }
     };
 

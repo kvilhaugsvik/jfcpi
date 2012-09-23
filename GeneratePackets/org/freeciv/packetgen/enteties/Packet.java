@@ -154,26 +154,26 @@ public class Packet extends ClassWriter implements IDependency {
 
         constructorBodyStream.addStatement(IF(BuiltIn.<ABool>toCode("number != header.getPacketKind()"),
                 new Block(THROW((ioexception).newInstance(sum(
-                        literalString("Tried to create package " + name + " but packet number was "),
+                        literal("Tried to create package " + name + " but packet number was "),
                         argHeader.<AnInt>call("getPacketKind")))))));
 
         constructorBodyStream.addStatement(ASSERT(BuiltIn.<ABool>toCode("header instanceof " + headerKind.getName()),
-                literalString("Packet not generated for this kind of header")));
+                literal("Packet not generated for this kind of header")));
 
         Block wrongSize = new Block();
         constructorBodyStream.addStatement(IF(BuiltIn.<ABool>toCode("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),
                 wrongSize));
         wrongSize.addStatement(new MethodCall<NoValue>("Logger.getLogger(" + logger + ").warning", sum(
-                literalString("Probable misinterpretation: "),
-                literalString("interpreted packet size ("),
+                literal("Probable misinterpretation: "),
+                literal("interpreted packet size ("),
                 GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), BuiltIn.<AnInt>toCode("calcBodyLen()"))),
-                literalString(") don't match header packet size ("), argHeader.<AnInt>call("getTotalSize"),
-                literalString(") for "), BuiltIn.<AString>toCode("this.toString()"))));
+                literal(") don't match header packet size ("), argHeader.<AnInt>call("getTotalSize"),
+                literal(") for "), BuiltIn.<AString>toCode("this.toString()"))));
         wrongSize.addStatement(THROW(ioexception.newInstance(sum(
-                literalString("Packet size in header and Java packet not the same."),
-                literalString(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
-                literalString(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
-                literalString(" Packet body size: "), BuiltIn.<AValue>toCode("calcBodyLen()")))));
+                literal("Packet size in header and Java packet not the same."),
+                literal(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
+                literal(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
+                literal(" Packet body size: "), BuiltIn.<AValue>toCode("calcBodyLen()")))));
         addMethod(Method.newPublicConstructorWithException(Comment.doc(
                 "Construct an object from a DataInput", new String(),
                 Comment.param(streamName, "data stream that is at the start of the package body"),
@@ -228,14 +228,14 @@ public class Packet extends ClassWriter implements IDependency {
 
     private void addToString(String name, Field[] fields) {
         Var buildOutput = Var.local(String.class, "out",
-                sum(literalString(name), literalString("("), getField("number").ref(), literalString(")")));
+                sum(literal(name), literal("("), getField("number").ref(), literal(")")));
         Block body = new Block(buildOutput);
         for (Field field : fields)
             body.addStatement(BuiltIn.inc(buildOutput, sum(
-                    literalString("\\n\\t" + field.getFieldName() + " = "),
+                    literal("\\n\\t" + field.getFieldName() + " = "),
                     (field.hasDeclarations() ?
-                            new MethodCall<AString>("Util.joinStringArray", field.ref(), literalString(", "),
-                                    literalString("("), literalString(")")) :
+                            new MethodCall<AString>("Util.joinStringArray", field.ref(), literal(", "),
+                                    literal("("), literal(")")) :
                             field.<AString>call("toString")))));
         body.addStatement(RETURN(buildOutput.ref()));
         addMethod(Method.newPublicReadObjectState(Comment.no(), new TargetClass(String.class), "toString", body));

@@ -325,7 +325,7 @@ public class CodeGenTest {
     @Test public void testClassWriterEnumWithOneElement() {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
-        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1), literalString("one")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1), literal("one")));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -409,9 +409,9 @@ public class CodeGenTest {
     @Test public void testClassWriterEnumWithThreeElementsTwoAreTheSame() {
         ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, new TargetPackage("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
-        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1), literalString("one")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("2nd", literal(2), literalString("2nd")));
-        toWrite.addEnumerated(EnumElement.newEnumValue("TWO", literal(2), literalString("two")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1), literal("one")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("2nd", literal(2), literal("2nd")));
+        toWrite.addEnumerated(EnumElement.newEnumValue("TWO", literal(2), literal("two")));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
@@ -523,9 +523,9 @@ public class CodeGenTest {
         body.addStatement(IF(BuiltIn.<ABool>toCode("getEncodedSize() != headerLen"),
                 new Block(THROW((new TargetClass(IOException.class, true))
                         .newInstance(sum(
-                                literalString("Package size in header and Java packet not the same. Header: "),
+                                literal("Package size in header and Java packet not the same. Header: "),
                                 BuiltIn.<AValue>toCode("headerLen"),
-                                literalString(" Packet: "),
+                                literal(" Packet: "),
                                 BuiltIn.<AValue>toCode("getEncodedSize()")))))));
         String result = Method.newPublicConstructorWithException(Comment.doc("Construct an object from a DataInput", "",
                 Comment.param(pFrom, "data stream that is at the start of the package body"),

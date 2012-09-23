@@ -186,7 +186,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         // TODO: make sure it will cause a compile time error or throw an error here
         if (!transferTypeCheck.isEmpty())
             to.addStatement(ASSERT(and(transferTypeCheck.toArray(new Typed[transferTypeCheck.size()])),
-                    literalString("Can't prove that index value will stay in the range Java's signed integers can represent.")));
+                    literal("Can't prove that index value will stay in the range Java's signed integers can represent.")));
 
         LinkedList<Typed<ABool>> legalSize = new LinkedList<Typed<ABool>>();
         String arrayLevel = "";
@@ -204,7 +204,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
         if (!legalSize.isEmpty())
             to.addStatement(BuiltIn.IF(or(legalSize.toArray(new Typed[legalSize.size()])),
-                    new Block(THROW(IllegalArgumentException.class, literalString("Array " + this.getFieldName() +
+                    new Block(THROW(IllegalArgumentException.class, literal("Array " + this.getFieldName() +
                             " constructed with value out of scope in packet " + onPacket)))));
     }
 

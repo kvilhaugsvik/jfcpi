@@ -266,7 +266,7 @@ public class Hardcoded {
     );
 
     public static Typed<NoValue> arrayEaterScopeCheck(Typed<ABool> check) {
-        return IF(check, new Block(THROW(IllegalArgumentException.class, literalString("Value out of scope"))));
+        return IF(check, new Block(THROW(IllegalArgumentException.class, literal("Value out of scope"))));
     }
 
     public static void applyManualChanges(PacketsStore toStorage) {
@@ -282,11 +282,11 @@ public class Hardcoded {
         handRolledUniversal.addConstructorFields();
         handRolledUniversal.addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.fromName("String"), "toString",
-                new Block(RETURN(sum(literalString("("),
+                new Block(RETURN(sum(literal("("),
                         handRolledUniversal.getField("kind").ref(),
-                        literalString(":"),
+                        literal(":"),
                         handRolledUniversal.getField("value").ref(),
-                        literalString(")"))))));
+                        literal(")"))))));
         toStorage.addDependency(handRolledUniversal);
     }
 

@@ -46,16 +46,16 @@ public class Struct extends ClassWriter implements IDependency {
                     new Block(RETURN(getField(field.getName()).ref()))));
         }
 
-        Typed<? extends AValue> varsToString = literalString("(");
+        Typed<? extends AValue> varsToString = literal("(");
         for (int i = 0; i < fields.size(); i++) {
             if (0 != i)
-                varsToString = sum(varsToString, literalString(", "));
+                varsToString = sum(varsToString, literal(", "));
             varsToString = sum(
                     varsToString,
-                    literalString(fields.get(i).getName() + ": "),
+                    literal(fields.get(i).getName() + ": "),
                     getField(fields.get(i).getName()).ref());
         }
-        varsToString = sum(varsToString, literalString(")"));
+        varsToString = sum(varsToString, literal(")"));
         addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.fromName("String"), "toString",
                 new Block(RETURN(varsToString))));
