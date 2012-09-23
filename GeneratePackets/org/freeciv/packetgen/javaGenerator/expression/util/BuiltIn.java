@@ -206,23 +206,12 @@ public class BuiltIn {
         };
     }
 
-    private static Typed<? extends AValue> numBinOp(final CodeAtom op, final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
-        return new Formatted.Type<AValue>() {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                a.writeAtoms(to);
-                to.add(op);
-                b.writeAtoms(to);
-            }
-        };
-    }
-
     public static Typed<? extends AValue> subtract(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
-        return numBinOp(HasAtoms.SUB, a, b);
+        return binOp(HasAtoms.SUB, a, b);
     }
 
     public static Typed<? extends AValue> divide(final Typed<? extends AValue> a, final Typed<? extends AValue> b) {
-        return numBinOp(HasAtoms.DIV, a, b);
+        return binOp(HasAtoms.DIV, a, b);
     }
 
     public static MethodCall<AValue> inc(final Var var, final Typed<? extends AValue> toAdd) {
@@ -246,42 +235,29 @@ public class BuiltIn {
         };
     }
 
-    private static Typed<ABool> compareOperator(final Typed<? extends AValue> small,
-                                             final CodeAtom operator,
-                                             final Typed<? extends AValue> largerThan) {
-        return new Formatted.Type<ABool>() {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                small.writeAtoms(to);
-                to.add(operator);
-                largerThan.writeAtoms(to);
-            }
-        };
-    }
-
     public static Typed<ABool> isBiggerThan(final Typed<? extends AValue> small,
                                              final Typed<? extends AValue> largerThan) {
-        return compareOperator(small, HasAtoms.IS_BIGGER, largerThan);
+        return BuiltIn.<ABool>binOp(HasAtoms.IS_BIGGER, small, largerThan);
     }
 
     public static Typed<ABool> isSmallerThan(final Typed<? extends AValue> small,
                                              final Typed<? extends AValue> largerThan) {
-        return compareOperator(small, HasAtoms.IS_SMALLER, largerThan);
+        return BuiltIn.<ABool>binOp(HasAtoms.IS_SMALLER, small, largerThan);
     }
 
     public static Typed<ABool> isSmallerThanOrEq(final Typed<? extends AValue> small,
                                              final Typed<? extends AValue> largerThan) {
-        return compareOperator(small, HasAtoms.IS_SMALLER_OR_EQUAL, largerThan);
+        return BuiltIn.<ABool>binOp(HasAtoms.IS_SMALLER_OR_EQUAL, small, largerThan);
     }
 
     public static Typed<ABool> isSame(final Typed<? extends AValue> small,
                                              final Typed<? extends AValue> largerThan) {
-        return compareOperator(small, HasAtoms.IS_SAME, largerThan);
+        return BuiltIn.<ABool>binOp(HasAtoms.IS_SAME, small, largerThan);
     }
 
     public static Typed<ABool> isNotSame(final Typed<? extends AValue> small,
                                              final Typed<? extends AValue> largerThan) {
-        return compareOperator(small, HasAtoms.IS_NOT_SAME, largerThan);
+        return BuiltIn.<ABool>binOp(HasAtoms.IS_NOT_SAME, small, largerThan);
     }
 
     public static MethodCall<AValue> arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
@@ -318,5 +294,21 @@ public class BuiltIn {
 
     public static <Kind extends Returnable> Typed<Kind> toCode(String javaCode) {
         return new WrapCodeString<Kind>(javaCode);
+    }
+
+    /*
+     * Internal helpers
+     */
+    private static <Ret extends AValue> Typed<Ret> binOp(final CodeAtom op,
+                                                         final Typed<? extends AValue> a,
+                                                         final Typed<? extends AValue> b) {
+        return new Formatted.Type<Ret>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                a.writeAtoms(to);
+                to.add(op);
+                b.writeAtoms(to);
+            }
+        };
     }
 }
