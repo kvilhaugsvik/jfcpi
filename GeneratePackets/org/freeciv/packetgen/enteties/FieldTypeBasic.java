@@ -28,10 +28,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
@@ -122,22 +119,22 @@ public class FieldTypeBasic implements IDependency {
             Var<TargetClass> pValue = Var.param(javaType, "value");
             Var<AnInt> pArraySize = Var.param(int.class, "arraySize");
 
+            List<Var<? extends AValue>> paramsConstructArgs = new ArrayList(Arrays.asList(pValue));
+            List<Var<? extends AValue>> paramsConstructIO = new ArrayList(Arrays.asList(pFromStream));
+
             if (arrayEater) {
                 addObjectConstant("int", "maxArraySize");
-                addMethod(Method.newPublicConstructor(Comment.no(),
-                        getName(), Arrays.asList(pValue, pArraySize),
-                        constructorBody));
-                addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                        getName(), Arrays.asList(pFromStream, pArraySize),
-                        tIOExcept, decode));
-            } else {
-                addMethod(Method.newPublicConstructor(Comment.no(),
-                        getName(), Arrays.asList(pValue),
-                        constructorBody));
-                addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                        getName(), Arrays.asList(pFromStream), tIOExcept,
-                        decode));
+
+                paramsConstructArgs.add(pArraySize);
+                paramsConstructIO.add(pArraySize);
             }
+
+            addMethod(Method.newPublicConstructor(Comment.no(),
+                    getName(), paramsConstructArgs,
+                    constructorBody));
+            addMethod(Method.newPublicConstructorWithException(Comment.no(),
+                    getName(), paramsConstructIO, tIOExcept,
+                    decode));
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
                     new TargetClass(void.class, true), "encodeTo", Arrays.asList(pTo),
                     tIOExcept, encode));
