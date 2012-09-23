@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.dependency;
 
+import org.freeciv.packetgen.UndefinedException;
+
 import java.util.*;
 
 public final class DependencyStore {
@@ -24,6 +26,7 @@ public final class DependencyStore {
     private final HashMap<Requirement, IDependency> dependenciesFulfilled = new HashMap<Requirement, IDependency>();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
     private final HashSet<Requirement> wantsOut = new HashSet<Requirement>();
+    private final HashMap<Requirement, IDependency.Maker> makers = new HashMap<>();
 
     /**
      * Make the dependency store aware of the fulfillment of a possible requirement.
@@ -57,6 +60,11 @@ public final class DependencyStore {
         wantsOut.add(requirement);
     }
 
+    public void addMaker(IDependency.Maker maker) {
+        if  (null == maker) throw new NullPointerException(nullNotAllowed);
+        makers.put(maker.getICanProduceReq(), maker);
+    }
+
     public Set<Requirement> getMissingRequirements() {
         resolve();
         return Collections.unmodifiableSet(dependenciesUnfulfilled);
@@ -72,7 +80,25 @@ public final class DependencyStore {
     }
 
     public boolean isAwareOfPotentialProvider(Requirement item) {
-        return existing.containsKey(item);
+        return existing.containsKey(item) || (makers.containsKey(item) && creationWorked(item));
+    }
+
+    private boolean creationWorked(Requirement item) {
+        IDependency.Maker maker = makers.get(item);
+        LinkedList<IDependency> args = new LinkedList<IDependency>();
+        for (Requirement req : maker.getReqs())
+            if (isAwareOfPotentialProvider(req))
+                args.add(getPotentialProvider(req));
+            else
+                return false;
+
+        try {
+            existing.put(item, maker.produce(args.toArray(new IDependency[args.size()])));
+            makers.remove(item);
+            return true;
+        } catch (UndefinedException e) {
+            return false;
+        }
     }
 
     public IDependency getPotentialProvider(Requirement item) {

@@ -15,10 +15,14 @@
 package org.freeciv.packetgen;
 
 import org.freeciv.packetgen.dependency.*;
+import org.freeciv.packetgen.enteties.Constant;
+import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.junit.Test;
 
 import java.util.*;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class DependencyStoreTest {
@@ -109,6 +113,36 @@ public class DependencyStoreTest {
         store.addPossibleRequirement(alone);
         assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Alone")));
         assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Non existing")));
+    }
+
+    @Test public void makerWorks() {
+        final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
+        IDependency.Maker valueGen = new IDependency.Maker() {
+            @Override
+            public Collection<Requirement> getReqs() {
+                return Collections.emptySet();
+            }
+
+            @Override
+            public Requirement getICanProduceReq() {
+                return new Requirement("Value", Requirement.Kind.VALUE);
+            }
+
+            @Override
+            public IDependency produce(IDependency... wasRequired) throws UndefinedException {
+                return made;
+            }
+        };
+
+        DependencyStore store = new DependencyStore();
+        store.addMaker(valueGen);
+        OnlyRequire lookedFor = new OnlyRequire("ValueUser", new Requirement("Value", Requirement.Kind.VALUE));
+        store.addWanted(lookedFor);
+
+        List<IDependency> result = store.getResolved();
+
+        assertTrue("Demanded item should be in output", result.contains(lookedFor));
+        assertTrue("Dependency of demanded item should be in output", result.contains(made));
     }
 
     public static class OnlyRequire implements IDependency {

@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.dependency;
 
+import org.freeciv.packetgen.UndefinedException;
+
 import java.util.*;
 
 public interface IDependency {
@@ -29,6 +31,12 @@ public interface IDependency {
          * @return the additional requirements fulfilled.
          */
         public Collection<Requirement> getIAlsoFulfillReqs();
+    }
+
+    public static interface Maker {
+        public Collection<Requirement> getReqs();
+        public Requirement getICanProduceReq();
+        public IDependency produce(IDependency... wasRequired) throws UndefinedException;
     }
 
     /**
