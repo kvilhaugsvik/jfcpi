@@ -95,7 +95,7 @@ public final class DependencyStore {
         } else {
             boolean missingReq = false;
             for (Requirement req : item.getReqs()) {
-                if (!(existing.containsKey(req) && dependenciesFound(existing.get(req)))) {
+                if (!(isAwareOfPotentialProvider(req) && dependenciesFound(existing.get(req)))) {
                     dependenciesUnfulfilled.add(req);
                     missingReq = true;
                 }
