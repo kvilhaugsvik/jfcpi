@@ -1,5 +1,6 @@
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
@@ -134,6 +135,9 @@ public class TerminatedArray extends FieldTypeBasic {
                         } else {
                             fromJavaTyped.addStatement(fMaxSize.assign(numberOfElements.x(pValue)));
                         }
+                        if (absoluteMaxSizeAsParameter)
+                            fromJavaTyped.addStatement(Hardcoded.arrayEaterScopeCheck(
+                                    isSmallerThan(Var.param(int.class, "maxArraySizeThisTime").ref(), fMaxSize.ref())));
                         fromJavaTyped.addStatement(to.assign(pValue.ref()));
                         return fromJavaTyped;
                     }
@@ -158,6 +162,10 @@ public class TerminatedArray extends FieldTypeBasic {
 
                         if (null != readBeforeElements)
                             out.addStatement(readBeforeElements.x(from));
+
+                        if (absoluteMaxSizeAsParameter)
+                            out.addStatement(Hardcoded.arrayEaterScopeCheck(
+                                    isSmallerThan(Var.param(int.class, "maxArraySizeThisTime").ref(), fMaxSize.ref())));
 
                         out.addStatement(buf);
                         out.addStatement(current);

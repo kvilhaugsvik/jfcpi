@@ -199,9 +199,6 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         LinkedList<Typed<ABool>> legalSize = new LinkedList<Typed<ABool>>();
         String arrayLevel = "";
 
-        if (type.getBasicType().isArrayEater())
-            validateElementsToTransfer(declarations[declarations.length - 1], legalSize);
-
         for (int i = 0; i < getNumberOfDeclarations(); i++) {
             final ArrayDeclaration element = declarations[i];
             validateElementsToTransfer(element, legalSize);
