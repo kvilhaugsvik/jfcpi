@@ -126,10 +126,14 @@ public class FieldTypeBasic implements IDependency {
             if (arrayEater) {
                 paramsConstructArgs.add(pArraySize);
                 paramsConstructIO.add(pArraySize);
+                generateConstructors(tIOExcept, paramsConstructArgs, paramsConstructIO,
+                        new Block(new MethodCall("this", pValue.ref(), pArraySize.ref(), pArraySize.ref())),
+                        new Block(new MethodCall("this", pFromStream.ref(), pArraySize.ref(), pArraySize.ref())));
+                paramsConstructArgs.add(pMaxArraySizeNow);
+                paramsConstructIO.add(pMaxArraySizeNow);
             }
 
-            generateConstructors(tIOExcept, paramsConstructArgs, paramsConstructIO);
-
+            generateConstructors(tIOExcept, paramsConstructArgs, paramsConstructIO, constructorBody, decode);
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
                     new TargetClass(void.class, true), "encodeTo", Arrays.asList(pTo),
                     tIOExcept, encode));
@@ -151,24 +155,19 @@ public class FieldTypeBasic implements IDependency {
                             BuiltIn.<ABool>toCode("other instanceof " + name),
                             new Block(RETURN(BuiltIn.<ABool>toCode("this.value == ((" + name + ")other).getValue()"))),
                             new Block(RETURN(FALSE))))));
-
-            if (arrayEater) {
-                paramsConstructArgs.add(pMaxArraySizeNow);
-                paramsConstructIO.add(pMaxArraySizeNow);
-
-                generateConstructors(tIOExcept, paramsConstructArgs, paramsConstructIO);
-            }
         }
 
         private void generateConstructors(List<TargetClass> tIOExcept,
                                           List<Var<? extends AValue>> paramsConstructArgs,
-                                          List<Var<? extends AValue>> paramsConstructIO) {
+                                          List<Var<? extends AValue>> paramsConstructIO,
+                                          Block javaVarsConstructor,
+                                          Block serializedConstructor) {
             addMethod(Method.newPublicConstructor(Comment.no(),
                     getName(), new ArrayList<Var<? extends AValue>>(paramsConstructArgs),
-                    constructorBody));
+                    javaVarsConstructor));
             addMethod(Method.newPublicConstructorWithException(Comment.no(),
                     getName(), new ArrayList<Var<? extends AValue>>(paramsConstructIO), tIOExcept,
-                    decode));
+                    serializedConstructor));
         }
 
         public FieldTypeBasic getBasicType() {
