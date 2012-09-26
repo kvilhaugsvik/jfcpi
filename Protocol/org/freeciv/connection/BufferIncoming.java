@@ -63,7 +63,9 @@ public class BufferIncoming {
                         byte[] body = readXBytesFrom(head.getBodySize(), in, owner);
                         RawPacket incoming = new RawPacket(body, head);
                         quickRespond.handle(incoming);
-                        buffered.add(incoming);
+                        synchronized (buffered) {
+                            buffered.add(incoming);
+                        }
                     }
                     server.close();
                 } catch (Exception e) {
@@ -97,6 +99,8 @@ public class BufferIncoming {
     }
 
     public RawPacket getNext() {
-        return buffered.removeFirst();
+        synchronized (buffered) {
+            return buffered.removeFirst();
+        }
     }
 }
