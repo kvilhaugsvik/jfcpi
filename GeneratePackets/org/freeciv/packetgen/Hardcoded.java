@@ -134,7 +134,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var from) {
-                            return Var.<AnInt>local(int.class, "arraySize", from.<AnInt>call("readUnsignedByte"));
+                            return fMaxSize.assign(from.<AnInt>call("readUnsignedByte"));
                         }
                     },
                     new ExprFrom2<Typed<ABool>, Var, Var>() {

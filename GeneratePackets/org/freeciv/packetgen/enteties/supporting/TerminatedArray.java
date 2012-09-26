@@ -131,6 +131,8 @@ public class TerminatedArray extends FieldTypeBasic {
                             fromJavaTyped.addStatement(fMaxSize.assign(pMaxSize.ref()));
                             fromJavaTyped.addStatement(arrayEaterScopeCheck(testIfSizeIsWrong.x(pMaxSize.ref(),
                                     numberOfElements.x(pValue))));
+                        } else {
+                            fromJavaTyped.addStatement(fMaxSize.assign(numberOfElements.x(pValue)));
                         }
                         fromJavaTyped.addStatement(to.assign(pValue.ref()));
                         return fromJavaTyped;
@@ -140,7 +142,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Block x(Var to, Var from) {
                         Var buf = Var.local(buffertype, "buffer",
-                                buffertype.newInstance(pMaxSize.ref()));
+                                buffertype.newInstance(fMaxSize.ref()));
                         Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
                         Var pos = Var.local("int", "pos", literal(0));
 
@@ -164,7 +166,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                 WHILE(noTerminatorFound,
                                         new Block(arraySetElement(buf, pos.ref(), current.ref()),
                                                 inc(pos),
-                                                IF(isSmallerThan(pos.ref(), pMaxSize.ref()),
+                                                IF(isSmallerThan(pos.ref(), fMaxSize.ref()),
                                                         new Block(current.assign(readElementFrom.x(from))),
                                                         new Block(BuiltIn.<NoValue>toCode("break"))))));
                         out.addStatement(to.assign(convertByteArrayToAllElements.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
@@ -219,8 +221,7 @@ public class TerminatedArray extends FieldTypeBasic {
     private class FieldTypeAliasToTerminatedArray extends FieldTypeAlias {
         private FieldTypeAliasToTerminatedArray(String name) {
             super(name);
-            if (isArrayEater())
-                addObjectConstant("int", "maxArraySize");
+            addObjectConstant("int", "maxArraySize");
         }
     }
 }
