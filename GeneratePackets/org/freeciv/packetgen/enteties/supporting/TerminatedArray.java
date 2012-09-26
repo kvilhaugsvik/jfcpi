@@ -210,4 +210,17 @@ public class TerminatedArray extends FieldTypeBasic {
               absoluteMaxSizeAsParameter,
               uses);
     }
+
+    @Override
+    public FieldTypeAlias createFieldType(String name) {
+        return new FieldTypeAliasToTerminatedArray(name);
+    }
+
+    private class FieldTypeAliasToTerminatedArray extends FieldTypeAlias {
+        private FieldTypeAliasToTerminatedArray(String name) {
+            super(name);
+            if (isArrayEater())
+                addObjectConstant("int", "maxArraySize");
+        }
+    }
 }

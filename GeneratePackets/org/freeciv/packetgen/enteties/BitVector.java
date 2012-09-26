@@ -113,8 +113,6 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                     @Override
                     public Block x(Var arg1) {
                         Block body = new Block(arg1.assign(BuiltIn.<AValue>toCode("value")));
-                        if (arrayEater)
-                            body.addStatement(fMaxSize.assign(pMaxSize.ref()));
                         return body;
                     }
                 },
@@ -127,8 +125,6 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                                 io.getRead(size[0] + "size" + size[1],
                                         BuiltIn.<AValue>toCode("int size = from.readUnsignedShort()"),
                                         BuiltIn.<AValue>toCode("this.value = new " + getName() + "(innBuffer" + ", size)"));
-                        if (arrayEater)
-                            body.addStatement(fMaxSize.assign(pMaxSize.ref()));
                         return body;
                     }
                 },

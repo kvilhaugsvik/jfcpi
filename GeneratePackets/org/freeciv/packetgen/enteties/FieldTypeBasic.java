@@ -103,7 +103,7 @@ public class FieldTypeBasic implements IDependency {
 
     public class FieldTypeAlias extends ClassWriter implements IDependency {
 
-        private FieldTypeAlias(String name) {
+        protected FieldTypeAlias(String name) {
             super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()), new Import[]{
                                                   Import.classIn(java.io.DataInput.class),
                                                   Import.classIn(java.io.DataOutput.class),
@@ -123,8 +123,6 @@ public class FieldTypeBasic implements IDependency {
             List<Var<? extends AValue>> paramsConstructIO = new ArrayList(Arrays.asList(pFromStream));
 
             if (arrayEater) {
-                addObjectConstant("int", "maxArraySize");
-
                 paramsConstructArgs.add(pArraySize);
                 paramsConstructIO.add(pArraySize);
             }
