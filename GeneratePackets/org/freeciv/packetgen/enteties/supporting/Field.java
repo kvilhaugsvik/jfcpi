@@ -134,13 +134,21 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     public String getNewFromDataStream(String streamName) throws UndefinedException {
         return "new " + this.getFType() + "(" + streamName +
                 (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getSize() : "") + ")";
+                        ", " + declarations[declarations.length - 1].getMaxSize() +
+                                (declarations[declarations.length - 1].hasTransfer() ?
+                                        ", " + declarations[declarations.length - 1].getElementsToTransfer() :
+                                        "") :
+                        "") + ")";
     }
 
     public String getNewFromJavaType() throws UndefinedException {
         return "new " + this.getFType() + "(" + this.getFieldName() + "[i]" +
                 (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getSize() : "") + ")";
+                        ", " + declarations[declarations.length - 1].getMaxSize() +
+                                (declarations[declarations.length - 1].hasTransfer() ?
+                                        ", " + declarations[declarations.length - 1].getElementsToTransfer() :
+                                        "") :
+                        "") + ")";
     }
 
     private static void validateElementsToTransfer(ArrayDeclaration element, Collection<Typed<ABool>> to) throws UndefinedException {
