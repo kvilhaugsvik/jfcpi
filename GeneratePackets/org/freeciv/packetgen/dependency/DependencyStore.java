@@ -26,7 +26,7 @@ public final class DependencyStore {
     private final HashMap<Requirement, IDependency> dependenciesFulfilled = new HashMap<Requirement, IDependency>();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
     private final HashSet<Requirement> wantsOut = new HashSet<Requirement>();
-    private final HashMap<Requirement, IDependency.Maker> makers = new HashMap<>();
+    private final HashMap<Requirement, IDependency.Maker> makers = new HashMap<Requirement, IDependency.Maker>();
 
     /**
      * Make the dependency store aware of the fulfillment of a possible requirement.
