@@ -17,6 +17,7 @@ import java.util.*;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 import static org.freeciv.packetgen.Hardcoded.fMaxSize;
 import static org.freeciv.packetgen.Hardcoded.pMaxSize;
+import static org.freeciv.packetgen.Hardcoded.pFullMaxSize;
 import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
@@ -85,7 +86,8 @@ public class TerminatedArray extends FieldTypeBasic {
 
     public TerminatedArray(String dataIOType, String publicType) {
         this(dataIOType, publicType, byteArray, null,
-                true,
+                MaxArraySize.CONSTRUCTOR_PARAM,
+                TransferArraySize.CONSTRUCTOR_PARAM,
                 byteArray,
                 arrayLen,
                 null,
@@ -97,19 +99,26 @@ public class TerminatedArray extends FieldTypeBasic {
                 elemIsByteArray,
                 readByte,
                 TO_STRING_ARRAY,
-                Collections.<Requirement>emptySet());
+                Collections.<Requirement>emptySet(),
+                null);
     };
 
     public TerminatedArray(String dataIOType, String publicType, final Requirement terminator) {
-        this(dataIOType, publicType, byteArray, terminator, true, byteArray,
+        this(dataIOType, publicType, byteArray, terminator,
+                MaxArraySize.CONSTRUCTOR_PARAM,
+                TransferArraySize.CONSTRUCTOR_PARAM,
+                byteArray,
                 arrayLen, null, null, addAfterIfSmallerThanMaxSize, wrongSizeIfToBig,
                 fullIsByteArray, byteArrayIsFull, elemIsByteArray, readByte,
-                TO_STRING_ARRAY, Arrays.asList(terminator));
+                TO_STRING_ARRAY,
+                Arrays.asList(terminator),
+                null);
     }
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
                            final Requirement terminator,
-                           final boolean absoluteMaxSizeAsParameter,
+                           final MaxArraySize maxArraySize,
+                           final TransferArraySize transferArraySize,
                            final TargetArray buffertype,
                            final ExprFrom1<Typed<AnInt>, Var> numberOfElements,
                            final ExprFrom1<Typed<AnInt>, Var> readBeforeElements,
@@ -121,21 +130,22 @@ public class TerminatedArray extends FieldTypeBasic {
                            final ExprFrom2<Block, Var, Var> writeElementTo,
                            final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom,
                            final ExprFrom1<Typed<AString>, Var> toString,
-                           final Collection<Requirement> uses) {
+                           final Collection<Requirement> uses,
+                           final Var fullArraySizeLocation) {
         super(dataIOType, publicType, javaType,
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
                         final Var pValue = Var.param(javaType, "value");
                         Block fromJavaTyped = new Block();
-                        if (absoluteMaxSizeAsParameter) {
-                            fromJavaTyped.addStatement(fMaxSize.assign(pMaxSize.ref()));
-                            fromJavaTyped.addStatement(arrayEaterScopeCheck(testIfSizeIsWrong.x(pMaxSize.ref(),
+                        Var maxArraySizeRef = maxArraySizeVar(maxArraySize, fullArraySizeLocation);
+                        fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(maxArraySizeRef,
+                                transferArraySize, numberOfElements, pValue)));
+                        if (null != maxArraySizeRef) {
+                            fromJavaTyped.addStatement(arrayEaterScopeCheck(testIfSizeIsWrong.x(fMaxSize.ref(),
                                     numberOfElements.x(pValue))));
-                        } else {
-                            fromJavaTyped.addStatement(fMaxSize.assign(numberOfElements.x(pValue)));
                         }
-                        if (absoluteMaxSizeAsParameter)
+                        if (validationPossible(transferArraySize, maxArraySize))
                             fromJavaTyped.addStatement(Hardcoded.arrayEaterScopeCheck(
                                     isSmallerThan(Var.param(int.class, "maxArraySizeThisTime").ref(), fMaxSize.ref())));
                         fromJavaTyped.addStatement(to.assign(pValue.ref()));
@@ -157,15 +167,13 @@ public class TerminatedArray extends FieldTypeBasic {
 
                         Block out = new Block();
 
-                        if (absoluteMaxSizeAsParameter)
-                            out.addStatement(fMaxSize.assign(pMaxSize.ref()));
+                        Var maxArraySizeRef = maxArraySizeVar(maxArraySize, fullArraySizeLocation);
+                        out.addStatement(fMaxSize.assign(setFMaxSize(maxArraySizeRef,
+                                transferArraySize, readBeforeElements, from)));
 
-                        if (null != readBeforeElements)
-                            out.addStatement(readBeforeElements.x(from));
-
-                        if (absoluteMaxSizeAsParameter)
+                        if (validationPossible(transferArraySize, maxArraySize))
                             out.addStatement(Hardcoded.arrayEaterScopeCheck(
-                                    isSmallerThan(Var.param(int.class, "maxArraySizeThisTime").ref(), fMaxSize.ref())));
+                                    isSmallerThan(fMaxSize.ref(), maxArraySizeRef.ref())));
 
                         out.addStatement(buf);
                         out.addStatement(current);
@@ -187,7 +195,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Block x(Var val, Var to) {
                         Block out = new Block();
-                        if (null != writeBeforeElements)
+                        if (TransferArraySize.SERIALIZED.equals(transferArraySize))
                             out.addStatement(writeBeforeElements.x(val, to));
                         if (null == convertAllElementsToByteArray) {
                             Var element = Var.param(buffertype.getOf(), "element");
@@ -202,7 +210,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         return out;
                     }
                 },
-              new ExprFrom1<Typed<AnInt>, Var>() {
+                new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var value) {
                         Typed<AnInt> length = numberOfElements.x(value);
@@ -215,10 +223,44 @@ public class TerminatedArray extends FieldTypeBasic {
                                             literal(0)));
                         return length;
                     }
-              },
-              toString,
-              absoluteMaxSizeAsParameter,
-              uses);
+                },
+                toString,
+                MaxArraySize.CONSTRUCTOR_PARAM.equals(maxArraySize)
+                        || TransferArraySize.CONSTRUCTOR_PARAM.equals(transferArraySize),
+                uses
+        );
+    }
+
+    private static boolean validationPossible(TransferArraySize transferArraySize, MaxArraySize maxArraySize) {
+        return !(TransferArraySize.MAX_ARRAY_SIZE.equals(transferArraySize)
+                || MaxArraySize.NO_LIMIT.equals(maxArraySize));
+    }
+
+    private static Var maxArraySizeVar(MaxArraySize maxArraySize, Var fullArraySizeLocation) {
+        switch (maxArraySize) {
+            case CONSTRUCTOR_PARAM:
+                return pMaxSize;
+            case STORED_IN:
+                return fullArraySizeLocation;
+            case NO_LIMIT:
+                return null;
+            default:
+                throw new UnsupportedOperationException("Source of max array size is not known");
+        }
+    }
+
+    private static Typed<AnInt> setFMaxSize(Var maxArraySizeRef, TransferArraySize transferArraySize,
+                                            ExprFrom1<Typed<AnInt>, Var> numberOfElements, Var dataStreamOrJavaTyped) {
+        switch (transferArraySize) {
+            case MAX_ARRAY_SIZE:
+                return maxArraySizeRef.ref();
+            case CONSTRUCTOR_PARAM:
+                return pFullMaxSize.ref();
+            case SERIALIZED:
+                return numberOfElements.x(dataStreamOrJavaTyped);
+            default:
+                throw new UnsupportedOperationException("Source of transfer array size is not known");
+        }
     }
 
     @Override
@@ -231,5 +273,17 @@ public class TerminatedArray extends FieldTypeBasic {
             super(name);
             addObjectConstant("int", "maxArraySize");
         }
+    }
+
+    public enum MaxArraySize {
+        NO_LIMIT,
+        CONSTRUCTOR_PARAM,
+        STORED_IN
+    }
+
+    public enum TransferArraySize {
+        MAX_ARRAY_SIZE,
+        CONSTRUCTOR_PARAM,
+        SERIALIZED
     }
 }

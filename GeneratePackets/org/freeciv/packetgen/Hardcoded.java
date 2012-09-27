@@ -42,7 +42,8 @@ public class Hardcoded {
     // TODO: Make parameters in stead
     private static final Var pArraySize = Var.param(int.class, "arraySize");
     private static final Var pValue = Var.param(String.class, "value"); // can't know type
-    public static final Var pMaxSize = Var.param(int.class, "arraySize");
+    public static final Var pFullMaxSize = Var.param(int.class, "arraySize");
+    public static final Var pMaxSize = Var.param(int.class, "maxArraySizeThisTime");
     public static final Var fMaxSize = Var.field(Collections.<Annotate>emptyList(),
             Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
             new TargetClass(int.class), "maxArraySize", null);
@@ -129,12 +130,15 @@ public class Hardcoded {
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
             ),
             new TerminatedArray("worklist", "struct worklist", new TargetArray("universal", 1, true),
-                    null, false, new TargetArray("universal", 1, true),
+                    null,
+                    TerminatedArray.MaxArraySize.NO_LIMIT,
+                    TerminatedArray.TransferArraySize.SERIALIZED,
+                    new TargetArray("universal", 1, true),
                     TerminatedArray.arrayLen,
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var from) {
-                            return fMaxSize.assign(from.<AnInt>call("readUnsignedByte"));
+                            return from.<AnInt>call("readUnsignedByte");
                         }
                     },
                     new ExprFrom2<Typed<ABool>, Var, Var>() {
@@ -174,13 +178,15 @@ public class Hardcoded {
                     },
                     TO_STRING_ARRAY,
                     Arrays.asList(new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
-                            new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))),
+                            new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE)),
+                    null),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
             new TerminatedArray("string", "char", new TargetClass(String.class),
                     new Requirement("STRING_ENDER", Requirement.Kind.VALUE),
-                    true,
+                    TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
+                    TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
                     TerminatedArray.byteArray,
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
@@ -207,7 +213,8 @@ public class Hardcoded {
                     TerminatedArray.elemIsByteArray,
                     TerminatedArray.readByte,
                     TO_STRING_OBJECT,
-                    Arrays.asList(new Requirement("STRING_ENDER", Requirement.Kind.VALUE))),
+                    Arrays.asList(new Requirement("STRING_ENDER", Requirement.Kind.VALUE)),
+                    null),
             new TerminatedArray("tech_list", "int",
                                 new Requirement("A_LAST", Requirement.Kind.VALUE)),
             new TerminatedArray("unit_list", "int",
