@@ -100,7 +100,8 @@ public class TerminatedArray extends FieldTypeBasic {
                 readByte,
                 TO_STRING_ARRAY,
                 Collections.<Requirement>emptySet(),
-                null);
+                null,
+                arrayLen);
     };
 
     public TerminatedArray(String dataIOType, String publicType, final Requirement terminator) {
@@ -112,7 +113,8 @@ public class TerminatedArray extends FieldTypeBasic {
                 fullIsByteArray, byteArrayIsFull, elemIsByteArray, readByte,
                 TO_STRING_ARRAY,
                 Arrays.asList(terminator),
-                null);
+                null,
+                arrayLen);
     }
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
@@ -131,7 +133,8 @@ public class TerminatedArray extends FieldTypeBasic {
                            final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom,
                            final ExprFrom1<Typed<AString>, Var> toString,
                            final Collection<Requirement> uses,
-                           final Typed<AnInt> fullArraySizeLocation) {
+                           final Typed<AnInt> fullArraySizeLocation,
+                           final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen) {
         super(dataIOType, publicType, javaType,
                 new ExprFrom1<Block, Var>() {
                     @Override
@@ -213,7 +216,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var value) {
-                        Typed<AnInt> length = numberOfElements.x(value);
+                        Typed<AnInt> length = valueGetByteLen.x(value);
                         Typed<ABool> addAfterResult = testIfTerminatorShouldBeAdded.x(numberOfElements.x(value));
                         if (!FALSE.equals(addAfterResult))
                             length = BuiltIn.<AnInt>sum(

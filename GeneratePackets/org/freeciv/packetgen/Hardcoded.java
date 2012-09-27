@@ -179,7 +179,13 @@ public class Hardcoded {
                     TO_STRING_ARRAY,
                     Arrays.asList(new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE)),
-                    null),
+                    null,
+                    new ExprFrom1<Typed<AnInt>, Var>() {
+                        @Override
+                        public Typed<AnInt> x(Var val) {
+                            return multiply(literal(2), val.read("length"));
+                        }
+                    }),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
@@ -214,7 +220,13 @@ public class Hardcoded {
                     TerminatedArray.readByte,
                     TO_STRING_OBJECT,
                     Arrays.asList(new Requirement("STRING_ENDER", Requirement.Kind.VALUE)),
-                    null),
+                    null,
+                    new ExprFrom1<Typed<AnInt>, Var>() {
+                        @Override
+                        public Typed<AnInt> x(Var value) {
+                            return value.read("getBytes().length");
+                        }
+                    }),
             new TerminatedArray("tech_list", "int",
                                 new Requirement("A_LAST", Requirement.Kind.VALUE)),
             new TerminatedArray("unit_list", "int",
