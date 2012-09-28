@@ -180,6 +180,7 @@ public class Hardcoded {
                     Arrays.asList(new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE)),
                     null,
+                    NetworkIO.witIntAsIntermediate("uint8", 1, "from.readUnsignedByte()", "writeByte"),
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var val) {
@@ -220,6 +221,7 @@ public class Hardcoded {
                     TerminatedArray.readByte,
                     TO_STRING_OBJECT,
                     Arrays.asList(new Requirement("STRING_ENDER", Requirement.Kind.VALUE)),
+                    null,
                     null,
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override

@@ -101,6 +101,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 TO_STRING_ARRAY,
                 Collections.<Requirement>emptySet(),
                 null,
+                null,
                 arrayLen);
     };
 
@@ -113,6 +114,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 fullIsByteArray, byteArrayIsFull, elemIsByteArray, readByte,
                 TO_STRING_ARRAY,
                 Arrays.asList(terminator),
+                null,
                 null,
                 arrayLen);
     }
@@ -134,6 +136,7 @@ public class TerminatedArray extends FieldTypeBasic {
                            final ExprFrom1<Typed<AString>, Var> toString,
                            final Collection<Requirement> uses,
                            final Typed<AnInt> fullArraySizeLocation,
+                           final NetworkIO transferSizeSerialize,
                            final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen) {
         super(dataIOType, publicType, javaType,
                 new ExprFrom1<Block, Var>() {
@@ -217,6 +220,8 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Typed<AnInt> x(Var value) {
                         Typed<AnInt> length = valueGetByteLen.x(value);
+                        if (TransferArraySize.SERIALIZED.equals(transferArraySize))
+                            length = sum(transferSizeSerialize.getSize().x(value), length);
                         Typed<ABool> addAfterResult = testIfTerminatorShouldBeAdded.x(numberOfElements.x(value));
                         if (!FALSE.equals(addAfterResult))
                             length = BuiltIn.<AnInt>sum(
