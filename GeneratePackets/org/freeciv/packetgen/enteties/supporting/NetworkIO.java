@@ -64,8 +64,8 @@ public class NetworkIO implements IDependency {
         return readNoArgs;
     }
 
-    public String getWrite(String toWrite) {
-        return write + "(" + toWrite + ")";
+    public String getWrite() {
+        return write;
     }
 
     @Override
@@ -96,7 +96,7 @@ public class NetworkIO implements IDependency {
     public static NetworkIO withBytesAsIntermediate(String type) {
         return new NetworkIO(type,
              -1,
-             "to.write",
+             "write",
              Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES,
              null);
     }

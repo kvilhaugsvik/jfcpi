@@ -266,12 +266,12 @@ public class Hardcoded {
              * Read from and write to the network
              ************************************************************************************************/
             NetworkIO.withBytesAsIntermediate("bitvector"),
-            NetworkIO.witIntAsIntermediate("uint8", 1, "from.readUnsignedByte()", "to.writeByte"),
+            NetworkIO.witIntAsIntermediate("uint8", 1, "from.readUnsignedByte()", "writeByte"),
             // to.writeByte wraps around so -128 shares encoding with 128
-            NetworkIO.witIntAsIntermediate("sint8", 1, "(int) from.readByte()", "to.writeByte"),
-            NetworkIO.witIntAsIntermediate("uint16", 2, "(int) from.readChar()", "to.writeChar"),
-            NetworkIO.witIntAsIntermediate("sint16", 2, "(int) from.readShort()", "to.writeShort"),
-            NetworkIO.witIntAsIntermediate("sint32", 4, "from.readInt()", "to.writeInt"),
+            NetworkIO.witIntAsIntermediate("sint8", 1, "(int) from.readByte()", "writeByte"),
+            NetworkIO.witIntAsIntermediate("uint16", 2, "(int) from.readChar()", "writeChar"),
+            NetworkIO.witIntAsIntermediate("sint16", 2, "(int) from.readShort()", "writeShort"),
+            NetworkIO.witIntAsIntermediate("sint32", 4, "from.readInt()", "writeInt"),
 
             /************************************************************************************************
              * Built in types

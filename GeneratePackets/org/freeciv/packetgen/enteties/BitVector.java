@@ -108,7 +108,9 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         final String bvName = iProvide.getName();
         final String[] size = new String[]{"1 + (", " - 1) / 8"};
         final String realBitVector =  bvName + ".size";
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName, new TargetClass(getName()),
+        TargetClass javaType = getAddress().scopeKnown();
+        javaType.register(new TargetMethod("getAsByteArray"));
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName, javaType,
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
@@ -134,7 +136,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                         Block out = new Block();
                         if (!knowsSize)
                             out.addStatement(to.call("writeShort", val.read("size")));
-                        out.addStatement(BuiltIn.<AValue>toCode(io.getWrite("this.value.getAsByteArray()")));
+                        out.addStatement(to.call(io.getWrite(), val.<AValue>call("getAsByteArray")));
                         return out;
                     }
                 },

@@ -25,6 +25,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.*;
 
@@ -64,8 +65,9 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var val, Var to) {
-                        return Block.fromStrings(
-                                io.getWrite((willRequire.isEmpty() ? "this.value" : "this.value.getNumber()")));
+                        return new Block(to.<Returnable>call(io.getWrite(), willRequire.isEmpty() ?
+                                val.ref() :
+                                val.call("getNumber")));
                     }
                 },
                                   io.getSize(),
