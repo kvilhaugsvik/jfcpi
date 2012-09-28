@@ -28,11 +28,12 @@ public class TargetClass extends Address implements AValue {
     private final boolean isInScope;
     private final CodeAtom name;
     private final TargetPackage where;
-    private final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
+    private final HashMap<String, TargetMethod> methods;
 
     public TargetClass(String fullPath, boolean isInScope) {
         super(fullPath.split("\\."));
-        name = super.components[super.components.length - 1];
+        this.name = super.components[super.components.length - 1];
+        this.methods = new HashMap<String, TargetMethod>();
         this.isInScope = isInScope;
 
         if (1 < super.components.length)
@@ -62,9 +63,14 @@ public class TargetClass extends Address implements AValue {
     }
 
     public TargetClass(TargetPackage where, CodeAtom name, boolean isInScope) {
+        this(where, name, isInScope, new HashMap<String, TargetMethod>());
+    }
+
+    private TargetClass(TargetPackage where, CodeAtom name, boolean isInScope, HashMap<String, TargetMethod> methods) {
         super(where, name);
         this.where = where;
         this.name = name;
+        this.methods = methods;
         this.isInScope = isInScope;
     }
 
@@ -81,7 +87,8 @@ public class TargetClass extends Address implements AValue {
     }
 
     public TargetClass scopeKnown() {
-        return new TargetClass(where, name, true);
+        TargetClass targetClass = new TargetClass(where, name, true, methods);
+        return targetClass;
     }
 
     public <Kind extends AValue> Typed<Kind> read(final String field) {
