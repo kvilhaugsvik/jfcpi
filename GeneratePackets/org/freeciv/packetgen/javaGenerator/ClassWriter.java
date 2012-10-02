@@ -334,7 +334,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         },
                         maker.condLeftIs(Visibility.Atom.class)
                 ),
-                EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.LEFT_TOKEN),
+                DependsOn.token_left,
                 Arrays.<CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>>asList(
                         maker.INSERT_SPACE));
         maker.whenBefore(ClassKind.Atom.class, maker.BREAK_LINE,
@@ -375,7 +375,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                             }
                         }
                 ),
-                EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
+                DependsOn.token_left,
                 Arrays.asList(
                         maker.BREAK_LINE,
                         new Triggered<DefaultStyleScopeInfo>() {
@@ -400,7 +400,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                                                 context.getLeftAtom().equals(HasAtoms.JDocStart));
                             }
                         }),
-                EnumSet.<CodeStyleBuilder.DependsOn>of(DependsOn.LEFT_TOKEN),
+                DependsOn.token_left,
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
                         maker.BREAK_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
@@ -419,7 +419,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                                 return context.getLineBreakTry() <= 2;
                             }
                         }),
-                EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN, DependsOn.RIGHT_TOKEN),
+                DependsOn.token_both,
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
                             @Override
@@ -432,7 +432,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(
                         maker.condRightIs(Annotate.Atom.class),
                         maker.condLeftIs(Comment.Word.class)),
-                EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN, DependsOn.RIGHT_TOKEN),
+                DependsOn.token_both,
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
                         maker.BREAK_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
@@ -449,7 +449,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                                 return 2 < argument.getLineBreakTry();
                             }
                         }),
-                EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
+                DependsOn.token_right,
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
                         maker.BREAK_LINE,
                         maker.INSERT_SPACE));
@@ -468,7 +468,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                                 return 2 < argument.getLineBreakTry() && argument.approachingTheEdge();
                             }
                         }),
-                EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.RIGHT_TOKEN),
+                DependsOn.token_right,
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
                         maker.BREAK_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
@@ -491,7 +491,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                                 return 3 < argument.getLineBreakTry() && argument.approachingTheEdge();
                             }
                         }),
-                EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.RIGHT_TOKEN),
+                DependsOn.token_right,
                 Arrays.<CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>>asList(
                         maker.BREAK_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
@@ -513,7 +513,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                                 return 0 < argument.getLineBreakTry();
                             }
                         }),
-                EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.RIGHT_TOKEN),
+                DependsOn.token_right,
                 Arrays.<CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>>asList(
                         maker.BREAK_LINE));
         maker.whenAfter(HasAtoms.ALS, maker.DO_NOTHING);
@@ -560,7 +560,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                             }
                         }));
         maker.alwaysWhen(Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(maker.condLeftIs(HasAtoms.EOL)),
-                EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.LEFT_TOKEN),
+                DependsOn.token_left,
                 Arrays.<CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>>asList(
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
                             @Override public void run(DefaultStyleScopeInfo context) {
