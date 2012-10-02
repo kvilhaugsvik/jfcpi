@@ -18,7 +18,6 @@ import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
@@ -26,6 +25,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 
 import static org.junit.Assert.*;
 
@@ -49,10 +49,10 @@ public class TypedCodeTest {
                 new CodeStyleBuilder<ScopeInfo>(CodeStyleBuilder.<ScopeInfo>INSERT_SPACE(),
                         ScopeInfo.class);
 
-        builder.whenBetween(HasAtoms.EOL, HasAtoms.CCommentStart, builder.BREAK_LINE_BLOCK);
-        builder.whenAfter(HasAtoms.EOL, builder.BREAK_LINE);
-        builder.whenBefore(HasAtoms.EOL, builder.DO_NOTHING);
-        builder.atTheBeginning(builder.DO_NOTHING);
+        builder.whenFirst(builder.condLeftIs(HasAtoms.EOL), builder.condRightIs(HasAtoms.CCommentStart), CodeStyleBuilder.DependsOn.token_both, builder.BREAK_LINE_BLOCK);
+        builder.whenFirst(builder.condLeftIs(HasAtoms.EOL), CodeStyleBuilder.DependsOn.token_left, builder.BREAK_LINE);
+        builder.whenFirst(builder.condRightIs(HasAtoms.EOL), CodeStyleBuilder.DependsOn.token_right, builder.DO_NOTHING);
+        builder.whenFirst(builder.condAtTheBeginning(), EnumSet.<CodeStyleBuilder.DependsOn>noneOf(CodeStyleBuilder.DependsOn.class), builder.DO_NOTHING);
 
         CodeAtoms toRunOn = new CodeAtoms();
         toRunOn.add(new CodeAtom("A"));
@@ -77,19 +77,19 @@ public class TypedCodeTest {
                 new CodeStyleBuilder<ScopeInfo>(CodeStyleBuilder.<ScopeInfo>INSERT_SPACE(),
                         ScopeInfo.class);
 
-        builder.whenBetween(HasAtoms.EOL, HasAtoms.RSC, builder.BREAK_LINE);
-        builder.whenAfter(HasAtoms.EOL, builder.BREAK_LINE, new Util.OneCondition<ScopeInfo>() {
+        builder.whenFirst(builder.condLeftIs(HasAtoms.EOL), builder.condRightIs(HasAtoms.RSC), CodeStyleBuilder.DependsOn.token_both, builder.BREAK_LINE);
+        builder.whenFirst(new Util.OneCondition<ScopeInfo>() {
             @Override
             public boolean isTrueFor(ScopeInfo argument) {
                 return CodeStyle.GROUP.equals(argument.seeTopHint());
             }
-        });
-        builder.whenAfter(HasAtoms.EOL, builder.BREAK_LINE_BLOCK);
-        builder.whenAfter(HasAtoms.LSC, builder.BREAK_LINE);
-        builder.whenAfter(HasAtoms.RSC, builder.BREAK_LINE);
-        builder.whenBefore(HasAtoms.RSC, builder.BREAK_LINE);
-        builder.whenBefore(HasAtoms.EOL, builder.DO_NOTHING);
-        builder.atTheBeginning(builder.DO_NOTHING);
+        }, builder.condLeftIs(HasAtoms.EOL), CodeStyleBuilder.DependsOn.token_left, builder.BREAK_LINE);
+        builder.whenFirst(builder.condLeftIs(HasAtoms.EOL), CodeStyleBuilder.DependsOn.token_left, builder.BREAK_LINE_BLOCK);
+        builder.whenFirst(builder.condLeftIs(HasAtoms.LSC), CodeStyleBuilder.DependsOn.token_left, builder.BREAK_LINE);
+        builder.whenFirst(builder.condLeftIs(HasAtoms.RSC), CodeStyleBuilder.DependsOn.token_left, builder.BREAK_LINE);
+        builder.whenFirst(builder.condRightIs(HasAtoms.RSC), CodeStyleBuilder.DependsOn.token_right, builder.BREAK_LINE);
+        builder.whenFirst(builder.condRightIs(HasAtoms.EOL), CodeStyleBuilder.DependsOn.token_right, builder.DO_NOTHING);
+        builder.whenFirst(builder.condAtTheBeginning(), EnumSet.<CodeStyleBuilder.DependsOn>noneOf(CodeStyleBuilder.DependsOn.class), builder.DO_NOTHING);
 
         Block haveStatementGroup = new Block();
         Var i = Var.local("int", "i", null);
