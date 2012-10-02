@@ -282,42 +282,42 @@ public class ClassWriter extends Formatted implements HasAtoms {
     static {
         final CodeStyleBuilder<DefaultStyleScopeInfo> maker =
                 new CodeStyleBuilder<DefaultStyleScopeInfo>(
-                        CodeStyle.Action.INSERT_SPACE,
+                        CodeStyleBuilder.<DefaultStyleScopeInfo>INSERT_SPACE(),
                         DefaultStyleScopeInfo.class);
 
-        maker.atTheBeginning(CodeStyle.Action.DO_NOTHING);
+        maker.atTheBeginning(maker.DO_NOTHING);
         maker.whenFirst(Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(maker.condAtTheEnd()),
                 EnumSet.<CodeStyleBuilder.DependsOn>noneOf(CodeStyleBuilder.DependsOn.class),
-                Arrays.<Triggered<DefaultStyleScopeInfo>>asList(maker.action2Triggered(CodeStyle.Action.DO_NOTHING)));
-        maker.whenBetween(HasAtoms.LSC, HasAtoms.RSC, CodeStyle.Action.DO_NOTHING);
-        maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, CodeStyle.Action.INSERT_SPACE);
-        maker.whenBefore(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
-        maker.whenAfter(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
+                Arrays.<Triggered<DefaultStyleScopeInfo>>asList(maker.DO_NOTHING));
+        maker.whenBetween(HasAtoms.LSC, HasAtoms.RSC, maker.DO_NOTHING);
+        maker.whenBetween(HasAtoms.RSC, HasAtoms.ELSE, maker.INSERT_SPACE);
+        maker.whenBefore(HasAtoms.RSC, maker.BREAK_LINE);
+        maker.whenAfter(HasAtoms.RSC, maker.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return null == argument.seeTopHint();
             }
         });
-        maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
+        maker.whenAfter(HasAtoms.EOL, maker.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return null == argument.seeTopHint();
             }
         });
-        maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
+        maker.whenAfter(HasAtoms.EOL, maker.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return CodeStyle.OUTER_LEVEL.equals(argument.seeTopHint());
             }
         });
-        maker.whenBefore(Annotate.Atom.class, CodeStyle.Action.BREAK_LINE,
+        maker.whenBefore(Annotate.Atom.class, maker.BREAK_LINE,
                 new Util.OneCondition<DefaultStyleScopeInfo>() {
                     @Override
                     public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                         return CodeStyle.OUTER_LEVEL.equals(argument.seeTopHint());
                     }
                 });
-        maker.whenBefore(Visibility.Atom.class, CodeStyle.Action.BREAK_LINE,
+        maker.whenBefore(Visibility.Atom.class, maker.BREAK_LINE,
                 new Util.OneCondition<DefaultStyleScopeInfo>() {
                     @Override
                     public boolean isTrueFor(DefaultStyleScopeInfo argument) {
@@ -336,29 +336,29 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 ),
                 EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.LEFT_TOKEN),
                 Arrays.<CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>>asList(
-                        maker.action2Triggered(CodeStyle.Action.INSERT_SPACE)));
-        maker.whenBefore(ClassKind.Atom.class, CodeStyle.Action.BREAK_LINE,
+                        maker.INSERT_SPACE));
+        maker.whenBefore(ClassKind.Atom.class, maker.BREAK_LINE,
                 new Util.OneCondition<DefaultStyleScopeInfo>() {
                     @Override
                     public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                         return CodeStyle.OUTER_LEVEL.equals(argument.seeTopHint());
                     }
                 });
-        maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
-        maker.whenAfter(HasAtoms.LSC, CodeStyle.Action.BREAK_LINE);
-        maker.whenAfter(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
-        maker.whenBefore(HasAtoms.EOL, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.FORSEP, CodeStyle.Action.DO_NOTHING);
-        maker.whenAfter(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.HAS, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.RPR, CodeStyle.Action.DO_NOTHING);
-        maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+        maker.whenAfter(HasAtoms.EOL, maker.BREAK_LINE);
+        maker.whenAfter(HasAtoms.LSC, maker.BREAK_LINE);
+        maker.whenAfter(HasAtoms.RSC, maker.BREAK_LINE);
+        maker.whenBefore(HasAtoms.EOL, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.FORSEP, maker.DO_NOTHING);
+        maker.whenAfter(HasAtoms.HAS, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.HAS, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.RPR, maker.DO_NOTHING);
+        maker.whenAfter(HasAtoms.SEP, maker.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return EnumElements.class.getName().equals(argument.seeTopHint());
             }
         });
-        maker.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
+        maker.whenAfter(HasAtoms.EOL, maker.BREAK_LINE_BLOCK, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return EnumElements.class.getName().equals(argument.seeTopHint());
@@ -377,7 +377,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 ),
                 EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
                 Arrays.asList(
-                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        maker.BREAK_LINE,
                         new Triggered<DefaultStyleScopeInfo>() {
                             @Override
                             public void run(DefaultStyleScopeInfo context) {
@@ -385,7 +385,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                             }
                         }
                 ));
-        maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+        maker.whenAfter(HasAtoms.SEP, maker.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 1 < argument.getLineBreakTry() && argument.approachingTheEdge();
             }
@@ -402,7 +402,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         }),
                 EnumSet.<CodeStyleBuilder.DependsOn>of(DependsOn.LEFT_TOKEN),
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
-                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        maker.BREAK_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
                             @Override
                             public void run(DefaultStyleScopeInfo context) {
@@ -434,7 +434,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         maker.condLeftIs(Comment.Word.class)),
                 EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN, DependsOn.RIGHT_TOKEN),
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
-                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        maker.BREAK_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
                             @Override
                             public void run(DefaultStyleScopeInfo context) {
@@ -451,9 +451,9 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         }),
                 EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
-                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
-                        maker.action2Triggered(CodeStyle.Action.INSERT_SPACE)));
-        maker.whenAfter(HasAtoms.CCommentEnd, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+                        maker.BREAK_LINE,
+                        maker.INSERT_SPACE));
+        maker.whenAfter(HasAtoms.CCommentEnd, maker.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 1 < argument.getLineBreakTry();
@@ -470,14 +470,14 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         }),
                 EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.RIGHT_TOKEN),
                 Arrays.<Triggered<DefaultStyleScopeInfo>>asList(
-                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        maker.BREAK_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
                             @Override
                             public void run(DefaultStyleScopeInfo context) {
                                 context.getRunningFormatting().insertStar();
                             }
                         }));
-        maker.whenAfter(HasAtoms.SEP, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+        maker.whenAfter(HasAtoms.SEP, maker.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 2 < argument.getLineBreakTry() &&
                         !CodeStyle.ARGUMENTS.equals(argument.seeTopHint());
@@ -493,14 +493,14 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         }),
                 EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.RIGHT_TOKEN),
                 Arrays.<CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>>asList(
-                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE),
+                        maker.BREAK_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
                             @Override public void run(DefaultStyleScopeInfo context) {
                                 context.statementBroken = true;
                             }
                         }
                 ));
-        maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+        maker.whenAfter(HasAtoms.ALS, maker.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 0 < argument.getLineBreakTry();
             }
@@ -515,31 +515,31 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         }),
                 EnumSet.<CodeStyleBuilder.DependsOn>of(CodeStyleBuilder.DependsOn.RIGHT_TOKEN),
                 Arrays.<CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>>asList(
-                        maker.action2Triggered(CodeStyle.Action.BREAK_LINE)));
-        maker.whenAfter(HasAtoms.ALS, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.ALE, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.SEP, CodeStyle.Action.DO_NOTHING);
-        maker.whenBetween(HasAtoms.WHILE, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
-        maker.whenBetween(HasAtoms.IF, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
-        maker.whenBetween(HasAtoms.FOR, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
-        maker.whenBetween(HasAtoms.RET, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
-        maker.whenBetween(HasAtoms.ADD, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
-        maker.whenBetween(HasAtoms.MUL, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
-        maker.whenBetween(HasAtoms.DIV, HasAtoms.LPR, CodeStyle.Action.INSERT_SPACE);
-        maker.whenBefore(HasAtoms.INC, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.LPR, CodeStyle.Action.DO_NOTHING);
-        maker.whenAfter(HasAtoms.LPR, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
-        maker.whenAfter(HasAtoms.ARRAY_ACCESS_START, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.ARRAY_ACCESS_END, CodeStyle.Action.DO_NOTHING);
-        maker.whenAfter(HasAtoms.CCommentEnd, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
+                        maker.BREAK_LINE));
+        maker.whenAfter(HasAtoms.ALS, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.ALE, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.SEP, maker.DO_NOTHING);
+        maker.whenBetween(HasAtoms.WHILE, HasAtoms.LPR, maker.INSERT_SPACE);
+        maker.whenBetween(HasAtoms.IF, HasAtoms.LPR, maker.INSERT_SPACE);
+        maker.whenBetween(HasAtoms.FOR, HasAtoms.LPR, maker.INSERT_SPACE);
+        maker.whenBetween(HasAtoms.RET, HasAtoms.LPR, maker.INSERT_SPACE);
+        maker.whenBetween(HasAtoms.ADD, HasAtoms.LPR, maker.INSERT_SPACE);
+        maker.whenBetween(HasAtoms.MUL, HasAtoms.LPR, maker.INSERT_SPACE);
+        maker.whenBetween(HasAtoms.DIV, HasAtoms.LPR, maker.INSERT_SPACE);
+        maker.whenBefore(HasAtoms.INC, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.LPR, maker.DO_NOTHING);
+        maker.whenAfter(HasAtoms.LPR, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.ARRAY_ACCESS_START, maker.DO_NOTHING);
+        maker.whenAfter(HasAtoms.ARRAY_ACCESS_START, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.ARRAY_ACCESS_END, maker.DO_NOTHING);
+        maker.whenAfter(HasAtoms.CCommentEnd, maker.BREAK_LINE, new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return null == argument.seeTopHint();
             }
         });
-        maker.whenBefore(HasAtoms.OR, CodeStyle.Action.DO_NOTHING);
-        maker.whenBefore(HasAtoms.AND, CodeStyle.Action.DO_NOTHING);
+        maker.whenBefore(HasAtoms.OR, maker.DO_NOTHING);
+        maker.whenBefore(HasAtoms.AND, maker.DO_NOTHING);
 
         maker.alwaysWhen(
                 Arrays.<Util.OneCondition<DefaultStyleScopeInfo>>asList(
@@ -550,7 +550,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         }),
                 EnumSet.<CodeStyleBuilder.DependsOn>noneOf(CodeStyleBuilder.DependsOn.class),
                 Arrays.<CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>>asList(
-                        maker.action2Triggered(CodeStyle.Action.RESET_LINE),
+                        maker.RESET_LINE,
                         new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
                             @Override
                             public void run(DefaultStyleScopeInfo context) {
@@ -567,15 +567,15 @@ public class ClassWriter extends Formatted implements HasAtoms {
                                 context.statementBroken = false;
                             }
                         }));
-        maker.alwaysBefore(HasAtoms.ALS, CodeStyle.Action.SCOPE_ENTER);
-        maker.alwaysBefore(HasAtoms.ALE, CodeStyle.Action.SCOPE_EXIT);
-        maker.alwaysBefore(HasAtoms.LPR, CodeStyle.Action.SCOPE_ENTER);
-        maker.alwaysBefore(HasAtoms.RPR, CodeStyle.Action.SCOPE_EXIT);
-        maker.alwaysBefore(HasAtoms.LSC, CodeStyle.Action.SCOPE_ENTER);
-        maker.alwaysBefore(HasAtoms.RSC, CodeStyle.Action.SCOPE_EXIT);
-        maker.alwaysBefore(HasAtoms.ALS, CodeStyle.Action.INDENT);
-        maker.alwaysBefore(HasAtoms.LPR, CodeStyle.Action.INDENT);
-        maker.alwaysBefore(HasAtoms.LSC, CodeStyle.Action.INDENT);
+        maker.alwaysBefore(HasAtoms.ALS, maker.SCOPE_ENTER);
+        maker.alwaysBefore(HasAtoms.ALE, maker.SCOPE_EXIT);
+        maker.alwaysBefore(HasAtoms.LPR, maker.SCOPE_ENTER);
+        maker.alwaysBefore(HasAtoms.RPR, maker.SCOPE_EXIT);
+        maker.alwaysBefore(HasAtoms.LSC, maker.SCOPE_ENTER);
+        maker.alwaysBefore(HasAtoms.RSC, maker.SCOPE_EXIT);
+        maker.alwaysBefore(HasAtoms.ALS, maker.INDENT);
+        maker.alwaysBefore(HasAtoms.LPR, maker.INDENT);
+        maker.alwaysBefore(HasAtoms.LSC, maker.INDENT);
         DEFAULT_STYLE_INDENT = maker.getStyle();
     }
 

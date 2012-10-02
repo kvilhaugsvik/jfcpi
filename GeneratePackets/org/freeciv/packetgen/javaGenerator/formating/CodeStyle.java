@@ -30,17 +30,6 @@ public interface CodeStyle {
 
     public List<String> asFormattedLines(CodeAtoms from);
 
-    enum Action {
-        DO_NOTHING,
-        INSERT_SPACE,
-        BREAK_LINE_BLOCK,
-        BREAK_LINE,
-        RESET_LINE,
-        INDENT,
-        SCOPE_ENTER,
-        SCOPE_EXIT
-    }
-
     public interface FormattingProcess {
         void start() throws OperationNotSupportedException;
         void insertSpace();

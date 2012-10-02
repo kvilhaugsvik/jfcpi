@@ -46,13 +46,13 @@ public class TypedCodeTest {
 
     @Test public void breakLineBlock() {
         CodeStyleBuilder<ScopeInfo> builder =
-                new CodeStyleBuilder<ScopeInfo>(CodeStyle.Action.INSERT_SPACE,
+                new CodeStyleBuilder<ScopeInfo>(CodeStyleBuilder.<ScopeInfo>INSERT_SPACE(),
                         ScopeInfo.class);
 
-        builder.whenBetween(HasAtoms.EOL, HasAtoms.CCommentStart, CodeStyle.Action.BREAK_LINE_BLOCK);
-        builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE);
-        builder.whenBefore(HasAtoms.EOL, CodeStyle.Action.DO_NOTHING);
-        builder.atTheBeginning(CodeStyle.Action.DO_NOTHING);
+        builder.whenBetween(HasAtoms.EOL, HasAtoms.CCommentStart, builder.BREAK_LINE_BLOCK);
+        builder.whenAfter(HasAtoms.EOL, builder.BREAK_LINE);
+        builder.whenBefore(HasAtoms.EOL, builder.DO_NOTHING);
+        builder.atTheBeginning(builder.DO_NOTHING);
 
         CodeAtoms toRunOn = new CodeAtoms();
         toRunOn.add(new CodeAtom("A"));
@@ -74,22 +74,22 @@ public class TypedCodeTest {
 
     @Test public void breakLineGroupedBlock() {
         CodeStyleBuilder<ScopeInfo> builder =
-                new CodeStyleBuilder<ScopeInfo>(CodeStyle.Action.INSERT_SPACE,
+                new CodeStyleBuilder<ScopeInfo>(CodeStyleBuilder.<ScopeInfo>INSERT_SPACE(),
                         ScopeInfo.class);
 
-        builder.whenBetween(HasAtoms.EOL, HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
-        builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE, new Util.OneCondition<ScopeInfo>() {
+        builder.whenBetween(HasAtoms.EOL, HasAtoms.RSC, builder.BREAK_LINE);
+        builder.whenAfter(HasAtoms.EOL, builder.BREAK_LINE, new Util.OneCondition<ScopeInfo>() {
             @Override
             public boolean isTrueFor(ScopeInfo argument) {
                 return CodeStyle.GROUP.equals(argument.seeTopHint());
             }
         });
-        builder.whenAfter(HasAtoms.EOL, CodeStyle.Action.BREAK_LINE_BLOCK);
-        builder.whenAfter(HasAtoms.LSC, CodeStyle.Action.BREAK_LINE);
-        builder.whenAfter(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
-        builder.whenBefore(HasAtoms.RSC, CodeStyle.Action.BREAK_LINE);
-        builder.whenBefore(HasAtoms.EOL, CodeStyle.Action.DO_NOTHING);
-        builder.atTheBeginning(CodeStyle.Action.DO_NOTHING);
+        builder.whenAfter(HasAtoms.EOL, builder.BREAK_LINE_BLOCK);
+        builder.whenAfter(HasAtoms.LSC, builder.BREAK_LINE);
+        builder.whenAfter(HasAtoms.RSC, builder.BREAK_LINE);
+        builder.whenBefore(HasAtoms.RSC, builder.BREAK_LINE);
+        builder.whenBefore(HasAtoms.EOL, builder.DO_NOTHING);
+        builder.atTheBeginning(builder.DO_NOTHING);
 
         Block haveStatementGroup = new Block();
         Var i = Var.local("int", "i", null);

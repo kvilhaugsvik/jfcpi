@@ -29,37 +29,14 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     private final Class<ScopeInfoKind> scopeMaker;
     private final FormattingRule<ScopeInfoKind> stdIns;
 
-    public CodeStyleBuilder(final CodeStyle.Action standard, Class<ScopeInfoKind> scopeMaker) {
+    public CodeStyleBuilder(final Triggered<ScopeInfoKind> standard, Class<ScopeInfoKind> scopeMaker) {
         triggers = new LinkedList<FormattingRule<ScopeInfoKind>>();
         this.scopeMaker = scopeMaker;
         this.stdIns = new FormattingRule<ScopeInfoKind>(Collections.<Util.OneCondition<ScopeInfoKind>>emptyList(),
                 EnumSet.<DependsOn>noneOf(DependsOn.class),
-                Arrays.asList(action2Triggered(standard)));
+                Arrays.asList(standard));
 
         this.many = new LinkedList<FormattingRule<ScopeInfoKind>>();
-    }
-
-    public Triggered<ScopeInfoKind> action2Triggered(final CodeStyle.Action action) {
-        switch (action) {
-            case INSERT_SPACE:
-                return INSERT_SPACE;
-            case BREAK_LINE_BLOCK:
-                return BREAK_LINE_BLOCK;
-            case BREAK_LINE:
-                return BREAK_LINE;
-            case DO_NOTHING:
-                return DO_NOTHING;
-            case SCOPE_ENTER:
-                return SCOPE_ENTER;
-            case SCOPE_EXIT:
-                return SCOPE_EXIT;
-            case RESET_LINE:
-                return RESET_LINE;
-            case INDENT:
-                return INDENT;
-            default:
-                throw new UnsupportedOperationException(action + " unknown.");
-        }
     }
 
     public void alwaysWhen(List<Util.OneCondition<ScopeInfoKind>> isTrue, EnumSet<DependsOn> deps,
@@ -67,9 +44,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         many.add(new FormattingRule<ScopeInfoKind>(isTrue, deps, actions));
     }
 
-    public void alwaysBefore(CodeAtom atom, CodeStyle.Action change) {
+    public void alwaysBefore(CodeAtom atom, Triggered<ScopeInfoKind> change) {
         alwaysWhen(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(condRightIs(atom)), EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
-                Arrays.<Triggered<ScopeInfoKind>>asList(action2Triggered(change)));
+                Arrays.<Triggered<ScopeInfoKind>>asList(change));
     }
 
     public void whenFirst(List<Util.OneCondition<ScopeInfoKind>> isTrue, EnumSet<DependsOn> deps,
@@ -77,41 +54,41 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         triggers.add(new FormattingRule<ScopeInfoKind>(isTrue, deps, actions));
     }
 
-    public void whenAfter(final CodeAtom atom, CodeStyle.Action toDo) {
+    public void whenAfter(final CodeAtom atom, Triggered<ScopeInfoKind> toDo) {
         whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(condLeftIs(atom)),
                 EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
-                Arrays.<Triggered<ScopeInfoKind>>asList(action2Triggered(toDo)));
+                Arrays.<Triggered<ScopeInfoKind>>asList(toDo));
     }
 
-    public void whenAfter(final CodeAtom atom, CodeStyle.Action toDo, Util.OneCondition<ScopeInfoKind> scopeCond) {
+    public void whenAfter(final CodeAtom atom, Triggered<ScopeInfoKind> toDo, Util.OneCondition<ScopeInfoKind> scopeCond) {
         whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(scopeCond, condLeftIs(atom)),
                 EnumSet.<DependsOn>of(DependsOn.LEFT_TOKEN),
-                Arrays.<Triggered<ScopeInfoKind>>asList(action2Triggered(toDo)));
+                Arrays.<Triggered<ScopeInfoKind>>asList(toDo));
     }
 
-    public void whenBefore(final CodeAtom atom, CodeStyle.Action toInsert) {
+    public void whenBefore(final CodeAtom atom, Triggered<ScopeInfoKind> toInsert) {
         whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(condRightIs(atom)),
                 EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
-                Arrays.<Triggered<ScopeInfoKind>>asList(action2Triggered(toInsert)));
+                Arrays.<Triggered<ScopeInfoKind>>asList(toInsert));
     }
 
-    public void whenBefore(final Class<? extends CodeAtom> kind, CodeStyle.Action toDo,
+    public void whenBefore(final Class<? extends CodeAtom> kind, Triggered<ScopeInfoKind> toDo,
                            Util.OneCondition<ScopeInfoKind> scopeCond) {
         whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(condRightIs(kind), scopeCond),
                 EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN),
-                Arrays.<Triggered<ScopeInfoKind>>asList(action2Triggered(toDo)));
+                Arrays.<Triggered<ScopeInfoKind>>asList(toDo));
     }
 
-    public void whenBetween(final CodeAtom before, final CodeAtom after, CodeStyle.Action toInsert) {
+    public void whenBetween(final CodeAtom before, final CodeAtom after, Triggered<ScopeInfoKind> toInsert) {
         whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(condLeftIs(before), condRightIs(after)),
                 EnumSet.<DependsOn>of(DependsOn.RIGHT_TOKEN, DependsOn.LEFT_TOKEN),
-                Arrays.<Triggered<ScopeInfoKind>>asList(action2Triggered(toInsert)));
+                Arrays.<Triggered<ScopeInfoKind>>asList(toInsert));
     }
 
-    public void atTheBeginning(CodeStyle.Action toInsert) {
+    public void atTheBeginning(Triggered<ScopeInfoKind> toInsert) {
         whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(condAtTheBeginning()),
                 EnumSet.<DependsOn>noneOf(DependsOn.class),
-                Arrays.<Triggered<ScopeInfoKind>>asList(action2Triggered(toInsert)));
+                Arrays.<Triggered<ScopeInfoKind>>asList(toInsert));
     }
 
     public Util.OneCondition<ScopeInfoKind> condAtTheBeginning() {
@@ -177,13 +154,21 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         };
     }
 
+    public static <ScopeInfoKind extends ScopeInfo> Triggered<ScopeInfoKind> INSERT_SPACE() {
+        return new Triggered<ScopeInfoKind>() {
+            @Override
+            public void run(ScopeInfoKind context) {
+                context.getRunningFormatting().insertSpace();
+            }
+        };
+    }
+
     public Triggered<ScopeInfoKind> INSERT_SPACE = new Triggered<ScopeInfoKind>() {
         @Override
         public void run(ScopeInfoKind context) {
             context.getRunningFormatting().insertSpace();
         }
     };
-
     public Triggered<ScopeInfoKind> BREAK_LINE_BLOCK = new Triggered<ScopeInfoKind>() {
         @Override
         public void run(ScopeInfoKind context) {
