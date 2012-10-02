@@ -40,36 +40,26 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     }
 
     public Triggered<ScopeInfoKind> action2Triggered(final CodeStyle.Action action) {
-        return new Triggered<ScopeInfoKind>() {
-            @Override
-            public void run(ScopeInfoKind context) {
-                switch (action) {
-                    case INSERT_SPACE:
-                        context.getRunningFormatting().insertSpace();
-                        break;
-                    case BREAK_LINE_BLOCK:
-                        context.getRunningFormatting().breakLineBlock();
-                        break;
-                    case BREAK_LINE:
-                        context.getRunningFormatting().breakLine();
-                        break;
-                    case DO_NOTHING:
-                        break;
-                    case SCOPE_ENTER:
-                        context.getRunningFormatting().scopeEnter();
-                        break;
-                    case SCOPE_EXIT:
-                        context.getRunningFormatting().scopeExit();
-                        break;
-                    case RESET_LINE:
-                        context.getRunningFormatting().scopeReset();
-                        break;
-                    case INDENT:
-                        context.getRunningFormatting().indent();
-                        break;
-                }
-            }
-        };
+        switch (action) {
+            case INSERT_SPACE:
+                return INSERT_SPACE;
+            case BREAK_LINE_BLOCK:
+                return BREAK_LINE_BLOCK;
+            case BREAK_LINE:
+                return BREAK_LINE;
+            case DO_NOTHING:
+                return DO_NOTHING;
+            case SCOPE_ENTER:
+                return SCOPE_ENTER;
+            case SCOPE_EXIT:
+                return SCOPE_EXIT;
+            case RESET_LINE:
+                return RESET_LINE;
+            case INDENT:
+                return INDENT;
+            default:
+                throw new UnsupportedOperationException(action + " unknown.");
+        }
     }
 
     public void alwaysWhen(List<Util.OneCondition<ScopeInfoKind>> isTrue, EnumSet<DependsOn> deps,
@@ -186,6 +176,55 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             }
         };
     }
+
+    public Triggered<ScopeInfoKind> INSERT_SPACE = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+            context.getRunningFormatting().insertSpace();
+        }
+    };
+
+    public Triggered<ScopeInfoKind> BREAK_LINE_BLOCK = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+            context.getRunningFormatting().breakLineBlock();
+        }
+    };
+    public Triggered<ScopeInfoKind> BREAK_LINE = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+            context.getRunningFormatting().breakLine();
+        }
+    };
+    public Triggered<ScopeInfoKind> DO_NOTHING = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+        }
+    };
+    public Triggered<ScopeInfoKind> SCOPE_ENTER = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+            context.getRunningFormatting().scopeEnter();
+        }
+    };
+    public Triggered<ScopeInfoKind> SCOPE_EXIT = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+            context.getRunningFormatting().scopeExit();
+        }
+    };
+    public Triggered<ScopeInfoKind> RESET_LINE = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+            context.getRunningFormatting().scopeReset();
+        }
+    };
+    public Triggered<ScopeInfoKind> INDENT = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+            context.getRunningFormatting().indent();
+        }
+    };
 
     public CodeStyle getStyle() {
         return new CodeStyle() {
