@@ -45,9 +45,9 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     }
 
     public void alwaysWhen(Util.OneCondition<ScopeInfoKind> isTrue, EnumSet<DependsOn> deps,
-                           Triggered<ScopeInfoKind> action) {
+                           Triggered<ScopeInfoKind>... actions) {
         alwaysWhen(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(isTrue), deps,
-                Arrays.<Triggered<ScopeInfoKind>>asList(action));
+                Arrays.<Triggered<ScopeInfoKind>>asList(actions));
     }
 
     public void whenFirst(List<Util.OneCondition<ScopeInfoKind>> isTrue, EnumSet<DependsOn> deps,
@@ -56,19 +56,29 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     }
 
     public void whenFirst(Util.OneCondition<ScopeInfoKind> isTrue, EnumSet<DependsOn> deps,
-                          Triggered<ScopeInfoKind> action) {
+                          Triggered<ScopeInfoKind>... actions) {
         whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(isTrue),
                 deps,
-                Arrays.<Triggered<ScopeInfoKind>>asList(action));
+                Arrays.<Triggered<ScopeInfoKind>>asList(actions));
     }
 
     public void whenFirst(Util.OneCondition<ScopeInfoKind> cond1,
                           Util.OneCondition<ScopeInfoKind> cond2,
                           EnumSet<DependsOn> deps,
-                          Triggered<ScopeInfoKind> action) {
+                          Triggered<ScopeInfoKind>... actions) {
         whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(cond1, cond2),
                 deps,
-                Arrays.<Triggered<ScopeInfoKind>>asList(action));
+                Arrays.<Triggered<ScopeInfoKind>>asList(actions));
+    }
+
+    public void whenFirst(Util.OneCondition<ScopeInfoKind> cond1,
+                          Util.OneCondition<ScopeInfoKind> cond2,
+                          Util.OneCondition<ScopeInfoKind> cond3,
+                          EnumSet<DependsOn> deps,
+                          Triggered<ScopeInfoKind>... actions) {
+        whenFirst(Arrays.<Util.OneCondition<ScopeInfoKind>>asList(cond1, cond2, cond3),
+                deps,
+                Arrays.<Triggered<ScopeInfoKind>>asList(actions));
     }
 
     public Util.OneCondition<ScopeInfoKind> condAtTheBeginning() {
