@@ -53,15 +53,6 @@ public class NetworkIO implements IDependency {
         };
     }
 
-    public Block getRead(String argument, Typed<AValue> pre, Typed<AValue> post) {
-        Block out = new Block();
-        if (null != pre) out.addStatement(pre);
-        out.addStatement(BuiltIn.<AValue>toCode("byte[] innBuffer = new byte[" + argument + "]"));
-        out.addStatement(BuiltIn.<AValue>toCode("from.readFully(innBuffer)"));
-        if (null != post) out.addStatement(post);
-        return out;
-    }
-
     public final ExprFrom1<Typed<AnInt>, Var> getRead() {
         return readNoArgs;
     }
