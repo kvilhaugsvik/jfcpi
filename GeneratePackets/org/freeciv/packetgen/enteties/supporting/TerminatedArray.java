@@ -146,7 +146,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         Block fromJavaTyped = new Block();
                         Typed<AnInt> maxArraySizeRef = maxArraySizeVar(maxArraySize, fullArraySizeLocation);
                         fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(maxArraySizeRef,
-                                transferArraySize, numberOfElements, pValue)));
+                                transferArraySize, null == numberOfElements ? null : numberOfElements.x(pValue))));
                         if (null != maxArraySizeRef) {
                             fromJavaTyped.addStatement(arrayEaterScopeCheck(testIfSizeIsWrong.x(fMaxSize.ref(),
                                     numberOfElements.x(pValue))));
@@ -175,7 +175,7 @@ public class TerminatedArray extends FieldTypeBasic {
 
                         Typed<AnInt> maxArraySizeRef = maxArraySizeVar(maxArraySize, fullArraySizeLocation);
                         out.addStatement(fMaxSize.assign(setFMaxSize(maxArraySizeRef,
-                                transferArraySize, readBeforeElements, from)));
+                                transferArraySize, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from))));
 
                         if (validationPossible(transferArraySize, maxArraySize))
                             out.addStatement(Hardcoded.arrayEaterScopeCheck(
@@ -202,7 +202,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     public Block x(Var val, Var to) {
                         Block out = new Block();
                         if (TransferArraySize.SERIALIZED.equals(transferArraySize))
-                            out.addStatement(writeBeforeElements.x(val, to));
+                            out.addStatement(to.call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
                         if (null == convertAllElementsToByteArray) {
                             Var element = Var.param(buffertype.getOf(), "element");
                             out.addStatement(FOR(element, val.ref(), writeElementTo.x(to, element)));
@@ -258,14 +258,14 @@ public class TerminatedArray extends FieldTypeBasic {
     }
 
     private static Typed<AnInt> setFMaxSize(Typed<AnInt> maxArraySizeRef, TransferArraySize transferArraySize,
-                                            ExprFrom1<Typed<AnInt>, Var> numberOfElements, Var dataStreamOrJavaTyped) {
+                                            Typed<AnInt> numberOfElements) {
         switch (transferArraySize) {
             case MAX_ARRAY_SIZE:
                 return maxArraySizeRef;
             case CONSTRUCTOR_PARAM:
                 return pFullMaxSize.ref();
             case SERIALIZED:
-                return numberOfElements.x(dataStreamOrJavaTyped);
+                return numberOfElements;
             default:
                 throw new UnsupportedOperationException("Source of transfer array size is not known");
         }
