@@ -274,12 +274,12 @@ public class BuiltIn {
         };
     }
 
-    public static Typed<? extends AValue> cast(final Class newType, final Typed<? extends AValue> val) {
+    public static <Ret extends AValue> Typed<Ret> cast(final Class newType, final Typed<? extends AValue> val) {
         return cast(new TargetClass(newType), val);
     }
 
-    public static Typed<? extends AValue> cast(final TargetClass newType, final Typed<? extends AValue> val) {
-        return new Typed<AValue>() {
+    public static <Ret extends AValue> Typed<Ret> cast(final TargetClass newType, final Typed<? extends AValue> val) {
+        return new Typed<Ret>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(LPR);
