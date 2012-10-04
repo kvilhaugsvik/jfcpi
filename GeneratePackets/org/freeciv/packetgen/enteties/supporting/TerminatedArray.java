@@ -151,7 +151,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                 WHILE(noTerminatorFound,
                                         new Block(arraySetElement(buf, pos.ref(), current.ref()),
                                                 inc(pos),
-                                                IF(isSmallerThan(pos.ref(), fMaxSize.ref()),
+                                                IF(isSmallerThan(pos.ref(), buf.<AnInt>read("length")),
                                                         new Block(current.assign(readElementFrom.x(from))),
                                                         new Block(BuiltIn.<NoValue>toCode("break"))))));
                         out.addStatement(to.assign(convertByteArrayToAllElements.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
