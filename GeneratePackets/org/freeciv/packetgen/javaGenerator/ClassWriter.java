@@ -475,6 +475,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenFirst(maker.condLeftIs(HasAtoms.MUL), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.DIV), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condRightIs(HasAtoms.INC), DependsOn.token_right, maker.DO_NOTHING);
+        maker.whenFirst(maker.condLeftIs(HasAtoms.ASSIGN), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condRightIs(HasAtoms.LPR), DependsOn.token_right, maker.DO_NOTHING);
         maker.whenFirst(maker.condLeftIs(HasAtoms.LPR), DependsOn.token_left, maker.DO_NOTHING);
         maker.whenFirst(maker.condRightIs(HasAtoms.ARRAY_ACCESS_START), DependsOn.token_right, maker.DO_NOTHING);
