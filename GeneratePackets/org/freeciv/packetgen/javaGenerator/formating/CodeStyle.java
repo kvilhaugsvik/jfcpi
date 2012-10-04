@@ -46,6 +46,7 @@ public interface CodeStyle {
         private final FormattingProcess process;
         private final Constructor<Scope> kind;
         private final LinkedList<Scope> stack;
+        private final LinkedList<String> hints;
         private IR leftToken = null;
         private IR rightToken = null;
 
@@ -56,6 +57,7 @@ public interface CodeStyle {
                     int.class, int.class, String.class);
             this.stack = new LinkedList<Scope>();
             this.process = process;
+            hints = new LinkedList<String>();
             addNewScopeFrame(beganAt, beganAtLine, lineUpToScope);
         }
 
@@ -99,12 +101,12 @@ public interface CodeStyle {
             private final int beganAt;
             private final int beganAtLine;
             private final String lineUpToScope;
+            private final int hintsBefore;
 
             private int nowAt = 0;
             private int lineLength = 0;
 
             private int extraIndent = 0;
-            private final LinkedList<String> hints = new LinkedList<String>();
             private final FormattingProcess runningFormatting;
 
             public ScopeInfo(FormattingProcess runningFormatting, ScopeStack inStack,
@@ -114,6 +116,7 @@ public interface CodeStyle {
                 this.beganAtLine = beganAtLine;
                 this.lineUpToScope = lineUpToScope;
                 this.runningFormatting = runningFormatting;
+                this.hintsBefore = inStack.hints.size();
             }
 
             public int getLineLength() {
@@ -137,25 +140,26 @@ public interface CodeStyle {
             }
 
             final public String seeTopHint() {
-                return hints.peekFirst();
+                return inStack.hints.peekFirst();
             }
 
             final void addHint(String hint) {
-                hints.addFirst(hint);
+                inStack.hints.addFirst(hint);
             }
 
             final void removeTopHint(String hint) {
-                if (hints.isEmpty())
+                if (inStack.hints.isEmpty())
                     throw new UnsupportedOperationException("Tried to remove the top hint when no hints are there");
 
-                if (hints.peekFirst().equals(hint))
-                    hints.removeFirst();
+                if (inStack.hints.peekFirst().equals(hint))
+                    inStack.hints.removeFirst();
                 else
                     throw new IllegalArgumentException("Asked to remove a different hint than the top one");
             }
 
             final void resetHints() {
-                hints.clear();
+                while (hintsBefore < inStack.hints.size())
+                    inStack.hints.removeFirst();
             }
 
             public int getExtraIndent() {
