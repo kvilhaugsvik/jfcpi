@@ -292,17 +292,45 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenFirst(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return null == argument.seeTopHint();
+                return !CodeStyle.GROUP.equals(argument.seeTopHint());
             }
         }, maker.condLeftIs(HasAtoms.RSC), DependsOn.token_left, maker.BREAK_LINE_BLOCK);
         maker.whenFirst(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return null == argument.seeTopHint();
+                return !CodeStyle.GROUP.equals(argument.seeTopHint());
             }
         }, maker.condLeftIs(HasAtoms.EOL), DependsOn.token_left, maker.BREAK_LINE_BLOCK);
         maker.whenFirst(maker.condTopHintIs(CodeStyle.OUTER_LEVEL), maker.condLeftIs(HasAtoms.EOL),
                 DependsOn.token_left, maker.BREAK_LINE_BLOCK);
+        maker.whenFirst(
+                maker.condRightIs(Annotate.Atom.class),
+                maker.condLeftIs(Comment.Word.class),
+                new Util.OneCondition<DefaultStyleScopeInfo>() {
+                    @Override
+                    public boolean isTrueFor(DefaultStyleScopeInfo context) {
+                        return context.getLineBreakTry() <= 2;
+                    }
+                },
+                DependsOn.token_both,
+                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                    @Override
+                    public void run(DefaultStyleScopeInfo context) {
+                        context.lineBreakTry = 3;
+                        context.getRunningFormatting().scopeReset();
+                    }
+                });
+        maker.whenFirst(
+                maker.condRightIs(Annotate.Atom.class),
+                maker.condLeftIs(Comment.Word.class),
+                DependsOn.token_both,
+                maker.BREAK_LINE,
+                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
+                    @Override
+                    public void run(DefaultStyleScopeInfo context) {
+                        context.getRunningFormatting().insertStar();
+                    }
+                });
         maker.whenFirst(maker.condRightIs(Annotate.Atom.class), maker.condTopHintIs(CodeStyle.OUTER_LEVEL),
                 DependsOn.token_right, maker.BREAK_LINE);
         maker.whenFirst(maker.condRightIs(Visibility.Atom.class), maker.condTopHintIs(CodeStyle.OUTER_LEVEL),
@@ -360,34 +388,6 @@ public class ClassWriter extends Formatted implements HasAtoms {
                     }
                 },
                 DependsOn.token_left,
-                maker.BREAK_LINE,
-                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
-                    @Override
-                    public void run(DefaultStyleScopeInfo context) {
-                        context.getRunningFormatting().insertStar();
-                    }
-                });
-        maker.whenFirst(
-                maker.condRightIs(Annotate.Atom.class),
-                maker.condLeftIs(Comment.Word.class),
-                new Util.OneCondition<DefaultStyleScopeInfo>() {
-                    @Override
-                    public boolean isTrueFor(DefaultStyleScopeInfo context) {
-                        return context.getLineBreakTry() <= 2;
-                    }
-                },
-                DependsOn.token_both,
-                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
-                    @Override
-                    public void run(DefaultStyleScopeInfo context) {
-                        context.lineBreakTry = 3;
-                        context.getRunningFormatting().scopeReset();
-                    }
-                });
-        maker.whenFirst(
-                maker.condRightIs(Annotate.Atom.class),
-                maker.condLeftIs(Comment.Word.class),
-                DependsOn.token_both,
                 maker.BREAK_LINE,
                 new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
                     @Override
@@ -480,12 +480,8 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenFirst(maker.condRightIs(HasAtoms.ARRAY_ACCESS_START), DependsOn.token_right, maker.DO_NOTHING);
         maker.whenFirst(maker.condLeftIs(HasAtoms.ARRAY_ACCESS_START), DependsOn.token_left, maker.DO_NOTHING);
         maker.whenFirst(maker.condRightIs(HasAtoms.ARRAY_ACCESS_END), DependsOn.token_right, maker.DO_NOTHING);
-        maker.whenFirst(new Util.OneCondition<DefaultStyleScopeInfo>() {
-            @Override
-            public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return null == argument.seeTopHint();
-            }
-        }, maker.condLeftIs(HasAtoms.CCommentEnd), DependsOn.token_left, maker.BREAK_LINE);
+        maker.whenFirst(maker.condTopHintIs(CodeStyle.OUTER_LEVEL), maker.condLeftIs(HasAtoms.CCommentEnd),
+                DependsOn.token_left, maker.BREAK_LINE);
         maker.whenFirst(maker.condRightIs(HasAtoms.OR), DependsOn.token_right, maker.DO_NOTHING);
         maker.whenFirst(maker.condRightIs(HasAtoms.AND), DependsOn.token_right, maker.DO_NOTHING);
 

@@ -26,6 +26,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.junit.Test;
 
 import java.io.DataInput;
@@ -43,24 +44,48 @@ public class CodeGenTest {
     private static final String generatorname = ",\n\tvalue = \"org.freeciv.packetgen.javaGenerator.ClassWriter\")";
 
     @Test public void testMethodEverything() {
-        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Arrays.asList(Var.param(String.class, "a")),
                 Arrays.asList(new TargetClass(Throwable.class)),
-                new Block(RETURN(literal(5))))).toString();
+                new Block(RETURN(literal(5)))));
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
-                "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
-                "\t" + "\t" + "return 5;\n" +
-                "\t" + "}" + "\n",
+                        "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
+                        "\t" + "\t" + "return 5;\n" +
+                        "\t" + "}" + "\n",
                 result);
     }
 
+    private String toStringAsIfInAClass(Method toSurround) {
+        CodeAtoms result = new CodeAtoms();
+        result.hintStart(CodeStyle.OUTER_LEVEL);
+        toSurround.writeAtoms(result);
+        result.hintEnd(CodeStyle.OUTER_LEVEL);
+
+        String start = "\t";
+
+        List<String> lines = ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(result);
+        if (0 == lines.size())
+            return "";
+        StringBuilder out = new StringBuilder(start);
+        out.append(lines.get(0));
+        for (int i = 1; i < lines.size(); i++) {
+            out.append("\n");
+            String line = lines.get(i);
+            if (!"".equals(line)) {
+                out.append(start);
+                out.append(line);
+            }
+        }
+        return out.toString() + "\n";
+    }
+
     @Test public void testMethodNoComment() {
-        String result = (Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS,
+        String result = toStringAsIfInAClass(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Arrays.asList(Var.param(String.class, "a")),
                 Arrays.asList(new TargetClass(Throwable.class)),
-                new Block(RETURN(literal(5))))).toString();
+                new Block(RETURN(literal(5)))));
 
         assertEquals("Generated source not as expected",
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
@@ -70,9 +95,9 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodNoParams() {
-        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Collections.<Var<AValue>>emptyList(),
-                Arrays.<TargetClass>asList(new TargetClass("Throwable")), new Block(RETURN(literal(5))))).toString();
+                Arrays.<TargetClass>asList(new TargetClass("Throwable")), new Block(RETURN(literal(5)))));
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
@@ -83,14 +108,14 @@ public class CodeGenTest {
     }
 
     @Test public void testMethodManyLevelsOfIndention() {
-        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass("int"), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(),
                 new Block(WHILE(TRUE,
                         new Block(WHILE(TRUE,
                                 new Block(WHILE(TRUE,
                                         new Block(WHILE(TRUE,
-                                                new Block(RETURN(literal(5))))))))))))).toString();
+                                                new Block(RETURN(literal(5)))))))))))));
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
@@ -174,9 +199,9 @@ public class CodeGenTest {
         isSeparated.addStatement(BuiltIn.<AValue>toCode("int a = 5"));
         isSeparated.groupBoundary();
         isSeparated.addStatement(BuiltIn.<AValue>toCode("return a"));
-        String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
+        String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
                 new TargetClass(int.class), "testMethod", Arrays.asList(Var.param(String.class, "a")),
-                Arrays.asList(new TargetClass(Throwable.class)), isSeparated)).toString();
+                Arrays.asList(new TargetClass(Throwable.class)), isSeparated));
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
@@ -527,14 +552,15 @@ public class CodeGenTest {
                                 BuiltIn.<AValue>toCode("headerLen"),
                                 literal(" Packet: "),
                                 BuiltIn.<AValue>toCode("getEncodedSize()")))))));
-        String result = Method.newPublicConstructorWithException(Comment.doc("Construct an object from a DataInput", "",
-                Comment.param(pFrom, "data stream that is at the start of the package body"),
-                Comment.param(pHeaderLen, "length from header package"),
-                Comment.param(pPacket, "the number of the packet specified in the header"),
-                Comment.docThrows(new TargetClass("IOException"), "if the DataInput has a problem")),
-                "PACKET_CITY_NAME_SUGGESTION_REQ", Arrays.asList(pFrom, pHeaderLen, pPacket),
-                Arrays.asList(ioe),
-                body).toString();
+        String result = toStringAsIfInAClass(
+                Method.newPublicConstructorWithException(Comment.doc("Construct an object from a DataInput", "",
+                        Comment.param(pFrom, "data stream that is at the start of the package body"),
+                        Comment.param(pHeaderLen, "length from header package"),
+                        Comment.param(pPacket, "the number of the packet specified in the header"),
+                        Comment.docThrows(new TargetClass("IOException"), "if the DataInput has a problem")),
+                        "PACKET_CITY_NAME_SUGGESTION_REQ", Arrays.asList(pFrom, pHeaderLen, pPacket),
+                        Arrays.asList(ioe),
+                        body));
 
         assertEquals("Generated source not as expected",
                 "\t" + "/**" + "\n" +
