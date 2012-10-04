@@ -215,13 +215,13 @@ public class Hardcoded {
                             return value.read("getBytes().length");
                         }
                     }),
-            new TerminatedArray("tech_list", "int",
-                                new Requirement("A_LAST", Requirement.Kind.VALUE)),
-            new TerminatedArray("unit_list", "int",
-                                new Requirement("U_LAST", Requirement.Kind.VALUE)),
-            new TerminatedArray("building_list", "int",
-                                new Requirement("B_LAST", Requirement.Kind.VALUE)),
-            new TerminatedArray("memory", "unsigned char"),
+            TerminatedArray.maxSizedTerminated("tech_list", "int",
+                    new Requirement("A_LAST", Requirement.Kind.VALUE)),
+            TerminatedArray.maxSizedTerminated("unit_list", "int",
+                    new Requirement("U_LAST", Requirement.Kind.VALUE)),
+            TerminatedArray.maxSizedTerminated("building_list", "int",
+                    new Requirement("B_LAST", Requirement.Kind.VALUE)),
+            TerminatedArray.xBytes("memory", "unsigned char"),
             new FieldTypeBasic("bool8", "bool",  new TargetClass(Boolean.class),
                     new ExprFrom1<Block, Var>() {
                         @Override

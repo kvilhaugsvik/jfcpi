@@ -84,39 +84,6 @@ public class TerminatedArray extends FieldTypeBasic {
                 }
             };
 
-    public TerminatedArray(String dataIOType, String publicType) {
-        this(dataIOType, publicType, byteArray, null,
-                MaxArraySize.CONSTRUCTOR_PARAM,
-                TransferArraySize.CONSTRUCTOR_PARAM,
-                byteArray,
-                arrayLen,
-                neverAnythingAfter,
-                lenShouldBeEqual,
-                fullIsByteArray,
-                byteArrayIsFull,
-                elemIsByteArray,
-                readByte,
-                TO_STRING_ARRAY,
-                Collections.<Requirement>emptySet(),
-                null,
-                null,
-                arrayLen);
-    };
-
-    public TerminatedArray(String dataIOType, String publicType, final Requirement terminator) {
-        this(dataIOType, publicType, byteArray, terminator,
-                MaxArraySize.CONSTRUCTOR_PARAM,
-                TransferArraySize.CONSTRUCTOR_PARAM,
-                byteArray,
-                arrayLen, addAfterIfSmallerThanMaxSize, wrongSizeIfToBig,
-                fullIsByteArray, byteArrayIsFull, elemIsByteArray, readByte,
-                TO_STRING_ARRAY,
-                Arrays.asList(terminator),
-                null,
-                null,
-                arrayLen);
-    }
-
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
                            final Requirement terminator,
                            final MaxArraySize maxArraySize,
@@ -277,6 +244,39 @@ public class TerminatedArray extends FieldTypeBasic {
             super(name);
             addObjectConstant("int", "maxArraySize");
         }
+    }
+
+    public static TerminatedArray xBytes(String dataIOType, String publicType) {
+        return new TerminatedArray(dataIOType, publicType, byteArray, null,
+                        MaxArraySize.CONSTRUCTOR_PARAM,
+                        TransferArraySize.CONSTRUCTOR_PARAM,
+                        byteArray,
+                        arrayLen,
+                        neverAnythingAfter,
+                        lenShouldBeEqual,
+                        fullIsByteArray,
+                        byteArrayIsFull,
+                        elemIsByteArray,
+                        readByte,
+                        TO_STRING_ARRAY,
+                        Collections.<Requirement>emptySet(),
+                        null,
+                        null,
+                        arrayLen);
+    }
+
+    public static TerminatedArray maxSizedTerminated(String dataIOType, String publicType, final Requirement terminator) {
+        return new TerminatedArray(dataIOType, publicType, byteArray, terminator,
+                        MaxArraySize.CONSTRUCTOR_PARAM,
+                        TransferArraySize.CONSTRUCTOR_PARAM,
+                        byteArray,
+                        arrayLen, addAfterIfSmallerThanMaxSize, wrongSizeIfToBig,
+                        fullIsByteArray, byteArrayIsFull, elemIsByteArray, readByte,
+                        TO_STRING_ARRAY,
+                        Arrays.asList(terminator),
+                        null,
+                        null,
+                        arrayLen);
     }
 
     public enum MaxArraySize {
