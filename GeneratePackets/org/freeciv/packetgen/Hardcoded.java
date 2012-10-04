@@ -180,7 +180,7 @@ public class Hardcoded {
                     Arrays.asList(new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
                             new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE)),
                     null,
-                    NetworkIO.witIntAsIntermediate("uint8", 1, "from.readUnsignedByte()", "writeByte"),
+                    NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var val) {
@@ -268,12 +268,12 @@ public class Hardcoded {
              * Read from and write to the network
              ************************************************************************************************/
             NetworkIO.withBytesAsIntermediate("bitvector"),
-            NetworkIO.witIntAsIntermediate("uint8", 1, "from.readUnsignedByte()", "writeByte"),
+            NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
             // to.writeByte wraps around so -128 shares encoding with 128
-            NetworkIO.witIntAsIntermediate("sint8", 1, "(int) from.readByte()", "writeByte"),
-            NetworkIO.witIntAsIntermediate("uint16", 2, "(int) from.readChar()", "writeChar"),
-            NetworkIO.witIntAsIntermediate("sint16", 2, "(int) from.readShort()", "writeShort"),
-            NetworkIO.witIntAsIntermediate("sint32", 4, "from.readInt()", "writeInt"),
+            NetworkIO.witIntAsIntermediate("sint8", 1, "readByte", false, "writeByte"),
+            NetworkIO.witIntAsIntermediate("uint16", 2, "readChar", false, "writeChar"),
+            NetworkIO.witIntAsIntermediate("sint16", 2, "readShort", false, "writeShort"),
+            NetworkIO.witIntAsIntermediate("sint32", 4, "readInt", true, "writeInt"),
 
             /************************************************************************************************
              * Built in types

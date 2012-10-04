@@ -214,7 +214,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        return new Block(to.assign(new MethodCall<AValue>(named + ".valueOf", io.getRead())));
+                        return new Block(to.assign(new MethodCall<AValue>(named + ".valueOf", io.getRead().x(from))));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {

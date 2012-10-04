@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
@@ -32,10 +33,11 @@ import java.util.Collections;
 public class NetworkIO implements IDependency {
     private final Requirement me;
     private final int size;
-    private final Typed<? extends AValue> readNoArgs;
+    private final ExprFrom1<Typed<AnInt>, Var> readNoArgs;
     private final String write;
 
-    private NetworkIO(String type, int size, String write, Requirement.Kind kind, Typed<? extends AValue> readNoArgs) {
+    private NetworkIO(String type, int size, String write, Requirement.Kind kind,
+                      final ExprFrom1<Typed<AnInt>, Var> readNoArgs) {
         this.me = new Requirement(type, kind);
         this.size = size;
         this.readNoArgs = readNoArgs;
@@ -60,7 +62,7 @@ public class NetworkIO implements IDependency {
         return out;
     }
 
-    public Typed<? extends AValue> getRead() {
+    public final ExprFrom1<Typed<AnInt>, Var> getRead() {
         return readNoArgs;
     }
 
@@ -82,11 +84,24 @@ public class NetworkIO implements IDependency {
      * A network reader that uses int as intermediate representation
      * @param type the IOType it should match
      * @param size expression returning the since on the wire in bytes
-     * @param read code to read an integer from a DataInput named "from"
+     * @param readFunction code to read an integer from a DataInput named "from"
+     * @param noCastNeeded does readFunction return an int?
      * @param write code to write an integer provided in braces right after to a DataOutput named "to"
      */
-    public static NetworkIO witIntAsIntermediate(String type, int size, String read, String write) {
-        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT, BuiltIn.<AnInt>toCode(read));
+    public static NetworkIO witIntAsIntermediate(String type,
+                                                 int size,
+                                                 final String readFunction, final boolean noCastNeeded,
+                                                 String write) {
+        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT,
+                new ExprFrom1<Typed<AnInt>, Var>() {
+                    @Override
+                    public Typed<AnInt> x(Var from) {
+                        Typed<AnInt> out = from.call(readFunction);
+                        if (!noCastNeeded)
+                            out = BuiltIn.<AnInt>cast(int.class, out);
+                        return out;
+                    }
+                });
     }
 
     /**
