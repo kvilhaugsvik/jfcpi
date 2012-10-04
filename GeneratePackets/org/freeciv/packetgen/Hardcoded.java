@@ -174,7 +174,9 @@ public class Hardcoded {
                         public Typed<AnInt> x(Var val) {
                             return multiply(literal(2), val.read("length"));
                         }
-                    }),
+                    },
+                    TerminatedArray.sameNumberOfBufferElementsAndValueElements
+            ),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
@@ -214,7 +216,9 @@ public class Hardcoded {
                         public Typed<AnInt> x(Var value) {
                             return value.read("getBytes().length");
                         }
-                    }),
+                    },
+                    TerminatedArray.sameNumberOfBufferElementsAndValueElements
+            ),
             TerminatedArray.maxSizedTerminated("tech_list", "int",
                     new Requirement("A_LAST", Requirement.Kind.VALUE)),
             TerminatedArray.maxSizedTerminated("unit_list", "int",

@@ -83,6 +83,13 @@ public class TerminatedArray extends FieldTypeBasic {
                     return isSmallerThan(max, size);
                 }
             };
+    public static final ExprFrom1<Typed<AnInt>, Typed<AnInt>> sameNumberOfBufferElementsAndValueElements =
+                                new ExprFrom1<Typed<AnInt>, Typed<AnInt>>() {
+                                    @Override
+                                    public Typed<AnInt> x(Typed<AnInt> maxElements) {
+                                        return maxElements;
+                                    }
+                                };
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
                            final Requirement terminator,
@@ -100,7 +107,8 @@ public class TerminatedArray extends FieldTypeBasic {
                            final Collection<Requirement> uses,
                            final Typed<AnInt> fullArraySizeLocation,
                            final NetworkIO transferSizeSerialize,
-                           final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen) {
+                           final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen,
+                           final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements) {
         super(dataIOType, publicType, javaType,
                 new ExprFrom1<Block, Var>() {
                     @Override
@@ -125,7 +133,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Block x(Var to, Var from) {
                         Var buf = Var.local(buffertype, "buffer",
-                                buffertype.newInstance(fMaxSize.ref()));
+                                buffertype.newInstance(numberOfValueElementToNumberOfBufferElements.x(fMaxSize.ref())));
                         Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
                         Var pos = Var.local("int", "pos", literal(0));
 
@@ -262,7 +270,9 @@ public class TerminatedArray extends FieldTypeBasic {
                         Collections.<Requirement>emptySet(),
                         null,
                         null,
-                        arrayLen);
+                        arrayLen,
+                        sameNumberOfBufferElementsAndValueElements
+        );
     }
 
     public static TerminatedArray maxSizedTerminated(String dataIOType, String publicType, final Requirement terminator) {
@@ -276,7 +286,9 @@ public class TerminatedArray extends FieldTypeBasic {
                         Arrays.asList(terminator),
                         null,
                         null,
-                        arrayLen);
+                        arrayLen,
+                        sameNumberOfBufferElementsAndValueElements
+        );
     }
 
     public enum MaxArraySize {
