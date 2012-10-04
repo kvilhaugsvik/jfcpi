@@ -135,18 +135,6 @@ public class Hardcoded {
                     TerminatedArray.TransferArraySize.SERIALIZED,
                     new TargetArray("universal", 1, true),
                     TerminatedArray.arrayLen,
-                    new ExprFrom1<Typed<AnInt>, Var>() {
-                        @Override
-                        public Typed<AnInt> x(Var from) {
-                            return from.<AnInt>call("readUnsignedByte");
-                        }
-                    },
-                    new ExprFrom2<Typed<ABool>, Var, Var>() {
-                        @Override
-                        public Typed<ABool> x(Var val, Var to) {
-                            return to.call("writeByte", val.read("length"));
-                        }
-                    },
                     TerminatedArray.neverAnythingAfter,
                     TerminatedArray.lenShouldBeEqual,
                     null,
@@ -201,8 +189,6 @@ public class Hardcoded {
                             return value.read("getBytes().length");
                         }
                     },
-                    null,
-                    null,
                     TerminatedArray.addAfterIfSmallerThanMaxSize,
                     TerminatedArray.wrongSizeIfToBig,
                     new ExprFrom1<Typed<AValue>, Var>() {
