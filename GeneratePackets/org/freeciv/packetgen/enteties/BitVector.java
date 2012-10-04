@@ -1,9 +1,11 @@
 package org.freeciv.packetgen.enteties;
 
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
+import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
@@ -103,59 +105,80 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         return iProvide;
     }
 
+    private static Typed<AnInt> neededBytes(Typed<AnInt> value) {
+        return BuiltIn.<AnInt>sum(literal(1),
+                divide(GROUP(subtract(value, literal(1))), literal(8)));
+    }
+
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
-        final String bvName = iProvide.getName();
-        final String[] size = new String[]{"1 + (", " - 1) / 8"};
-        final String realBitVector =  bvName + ".size";
-        TargetClass javaType = getAddress().scopeKnown();
-        javaType.register(new TargetMethod("getAsByteArray"));
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), bvName, javaType,
-                new ExprFrom1<Block, Var>() {
+        final TargetClass me = super.getAddress().scopeKnown();
+        me.register(new TargetMethod("getAsByteArray"));
+        return new TerminatedArray(io.getIFulfillReq().getName(), iProvide.getName(),
+                me,
+                null,
+                knowsSize ?
+                        TerminatedArray.MaxArraySize.STORED_IN :
+                        TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
+                knowsSize ?
+                        TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE :
+                        TerminatedArray.TransferArraySize.SERIALIZED,
+                TerminatedArray.byteArray,
+                new ExprFrom1<Typed<AnInt>, Var>() {
+                            @Override
+                            public Typed<AnInt> x(Var val) {
+                                return val.read("size");
+                            }
+                        },
+                TerminatedArray.neverAnythingAfter,
+                TerminatedArray.lenShouldBeEqual,
+                new ExprFrom1<Typed<AValue>, Var>() {
                     @Override
-                    public Block x(Var arg1) {
-                        Block body = new Block(arg1.assign(BuiltIn.<AValue>toCode("value")));
-                        return body;
+                    public Typed<AValue> x(Var buffer) {
+                        return buffer.call("getAsByteArray");
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
-                    @Override
-                    public Block x(Var to, Var from) {
-                        Block body = knowsSize ?
-                                io.getRead(size[0] + realBitVector + size[1], null,
-                                        BuiltIn.<AValue>toCode("this.value = new " + getName() + "(innBuffer)")) :
-                                io.getRead(size[0] + "size" + size[1],
-                                        BuiltIn.<AValue>toCode("int size = from.readUnsignedShort()"),
-                                        BuiltIn.<AValue>toCode("this.value = new " + getName() + "(innBuffer" + ", size)"));
-                        return body;
-                    }
-                },
-                new ExprFrom2<Block, Var, Var>() {
-                    @Override
-                    public Block x(Var val, Var to) {
-                        Block out = new Block();
-                        if (!knowsSize)
-                            out.addStatement(to.call("writeShort", val.read("size")));
-                        out.addStatement(to.call(io.getWrite(), val.<AValue>call("getAsByteArray")));
-                        return out;
-                    }
-                },
-                (knowsSize ?
+                knowsSize ?
+                        new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                            @Override
+                            public Typed<AValue> x(Typed<AValue> bv) {
+                                return me.newInstance(bv);
+                            }
+                        } :
+                        new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                            @Override
+                            public Typed<AValue> x(Typed<AValue> bv) {
+                                return me.newInstance(bv, Hardcoded.pMaxSize.ref());
+                            }
+                        },
+                null,
+                TerminatedArray.readByte,
+                BuiltIn.TO_STRING_OBJECT,
+                Arrays.asList(iProvide),
+                me.<AnInt>read("size"),
+                knowsSize ?
+                        null :
+                        NetworkIO.witIntAsIntermediate("uint16", 2, "readUnsignedShort", false, "writeShort"),
+                knowsSize ?
                         new ExprFrom1<Typed<AnInt>, Var>() {
                             @Override
-                            public Typed<AnInt> x(Var value) {
-                                return BuiltIn.<AnInt>toCode(size[0] + realBitVector + size[1]);
+                            public Typed<AnInt> x(Var val) {
+                                return neededBytes(me.<AnInt>read("size"));
                             }
                         } :
                         new ExprFrom1<Typed<AnInt>, Var>() {
                             @Override
-                            public Typed<AnInt> x(Var value) {
-                                return BuiltIn.<AnInt>toCode("2 + " + size[0] + "this." + "value" + ".size" + size[1]);
+                            public Typed<AnInt> x(Var arg1) {
+                                return neededBytes(arg1.read("size"));
                             }
-                        }),
-                TO_STRING_OBJECT,
-                                  arrayEater,
-                                  Arrays.asList(iProvide));
+                        },
+                new ExprFrom1<Typed<AnInt>, Typed<AnInt>>() {
+                    @Override
+                    public Typed<AnInt> x(Typed<AnInt> val) {
+                        return neededBytes(val);
+                    }
+                }
+        );
     }
 
     @Override
