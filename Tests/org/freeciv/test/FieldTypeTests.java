@@ -118,4 +118,12 @@ public class FieldTypeTests {
     @Test public void STRING_non_ASCII_twice() throws IOException {
         testString("I dag når du hører", 100);
     }
+
+    @Test public void STRING_empty_odd() throws IOException {
+        testString("", 3);
+    }
+
+    @Test public void STRING_empty_even() throws IOException {
+        testString("", 4);
+    }
 }
