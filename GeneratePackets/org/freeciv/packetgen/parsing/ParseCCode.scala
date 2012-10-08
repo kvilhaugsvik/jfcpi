@@ -265,7 +265,7 @@ object ParseCCode extends ExtractableParser {
 
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
 
-  def constantValueDefConverted = constantValueDef ^^ {variable => new Constant(variable._1, variable._2)}
+  def constantValueDefConverted = constantValueDef ^^ {variable => Constant.isInt(variable._1, variable._2)}
 
   def exprConverted = cEnumDefConverted |
     specEnumDefConverted |

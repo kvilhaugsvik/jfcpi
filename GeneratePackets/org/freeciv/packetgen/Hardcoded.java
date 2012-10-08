@@ -273,7 +273,7 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in constants
              ************************************************************************************************/
-            new Constant("STRING_ENDER", IntExpression.integer("0"))
+            Constant.isInt("STRING_ENDER", IntExpression.integer("0"))
     );
 
     public static Typed<NoValue> arrayEaterScopeCheck(Typed<ABool> check) {

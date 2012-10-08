@@ -64,7 +64,7 @@ public class PacketsStore {
                                                                 "for packet kind field in packet header");
         }
 
-        requirements.addWanted(new Constant(Util.PACKET_NUMBER_SIZE_NAME,
+        requirements.addWanted(Constant.isInt(Util.PACKET_NUMBER_SIZE_NAME,
                                             IntExpression.integer(bytesInPacketNumber + "")));
     }
 

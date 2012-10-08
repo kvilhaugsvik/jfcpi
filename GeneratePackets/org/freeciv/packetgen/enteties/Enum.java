@@ -180,7 +180,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
     public Collection<IDependency> getEnumConstants() {
         Collection<IDependency> out = new LinkedList<IDependency>();
         for (String valueName : enums.getElementNames()) {
-            out.add(new Constant(valueName, IntExpression.readFromOther(this,
+            out.add(Constant.isInt(valueName, IntExpression.readFromOther(this,
                                                                         this.getPackage() + "." + this
                                                                                 .getName() + "." + valueName + "" +
                                                                                 ".getNumber()")));
