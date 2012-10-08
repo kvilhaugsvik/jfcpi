@@ -640,7 +640,7 @@ class PacketsDefParseTest {
     var decNum = 0
     while (decNum < decs.size) {
       val declaration = decs(decNum)
-      assertEquals(message, expected(2 + decNum * 2), declaration.maxSize.evaluate().toString)
+      assertEquals(message, expected(2 + decNum * 2), declaration.maxSize.toString)
       assertEquals(message, expected(1 + 2 + decNum * 2), declaration.elementsToTransfer)
       decNum += 1
     }

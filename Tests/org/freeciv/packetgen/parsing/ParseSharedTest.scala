@@ -108,23 +108,6 @@ class ParseSharedTest {
   @Test def expressionWithConsIsNotANumber = assertFalse("An expression that has a constant is no pure number",
     CParserTest.parsesCorrectly("4 + 5 * (2 - (3 % CONS))", parserShared, parserShared.intExpr).get.hasNoVariables)
 
-  // Semantic: calculates
-  @Test def numberIsSelf = assertEquals("The number 4 should be 4",
-    4,
-    CParserTest.parsesCorrectly("4", parserShared, parserShared.intExpr).get.evaluate)
-
-  @Test def negativeNumberIsSelf = assertEquals("The expression -4 should be -4",
-    -4,
-    CParserTest.parsesCorrectly("-4", parserShared, parserShared.intExpr).get.evaluate)
-
-  @Test def numberExpressionIsResult = assertEquals("Wrong result",
-    -4,
-    CParserTest.parsesCorrectly("((1 + 2) * 3 / 4 % 5) - 6", parserShared, parserShared.intExpr).get.evaluate)
-
-  @Test(expected = classOf[UnsupportedOperationException]) def constantWillNotWork {
-    CParserTest.parsesCorrectly("CONS", parserShared, parserShared.intExpr).get.evaluate
-  }
-
   // TODO: Should probably be tested another place
   // Mapping
   @Test def mapParsedNumbersToTheirNames = assertEquals("Failed to map the values of an IntExpression",

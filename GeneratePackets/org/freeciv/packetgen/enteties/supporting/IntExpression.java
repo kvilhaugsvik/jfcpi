@@ -38,38 +38,6 @@ public class IntExpression {
         return reqs.isEmpty();
     }
 
-    public int evaluate() {
-        if (!hasNoVariables()) {
-            throw new UnsupportedOperationException("Can't evaluate unknown constants");
-        }
-        if (isValue())
-            return Integer.parseInt(operatorOrValue);
-        if (noPostfix())
-            noToIntSupport("Postfix");
-        if (noPrefix()) {
-            if ("-".equals(operatorOrValue))
-                return -rhs.evaluate();
-            if ("+".equals(operatorOrValue))
-                return rhs.evaluate();
-            noToIntSupport("Unary");
-        }
-        if ("+".equals(operatorOrValue))
-            return lhs.evaluate() + rhs.evaluate();
-        if ("-".equals(operatorOrValue))
-            return lhs.evaluate() - rhs.evaluate();
-        if ("*".equals(operatorOrValue))
-            return lhs.evaluate() * rhs.evaluate();
-        if ("/".equals(operatorOrValue))
-            return lhs.evaluate() / rhs.evaluate();
-        if ("%".equals(operatorOrValue))
-            return lhs.evaluate() % rhs.evaluate();
-        return noToIntSupport("Binary");
-    }
-
-    private int noToIntSupport(String op) {
-        throw new UnsupportedOperationException(op + " operator " + operatorOrValue + " not supported for evaluation");
-    }
-
     // The one use of the Scala library from Java.
     // Since an interface like it can be made in 1 minute it won't cause problems should Scala be dropped.
     // TODO: Optimize if long expression is met.
