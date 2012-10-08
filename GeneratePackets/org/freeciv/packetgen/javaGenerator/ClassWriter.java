@@ -86,11 +86,11 @@ public class ClassWriter extends Formatted implements HasAtoms {
         fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, BuiltIn.<AValue>toCode(value)));
     }
 
-    public void addClassConstant(String type, String name, Typed<AValue> value) {
+    public void addClassConstant(String type, String name, Typed<? extends AValue> value) {
         fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
-    public void addClassConstant(Visibility visibility, String type, String name, Typed<AValue> value) {
+    public void addClassConstant(Visibility visibility, String type, String name, Typed<? extends AValue> value) {
         fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
