@@ -32,9 +32,9 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements IDepende
     private static final String constantPrefix = Util.VERSION_DATA_CLASS + ".";
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
 
-    private Constant(String name, Typed<Kind> expression, String typeName, Collection<? extends Requirement> needed) {
+    private Constant(TargetClass type, String name, Typed<Kind> expression, Collection<? extends Requirement> needed) {
         super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
-                new TargetClass(typeName), name, expression);
+                type, name, expression);
         reqs.addAll(needed);
     }
 
@@ -73,14 +73,16 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements IDepende
     }
 
     public static Constant<AnInt> isInt(String name, IntExpression expression) {
-        return new Constant<AnInt>(name, BuiltIn.<AnInt>toCode(expression.toString()), "int", expression.getReqs());
+        return new Constant<AnInt>(new TargetClass(int.class), name,
+                BuiltIn.<AnInt>toCode(expression.toString()), expression.getReqs());
     }
 
     public static Constant<AString> isString(String name, Typed<AString> expression) {
-        return new Constant<AString>(name, expression, "String", Collections.<Requirement>emptySet());
+        return new Constant<AString>(new TargetClass(String.class), name,
+                expression, Collections.<Requirement>emptySet());
     }
 
     public static Constant<ALong> isLong(String name, Typed<ALong> expression) {
-        return new Constant<ALong>(name, expression, "long", Collections.<Requirement>emptySet());
+        return new Constant<ALong>(new TargetClass(long.class), name, expression, Collections.<Requirement>emptySet());
     }
 }
