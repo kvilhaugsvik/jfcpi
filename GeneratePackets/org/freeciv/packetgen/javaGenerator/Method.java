@@ -123,4 +123,13 @@ public class Method extends Formatted implements HasAtoms {
         return new Method(comment, visibility, scope, type, name, paramList,
                 exceptionList, body);
     }
+
+    public static Method newHelper(Comment comment,
+                                   TargetClass type,
+                                   String name,
+                                   List<? extends Var<? extends AValue>> paramList,
+                                   Block body) {
+        return custom(comment, Visibility.PRIVATE, Scope.CLASS, type, name, paramList,
+                Collections.<TargetClass>emptyList(), body);
+    }
 }
