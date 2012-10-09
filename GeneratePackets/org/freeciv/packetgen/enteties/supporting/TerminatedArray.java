@@ -42,7 +42,7 @@ public class TerminatedArray extends FieldTypeBasic {
             return everything.ref();
         }
     };
-    private static final ExprFrom1<Typed<AValue>, Typed<AValue>> byteArrayIsFull =
+    private static final ExprFrom1<Typed<AValue>, Typed<AValue>> valueIsBufferArray =
             new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
                 @Override
                 public Typed<AValue> x(Typed<AValue> bytes) {
@@ -102,7 +102,7 @@ public class TerminatedArray extends FieldTypeBasic {
                            final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded,
                            final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> testIfSizeIsWrong,
                            final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray,
-                           final ExprFrom1<Typed<AValue>, Typed<AValue>> convertByteArrayToAllElements,
+                           final ExprFrom1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue,
                            final ExprFrom2<Block, Var, Var> writeElementTo,
                            final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom,
                            final ExprFrom1<Typed<AString>, Var> toString,
@@ -165,7 +165,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                                 IF(isSmallerThan(pos.ref(), buf.<AnInt>read("length")),
                                                         new Block(current.assign(readElementFrom.x(from))),
                                                         new Block(BuiltIn.<NoValue>toCode("break"))))));
-                        out.addStatement(to.assign(convertByteArrayToAllElements.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
+                        out.addStatement(to.assign(convertBufferArrayToValue.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
                                 buf.ref(), pos.ref()))));
 
                         return out;
@@ -272,7 +272,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         neverAnythingAfter,
                         lenShouldBeEqual,
                         fullIsByteArray,
-                        byteArrayIsFull,
+                valueIsBufferArray,
                         elemIsByteArray,
                         readByte,
                         TO_STRING_ARRAY,
@@ -291,7 +291,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         TransferArraySize.CONSTRUCTOR_PARAM,
                         byteArray,
                         arrayLen, addAfterIfSmallerThanMaxSize, wrongSizeIfToBig,
-                        fullIsByteArray, byteArrayIsFull, elemIsByteArray, readByte,
+                        fullIsByteArray, valueIsBufferArray, elemIsByteArray, readByte,
                         TO_STRING_ARRAY,
                         Arrays.asList(terminator),
                         null,
