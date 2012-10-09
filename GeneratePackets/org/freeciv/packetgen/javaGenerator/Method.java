@@ -133,7 +133,7 @@ public class Method extends Formatted implements HasAtoms {
                 exceptionList, body);
     }
 
-    public static Method newHelper(Comment comment,
+    public static Helper newHelper(Comment comment,
                                    TargetClass type,
                                    String name,
                                    List<? extends Var<? extends AValue>> paramList,

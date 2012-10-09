@@ -9,16 +9,12 @@ import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
-
-import static org.freeciv.packetgen.Hardcoded.fMaxSize;
-import static org.freeciv.packetgen.Hardcoded.pMaxSize;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -177,7 +173,8 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                     public Typed<AnInt> x(Typed<AnInt> val) {
                         return neededBytes(val);
                     }
-                }
+                },
+                Collections.<Method.Helper>emptySet()
         );
     }
 

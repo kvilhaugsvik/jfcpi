@@ -175,7 +175,8 @@ public class Hardcoded {
                             return multiply(literal(2), val.read("length"));
                         }
                     },
-                    TerminatedArray.sameNumberOfBufferElementsAndValueElements
+                    TerminatedArray.sameNumberOfBufferElementsAndValueElements,
+                    Collections.<Method.Helper>emptySet()
             ),
             getFloat("100"),
             getFloat("10000"),
@@ -217,7 +218,8 @@ public class Hardcoded {
                             return value.read("getBytes().length");
                         }
                     },
-                    TerminatedArray.sameNumberOfBufferElementsAndValueElements
+                    TerminatedArray.sameNumberOfBufferElementsAndValueElements,
+                    Collections.<Method.Helper>emptySet()
             ),
             TerminatedArray.maxSizedTerminated("tech_list", "int",
                     new Requirement("A_LAST", Requirement.Kind.VALUE)),

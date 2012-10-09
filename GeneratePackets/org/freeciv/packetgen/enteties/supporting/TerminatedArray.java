@@ -91,6 +91,8 @@ public class TerminatedArray extends FieldTypeBasic {
                                     }
                                 };
 
+    private final HashSet<Method.Helper> helpers;
+
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
                            final Requirement terminator,
                            final MaxArraySize maxArraySize,
@@ -108,7 +110,8 @@ public class TerminatedArray extends FieldTypeBasic {
                            final Typed<AnInt> fullArraySizeLocation,
                            final NetworkIO transferSizeSerialize,
                            final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen,
-                           final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements) {
+                           final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
+                           final Collection<Method.Helper> helperMethods) {
         super(dataIOType, publicType, javaType,
                 new ExprFrom1<Block, Var>() {
                     @Override
@@ -208,6 +211,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         || TransferArraySize.CONSTRUCTOR_PARAM.equals(transferArraySize),
                 uses
         );
+        helpers = new HashSet<Method.Helper>(helperMethods);
     }
 
     private static boolean validationPossible(TransferArraySize transferArraySize, MaxArraySize maxArraySize) {
@@ -251,6 +255,11 @@ public class TerminatedArray extends FieldTypeBasic {
         private FieldTypeAliasToTerminatedArray(String name) {
             super(name);
             addObjectConstant("int", "maxArraySize");
+            if (!helpers.isEmpty()) {
+                for (Method helper : helpers) {
+                    addMethod(helper);
+                }
+            }
         }
     }
 
@@ -271,7 +280,8 @@ public class TerminatedArray extends FieldTypeBasic {
                         null,
                         null,
                         arrayLen,
-                        sameNumberOfBufferElementsAndValueElements
+                        sameNumberOfBufferElementsAndValueElements,
+                        Collections.<Method.Helper>emptySet()
         );
     }
 
@@ -287,7 +297,8 @@ public class TerminatedArray extends FieldTypeBasic {
                         null,
                         null,
                         arrayLen,
-                        sameNumberOfBufferElementsAndValueElements
+                        sameNumberOfBufferElementsAndValueElements,
+                        Collections.<Method.Helper>emptySet()
         );
     }
 
