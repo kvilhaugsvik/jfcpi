@@ -20,7 +20,6 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Method extends Formatted implements HasAtoms {
@@ -85,7 +84,17 @@ public class Method extends Formatted implements HasAtoms {
                                                     List<? extends Var<? extends AValue>> paramList,
                                                     List<TargetClass> exceptionList,
                                                     Block body) {
-        return newPublicDynamicMethod(comment, TargetClass.fromName(null), name, paramList, exceptionList, body);
+        return new Constructor(comment, name, paramList, exceptionList, body);
+    }
+
+    public static class Constructor extends Method {
+        protected Constructor(Comment comment,
+                              String name,
+                              List<? extends Var<? extends AValue>> paramList,
+                              List<TargetClass> exceptionList,
+                              Block body) {
+            super(comment, Visibility.PUBLIC, Scope.OBJECT, TargetClass.fromName(null), name, paramList, exceptionList, body);
+        }
     }
 
     public static Method newPublicConstructor(Comment comment,
@@ -129,7 +138,17 @@ public class Method extends Formatted implements HasAtoms {
                                    String name,
                                    List<? extends Var<? extends AValue>> paramList,
                                    Block body) {
-        return custom(comment, Visibility.PRIVATE, Scope.CLASS, type, name, paramList,
-                Collections.<TargetClass>emptyList(), body);
+        return new Helper(comment, type, name, paramList, body);
+    }
+
+    public static class Helper extends Method {
+        protected Helper(Comment comment,
+                         TargetClass type,
+                         String name,
+                         List<? extends Var<? extends AValue>> paramList,
+                         Block body) {
+            super(comment, Visibility.PRIVATE, Scope.CLASS, type, name, paramList,
+                    Collections.<TargetClass>emptyList(), body);
+        }
     }
 }
