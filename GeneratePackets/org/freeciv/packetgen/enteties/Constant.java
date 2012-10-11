@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.Util;
+import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -26,7 +27,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class Constant<Kind extends AValue> extends Var<Kind> implements IDependency {
+public class Constant<Kind extends AValue> extends Var<Kind> implements IDependency, ReqKind {
     private final HashSet<Requirement> reqs = new HashSet<Requirement>();
 
     private static final String constantPrefix = Util.VERSION_DATA_CLASS + ".";

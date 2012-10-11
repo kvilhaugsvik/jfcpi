@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
+import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -32,7 +33,7 @@ import java.util.*;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
-public class FieldTypeBasic implements IDependency {
+public class FieldTypeBasic implements IDependency, ReqKind {
     private final String fieldTypeBasic;
     private final String publicType;
     private final TargetClass javaType;
@@ -101,7 +102,7 @@ public class FieldTypeBasic implements IDependency {
         return arrayEater;
     }
 
-    public class FieldTypeAlias extends ClassWriter implements IDependency {
+    public class FieldTypeAlias extends ClassWriter implements IDependency, ReqKind {
 
         protected FieldTypeAlias(String name) {
             super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()), new Import[]{

@@ -17,6 +17,7 @@ package org.freeciv.packetgen.enteties;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.Field;
 import org.freeciv.packetgen.javaGenerator.*;
@@ -33,7 +34,7 @@ import java.util.*;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
-public class Packet extends ClassWriter implements IDependency {
+public class Packet extends ClassWriter implements IDependency, ReqKind {
     private final int number;
     private final Field[] fields;
 

@@ -14,6 +14,12 @@
 
 package org.freeciv.packetgen.dependency;
 
+import org.freeciv.packetgen.enteties.Constant;
+import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.Packet;
+import org.freeciv.packetgen.enteties.supporting.DataType;
+import org.freeciv.packetgen.enteties.supporting.NetworkIO;
+
 public class Requirement implements Comparable<Requirement> {
     private final String name;
     private final Kind kind;
@@ -61,12 +67,17 @@ public class Requirement implements Comparable<Requirement> {
     }
 
     public enum Kind {
-        VALUE,
-        FROM_NETWORK,
-        AS_JAVA_DATATYPE,
-        PRIMITIVE_FIELD_TYPE,
-        FIELD_TYPE,
-        HARD_FAILURE, // a Requirement that already has failed to be met
-        PACKET
+        VALUE(Constant.class),
+        FROM_NETWORK(NetworkIO.class),
+        AS_JAVA_DATATYPE(DataType.class),
+        PRIMITIVE_FIELD_TYPE(FieldTypeBasic.class),
+        FIELD_TYPE(FieldTypeBasic.FieldTypeAlias.class),
+        HARD_FAILURE(ReqKind.FailHard.class), // a Requirement that already has failed to be met
+        PACKET(Packet.class);
+        private final Class<? extends ReqKind> newSystem;
+
+        private Kind(Class<? extends ReqKind> newSystem) {
+            this.newSystem = newSystem;
+        }
     }
 }
