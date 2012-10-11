@@ -16,13 +16,10 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.Var;
-import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 
 import java.util.Collection;
@@ -83,7 +80,7 @@ public class NetworkIO implements IDependency {
                                                  int size,
                                                  final String readFunction, final boolean noCastNeeded,
                                                  String write) {
-        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK_TO_INT,
+        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK,
                 new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var from) {
@@ -103,7 +100,7 @@ public class NetworkIO implements IDependency {
         return new NetworkIO(type,
              -1,
              "write",
-             Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES,
+             Requirement.Kind.FROM_NETWORK,
              null);
     }
 }

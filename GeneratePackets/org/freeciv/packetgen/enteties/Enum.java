@@ -230,7 +230,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
 
     @Override
     public Requirement.Kind needsDataInFormat() {
-        return Requirement.Kind.FROM_NETWORK_TO_INT;
+        return Requirement.Kind.FROM_NETWORK;
     }
 
     @Deprecated

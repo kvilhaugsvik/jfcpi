@@ -180,6 +180,6 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
 
     @Override
     public Requirement.Kind needsDataInFormat() {
-        return Requirement.Kind.FROM_NETWORK_AMOUNT_OF_BYTES;
+        return Requirement.Kind.FROM_NETWORK;
     }
 }

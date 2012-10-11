@@ -77,7 +77,7 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
 
     @Override
     public Requirement.Kind needsDataInFormat() {
-        return Requirement.Kind.FROM_NETWORK_TO_INT;
+        return Requirement.Kind.FROM_NETWORK;
     }
 
     @Override

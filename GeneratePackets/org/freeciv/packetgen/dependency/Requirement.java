@@ -62,8 +62,7 @@ public class Requirement implements Comparable<Requirement> {
 
     public enum Kind {
         VALUE,
-        FROM_NETWORK_TO_INT,
-        FROM_NETWORK_AMOUNT_OF_BYTES,
+        FROM_NETWORK,
         AS_JAVA_DATATYPE,
         PRIMITIVE_FIELD_TYPE,
         FIELD_TYPE,
