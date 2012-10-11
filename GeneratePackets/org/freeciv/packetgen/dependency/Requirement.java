@@ -14,13 +14,7 @@
 
 package org.freeciv.packetgen.dependency;
 
-import org.freeciv.packetgen.enteties.Constant;
-import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.enteties.Packet;
-import org.freeciv.packetgen.enteties.supporting.DataType;
-import org.freeciv.packetgen.enteties.supporting.NetworkIO;
-
-public class Requirement implements Comparable<Requirement> {
+public class Requirement implements Comparable<Requirement>, Required {
     private final String name;
     private final Class<? extends ReqKind> kind;
 
@@ -31,6 +25,11 @@ public class Requirement implements Comparable<Requirement> {
 
     public Class<? extends ReqKind> getKind() {
         return kind;
+    }
+
+    @Override
+    public boolean canFulfill(Requirement req) {
+        return this.equals(req);
     }
 
     public String getName() {
