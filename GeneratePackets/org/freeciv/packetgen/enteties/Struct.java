@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.WeakVarDec;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
@@ -61,7 +62,7 @@ public class Struct extends ClassWriter implements IDependency {
                 new Block(RETURN(varsToString))));
 
         iRequire = willNeed;
-        iProvide = new Requirement("struct" + " " + name, Requirement.Kind.AS_JAVA_DATATYPE);
+        iProvide = new Requirement("struct" + " " + name, DataType.class);
     }
 
     @Override

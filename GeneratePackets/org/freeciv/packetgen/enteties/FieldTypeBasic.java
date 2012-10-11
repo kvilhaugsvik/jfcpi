@@ -91,7 +91,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
 
     @Override
     public Requirement getIFulfillReq() {
-        return new Requirement(fieldTypeBasic, Requirement.Kind.PRIMITIVE_FIELD_TYPE);
+        return new Requirement(fieldTypeBasic, FieldTypeBasic.class);
     }
 
     public FieldTypeAlias createFieldType(String name) {
@@ -186,12 +186,12 @@ public class FieldTypeBasic implements IDependency, ReqKind {
 
         @Override
         public Requirement getIFulfillReq() {
-            return new Requirement(getName(), Requirement.Kind.FIELD_TYPE);
+            return new Requirement(getName(), FieldTypeBasic.FieldTypeAlias.class);
         }
     }
 
     public static interface Generator {
         public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io);
-        public Requirement.Kind needsDataInFormat();
+        public Class<? extends ReqKind> needsDataInFormat();
     }
 }

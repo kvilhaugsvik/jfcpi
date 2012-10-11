@@ -2,7 +2,9 @@ package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
@@ -51,7 +53,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                 new Block(new MethodCall<Returnable>("super", getField("size").ref(), pFromBit.ref()))));
 
         iRequire = bits.getReqs();
-        iProvide = new Requirement(getName(), Requirement.Kind.AS_JAVA_DATATYPE);
+        iProvide = new Requirement(getName(), DataType.class);
         arrayEater = false;
     }
 
@@ -87,7 +89,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                         size.assign(pSize.ref()))));
 
         iRequire = Collections.<Requirement>emptySet();
-        iProvide = new Requirement("char", Requirement.Kind.AS_JAVA_DATATYPE);
+        iProvide = new Requirement("char", DataType.class);
         arrayEater = true;
     }
 
@@ -179,7 +181,7 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
     }
 
     @Override
-    public Requirement.Kind needsDataInFormat() {
-        return Requirement.Kind.FROM_NETWORK;
+    public Class<? extends ReqKind> needsDataInFormat() {
+        return NetworkIO.class;
     }
 }

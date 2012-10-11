@@ -124,10 +124,10 @@ public class Hardcoded {
                     TO_STRING_OBJECT,
                     false,
                     Arrays.asList(
-                            new Requirement("struct requirement", Requirement.Kind.AS_JAVA_DATATYPE),
-                            new Requirement("enum req_range", Requirement.Kind.AS_JAVA_DATATYPE),
-                            new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
-                            new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE))
+                            new Requirement("struct requirement", DataType.class),
+                            new Requirement("enum req_range", DataType.class),
+                            new Requirement("enum universals_n", DataType.class),
+                            new Requirement("struct universal", DataType.class))
             ),
             new TerminatedArray("worklist", "struct worklist", new TargetArray("universal", 1, true),
                     null,
@@ -165,8 +165,8 @@ public class Hardcoded {
                         }
                     },
                     TO_STRING_ARRAY,
-                    Arrays.asList(new Requirement("enum universals_n", Requirement.Kind.AS_JAVA_DATATYPE),
-                            new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE)),
+                    Arrays.asList(new Requirement("enum universals_n", DataType.class),
+                            new Requirement("struct universal", DataType.class)),
                     null,
                     NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
                     new ExprFrom1<Typed<AnInt>, Var>() {
@@ -182,7 +182,7 @@ public class Hardcoded {
             getFloat("10000"),
             getFloat("1000000"),
             new TerminatedArray("string", "char", new TargetClass(String.class),
-                    new Requirement("STRING_ENDER", Requirement.Kind.VALUE),
+                    new Requirement("STRING_ENDER", Constant.class),
                     TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
                     TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
                     TerminatedArray.byteArray,
@@ -209,7 +209,7 @@ public class Hardcoded {
                     TerminatedArray.elemIsByteArray,
                     TerminatedArray.readByte,
                     TO_STRING_OBJECT,
-                    Arrays.asList(new Requirement("STRING_ENDER", Requirement.Kind.VALUE)),
+                    Arrays.asList(new Requirement("STRING_ENDER", Constant.class)),
                     null,
                     null,
                     new ExprFrom1<Typed<AnInt>, Var>() {
@@ -222,11 +222,11 @@ public class Hardcoded {
                     Collections.<Method.Helper>emptySet()
             ),
             TerminatedArray.maxSizedTerminated("tech_list", "int",
-                    new Requirement("A_LAST", Requirement.Kind.VALUE)),
+                    new Requirement("A_LAST", Constant.class)),
             TerminatedArray.maxSizedTerminated("unit_list", "int",
-                    new Requirement("U_LAST", Requirement.Kind.VALUE)),
+                    new Requirement("U_LAST", Constant.class)),
             TerminatedArray.maxSizedTerminated("building_list", "int",
-                    new Requirement("B_LAST", Requirement.Kind.VALUE)),
+                    new Requirement("B_LAST", Constant.class)),
             TerminatedArray.xBytes("memory", "unsigned char"),
             new FieldTypeBasic("bool8", "bool",  new TargetClass(Boolean.class),
                     new ExprFrom1<Block, Var>() {
@@ -288,7 +288,7 @@ public class Hardcoded {
         SpecialClass handRolledUniversal =
                 new SpecialClass(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()),
                 "Freeciv source interpreted by hand", "universal",
-                new Requirement("struct universal", Requirement.Kind.AS_JAVA_DATATYPE),
+                new Requirement("struct universal", DataType.class),
                 Collections.<Requirement>emptySet());
         handRolledUniversal.addPublicObjectConstant("universals_n", "kind");
         handRolledUniversal.addPublicObjectConstant("int", "value");

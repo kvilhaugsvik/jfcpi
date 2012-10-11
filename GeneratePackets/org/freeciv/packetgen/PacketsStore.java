@@ -69,7 +69,7 @@ public class PacketsStore {
     }
 
     private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype, Requirement neededBasic) {
-        Requirement wantPType = new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE);
+        Requirement wantPType = new Requirement(ptype, DataType.class);
         if (!requirements.isAwareOfPotentialProvider(wantPType)) {
             return failAndBlame(wantPType, neededBasic, ptype);
         }
@@ -95,13 +95,13 @@ public class PacketsStore {
     private FieldTypeBasic failAndBlame(Requirement missing, Requirement wanted, String ptype) {
         requirements.addPossibleRequirement(new NotCreated(
                 wanted,
-                Arrays.asList(new Requirement(ptype, Requirement.Kind.AS_JAVA_DATATYPE), missing),
+                Arrays.asList(new Requirement(ptype, DataType.class), missing),
                 Arrays.asList(missing)));
         return null;
     }
 
     public void registerTypeAlias(String alias, String iotype, String ptype) throws UndefinedException {
-        Requirement neededBasic = new Requirement(iotype + "(" + ptype + ")", Requirement.Kind.PRIMITIVE_FIELD_TYPE);
+        Requirement neededBasic = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
         FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider(neededBasic);
 
         if (null == basicFieldType)
@@ -109,24 +109,24 @@ public class PacketsStore {
 
         if (null == basicFieldType)
             requirements.addPossibleRequirement(new NotCreated(
-                    new Requirement(alias, Requirement.Kind.FIELD_TYPE), Arrays.asList(neededBasic)));
+                    new Requirement(alias, FieldTypeBasic.FieldTypeAlias.class), Arrays.asList(neededBasic)));
         else
             requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));
     }
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
-        Requirement req = new Requirement(aliased, Requirement.Kind.FIELD_TYPE);
+        Requirement req = new Requirement(aliased, FieldTypeBasic.FieldTypeAlias.class);
         if (requirements.isAwareOfPotentialProvider(req)) {
             requirements.addPossibleRequirement(((FieldTypeAlias)requirements.getPotentialProvider(req))
                                                         .getBasicType().createFieldType(alias));
         } else {
             requirements.addPossibleRequirement(new NotCreated(
-                    new Requirement(alias, Requirement.Kind.FIELD_TYPE), Arrays.asList(req)));
+                    new Requirement(alias, FieldTypeBasic.FieldTypeAlias.class), Arrays.asList(req)));
         }
     }
 
     public boolean hasTypeAlias(String name) {
-        return requirements.isAwareOfPotentialProvider(new Requirement(name, Requirement.Kind.FIELD_TYPE));
+        return requirements.isAwareOfPotentialProvider(new Requirement(name, FieldTypeBasic.FieldTypeAlias.class));
     }
 
     public void registerPacket(String name, int number, List<WeakFlag> flags, List<WeakField> fields)
@@ -164,7 +164,7 @@ public class PacketsStore {
         HashSet<Requirement> allNeeded = new HashSet<Requirement>();
         HashSet<Requirement> missingWhenNeeded = new HashSet<Requirement>();
         for (WeakField fieldType : fields) {
-            Requirement req = new Requirement(fieldType.getType(), Requirement.Kind.FIELD_TYPE);
+            Requirement req = new Requirement(fieldType.getType(), FieldTypeBasic.FieldTypeAlias.class);
             allNeeded.add(req);
             if (requirements.isAwareOfPotentialProvider(req) &&
                     requirements.getPotentialProvider(req) instanceof FieldTypeAlias) {
@@ -185,7 +185,7 @@ public class PacketsStore {
             packetsByNumber.put(number, name);
         } else {
             requirements.addWanted(
-                    new NotCreated(new Requirement(name, Requirement.Kind.PACKET), allNeeded, missingWhenNeeded));
+                    new NotCreated(new Requirement(name, Packet.class), allNeeded, missingWhenNeeded));
         }
     }
 
@@ -258,10 +258,10 @@ public class PacketsStore {
     }
 
     public void requestConstant(String constant) {
-        requirements.demand(new Requirement(constant, Requirement.Kind.VALUE));
+        requirements.demand(new Requirement(constant, Constant.class));
     }
 
     public void requestType(String type) {
-        requirements.demand(new Requirement(type, Requirement.Kind.AS_JAVA_DATATYPE));
+        requirements.demand(new Requirement(type, DataType.class));
     }
 }

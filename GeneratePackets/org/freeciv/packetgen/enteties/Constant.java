@@ -60,7 +60,7 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements IDepende
 
     @Override
     public Requirement getIFulfillReq() {
-        return new Requirement(super.getName(), Requirement.Kind.VALUE);
+        return new Requirement(super.getName(), Constant.class);
     }
 
     public static String referToInJavaCode(Requirement req) {

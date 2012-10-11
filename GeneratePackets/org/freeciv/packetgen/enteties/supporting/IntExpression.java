@@ -101,7 +101,7 @@ public class IntExpression {
     }
 
     public static IntExpression variable(String name) {
-        Requirement valueDefinition = new Requirement(name, Requirement.Kind.VALUE);
+        Requirement valueDefinition = new Requirement(name, Constant.class);
         return new IntExpression(Constant.referToInJavaCode(valueDefinition), null, null, valueDefinition);
     }
 

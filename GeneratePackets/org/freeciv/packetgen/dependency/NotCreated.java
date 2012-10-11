@@ -41,7 +41,7 @@ public class NotCreated implements IDependency {
 
         totalRequirements = new HashSet<Requirement>(wouldAtLeastHaveRequired);
         for (Requirement blamed: wasMissingAtCreation) {
-            totalRequirements.add(new Requirement(blamed.toString(), Requirement.Kind.HARD_FAILURE));
+            totalRequirements.add(new Requirement(blamed.toString(), ReqKind.FailHard.class));
         }
     }
 

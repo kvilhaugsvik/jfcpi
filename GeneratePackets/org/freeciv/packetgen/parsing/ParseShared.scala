@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.parsing
 
 import util.parsing.combinator._
-import org.freeciv.packetgen.enteties.supporting.IntExpression
+import org.freeciv.packetgen.enteties.supporting.{DataType, IntExpression}
 import org.freeciv.packetgen.dependency.{IDependency, Requirement}
 import util.parsing.input.CharArrayReader
 
@@ -119,7 +119,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   def cTypeDecsToJava(cTypeDecs: ParseType): (String, java.util.Set[Requirement], Int) = {
     def needAsJava(name: String): java.util.Set[Requirement] = {
       val out = new java.util.HashSet[Requirement]();
-      out.add(new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE));
+      out.add(new Requirement(name, classOf[DataType]));
       out
     }
 

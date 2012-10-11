@@ -34,7 +34,7 @@ public class NetworkIO implements IDependency, ReqKind {
     private final ExprFrom1<Typed<AnInt>, Var> readNoArgs;
     private final String write;
 
-    private NetworkIO(String type, int size, String write, Requirement.Kind kind,
+    private NetworkIO(String type, int size, String write, Class<? extends ReqKind> kind,
                       final ExprFrom1<Typed<AnInt>, Var> readNoArgs) {
         this.me = new Requirement(type, kind);
         this.size = size;
@@ -81,7 +81,7 @@ public class NetworkIO implements IDependency, ReqKind {
                                                  int size,
                                                  final String readFunction, final boolean noCastNeeded,
                                                  String write) {
-        return new NetworkIO(type, size, write, Requirement.Kind.FROM_NETWORK,
+        return new NetworkIO(type, size, write, NetworkIO.class,
                 new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var from) {
@@ -101,7 +101,7 @@ public class NetworkIO implements IDependency, ReqKind {
         return new NetworkIO(type,
              -1,
              "write",
-             Requirement.Kind.FROM_NETWORK,
+             NetworkIO.class,
              null);
     }
 }

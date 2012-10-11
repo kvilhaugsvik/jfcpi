@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.parsing
 
 import org.freeciv.packetgen.dependency.Requirement
-import org.freeciv.packetgen.enteties.Enum
+import org.freeciv.packetgen.enteties.{Constant, Enum}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.freeciv.Util
 import org.junit.Test
@@ -25,6 +25,7 @@ import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader
 import java.util.Collection
 import org.freeciv.packetgen.UndefinedException
+import org.freeciv.packetgen.enteties.supporting.DataType
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
@@ -503,7 +504,7 @@ class CParserSemanticTest {
     val parser = ParseCCode
     val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
     assertTrue("C enum based on external constant should depend on it",
-      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+      result.get.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
   }
 
   @Test def cEnumElementParanoidValueGeneratorSimple {
@@ -511,7 +512,7 @@ class CParserSemanticTest {
     val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
 
     assertTrue("C enum based on external constant should depend on it",
-      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+      result.get.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
 
     assertEquals("Should get value of constant",
       Util.VERSION_DATA_CLASS + ".START_VALUE",
@@ -527,7 +528,7 @@ class CParserSemanticTest {
     val result = parsesCorrectly(cEnumStartValueIsAnExpressionInvolvingExternal, parser, parser.exprConverted)
 
     assertTrue("C enum based on external constant should depend on it",
-      result.get.getReqs.contains(new Requirement("START_VALUE", Requirement.Kind.VALUE)))
+      result.get.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
 
     assertEquals("Should contain calculation",
       Util.VERSION_DATA_CLASS + ".START_VALUE * 16",
@@ -773,7 +774,7 @@ public enum test implements FCEnum {
     val reqs: Collection[Requirement] = result.get.getReqs
     assertNotNull("Didn't even generate requirements...", reqs)
     assertFalse("Should depend on WRONG", reqs.isEmpty)
-    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("WRONG", Requirement.Kind.VALUE)))
+    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("WRONG", classOf[Constant[_]])))
   }
 
   @Test def constantDefinedAddition {
@@ -800,8 +801,8 @@ public enum test implements FCEnum {
     val reqs: Collection[Requirement] = result.get.getReqs
     assertNotNull("Didn't even generate requirements...", reqs)
     assertFalse("Should depend on two other values", reqs.isEmpty)
-    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("WRONG", Requirement.Kind.VALUE)))
-    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("SIMPLE", Requirement.Kind.VALUE)))
+    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("WRONG", classOf[Constant[_]])))
+    assertTrue("Should depend on WRONG", reqs.contains(new Requirement("SIMPLE", classOf[Constant[_]])))
   }
 
   /*--------------------------------------------------------------------------------------------------------------------
@@ -813,7 +814,7 @@ public enum test implements FCEnum {
 
     assertTrue("No need for any constant", result.getReqs.isEmpty)
     assertEquals("Should provide it self",
-      new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
+      new Requirement("bv_test", classOf[DataType]),
       result.getIFulfillReq)
   }
 
@@ -822,9 +823,9 @@ public enum test implements FCEnum {
     val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", parser, parser.exprConverted).get
 
     assertTrue("Should need CONSTANT", result.getReqs.contains(
-      new Requirement("CONSTANT", Requirement.Kind.VALUE)))
+      new Requirement("CONSTANT", classOf[Constant[_]])))
     assertEquals("Should provide it self",
-      new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
+      new Requirement("bv_test", classOf[DataType]),
       result.getIFulfillReq)
   }
 
@@ -833,9 +834,9 @@ public enum test implements FCEnum {
     val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", parser, parser.exprConverted).get
 
     assertTrue("Should need CONSTANT", result.getReqs.contains(
-      new Requirement("CONSTANT", Requirement.Kind.VALUE)))
+      new Requirement("CONSTANT", classOf[Constant[_]])))
     assertEquals("Should provide it self",
-      new Requirement("bv_test", Requirement.Kind.AS_JAVA_DATATYPE),
+      new Requirement("bv_test", classOf[DataType]),
       result.getIFulfillReq)
   }
 
@@ -864,7 +865,7 @@ public enum test implements FCEnum {
     val parser = ParseCCode
     val result = parsesCorrectly("""struct justOne {enum test value;};""", parser, parser.structConverted)
     assertTrue("The enum test should be needed here",
-      result.get.getReqs.contains(new Requirement("enum test", Requirement.Kind.AS_JAVA_DATATYPE)))
+      result.get.getReqs.contains(new Requirement("enum test", classOf[DataType])))
   }
 
   @Test def structTwoFieldsPrimitive {
@@ -882,16 +883,16 @@ struct two {
 };
     """, parser, parser.structConverted)
     assertTrue("The enum test should be needed here",
-      result.get.getReqs.contains(new Requirement("enum test", Requirement.Kind.AS_JAVA_DATATYPE)))
+      result.get.getReqs.contains(new Requirement("enum test", classOf[DataType])))
     assertTrue("The enum bitwise should be needed here",
-      result.get.getReqs.contains(new Requirement("enum bitwise", Requirement.Kind.AS_JAVA_DATATYPE)))
+      result.get.getReqs.contains(new Requirement("enum bitwise", classOf[DataType])))
   }
 
   @Test def structArraySizeIsConstant {
     val parser = ParseCCode
     val result = parsesCorrectly("""struct two {bool value1; int value2[STANT];};""", parser, parser.structConverted)
     assertTrue("The constant STANT should be needed here",
-      result.get.getReqs.contains(new Requirement("STANT", Requirement.Kind.VALUE)))
+      result.get.getReqs.contains(new Requirement("STANT", classOf[Constant[_]])))
   }
 
   @Test def oneDimensionalArrayOfCharIsString = {

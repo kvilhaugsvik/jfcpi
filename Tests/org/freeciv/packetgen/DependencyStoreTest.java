@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 public class DependencyStoreTest {
     private static Requirement reqFor(String has) {
-        return new Requirement(has, Requirement.Kind.VALUE);
+        return new Requirement(has, Constant.class);
     }
 
     private DependencyStore depRoofOnTwoWallsOnTwoFloorsEachOneOverlapping() {
@@ -64,7 +64,7 @@ public class DependencyStoreTest {
         }
 
         @Override public Requirement getIFulfillReq() {
-            return new Requirement("Impossible", Requirement.Kind.HARD_FAILURE);
+            return new Requirement("Impossible", ReqKind.FailHard.class);
         }
     };
 
@@ -125,7 +125,7 @@ public class DependencyStoreTest {
 
             @Override
             public Requirement getICanProduceReq() {
-                return new Requirement("Value", Requirement.Kind.VALUE);
+                return new Requirement("Value", Constant.class);
             }
 
             @Override
@@ -136,7 +136,7 @@ public class DependencyStoreTest {
 
         DependencyStore store = new DependencyStore();
         store.addMaker(valueGen);
-        OnlyRequire lookedFor = new OnlyRequire("ValueUser", new Requirement("Value", Requirement.Kind.VALUE));
+        OnlyRequire lookedFor = new OnlyRequire("ValueUser", new Requirement("Value", Constant.class));
         store.addWanted(lookedFor);
 
         List<IDependency> result = store.getResolved();

@@ -17,6 +17,7 @@ package org.freeciv.packetgen;
 import org.freeciv.Util;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
@@ -69,7 +70,7 @@ public class PacketsStoreTest {
         registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
 
         assertLooksForButNoCodeYet(storage, new Requirement("enum unit_activity",
-                Requirement.Kind.AS_JAVA_DATATYPE), "ACTIVITY");
+                DataType.class), "ACTIVITY");
     }
 
     @Test public void registerTypeNotExisting() throws UndefinedException, PacketCollisionException {
@@ -78,7 +79,7 @@ public class PacketsStoreTest {
 
         registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
 
-        assertLooksForButNoCodeYet(storage, new Requirement("UINT32", Requirement.Kind.FIELD_TYPE),
+        assertLooksForButNoCodeYet(storage, new Requirement("UINT32", FieldTypeBasic.FieldTypeAlias.class),
                 "THISSHOULDNOTEXIST");
     }
 
@@ -88,7 +89,7 @@ public class PacketsStoreTest {
 
         registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
 
-        assertLooksForButNoCodeYet(storage, new Requirement("notexisting128(void)", Requirement.Kind.FIELD_TYPE),
+        assertLooksForButNoCodeYet(storage, new Requirement("notexisting128(void)", FieldTypeBasic.FieldTypeAlias.class),
                 "THISSHOULDNOTEXIST");
     }
 
@@ -206,7 +207,7 @@ public class PacketsStoreTest {
 
         assertFalse(storage.hasPacket(25));
         assertFalse(storage.hasPacket("PACKET_HELLO"));
-        assertLooksForButNoCodeYet(storage, new Requirement("STRING", Requirement.Kind.FIELD_TYPE), "STRING");
+        assertLooksForButNoCodeYet(storage, new Requirement("STRING", FieldTypeBasic.FieldTypeAlias.class), "STRING");
     }
 
     private static ClassWriter getVersionData(PacketsStore storage) {

@@ -24,9 +24,9 @@ public class Requirement implements Comparable<Requirement> {
     private final String name;
     private final Class<? extends ReqKind> kind;
 
-    public Requirement(String name, Kind kind) {
+    public Requirement(String name, Class<? extends ReqKind> kind) {
         this.name = name;
-        this.kind = kind.newSystem;
+        this.kind = kind;
     }
 
     public Class<? extends ReqKind> getKind() {
@@ -64,20 +64,5 @@ public class Requirement implements Comparable<Requirement> {
     @Override
     public String toString() {
         return "The " + kind + " " + name;
-    }
-
-    public enum Kind {
-        VALUE(Constant.class),
-        FROM_NETWORK(NetworkIO.class),
-        AS_JAVA_DATATYPE(DataType.class),
-        PRIMITIVE_FIELD_TYPE(FieldTypeBasic.class),
-        FIELD_TYPE(FieldTypeBasic.FieldTypeAlias.class),
-        HARD_FAILURE(ReqKind.FailHard.class), // a Requirement that already has failed to be met
-        PACKET(Packet.class);
-        private final Class<? extends ReqKind> newSystem;
-
-        private Kind(Class<? extends ReqKind> newSystem) {
-            this.newSystem = newSystem;
-        }
     }
 }

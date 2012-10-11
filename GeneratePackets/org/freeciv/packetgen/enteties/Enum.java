@@ -15,7 +15,9 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.*;
@@ -195,14 +197,14 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
 
     @Override
     public Requirement getIFulfillReq() {
-        return new Requirement("enum " + super.getName(), Requirement.Kind.AS_JAVA_DATATYPE);
+        return new Requirement("enum " + super.getName(), DataType.class);
     }
 
     @Override
     public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
         final String named = this.getName();
         HashSet<Requirement> req = new HashSet<Requirement>();
-        req.add(new Requirement("enum " + named, Requirement.Kind.AS_JAVA_DATATYPE));
+        req.add(new Requirement("enum " + named, DataType.class));
         final TargetClass parent = getAddress().scopeKnown();
         return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named, parent,
                 new ExprFrom1<Block, Var>() {
@@ -229,8 +231,8 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
     }
 
     @Override
-    public Requirement.Kind needsDataInFormat() {
-        return Requirement.Kind.FROM_NETWORK;
+    public Class<? extends ReqKind> needsDataInFormat() {
+        return NetworkIO.class;
     }
 
     @Deprecated

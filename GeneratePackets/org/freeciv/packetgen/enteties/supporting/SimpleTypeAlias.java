@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.MethodCall;
@@ -35,7 +36,7 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     private final String typeInJava;
 
     public SimpleTypeAlias(String name, String jType, Collection<Requirement> reqs) {
-        this.iProvide = new Requirement(name, Requirement.Kind.AS_JAVA_DATATYPE);
+        this.iProvide = new Requirement(name, DataType.class);
         this.typeInJava = jType;
         this.willRequire = reqs;
     }
@@ -76,8 +77,8 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     }
 
     @Override
-    public Requirement.Kind needsDataInFormat() {
-        return Requirement.Kind.FROM_NETWORK;
+    public Class<? extends ReqKind> needsDataInFormat() {
+        return NetworkIO.class;
     }
 
     @Override

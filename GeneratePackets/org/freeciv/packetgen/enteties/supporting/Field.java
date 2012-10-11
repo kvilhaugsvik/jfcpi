@@ -251,7 +251,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
     public Collection<Requirement> getReqs() {
         HashSet<Requirement> reqs = new HashSet<Requirement>();
-        reqs.add(new Requirement(getFType(), Requirement.Kind.FIELD_TYPE));
+        reqs.add(new Requirement(getFType(), FieldTypeBasic.FieldTypeAlias.class));
 
         for (ArrayDeclaration declaration : declarations) {
             reqs.addAll(declaration.getReqs());

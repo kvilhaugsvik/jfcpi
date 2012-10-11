@@ -72,7 +72,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
             requirements.addAll(field.getReqs());
         }
 
-        iFulfill = new Requirement(getName(), Requirement.Kind.PACKET);
+        iFulfill = new Requirement(getName(), Packet.class);
 
         addClassConstant("int", "number", number + "");
 

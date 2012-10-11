@@ -18,6 +18,7 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
+import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.javaGenerator.Comment;
 import org.freeciv.packetgen.javaGenerator.Modifiable;
@@ -217,19 +218,19 @@ public class EnumTest {
 
         assertTrue("ONE is missing", constants.containsKey("ONE"));
         assertTrue("ONE don't require it's enum", constants.get("ONE").getReqs()
-                .contains(new Requirement("enum Count", Requirement.Kind.AS_JAVA_DATATYPE)));
+                .contains(new Requirement("enum Count", DataType.class)));
         assertEquals("ONE has wrong value", "org.freeciv.types.Count.ONE.getNumber()",
                 constants.get("ONE").getExpression());
 
         assertTrue("TWO is missing", constants.containsKey("TWO"));
         assertTrue("TWO don't require it's enum", constants.get("TWO").getReqs()
-                .contains(new Requirement("enum Count", Requirement.Kind.AS_JAVA_DATATYPE)));
+                .contains(new Requirement("enum Count", DataType.class)));
         assertEquals("TWO has wrong value", "org.freeciv.types.Count.TWO.getNumber()",
                 constants.get("TWO").getExpression());
     }
 
     @Test public void enumRequiresOther() {
-        Requirement constantReferedTo = new Requirement("START_VALUE", Requirement.Kind.VALUE);
+        Requirement constantReferedTo = new Requirement("START_VALUE", Constant.class);
         Enum inNeed = Enum.fromArray("NeedOther", Arrays.asList(constantReferedTo),
                 Enum.EnumElementFC.newEnumValue("ONE", IntExpression.variable("Constants.START_VALUE")),
                 Enum.EnumElementFC.newEnumValue("TWO",
