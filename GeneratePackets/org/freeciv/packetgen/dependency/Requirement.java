@@ -22,14 +22,14 @@ import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 
 public class Requirement implements Comparable<Requirement> {
     private final String name;
-    private final Kind kind;
+    private final Class<? extends ReqKind> kind;
 
     public Requirement(String name, Kind kind) {
         this.name = name;
-        this.kind = kind;
+        this.kind = kind.newSystem;
     }
 
-    public Kind getKind() {
+    public Class<? extends ReqKind> getKind() {
         return kind;
     }
 
@@ -48,14 +48,14 @@ public class Requirement implements Comparable<Requirement> {
 
     @Override
     public int hashCode() {
-        return name.hashCode() + kind.ordinal();
+        return name.hashCode() + kind.hashCode();
     }
 
     @Override
     public int compareTo(Requirement that) {
-        if (this.getKind().ordinal() < that.getKind().ordinal())
+        if (this.getKind().hashCode() < that.getKind().hashCode())
             return -1;
-        else if (that.getKind().ordinal() < this.getKind().ordinal())
+        else if (that.getKind().hashCode() < this.getKind().hashCode())
             return 1;
         else
             return this.getName().compareTo(that.getName());

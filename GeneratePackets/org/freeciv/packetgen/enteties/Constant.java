@@ -64,7 +64,7 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements IDepende
     }
 
     public static String referToInJavaCode(Requirement req) {
-        assert (Requirement.Kind.VALUE.equals(req.getKind()));
+        assert (Constant.class.equals(req.getKind()));
 
         return constantPrefix + req.getName();
     }

@@ -36,7 +36,7 @@ public final class DependencyStore {
      */
     public void addPossibleRequirement(IDependency item) {
         if (null == item) throw new NullPointerException(nullNotAllowed);
-        if (Requirement.Kind.HARD_FAILURE.equals(item.getIFulfillReq().getKind()))
+        if (ReqKind.FailHard.class.equals(item.getIFulfillReq().getKind()))
             throw new AssertionError("Tried to fulfill a " + Requirement.Kind.HARD_FAILURE +
                                              " that by definition can't be fulfilled");
 
