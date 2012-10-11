@@ -206,7 +206,7 @@ public class PacketsStore {
         HashSet<ClassWriter> out = new HashSet<ClassWriter>();
 
         TreeSet<Constant> sortedConstants =
-                new TreeSet<Constant>(new IDependency.TotalOrderNoCircles(inn));
+                new TreeSet<Constant>(new TotalOrderNoCircles(inn));
 
         for (IDependency dep : inn)
             if (dep instanceof ClassWriter)
