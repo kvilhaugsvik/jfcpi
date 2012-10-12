@@ -21,9 +21,9 @@ import java.util.*;
 public final class DependencyStore {
     private static final String nullNotAllowed = "null is not an allowed argument here";
 
-    private final DepStore resolved = new DepStore();
-    private final DepStore existing = new DepStore();
-    private final DepStore dependenciesFulfilled = new DepStore();
+    private final DepStore<IDependency> resolved = DepStore.forIDependency();
+    private final DepStore<IDependency> existing = DepStore.forIDependency();
+    private final DepStore<IDependency> dependenciesFulfilled = DepStore.forIDependency();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
     private final HashSet<Requirement> wantsOut = new HashSet<Requirement>();
     private final HashMap<Requirement, IDependency.Maker> makers = new HashMap<Requirement, IDependency.Maker>();
@@ -156,23 +156,41 @@ public final class DependencyStore {
         wantsOut.removeAll(resolved.values());
     }
 
-    private static class DepStore {
-        private final LinkedHashMap<Requirement, IDependency> store = new LinkedHashMap<Requirement, IDependency>();
+    private static class DepStore<Of> {
+        private final LinkedHashMap<Requirement, Of> store = new LinkedHashMap<Requirement, Of>();
+        private final FulfillGetter fulfillGetter;
+
+        public static DepStore forIDependency() {
+            return new DepStore(new FulfillGetter<IDependency>() {
+                @Override
+                public Requirement getIFulfill(IDependency dep) {
+                    return dep.getIFulfillReq();
+                }
+            });
+        }
+
+        private DepStore(FulfillGetter fulfillGetter) {
+            this.fulfillGetter = fulfillGetter;
+        }
 
         public boolean hasFulfillmentOf(Requirement req) {
             return store.containsKey(req);
         }
 
-        public IDependency getFulfillmentOf(Requirement req) {
+        public Of getFulfillmentOf(Requirement req) {
             return store.get(req);
         }
 
-        public void add(IDependency dep) {
-            store.put(dep.getIFulfillReq(), dep);
+        public void add(Of dep) {
+            store.put(fulfillGetter.getIFulfill(dep), dep);
         }
 
-        public Collection<IDependency> values() {
+        public Collection<Of> values() {
             return Collections.unmodifiableCollection(store.values());
+        }
+
+        private static interface FulfillGetter<Of> {
+            public Requirement getIFulfill(Of of);
         }
     }
 }
