@@ -26,7 +26,7 @@ public final class DependencyStore {
     private final DepStore<IDependency> dependenciesFulfilled = DepStore.forIDependency();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
     private final HashSet<Requirement> wantsOut = new HashSet<Requirement>();
-    private final HashMap<Requirement, IDependency.Maker> makers = new HashMap<Requirement, IDependency.Maker>();
+    private final DepStore<IDependency.Maker> makers = DepStore.forMaker();
 
     /**
      * Make the dependency store aware of the fulfillment of a possible requirement.
@@ -55,7 +55,7 @@ public final class DependencyStore {
 
     public void addMaker(IDependency.Maker maker) {
         if  (null == maker) throw new NullPointerException(nullNotAllowed);
-        makers.put(maker.getICanProduceReq(), maker);
+        makers.add(maker);
     }
 
     public Set<Requirement> getMissingRequirements() {
@@ -73,11 +73,11 @@ public final class DependencyStore {
     }
 
     public boolean isAwareOfPotentialProvider(Requirement item) {
-        return existing.hasFulfillmentOf(item) || (makers.containsKey(item) && creationWorked(item));
+        return existing.hasFulfillmentOf(item) || (makers.hasFulfillmentOf(item) && creationWorked(item));
     }
 
     private boolean creationWorked(Requirement item) {
-        IDependency.Maker maker = makers.get(item);
+        IDependency.Maker maker = makers.getFulfillmentOf(item);
         LinkedList<IDependency> args = new LinkedList<IDependency>();
         for (Requirement req : maker.getReqs())
             if (isAwareOfPotentialProvider(req))
@@ -169,6 +169,15 @@ public final class DependencyStore {
             });
         }
 
+        public static DepStore forMaker() {
+            return new DepStore(new FulfillGetter<IDependency.Maker>() {
+                @Override
+                public Requirement getIFulfill(IDependency.Maker make) {
+                    return make.getICanProduceReq();
+                }
+            });
+        }
+
         private DepStore(FulfillGetter fulfillGetter) {
             this.fulfillGetter = fulfillGetter;
         }
@@ -183,6 +192,10 @@ public final class DependencyStore {
 
         public void add(Of dep) {
             store.put(fulfillGetter.getIFulfill(dep), dep);
+        }
+
+        public void remove(Requirement item) {
+            store.remove(item);
         }
 
         public Collection<Of> values() {
