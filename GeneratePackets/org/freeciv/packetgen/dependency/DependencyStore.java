@@ -158,12 +158,13 @@ public final class DependencyStore {
 
     private static class DepStore<Of> {
         private final LinkedHashMap<Requirement, Of> store = new LinkedHashMap<Requirement, Of>();
+        private final LinkedHashMap<Required, Of> complex = new LinkedHashMap<Required, Of>();
         private final FulfillGetter fulfillGetter;
 
         public static DepStore forIDependency() {
             return new DepStore(new FulfillGetter<IDependency>() {
                 @Override
-                public Requirement getIFulfill(IDependency dep) {
+                public Required getIFulfill(IDependency dep) {
                     return dep.getIFulfillReq();
                 }
             });
@@ -172,7 +173,7 @@ public final class DependencyStore {
         public static DepStore forMaker() {
             return new DepStore(new FulfillGetter<IDependency.Maker>() {
                 @Override
-                public Requirement getIFulfill(IDependency.Maker make) {
+                public Required getIFulfill(IDependency.Maker make) {
                     return make.getICanProduceReq();
                 }
             });
@@ -183,15 +184,31 @@ public final class DependencyStore {
         }
 
         public boolean hasFulfillmentOf(Requirement req) {
-            return store.containsKey(req);
+            return store.containsKey(req) || null != complexGet(req);
+        }
+
+        private Of complexGet(Requirement req) {
+            for (Required candidate : complex.keySet()) {
+                if (candidate.canFulfill(req))
+                    return complex.get(candidate);
+            }
+            return null;
         }
 
         public Of getFulfillmentOf(Requirement req) {
-            return store.get(req);
+            Of candidate = store.get(req);
+            if (null != candidate)
+                return candidate;
+            else
+                return complexGet(req);
         }
 
         public void add(Of dep) {
-            store.put(fulfillGetter.getIFulfill(dep), dep);
+            Required provides = fulfillGetter.getIFulfill(dep);
+            if (provides instanceof Requirement)
+                store.put((Requirement) provides, dep);
+            else
+                complex.put(provides, dep);
         }
 
         public void remove(Requirement item) {
@@ -203,7 +220,7 @@ public final class DependencyStore {
         }
 
         private static interface FulfillGetter<Of> {
-            public Requirement getIFulfill(Of of);
+            public Required getIFulfill(Of of);
         }
     }
 }
