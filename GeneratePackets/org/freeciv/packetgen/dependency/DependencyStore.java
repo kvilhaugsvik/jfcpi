@@ -40,15 +40,8 @@ public final class DependencyStore {
             throw new AssertionError("Tried to fulfill a " + ReqKind.FailHard.class +
                                              " that by definition can't be fulfilled");
 
-        putAllProvdesIn(item, existing);
+        existing.put(item.getIFulfillReq(), item);
         dependenciesUnfulfilled.clear();
-    }
-
-    private static void putAllProvdesIn(IDependency item, HashMap<Requirement, IDependency> depCategory) {
-        depCategory.put(item.getIFulfillReq(), item);
-        if (item instanceof IDependency.ManyFulfiller)
-            for (Requirement also : ((IDependency.ManyFulfiller)item).getIAlsoFulfillReqs())
-                depCategory.put(also, item);
     }
 
     public void addWanted(IDependency item) {
@@ -106,7 +99,7 @@ public final class DependencyStore {
     }
 
     private boolean declareFulfilled(IDependency item) {
-        putAllProvdesIn(item, dependenciesFulfilled);
+        dependenciesFulfilled.put(item.getIFulfillReq(), item);
         return true;
     }
 

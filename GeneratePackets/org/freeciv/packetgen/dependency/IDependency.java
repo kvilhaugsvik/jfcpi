@@ -22,17 +22,6 @@ public interface IDependency {
     public Collection<Requirement> getReqs();
     public Requirement getIFulfillReq();
 
-    /**
-     * Fulfill more than one thing.
-     */
-    public static interface ManyFulfiller extends IDependency {
-        /**
-         * Extra requirements fulfilled in addition to the primary fulfillment in getIFulfillReq.
-         * @return the additional requirements fulfilled.
-         */
-        public Collection<Requirement> getIAlsoFulfillReqs();
-    }
-
     public static interface Maker {
         public Collection<Requirement> getReqs();
         public Requirement getICanProduceReq();
