@@ -21,9 +21,9 @@ import java.util.*;
 public final class DependencyStore {
     private static final String nullNotAllowed = "null is not an allowed argument here";
 
-    private final LinkedHashMap<Requirement, IDependency> resolved = new LinkedHashMap<Requirement, IDependency>();
-    private final HashMap<Requirement, IDependency> existing = new HashMap<Requirement, IDependency>();
-    private final HashMap<Requirement, IDependency> dependenciesFulfilled = new HashMap<Requirement, IDependency>();
+    private final DepStore resolved = new DepStore();
+    private final DepStore existing = new DepStore();
+    private final DepStore dependenciesFulfilled = new DepStore();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
     private final HashSet<Requirement> wantsOut = new HashSet<Requirement>();
     private final HashMap<Requirement, IDependency.Maker> makers = new HashMap<Requirement, IDependency.Maker>();
@@ -40,7 +40,7 @@ public final class DependencyStore {
             throw new AssertionError("Tried to fulfill a " + ReqKind.FailHard.class +
                                              " that by definition can't be fulfilled");
 
-        existing.put(item.getIFulfillReq(), item);
+        existing.add(item);
         dependenciesUnfulfilled.clear();
     }
 
@@ -73,7 +73,7 @@ public final class DependencyStore {
     }
 
     public boolean isAwareOfPotentialProvider(Requirement item) {
-        return existing.containsKey(item) || (makers.containsKey(item) && creationWorked(item));
+        return existing.hasFulfillmentOf(item) || (makers.containsKey(item) && creationWorked(item));
     }
 
     private boolean creationWorked(Requirement item) {
@@ -86,7 +86,7 @@ public final class DependencyStore {
                 return false;
 
         try {
-            existing.put(item, maker.produce(args.toArray(new IDependency[args.size()])));
+            existing.add(maker.produce(args.toArray(new IDependency[args.size()])));
             makers.remove(item);
             return true;
         } catch (UndefinedException e) {
@@ -95,17 +95,17 @@ public final class DependencyStore {
     }
 
     public IDependency getPotentialProvider(Requirement item) {
-        return existing.get(item);
+        return existing.getFulfillmentOf(item);
     }
 
     private boolean declareFulfilled(IDependency item) {
-        dependenciesFulfilled.put(item.getIFulfillReq(), item);
+        dependenciesFulfilled.add(item);
         return true;
     }
 
     public boolean dependenciesFound(IDependency item) {
         assert (null != item) : nullNotAllowed;
-        if (dependenciesFulfilled.containsKey(item.getIFulfillReq())) {
+        if (dependenciesFulfilled.hasFulfillmentOf(item.getIFulfillReq())) {
             return true;
         } else if (item.getReqs().isEmpty()) {
             return declareFulfilled(item);
@@ -114,7 +114,7 @@ public final class DependencyStore {
         } else {
             boolean missingReq = false;
             for (Requirement req : item.getReqs()) {
-                if (!(isAwareOfPotentialProvider(req) && dependenciesFound(existing.get(req)))) {
+                if (!(isAwareOfPotentialProvider(req) && dependenciesFound(existing.getFulfillmentOf(req)))) {
                     dependenciesUnfulfilled.add(req);
                     missingReq = true;
                 }
@@ -130,12 +130,12 @@ public final class DependencyStore {
 
     private void addWillCrashUnlessAlreadyChecked(IDependency item) {
         assert (null != item) : nullNotAllowed;
-        assert (dependenciesFulfilled.containsKey(item.getIFulfillReq())) : "Missing dependency";
-        if (!resolved.containsKey(item.getIFulfillReq())) {
+        assert (dependenciesFulfilled.hasFulfillmentOf(item.getIFulfillReq())) : "Missing dependency";
+        if (!resolved.hasFulfillmentOf(item.getIFulfillReq())) {
             for (Requirement dependOn : item.getReqs()) {
-                addWillCrashUnlessAlreadyChecked(dependenciesFulfilled.get(dependOn));
+                addWillCrashUnlessAlreadyChecked(dependenciesFulfilled.getFulfillmentOf(dependOn));
             }
-            resolved.put(item.getIFulfillReq(), item);
+            resolved.add(item);
         }
     }
 
@@ -154,5 +154,25 @@ public final class DependencyStore {
                 dependenciesUnfulfilled.add(toAdd);
         }
         wantsOut.removeAll(resolved.values());
+    }
+
+    private static class DepStore {
+        private final LinkedHashMap<Requirement, IDependency> store = new LinkedHashMap<Requirement, IDependency>();
+
+        public boolean hasFulfillmentOf(Requirement req) {
+            return store.containsKey(req);
+        }
+
+        public IDependency getFulfillmentOf(Requirement req) {
+            return store.get(req);
+        }
+
+        public void add(IDependency dep) {
+            store.put(dep.getIFulfillReq(), dep);
+        }
+
+        public Collection<IDependency> values() {
+            return Collections.unmodifiableCollection(store.values());
+        }
     }
 }
