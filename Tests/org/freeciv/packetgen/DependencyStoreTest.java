@@ -124,7 +124,7 @@ public class DependencyStoreTest {
             }
 
             @Override
-            public Requirement getICanProduceReq() {
+            public Required getICanProduceReq() {
                 return new Requirement("Value", Constant.class);
             }
 

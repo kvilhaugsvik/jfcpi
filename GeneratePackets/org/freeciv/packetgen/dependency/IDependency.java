@@ -24,7 +24,7 @@ public interface IDependency {
 
     public static interface Maker {
         public Collection<Requirement> getReqs();
-        public Requirement getICanProduceReq();
+        public Required getICanProduceReq();
         public IDependency produce(IDependency... wasRequired) throws UndefinedException;
     }
 
