@@ -21,8 +21,10 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class DependencyStoreTest {
@@ -143,6 +145,26 @@ public class DependencyStoreTest {
 
         assertTrue("Demanded item should be in output", result.contains(lookedFor));
         assertTrue("Dependency of demanded item should be in output", result.contains(made));
+    }
+
+    private static final RequiredMulti wordThenWordInParen =
+            new RequiredMulti(Constant.class, Pattern.compile("\\w+\\(\\w+\\)"));
+
+    @Test public void requiredMultiFalseNegative() {
+        assertTrue("Should match", wordThenWordInParen.canFulfill(new Requirement("word(other)", Constant.class)));
+    }
+
+    @Test public void requiredMultiFalseNegativeUpperCaseAndNumber() {
+        assertTrue("Should match", wordThenWordInParen.canFulfill(new Requirement("WORD(other7)", Constant.class)));
+    }
+
+    @Test public void requiredMultiFalsePositive() {
+        assertFalse("Shouldn't match", wordThenWordInParen.canFulfill(new Requirement("word", Constant.class)));
+    }
+
+    @Test public void requiredMultiFalsePositiveTwice() {
+        assertFalse("Shouldn't match",
+                wordThenWordInParen.canFulfill(new Requirement("word(other)word(other)", Constant.class)));
     }
 
     public static class OnlyRequire implements IDependency {
