@@ -95,6 +95,8 @@ public final class DependencyStore {
     }
 
     public IDependency getPotentialProvider(Requirement item) {
+        if (!existing.hasFulfillmentOf(item) && makers.hasFulfillmentOf(item))
+            creationWorked(item);
         return existing.getFulfillmentOf(item);
     }
 
