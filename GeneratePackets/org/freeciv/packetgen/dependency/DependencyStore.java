@@ -39,6 +39,8 @@ public final class DependencyStore {
         if (ReqKind.FailHard.class.equals(item.getIFulfillReq().getKind()))
             throw new AssertionError("Tried to fulfill a " + ReqKind.FailHard.class +
                                              " that by definition can't be fulfilled");
+        if (item instanceof IDependency.Maker)
+            addMaker((IDependency.Maker)item);
 
         existing.add(item);
         dependenciesUnfulfilled.clear();
