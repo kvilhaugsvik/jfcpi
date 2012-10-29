@@ -117,19 +117,10 @@ public class DependencyStoreTest {
         assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Non existing")));
     }
 
-    @Test public void makerWorks() {
+    @Test public void makerWorksNoDependencies() {
         final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
-        IDependency.Maker valueGen = new IDependency.Maker() {
-            @Override
-            public Collection<Requirement> getReqs() {
-                return Collections.emptySet();
-            }
-
-            @Override
-            public Required getICanProduceReq() {
-                return new Requirement("Value", Constant.class);
-            }
-
+        final Requirement req = new Requirement("Value", Constant.class);
+        IDependency.Maker valueGen = new MakerTest(Collections.<Requirement>emptyList(), req) {
             @Override
             public IDependency produce(IDependency... wasRequired) throws UndefinedException {
                 return made;
@@ -138,11 +129,50 @@ public class DependencyStoreTest {
 
         DependencyStore store = new DependencyStore();
         store.addMaker(valueGen);
-        OnlyRequire lookedFor = new OnlyRequire("ValueUser", new Requirement("Value", Constant.class));
+        OnlyRequire lookedFor = new OnlyRequire("ValueUser", req);
         store.addWanted(lookedFor);
 
         List<IDependency> result = store.getResolved();
 
+        assertTrue("Demanded item should be in output", result.contains(lookedFor));
+        assertTrue("Dependency of demanded item should be in output", result.contains(made));
+    }
+
+    @Test public void makerThreeDependencies() {
+        final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
+        final Requirement req = new Requirement("Value", Constant.class);
+
+        LinkedList<Requirement>params = new LinkedList<Requirement>();
+        final OnlyRequire one = new OnlyRequire("one");
+        params.add(one.getIFulfillReq());
+        final OnlyRequire two = new OnlyRequire("two");
+        params.add(two.getIFulfillReq());
+        final OnlyRequire three = new OnlyRequire("three");
+        params.add(three.getIFulfillReq());
+
+        IDependency.Maker valueGen = new MakerTest(params, req) {
+            @Override
+            public IDependency produce(IDependency... wasRequired) throws UndefinedException {
+                if (one.equals(wasRequired[0]) && two.equals(wasRequired[1]) && three.equals(wasRequired[2]))
+                    return made;
+                throw new UndefinedException("Parameters missing or in wrong order");
+            }
+        };
+
+        DependencyStore store = new DependencyStore();
+        store.addMaker(valueGen);
+        OnlyRequire lookedFor = new OnlyRequire("ValueUser", req);
+        store.addWanted(lookedFor);
+
+        List<IDependency> result = store.getResolved();
+        assertFalse("Shouldn't generate without all requirements", result.contains(made));
+
+        // Now add the requirements
+        store.addPossibleRequirement(one);
+        store.addPossibleRequirement(two);
+        store.addPossibleRequirement(three);
+
+        result = store.getResolved();
         assertTrue("Demanded item should be in output", result.contains(lookedFor));
         assertTrue("Dependency of demanded item should be in output", result.contains(made));
     }
@@ -165,6 +195,26 @@ public class DependencyStoreTest {
     @Test public void requiredMultiFalsePositiveTwice() {
         assertFalse("Shouldn't match",
                 wordThenWordInParen.canFulfill(new Requirement("word(other)word(other)", Constant.class)));
+    }
+
+    public static abstract class MakerTest implements IDependency.Maker {
+        private final List<Requirement> requirements;
+        private final Requirement canProduce;
+
+        public MakerTest(List<Requirement> requirements, Requirement canProduce) {
+            this.requirements = requirements;
+            this.canProduce = canProduce;
+        }
+
+        @Override
+        public List<Requirement> neededInput() {
+            return requirements;
+        }
+
+        @Override
+        public Required getICanProduceReq() {
+            return canProduce;
+        }
     }
 
     public static class OnlyRequire implements IDependency {

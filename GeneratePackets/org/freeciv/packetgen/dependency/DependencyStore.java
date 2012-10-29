@@ -79,7 +79,7 @@ public final class DependencyStore {
     private boolean creationWorked(Requirement item) {
         IDependency.Maker maker = makers.getFulfillmentOf(item);
         LinkedList<IDependency> args = new LinkedList<IDependency>();
-        for (Requirement req : maker.getReqs())
+        for (Requirement req : maker.neededInput())
             if (isAwareOfPotentialProvider(req))
                 args.add(getPotentialProvider(req));
             else

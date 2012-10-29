@@ -23,7 +23,7 @@ public interface IDependency {
     public Requirement getIFulfillReq();
 
     public static interface Maker {
-        public Collection<Requirement> getReqs();
+        public List<Requirement> neededInput();
         public Required getICanProduceReq();
         public IDependency produce(IDependency... wasRequired) throws UndefinedException;
     }
