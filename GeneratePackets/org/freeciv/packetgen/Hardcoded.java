@@ -259,7 +259,6 @@ public class Hardcoded {
             /************************************************************************************************
              * Read from and write to the network
              ************************************************************************************************/
-            NetworkIO.withBytesAsIntermediate("bitvector"),
             NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
             // to.writeByte wraps around so -128 shares encoding with 128
             NetworkIO.witIntAsIntermediate("sint8", 1, "readByte", false, "writeByte"),
@@ -305,10 +304,7 @@ public class Hardcoded {
 
     public static Collection<IDependency> values() {
         HashSet<IDependency> out = new HashSet<IDependency>(hardCodedElements);
-        BitVector bitString = new BitVector();
-        out.add(bitString);
-        out.add(bitString.getBasicFieldTypeOnInput(
-                NetworkIO.withBytesAsIntermediate("bit_string")));
+        out.add(new BitVector());
         return out;
     }
 

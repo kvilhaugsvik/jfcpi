@@ -92,16 +92,4 @@ public class NetworkIO implements IDependency, ReqKind {
                     }
                 });
     }
-
-    /**
-     * A network reader that read X bytes into a byte[] called innBuffer
-     * @param type the IOType it should match
-     */
-    public static NetworkIO withBytesAsIntermediate(String type) {
-        return new NetworkIO(type,
-             -1,
-             "write",
-             NetworkIO.class,
-             null);
-    }
 }

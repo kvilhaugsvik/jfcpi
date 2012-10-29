@@ -1,8 +1,10 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.Hardcoded;
+import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.ReqKind;
+import org.freeciv.packetgen.dependency.Required;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
@@ -21,15 +23,18 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
-public class BitVector extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
+public class BitVector extends ClassWriter implements IDependency, IDependency.Maker {
     private final Collection<Requirement> iRequire;
     private final Requirement iProvide;
 
     private final boolean knowsSize;
     private final boolean arrayEater;
+
+    private final Required bvFieldType;
 
     public BitVector(String name, IntExpression bits) {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.types.BitVector.class.getPackage()), null,
@@ -55,6 +60,8 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         iRequire = bits.getReqs();
         iProvide = new Requirement(getName(), DataType.class);
         arrayEater = false;
+        bvFieldType = new Requirement((knowsSize ? "bitvector" : "bit_string") +
+                "(" + iProvide.getName() + ")", FieldTypeBasic.class);
     }
 
     public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
@@ -91,6 +98,8 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
         iRequire = Collections.<Requirement>emptySet();
         iProvide = new Requirement("char", DataType.class);
         arrayEater = true;
+        bvFieldType = new Requirement((knowsSize ? "bitvector" : "bit_string") +
+                "(" + iProvide.getName() + ")", FieldTypeBasic.class);
     }
 
     @Override
@@ -109,10 +118,22 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
     }
 
     @Override
-    public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
+    public List<Requirement> neededInput() {
+        return Collections.<Requirement>emptyList();
+    }
+
+    @Override
+    public Required getICanProduceReq() {
+        return bvFieldType;
+    }
+
+    @Override
+    public IDependency produce(IDependency... wasRequired) throws UndefinedException {
         final TargetClass me = super.getAddress().scopeKnown();
         me.register(new TargetMethod("getAsByteArray"));
-        return new TerminatedArray(io.getIFulfillReq().getName(), iProvide.getName(),
+        return new TerminatedArray(
+                knowsSize ? "bitvector" : "bit_string",
+                iProvide.getName(),
                 me,
                 null,
                 knowsSize ?
@@ -123,11 +144,11 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                         TerminatedArray.TransferArraySize.SERIALIZED,
                 TerminatedArray.byteArray,
                 new ExprFrom1<Typed<AnInt>, Var>() {
-                            @Override
-                            public Typed<AnInt> x(Var val) {
-                                return val.read("size");
-                            }
-                        },
+                    @Override
+                    public Typed<AnInt> x(Var val) {
+                        return val.read("size");
+                    }
+                },
                 TerminatedArray.neverAnythingAfter,
                 TerminatedArray.lenShouldBeEqual,
                 new ExprFrom1<Typed<AValue>, Var>() {
@@ -178,10 +199,5 @@ public class BitVector extends ClassWriter implements IDependency, FieldTypeBasi
                 },
                 Collections.<Method.Helper>emptySet()
         );
-    }
-
-    @Override
-    public Class<? extends ReqKind> needsDataInFormat() {
-        return NetworkIO.class;
     }
 }
