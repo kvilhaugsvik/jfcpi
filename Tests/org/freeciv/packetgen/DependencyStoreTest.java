@@ -50,6 +50,24 @@ public class DependencyStoreTest {
                 store.isAwareOfPotentialProvider(reqFor("Is")));
     }
 
+    @Test public void isAwareOfProviderNoProvider() {
+        DependencyStore store = new DependencyStore();
+        assertFalse(store.isAwareOfProvider(reqFor("Is")));
+    }
+
+    @Test public void isAwareOfProviderAProvider() {
+        DependencyStore store = new DependencyStore();
+        store.addPossibleRequirement(new OnlyRequire("Is"));
+        assertTrue(store.isAwareOfProvider(reqFor("Is")));
+    }
+
+    @Test public void isAwareOfProviderAProviderThatDependOnNotExisting() {
+        DependencyStore store = new DependencyStore();
+        store.addPossibleRequirement(new OnlyRequire("Is", reqFor("isn't")));
+        assertFalse("The provider won't resolve so it should return false",
+                store.isAwareOfProvider(reqFor("Is")));
+    }
+
     private DependencyStore depRoofOnTwoWallsOnTwoFloorsEachOneOverlapping() {
         DependencyStore store = new DependencyStore();
 

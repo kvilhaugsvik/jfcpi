@@ -82,6 +82,16 @@ public final class DependencyStore {
         return existing.hasFulfillmentOf(item) || (makers.hasFulfillmentOf(item) && creationWorked(item));
     }
 
+    /**
+     * Returns true if a provider for a requirement is known
+     *
+     * @param item the requirement to find a provider for
+     * @return true if a provider for a requirement is known AND it resolves
+     */
+    public boolean isAwareOfProvider(Requirement item) {
+        return isAwareOfPotentialProvider(item) && dependenciesFound(existing.getFulfillmentOf(item));
+    }
+
     private boolean creationWorked(Requirement item) {
         IDependency.Maker maker = makers.getFulfillmentOf(item);
         LinkedList<IDependency> args = new LinkedList<IDependency>();
@@ -126,7 +136,7 @@ public final class DependencyStore {
         } else {
             boolean missingReq = false;
             for (Requirement req : item.getReqs()) {
-                if (!(isAwareOfPotentialProvider(req) && dependenciesFound(existing.getFulfillmentOf(req)))) {
+                if (!(isAwareOfProvider(req))) {
                     dependenciesUnfulfilled.add(req);
                     missingReq = true;
                 }
