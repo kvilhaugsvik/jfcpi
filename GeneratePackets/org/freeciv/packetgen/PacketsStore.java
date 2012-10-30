@@ -68,50 +68,24 @@ public class PacketsStore {
                                             IntExpression.integer(bytesInPacketNumber + "")));
     }
 
-    private FieldTypeBasic tryToCreatePrimitive(String iotype, String ptype, Requirement neededBasic) {
-        Requirement wantPType = new Requirement(ptype, DataType.class);
-        if (!requirements.isAwareOfPotentialProvider(wantPType)) {
-            return failAndBlame(wantPType, neededBasic, ptype);
-        }
-        IDependency pubType = requirements.getPotentialProvider(wantPType);
-        if (!(pubType instanceof FieldTypeBasic.Generator)) {
-            return failAndBlame(wantPType, neededBasic, ptype);
-        }
-
-        Requirement wantIOType = new Requirement(iotype, ((FieldTypeBasic.Generator)pubType).needsDataInFormat());
-        if (!requirements.isAwareOfPotentialProvider(wantIOType)) {
-            return failAndBlame(wantIOType, neededBasic, ptype);
-        }
-        IDependency ioType = requirements.getPotentialProvider(wantIOType);
-        if (!(ioType instanceof NetworkIO)) {
-            return failAndBlame(wantIOType, neededBasic, ptype);
-        }
-
-        FieldTypeBasic basicFieldType = ((FieldTypeBasic.Generator)pubType).getBasicFieldTypeOnInput((NetworkIO)ioType);
-        requirements.addPossibleRequirement(basicFieldType);
-        return basicFieldType;
-    }
-
-    private FieldTypeBasic failAndBlame(Requirement missing, Requirement wanted, String ptype) {
-        requirements.addPossibleRequirement(new NotCreated(
-                wanted,
-                Arrays.asList(new Requirement(ptype, DataType.class), missing),
-                Arrays.asList(missing)));
-        return null;
-    }
-
     public void registerTypeAlias(String alias, String iotype, String ptype) throws UndefinedException {
         Requirement neededBasic = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
         FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider(neededBasic);
 
-        if (null == basicFieldType)
-            basicFieldType = tryToCreatePrimitive(iotype, ptype, neededBasic);
+        if (null == basicFieldType) {
+            Requirement wantPType = new Requirement(ptype, DataType.class);
+            if (!requirements.isAwareOfPotentialProvider(wantPType)) {
+                requirements.addPossibleRequirement(new NotCreated(
+                        neededBasic,
+                        Arrays.asList(new Requirement(ptype, DataType.class), wantPType),
+                        Arrays.asList(wantPType)));
+            }
 
-        if (null == basicFieldType)
             requirements.addPossibleRequirement(new NotCreated(
                     new Requirement(alias, FieldTypeBasic.FieldTypeAlias.class), Arrays.asList(neededBasic)));
-        else
+        } else {
             requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));
+        }
     }
 
     public void registerTypeAlias(String alias, String aliased) throws UndefinedException {

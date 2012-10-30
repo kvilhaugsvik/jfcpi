@@ -189,9 +189,4 @@ public class FieldTypeBasic implements IDependency, ReqKind {
             return new Requirement(getName(), FieldTypeBasic.FieldTypeAlias.class);
         }
     }
-
-    public static interface Generator {
-        public FieldTypeBasic getBasicFieldTypeOnInput(NetworkIO io);
-        public Class<? extends ReqKind> needsDataInFormat();
-    }
 }
