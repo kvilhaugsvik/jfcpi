@@ -118,7 +118,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     }
 
     @Override
-    public List<Requirement> neededInput() {
+    public List<Requirement> neededInput(Requirement toProduce) {
         return Collections.<Requirement>emptyList();
     }
 
@@ -128,7 +128,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     }
 
     @Override
-    public IDependency produce(IDependency... wasRequired) throws UndefinedException {
+    public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
         final TargetClass me = super.getAddress().scopeKnown();
         me.register(new TargetMethod("getAsByteArray"));
         return new TerminatedArray(

@@ -23,9 +23,9 @@ public interface IDependency {
     public Requirement getIFulfillReq();
 
     public static interface Maker {
-        public List<Requirement> neededInput();
+        public List<Requirement> neededInput(Requirement toProduce);
         public Required getICanProduceReq();
-        public IDependency produce(IDependency... wasRequired) throws UndefinedException;
+        public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException;
     }
 
 }

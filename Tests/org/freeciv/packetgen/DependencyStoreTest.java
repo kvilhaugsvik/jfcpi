@@ -122,7 +122,7 @@ public class DependencyStoreTest {
         final Requirement req = new Requirement("Value", Constant.class);
         IDependency.Maker valueGen = new MakerTest(Collections.<Requirement>emptyList(), req) {
             @Override
-            public IDependency produce(IDependency... wasRequired) throws UndefinedException {
+            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
                 return made;
             }
         };
@@ -152,7 +152,7 @@ public class DependencyStoreTest {
 
         IDependency.Maker valueGen = new MakerTest(params, req) {
             @Override
-            public IDependency produce(IDependency... wasRequired) throws UndefinedException {
+            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
                 if (one.equals(wasRequired[0]) && two.equals(wasRequired[1]) && three.equals(wasRequired[2]))
                     return made;
                 throw new UndefinedException("Parameters missing or in wrong order");
@@ -197,6 +197,56 @@ public class DependencyStoreTest {
                 wordThenWordInParen.canFulfill(new Requirement("word(other)word(other)", Constant.class)));
     }
 
+    @Test public void multiReqMakerMakesTwoDifferent() {
+        final OnlyRequire produced1 = new OnlyRequire("product1");
+        final OnlyRequire produced2 = new OnlyRequire("product2");
+
+        final OnlyRequire rawMaterial1 = new OnlyRequire("one");
+        final OnlyRequire rawMaterial2 = new OnlyRequire("two");
+        final OnlyRequire rawMaterial3 = new OnlyRequire("three");
+
+        IDependency.Maker valueGen = new IDependency.Maker() {
+            @Override
+            public List<Requirement> neededInput(Requirement toProduce) {
+                if (produced1.getIFulfillReq().canFulfill(toProduce))
+                    return Arrays.asList(rawMaterial1.getIFulfillReq(), rawMaterial2.getIFulfillReq());
+                else
+                    return Arrays.asList(rawMaterial2.getIFulfillReq(), rawMaterial3.getIFulfillReq());
+            }
+
+            @Override
+            public Required getICanProduceReq() {
+                return new RequiredMulti(Constant.class, Pattern.compile("product."));
+            }
+
+            @Override
+            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+                if (produced1.getIFulfillReq().equals(toProduce)) {
+                    if (rawMaterial1.equals(wasRequired[0]) && rawMaterial2.equals(wasRequired[1]))
+                        return produced1;
+                } else if (produced2.getIFulfillReq().equals(toProduce)) {
+                    if (rawMaterial2.equals(wasRequired[0]) && rawMaterial3.equals(wasRequired[1]))
+                        return produced2;
+                }
+                throw new UndefinedException("Parameters missing or in wrong order");
+            }
+        };
+
+        DependencyStore store = new DependencyStore();
+        store.addMaker(valueGen);
+        store.addPossibleRequirement(rawMaterial1);
+        store.addPossibleRequirement(rawMaterial2);
+        store.addPossibleRequirement(rawMaterial3);
+
+        store.demand(produced1.getIFulfillReq());
+        store.demand(produced2.getIFulfillReq());
+
+        assertEquals("Didn't create number one.",
+                produced1, store.getPotentialProvider(produced1.getIFulfillReq()));
+        assertEquals("Didn't create number two.",
+                produced2, store.getPotentialProvider(produced2.getIFulfillReq()));
+    }
+
     public static abstract class MakerTest implements IDependency.Maker {
         private final List<Requirement> requirements;
         private final Requirement canProduce;
@@ -207,7 +257,7 @@ public class DependencyStoreTest {
         }
 
         @Override
-        public List<Requirement> neededInput() {
+        public List<Requirement> neededInput(Requirement toProduce) {
             return requirements;
         }
 
