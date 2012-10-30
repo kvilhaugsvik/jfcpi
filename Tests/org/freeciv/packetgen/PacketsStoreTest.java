@@ -43,17 +43,17 @@ public class PacketsStoreTest {
 
     @Test public void registerType() throws UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("UINT32", "uint32", "int");
+        storage.registerTypeAlias("ALIAS", "uint32", "int");
 
-        assertTrue(storage.hasTypeAlias("UINT32"));
+        assertTrue(storage.hasTypeAlias("ALIAS"));
     }
 
     @Test public void registerTypeAlias() throws UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("UINT32", "uint32", "int");
-        storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
+        storage.registerTypeAlias("ALIASED", "uint32", "int");
+        storage.registerTypeAlias("ALIAS", "ALIASED");
 
-        assertTrue(storage.hasTypeAlias("UNSIGNEDINT32"));
+        assertTrue(storage.hasTypeAlias("ALIAS"));
     }
 
     private static void registerPacketToPullInnFieldtype(PacketsStore storage, String fieldTypeName, int time)
