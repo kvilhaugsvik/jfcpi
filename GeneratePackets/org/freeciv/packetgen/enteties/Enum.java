@@ -14,9 +14,8 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.packetgen.dependency.IDependency;
-import org.freeciv.packetgen.dependency.ReqKind;
-import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.UndefinedException;
+import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
@@ -30,12 +29,15 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
-public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Generator {
+public class Enum extends ClassWriter implements IDependency, IDependency.Maker {
     private final boolean bitwise;
     private final Collection<Requirement> iRequire;
+    private final Pattern fieldTypeBasicForMe;
     private final EnumElementFC invalidDefault;
     private final EnumElementFC countElement;
 
@@ -63,6 +65,7 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
 
         this.bitwise = bitwise;
         this.iRequire = reqs;
+        fieldTypeBasicForMe = Pattern.compile("(\\w+)\\((" + getIFulfillReq().getName() + ")\\)");
 
         int numberOfElements = 0;
         EnumElementFC invalidCandidate = null;
@@ -201,7 +204,13 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
     }
 
     @Override
-    public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
+    public Required getICanProduceReq() {
+        return new RequiredMulti(FieldTypeBasic.class, fieldTypeBasicForMe);
+    }
+
+    @Override
+    public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+        final NetworkIO io = (NetworkIO)wasRequired[0];
         final String named = this.getName();
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement("enum " + named, DataType.class));
@@ -231,8 +240,13 @@ public class Enum extends ClassWriter implements IDependency, FieldTypeBasic.Gen
     }
 
     @Override
-    public Class<? extends ReqKind> needsDataInFormat() {
-        return NetworkIO.class;
+    public List<Requirement> neededInput(Requirement toProduce) {
+        Matcher search = fieldTypeBasicForMe.matcher(toProduce.getName());
+        if (search.matches() && toProduce.getKind().equals(FieldTypeBasic.class))
+            return Arrays.asList(new Requirement(search.group(1), NetworkIO.class));
+        else
+            throw new IllegalArgumentException("The requirement " + toProduce +
+                    " isn't a basic field type using the enum " + getName());
     }
 
     @Deprecated
