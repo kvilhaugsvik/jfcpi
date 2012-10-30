@@ -30,8 +30,7 @@ public final class DependencyStore {
 
     /**
      * Make the dependency store aware of the fulfillment of a possible requirement.
-     * Any existing fulfillment will be overwritten. A ManyFulfiller will have every fulfillment added at once. In other
-     * words: An earlier registered primary fulfillment will be overwritten by the ManyFulfiller's also-fulfillment.
+     * Any existing fulfillment will be overwritten. A Maker will be added as a Maker as well
      * @param item The dependency to add.
      */
     public void addPossibleRequirement(IDependency item) {
