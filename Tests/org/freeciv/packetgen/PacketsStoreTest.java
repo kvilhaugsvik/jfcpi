@@ -22,7 +22,6 @@ import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.junit.Test;
 
 import java.util.*;
@@ -45,7 +44,7 @@ public class PacketsStoreTest {
         PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("ALIAS", "uint32", "int");
 
-        assertTrue(storage.hasTypeAlias("ALIAS"));
+        assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
     }
 
     @Test public void registerTypeAlias() throws UndefinedException {
@@ -53,7 +52,7 @@ public class PacketsStoreTest {
         storage.registerTypeAlias("ALIASED", "uint32", "int");
         storage.registerTypeAlias("ALIAS", "ALIASED");
 
-        assertTrue(storage.hasTypeAlias("ALIAS"));
+        assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
     }
 
     @Test public void registerTypeAliasToTypeRegisteredLater() throws UndefinedException {
@@ -61,7 +60,7 @@ public class PacketsStoreTest {
         storage.registerTypeAlias("ALIAS", "ALIASED");
         storage.registerTypeAlias("ALIASED", "uint32", "int");
 
-        assertTrue(storage.hasTypeAlias("ALIAS"));
+        assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
     }
 
     private static void registerPacketToPullInnFieldtype(PacketsStore storage, String fieldTypeName, int time)
@@ -170,7 +169,7 @@ public class PacketsStoreTest {
         fields.add(field1);
         storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields);
 
-        assertTrue(storage.hasTypeAlias("STRING"));
+        assertTrue(storage.doesFieldTypeAliasResolve("STRING"));
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
 

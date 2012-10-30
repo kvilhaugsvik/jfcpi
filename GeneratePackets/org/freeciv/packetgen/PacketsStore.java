@@ -98,8 +98,8 @@ public class PacketsStore {
         });
     }
 
-    public boolean hasTypeAlias(String name) {
-        return requirements.isAwareOfPotentialProvider(new Requirement(name, FieldTypeBasic.FieldTypeAlias.class));
+    public boolean doesFieldTypeAliasResolve(String name) {
+        return requirements.isAwareOfProvider(new Requirement(name, FieldTypeBasic.FieldTypeAlias.class));
     }
 
     public void registerPacket(String name, int number, List<WeakFlag> flags, List<WeakField> fields)
