@@ -166,6 +166,12 @@ public class DependencyStoreTest {
 
         List<IDependency> result = store.getResolved();
         assertFalse("Shouldn't generate without all requirements", result.contains(made));
+        assertTrue("Should complain about missing argument",
+                store.getMissingRequirements().contains(one.getIFulfillReq()));
+        assertTrue("Should complain about missing argument",
+                store.getMissingRequirements().contains(two.getIFulfillReq()));
+        assertTrue("Should complain about missing argument",
+                store.getMissingRequirements().contains(three.getIFulfillReq()));
 
         // Now add the requirements
         store.addPossibleRequirement(one);
