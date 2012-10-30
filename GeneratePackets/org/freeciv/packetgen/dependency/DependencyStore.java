@@ -73,6 +73,11 @@ public final class DependencyStore {
         return new LinkedList<IDependency>(resolved.values());
     }
 
+    /**
+     * Returns true if a potential provider for a requirement is known
+     * @param item the requirement to find a provider for
+     * @return true if a potential provider for a requirement is known EVEN IF IT WON'T RESOLVE
+     */
     public boolean isAwareOfPotentialProvider(Requirement item) {
         return existing.hasFulfillmentOf(item) || (makers.hasFulfillmentOf(item) && creationWorked(item));
     }
