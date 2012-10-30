@@ -88,15 +88,14 @@ public class PacketsStore {
         }
     }
 
-    public void registerTypeAlias(String alias, String aliased) throws UndefinedException {
-        Requirement req = new Requirement(aliased, FieldTypeBasic.FieldTypeAlias.class);
-        if (requirements.isAwareOfPotentialProvider(req)) {
-            requirements.addPossibleRequirement(((FieldTypeAlias)requirements.getPotentialProvider(req))
-                                                        .getBasicType().createFieldType(alias));
-        } else {
-            requirements.addPossibleRequirement(new NotCreated(
-                    new Requirement(alias, FieldTypeBasic.FieldTypeAlias.class), Arrays.asList(req)));
-        }
+    public void registerTypeAlias(final String alias, String aliased) throws UndefinedException {
+        requirements.addMaker(new IDependency.Maker.Simple(new Requirement(alias, FieldTypeAlias.class),
+                new Requirement(aliased, FieldTypeAlias.class)) {
+            @Override
+            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+                return ((FieldTypeAlias)wasRequired[0]).getBasicType().createFieldType(alias);
+            }
+        });
     }
 
     public boolean hasTypeAlias(String name) {

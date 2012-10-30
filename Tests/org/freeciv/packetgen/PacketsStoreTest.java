@@ -56,6 +56,14 @@ public class PacketsStoreTest {
         assertTrue(storage.hasTypeAlias("ALIAS"));
     }
 
+    @Test public void registerTypeAliasToTypeRegisteredLater() throws UndefinedException {
+        PacketsStore storage = defaultStorage();
+        storage.registerTypeAlias("ALIAS", "ALIASED");
+        storage.registerTypeAlias("ALIASED", "uint32", "int");
+
+        assertTrue(storage.hasTypeAlias("ALIAS"));
+    }
+
     private static void registerPacketToPullInnFieldtype(PacketsStore storage, String fieldTypeName, int time)
             throws PacketCollisionException, UndefinedException {
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
