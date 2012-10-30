@@ -138,16 +138,18 @@ public class DependencyStoreTest {
         assertTrue("Dependency of demanded item should be in output", result.contains(made));
     }
 
-    @Test public void makerThreeDependencies() {
-        final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
-        final Requirement req = new Requirement("Value", Constant.class);
+    private static final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
+    private static final Requirement req = new Requirement("Value", Constant.class);
+    private static final OnlyRequire lookedFor = new OnlyRequire("ValueUser", req);
 
+    private static final OnlyRequire one = new OnlyRequire("one");
+    private static final OnlyRequire two = new OnlyRequire("two");
+    private static final OnlyRequire three = new OnlyRequire("three");
+
+    private static DependencyStore makerThreeDependencies() {
         LinkedList<Requirement>params = new LinkedList<Requirement>();
-        final OnlyRequire one = new OnlyRequire("one");
         params.add(one.getIFulfillReq());
-        final OnlyRequire two = new OnlyRequire("two");
         params.add(two.getIFulfillReq());
-        final OnlyRequire three = new OnlyRequire("three");
         params.add(three.getIFulfillReq());
 
         IDependency.Maker valueGen = new MakerTest(params, req) {
@@ -161,24 +163,32 @@ public class DependencyStoreTest {
 
         DependencyStore store = new DependencyStore();
         store.addMaker(valueGen);
-        OnlyRequire lookedFor = new OnlyRequire("ValueUser", req);
         store.addWanted(lookedFor);
 
-        List<IDependency> result = store.getResolved();
-        assertFalse("Shouldn't generate without all requirements", result.contains(made));
+        return store;
+    }
+
+    @Test public void makerThreeDependenciesNoneAreThere() {
+        DependencyStore store = makerThreeDependencies();
+
+        assertFalse("Shouldn't generate without all requirements", store.getResolved().contains(made));
         assertTrue("Should complain about missing argument",
                 store.getMissingRequirements().contains(one.getIFulfillReq()));
         assertTrue("Should complain about missing argument",
                 store.getMissingRequirements().contains(two.getIFulfillReq()));
         assertTrue("Should complain about missing argument",
                 store.getMissingRequirements().contains(three.getIFulfillReq()));
+    }
+
+    @Test public void makerThreeDependenciesAllAreThere() {
+        DependencyStore store = makerThreeDependencies();
 
         // Now add the requirements
         store.addPossibleRequirement(one);
         store.addPossibleRequirement(two);
         store.addPossibleRequirement(three);
 
-        result = store.getResolved();
+        List<IDependency> result = store.getResolved();
         assertTrue("Demanded item should be in output", result.contains(lookedFor));
         assertTrue("Dependency of demanded item should be in output", result.contains(made));
     }
