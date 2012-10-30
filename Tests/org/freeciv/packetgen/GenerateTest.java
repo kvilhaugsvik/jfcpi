@@ -69,15 +69,15 @@ public class GenerateTest {
 
     public void remaining(String targetFolder) throws IOException, UndefinedException {
         HashMap<String, FieldTypeBasic> primitiveTypes = new HashMap<String, FieldTypeBasic>();
-        HashMap<String, FieldTypeBasic.Generator> generators = new HashMap<String, FieldTypeBasic.Generator>();
+        HashMap<String, IDependency.Maker> generators = new HashMap<String, IDependency.Maker>();
         HashMap<String, NetworkIO> network = new HashMap<String, NetworkIO>();
 
         for (IDependency mayBeNeeded : Hardcoded.values()) {
             if (mayBeNeeded instanceof FieldTypeBasic)
                 primitiveTypes.put(((FieldTypeBasic) mayBeNeeded).getFieldTypeBasic(), (FieldTypeBasic)mayBeNeeded);
-            else if (mayBeNeeded instanceof FieldTypeBasic.Generator)
+            else if (mayBeNeeded instanceof IDependency.Maker)
                 generators.put(mayBeNeeded.getIFulfillReq().getName(),
-                        (FieldTypeBasic.Generator)mayBeNeeded);
+                        (IDependency.Maker)mayBeNeeded);
             else if (mayBeNeeded instanceof NetworkIO)
                 network.put(mayBeNeeded.getIFulfillReq().getName(), (NetworkIO)mayBeNeeded);
         }
@@ -305,12 +305,14 @@ public class GenerateTest {
     }
 
     private static FieldTypeBasic.FieldTypeAlias getPrimitiveFieldType(HashMap<String, FieldTypeBasic> primitiveTypes,
-                HashMap<String, FieldTypeBasic.Generator> generators, HashMap<String, NetworkIO> network,
-                String netType, String pType, String alias) {
+                HashMap<String, IDependency.Maker> generators, HashMap<String, NetworkIO> network,
+                String netType, String pType, String alias) throws UndefinedException {
         if (primitiveTypes.containsKey(netType + "(" + pType + ")"))
             return primitiveTypes.get(netType + "(" + pType + ")").createFieldType(alias);
         else
-            return generators.get(pType).getBasicFieldTypeOnInput(network.get(netType)).createFieldType(alias);
+            return ((FieldTypeBasic)generators.get(pType)
+                    .produce(new Requirement(netType + "(" + pType + ")", FieldTypeBasic.class), network.get(netType)))
+                    .createFieldType(alias);
     }
 
     private static void writePacket(Packet packet, String targetFolder) throws IOException {

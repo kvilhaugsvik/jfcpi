@@ -14,9 +14,8 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
-import org.freeciv.packetgen.dependency.IDependency;
-import org.freeciv.packetgen.dependency.ReqKind;
-import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.UndefinedException;
+import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.TargetClass;
@@ -29,16 +28,20 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
+public class SimpleTypeAlias implements IDependency, IDependency.Maker {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
+    private final Pattern fieldTypeBasicForMe;
     private final String typeInJava;
 
     public SimpleTypeAlias(String name, String jType, Collection<Requirement> reqs) {
         this.iProvide = new Requirement(name, DataType.class);
         this.typeInJava = jType;
         this.willRequire = reqs;
+        fieldTypeBasicForMe = Pattern.compile("(\\w+)\\((" + getIFulfillReq().getName() + ")\\)");
     }
 
     public String getJavaType() {
@@ -46,7 +49,13 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     }
 
     @Override
-    public FieldTypeBasic getBasicFieldTypeOnInput(final NetworkIO io) {
+    public Required getICanProduceReq() {
+        return new RequiredMulti(FieldTypeBasic.class, fieldTypeBasicForMe);
+    }
+
+    @Override
+    public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+        final NetworkIO io = (NetworkIO)wasRequired[0];
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), new TargetClass(typeInJava),
                 new ExprFrom1<Block, Var>() {
                     @Override
@@ -77,8 +86,13 @@ public class SimpleTypeAlias implements IDependency, FieldTypeBasic.Generator {
     }
 
     @Override
-    public Class<? extends ReqKind> needsDataInFormat() {
-        return NetworkIO.class;
+    public List<Requirement> neededInput(Requirement toProduce) {
+        Matcher search = fieldTypeBasicForMe.matcher(toProduce.getName());
+        if (search.matches() && toProduce.getKind().equals(FieldTypeBasic.class))
+            return Arrays.asList(new Requirement(search.group(1), NetworkIO.class));
+        else
+            throw new IllegalArgumentException("The requirement " + toProduce +
+                    " isn't a basic field type for " + iProvide.getName());
     }
 
     @Override
