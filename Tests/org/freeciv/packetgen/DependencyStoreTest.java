@@ -120,7 +120,7 @@ public class DependencyStoreTest {
     @Test public void makerWorksNoDependencies() {
         final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
         final Requirement req = new Requirement("Value", Constant.class);
-        IDependency.Maker valueGen = new MakerTest(Collections.<Requirement>emptyList(), req) {
+        IDependency.Maker valueGen = new IDependency.Maker.Simple(req) {
             @Override
             public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
                 return made;
@@ -147,12 +147,8 @@ public class DependencyStoreTest {
     private static final OnlyRequire three = new OnlyRequire("three");
 
     private static DependencyStore makerThreeDependencies() {
-        LinkedList<Requirement>params = new LinkedList<Requirement>();
-        params.add(one.getIFulfillReq());
-        params.add(two.getIFulfillReq());
-        params.add(three.getIFulfillReq());
-
-        IDependency.Maker valueGen = new MakerTest(params, req) {
+        IDependency.Maker valueGen = new IDependency.Maker.Simple(req,
+                one.getIFulfillReq(), two.getIFulfillReq(), three.getIFulfillReq()) {
             @Override
             public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
                 if (one.equals(wasRequired[0]) && two.equals(wasRequired[1]) && three.equals(wasRequired[2]))
@@ -261,26 +257,6 @@ public class DependencyStoreTest {
                 produced1, store.getPotentialProvider(produced1.getIFulfillReq()));
         assertEquals("Didn't create number two.",
                 produced2, store.getPotentialProvider(produced2.getIFulfillReq()));
-    }
-
-    public static abstract class MakerTest implements IDependency.Maker {
-        private final List<Requirement> requirements;
-        private final Requirement canProduce;
-
-        public MakerTest(List<Requirement> requirements, Requirement canProduce) {
-            this.requirements = requirements;
-            this.canProduce = canProduce;
-        }
-
-        @Override
-        public List<Requirement> neededInput(Requirement toProduce) {
-            return requirements;
-        }
-
-        @Override
-        public Required getICanProduceReq() {
-            return canProduce;
-        }
     }
 
     public static class OnlyRequire implements IDependency {
