@@ -68,19 +68,31 @@ public final class DependencyStore {
      */
     public void blameMissingOn(Requirement missing, Requirement... blamed) {
         assert blamed.length != 0 : "No one to blame";
-        blameDeeperWhenNoItem.put(missing, Arrays.asList(blamed));
+        blameDeeperWhenNoItem.put(missing, new HashSet(Arrays.asList(blamed)));
     }
 
     public Set<Requirement> getMissingRequirements() {
         resolve();
+        purgeBlameDeeper();
+
         HashSet<Requirement> knownOrAssumedGuilty = new HashSet<Requirement>(dependenciesUnfulfilled);
-        for (Requirement missing : dependenciesUnfulfilled) {
-            if (blameDeeperWhenNoItem.containsKey(missing) && !existing.hasFulfillmentOf(missing))
-                for (Requirement blamed : blameDeeperWhenNoItem.get(missing))
-                    if (!existing.hasFulfillmentOf(blamed))
-                        knownOrAssumedGuilty.add(blamed);
-        }
+        for (Requirement blameHint : blameDeeperWhenNoItem.keySet())
+            if (dependenciesUnfulfilled.contains(blameHint))
+                knownOrAssumedGuilty.addAll(blameDeeperWhenNoItem.get(blameHint));
         return knownOrAssumedGuilty;
+    }
+
+    private void purgeBlameDeeper() {
+        for (Requirement purgeKey : new HashSet<Requirement>(blameDeeperWhenNoItem.keySet()))
+            if (existing.hasFulfillmentOf(purgeKey)) {
+                blameDeeperWhenNoItem.remove(purgeKey);
+            } else {
+                for (Requirement suspect : new HashSet<Requirement>(blameDeeperWhenNoItem.get(purgeKey)))
+                    if (isAwareOfProvider(suspect))
+                        blameDeeperWhenNoItem.get(blameDeeperWhenNoItem.get(purgeKey).remove(suspect));
+                if (blameDeeperWhenNoItem.get(purgeKey).isEmpty())
+                    blameDeeperWhenNoItem.remove(purgeKey);
+            }
     }
 
     /**
