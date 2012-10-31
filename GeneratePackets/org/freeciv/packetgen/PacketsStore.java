@@ -174,6 +174,10 @@ public class PacketsStore {
         return packets.get(name);
     }
 
+    public Packet getPacket(int number) {
+        return getPacket(packetsByNumber.get(number));
+    }
+
     public Collection<ClassWriter> getJavaCode() {
         Collection<IDependency> inn = requirements.getResolved();
         HashSet<ClassWriter> out = new HashSet<ClassWriter>();
@@ -202,8 +206,8 @@ public class PacketsStore {
         } else {
             understandsPackets = new Typed[packetsByNumber.lastKey() + 1];
             for (int number = 0; number <= packetsByNumber.lastKey(); number++) {
-                if (packetsByNumber.containsKey(number) && requirements.dependenciesFound(packets.get(packetsByNumber.get(number)))) {
-                    Packet packet = packets.get(packetsByNumber.get(number));
+                if (packetsByNumber.containsKey(number) && requirements.dependenciesFound(getPacket(number))) {
+                    Packet packet = getPacket(number);
                     understandsPackets[number] = BuiltIn.literal(packet.getPackage() + "." + packet.getName());
                 } else {
                     understandsPackets[number] = BuiltIn.literal(RawPacket.class.getCanonicalName()); // DEVMODE is handled elsewhere
