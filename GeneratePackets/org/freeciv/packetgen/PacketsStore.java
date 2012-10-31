@@ -68,24 +68,16 @@ public class PacketsStore {
                                             IntExpression.integer(bytesInPacketNumber + "")));
     }
 
-    public void registerTypeAlias(String alias, String iotype, String ptype) throws UndefinedException {
-        Requirement neededBasic = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
-        FieldTypeBasic basicFieldType = (FieldTypeBasic)requirements.getPotentialProvider(neededBasic);
-
-        if (null == basicFieldType) {
-            Requirement wantPType = new Requirement(ptype, DataType.class);
-            if (!requirements.isAwareOfPotentialProvider(wantPType)) {
-                requirements.addPossibleRequirement(new NotCreated(
-                        neededBasic,
-                        Arrays.asList(new Requirement(ptype, DataType.class), wantPType),
-                        Arrays.asList(wantPType)));
+    public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
+        Requirement basic = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
+        requirements.addMaker(new IDependency.Maker.Simple(new Requirement(alias, FieldTypeAlias.class), basic) {
+            @Override
+            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+                return ((FieldTypeBasic)wasRequired[0]).createFieldType(alias);
             }
-
-            requirements.addPossibleRequirement(new NotCreated(
-                    new Requirement(alias, FieldTypeBasic.FieldTypeAlias.class), Arrays.asList(neededBasic)));
-        } else {
-            requirements.addPossibleRequirement(basicFieldType.createFieldType(alias));
-        }
+        });
+        requirements.blameMissingOn(basic,
+                new Requirement(ptype, DataType.class), new Requirement(iotype, NetworkIO.class));
     }
 
     public void registerTypeAlias(final String alias, String aliased) throws UndefinedException {

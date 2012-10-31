@@ -47,6 +47,14 @@ public class PacketsStoreTest {
         assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
     }
 
+    @Test public void registerTypePreCondKnownLater() throws UndefinedException {
+        PacketsStore storage = defaultStorage();
+        storage.registerTypeAlias("ALIAS", "sint16", "fbbf");
+        storage.addDependency(new SimpleTypeAlias("fbbf", "BitString", Collections.<Requirement>emptySet()));
+
+        assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
+    }
+
     @Test public void registerTypeAlias() throws UndefinedException {
         PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("ALIASED", "uint32", "int");
