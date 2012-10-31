@@ -153,6 +153,67 @@ public class DependencyStoreTest {
         assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Non existing")));
     }
 
+    @Test(expected = AssertionError.class)
+    public void blameNotNoOne() {
+        DependencyStore store = new DependencyStore();
+        store.blameMissingOn(reqFor("NoOne"));
+    }
+
+    @Test public void blameAssumedGuiltyWhenNothingElseIsKnown() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("Alone"));
+        store.blameMissingOn(reqFor("Alone"), reqFor("Non existing"));
+
+        assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Alone")));
+        assertTrue("Should blame the fact that an item is missing on another missing item",
+                store.getMissingRequirements().contains(reqFor("Non existing")));
+    }
+
+    @Test public void blameNotTheUnrelated() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("Alone"));
+        store.blameMissingOn(reqFor("Not alone"), reqFor("Non existing"));
+
+        assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Alone")));
+        assertFalse("Shouldn't blame unrelated item",
+                store.getMissingRequirements().contains(reqFor("Non existing")));
+    }
+
+    @Test public void blameNotWhenAllIsWell() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("Alone"));
+        store.blameMissingOn(reqFor("Alone"), reqFor("Non existing"));
+        store.addPossibleRequirement(new OnlyRequire("Alone"));
+
+        assertFalse("Item should be resolved", store.getMissingRequirements().contains(reqFor("Alone")));
+        assertFalse("Shouldn't blame other item when there is nothing to blame it for",
+                store.getMissingRequirements().contains(reqFor("Non existing")));
+    }
+
+    @Test public void blameNotAssumedGuiltyWhenRealGuiltyIsKnown() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("Alone"));
+        store.blameMissingOn(reqFor("Alone"), reqFor("innocent"));
+        store.addPossibleRequirement(new OnlyRequire("Alone", reqFor("guilty")));
+
+        assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Alone")));
+        assertTrue("Should blame the guilty item",
+                store.getMissingRequirements().contains(reqFor("guilty")));
+        assertFalse("Shouldn't blame innocent item when the guilty is known",
+                store.getMissingRequirements().contains(reqFor("innocent")));
+    }
+
+    @Test public void blameNotTheAssumedGuiltyWhenProvenInnocent() {
+        DependencyStore store = new DependencyStore();
+        store.demand(reqFor("Alone"));
+        store.blameMissingOn(reqFor("Alone"), reqFor("Existing"));
+        store.addPossibleRequirement(new OnlyRequire("Existing"));
+
+        assertTrue("Should be informed about missing item", store.getMissingRequirements().contains(reqFor("Alone")));
+        assertFalse("Shouldn't blame item that exist and therefore is blameless",
+                store.getMissingRequirements().contains(reqFor("Existing")));
+    }
+
     @Test public void makerWorksNoDependencies() {
         final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
         final Requirement req = new Requirement("Value", Constant.class);

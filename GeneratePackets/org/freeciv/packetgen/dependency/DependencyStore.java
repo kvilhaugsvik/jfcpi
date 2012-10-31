@@ -26,6 +26,7 @@ public final class DependencyStore {
     private final DepStore<IDependency> dependenciesFulfilled = DepStore.forIDependency();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
     private final HashSet<Requirement> wantsOut = new HashSet<Requirement>();
+    private final HashMap<Requirement, Collection<Requirement>> blameDeeperWhenNoItem = new HashMap<Requirement, Collection<Requirement>>();
     private final DepStore<IDependency.Maker> makers = DepStore.forMaker();
 
     /**
@@ -59,9 +60,27 @@ public final class DependencyStore {
         makers.add(maker);
     }
 
+    /**
+     * Add information on what missing requirements to suspect when a certain requirement is missing. This may be a
+     * maker that could have produced it, a parameter to the maker or something the item would have required.
+     * @param missing the missing item
+     * @param blamed requirements to add when it is missing
+     */
+    public void blameMissingOn(Requirement missing, Requirement... blamed) {
+        assert blamed.length != 0 : "No one to blame";
+        blameDeeperWhenNoItem.put(missing, Arrays.asList(blamed));
+    }
+
     public Set<Requirement> getMissingRequirements() {
         resolve();
-        return Collections.unmodifiableSet(dependenciesUnfulfilled);
+        HashSet<Requirement> knownOrAssumedGuilty = new HashSet<Requirement>(dependenciesUnfulfilled);
+        for (Requirement missing : dependenciesUnfulfilled) {
+            if (blameDeeperWhenNoItem.containsKey(missing) && !existing.hasFulfillmentOf(missing))
+                for (Requirement blamed : blameDeeperWhenNoItem.get(missing))
+                    if (!existing.hasFulfillmentOf(blamed))
+                        knownOrAssumedGuilty.add(blamed);
+        }
+        return knownOrAssumedGuilty;
     }
 
     /**
