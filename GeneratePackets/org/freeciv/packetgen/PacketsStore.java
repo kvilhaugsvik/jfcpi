@@ -96,34 +96,8 @@ public class PacketsStore {
 
     public void registerPacket(String name, int number, List<WeakFlag> flags, List<WeakField> fields)
             throws PacketCollisionException, UndefinedException {
-        if (hasPacket(name)) {
-            throw new PacketCollisionException("Packet name " + name + " already in use");
-        } else if (hasPacket(number)) {
-            throw new PacketCollisionException("Packet number " + number + " already in use");
-        }
-
-        List<Annotate> packetFlags = new LinkedList<Annotate>();
-        byte sentBy = 0;
-        LinkedList<String> canceled = new LinkedList<String>();
-        for (WeakFlag flag : flags) {
-            if ("sc".equals(flag.getName()))
-                sentBy += 2;
-            else if ("cs".equals(flag.getName()))
-                sentBy += 1;
-            else if ("no-delta".equals(flag.getName()))
-                packetFlags.add(new Annotate(NoDelta.class.getSimpleName()));
-            else if ("is-info".equals(flag.getName()))
-                packetFlags.add(new Annotate(IsInfo.class.getSimpleName()));
-            else if ("is-game-info".equals(flag.getName()))
-                packetFlags.add(new Annotate(IsGameInfo.class.getSimpleName()));
-            else if ("force".equals(flag.getName()))
-                packetFlags.add(new Annotate(Force.class.getSimpleName()));
-            else if ("cancel".equals(flag.getName()))
-                canceled.add(flag.getArguments()[0]);
-
-        }
-        if (!canceled.isEmpty()) packetFlags.add(new Canceler(canceled));
-        packetFlags.add(new Sender(sentBy));
+        validateNameAndNumber(name, number);
+        List<Annotate> packetFlags = extractFlags(flags);
 
         List<Field> fieldList = new LinkedList<Field>();
         HashSet<Requirement> allNeeded = new HashSet<Requirement>();
@@ -151,6 +125,40 @@ public class PacketsStore {
         } else {
             requirements.addWanted(
                     new NotCreated(new Requirement(name, Packet.class), allNeeded, missingWhenNeeded));
+        }
+    }
+
+    private List<Annotate> extractFlags(List<WeakFlag> flags) {
+        List<Annotate> packetFlags = new LinkedList<Annotate>();
+        byte sentBy = 0;
+        LinkedList<String> canceled = new LinkedList<String>();
+        for (WeakFlag flag : flags) {
+            if ("sc".equals(flag.getName()))
+                sentBy += 2;
+            else if ("cs".equals(flag.getName()))
+                sentBy += 1;
+            else if ("no-delta".equals(flag.getName()))
+                packetFlags.add(new Annotate(NoDelta.class.getSimpleName()));
+            else if ("is-info".equals(flag.getName()))
+                packetFlags.add(new Annotate(IsInfo.class.getSimpleName()));
+            else if ("is-game-info".equals(flag.getName()))
+                packetFlags.add(new Annotate(IsGameInfo.class.getSimpleName()));
+            else if ("force".equals(flag.getName()))
+                packetFlags.add(new Annotate(Force.class.getSimpleName()));
+            else if ("cancel".equals(flag.getName()))
+                canceled.add(flag.getArguments()[0]);
+
+        }
+        if (!canceled.isEmpty()) packetFlags.add(new Canceler(canceled));
+        packetFlags.add(new Sender(sentBy));
+        return packetFlags;
+    }
+
+    private void validateNameAndNumber(String name, int number) throws PacketCollisionException {
+        if (hasPacket(name)) {
+            throw new PacketCollisionException("Packet name " + name + " already in use");
+        } else if (hasPacket(number)) {
+            throw new PacketCollisionException("Packet number " + number + " already in use");
         }
     }
 
