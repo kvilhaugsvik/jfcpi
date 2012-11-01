@@ -38,7 +38,7 @@ public class PacketsStore {
 
     // To avoid duplication of structures have packets store the packets and packetsByNumber translate the keys
     // Idea from http://stackoverflow.com/q/822701
-    private final HashMap<String, Packet> packets = new HashMap<String, Packet>();
+    private final HashMap<String, Requirement> packets = new HashMap<String, Requirement>();
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
     @Deprecated public PacketsStore(int bytesInPacketNumber) {
@@ -85,7 +85,7 @@ public class PacketsStore {
                 new Requirement(aliased, FieldTypeAlias.class)) {
             @Override
             public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
-                return ((FieldTypeAlias)wasRequired[0]).getBasicType().createFieldType(alias);
+                return ((FieldTypeAlias) wasRequired[0]).getBasicType().createFieldType(alias);
             }
         });
     }
@@ -94,38 +94,48 @@ public class PacketsStore {
         return requirements.isAwareOfProvider(new Requirement(name, FieldTypeBasic.FieldTypeAlias.class));
     }
 
-    public void registerPacket(String name, int number, List<WeakFlag> flags, List<WeakField> fields)
+    public void registerPacket(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields)
             throws PacketCollisionException, UndefinedException {
         validateNameAndNumber(name, number);
-        List<Annotate> packetFlags = extractFlags(flags);
 
-        List<Field> fieldList = new LinkedList<Field>();
-        HashSet<Requirement> allNeeded = new HashSet<Requirement>();
-        HashSet<Requirement> missingWhenNeeded = new HashSet<Requirement>();
-        for (WeakField fieldType : fields) {
-            Requirement req = new Requirement(fieldType.getType(), FieldTypeBasic.FieldTypeAlias.class);
-            allNeeded.add(req);
-            if (requirements.isAwareOfPotentialProvider(req) &&
-                    requirements.getPotentialProvider(req) instanceof FieldTypeAlias) {
-                fieldList.add(new Field(fieldType.getName(),
-                                        (FieldTypeAlias)requirements.getPotentialProvider(req),
-                                        name,
-                                        fieldType.getFlags(),
-                                        fieldType.getDeclarations()));
-            } else
-                missingWhenNeeded.add(req);
-        }
+        Requirement me = new Requirement(name, Packet.class);
+        reserveNameAndNumber(name, number, me);
 
-        if (missingWhenNeeded.isEmpty()) {
-            Packet packet = new Packet(name, number, packetHeaderType, logger,
-                                       packetFlags, fieldList.toArray(new Field[0]));
-            requirements.addWanted(packet);
-            packets.put(name, packet);
-            packetsByNumber.put(number, name);
-        } else {
-            requirements.addWanted(
-                    new NotCreated(new Requirement(name, Packet.class), allNeeded, missingWhenNeeded));
+        final List<Annotate> packetFlags = extractFlags(flags);
+        List<Requirement> allNeeded = extractFieldRequirements(fields);
+
+        requirements.addMaker(new IDependency.Maker.Simple(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
+            @Override
+            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+                assert wasRequired.length == fields.size() : "Wrong number of arguments";
+                List<Field> fieldList = new LinkedList<Field>();
+                for (int i = 0; i < fields.size(); i++) {
+                    WeakField fieldType = fields.get(i);
+                    fieldList.add(new Field(fieldType.getName(),
+                            (FieldTypeAlias)wasRequired[i],
+                            name,
+                            fieldType.getFlags(),
+                            fieldType.getDeclarations()));
+                }
+
+                return new Packet(name, number, packetHeaderType, logger, packetFlags, fieldList.toArray(new Field[0]));
+            }
+        });
+
+        requirements.demand(me);
+    }
+
+    private void validateNameAndNumber(String name, int number) throws PacketCollisionException {
+        if (hasPacket(name)) {
+            throw new PacketCollisionException("Packet name " + name + " already in use");
+        } else if (hasPacket(number)) {
+            throw new PacketCollisionException("Packet number " + number + " already in use");
         }
+    }
+
+    private void reserveNameAndNumber(String name, int number, Requirement packetID) {
+        packets.put(name, packetID);
+        packetsByNumber.put(number, name);
     }
 
     private List<Annotate> extractFlags(List<WeakFlag> flags) {
@@ -154,12 +164,12 @@ public class PacketsStore {
         return packetFlags;
     }
 
-    private void validateNameAndNumber(String name, int number) throws PacketCollisionException {
-        if (hasPacket(name)) {
-            throw new PacketCollisionException("Packet name " + name + " already in use");
-        } else if (hasPacket(number)) {
-            throw new PacketCollisionException("Packet number " + number + " already in use");
+    private List<Requirement> extractFieldRequirements(List<WeakField> fields) {
+        LinkedList<Requirement> allNeeded = new LinkedList<Requirement>();
+        for (WeakField fieldType : fields) {
+            allNeeded.add(new Requirement(fieldType.getType(), FieldTypeAlias.class));
         }
+        return allNeeded;
     }
 
     public boolean hasPacket(String name) {
@@ -171,7 +181,7 @@ public class PacketsStore {
     }
 
     public Packet getPacket(String name) {
-        return packets.get(name);
+        return (Packet)requirements.getPotentialProvider(packets.get(name));
     }
 
     public Packet getPacket(int number) {
@@ -206,7 +216,8 @@ public class PacketsStore {
         } else {
             understandsPackets = new Typed[packetsByNumber.lastKey() + 1];
             for (int number = 0; number <= packetsByNumber.lastKey(); number++) {
-                if (packetsByNumber.containsKey(number) && requirements.dependenciesFound(getPacket(number))) {
+                if (null != packetsByNumber.get(number) && null != packets.get(packetsByNumber.get(number)) &&
+                        requirements.isAwareOfProvider(packets.get(packetsByNumber.get(number)))) {
                     Packet packet = getPacket(number);
                     understandsPackets[number] = BuiltIn.literal(packet.getPackage() + "." + packet.getName());
                 } else {

@@ -220,9 +220,20 @@ public class PacketsStoreTest {
 
         storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields);
 
-        assertFalse(storage.hasPacket(25));
-        assertFalse(storage.hasPacket("PACKET_HELLO"));
+        assertNull(storage.getPacket(25));
+        assertNull(storage.getPacket("PACKET_HELLO"));
         assertLooksForButNoCodeYet(storage, new Requirement("STRING", FieldTypeBasic.FieldTypeAlias.class), "STRING");
+    }
+
+    @Test public void registerPacketBeforeItsFieldType() throws PacketCollisionException, UndefinedException {
+        PacketsStore storage = defaultStorage();
+        WeakField field1 = new WeakField("myNameIs", "STRING",
+                Collections.<WeakFlag>emptyList(), new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
+        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), Arrays.asList(field1));
+        storage.registerTypeAlias("STRING", "string", "char");
+
+        assertTrue("Packet not created", storage.hasPacket("PACKET_HELLO"));
+        assertEquals("Should have one field", 1, storage.getPacket("PACKET_HELLO").getFields().size());
     }
 
     private static ClassWriter getVersionData(PacketsStore storage) {
