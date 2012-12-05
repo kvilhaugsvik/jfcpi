@@ -79,6 +79,9 @@ public class ProxyRecorder implements Runnable {
             proxyPacket(serverCon, clientCon, false);
         }
 
+        clientCon.setOver();
+        serverCon.setOver();
+
         System.out.println(proxyNumber + " is finished");
     }
 
