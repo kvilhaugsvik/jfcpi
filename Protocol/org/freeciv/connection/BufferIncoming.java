@@ -34,13 +34,13 @@ public class BufferIncoming {
 
     public BufferIncoming(
             final Connect owner,
-            final Socket server,
+            final Socket connection,
             final Class<? extends PacketHeader> packetHeaderClass,
             final Map<Integer, ReflexReaction> reflexes
     ) throws IOException {
         buffered = new LinkedList<RawPacket>();
         quickRespond = new ReflexPacketKind(reflexes, owner);
-        connection = server;
+        this.connection = connection;
 
         try {
             headerReader = packetHeaderClass.getConstructor(DataInput.class);
@@ -53,7 +53,7 @@ public class BufferIncoming {
             throw new IOException("Could not access header size in header interpreter", e);
         }
 
-        final InputStream in = server.getInputStream();
+        final InputStream in = connection.getInputStream();
 
         Thread fastReader = new Thread(new Runnable(){
             @Override
@@ -75,7 +75,7 @@ public class BufferIncoming {
                     owner.setOver();
                 } finally {
                     try {
-                        server.close();
+                        connection.close();
                     } catch (IOException e) {
                         System.err.println("Problems while closing network connection. Packets may not have been sent");
                         e.printStackTrace();
