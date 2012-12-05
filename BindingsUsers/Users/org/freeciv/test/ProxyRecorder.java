@@ -52,7 +52,9 @@ public class ProxyRecorder implements Runnable {
         } catch (IOException e) {
             System.err.println("Port not free");
             e.printStackTrace();
+            System.exit(1);
         }
+        System.exit(0);
     }
 
     public ProxyRecorder(Connect clientCon, int proxyNumber) throws IOException, InterruptedException {
