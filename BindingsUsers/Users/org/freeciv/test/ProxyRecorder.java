@@ -75,17 +75,17 @@ public class ProxyRecorder implements Runnable {
             throw new IllegalStateException("Already started");
 
         while (clientCon.isOpen() && serverCon.isOpen()) {
-            proxyPacket(clientCon, serverCon, " c2s: ");
-            proxyPacket(serverCon, clientCon, " s2c: ");
+            proxyPacket(clientCon, serverCon, true);
+            proxyPacket(serverCon, clientCon, false);
         }
 
         System.out.println(proxyNumber + " is finished");
     }
 
-    private void proxyPacket(Connect readFrom, Connect writeTo, String directionMessage) {
+    private void proxyPacket(Connect readFrom, Connect writeTo, boolean clientToServer) {
         try {
             Packet fromClient = readFrom.getPacket();
-            System.out.println(proxyNumber + directionMessage + fromClient);
+            System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);
             writeTo.toSend(fromClient);
         } catch (NotReadyYetException e) {
             Thread.yield();
