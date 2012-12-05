@@ -23,6 +23,8 @@ import java.net.ServerSocket;
 import java.util.*;
 
 public class ProxyRecorder implements Runnable {
+    private static final int ACCEPT_CLIENTS_AT = 5556;
+
     private final int proxyNumber;
     private final Connect clientCon;
 
@@ -30,7 +32,7 @@ public class ProxyRecorder implements Runnable {
 
     public static void main(String[] args) throws InterruptedException {
         try {
-            ServerSocket serverProxy = new ServerSocket(5556);
+            ServerSocket serverProxy = new ServerSocket(ACCEPT_CLIENTS_AT);
             ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
             while (!serverProxy.isClosed())
                 try {
