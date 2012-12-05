@@ -17,6 +17,7 @@ package org.freeciv.test;
 import org.freeciv.Connect;
 import org.freeciv.NotReadyYetException;
 import org.freeciv.connection.ReflexReaction;
+import org.freeciv.packet.Packet;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -24,9 +25,12 @@ import java.util.*;
 
 public class ProxyRecorder implements Runnable {
     private static final int ACCEPT_CLIENTS_AT = 5556;
+    private static final int REAL_SERVER_PORT = 55555;
+    private static final String REAL_SERVER_ADDRESS = "127.0.0.1";
 
     private final int proxyNumber;
     private final Connect clientCon;
+    private final Connect serverCon;
 
     private boolean started = false;
 
@@ -54,6 +58,11 @@ public class ProxyRecorder implements Runnable {
     public ProxyRecorder(Connect clientCon, int proxyNumber) throws IOException, InterruptedException {
         this.proxyNumber = proxyNumber;
         this.clientCon = clientCon;
+        try {
+            serverCon = new Connect(REAL_SERVER_ADDRESS, REAL_SERVER_PORT, Collections.<Integer, ReflexReaction>emptyMap());
+        } catch (IOException e) {
+            throw new IOException(proxyNumber + ": Unable to connect to server", e);
+        }
     }
 
     @Override
@@ -63,18 +72,26 @@ public class ProxyRecorder implements Runnable {
         else
             throw new IllegalStateException("Already started");
 
-        while (clientCon.isOpen() || clientCon.hasMorePackets()) {
-            try {
-                System.out.println(proxyNumber + " c2s: " + clientCon.getPacket());
-            } catch (NotReadyYetException e) {
-                Thread.yield();
-            } catch (IOException e) {
-                System.err.println("Couldn't get packet. Finishing...");
-                e.printStackTrace();
-                clientCon.setOver();
-            }
+        while (clientCon.isOpen() && serverCon.isOpen()) {
+            proxyPacket(clientCon, serverCon, " c2s: ");
+            proxyPacket(serverCon, clientCon, " s2c: ");
         }
 
         System.out.println(proxyNumber + " is finished");
+    }
+
+    private void proxyPacket(Connect readFrom, Connect writeTo, String directionMessage) {
+        try {
+            Packet fromClient = readFrom.getPacket();
+            System.out.println(proxyNumber + directionMessage + fromClient);
+            writeTo.toSend(fromClient);
+        } catch (NotReadyYetException e) {
+            Thread.yield();
+        } catch (IOException e) {
+            System.err.println("Couldn't get packet. Finishing...");
+            e.printStackTrace();
+            readFrom.setOver();
+            serverCon.setOver();
+        }
     }
 }
