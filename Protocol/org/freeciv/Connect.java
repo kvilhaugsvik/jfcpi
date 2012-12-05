@@ -26,7 +26,6 @@ import java.util.Map;
 //TODO: Implement compression in protocol
 public class Connect {
     private final OutputStream out;
-    private final Socket server;
     private final BufferIncoming toProcess;
 
     private final PacketsMapping interpreter;
@@ -40,10 +39,9 @@ public class Connect {
     public Connect(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
         interpreter = new PacketsMapping();
 
-        server = connection;
-        out = server.getOutputStream();
+        out = connection.getOutputStream();
 
-        toProcess = new BufferIncoming(this, server, interpreter.getPacketHeaderClass(), reflexes);
+        toProcess = new BufferIncoming(this, connection, interpreter.getPacketHeaderClass(), reflexes);
     }
 
     public Packet getPacket() throws IOException, NotReadyYetException {
@@ -89,7 +87,7 @@ public class Connect {
     }
 
     public boolean isOpen() {
-        return !server.isClosed();
+        return !toProcess.isClosed();
     }
 
     public boolean hasMorePackets() {

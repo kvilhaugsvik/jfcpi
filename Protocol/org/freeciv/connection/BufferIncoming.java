@@ -26,6 +26,7 @@ import java.util.Map;
 
 public class BufferIncoming {
     private final LinkedList<RawPacket> buffered;
+    private final Socket connection;
 
     private final ReflexPacketKind quickRespond;
     private final Constructor<? extends PacketHeader> headerReader;
@@ -39,6 +40,7 @@ public class BufferIncoming {
     ) throws IOException {
         buffered = new LinkedList<RawPacket>();
         quickRespond = new ReflexPacketKind(reflexes, owner);
+        connection = server;
 
         try {
             headerReader = packetHeaderClass.getConstructor(DataInput.class);
@@ -108,5 +110,9 @@ public class BufferIncoming {
         synchronized (buffered) {
             return buffered.removeFirst();
         }
+    }
+
+    public boolean isClosed() {
+        return connection.isClosed();
     }
 }
