@@ -34,12 +34,7 @@ public class Connect {
     private boolean over = false;
 
     public Connect(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
-        interpreter = new PacketsMapping();
-
-        server = new Socket(address, port);
-        out = server.getOutputStream();
-
-        toProcess = new BufferIncoming(this, server, interpreter.getPacketHeaderClass(), reflexes);
+        this(new Socket(address, port), reflexes);
     }
 
     public Connect(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
