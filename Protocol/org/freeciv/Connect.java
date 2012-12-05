@@ -42,6 +42,15 @@ public class Connect {
         toProcess = new BufferIncoming(this, server, interpreter.getPacketHeaderClass(), reflexes);
     }
 
+    public Connect(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
+        interpreter = new PacketsMapping();
+
+        server = connection;
+        out = server.getOutputStream();
+
+        toProcess = new BufferIncoming(this, server, interpreter.getPacketHeaderClass(), reflexes);
+    }
+
     public Packet getPacket() throws IOException, NotReadyYetException {
         RawPacket out;
         if (toProcess.isEmpty())
