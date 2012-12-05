@@ -67,11 +67,17 @@ public class BufferIncoming {
                             buffered.add(incoming);
                         }
                     }
-                    server.close();
                 } catch (Exception e) {
                     System.err.println("Problem in the thread that reads from the network");
                     e.printStackTrace();
-                    System.exit(1);
+                    owner.setOver();
+                } finally {
+                    try {
+                        server.close();
+                    } catch (IOException e) {
+                        System.err.println("Problems while closing network connection. Packets may not have been sent");
+                        e.printStackTrace();
+                    }
                 }
             }
         });
