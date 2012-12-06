@@ -118,7 +118,7 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} `find Tests/org/freeciv/test/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileBindingsUsers: compileFromFreeciv
+compileBindingsUsers: compileFromFreeciv compileUtils
 	mkdir -p ${COMPILED_BINDINGS_USERS_FOLDER}
 	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find BindingsUsers/Users -iname "*.java"`
 	touch compileBindingsUsers
@@ -133,7 +133,7 @@ runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
 compileProxyRecorder: compileBindingsUsers
-	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.ProxyRecorder \$$1 \$$2 \$$3" > proxyRecorder
+	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
 	touch compileProxyRecorder
 
