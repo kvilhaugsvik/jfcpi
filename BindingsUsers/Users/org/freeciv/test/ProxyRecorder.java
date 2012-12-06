@@ -19,7 +19,7 @@ import org.freeciv.NotReadyYetException;
 import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.Packet;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.util.*;
 
@@ -28,9 +28,15 @@ public class ProxyRecorder implements Runnable {
     private static final int REAL_SERVER_PORT = 55555;
     private static final String REAL_SERVER_ADDRESS = "127.0.0.1";
 
+    private static final String TRACE_NAME_ROOT = "FreecivCon";
+    private static final String TRACE_NAME_EXTENSION = ".fct";
+    private static final boolean TRACE_DYNAMIC = true;
+
+
     private final int proxyNumber;
     private final Connect clientCon;
     private final Connect serverCon;
+    private final DataOutputStream trace;
 
     private boolean started = false;
 
@@ -42,7 +48,9 @@ public class ProxyRecorder implements Runnable {
                 try {
                     Connect clientCon =
                             new Connect(serverProxy.accept(), Collections.<Integer, ReflexReaction>emptyMap());
-                    ProxyRecorder proxy = new ProxyRecorder(clientCon, connections.size());
+                    ProxyRecorder proxy = new ProxyRecorder(clientCon, connections.size(),
+                            new DataOutputStream(new BufferedOutputStream(
+                                    new FileOutputStream(TRACE_NAME_ROOT + connections.size() + TRACE_NAME_EXTENSION))));
                     connections.add(proxy);
                     (new Thread(proxy)).start();
                 } catch (IOException e) {
@@ -57,8 +65,9 @@ public class ProxyRecorder implements Runnable {
         System.exit(0);
     }
 
-    public ProxyRecorder(Connect clientCon, int proxyNumber) throws IOException, InterruptedException {
+    public ProxyRecorder(Connect clientCon, int proxyNumber, DataOutputStream trace) throws IOException, InterruptedException {
         this.proxyNumber = proxyNumber;
+        this.trace = trace;
         this.clientCon = clientCon;
         try {
             serverCon = new Connect(REAL_SERVER_ADDRESS, REAL_SERVER_PORT, Collections.<Integer, ReflexReaction>emptyMap());
@@ -74,21 +83,48 @@ public class ProxyRecorder implements Runnable {
         else
             throw new IllegalStateException("Already started");
 
+        try {
+            // the version of the trace format
+            trace.writeChar(1);
+            // is the time a packet arrived included in the trace
+            trace.writeBoolean(TRACE_DYNAMIC);
+        } catch (IOException e) {
+            System.err.println(proxyNumber + ": Unable to write trace");
+            e.printStackTrace();
+
+            cleanUp();
+            return;
+        }
+
         while (clientCon.isOpen() && serverCon.isOpen()) {
             proxyPacket(clientCon, serverCon, true);
             proxyPacket(serverCon, clientCon, false);
         }
 
-        clientCon.setOver();
-        serverCon.setOver();
+        cleanUp();
 
         System.out.println(proxyNumber + " is finished");
+    }
+
+    private void cleanUp() {
+        clientCon.setOver();
+        serverCon.setOver();
+        try {
+            trace.close();
+        } catch (IOException e) {
+            System.err.println("Some data may not have been written to the trace for connection " + proxyNumber);
+            e.printStackTrace();
+        }
     }
 
     private void proxyPacket(Connect readFrom, Connect writeTo, boolean clientToServer) {
         try {
             Packet fromClient = readFrom.getPacket();
             System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);
+            trace.writeBoolean(clientToServer);
+            if (TRACE_DYNAMIC)
+                trace.writeLong(System.currentTimeMillis());
+            fromClient.encodeTo(trace);
             writeTo.toSend(fromClient);
         } catch (NotReadyYetException e) {
             Thread.yield();
