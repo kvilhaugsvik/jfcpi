@@ -31,8 +31,6 @@ public class Connect implements FreecivConnection {
 
     private final PacketsMapping interpreter;
 
-    private boolean over = false;
-
     public Connect(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
         this(new Socket(address, port), reflexes);
     }
@@ -73,21 +71,14 @@ public class Connect implements FreecivConnection {
         out.write(packetSerialized.toByteArray());
     }
 
-    /**
-     * Close the connection as soon as its data has been read
-     */
     @Override
     public void setOver() {
-        over = true;
+        toProcess.setOver();
     }
 
-    /**
-     * Will the connection be closed (unless it already is) as soon as its empty?
-     * @return true if the connection is closed or soon will be
-     */
     @Override
     public boolean isOver() {
-        return over;
+        return toProcess.isOver();
     }
 
     public boolean isOpen() {

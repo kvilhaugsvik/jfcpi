@@ -32,6 +32,8 @@ public class BufferIncoming {
     private final Constructor<? extends PacketHeader> headerReader;
     private final int headerSize;
 
+    private boolean over = false;
+
     public BufferIncoming(
             final FreecivConnection owner,
             final Socket connection,
@@ -55,18 +57,20 @@ public class BufferIncoming {
 
         final InputStream in = connection.getInputStream();
 
+        final BufferIncoming parent = this;
+
         Thread fastReader = new Thread(new Runnable(){
             @Override
             public void run() {
                 try {
-                    while(0 < in.available() || !owner.isOver()) {
-                        byte[] headerStart = readXBytesFrom(headerSize, in, owner);
+                    while(0 < in.available() || !parent.isOver()) {
+                        byte[] headerStart = readXBytesFrom(headerSize, in, parent);
                         if (headerStart.length < headerSize)
                             break; // incomplete data was returned as its over
                         PacketHeader head =
                                 headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
 
-                        byte[] body = readXBytesFrom(head.getBodySize(), in, owner);
+                        byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
                         if (body.length < head.getBodySize())
                             break; // incomplete data was returned as its over
                         RawPacket incoming = new RawPacket(body, head);
@@ -80,7 +84,7 @@ public class BufferIncoming {
                 } catch (Exception e) {
                     System.err.println("Problem in the thread that reads from the network");
                     e.printStackTrace();
-                    owner.setOver();
+                    parent.setOver();
                 } finally {
                     try {
                         connection.close();
@@ -95,14 +99,14 @@ public class BufferIncoming {
         fastReader.start();
     }
 
-    private static byte[] readXBytesFrom(int wanted, InputStream from, FreecivConnection owner) throws IOException {
+    private static byte[] readXBytesFrom(int wanted, InputStream from, BufferIncoming parent) throws IOException {
         byte[] out = new byte[wanted];
         int alreadyRead = 0;
         while(alreadyRead < wanted) {
             int bytesRead = from.read(out, alreadyRead, wanted - alreadyRead);
             if (0 <= bytesRead)
                 alreadyRead += bytesRead;
-            else if (owner.isOver())
+            else if (parent.isOver())
                 return Arrays.copyOfRange(out, 0, alreadyRead);
             if (alreadyRead < wanted)
                 Thread.yield();
@@ -122,5 +126,13 @@ public class BufferIncoming {
 
     public boolean isClosed() {
         return connection.isClosed();
+    }
+
+    public void setOver() {
+        over = true;
+    }
+
+    public boolean isOver() {
+        return over;
     }
 }
