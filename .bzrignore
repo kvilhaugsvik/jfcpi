@@ -5,6 +5,7 @@ BindingsUsers/GeneratedPackets
 GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
 FreecivProto.jar
 testSignInToServer
+proxyRecorder
 
 # Make targets
 all

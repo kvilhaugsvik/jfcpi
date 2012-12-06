@@ -118,9 +118,12 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} `find Tests/org/freeciv/test/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileTestSignInToServer: compileFromFreeciv
+compileBindingsUsers: compileFromFreeciv
 	mkdir -p ${COMPILED_BINDINGS_USERS_FOLDER}
 	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find BindingsUsers/Users -iname "*.java"`
+	touch compileBindingsUsers
+
+compileTestSignInToServer: compileBindingsUsers
 	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \$$1 \$$2 \$$3" > testSignInToServer
 	chmod +x testSignInToServer
 	touch compileTestSignInToServer
@@ -128,6 +131,15 @@ compileTestSignInToServer: compileFromFreeciv
 # not included in tests since it needs a running Freeciv server
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
+
+compileProxyRecorder: compileBindingsUsers
+	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.ProxyRecorder \$$1 \$$2 \$$3" > proxyRecorder
+	chmod +x proxyRecorder
+	touch compileProxyRecorder
+
+# not included in tests since it needs a running Freeciv server and client
+runProxyRecorer: compileProxyRecorder
+	sh proxyRecorder && touch runProxyRecorer
 
 compileConnectionTests: folderTestOut compileBasicProtocol
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/connection/ -iname "*.java"`
@@ -175,6 +187,8 @@ clean:
 	rm -rf ${PROTOCOL_DISTRIBUTION}
 	rm -rf sourceFromFreeciv
 	rm -rf compileFromFreeciv
+	rm -rf compileBindingsUsers
+	rm -rf compileProxyRecorder proxyRecorder runProxyRecorer
 
 distclean: clean
 	rm -rf out ${GENERATED_TEST_SOURCE_FOLDER}
