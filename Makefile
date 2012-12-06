@@ -149,6 +149,18 @@ runConnectionTests: compileConnectionTests
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.connection.NetworkUninterpreted
 	touch runConnectionTests
 
+compileUtils: compileBasicProtocol
+	${JAVAC} -d ${COMPILED_PROTOCOL_FOLDER} `find Utility -iname "*.java"`
+	touch compileUtils
+
+compileUtilsTests: folderTestOut compileUtils
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/utility/ -iname "*.java"`
+	touch compileUtilsTests
+
+runUtilsTests: compileUtilsTests
+	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestArgumentSettings
+	touch runUtilsTests
+
 compilePacketTest: folderTestOut compileBasicProtocol
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/packet/ -iname "*.java"`
 	touch compilePacketTest
@@ -158,7 +170,7 @@ runPacketTest: compilePacketTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.HeaderTest
 	touch runPacketTest
 
-runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnectionTests
+runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnectionTests runUtilsTests
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedPacketTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedStructTest
@@ -189,6 +201,7 @@ clean:
 	rm -rf compileFromFreeciv
 	rm -rf compileBindingsUsers
 	rm -rf compileProxyRecorder proxyRecorder runProxyRecorer
+	rm -rf compileUtils compileUtilsTests runUtilsTests
 
 distclean: clean
 	rm -rf out ${GENERATED_TEST_SOURCE_FOLDER}
