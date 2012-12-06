@@ -14,7 +14,7 @@
 
 package org.freeciv.test;
 
-import org.freeciv.Connect;
+import org.freeciv.connection.Interpretated;
 import org.freeciv.NotReadyYetException;
 import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.Packet;
@@ -34,8 +34,8 @@ public class ProxyRecorder implements Runnable {
 
 
     private final int proxyNumber;
-    private final Connect clientCon;
-    private final Connect serverCon;
+    private final Interpretated clientCon;
+    private final Interpretated serverCon;
     private final DataOutputStream trace;
 
     private boolean started = false;
@@ -46,8 +46,8 @@ public class ProxyRecorder implements Runnable {
             ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
             while (!serverProxy.isClosed())
                 try {
-                    Connect clientCon =
-                            new Connect(serverProxy.accept(), Collections.<Integer, ReflexReaction>emptyMap());
+                    Interpretated clientCon =
+                            new Interpretated(serverProxy.accept(), Collections.<Integer, ReflexReaction>emptyMap());
                     ProxyRecorder proxy = new ProxyRecorder(clientCon, connections.size(),
                             new DataOutputStream(new BufferedOutputStream(
                                     new FileOutputStream(TRACE_NAME_ROOT + connections.size() + TRACE_NAME_EXTENSION))));
@@ -65,12 +65,12 @@ public class ProxyRecorder implements Runnable {
         System.exit(0);
     }
 
-    public ProxyRecorder(Connect clientCon, int proxyNumber, DataOutputStream trace) throws IOException, InterruptedException {
+    public ProxyRecorder(Interpretated clientCon, int proxyNumber, DataOutputStream trace) throws IOException, InterruptedException {
         this.proxyNumber = proxyNumber;
         this.trace = trace;
         this.clientCon = clientCon;
         try {
-            serverCon = new Connect(REAL_SERVER_ADDRESS, REAL_SERVER_PORT, Collections.<Integer, ReflexReaction>emptyMap());
+            serverCon = new Interpretated(REAL_SERVER_ADDRESS, REAL_SERVER_PORT, Collections.<Integer, ReflexReaction>emptyMap());
         } catch (IOException e) {
             throw new IOException(proxyNumber + ": Unable to connect to server", e);
         }
@@ -117,7 +117,7 @@ public class ProxyRecorder implements Runnable {
         }
     }
 
-    private void proxyPacket(Connect readFrom, Connect writeTo, boolean clientToServer) {
+    private void proxyPacket(Interpretated readFrom, Interpretated writeTo, boolean clientToServer) {
         try {
             Packet fromClient = readFrom.getPacket();
             System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);

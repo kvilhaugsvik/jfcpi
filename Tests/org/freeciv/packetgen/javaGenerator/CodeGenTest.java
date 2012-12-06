@@ -18,6 +18,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
+import org.freeciv.connection.Interpretated;
 import org.freeciv.packet.fieldtype.FieldType;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
@@ -244,8 +245,8 @@ public class CodeGenTest {
 
     @Test public void testPackageImport() {
         assertEquals("Generated source not as expected",
-                "import org.freeciv.Connect;",
-                Import.classIn(org.freeciv.Connect.class).toString());
+                "import org.freeciv.connection.Interpretated;",
+                Import.classIn(Interpretated.class).toString());
     }
 
     @Test public void testImportAllInPackageOf() {

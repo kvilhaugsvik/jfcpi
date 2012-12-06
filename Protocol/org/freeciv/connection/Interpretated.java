@@ -12,11 +12,10 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv;
+package org.freeciv.connection;
 
-import org.freeciv.connection.Uninterpreted;
-import org.freeciv.connection.FreecivConnection;
-import org.freeciv.connection.ReflexReaction;
+import org.freeciv.NotReadyYetException;
+import org.freeciv.PacketsMapping;
 import org.freeciv.packet.*;
 
 import java.io.*;
@@ -25,16 +24,16 @@ import java.util.Map;
 
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
-public class Connect implements FreecivConnection {
+public class Interpretated implements FreecivConnection {
     private final Uninterpreted toProcess;
 
     private final PacketsMapping interpreter;
 
-    public Connect(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
+    public Interpretated(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
         this(new Socket(address, port), reflexes);
     }
 
-    public Connect(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
+    public Interpretated(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
         interpreter = new PacketsMapping();
 
         toProcess = new Uninterpreted(connection, interpreter.getPacketHeaderClass(), reflexes);
