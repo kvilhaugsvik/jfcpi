@@ -124,8 +124,8 @@ public class Uninterpreted implements FreecivConnection {
         }
     }
 
-    public boolean isClosed() {
-        return connection.isClosed();
+    public boolean isOpen() {
+        return !connection.isClosed();
     }
 
     public void toSend(Packet toSend) throws IOException {

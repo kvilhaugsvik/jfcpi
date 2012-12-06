@@ -36,4 +36,10 @@ public interface FreecivConnection {
      * @return true if the connection is closed or soon will be
      */
     boolean isOver();
+
+    /**
+     * Is the underlying connection open
+     * @return true if the underlying connection is open
+     */
+    public boolean isOpen();
 }

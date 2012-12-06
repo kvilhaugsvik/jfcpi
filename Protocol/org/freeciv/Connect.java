@@ -74,7 +74,7 @@ public class Connect implements FreecivConnection {
     }
 
     public boolean isOpen() {
-        return !toProcess.isClosed();
+        return toProcess.isOpen();
     }
 
     public boolean hasMorePackets() {
