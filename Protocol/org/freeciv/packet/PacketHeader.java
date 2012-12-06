@@ -23,10 +23,17 @@ public abstract class PacketHeader {
     protected final int totalSize;
 
     protected PacketHeader(int packetKind, int bodySize, int totalSize) {
-        assert 0 <= packetKind : "A packet kind number should be positive";
-        assert 0 <= bodySize : "Body size can't be negative";
-        assert 0 <= totalSize : "Total size can't be negative";
-        assert bodySize <= totalSize : "Total size includes body size and header size so it's bigger";
+        if (packetKind < 0)
+            throw new IllegalArgumentException("A packet kind number should be positive");
+
+        if (bodySize < 0)
+            throw new IllegalArgumentException("Body size can't be negative");
+
+        if (totalSize < 0)
+            throw new IllegalArgumentException("Total size can't be negative");
+
+        if (totalSize < bodySize)
+            throw new IllegalArgumentException("Total size includes body size and header size so it cant be smaller");
 
         this.packetKind = packetKind;
         this.bodySize = bodySize;

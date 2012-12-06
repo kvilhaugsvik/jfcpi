@@ -135,6 +135,7 @@ compilePacketTest: folderTestOut compileBasicProtocol
 
 runPacketTest: compilePacketTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.PacketTest
+	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.HeaderTest
 	touch runPacketTest
 
 runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest
