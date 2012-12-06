@@ -129,6 +129,14 @@ compileTestSignInToServer: compileFromFreeciv
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
+compileConnectionTests: folderTestOut compileBasicProtocol
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/connection/ -iname "*.java"`
+	touch compileConnectionTests
+
+runConnectionTests: compileConnectionTests
+	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.connection.NetworkUninterpreted
+	touch runConnectionTests
+
 compilePacketTest: folderTestOut compileBasicProtocol
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/org/freeciv/packet/ -iname "*.java"`
 	touch compilePacketTest
@@ -138,7 +146,7 @@ runPacketTest: compilePacketTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.HeaderTest
 	touch runPacketTest
 
-runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest
+runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnectionTests
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedPacketTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedStructTest
@@ -148,6 +156,7 @@ runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest
 clean:
 	rm -rf ${COMPILED_PROTOCOL_FOLDER} compileBasicProtocol
 	rm -rf runPacketTest compilePacketTest
+	rm -rf runConnectionTests compileConnectionTests
 	rm -rf ${PACKETGENOUT} compileCodeGenerator
 	rm -rf compileTestPeerGenerator
 	rm -rf compileTestPeers
