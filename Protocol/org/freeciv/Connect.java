@@ -15,6 +15,7 @@
 package org.freeciv;
 
 import org.freeciv.connection.BufferIncoming;
+import org.freeciv.connection.FreecivConnection;
 import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.*;
 
@@ -24,7 +25,7 @@ import java.util.Map;
 
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
-public class Connect {
+public class Connect implements FreecivConnection {
     private final OutputStream out;
     private final BufferIncoming toProcess;
 
@@ -62,6 +63,7 @@ public class Connect {
         }
     }
 
+    @Override
     public void toSend(Packet toSend) throws IOException {
         ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getHeader().getTotalSize());
         DataOutputStream packet = new DataOutputStream(packetSerialized);
@@ -74,6 +76,7 @@ public class Connect {
     /**
      * Close the connection as soon as its data has been read
      */
+    @Override
     public void setOver() {
         over = true;
     }
@@ -82,6 +85,7 @@ public class Connect {
      * Will the connection be closed (unless it already is) as soon as its empty?
      * @return true if the connection is closed or soon will be
      */
+    @Override
     public boolean isOver() {
         return over;
     }

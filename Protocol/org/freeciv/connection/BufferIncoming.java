@@ -14,7 +14,6 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.Connect;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
@@ -33,7 +32,7 @@ public class BufferIncoming {
     private final int headerSize;
 
     public BufferIncoming(
-            final Connect owner,
+            final FreecivConnection owner,
             final Socket connection,
             final Class<? extends PacketHeader> packetHeaderClass,
             final Map<Integer, ReflexReaction> reflexes
@@ -87,7 +86,7 @@ public class BufferIncoming {
         fastReader.start();
     }
 
-    private static byte[] readXBytesFrom(int wanted, InputStream from, Connect owner) throws IOException {
+    private static byte[] readXBytesFrom(int wanted, InputStream from, FreecivConnection owner) throws IOException {
         byte[] out = new byte[wanted];
         int alreadyRead = 0;
         while(alreadyRead < wanted) {

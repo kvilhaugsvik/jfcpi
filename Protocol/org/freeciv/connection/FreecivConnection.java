@@ -14,8 +14,26 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.RawPacket;
+import org.freeciv.packet.Packet;
 
-public interface ReflexReaction {
-    public void apply(RawPacket incoming, FreecivConnection connection);
+import java.io.IOException;
+
+public interface FreecivConnection {
+    /**
+     * Send a packet via this connection
+     * @param toSend
+     * @throws IOException
+     */
+    void toSend(Packet toSend) throws IOException;
+
+    /**
+     * Close this connection as soon as its data has been read
+     */
+    void setOver();
+
+    /**
+     * Will this connection be closed (unless it already is) as soon as its empty?
+     * @return true if the connection is closed or soon will be
+     */
+    boolean isOver();
 }
