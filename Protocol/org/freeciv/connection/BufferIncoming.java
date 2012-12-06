@@ -20,6 +20,7 @@ import org.freeciv.packet.RawPacket;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -59,11 +60,19 @@ public class BufferIncoming {
             public void run() {
                 try {
                     while(0 < in.available() || !owner.isOver()) {
-                        PacketHeader head = headerReader
-                                .newInstance(new DataInputStream(new ByteArrayInputStream(readXBytesFrom(headerSize, in, owner))));
+                        byte[] headerStart = readXBytesFrom(headerSize, in, owner);
+                        if (headerStart.length < headerSize)
+                            break; // incomplete data was returned as its over
+                        PacketHeader head =
+                                headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
+
                         byte[] body = readXBytesFrom(head.getBodySize(), in, owner);
+                        if (body.length < head.getBodySize())
+                            break; // incomplete data was returned as its over
                         RawPacket incoming = new RawPacket(body, head);
+
                         quickRespond.handle(incoming);
+
                         synchronized (buffered) {
                             buffered.add(incoming);
                         }
@@ -94,7 +103,7 @@ public class BufferIncoming {
             if (0 <= bytesRead)
                 alreadyRead += bytesRead;
             else if (owner.isOver())
-                break;
+                return Arrays.copyOfRange(out, 0, alreadyRead);
             if (alreadyRead < wanted)
                 Thread.yield();
         }
