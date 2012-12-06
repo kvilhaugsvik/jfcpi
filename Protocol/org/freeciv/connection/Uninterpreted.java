@@ -114,8 +114,8 @@ public class Uninterpreted implements FreecivConnection {
         return out;
     }
 
-    public boolean isEmpty() {
-        return buffered.isEmpty();
+    public boolean packetReady() {
+        return !buffered.isEmpty();
     }
 
     public RawPacket getNext() {

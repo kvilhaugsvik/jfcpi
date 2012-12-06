@@ -70,7 +70,7 @@ public class SignInAndWait {
                     con.getVersionMinor(),
                     con.getVersionPatch()));
 
-            while(con.isOpen() || con.hasMorePackets()) {
+            while(con.isOpen() || con.packetReady()) {
                 try {
                     System.out.println(con.getPacket());
                     System.out.println();

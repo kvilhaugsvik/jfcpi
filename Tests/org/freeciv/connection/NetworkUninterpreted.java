@@ -35,7 +35,7 @@ public class NetworkUninterpreted {
 
         helperWaitSomeSecondsForAPacket(self, 4);
 
-        assertFalse("There should be a packet here", self.isEmpty());
+        assertTrue("There should be a packet here", self.packetReady());
         Packet packet = self.getNext();
 
         assertEquals("Wrong kind", 0, packet.getHeader().getPacketKind());
@@ -93,7 +93,7 @@ public class NetworkUninterpreted {
     }
 
     public static class YieldUnlessNewPacket implements Runnable {
-        private final Uninterpreted conn; // TODO: Make a FreecivConnection when checking for new packets is on it
+        private final FreecivConnection conn;
 
         public YieldUnlessNewPacket(Uninterpreted conn) {
             this.conn = conn;
@@ -101,7 +101,7 @@ public class NetworkUninterpreted {
 
         @Override
         public void run() {
-            while (conn.isEmpty()) {
+            while (!conn.packetReady()) {
                 Thread.yield();
             }
         }

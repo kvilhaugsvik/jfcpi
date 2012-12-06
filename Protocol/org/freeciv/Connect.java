@@ -42,7 +42,7 @@ public class Connect implements FreecivConnection {
 
     public Packet getPacket() throws IOException, NotReadyYetException {
         RawPacket out;
-        if (toProcess.isEmpty())
+        if (!toProcess.packetReady())
             throw new NotReadyYetException("No packets waiting");
         else
             out = toProcess.getNext();
@@ -77,8 +77,8 @@ public class Connect implements FreecivConnection {
         return toProcess.isOpen();
     }
 
-    public boolean hasMorePackets() {
-        return !toProcess.isEmpty();
+    public boolean packetReady() {
+        return toProcess.packetReady();
     }
 
     public String getCapStringMandatory() {

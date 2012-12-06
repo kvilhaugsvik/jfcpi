@@ -20,6 +20,12 @@ import java.io.IOException;
 
 public interface FreecivConnection {
     /**
+     * Return true if a packet is ready to be read
+     * @return true if a packet is ready to be read
+     */
+    public boolean packetReady();
+
+    /**
      * Send a packet via this connection
      * @param toSend
      * @throws IOException
