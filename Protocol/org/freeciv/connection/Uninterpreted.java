@@ -118,6 +118,10 @@ public class Uninterpreted implements FreecivConnection {
         return !buffered.isEmpty();
     }
 
+    public Packet getPacket() {
+        return getNext();
+    }
+
     public RawPacket getNext() {
         synchronized (buffered) {
             return buffered.removeFirst();

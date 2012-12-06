@@ -14,6 +14,7 @@
 
 package org.freeciv.connection;
 
+import org.freeciv.NotReadyYetException;
 import org.freeciv.packet.Packet;
 
 import java.io.IOException;
@@ -24,6 +25,14 @@ public interface FreecivConnection {
      * @return true if a packet is ready to be read
      */
     public boolean packetReady();
+
+    /**
+     * Get the next packet
+     * @return a packet
+     * @throws IOException if there is an error reading it
+     * @throws NotReadyYetException if no packet is ready
+     */
+    public Packet getPacket() throws IOException, NotReadyYetException;
 
     /**
      * Send a packet via this connection
