@@ -14,6 +14,7 @@
 
 package org.freeciv.connection;
 
+import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
@@ -24,7 +25,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class BufferIncoming {
+public class Uninterpreted implements FreecivConnection {
     private final LinkedList<RawPacket> buffered;
     private final Socket connection;
 
@@ -34,14 +35,13 @@ public class BufferIncoming {
 
     private boolean over = false;
 
-    public BufferIncoming(
-            final FreecivConnection owner,
+    public Uninterpreted(
             final Socket connection,
             final Class<? extends PacketHeader> packetHeaderClass,
             final Map<Integer, ReflexReaction> reflexes
     ) throws IOException {
         buffered = new LinkedList<RawPacket>();
-        quickRespond = new ReflexPacketKind(reflexes, owner);
+        quickRespond = new ReflexPacketKind(reflexes, this);
         this.connection = connection;
 
         try {
@@ -57,7 +57,7 @@ public class BufferIncoming {
 
         final InputStream in = connection.getInputStream();
 
-        final BufferIncoming parent = this;
+        final Uninterpreted parent = this;
 
         Thread fastReader = new Thread(new Runnable(){
             @Override
@@ -99,7 +99,7 @@ public class BufferIncoming {
         fastReader.start();
     }
 
-    private static byte[] readXBytesFrom(int wanted, InputStream from, BufferIncoming parent) throws IOException {
+    private static byte[] readXBytesFrom(int wanted, InputStream from, Uninterpreted parent) throws IOException {
         byte[] out = new byte[wanted];
         int alreadyRead = 0;
         while(alreadyRead < wanted) {
@@ -126,6 +126,15 @@ public class BufferIncoming {
 
     public boolean isClosed() {
         return connection.isClosed();
+    }
+
+    public void toSend(Packet toSend) throws IOException {
+        ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getHeader().getTotalSize());
+        DataOutputStream packet = new DataOutputStream(packetSerialized);
+
+        toSend.encodeTo(packet);
+
+        connection.getOutputStream().write(packetSerialized.toByteArray());
     }
 
     public void setOver() {

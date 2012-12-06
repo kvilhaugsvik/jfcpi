@@ -30,7 +30,7 @@ public class NetworkUninterpreted {
     @Test
     public void pureHeader() throws IOException, ExecutionException, TimeoutException, InterruptedException {
         Socket other = helperDataSender(new byte[]{0, 4, 0, 0});
-        BufferIncoming self = new BufferIncoming(temporaryHack(), other, Header_2_2.class,
+        Uninterpreted self = new Uninterpreted(other, Header_2_2.class,
                 Collections.<Integer, ReflexReaction>emptyMap());
 
         helperWaitSomeSecondsForAPacket(self, 4);
@@ -45,27 +45,6 @@ public class NetworkUninterpreted {
     /*********************************************************************************************************************
      * Helpers
      ********************************************************************************************************************/
-
-    //TODO: Remove this when uninterpreted FreecivConnection appears
-    private FreecivConnection temporaryHack() {
-        return new FreecivConnection() {
-            private boolean over = false;
-
-            @Override
-            public void toSend(Packet toSend) throws IOException {
-            }
-
-            @Override
-            public void setOver() {
-                over = true;
-            }
-
-            @Override
-            public boolean isOver() {
-                return over;
-            }
-        };
-    }
 
     /* Create and start a service that will send the data in toSend to the returned socket */
     private static Socket helperDataSender(byte[] toSend) throws IOException {
@@ -108,15 +87,15 @@ public class NetworkUninterpreted {
     }
 
     /* Wait for a packet to appear but no longer than x seconds */
-    private static void helperWaitSomeSecondsForAPacket(BufferIncoming on, int seconds)
+    private static void helperWaitSomeSecondsForAPacket(Uninterpreted on, int seconds)
             throws ExecutionException, TimeoutException, InterruptedException {
         Executors.newSingleThreadExecutor().submit(new YieldUnlessNewPacket(on)).get(seconds, TimeUnit.SECONDS);
     }
 
     public static class YieldUnlessNewPacket implements Runnable {
-        private final BufferIncoming conn; // TODO: Make a FreecivConnection when checking for new packets is on it
+        private final Uninterpreted conn; // TODO: Make a FreecivConnection when checking for new packets is on it
 
-        public YieldUnlessNewPacket(BufferIncoming conn) {
+        public YieldUnlessNewPacket(Uninterpreted conn) {
             this.conn = conn;
         }
 

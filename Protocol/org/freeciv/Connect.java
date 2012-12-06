@@ -14,7 +14,7 @@
 
 package org.freeciv;
 
-import org.freeciv.connection.BufferIncoming;
+import org.freeciv.connection.Uninterpreted;
 import org.freeciv.connection.FreecivConnection;
 import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.*;
@@ -26,8 +26,7 @@ import java.util.Map;
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
 public class Connect implements FreecivConnection {
-    private final OutputStream out;
-    private final BufferIncoming toProcess;
+    private final Uninterpreted toProcess;
 
     private final PacketsMapping interpreter;
 
@@ -38,9 +37,7 @@ public class Connect implements FreecivConnection {
     public Connect(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
         interpreter = new PacketsMapping();
 
-        out = connection.getOutputStream();
-
-        toProcess = new BufferIncoming(this, connection, interpreter.getPacketHeaderClass(), reflexes);
+        toProcess = new Uninterpreted(connection, interpreter.getPacketHeaderClass(), reflexes);
     }
 
     public Packet getPacket() throws IOException, NotReadyYetException {
@@ -63,12 +60,7 @@ public class Connect implements FreecivConnection {
 
     @Override
     public void toSend(Packet toSend) throws IOException {
-        ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getHeader().getTotalSize());
-        DataOutputStream packet = new DataOutputStream(packetSerialized);
-
-        toSend.encodeTo(packet);
-
-        out.write(packetSerialized.toByteArray());
+        toProcess.toSend(toSend);
     }
 
     @Override
