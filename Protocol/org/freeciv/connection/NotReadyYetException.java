@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv;
+package org.freeciv.connection;
 
 public class NotReadyYetException extends Exception {
     public NotReadyYetException(String message) {

@@ -12,8 +12,9 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv;
+package org.freeciv.connection;
 
+import org.freeciv.Util;
 import org.freeciv.packet.*;
 
 import java.io.*;

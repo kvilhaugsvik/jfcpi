@@ -14,7 +14,6 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.NotReadyYetException;
 import org.freeciv.packet.Packet;
 
 import java.io.IOException;

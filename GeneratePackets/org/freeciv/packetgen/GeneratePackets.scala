@@ -18,7 +18,6 @@ import parsing._
 import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
-import org.freeciv.PacketsMapping
 import xml.XML
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],

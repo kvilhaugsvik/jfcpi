@@ -15,7 +15,7 @@
 package org.freeciv.test;
 
 import org.freeciv.connection.Interpretated;
-import org.freeciv.NotReadyYetException;
+import org.freeciv.connection.NotReadyYetException;
 import org.freeciv.connection.FreecivConnection;
 import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.PACKET_CONN_PONG;
