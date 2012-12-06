@@ -78,7 +78,7 @@ public class ProxyRecorder implements Runnable {
 
     @Override
     public void run() {
-        if (false == started)
+        if (!started)
             started = true;
         else
             throw new IllegalStateException("Already started");
