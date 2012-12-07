@@ -33,7 +33,7 @@ COMPILED_BINDINGS_USERS_FOLDER ?= out/BindingsUsers
 # Generated jars
 PROTOCOL_DISTRIBUTION = FreecivProto.jar
 
-all: tests compileTestSignInToServer protojar
+all: tests compileTestSignInToServer compileProxyRecorder protojar
 	touch all
 
 tests: runTests
