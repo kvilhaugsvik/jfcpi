@@ -131,6 +131,29 @@ public class TestArgumentSettings {
         assertFalse("Valid setting included", unrecognized.contains("-setting3"));
     }
 
+    @Test
+    public void namesPermitMinusInSide() {
+        ArgumentSettings settings = new ArgumentSettings(new HashMap<String, String>(){{
+            put("setting-like-this", "fail");
+        }}, "--setting-like-this=win");
+
+        assertEquals("Should override default", "win", settings.getSetting("setting-like-this"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void namesForbidMinusAtTheStart() {
+        ArgumentSettings settings = new ArgumentSettings(new HashMap<String, String>(){{
+            put("-forgot", "fail");
+        }});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void namesForbidSpaceInName() {
+        ArgumentSettings settings = new ArgumentSettings(new HashMap<String, String>(){{
+            put("setting containing space", "fail");
+        }});
+    }
+
 
     private HashMap<String, String> simpleDefaults() {
         HashMap<String, String> defaults = new HashMap<String, String>();

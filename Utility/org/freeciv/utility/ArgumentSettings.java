@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ArgumentSettings {
-    private static final Pattern extractor = Pattern.compile("--?(\\w+)(=(.*))?");
+    private static final Pattern extractor = Pattern.compile("--?(\\w[-\\w]*)(=(.*))?");
 
     private final List<String> unrecognized_all;
     private final List<String> unrecognized_optionish;
@@ -33,6 +33,10 @@ public class ArgumentSettings {
      * @param args arguments given as "--setting=value". "--setting" is a shortcut for "--setting=true"
      */
     public ArgumentSettings(Map<String, String> defaults, String... args) {
+        for (String name : defaults.keySet())
+            if (!(extractor.matcher("--" + name).matches()))
+                throw new IllegalArgumentException("Name of setting \"" + name + "\" not allowed.");
+
         this.settings = new HashMap<String, String>(defaults);
 
         List<String> probablyMisspelled = new LinkedList<String>();
