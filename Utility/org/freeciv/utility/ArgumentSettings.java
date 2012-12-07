@@ -14,10 +14,7 @@
 
 package org.freeciv.utility;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +32,7 @@ public class ArgumentSettings {
      * @param defaults The default settings. No setting without a default will be considered.
      * @param args arguments given as "--setting=value". "--setting" is a shortcut for "--setting=true"
      */
-    public ArgumentSettings(HashMap<String, String> defaults, String... args) {
+    public ArgumentSettings(Map<String, String> defaults, String... args) {
         this.settings = new HashMap<String, String>(defaults);
 
         List<String> probablyMisspelled = new LinkedList<String>();

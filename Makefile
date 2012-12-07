@@ -51,20 +51,20 @@ sourceDefaultsForGenerator:
 	echo "  public static final String GENERATED_TEST_SOURCE_FOLDER = \"${GENERATED_TEST_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final boolean DEVMODE = ${DEVMODE};" >> ${GENERATORDEFAULTS}
+	echo "  public static final String DEVMODE = \"${DEVMODE}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String LOG_TO = \"${LOG_TO}\";" >> ${GENERATORDEFAULTS}
 	echo "}" >>${GENERATORDEFAULTS}
 	touch sourceDefaultsForGenerator
 
-compileCodeGenerator: sourceDefaultsForGenerator compileBasicProtocol
+compileCodeGenerator: sourceDefaultsForGenerator compileBasicProtocol compileUtils
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
 	${JAVAC} -cp ${COMPILED_PROTOCOL_FOLDER}:${SCALALIB} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
 	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.scala"`
-	echo "${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} org.freeciv.packetgen.GeneratePackets \$$1 \$$2 \$$3 \$$4" > compileCodeGenerator
+	echo "${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} org.freeciv.packetgen.GeneratePackets \"\$$@\"" > compileCodeGenerator
 	chmod +x compileCodeGenerator || rm compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
-	sh compileCodeGenerator ${FREECIV_SOURCE_PATH} ${VERSIONCONFIGURATION} ${LOG_TO} ${DEVMODE}
+	sh compileCodeGenerator --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${DEVMODE}
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv

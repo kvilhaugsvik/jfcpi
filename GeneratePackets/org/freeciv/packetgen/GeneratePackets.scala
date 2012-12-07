@@ -19,6 +19,7 @@ import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 import xml.XML
+import org.freeciv.utility.ArgumentSettings
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
                       requested: List[(String, String)], logger: String,
@@ -84,17 +85,19 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
 
 object GeneratePackets {
   def main(args: Array[String]) {
-    val pathPrefix = if (args.length < 1) GeneratorDefaults.FREECIV_SOURCE_PATH else args(0)
-    val versionConfPath = if (args.length < 2) GeneratorDefaults.VERSIONCONFIGURATION else args(1)
-    val logger = if (args.length < 3) GeneratorDefaults.LOG_TO else args(2)
-    val devmode = if (args.length < 4) GeneratorDefaults.DEVMODE else args(3).toBoolean
+    val settings = new ArgumentSettings(Map(
+      "source-code-location" -> GeneratorDefaults.FREECIV_SOURCE_PATH,
+      "version-information" -> GeneratorDefaults.VERSIONCONFIGURATION,
+      "packets-should-log-to" -> GeneratorDefaults.LOG_TO,
+      "ignore-problems" -> GeneratorDefaults.DEVMODE
+    ), args: _*)
 
-    val versionConfiguration = readVersionParameters(new File(versionConfPath))
+    val versionConfiguration = readVersionParameters(new File(settings.getSetting("version-information")))
 
     val bytesInPacketNumber = versionConfiguration.attribute("packetNumberSize").get.text.toInt
 
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem \ "file").map(pathPrefix + "/" + _.text)).toMap
+      elem.attribute("parseAs").get.text -> (elem \ "file").map(settings.getSetting("source-code-location") + "/" + _.text)).toMap
 
     val requested: List[(String, String)] =
       ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
@@ -103,8 +106,8 @@ object GeneratePackets {
       inputSources("variables").head,
       inputSources("C").toList,
       requested,
-      logger,
-      devmode,
+      settings.getSetting("packets-should-log-to"),
+      settings.getSetting("ignore-problems").toBoolean,
       bytesInPacketNumber)
 
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
