@@ -84,20 +84,25 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
 }
 
 object GeneratePackets {
+  private val SOURCE_CODE_LOCATION = "source-code-location"
+  private val VERSION_INFORMATION = "version-information"
+  private val PACKETS_SHOULD_LOG_TO = "packets-should-log-to"
+  private val IGNORE_PROBLEMS = "ignore-problems"
+
   def main(args: Array[String]) {
     val settings = new ArgumentSettings(Map(
-      "source-code-location" -> GeneratorDefaults.FREECIV_SOURCE_PATH,
-      "version-information" -> GeneratorDefaults.VERSIONCONFIGURATION,
-      "packets-should-log-to" -> GeneratorDefaults.LOG_TO,
-      "ignore-problems" -> GeneratorDefaults.DEVMODE
+      SOURCE_CODE_LOCATION -> GeneratorDefaults.FREECIV_SOURCE_PATH,
+      VERSION_INFORMATION -> GeneratorDefaults.VERSIONCONFIGURATION,
+      PACKETS_SHOULD_LOG_TO -> GeneratorDefaults.LOG_TO,
+      IGNORE_PROBLEMS -> GeneratorDefaults.DEVMODE
     ), args: _*)
 
-    val versionConfiguration = readVersionParameters(new File(settings.getSetting("version-information")))
+    val versionConfiguration = readVersionParameters(new File(settings.getSetting(VERSION_INFORMATION)))
 
     val bytesInPacketNumber = versionConfiguration.attribute("packetNumberSize").get.text.toInt
 
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem \ "file").map(settings.getSetting("source-code-location") + "/" + _.text)).toMap
+      elem.attribute("parseAs").get.text -> (elem \ "file").map(settings.getSetting(SOURCE_CODE_LOCATION) + "/" + _.text)).toMap
 
     val requested: List[(String, String)] =
       ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
@@ -106,8 +111,8 @@ object GeneratePackets {
       inputSources("variables").head,
       inputSources("C").toList,
       requested,
-      settings.getSetting("packets-should-log-to"),
-      settings.getSetting("ignore-problems").toBoolean,
+      settings.getSetting(PACKETS_SHOULD_LOG_TO),
+      settings.getSetting(IGNORE_PROBLEMS).toBoolean,
       bytesInPacketNumber)
 
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
