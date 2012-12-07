@@ -51,6 +51,15 @@ public class ProxyRecorder implements Runnable {
             put(TRACE_DYNAMIC, "true");
         }}, args);
 
+        System.out.println("Listening for Freeciv clients on port " + settings.getSetting(PROXY_PORT));
+        System.out.println("Will connect to Freeciv server at " + settings.getSetting(REAL_SERVER_ADDRESS) +
+                ", port " + settings.getSetting(REAL_SERVER_PORT));
+        System.out.println("Trace files will have a name starting with " + settings.getSetting(TRACE_NAME_START) +
+                " followed by the number the proxy has given to the connection and ending in " +
+                settings.getSetting(TRACE_NAME_END));
+        System.out.println("Time data " + (Boolean.parseBoolean(settings.getSetting(TRACE_DYNAMIC)) ? "is" : "isn't") +
+                " included in the trace.");
+
         try {
             ServerSocket serverProxy = new ServerSocket(Integer.parseInt(settings.getSetting(PROXY_PORT)));
             ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
