@@ -32,18 +32,6 @@ public class ProxyRecorder implements Runnable {
     private static final String TRACE_NAME_END = "trace-name-end";
     private static final String TRACE_DYNAMIC = "record-time";
 
-    private static final HashMap<String, String> defaultSettings = new HashMap<String, String>();
-    static {
-        defaultSettings.put(PROXY_PORT, "5556");
-        defaultSettings.put(REAL_SERVER_PORT, "55555");
-        defaultSettings.put(REAL_SERVER_ADDRESS, "127.0.0.1");
-
-        defaultSettings.put(TRACE_NAME_START, "FreecivCon");
-        defaultSettings.put(TRACE_NAME_END, ".fct");
-        defaultSettings.put(TRACE_DYNAMIC, "true");
-    }
-
-
     private final int proxyNumber;
     private final ArgumentSettings settings;
     private final Interpretated clientCon;
@@ -53,7 +41,15 @@ public class ProxyRecorder implements Runnable {
     private boolean started = false;
 
     public static void main(String[] args) throws InterruptedException {
-        ArgumentSettings settings = new ArgumentSettings(defaultSettings, args);
+        ArgumentSettings settings = new ArgumentSettings(new HashMap<String, String>(){{
+            put(PROXY_PORT, "5556");
+            put(REAL_SERVER_PORT, "55555");
+            put(REAL_SERVER_ADDRESS, "127.0.0.1");
+
+            put(TRACE_NAME_START, "FreecivCon");
+            put(TRACE_NAME_END, ".fct");
+            put(TRACE_DYNAMIC, "true");
+        }}, args);
 
         try {
             ServerSocket serverProxy = new ServerSocket(Integer.parseInt(settings.getSetting(PROXY_PORT)));
