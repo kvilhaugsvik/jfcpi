@@ -124,7 +124,7 @@ compileBindingsUsers: compileFromFreeciv compileUtils
 	touch compileBindingsUsers
 
 compileTestSignInToServer: compileBindingsUsers
-	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \$$1 \$$2 \$$3" > testSignInToServer
+	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \"\$$@\"" > testSignInToServer
 	chmod +x testSignInToServer
 	touch compileTestSignInToServer
 
