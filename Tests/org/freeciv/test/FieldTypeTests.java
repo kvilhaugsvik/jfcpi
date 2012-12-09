@@ -16,10 +16,12 @@ package org.freeciv.test;
 
 import org.freeciv.packet.fieldtype.STRING;
 import org.freeciv.packet.fieldtype.UINT32;
+import org.freeciv.packet.fieldtype.UINT32S;
 import org.junit.Test;
 
 import java.io.*;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class FieldTypeTests {
@@ -89,6 +91,26 @@ public class FieldTypeTests {
     }
     @Test public void UINT32_MaxAdd7RoundTrip() throws IOException {
         assertRoundTripOkUINT32(((long)Integer.MAX_VALUE) + 7L);
+    }
+
+    @Test public void UNINT32_1_dimensionalArray_round_trip() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+
+        // create and write
+        UINT32S theArray = new UINT32S(new UINT32[]{
+            new UINT32(5L),
+            new UINT32(1000L)
+        }, 2);
+        theArray.encodeTo(new DataOutputStream(storeTo));
+
+        // read it back
+        UINT32S theReturnedArray = new UINT32S(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), 2);
+
+        // compare the values
+        assertEquals("1 dimensional field type array didn't survive encoding followed by decoding",
+                theArray.getValue()[0].getValue(), theReturnedArray.getValue()[0].getValue());
+        assertEquals("1 dimensional field type array didn't survive encoding followed by decoding",
+                theArray.getValue()[1].getValue(), theReturnedArray.getValue()[1].getValue());
     }
 
     private void testString(String text, int maxLen) throws IOException {

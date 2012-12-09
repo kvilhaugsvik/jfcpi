@@ -318,6 +318,46 @@ public class TerminatedArray extends FieldTypeBasic {
         );
     }
 
+    public static TerminatedArray fieldArray(String dataIOType, String publicType, final TargetArray type) {
+        Var<AValue> helperParamValue = Var.param(type, "value");
+        final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), new TargetClass(int.class), "lengthInBytes",
+                Arrays.<Var<?>>asList(helperParamValue), new Block(RETURN(helperParamValue.read("length"))));
+        return new TerminatedArray(dataIOType, publicType, type, null,
+                MaxArraySize.CONSTRUCTOR_PARAM,
+                TransferArraySize.CONSTRUCTOR_PARAM,
+                type,
+                arrayLen,
+                neverAnythingAfter,
+                lenShouldBeEqual,
+                null,
+                valueIsBufferArray,
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var to, Var elem) {
+                        return new Block(elem.call("encodeTo", to.ref()));
+                    }
+                },
+                new ExprFrom1<Typed<? extends AValue>, Var>() {
+                    @Override
+                    public Typed<? extends AValue> x(Var from) {
+                        return type.getOf().newInstance(from.ref());
+                    }
+                },
+                TO_STRING_ARRAY,
+                Arrays.asList(new Requirement(type.getName(), FieldTypeAlias.class)),
+                null,
+                null,
+                new ExprFrom1<Typed<AnInt>, Var>() {
+                    @Override
+                    public Typed<AnInt> x(Var value) {
+                        return lenInBytesHelper.getAddress().call(value.ref());
+                    }
+                },
+                sameNumberOfBufferElementsAndValueElements,
+                Arrays.<Method.Helper>asList(lenInBytesHelper)
+        );
+    }
+
     public enum MaxArraySize {
         NO_LIMIT,
         CONSTRUCTOR_PARAM,

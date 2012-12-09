@@ -56,6 +56,8 @@ public class GenerateTest {
 
         writeStructThatHasAnArrayField(targetFolder);
 
+        writeTerminatedArrayFieldArray(targetFolder);
+
         writeConstantClass(targetFolder);
 
         remaining(targetFolder);
@@ -279,6 +281,18 @@ public class GenerateTest {
         Struct result = new Struct("StructArrayField", fields, Collections.<Requirement>emptySet());
 
         writeJavaFile(result, targetFolder);
+    }
+
+    @Test public void writeTerminatedArrayFieldArray() throws IOException {
+        writeTerminatedArrayFieldArray(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    private static void writeTerminatedArrayFieldArray(String targetFolder) throws IOException {
+        TargetArray arrayOfFields = new TargetArray("UINT32", 1, false);
+        // add method enocodeTo to underlying type since it's field type
+        arrayOfFields.getOf().register(new TargetMethod("encodeTo"));
+
+        writeJavaFile(TerminatedArray.fieldArray("x", "y", arrayOfFields).createFieldType("UINT32S"), targetFolder);
     }
 
     @Test
