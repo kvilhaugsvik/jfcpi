@@ -26,6 +26,11 @@ public class TargetArray extends TargetClass {
         this.of = new TargetClass(wrapped.getComponentType(), isInScope);
     }
 
+    public TargetArray(TargetClass wrapped, int levels, boolean isInScope) {
+        super(wrapped.getName() + Util.repeat("[]", levels), isInScope);
+        this.of = wrapped;
+    }
+
     public TargetArray(String wrapped, int levels, boolean isInScope) {
         super(wrapped + Util.repeat("[]", levels), isInScope);
         this.of = new TargetClass(wrapped, isInScope);
