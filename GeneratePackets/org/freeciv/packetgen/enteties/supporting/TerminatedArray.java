@@ -318,7 +318,12 @@ public class TerminatedArray extends FieldTypeBasic {
         );
     }
 
-    public static TerminatedArray fieldArray(String dataIOType, String publicType, final TargetArray type) {
+    public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
+                                             final FieldTypeAlias kind, final int dimensions) {
+        return fieldArray(dataIOType, publicType, new TargetArray(kind.getAddress(), dimensions, true));
+    }
+
+    public static TerminatedArray fieldArray(final String dataIOType, final String publicType, final TargetArray type) {
         Var<AValue> helperParamValue = Var.param(type, "value");
         final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), new TargetClass(int.class), "lengthInBytes",
                 Arrays.<Var<?>>asList(helperParamValue), new Block(RETURN(helperParamValue.read("length"))));

@@ -94,6 +94,10 @@ public class GenerateTest {
         writeJavaFile(string, targetFolder);
         writeJavaFile(bool, targetFolder);
         writeJavaFile(connection, targetFolder);
+
+        FieldTypeBasic.FieldTypeAlias uint8s = TerminatedArray.fieldArray("n", "a", uint8, 1).createFieldType("UINT8S");
+        writeJavaFile(uint8s, targetFolder);
+
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
                 new TargetClass(Header_2_1.class.getSimpleName()),
