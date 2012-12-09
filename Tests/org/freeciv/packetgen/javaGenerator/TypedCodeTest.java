@@ -118,6 +118,14 @@ public class TypedCodeTest {
                 Util.joinStringArray(builder.getStyle().asFormattedLines(toRunOn).toArray(), "\n", "", ""));
     }
 
+    @Test public void blockEmpty() {
+        CodeAtoms result = new CodeAtoms();
+        (new Block()).writeAtoms(result);
+
+        assertEquals(HasAtoms.LSC, result.get(0).getAtom());
+        assertEquals(HasAtoms.RSC, result.get(1).getAtom());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void addLocalAsFieldWhileAskingForGetter() {
         Var notAField = Var.local(Integer.class, "i", null);
