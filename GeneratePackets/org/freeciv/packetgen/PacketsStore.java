@@ -192,45 +192,54 @@ public class PacketsStore {
         Collection<IDependency> inn = requirements.getResolved();
         HashSet<ClassWriter> out = new HashSet<ClassWriter>();
 
+        TreeMap<Integer, String> resolvedPackets = new TreeMap<Integer, String>();
         TreeSet<Constant> sortedConstants =
                 new TreeSet<Constant>(new TotalOrderNoCircles(inn));
 
         for (IDependency dep : inn)
-            if (dep instanceof ClassWriter)
-                out.add((ClassWriter)dep);
-            else if (dep instanceof Constant)
+            if (dep instanceof ClassWriter) {
+                out.add((ClassWriter) dep);
+                if (dep instanceof Packet) {
+                    resolvedPackets.put(((Packet) dep).getNumber(),
+                            ((Packet) dep).getPackage() + "." + ((Packet) dep).getName());
+                }
+            } else if (dep instanceof Constant)
                 sortedConstants.add((Constant)dep);
 
+        out.add(generateVersionData(resolvedPackets, sortedConstants));
+
+        return out;
+    }
+
+    static ClassWriter generateVersionData(TreeMap<Integer, String> packets, TreeSet<Constant> constants) {
         int border = Util.VERSION_DATA_CLASS.lastIndexOf('.');
-        ClassWriter constants =
+        ClassWriter versionData =
                 new ClassWriter(ClassKind.CLASS, new TargetPackage(Util.VERSION_DATA_CLASS.substring(0, border)), null,
                         "Freeciv C code", Collections.<Annotate>emptyList(), Util.VERSION_DATA_CLASS.substring(border + 1),
                         TargetClass.fromName(null), Collections.<TargetClass>emptyList());
 
-        for (Constant dep : sortedConstants)
-            constants.addField(dep);
+        for (Constant dep : constants)
+            versionData.addField(dep);
 
-        Typed<AString>[] understandsPackets;
-        if (packetsByNumber.isEmpty()) {
-            understandsPackets = new Typed[0];
-        } else {
-            understandsPackets = new Typed[packetsByNumber.lastKey() + 1];
-            for (int number = 0; number <= packetsByNumber.lastKey(); number++) {
-                if (null != packetsByNumber.get(number) && null != packets.get(packetsByNumber.get(number)) &&
-                        requirements.isAwareOfProvider(packets.get(packetsByNumber.get(number)))) {
-                    Packet packet = getPacket(number);
-                    understandsPackets[number] = BuiltIn.literal(packet.getPackage() + "." + packet.getName());
-                } else {
-                    understandsPackets[number] = BuiltIn.literal(RawPacket.class.getCanonicalName()); // DEVMODE is handled elsewhere
-                }
-            }
-        }
-        constants.addClassConstant(Visibility.PUBLIC, "String[]", Util.PACKET_MAP_NAME,
-                                   new ArrayLiteral(understandsPackets));
+        versionData.addClassConstant(Visibility.PUBLIC, "String[]",
+                Util.PACKET_MAP_NAME, new ArrayLiteral(formatPacketMap(packets)));
 
-        out.add(constants);
+        return versionData;
+    }
 
-        return out;
+    private static Typed<AString>[] formatPacketMap(TreeMap<Integer, String> pNumToPName) {
+        if (pNumToPName.isEmpty())
+            return new Typed[0];
+
+        Typed<AString> raw = BuiltIn.literal(RawPacket.class.getCanonicalName());
+
+        Typed<AString>[] packets = new Typed[pNumToPName.lastKey() + 1];
+        for (int packetNumber = 0; packetNumber <= pNumToPName.lastKey(); packetNumber++)
+            if (pNumToPName.containsKey(packetNumber))
+                packets[packetNumber] = BuiltIn.literal(pNumToPName.get(packetNumber));
+            else
+                packets[packetNumber] = raw;
+        return packets;
     }
 
     public Collection<Requirement> getUnsolvedRequirements() {
