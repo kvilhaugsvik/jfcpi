@@ -211,7 +211,7 @@ public class PacketsStore {
         return out;
     }
 
-    static ClassWriter generateVersionData(TreeMap<Integer, String> packets, TreeSet<Constant> constants) {
+    static ClassWriter generateVersionData(TreeMap<Integer, String> packets, Set<Constant> constants) {
         int border = Util.VERSION_DATA_CLASS.lastIndexOf('.');
         ClassWriter versionData =
                 new ClassWriter(ClassKind.CLASS, new TargetPackage(Util.VERSION_DATA_CLASS.substring(0, border)), null,

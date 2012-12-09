@@ -17,7 +17,6 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.Util;
 import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.dependency.IDependency;
@@ -30,17 +29,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newEnumValue;
 import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newInvalidEnum;
 
 public class GenerateTest {
-    private static final LinkedList<String> writtenPackets = new LinkedList<String>();
-
     public static void main(String[] args) throws IOException, UndefinedException {
         (new GenerateTest()).generate(args);
     }
@@ -292,16 +286,20 @@ public class GenerateTest {
         writeConstantClass(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
     }
 
-    private static void writeConstantClass(String targetFolder) throws IOException {
-        TargetClass target = new TargetClass(Util.VERSION_DATA_CLASS);
-        ClassWriter constants = new ClassWriter(ClassKind.CLASS, target.getPackage(), null,
-                        "hard coded data", Collections.<Annotate>emptyList(), target.getName(),
-                        TargetClass.fromName(null), Collections.<TargetClass>emptyList());
+    private void writeConstantClass(String targetFolder) throws IOException {
+        Set<Constant> constants = new HashSet<Constant>();
         for (IDependency stringEnd : Hardcoded.values())
             if (stringEnd instanceof Constant && "STRING_ENDER".equals(((Constant) stringEnd).getName()))
-                constants.addField((Constant) stringEnd);
+                constants.add((Constant)stringEnd);
 
-        writeJavaFile(constants, targetFolder);
+        TreeMap<Integer, String> packets = new TreeMap<Integer, String>();
+        packets.put(926, "TestArray");
+        packets.put(927, "TestArrayTransfer");
+        packets.put(928, "TestArrayDouble");
+        packets.put(929, "TestArrayDoubleTransfer");
+        packets.put(930, "StringArray");
+
+        writeJavaFile(PacketsStore.generateVersionData(packets, constants), targetFolder);
     }
 
     private static FieldTypeBasic.FieldTypeAlias getPrimitiveFieldType(HashMap<String, FieldTypeBasic> primitiveTypes,
@@ -315,9 +313,8 @@ public class GenerateTest {
                     .createFieldType(alias);
     }
 
-    private static void writePacket(Packet packet, String targetFolder) throws IOException {
+    private void writePacket(Packet packet, String targetFolder) throws IOException {
         writeJavaFile(packet, targetFolder);
-        writtenPackets.add((packet.getNumber() + "\t" + packet.getPackage() + "." + packet.getName()));
     }
 
     private static void writeJavaFile(ClassWriter content, String targetFolder) throws IOException {
