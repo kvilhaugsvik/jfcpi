@@ -132,23 +132,20 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public String getNewFromDataStream(String streamName) throws UndefinedException {
-        return "new " + this.getFType() + "(" + streamName +
-                (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getMaxSize() +
-                                (declarations[declarations.length - 1].hasTransfer() ?
-                                        ", " + declarations[declarations.length - 1].getElementsToTransfer() :
-                                        "") :
-                        "") + ")";
+        return "new " + this.getFType() + "(" + streamName + getLimits() + ")";
+    }
+
+    private String getLimits() throws UndefinedException {
+        return ", " + (type.getBasicType().isArrayEater() ?
+                "ElementsLimit.limit(" + declarations[declarations.length - 1].getMaxSize() + ", " +
+                        (declarations[declarations.length - 1].hasTransfer() ?
+                                declarations[declarations.length - 1].getElementsToTransfer() :
+                                declarations[declarations.length - 1].getMaxSize()) :
+                "ElementsLimit.noLimit(") + ")";
     }
 
     public String getNewFromJavaType() throws UndefinedException {
-        return "new " + this.getFType() + "(" + this.getFieldName() + "[i]" +
-                (type.getBasicType().isArrayEater() ?
-                        ", " + declarations[declarations.length - 1].getMaxSize() +
-                                (declarations[declarations.length - 1].hasTransfer() ?
-                                        ", " + declarations[declarations.length - 1].getElementsToTransfer() :
-                                        "") :
-                        "") + ")";
+        return "new " + this.getFType() + "(" + this.getFieldName() + "[i]" + getLimits() + ")";
     }
 
     private static void validateElementsToTransfer(ArrayDeclaration element, Collection<Typed<ABool>> to) throws UndefinedException {

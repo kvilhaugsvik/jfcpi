@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.enteties;
 
+import org.freeciv.packet.fieldtype.ElementsLimit;
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.dependency.IDependency;
@@ -118,21 +120,9 @@ public class FieldTypeBasic implements IDependency, ReqKind {
 
             List<TargetClass> tIOExcept = Arrays.asList(new TargetClass("IOException"));
             Var<TargetClass> pValue = Var.param(javaType, "value");
-            Var<AnInt> pArraySize = Var.param(int.class, "arraySize");
-            Var<AnInt> pMaxArraySizeNow = Var.param(int.class, "maxArraySizeThisTime");
 
-            List<Var<? extends AValue>> paramsConstructArgs = new ArrayList(Arrays.asList(pValue));
-            List<Var<? extends AValue>> paramsConstructIO = new ArrayList(Arrays.asList(pFromStream));
-
-            if (arrayEater) {
-                paramsConstructArgs.add(pArraySize);
-                paramsConstructIO.add(pArraySize);
-                generateConstructors(tIOExcept, paramsConstructArgs, paramsConstructIO,
-                        new Block(new MethodCall("this", pValue.ref(), pArraySize.ref(), pArraySize.ref())),
-                        new Block(new MethodCall("this", pFromStream.ref(), pArraySize.ref(), pArraySize.ref())));
-                paramsConstructArgs.add(pMaxArraySizeNow);
-                paramsConstructIO.add(pMaxArraySizeNow);
-            }
+            List<Var<? extends AValue>> paramsConstructArgs = new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits));
+            List<Var<? extends AValue>> paramsConstructIO = new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits));
 
             generateConstructors(tIOExcept, paramsConstructArgs, paramsConstructIO, constructorBody, decode);
             addMethod(Method.newPublicDynamicMethod(Comment.no(),

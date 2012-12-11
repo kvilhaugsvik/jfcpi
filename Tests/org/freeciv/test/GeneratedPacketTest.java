@@ -58,12 +58,12 @@ public class GeneratedPacketTest {
     public void testPacketWithFieldsFromFields() throws IOException {
         SERVER_JOIN_REQ packet =
                 new SERVER_JOIN_REQ(
-                        new STRING("FreecivJava", 100),
-                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", 100),
-                        new STRING("-dev", 100),
-                        new UINT32(2L),
-                        new UINT32(3L),
-                        new UINT32(99L));
+                        new STRING("FreecivJava", ElementsLimit.limit(100, 100)),
+                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100, 100)),
+                        new STRING("-dev", ElementsLimit.limit(100, 100)),
+                        new UINT32(2L, ElementsLimit.noLimit()),
+                        new UINT32(3L, ElementsLimit.noLimit()),
+                        new UINT32(99L, ElementsLimit.noLimit()));
 
         assertEquals(64, packet.getHeader().getTotalSize());
         assertEquals(4, packet.getHeader().getPacketKind());
@@ -73,12 +73,12 @@ public class GeneratedPacketTest {
     public void testPacketWithFieldValuesFromFields() throws IOException {
         SERVER_JOIN_REQ packet =
                 new SERVER_JOIN_REQ(
-                        new STRING("FreecivJava", 100),
-                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", 100),
-                        new STRING("-dev", 100),
-                        new UINT32(2L),
-                        new UINT32(3L),
-                        new UINT32(99L));
+                        new STRING("FreecivJava", ElementsLimit.limit(100, 100)),
+                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100, 100)),
+                        new STRING("-dev", ElementsLimit.limit(100, 100)),
+                        new UINT32(2L, ElementsLimit.noLimit()),
+                        new UINT32(3L, ElementsLimit.noLimit()),
+                        new UINT32(99L, ElementsLimit.noLimit()));
 
         assertEquals("FreecivJava", packet.getUsernameValue());
         assertEquals("+Freeciv.Devel-2.4-2011.Aug.02 ", packet.getCapabilityValue());
@@ -141,12 +141,12 @@ public class GeneratedPacketTest {
     }
 
     @Test public void testPacketGetFields() {
-        STRING username = new STRING("FreecivJava", 100);
-        STRING capability = new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", 100);
-        STRING version_label = new STRING("-dev", 100);
-        UINT32 major_version = new UINT32(2L);
-        UINT32 minor_version = new UINT32(3L);
-        UINT32 patch_version = new UINT32(99L);
+        STRING username = new STRING("FreecivJava", ElementsLimit.limit(100, 100));
+        STRING capability = new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100, 100));
+        STRING version_label = new STRING("-dev", ElementsLimit.limit(100, 100));
+        UINT32 major_version = new UINT32(2L, ElementsLimit.noLimit());
+        UINT32 minor_version = new UINT32(3L, ElementsLimit.noLimit());
+        UINT32 patch_version = new UINT32(99L, ElementsLimit.noLimit());
         SERVER_JOIN_REQ packet =
                 new SERVER_JOIN_REQ(
                         username,
@@ -214,7 +214,7 @@ public class GeneratedPacketTest {
     }
 
     @Test public void generatedPacketWithArrayFieldsSimpleFromFields() {
-        UINT32[] uint32s = {new UINT32(5L), new UINT32(6L)};
+        UINT32[] uint32s = {new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit())};
         TestArray packet = new TestArray(uint32s);
         assertArrayEquals("Result not the same as constructor",
                 uint32s,
@@ -223,12 +223,12 @@ public class GeneratedPacketTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void generatedPacketWithArrayFieldsSimpleFromFieldsToSmallArray() {
-        TestArray packet = new TestArray(new UINT32[]{new UINT32(5L)});
+        TestArray packet = new TestArray(new UINT32[]{new UINT32(5L, ElementsLimit.noLimit())});
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void generatedPacketWithArrayFieldsSimpleFromFieldsToBigArray() {
-        TestArray packet = new TestArray(new UINT32[]{new UINT32(5L), new UINT32(6L), new UINT32(7L)});
+        TestArray packet = new TestArray(new UINT32[]{new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit()), new UINT32(7L, ElementsLimit.noLimit())});
     }
 
     @Test public void generatedPacketWithArrayFieldsTransferFromJava() {
@@ -252,8 +252,8 @@ public class GeneratedPacketTest {
     }
 
     @Test public void generatedPacketWithArrayFieldsTransferFromFields() {
-        UINT32[] uint32s = {new UINT32(5L), new UINT32(6L)};
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2), uint32s);
+        UINT32[] uint32s = {new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit())};
+        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()), uint32s);
         assertArrayEquals("Result not the same as constructor",
                 uint32s,
                 packet.getTheArray());
@@ -261,20 +261,20 @@ public class GeneratedPacketTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void generatedPacketWithArrayFieldsTransferFromFieldsToSmallArray() {
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2),
-                new UINT32[]{new UINT32(5L)});
+        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()),
+                new UINT32[]{new UINT32(5L, ElementsLimit.noLimit())});
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void generatedPacketWithArrayFieldsTransferFromFieldsToBigArray() {
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2),
-                new UINT32[]{new UINT32(5L), new UINT32(6L), new UINT32(7L)});
+        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()),
+                new UINT32[]{new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit()), new UINT32(7L, ElementsLimit.noLimit())});
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void generatedPacketWithArrayFieldsTransferFromFieldsToBigTransfer() {
-        UINT32[] uint32s = {new UINT32(5L), new UINT32(6L), new UINT32(5L), new UINT32(6L)};
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(4), uint32s);
+        UINT32[] uint32s = {new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit()), new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit())};
+        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(4, ElementsLimit.noLimit()), uint32s);
     }
 
     @Test public void generatedPacketWithArrayFieldsDoubleFromJava() {

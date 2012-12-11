@@ -14,6 +14,7 @@
 
 package org.freeciv.test;
 
+import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packet.fieldtype.STRING;
 import org.freeciv.packet.fieldtype.UINT32;
 import org.freeciv.packet.fieldtype.UINT32S;
@@ -27,9 +28,9 @@ import static org.junit.Assert.assertEquals;
 public class FieldTypeTests {
     private static long roundTripUINT32(long number) throws IOException {
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
-        UINT32 theInt = new UINT32(number);
+        UINT32 theInt = new UINT32(number, ElementsLimit.noLimit());
         theInt.encodeTo(new DataOutputStream(storeTo));
-        return (new UINT32(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())))).getValue();
+        return (new UINT32(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), ElementsLimit.noLimit())).getValue();
     }
 
     private static void assertRoundTripOkUINT32(long number) throws IOException {
@@ -37,7 +38,7 @@ public class FieldTypeTests {
     }
 
     private static long fromJavaUINT32(long number) {
-        return new UINT32(number).getValue();
+        return new UINT32(number, ElementsLimit.noLimit()).getValue();
     }
 
     private static void assertFromJavaOkUINT32(long number) {
@@ -98,13 +99,13 @@ public class FieldTypeTests {
 
         // create and write
         UINT32S theArray = new UINT32S(new UINT32[]{
-            new UINT32(5L),
-            new UINT32(1000L)
-        }, 2);
+            new UINT32(5L, ElementsLimit.noLimit()),
+            new UINT32(1000L, ElementsLimit.noLimit())
+        }, ElementsLimit.limit(2, 2));
         theArray.encodeTo(new DataOutputStream(storeTo));
 
         // read it back
-        UINT32S theReturnedArray = new UINT32S(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), 2);
+        UINT32S theReturnedArray = new UINT32S(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), ElementsLimit.limit(2, 2));
 
         // compare the values
         assertEquals("1 dimensional field type array didn't survive encoding followed by decoding",
@@ -114,12 +115,13 @@ public class FieldTypeTests {
     }
 
     private void testString(String text, int maxLen) throws IOException {
-        STRING fromJava = new STRING(text, maxLen);
+        STRING fromJava = new STRING(text, ElementsLimit.limit(maxLen, maxLen));
         checkString(text, fromJava, maxLen);
 
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
         fromJava.encodeTo(new DataOutputStream(storeTo));
-        STRING fromData = new STRING(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), maxLen);
+        STRING fromData = new STRING(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
+                ElementsLimit.limit(maxLen, maxLen));
         checkString(text, fromData, maxLen);
     }
 

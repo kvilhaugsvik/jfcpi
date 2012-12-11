@@ -14,11 +14,8 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
 import java.util.*;
 
+import static org.freeciv.packetgen.Hardcoded.*;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
-import static org.freeciv.packetgen.Hardcoded.fMaxSize;
-import static org.freeciv.packetgen.Hardcoded.pMaxSize;
-import static org.freeciv.packetgen.Hardcoded.pFullMaxSize;
-import static org.freeciv.packetgen.Hardcoded.arrayEaterScopeCheck;
 
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {
@@ -223,7 +220,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 }
                 if (validationPossible(transferArraySize, maxArraySize))
                     fromJavaTyped.addStatement(Hardcoded.arrayEaterScopeCheck(
-                            isSmallerThan(Var.param(int.class, "maxArraySizeThisTime").ref(), fMaxSize.ref())));
+                            isSmallerThan(Hardcoded.pLimits.read("elements_to_transfer"), fMaxSize.ref())));
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
                 return fromJavaTyped;
             }
@@ -238,7 +235,7 @@ public class TerminatedArray extends FieldTypeBasic {
     private static Typed<AnInt> maxArraySizeVar(MaxArraySize maxArraySize, Typed<AnInt> fullArraySizeLocation) {
         switch (maxArraySize) {
             case CONSTRUCTOR_PARAM:
-                return pMaxSize.ref();
+                return Hardcoded.pLimits.read("elements_to_transfer");
             case STORED_IN:
                 return fullArraySizeLocation;
             case NO_LIMIT:
@@ -254,7 +251,7 @@ public class TerminatedArray extends FieldTypeBasic {
             case MAX_ARRAY_SIZE:
                 return maxArraySizeRef;
             case CONSTRUCTOR_PARAM:
-                return pFullMaxSize.ref();
+                return pLimits.read("full_array_size");
             case SERIALIZED:
                 return numberOfElements;
             default:
@@ -345,7 +342,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 new ExprFrom1<Typed<? extends AValue>, Var>() {
                     @Override
                     public Typed<? extends AValue> x(Var from) {
-                        return type.getOf().newInstance(from.ref());
+                        return type.getOf().newInstance(from.ref(), new MethodCall<AValue>("ElementsLimit.noLimit"));
                     }
                 },
                 TO_STRING_ARRAY,

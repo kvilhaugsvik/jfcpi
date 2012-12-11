@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.BitVector;
@@ -40,10 +41,8 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 //TODO: Move data to file
 public class Hardcoded {
     // TODO: Make parameters in stead
-    private static final Var pArraySize = Var.param(int.class, "arraySize");
+    public static final Var<TargetClass> pLimits = Var.param(ElementsLimit.class, "limits");
     private static final Var pValue = Var.param(String.class, "value"); // can't know type
-    public static final Var pFullMaxSize = Var.param(int.class, "arraySize");
-    public static final Var pMaxSize = Var.param(int.class, "maxArraySizeThisTime");
     public static final Var fMaxSize = Var.field(Collections.<Annotate>emptyList(),
             Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
             new TargetClass(int.class), "maxArraySize", null);
