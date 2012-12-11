@@ -14,10 +14,7 @@
 
 package org.freeciv.test;
 
-import org.freeciv.packet.fieldtype.ElementsLimit;
-import org.freeciv.packet.fieldtype.STRING;
-import org.freeciv.packet.fieldtype.UINT32;
-import org.freeciv.packet.fieldtype.UINT32S;
+import org.freeciv.packet.fieldtype.*;
 import org.junit.Test;
 
 import java.io.*;
@@ -112,6 +109,31 @@ public class FieldTypeTests {
         assertEquals("1 dimensional field type array didn't survive encoding followed by decoding",
                 theArray.getValue()[0].getValue(), theReturnedArray.getValue()[0].getValue());
         assertEquals("1 dimensional field type array didn't survive encoding followed by decoding",
+                theArray.getValue()[1].getValue(), theReturnedArray.getValue()[1].getValue());
+    }
+
+    @Test public void STRING_1_dimensionalArray_round_trip() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+
+        // create and write
+        STRINGS theArray = new STRINGS(new STRING[]{
+            new STRING("1", ElementsLimit.limit(5, 4)),
+            new STRING("win", ElementsLimit.limit(5, 4))
+        }, ElementsLimit.superLimit(2, 2, ElementsLimit.limit(5, 4)));
+        theArray.encodeTo(new DataOutputStream(storeTo));
+
+        // check the encoding
+        assertEquals("1d + eater field type array encoded wrong", "1", theArray.getValue()[0].getValue());
+        assertEquals("1d + eater  field type array encoded wrong", "win", theArray.getValue()[1].getValue());
+
+        // read it back
+        STRINGS theReturnedArray = new STRINGS(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
+                ElementsLimit.superLimit(2, 2, ElementsLimit.limit(5, 4)));
+
+        // compare the values
+        assertEquals("1d + eater field type array didn't survive encoding followed by decoding",
+                theArray.getValue()[0].getValue(), theReturnedArray.getValue()[0].getValue());
+        assertEquals("1d + eater  field type array didn't survive encoding followed by decoding",
                 theArray.getValue()[1].getValue(), theReturnedArray.getValue()[1].getValue());
     }
 

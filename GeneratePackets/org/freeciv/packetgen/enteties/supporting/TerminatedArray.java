@@ -317,10 +317,12 @@ public class TerminatedArray extends FieldTypeBasic {
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
                                              final FieldTypeAlias kind, final int dimensions) {
-        return fieldArray(dataIOType, publicType, new TargetArray(kind.getAddress(), dimensions, true));
+        return fieldArray(dataIOType, publicType, new TargetArray(kind.getAddress(), dimensions, true),
+                kind.getBasicType().isArrayEater());
     }
 
-    public static TerminatedArray fieldArray(final String dataIOType, final String publicType, final TargetArray type) {
+    public static TerminatedArray fieldArray(final String dataIOType, final String publicType, final TargetArray type,
+                                             final boolean arrayEater) {
         Var<AValue> helperParamValue = Var.param(type, "value");
         final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), new TargetClass(int.class), "lengthInBytes",
                 Arrays.<Var<?>>asList(helperParamValue), new Block(RETURN(helperParamValue.read("length"))));
@@ -342,7 +344,11 @@ public class TerminatedArray extends FieldTypeBasic {
                 new ExprFrom1<Typed<? extends AValue>, Var>() {
                     @Override
                     public Typed<? extends AValue> x(Var from) {
-                        return type.getOf().newInstance(from.ref(), new MethodCall<AValue>("ElementsLimit.noLimit"));
+                        TargetClass elemType = type.getOf();
+                        if (arrayEater)
+                            return elemType.newInstance(from.ref(), Hardcoded.pLimits.<TargetClass>call("next"));
+                        else
+                            return elemType.newInstance(from.ref(), new MethodCall<AValue>("ElementsLimit.noLimit"));
                     }
                 },
                 TO_STRING_ARRAY,

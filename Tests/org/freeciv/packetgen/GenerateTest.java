@@ -98,6 +98,9 @@ public class GenerateTest {
         FieldTypeBasic.FieldTypeAlias uint8s = TerminatedArray.fieldArray("n", "a", uint8, 1).createFieldType("UINT8S");
         writeJavaFile(uint8s, targetFolder);
 
+        FieldTypeBasic.FieldTypeAlias strings = TerminatedArray.fieldArray("n", "a", string, 1).createFieldType("STRINGS");
+        writeJavaFile(strings, targetFolder);
+
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
                 new TargetClass(Header_2_1.class.getSimpleName()),
@@ -296,7 +299,7 @@ public class GenerateTest {
         // add method enocodeTo to underlying type since it's field type
         arrayOfFields.getOf().register(new TargetMethod("encodeTo"));
 
-        writeJavaFile(TerminatedArray.fieldArray("x", "y", arrayOfFields).createFieldType("UINT32S"), targetFolder);
+        writeJavaFile(TerminatedArray.fieldArray("x", "y", arrayOfFields, false).createFieldType("UINT32S"), targetFolder);
     }
 
     @Test
