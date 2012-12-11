@@ -137,6 +137,19 @@ public class FieldTypeTests {
                 theArray.getValue()[1].getValue(), theReturnedArray.getValue()[1].getValue());
     }
 
+    @Test public void UINT8_2D_understand() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        storeTo.write(new byte[]{1, 3, 7, 12});
+
+        UINT8S2D result = new UINT8S2D(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
+                ElementsLimit.superLimit(2, 2, ElementsLimit.limit(2, 2)));
+
+        assertEquals(1, result.getValue()[0].getValue()[0].getValue().intValue());
+        assertEquals(3, result.getValue()[0].getValue()[1].getValue().intValue());
+        assertEquals(7, result.getValue()[1].getValue()[0].getValue().intValue());
+        assertEquals(12, result.getValue()[1].getValue()[1].getValue().intValue());
+    }
+
     private void testString(String text, int maxLen) throws IOException {
         STRING fromJava = new STRING(text, ElementsLimit.limit(maxLen, maxLen));
         checkString(text, fromJava, maxLen);

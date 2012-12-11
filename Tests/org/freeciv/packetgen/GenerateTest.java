@@ -98,6 +98,9 @@ public class GenerateTest {
         FieldTypeBasic.FieldTypeAlias uint8s = TerminatedArray.fieldArray("n", "a", uint8, 1).createFieldType("UINT8S");
         writeJavaFile(uint8s, targetFolder);
 
+        FieldTypeBasic.FieldTypeAlias uint8s2D = TerminatedArray.fieldArray("n", "a", uint8s, 1).createFieldType("UINT8S2D");
+        writeJavaFile(uint8s2D, targetFolder);
+
         FieldTypeBasic.FieldTypeAlias strings = TerminatedArray.fieldArray("n", "a", string, 1).createFieldType("STRINGS");
         writeJavaFile(strings, targetFolder);
 
