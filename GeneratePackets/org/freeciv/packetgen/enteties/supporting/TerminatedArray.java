@@ -316,8 +316,8 @@ public class TerminatedArray extends FieldTypeBasic {
     }
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
-                                             final FieldTypeAlias kind, final int dimensions) {
-        return fieldArray(dataIOType, publicType, new TargetArray(kind.getAddress(), dimensions, true),
+                                             final FieldTypeAlias kind) {
+        return fieldArray(dataIOType, publicType, new TargetArray(kind.getAddress(), 1, true),
                 kind.getBasicType().isArrayEater());
     }
 

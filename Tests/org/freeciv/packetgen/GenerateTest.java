@@ -95,13 +95,13 @@ public class GenerateTest {
         writeJavaFile(bool, targetFolder);
         writeJavaFile(connection, targetFolder);
 
-        FieldTypeBasic.FieldTypeAlias uint8s = TerminatedArray.fieldArray("n", "a", uint8, 1).createFieldType("UINT8S");
+        FieldTypeBasic.FieldTypeAlias uint8s = TerminatedArray.fieldArray("n", "a", uint8).createFieldType("UINT8S");
         writeJavaFile(uint8s, targetFolder);
 
-        FieldTypeBasic.FieldTypeAlias uint8s2D = TerminatedArray.fieldArray("n", "a", uint8s, 1).createFieldType("UINT8S2D");
+        FieldTypeBasic.FieldTypeAlias uint8s2D = TerminatedArray.fieldArray("n", "a", uint8s).createFieldType("UINT8S2D");
         writeJavaFile(uint8s2D, targetFolder);
 
-        FieldTypeBasic.FieldTypeAlias strings = TerminatedArray.fieldArray("n", "a", string, 1).createFieldType("STRINGS");
+        FieldTypeBasic.FieldTypeAlias strings = TerminatedArray.fieldArray("n", "a", string).createFieldType("STRINGS");
         writeJavaFile(strings, targetFolder);
 
         writePacket(new Packet("SERVER_JOIN_REQ",
