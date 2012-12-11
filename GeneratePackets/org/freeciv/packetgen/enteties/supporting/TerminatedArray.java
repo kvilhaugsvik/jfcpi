@@ -220,7 +220,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 }
                 if (validationPossible(transferArraySize, maxArraySize))
                     fromJavaTyped.addStatement(Hardcoded.arrayEaterScopeCheck(
-                            isSmallerThan(Hardcoded.pLimits.read("elements_to_transfer"), fMaxSize.ref())));
+                            isSmallerThan(fMaxSize.ref(), Hardcoded.pLimits.read("elements_to_transfer"))));
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
                 return fromJavaTyped;
             }

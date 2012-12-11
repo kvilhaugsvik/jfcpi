@@ -24,6 +24,7 @@ import java.io.*;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class FieldTypeTests {
     private static long roundTripUINT32(long number) throws IOException {
@@ -149,5 +150,16 @@ public class FieldTypeTests {
 
     @Test public void STRING_empty_even() throws IOException {
         testString("", 4);
+    }
+
+    @Test public void STRING_fewer_max_this_time() throws IOException {
+        STRING smallButOk = new STRING("Hello", ElementsLimit.limit(20, 7));
+        assertEquals("Hello", smallButOk.getValue());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void STRING_more_this_time_than_max() throws IOException {
+        STRING notOk = new STRING("Hello", ElementsLimit.limit(7, 20));
+        fail(notOk.getValue() + " is smaller than 20 but 20 is smaller than 7");
     }
 }
