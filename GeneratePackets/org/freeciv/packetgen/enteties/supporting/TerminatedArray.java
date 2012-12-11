@@ -352,7 +352,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     }
                 },
                 TO_STRING_ARRAY,
-                Arrays.asList(new Requirement(type.getName(), FieldTypeAlias.class)),
+                Arrays.asList(new Requirement(type.getOf().getName(), FieldTypeAlias.class)),
                 null,
                 null,
                 new ExprFrom1<Typed<AnInt>, Var>() {
