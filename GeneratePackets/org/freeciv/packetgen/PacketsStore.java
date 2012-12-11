@@ -51,6 +51,8 @@ public class PacketsStore {
             requirements.addPossibleRequirement(primitive);
         }
 
+        requirements.addMaker(new FieldAliasArrayMaker());
+
         this.logger = logger;
 
         switch (bytesInPacketNumber) {

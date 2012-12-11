@@ -15,6 +15,7 @@
 package org.freeciv.packetgen;
 
 import org.freeciv.Util;
+import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
@@ -276,5 +277,107 @@ public class PacketsStoreTest {
                 Util.joinStringArray(ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(
                         new CodeAtoms(getVersionData(storage).getField("understandsPackets").getValue())).toArray(),
                         "\n", "", ""));
+    }
+
+    @Test
+    public void generateFieldArraySimple() throws UndefinedException, PacketCollisionException {
+        PacketsStore storage = defaultStorage();
+
+        storage.registerTypeAlias("DEX", "uint8", "int");
+        storage.registerTypeAlias("UNDER", "uint8", "int");
+
+        List<WeakField> fieldList = Arrays.asList(
+                new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
+                new WeakField("field", "UNDER_1", Collections.<WeakFlag>emptyList(),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
+
+        storage.registerPacket("Array1D", 44, Collections.<WeakFlag>emptyList(), fieldList);
+
+        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
+        for (ClassWriter item : storage.getJavaCode()) {
+            results.put(item.getName(), item);
+        }
+
+        assertTrue("Can't test as underlying not generated...", results.containsKey("UNDER"));
+        assertTrue("Failed to generate simple 1 dimensional array", results.containsKey("UNDER_1"));
+    }
+
+    @Test
+    public void generateFieldArray5Dimensions() throws UndefinedException, PacketCollisionException {
+        PacketsStore storage = defaultStorage();
+
+        storage.registerTypeAlias("DEX", "uint8", "int");
+        storage.registerTypeAlias("UNDER", "uint8", "int");
+
+        List<WeakField> fieldList = Arrays.asList(
+                new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
+                new WeakField("field", "UNDER_5", Collections.<WeakFlag>emptyList(),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
+
+        storage.registerPacket("Array5D", 44, Collections.<WeakFlag>emptyList(), fieldList);
+
+        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
+        for (ClassWriter item : storage.getJavaCode()) {
+            results.put(item.getName(), item);
+        }
+
+        assertTrue("Can't test as underlying not generated...", results.containsKey("UNDER"));
+        assertTrue("Failed to generate array dimension 1", results.containsKey("UNDER_1"));
+        assertTrue("Failed to generate array dimension 2", results.containsKey("UNDER_2"));
+        assertTrue("Failed to generate array dimension 3", results.containsKey("UNDER_3"));
+        assertTrue("Failed to generate array dimension 4", results.containsKey("UNDER_4"));
+        assertTrue("Failed to generate 5 dimensional array", results.containsKey("UNDER_5"));
+    }
+
+    @Test
+    public void generateFieldArray15Dimensions() throws UndefinedException, PacketCollisionException {
+        PacketsStore storage = defaultStorage();
+
+        storage.registerTypeAlias("DEX", "uint8", "int");
+        storage.registerTypeAlias("UNDER", "uint8", "int");
+
+        List<WeakField> fieldList = Arrays.asList(
+                new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
+                new WeakField("field", "UNDER_15", Collections.<WeakFlag>emptyList(),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
+
+        storage.registerPacket("Array15D", 44, Collections.<WeakFlag>emptyList(), fieldList);
+
+        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
+        for (ClassWriter item : storage.getJavaCode()) {
+            results.put(item.getName(), item);
+        }
+
+        assertTrue("Can't test as underlying not generated...", results.containsKey("UNDER"));
+        assertTrue("Failed to generate array dimension 1", results.containsKey("UNDER_1"));
+        assertTrue("Failed to generate array dimension 9", results.containsKey("UNDER_9"));
+        assertTrue("Failed to generate array dimension 10", results.containsKey("UNDER_10"));
+        assertTrue("Failed to generate array dimension 11", results.containsKey("UNDER_11"));
+        assertTrue("Failed to generate 15 dimensional array", results.containsKey("UNDER_15"));
+    }
+
+    @Test
+    public void generateFieldArrayEaterUnder() throws UndefinedException, PacketCollisionException {
+        PacketsStore storage = defaultStorage();
+
+        storage.registerTypeAlias("DEX", "uint8", "int");
+        storage.registerTypeAlias("UNDER", "string", "char");
+
+        List<WeakField> fieldList = Arrays.asList(
+                new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
+                new WeakField("field", "UNDER_3", Collections.<WeakFlag>emptyList(),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
+
+        storage.registerPacket("ArrayEat", 44, Collections.<WeakFlag>emptyList(), fieldList);
+
+        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
+        for (ClassWriter item : storage.getJavaCode()) {
+            results.put(item.getName(), item);
+        }
+
+        assertTrue("Can't test as underlying not generated...", results.containsKey("UNDER"));
+        assertFalse("Dimension 1 should be eaten", results.containsKey("UNDER_1"));
+        assertTrue("Failed to generate array dimension 2", results.containsKey("UNDER_2"));
+        assertTrue("Failed to generate array dimension 3", results.containsKey("UNDER_3"));
     }
 }
