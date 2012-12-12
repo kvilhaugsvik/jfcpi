@@ -183,9 +183,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 out.addStatement(fMaxSize.assign(setFMaxSize(maxArraySizeRef,
                         transferArraySize, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from))));
 
-                if (validationPossible(transferArraySize, maxArraySize))
-                    out.addStatement(Hardcoded.arrayEaterScopeCheck(
-                            isSmallerThan(fMaxSize.ref(), maxArraySizeRef)));
+                theLimitIsSane(out, maxArraySizeRef, transferArraySize, maxArraySize);
 
                 out.addStatement(buf);
                 out.addStatement(current);
@@ -205,6 +203,17 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
+    private static void theLimitIsSane(Block out, Typed<AnInt> maxArraySizeRef,
+                                       TransferArraySize transferArraySize, MaxArraySize maxArraySize) {
+        if (shouldValidateLimits(transferArraySize, maxArraySize))
+            out.addStatement(Hardcoded.arrayEaterScopeCheck(isSmallerThan(fMaxSize.ref(), maxArraySizeRef)));
+    }
+
+    private static boolean shouldValidateLimits(TransferArraySize transferArraySize, MaxArraySize maxArraySize) {
+        return !(TransferArraySize.MAX_ARRAY_SIZE.equals(transferArraySize)
+                || MaxArraySize.NO_LIMIT.equals(maxArraySize));
+    }
+
     private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySize, final TransferArraySize transferArraySize, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> testIfSizeIsWrong, final Typed<AnInt> fullArraySizeLocation) {
         return new ExprFrom1<Block, Var>() {
             @Override
@@ -214,22 +223,20 @@ public class TerminatedArray extends FieldTypeBasic {
                 Typed<AnInt> maxArraySizeRef = maxArraySizeVar(maxArraySize, fullArraySizeLocation);
                 fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(maxArraySizeRef,
                         transferArraySize, null == numberOfElements ? null : numberOfElements.x(pValue))));
-                if (null != maxArraySizeRef) {
-                    fromJavaTyped.addStatement(arrayEaterScopeCheck(testIfSizeIsWrong.x(fMaxSize.ref(),
-                            numberOfElements.x(pValue))));
-                }
-                if (validationPossible(transferArraySize, maxArraySize))
-                    fromJavaTyped.addStatement(Hardcoded.arrayEaterScopeCheck(
-                            isSmallerThan(fMaxSize.ref(), Hardcoded.pLimits.read("elements_to_transfer"))));
+                sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeRef, numberOfElements.x(pValue), testIfSizeIsWrong);
+                theLimitIsSane(fromJavaTyped, maxArraySizeRef, transferArraySize, maxArraySize);
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
                 return fromJavaTyped;
             }
         };
     }
 
-    private static boolean validationPossible(TransferArraySize transferArraySize, MaxArraySize maxArraySize) {
-        return !(TransferArraySize.MAX_ARRAY_SIZE.equals(transferArraySize)
-                || MaxArraySize.NO_LIMIT.equals(maxArraySize));
+    private static void sizeIsInsideTheLimit(Block out,
+                                             Typed<AnInt> maxArraySizeRef, Typed<AnInt> actualNumberOfElements,
+                                             ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> comparator) {
+        if (null != maxArraySizeRef) {
+            out.addStatement(arrayEaterScopeCheck(comparator.x(fMaxSize.ref(), actualNumberOfElements)));
+        }
     }
 
     private static Typed<AnInt> maxArraySizeVar(MaxArraySize maxArraySize, Typed<AnInt> fullArraySizeLocation) {
