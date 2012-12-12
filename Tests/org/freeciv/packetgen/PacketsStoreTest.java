@@ -19,6 +19,7 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.Packet;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
@@ -379,5 +380,32 @@ public class PacketsStoreTest {
         assertFalse("Dimension 1 should be eaten", results.containsKey("UNDER_1"));
         assertTrue("Failed to generate array dimension 2", results.containsKey("UNDER_2"));
         assertTrue("Failed to generate array dimension 3", results.containsKey("UNDER_3"));
+    }
+
+    @Test
+    public void generateFieldArrayButNotFor1DArrayEater() throws UndefinedException, PacketCollisionException {
+        PacketsStore storage = defaultStorage();
+
+        storage.registerTypeAlias("DEX", "uint8", "int");
+        storage.registerTypeAlias("UNDER", "string", "char");
+
+        List<WeakField> fieldList = Arrays.asList(
+                new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
+                new WeakField("field", "UNDER_1", Collections.<WeakFlag>emptyList(),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
+
+        storage.registerPacket("ArrayEat", 44, Collections.<WeakFlag>emptyList(), fieldList);
+
+        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
+        for (ClassWriter item : storage.getJavaCode()) {
+            results.put(item.getName(), item);
+        }
+
+        assertFalse("Dimension 1 should be eaten", results.containsKey("UNDER_1"));
+
+        assertTrue("Packet not generated", results.containsKey("ArrayEat"));
+        assertNotNull("Probable bug in test", results.get("ArrayEat"));
+        assertTrue("Field should exist and be of the correct type",
+                results.get("ArrayEat").getField("field").getType().equals("UNDER"));
     }
 }

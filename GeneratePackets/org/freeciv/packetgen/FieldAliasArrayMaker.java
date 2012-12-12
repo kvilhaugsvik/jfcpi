@@ -71,12 +71,18 @@ public class FieldAliasArrayMaker implements IDependency.Maker {
             return TerminatedArray.fieldArray("n", "a", (FieldTypeBasic.FieldTypeAlias) wasRequired[1])
                     .createFieldType(toProduce.getName());
 
+        if ("1".equals(splitRequest(toProduce).group(2)) && eatsArrays(wasRequired[0]))
+            return ((FieldTypeBasic.FieldTypeAlias)wasRequired[0]).aliasUnseenToCode(toProduce.getName());
 
         return TerminatedArray.fieldArray("n", "a", (FieldTypeBasic.FieldTypeAlias) wasRequired[0])
                 .createFieldType(toProduce.getName());
     }
 
+    private static boolean eatsArrays(IDependency iDependency) {
+        return ((FieldTypeBasic.FieldTypeAlias)iDependency).getBasicType().isArrayEater();
+    }
+
     private static boolean wasntArrayEaterAfterAll(IDependency[] wasRequired) {
-        return 2 == wasRequired.length && !((FieldTypeBasic.FieldTypeAlias)wasRequired[0]).getBasicType().isArrayEater();
+        return 2 == wasRequired.length && !eatsArrays(wasRequired[0]);
     }
 }
