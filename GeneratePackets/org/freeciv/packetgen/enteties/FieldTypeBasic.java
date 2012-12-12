@@ -105,8 +105,13 @@ public class FieldTypeBasic implements IDependency, ReqKind {
     }
 
     public class FieldTypeAlias extends ClassWriter implements IDependency, ReqKind {
+        private final String requiredAs;
 
         protected FieldTypeAlias(String name) {
+            this(name, name);
+        }
+
+        protected FieldTypeAlias(String name, String requiredAs) {
             super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage()), new Import[]{
                                                   Import.classIn(java.io.DataInput.class),
                                                   Import.classIn(java.io.DataOutput.class),
@@ -115,6 +120,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                                                   Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()))
                                           }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
                                           TargetClass.fromName(null), Arrays.asList(new TargetClass("FieldType<" + javaType.getName() + ">")));
+            this.requiredAs = requiredAs;
 
             addObjectConstant(javaType.getName(), "value");
 
@@ -169,6 +175,15 @@ public class FieldTypeBasic implements IDependency, ReqKind {
             return javaType.getName();
         }
 
+        /**
+         * Use this to provide another type and replace mentions of the other type with this in the generated code
+         * @param alias Name of the field type alias to replace
+         * @return A Field type alias that is a copy of this except that it will fulfill the requirement alias
+         */
+        public FieldTypeAlias aliasUnseenToCode(String alias) {
+            return new FieldTypeAlias(getName(), alias);
+        }
+
         @Override
         public Collection<Requirement> getReqs() {
             return requirement;
@@ -176,7 +191,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
 
         @Override
         public Requirement getIFulfillReq() {
-            return new Requirement(getName(), FieldTypeBasic.FieldTypeAlias.class);
+            return new Requirement(requiredAs, FieldTypeBasic.FieldTypeAlias.class);
         }
     }
 }
