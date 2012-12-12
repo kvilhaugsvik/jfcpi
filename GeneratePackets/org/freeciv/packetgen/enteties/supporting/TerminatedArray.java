@@ -53,13 +53,6 @@ public class TerminatedArray extends FieldTypeBasic {
                     return FALSE;
                 }
             };
-    public static final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> lenShouldBeEqual =
-            new ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>>() {
-                @Override
-                public Typed<ABool> x(Typed<AnInt> max, Typed<AnInt> size) {
-                    return isNotSame(max, size);
-                }
-            };
     public static final ExprFrom1<Typed<? extends AValue>, Var> readByte = new ExprFrom1<Typed<? extends AValue>, Var>() {
         @Override
         public Typed<? extends AValue> x(Var from) {
@@ -71,13 +64,6 @@ public class TerminatedArray extends FieldTypeBasic {
                 @Override
                 public Typed<ABool> x(Typed<AnInt> size) {
                     return isSmallerThan(size, fMaxSize.ref());
-                }
-            };
-    public static final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> wrongSizeIfToBig =
-            new ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>>() {
-                @Override
-                public Typed<ABool> x(Typed<AnInt> max, Typed<AnInt> size) {
-                    return isSmallerThan(max, size);
                 }
             };
     public static final ExprFrom1<Typed<AnInt>, Typed<AnInt>> sameNumberOfBufferElementsAndValueElements =
@@ -97,7 +83,6 @@ public class TerminatedArray extends FieldTypeBasic {
                            final TargetArray buffertype,
                            final ExprFrom1<Typed<AnInt>, Var> numberOfElements,
                            final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded,
-                           final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> testIfSizeIsWrong,
                            final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray,
                            final ExprFrom1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue,
                            final ExprFrom2<Block, Var, Var> writeElementTo,
@@ -110,7 +95,7 @@ public class TerminatedArray extends FieldTypeBasic {
                            final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
                            final Collection<Method.Helper> helperMethods) {
         super(dataIOType, publicType, javaType,
-                createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, testIfSizeIsWrong, fullArraySizeLocation),
+                createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation),
                 createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements),
                 createEncode(terminator, transferArraySizeKind, buffertype, numberOfElements, testIfTerminatorShouldBeAdded, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize),
                 createEnocedSize(transferArraySizeKind, numberOfElements, testIfTerminatorShouldBeAdded, transferSizeSerialize, valueGetByteLen),
@@ -120,6 +105,10 @@ public class TerminatedArray extends FieldTypeBasic {
                 uses
         );
         helpers = new HashSet<Method.Helper>(helperMethods);
+    }
+
+    private static boolean notTerminatable(Requirement terminator) {
+        return null == terminator;
     }
 
     private static ExprFrom1<Typed<AnInt>, Var> createEnocedSize(final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen) {
@@ -172,7 +161,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
                 Var pos = Var.local("int", "pos", literal(0));
 
-                Typed<ABool> noTerminatorFound = (null == terminator ?
+                Typed<ABool> noTerminatorFound = (notTerminatable(terminator) ?
                         TRUE :
                         isNotSame(cast(byte.class,
                                 BuiltIn.<AnInt>toCode(Constant.referToInJavaCode(terminator))), current.ref()));
@@ -214,7 +203,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 || noUpperLimitOnTheNumberOfElements(maxArraySizeKind));
     }
 
-    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> testIfSizeIsWrong, final Typed<AnInt> fullArraySizeLocation) {
+    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation) {
         return new ExprFrom1<Block, Var>() {
             @Override
             public Block x(Var to) {
@@ -223,7 +212,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 Typed<AnInt> relativeMaxArray = maxArraySizeVar(maxArraySizeKind, fullArraySizeLocation);
                 fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
                         transferArraySizeKind, null == numberOfElements ? null : numberOfElements.x(pValue))));
-                sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeKind, numberOfElements.x(pValue), testIfSizeIsWrong);
+                sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeKind, numberOfElements.x(pValue), terminatable);
                 theLimitIsSane(fromJavaTyped, relativeMaxArray, transferArraySizeKind, maxArraySizeKind);
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
                 return fromJavaTyped;
@@ -233,9 +222,14 @@ public class TerminatedArray extends FieldTypeBasic {
 
     private static void sizeIsInsideTheLimit(Block out,
                                              MaxArraySize maxArraySizeKind, Typed<AnInt> actualNumberOfElements,
-                                             ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> comparator) {
+                                             boolean tolerateSmaller) {
         if (!noUpperLimitOnTheNumberOfElements(maxArraySizeKind)) {
-            out.addStatement(arrayEaterScopeCheck(comparator.x(fMaxSize.ref(), actualNumberOfElements)));
+            Typed<ABool> check;
+            if (tolerateSmaller)
+                check = isSmallerThan(fMaxSize.ref(), actualNumberOfElements);
+            else
+                check = isNotSame(fMaxSize.ref(), actualNumberOfElements);
+            out.addStatement(arrayEaterScopeCheck(check));
         }
     }
 
@@ -304,8 +298,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         byteArray,
                         arrayLen,
                         neverAnythingAfter,
-                        lenShouldBeEqual,
-                        fullIsByteArray,
+                fullIsByteArray,
                 valueIsBufferArray,
                         elemIsByteArray,
                         readByte,
@@ -324,8 +317,8 @@ public class TerminatedArray extends FieldTypeBasic {
                         MaxArraySize.CONSTRUCTOR_PARAM,
                         TransferArraySize.CONSTRUCTOR_PARAM,
                         byteArray,
-                        arrayLen, addAfterIfSmallerThanMaxSize, wrongSizeIfToBig,
-                        fullIsByteArray, valueIsBufferArray, elemIsByteArray, readByte,
+                        arrayLen, addAfterIfSmallerThanMaxSize,
+                fullIsByteArray, valueIsBufferArray, elemIsByteArray, readByte,
                         TO_STRING_ARRAY,
                         Arrays.asList(terminator),
                         null,
@@ -353,7 +346,6 @@ public class TerminatedArray extends FieldTypeBasic {
                 type,
                 arrayLen,
                 neverAnythingAfter,
-                lenShouldBeEqual,
                 null,
                 valueIsBufferArray,
                 new ExprFrom2<Block, Var, Var>() {

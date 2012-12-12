@@ -135,7 +135,6 @@ public class Hardcoded {
                     new TargetArray("universal", 1, true),
                     TerminatedArray.arrayLen,
                     TerminatedArray.neverAnythingAfter,
-                    TerminatedArray.lenShouldBeEqual,
                     null,
                     new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
                         @Override
@@ -192,7 +191,6 @@ public class Hardcoded {
                         }
                     },
                     TerminatedArray.addAfterIfSmallerThanMaxSize,
-                    TerminatedArray.wrongSizeIfToBig,
                     new ExprFrom1<Typed<AValue>, Var>() {
                         @Override
                         public Typed<AValue> x(Var everything) {

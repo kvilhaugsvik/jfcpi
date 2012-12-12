@@ -3,7 +3,6 @@ package org.freeciv.packetgen.enteties;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
-import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Required;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.DataType;
@@ -150,7 +149,6 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                     }
                 },
                 TerminatedArray.neverAnythingAfter,
-                TerminatedArray.lenShouldBeEqual,
                 new ExprFrom1<Typed<AValue>, Var>() {
                     @Override
                     public Typed<AValue> x(Var buffer) {
