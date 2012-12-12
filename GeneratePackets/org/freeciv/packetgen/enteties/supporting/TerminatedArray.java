@@ -92,8 +92,8 @@ public class TerminatedArray extends FieldTypeBasic {
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
                            final Requirement terminator,
-                           final MaxArraySize maxArraySize,
-                           final TransferArraySize transferArraySize,
+                           final MaxArraySize maxArraySizeKind,
+                           final TransferArraySize transferArraySizeKind,
                            final TargetArray buffertype,
                            final ExprFrom1<Typed<AnInt>, Var> numberOfElements,
                            final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded,
@@ -110,24 +110,24 @@ public class TerminatedArray extends FieldTypeBasic {
                            final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
                            final Collection<Method.Helper> helperMethods) {
         super(dataIOType, publicType, javaType,
-                createConstructorBody(javaType, maxArraySize, transferArraySize, numberOfElements, testIfSizeIsWrong, fullArraySizeLocation),
-                createDecode(terminator, maxArraySize, transferArraySize, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements),
-                createEncode(terminator, transferArraySize, buffertype, numberOfElements, testIfTerminatorShouldBeAdded, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize),
-                createEnocedSize(transferArraySize, numberOfElements, testIfTerminatorShouldBeAdded, transferSizeSerialize, valueGetByteLen),
+                createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, testIfSizeIsWrong, fullArraySizeLocation),
+                createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements),
+                createEncode(terminator, transferArraySizeKind, buffertype, numberOfElements, testIfTerminatorShouldBeAdded, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize),
+                createEnocedSize(transferArraySizeKind, numberOfElements, testIfTerminatorShouldBeAdded, transferSizeSerialize, valueGetByteLen),
                 toString,
-                MaxArraySize.CONSTRUCTOR_PARAM.equals(maxArraySize)
-                        || TransferArraySize.CONSTRUCTOR_PARAM.equals(transferArraySize),
+                MaxArraySize.CONSTRUCTOR_PARAM.equals(maxArraySizeKind)
+                        || TransferArraySize.CONSTRUCTOR_PARAM.equals(transferArraySizeKind),
                 uses
         );
         helpers = new HashSet<Method.Helper>(helperMethods);
     }
 
-    private static ExprFrom1<Typed<AnInt>, Var> createEnocedSize(final TransferArraySize transferArraySize, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen) {
+    private static ExprFrom1<Typed<AnInt>, Var> createEnocedSize(final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen) {
         return new ExprFrom1<Typed<AnInt>, Var>() {
             @Override
             public Typed<AnInt> x(Var value) {
                 Typed<AnInt> length = valueGetByteLen.x(value);
-                if (TransferArraySize.SERIALIZED.equals(transferArraySize))
+                if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     length = sum(transferSizeSerialize.getSize().x(value), length);
                 Typed<ABool> addAfterResult = testIfTerminatorShouldBeAdded.x(numberOfElements.x(value));
                 if (!FALSE.equals(addAfterResult))
@@ -141,12 +141,12 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
-    private static ExprFrom2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySize, final TargetArray buffertype, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray, final ExprFrom2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize) {
+    private static ExprFrom2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray, final ExprFrom2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize) {
         return new ExprFrom2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
                 Block out = new Block();
-                if (TransferArraySize.SERIALIZED.equals(transferArraySize))
+                if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     out.addStatement(to.call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
                 if (null == convertAllElementsToByteArray) {
                     Var element = Var.param(buffertype.getOf(), "element");
@@ -163,7 +163,7 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
-    private static ExprFrom2<Block, Var, Var> createDecode(final Requirement terminator, final MaxArraySize maxArraySize, final TransferArraySize transferArraySize, final TargetArray buffertype, final ExprFrom1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements) {
+    private static ExprFrom2<Block, Var, Var> createDecode(final Requirement terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final ExprFrom1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements) {
         return new ExprFrom2<Block, Var, Var>() {
             @Override
             public Block x(Var to, Var from) {
@@ -179,11 +179,11 @@ public class TerminatedArray extends FieldTypeBasic {
 
                 Block out = new Block();
 
-                Typed<AnInt> maxArraySizeRef = maxArraySizeVar(maxArraySize, fullArraySizeLocation);
-                out.addStatement(fMaxSize.assign(setFMaxSize(maxArraySizeRef,
-                        transferArraySize, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from))));
+                Typed<AnInt> relativeMaxArray = maxArraySizeVar(maxArraySizeKind, fullArraySizeLocation);
+                out.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
+                        transferArraySizeKind, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from))));
 
-                theLimitIsSane(out, maxArraySizeRef, transferArraySize, maxArraySize);
+                theLimitIsSane(out, relativeMaxArray, transferArraySizeKind, maxArraySizeKind);
 
                 out.addStatement(buf);
                 out.addStatement(current);
@@ -203,28 +203,28 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
-    private static void theLimitIsSane(Block out, Typed<AnInt> maxArraySizeRef,
-                                       TransferArraySize transferArraySize, MaxArraySize maxArraySize) {
-        if (shouldValidateLimits(transferArraySize, maxArraySize))
-            out.addStatement(Hardcoded.arrayEaterScopeCheck(isSmallerThan(fMaxSize.ref(), maxArraySizeRef)));
+    private static void theLimitIsSane(Block out, Typed<AnInt> relativeMaxArray,
+                                       TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
+        if (shouldValidateLimits(transferArraySizeKind, maxArraySizeKind))
+            out.addStatement(Hardcoded.arrayEaterScopeCheck(isSmallerThan(fMaxSize.ref(), relativeMaxArray)));
     }
 
-    private static boolean shouldValidateLimits(TransferArraySize transferArraySize, MaxArraySize maxArraySize) {
-        return !(TransferArraySize.MAX_ARRAY_SIZE.equals(transferArraySize)
-                || MaxArraySize.NO_LIMIT.equals(maxArraySize));
+    private static boolean shouldValidateLimits(TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
+        return !(TransferArraySize.MAX_ARRAY_SIZE.equals(transferArraySizeKind)
+                || noUpperLimitOnTheNumberOfElements(maxArraySizeKind));
     }
 
-    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySize, final TransferArraySize transferArraySize, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> testIfSizeIsWrong, final Typed<AnInt> fullArraySizeLocation) {
+    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> testIfSizeIsWrong, final Typed<AnInt> fullArraySizeLocation) {
         return new ExprFrom1<Block, Var>() {
             @Override
             public Block x(Var to) {
                 final Var pValue = Var.param(javaType, "value");
                 Block fromJavaTyped = new Block();
-                Typed<AnInt> maxArraySizeRef = maxArraySizeVar(maxArraySize, fullArraySizeLocation);
-                fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(maxArraySizeRef,
-                        transferArraySize, null == numberOfElements ? null : numberOfElements.x(pValue))));
-                sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeRef, numberOfElements.x(pValue), testIfSizeIsWrong);
-                theLimitIsSane(fromJavaTyped, maxArraySizeRef, transferArraySize, maxArraySize);
+                Typed<AnInt> relativeMaxArray = maxArraySizeVar(maxArraySizeKind, fullArraySizeLocation);
+                fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
+                        transferArraySizeKind, null == numberOfElements ? null : numberOfElements.x(pValue))));
+                sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeKind, numberOfElements.x(pValue), testIfSizeIsWrong);
+                theLimitIsSane(fromJavaTyped, relativeMaxArray, transferArraySizeKind, maxArraySizeKind);
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
                 return fromJavaTyped;
             }
@@ -232,15 +232,19 @@ public class TerminatedArray extends FieldTypeBasic {
     }
 
     private static void sizeIsInsideTheLimit(Block out,
-                                             Typed<AnInt> maxArraySizeRef, Typed<AnInt> actualNumberOfElements,
+                                             MaxArraySize maxArraySizeKind, Typed<AnInt> actualNumberOfElements,
                                              ExprFrom2<Typed<ABool>, Typed<AnInt>, Typed<AnInt>> comparator) {
-        if (null != maxArraySizeRef) {
+        if (!noUpperLimitOnTheNumberOfElements(maxArraySizeKind)) {
             out.addStatement(arrayEaterScopeCheck(comparator.x(fMaxSize.ref(), actualNumberOfElements)));
         }
     }
 
-    private static Typed<AnInt> maxArraySizeVar(MaxArraySize maxArraySize, Typed<AnInt> fullArraySizeLocation) {
-        switch (maxArraySize) {
+    private static boolean noUpperLimitOnTheNumberOfElements(MaxArraySize maxArraySizeKind) {
+        return MaxArraySize.NO_LIMIT.equals(maxArraySizeKind);
+    }
+
+    private static Typed<AnInt> maxArraySizeVar(MaxArraySize maxArraySizeKind, Typed<AnInt> fullArraySizeLocation) {
+        switch (maxArraySizeKind) {
             case CONSTRUCTOR_PARAM:
                 return Hardcoded.pLimits.read("elements_to_transfer");
             case STORED_IN:
@@ -252,11 +256,11 @@ public class TerminatedArray extends FieldTypeBasic {
         }
     }
 
-    private static Typed<AnInt> setFMaxSize(Typed<AnInt> maxArraySizeRef, TransferArraySize transferArraySize,
+    private static Typed<AnInt> setFMaxSize(Typed<AnInt> relativeMaxArray, TransferArraySize transferArraySizeKind,
                                             Typed<AnInt> numberOfElements) {
-        switch (transferArraySize) {
+        switch (transferArraySizeKind) {
             case MAX_ARRAY_SIZE:
-                return maxArraySizeRef;
+                return relativeMaxArray;
             case CONSTRUCTOR_PARAM:
                 return pLimits.read("full_array_size");
             case SERIALIZED:
