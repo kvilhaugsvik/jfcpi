@@ -15,11 +15,9 @@
 package org.freeciv.packetgen;
 
 import org.freeciv.Util;
-import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.enteties.Packet;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
@@ -294,13 +292,12 @@ public class PacketsStoreTest {
 
         storage.registerPacket("Array1D", 44, Collections.<WeakFlag>emptyList(), fieldList);
 
-        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
-        for (ClassWriter item : storage.getJavaCode()) {
-            results.put(item.getName(), item);
-        }
+        HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
         assertTrue("Can't test as underlying not generated...", results.containsKey("UNDER"));
         assertTrue("Failed to generate simple 1 dimensional array", results.containsKey("UNDER_1"));
+
+        assertPacketExistsAndHasField(results, "Array1D", "field", "UNDER_1");
     }
 
     @Test
@@ -317,10 +314,7 @@ public class PacketsStoreTest {
 
         storage.registerPacket("Array5D", 44, Collections.<WeakFlag>emptyList(), fieldList);
 
-        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
-        for (ClassWriter item : storage.getJavaCode()) {
-            results.put(item.getName(), item);
-        }
+        HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
         assertTrue("Can't test as underlying not generated...", results.containsKey("UNDER"));
         assertTrue("Failed to generate array dimension 1", results.containsKey("UNDER_1"));
@@ -328,6 +322,8 @@ public class PacketsStoreTest {
         assertTrue("Failed to generate array dimension 3", results.containsKey("UNDER_3"));
         assertTrue("Failed to generate array dimension 4", results.containsKey("UNDER_4"));
         assertTrue("Failed to generate 5 dimensional array", results.containsKey("UNDER_5"));
+
+        assertPacketExistsAndHasField(results, "Array5D", "field", "UNDER_5");
     }
 
     @Test
@@ -344,10 +340,7 @@ public class PacketsStoreTest {
 
         storage.registerPacket("Array15D", 44, Collections.<WeakFlag>emptyList(), fieldList);
 
-        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
-        for (ClassWriter item : storage.getJavaCode()) {
-            results.put(item.getName(), item);
-        }
+        HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
         assertTrue("Can't test as underlying not generated...", results.containsKey("UNDER"));
         assertTrue("Failed to generate array dimension 1", results.containsKey("UNDER_1"));
@@ -355,6 +348,8 @@ public class PacketsStoreTest {
         assertTrue("Failed to generate array dimension 10", results.containsKey("UNDER_10"));
         assertTrue("Failed to generate array dimension 11", results.containsKey("UNDER_11"));
         assertTrue("Failed to generate 15 dimensional array", results.containsKey("UNDER_15"));
+
+        assertPacketExistsAndHasField(results, "Array15D", "field", "UNDER_15");
     }
 
     @Test
@@ -371,15 +366,14 @@ public class PacketsStoreTest {
 
         storage.registerPacket("ArrayEat", 44, Collections.<WeakFlag>emptyList(), fieldList);
 
-        HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
-        for (ClassWriter item : storage.getJavaCode()) {
-            results.put(item.getName(), item);
-        }
+        HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
         assertTrue("Can't test as underlying not generated...", results.containsKey("UNDER"));
         assertFalse("Dimension 1 should be eaten", results.containsKey("UNDER_1"));
         assertTrue("Failed to generate array dimension 2", results.containsKey("UNDER_2"));
         assertTrue("Failed to generate array dimension 3", results.containsKey("UNDER_3"));
+
+        assertPacketExistsAndHasField(results, "ArrayEat", "field", "UNDER_3");
     }
 
     @Test
@@ -396,16 +390,26 @@ public class PacketsStoreTest {
 
         storage.registerPacket("ArrayEat", 44, Collections.<WeakFlag>emptyList(), fieldList);
 
+        HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
+
+        assertFalse("Dimension 1 should be eaten", results.containsKey("UNDER_1"));
+
+        assertPacketExistsAndHasField(results, "ArrayEat", "field", "UNDER");
+    }
+
+    private static void assertPacketExistsAndHasField(HashMap<String, ClassWriter> results,
+                                               String packetName, String fieldName, String fieldType) {
+        assertTrue("Packet not generated", results.containsKey(packetName));
+        assertNotNull("Probable bug in test", results.get(packetName));
+        assertTrue("Field should exist and be of the correct type",
+                results.get(packetName).getField(fieldName).getType().equals(fieldType));
+    }
+
+    private static HashMap<String, ClassWriter> getJavaCodeIndexedOnClassName(PacketsStore storage) {
         HashMap<String, ClassWriter> results = new HashMap<String, ClassWriter>();
         for (ClassWriter item : storage.getJavaCode()) {
             results.put(item.getName(), item);
         }
-
-        assertFalse("Dimension 1 should be eaten", results.containsKey("UNDER_1"));
-
-        assertTrue("Packet not generated", results.containsKey("ArrayEat"));
-        assertNotNull("Probable bug in test", results.get("ArrayEat"));
-        assertTrue("Field should exist and be of the correct type",
-                results.get("ArrayEat").getField("field").getType().equals("UNDER"));
+        return results;
     }
 }
