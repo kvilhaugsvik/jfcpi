@@ -181,6 +181,21 @@ public class FieldTypeBasic implements IDependency, ReqKind {
          * @return A Field type alias that is a copy of this except that it will fulfill the requirement alias
          */
         public FieldTypeAlias aliasUnseenToCode(String alias) {
+            FieldTypeAlias invisibleAlias = invisibleAliasCreation(alias);
+
+            // See if a sub class has messed this up
+            assert alias.equals(invisibleAlias.getIFulfillReq().getName()) : "Not a proper alias";
+            assert invisibleAlias.toString().equals(this.toString()) : "Different code generated";
+
+            return invisibleAlias;
+        }
+
+        /**
+         * Override this if a subclass changes the generated code
+         * @param alias the alias requested
+         * @return an instance that is an invisible alias of the class
+         */
+        protected FieldTypeAlias invisibleAliasCreation(String alias) {
             return new FieldTypeAlias(getName(), alias);
         }
 

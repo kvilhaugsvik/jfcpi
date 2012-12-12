@@ -266,13 +266,23 @@ public class TerminatedArray extends FieldTypeBasic {
 
     private class FieldTypeAliasToTerminatedArray extends FieldTypeAlias {
         private FieldTypeAliasToTerminatedArray(String name) {
-            super(name);
+            this(name, name);
+        }
+
+        private FieldTypeAliasToTerminatedArray(String name, String alias) {
+            super(name, alias);
+
             addObjectConstant("int", "maxArraySize");
             if (!helpers.isEmpty()) {
                 for (Method helper : helpers) {
                     addMethod(helper);
                 }
             }
+        }
+
+        @Override
+        protected FieldTypeAlias invisibleAliasCreation(String alias) {
+            return new FieldTypeAliasToTerminatedArray(getName(), alias);
         }
     }
 
