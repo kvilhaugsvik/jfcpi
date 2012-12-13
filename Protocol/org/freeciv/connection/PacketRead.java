@@ -18,12 +18,24 @@ import org.freeciv.packet.Packet;
 
 import java.io.IOException;
 
-public interface FreecivConnection extends Over, PacketRead {
+public interface PacketRead {
     /**
-     * Send a packet via this connection
-     * @param toSend
-     * @throws IOException
+     * Return true if a packet is ready to be read
+     * @return true if a packet is ready to be read
      */
-    void toSend(Packet toSend) throws IOException;
+    boolean packetReady();
 
+    /**
+     * Get the next packet
+     * @return a packet
+     * @throws java.io.IOException if there is an error reading it
+     * @throws org.freeciv.connection.NotReadyYetException if no packet is ready
+     */
+    Packet getPacket() throws IOException, NotReadyYetException;
+
+    /**
+     * Is the underlying connection open
+     * @return true if the underlying connection is open
+     */
+    boolean isOpen();
 }

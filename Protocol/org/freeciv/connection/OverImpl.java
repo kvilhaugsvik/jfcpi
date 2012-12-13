@@ -14,7 +14,7 @@
 
 package org.freeciv.connection;
 
-public class OverImpl {
+public class OverImpl implements Over {
     boolean over = false;
 
     public OverImpl() {
