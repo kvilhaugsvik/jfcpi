@@ -171,6 +171,28 @@ public class Field<Kind extends AValue> extends Var<Kind> {
             return -1; // not supported
     }
 
+    public void appendArrayEaterValidationTo(Block body) throws UndefinedException {
+        if (type.getBasicType().isArrayEater() && 1 == declarations.length) {
+            // TODO: Remove 1 == declarations.length when field arrays are standard
+            this.getTType().register(new TargetMethod("verifyInsideLimits"));
+            // TODO: Remove the above hack when the code is cleaner
+            // * constructor stops destroying type information to add arrayinfo as text
+            // * type isn't stored twice
+            body.addStatement(this.call("verifyInsideLimits", getSuperLimit(0)));
+        }
+    }
+
+    private Typed getSuperLimit(int pos) throws UndefinedException {
+        if (pos < declarations.length)
+        return new MethodCall("ElementsLimit.superLimit",
+                BuiltIn.<AnInt>toCode(declarations[pos].getMaxSize().toString()),
+                BuiltIn.<AnInt>toCode(declarations[pos].getSize()),
+                getSuperLimit(pos + 1));
+        else
+            return new MethodCall("ElementsLimit.noLimit");
+
+    }
+
     public void appendValidationTo(boolean testArrayLength, Block to) throws UndefinedException {
         LinkedList<Typed<ABool>> transferTypeCheck = new LinkedList<Typed<ABool>>();
         for (ArrayDeclaration dec : declarations) {

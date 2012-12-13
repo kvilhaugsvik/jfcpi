@@ -417,4 +417,14 @@ public class GeneratedPacketTest {
         StringArray packet = new StringArray("Not an Array",
                 new String[]{"Element 1", "Element 2", "Element 3", "Element 4"});
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void generatedPacketStringToBig() {
+        StringArray packet = new StringArray(new STRING("Not an ArrayNot an Array", ElementsLimit.limit(30, 30)),
+                new STRING[]{
+                        new STRING("Element 1", ElementsLimit.limit(10, 10)),
+                        new STRING("Element 2", ElementsLimit.limit(10, 10)),
+                        new STRING("Element 3", ElementsLimit.limit(10, 10))
+                });
+    }
 }
