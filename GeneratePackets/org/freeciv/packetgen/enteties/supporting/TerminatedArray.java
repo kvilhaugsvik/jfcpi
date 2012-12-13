@@ -78,6 +78,8 @@ public class TerminatedArray extends FieldTypeBasic {
     private final TransferArraySize transferArraySizeKind;
     private final MaxArraySize maxArraySizeKind;
     private final ExprFrom1<Typed<AnInt>, Var> numberOfElements;
+    private final boolean elementTypeCanLimitVerify;
+    private final TargetArray buffertype;
     private final HashSet<Method.Helper> helpers;
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
@@ -97,7 +99,9 @@ public class TerminatedArray extends FieldTypeBasic {
                            final NetworkIO transferSizeSerialize,
                            final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen,
                            final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
-                           final Collection<Method.Helper> helperMethods) {
+                           final Collection<Method.Helper> helperMethods,
+                           boolean elementTypeCanLimitVerify
+    ) {
         super(dataIOType, publicType, javaType,
                 createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation),
                 createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements),
@@ -112,6 +116,8 @@ public class TerminatedArray extends FieldTypeBasic {
         this.maxArraySizeKind = maxArraySizeKind;
         this.transferArraySizeKind = transferArraySizeKind;
         this.numberOfElements = numberOfElements;
+        this.elementTypeCanLimitVerify = elementTypeCanLimitVerify;
+        this.buffertype = buffertype;
 
         helpers = new HashSet<Method.Helper>(helperMethods);
     }
@@ -311,6 +317,13 @@ public class TerminatedArray extends FieldTypeBasic {
                         numberOfElements.x(fValue),
                         Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
                         !unterminatable);
+                if (elementTypeCanLimitVerify) {
+                    TargetClass elemtype = buffertype.getOf(); // arrayEater's are read element by element
+                    Var element = Var.local(elemtype, "element", null);
+                    verifyInsideLimits.addStatement(FOR(element, fValue.ref(), new Block(
+                            element.call("verifyInsideLimits", pLimits.<TargetClass>call("next"))
+                    )));
+                }
                 addMethod(Method.newPublicDynamicMethod(Comment.no(),
                         new TargetClass("void", true), "verifyInsideLimits",
                         Arrays.asList(Hardcoded.pLimits),
@@ -342,7 +355,8 @@ public class TerminatedArray extends FieldTypeBasic {
                         null,
                         arrayLen,
                         sameNumberOfBufferElementsAndValueElements,
-                        Collections.<Method.Helper>emptySet()
+                        Collections.<Method.Helper>emptySet(),
+                false
         );
     }
 
@@ -359,7 +373,8 @@ public class TerminatedArray extends FieldTypeBasic {
                         null,
                         arrayLen,
                         sameNumberOfBufferElementsAndValueElements,
-                        Collections.<Method.Helper>emptySet()
+                        Collections.<Method.Helper>emptySet(),
+                false
         );
     }
 
@@ -409,7 +424,8 @@ public class TerminatedArray extends FieldTypeBasic {
                     }
                 },
                 sameNumberOfBufferElementsAndValueElements,
-                Arrays.<Method.Helper>asList(lenInBytesHelper)
+                Arrays.<Method.Helper>asList(lenInBytesHelper),
+                arrayEater
         );
     }
 

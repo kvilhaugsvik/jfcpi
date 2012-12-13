@@ -195,7 +195,8 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                         return neededBytes(val);
                     }
                 },
-                Collections.<Method.Helper>emptySet()
+                Collections.<Method.Helper>emptySet(),
+                false
         );
     }
 }

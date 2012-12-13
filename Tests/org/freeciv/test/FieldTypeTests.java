@@ -223,4 +223,15 @@ public class FieldTypeTests {
         STRING field = new STRING("Hello", ElementsLimit.limit(20, 7));
         field.verifyInsideLimits(ElementsLimit.limit(20, 21));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void verifyInsideLimitsWrongLenInDimension1() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        storeTo.write(new byte[]{1, 3, 7, 12, 44, 77});
+
+        UINT8S2D array = new UINT8S2D(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
+                ElementsLimit.superLimit(2, 2, ElementsLimit.limit(3, 3)));
+
+        array.verifyInsideLimits(ElementsLimit.superLimit(2, 2, ElementsLimit.limit(2, 2)));
+    }
 }
