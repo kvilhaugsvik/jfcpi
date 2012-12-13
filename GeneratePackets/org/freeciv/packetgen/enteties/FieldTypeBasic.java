@@ -46,7 +46,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
     private final ExprFrom1<Typed<AString>, Var> value2String;
     private final boolean arrayEater;
 
-    private final Var<TargetClass> fValue;
+    protected final Var<TargetClass> fValue;
     private final Var<TargetClass> pTo;
     private final Var<TargetClass> pFromStream;
 

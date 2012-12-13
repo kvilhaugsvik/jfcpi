@@ -74,6 +74,10 @@ public class TerminatedArray extends FieldTypeBasic {
                                     }
                                 };
 
+    private final boolean unterminatable;
+    private final TransferArraySize transferArraySizeKind;
+    private final MaxArraySize maxArraySizeKind;
+    private final ExprFrom1<Typed<AnInt>, Var> numberOfElements;
     private final HashSet<Method.Helper> helpers;
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
@@ -103,6 +107,12 @@ public class TerminatedArray extends FieldTypeBasic {
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
                 uses
         );
+
+        this.unterminatable = notTerminatable(terminator);
+        this.maxArraySizeKind = maxArraySizeKind;
+        this.transferArraySizeKind = transferArraySizeKind;
+        this.numberOfElements = numberOfElements;
+
         helpers = new HashSet<Method.Helper>(helperMethods);
     }
 
@@ -282,10 +292,30 @@ public class TerminatedArray extends FieldTypeBasic {
             super(name, alias);
 
             addObjectConstant("int", "maxArraySize");
+
             if (!helpers.isEmpty()) {
                 for (Method helper : helpers) {
                     addMethod(helper);
                 }
+            }
+
+            boolean arrayEater = eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind);
+            if (arrayEater) {
+                Block verifyInsideLimits = new Block();
+                theLimitIsSane(verifyInsideLimits,
+                        Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
+                        Hardcoded.pLimits.<AnInt>read("full_array_size"),
+                        transferArraySizeKind, maxArraySizeKind);
+                sizeIsInsideTheLimit(verifyInsideLimits,
+                        maxArraySizeKind, transferArraySizeKind,
+                        numberOfElements.x(fValue),
+                        Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
+                        !unterminatable);
+                addMethod(Method.newPublicDynamicMethod(Comment.no(),
+                        new TargetClass("void", true), "verifyInsideLimits",
+                        Arrays.asList(Hardcoded.pLimits),
+                        Collections.<TargetClass>emptyList(),
+                        verifyInsideLimits));
             }
         }
 

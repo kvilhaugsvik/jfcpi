@@ -197,4 +197,30 @@ public class FieldTypeTests {
         STRING notOk = new STRING("Hello", ElementsLimit.limit(7, 20));
         fail(notOk.getValue() + " is smaller than 20 but 20 is smaller than 7");
     }
+
+    @Test public void verifyInsideLimitsSmallerAndOK() throws IOException {
+        STRING smallButOk = new STRING("Hello", ElementsLimit.limit(20, 7));
+        smallButOk.verifyInsideLimits(ElementsLimit.limit(20, 7));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void verifyInsideLimitsSmallerNotOK() throws IOException {
+        UINT8S toSmall = new UINT8S(new UINT8[]{
+                new UINT8(2, ElementsLimit.noLimit()),
+                new UINT8(5, ElementsLimit.noLimit())
+        }, ElementsLimit.limit(3, 2));
+        toSmall.verifyInsideLimits(ElementsLimit.limit(20, 7));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void verifyInsideLimitsBigger() throws IOException {
+        STRING toBigForStricterLimits = new STRING("Hello", ElementsLimit.limit(20, 7));
+        toBigForStricterLimits.verifyInsideLimits(ElementsLimit.limit(4, 3));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void verifyInsideLimitsRelativeLimitToBig() throws IOException {
+        STRING field = new STRING("Hello", ElementsLimit.limit(20, 7));
+        field.verifyInsideLimits(ElementsLimit.limit(20, 21));
+    }
 }
