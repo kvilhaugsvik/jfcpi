@@ -171,7 +171,11 @@ public interface CodeStyle {
             }
 
             public int getRLen() {
-                return (null == inStack.rightToken ? 0 : inStack.rightToken.getAtom().get().length());
+                try {
+                    return inStack.rightToken.getAtom().get().length();
+                } catch (NullPointerException e) {
+                    return 0;
+                }
             }
 
             void setRightToken(IR rightToken) {
