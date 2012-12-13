@@ -100,11 +100,15 @@ public class TerminatedArray extends FieldTypeBasic {
                 createEncode(terminator, transferArraySizeKind, buffertype, numberOfElements, testIfTerminatorShouldBeAdded, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize),
                 createEnocedSize(transferArraySizeKind, numberOfElements, testIfTerminatorShouldBeAdded, transferSizeSerialize, valueGetByteLen),
                 toString,
-                MaxArraySize.CONSTRUCTOR_PARAM.equals(maxArraySizeKind)
-                        || TransferArraySize.CONSTRUCTOR_PARAM.equals(transferArraySizeKind),
+                eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
                 uses
         );
         helpers = new HashSet<Method.Helper>(helperMethods);
+    }
+
+    private static boolean eatsArrayLimitInformation(MaxArraySize maxArraySizeKind, TransferArraySize transferArraySizeKind) {
+        return MaxArraySize.CONSTRUCTOR_PARAM.equals(maxArraySizeKind)
+                || TransferArraySize.CONSTRUCTOR_PARAM.equals(transferArraySizeKind);
     }
 
     private static boolean notTerminatable(Requirement terminator) {
@@ -212,7 +216,9 @@ public class TerminatedArray extends FieldTypeBasic {
                 Typed<AnInt> relativeMaxArray = maxArraySizeVar(maxArraySizeKind, fullArraySizeLocation);
                 fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
                         transferArraySizeKind, null == numberOfElements ? null : numberOfElements.x(pValue))));
-                sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeKind, numberOfElements.x(pValue), fMaxSize.ref(), terminatable);
+                if (eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind))
+                    sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeKind, transferArraySizeKind,
+                        numberOfElements.x(pValue), fMaxSize.ref(), terminatable);
                 theLimitIsSane(fromJavaTyped, relativeMaxArray, fMaxSize.ref(), transferArraySizeKind, maxArraySizeKind);
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
                 return fromJavaTyped;
@@ -220,18 +226,15 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
+    // all array eaters, those that take serialized size limits if serialized constructor
     private static void sizeIsInsideTheLimit(Block out,
-                                             MaxArraySize maxArraySizeKind,
+                                             MaxArraySize maxArraySizeKind, TransferArraySize transferArraySizeKind,
                                              Typed<AnInt> actualNumberOfElements, Typed<AnInt> limit,
                                              boolean tolerateSmaller) {
-        if (!noUpperLimitOnTheNumberOfElements(maxArraySizeKind)) {
-            Typed<ABool> check;
-            if (tolerateSmaller)
-                check = isSmallerThan(limit, actualNumberOfElements);
-            else
-                check = isNotSame(limit, actualNumberOfElements);
-            out.addStatement(arrayEaterScopeCheck(check));
-        }
+        Typed<ABool> check = tolerateSmaller ?
+                isSmallerThan(limit, actualNumberOfElements) :
+                isNotSame(limit, actualNumberOfElements);
+        out.addStatement(arrayEaterScopeCheck(check));
     }
 
     private static boolean noUpperLimitOnTheNumberOfElements(MaxArraySize maxArraySizeKind) {
@@ -242,7 +245,7 @@ public class TerminatedArray extends FieldTypeBasic {
         switch (maxArraySizeKind) {
             case CONSTRUCTOR_PARAM:
                 return Hardcoded.pLimits.read("elements_to_transfer");
-            case STORED_IN:
+            case LIMITED_BY_TYPE:
                 return fullArraySizeLocation;
             case NO_LIMIT:
                 return null;
@@ -383,7 +386,7 @@ public class TerminatedArray extends FieldTypeBasic {
     public enum MaxArraySize {
         NO_LIMIT,
         CONSTRUCTOR_PARAM,
-        STORED_IN
+        LIMITED_BY_TYPE
     }
 
     public enum TransferArraySize {

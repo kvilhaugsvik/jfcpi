@@ -136,7 +136,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                 me,
                 null,
                 knowsSize ?
-                        TerminatedArray.MaxArraySize.STORED_IN :
+                        TerminatedArray.MaxArraySize.LIMITED_BY_TYPE :
                         TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
                 knowsSize ?
                         TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE :
