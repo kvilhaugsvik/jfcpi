@@ -59,7 +59,7 @@ public class Uninterpreted implements FreecivConnection {
 
         final Uninterpreted parent = this;
 
-        Thread fastReader = new Thread(new Runnable(){
+        Thread fastReader = new Thread(){
             @Override
             public void run() {
                 try {
@@ -94,7 +94,7 @@ public class Uninterpreted implements FreecivConnection {
                     }
                 }
             }
-        });
+        };
         fastReader.setDaemon(true);
         fastReader.start();
     }
