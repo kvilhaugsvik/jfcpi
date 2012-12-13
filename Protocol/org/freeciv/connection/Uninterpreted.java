@@ -30,8 +30,6 @@ public class Uninterpreted implements FreecivConnection {
     private final Socket connection;
 
     private final ReflexPacketKind quickRespond;
-    private final Constructor<? extends PacketHeader> headerReader;
-    private final int headerSize;
 
     private boolean over = false;
 
@@ -44,22 +42,9 @@ public class Uninterpreted implements FreecivConnection {
         quickRespond = new ReflexPacketKind(reflexes, this);
         this.connection = connection;
 
-        try {
-            headerReader = packetHeaderClass.getConstructor(DataInput.class);
-            headerSize = packetHeaderClass.getField("HEADER_SIZE").getInt(null);
-        } catch (NoSuchMethodException e) {
-            throw new IOException("Could not find constructor for header interpreter", e);
-        } catch (NoSuchFieldException e) {
-            throw new IOException("Could not find header size in header interpreter", e);
-        } catch (IllegalAccessException e) {
-            throw new IOException("Could not access header size in header interpreter", e);
-        }
-
         final InputStream in = connection.getInputStream();
 
-        final Uninterpreted parent = this;
-
-        Thread fastReader = new BackgroundReader(in, parent, connection);
+        Thread fastReader = new BackgroundReader(in, this, connection, packetHeaderClass);
         fastReader.setDaemon(true);
         fastReader.start();
     }
@@ -118,11 +103,25 @@ public class Uninterpreted implements FreecivConnection {
         private final InputStream in;
         private final Uninterpreted parent;
         private final Socket connection;
+        private final Constructor<? extends PacketHeader> headerReader;
+        private final int headerSize;
 
-        public BackgroundReader(InputStream in, Uninterpreted parent, Socket connection) {
+        public BackgroundReader(InputStream in, Uninterpreted parent, Socket connection,
+                                final Class<? extends PacketHeader> packetHeaderClass) throws IOException {
             this.in = in;
             this.parent = parent;
             this.connection = connection;
+
+            try {
+                headerReader = packetHeaderClass.getConstructor(DataInput.class);
+                headerSize = packetHeaderClass.getField("HEADER_SIZE").getInt(null);
+            } catch (NoSuchMethodException e) {
+                throw new IOException("Could not find constructor for header interpreter", e);
+            } catch (NoSuchFieldException e) {
+                throw new IOException("Could not find header size in header interpreter", e);
+            } catch (IllegalAccessException e) {
+                throw new IOException("Could not access header size in header interpreter", e);
+            }
         }
 
         @Override
