@@ -20,6 +20,7 @@ import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -128,12 +129,7 @@ public class Uninterpreted implements FreecivConnection {
         public void run() {
             try {
                 while(0 < in.available() || !parent.isOver()) {
-                    byte[] headerStart = readXBytesFrom(headerSize, in, parent);
-                    PacketHeader head =
-                            headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
-
-                    byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
-                    RawPacket incoming = new RawPacket(body, head);
+                    RawPacket incoming = readPacket();
 
                     quickRespond.handle(incoming);
 
@@ -153,6 +149,15 @@ public class Uninterpreted implements FreecivConnection {
                     e.printStackTrace();
                 }
             }
+        }
+
+        private RawPacket readPacket() throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            byte[] headerStart = readXBytesFrom(headerSize, in, parent);
+            PacketHeader head =
+                    headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
+
+            byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
+            return new RawPacket(body, head);
         }
     }
 }
