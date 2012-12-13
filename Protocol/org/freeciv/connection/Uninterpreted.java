@@ -22,7 +22,6 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -32,7 +31,7 @@ public class Uninterpreted implements FreecivConnection {
 
     private final ReflexPacketKind quickRespond;
 
-    private boolean over = false;
+    private final OverImpl overImpl = new OverImpl();
 
     public Uninterpreted(
             final Socket connection,
@@ -93,11 +92,11 @@ public class Uninterpreted implements FreecivConnection {
     }
 
     public void setOver() {
-        over = true;
+        overImpl.setOver();
     }
 
     public boolean isOver() {
-        return over;
+        return overImpl.isOver();
     }
 
     private class BackgroundReader extends Thread {
