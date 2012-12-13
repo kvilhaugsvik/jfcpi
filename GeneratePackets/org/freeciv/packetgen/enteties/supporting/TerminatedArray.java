@@ -172,7 +172,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 out.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
                         transferArraySizeKind, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from))));
 
-                theLimitIsSane(out, relativeMaxArray, transferArraySizeKind, maxArraySizeKind);
+                theLimitIsSane(out, relativeMaxArray, fMaxSize.ref(), transferArraySizeKind, maxArraySizeKind);
 
                 out.addStatement(buf);
                 out.addStatement(current);
@@ -192,10 +192,10 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
-    private static void theLimitIsSane(Block out, Typed<AnInt> relativeMaxArray,
+    private static void theLimitIsSane(Block out, Typed<AnInt> relativeMaxArray, Typed<AnInt> absoluteMaxArray,
                                        TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
         if (shouldValidateLimits(transferArraySizeKind, maxArraySizeKind))
-            out.addStatement(Hardcoded.arrayEaterScopeCheck(isSmallerThan(fMaxSize.ref(), relativeMaxArray)));
+            out.addStatement(Hardcoded.arrayEaterScopeCheck(isSmallerThan(absoluteMaxArray, relativeMaxArray)));
     }
 
     private static boolean shouldValidateLimits(TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
@@ -212,8 +212,8 @@ public class TerminatedArray extends FieldTypeBasic {
                 Typed<AnInt> relativeMaxArray = maxArraySizeVar(maxArraySizeKind, fullArraySizeLocation);
                 fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
                         transferArraySizeKind, null == numberOfElements ? null : numberOfElements.x(pValue))));
-                sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeKind, numberOfElements.x(pValue), terminatable);
-                theLimitIsSane(fromJavaTyped, relativeMaxArray, transferArraySizeKind, maxArraySizeKind);
+                sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeKind, numberOfElements.x(pValue), fMaxSize.ref(), terminatable);
+                theLimitIsSane(fromJavaTyped, relativeMaxArray, fMaxSize.ref(), transferArraySizeKind, maxArraySizeKind);
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
                 return fromJavaTyped;
             }
@@ -221,14 +221,15 @@ public class TerminatedArray extends FieldTypeBasic {
     }
 
     private static void sizeIsInsideTheLimit(Block out,
-                                             MaxArraySize maxArraySizeKind, Typed<AnInt> actualNumberOfElements,
+                                             MaxArraySize maxArraySizeKind,
+                                             Typed<AnInt> actualNumberOfElements, Typed<AnInt> limit,
                                              boolean tolerateSmaller) {
         if (!noUpperLimitOnTheNumberOfElements(maxArraySizeKind)) {
             Typed<ABool> check;
             if (tolerateSmaller)
-                check = isSmallerThan(fMaxSize.ref(), actualNumberOfElements);
+                check = isSmallerThan(limit, actualNumberOfElements);
             else
-                check = isNotSame(fMaxSize.ref(), actualNumberOfElements);
+                check = isNotSame(limit, actualNumberOfElements);
             out.addStatement(arrayEaterScopeCheck(check));
         }
     }
