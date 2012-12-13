@@ -57,7 +57,7 @@ public class Uninterpreted implements FreecivConnection {
             if (0 <= bytesRead)
                 alreadyRead += bytesRead;
             else if (parent.isOver())
-                return Arrays.copyOfRange(out, 0, alreadyRead);
+                throw new EOFException("Nothing to read and nothing is waiting");
             if (alreadyRead < wanted)
                 Thread.yield();
         }
@@ -129,14 +129,10 @@ public class Uninterpreted implements FreecivConnection {
             try {
                 while(0 < in.available() || !parent.isOver()) {
                     byte[] headerStart = readXBytesFrom(headerSize, in, parent);
-                    if (headerStart.length < headerSize)
-                        break; // incomplete data was returned as its over
                     PacketHeader head =
                             headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
 
                     byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
-                    if (body.length < head.getBodySize())
-                        break; // incomplete data was returned as its over
                     RawPacket incoming = new RawPacket(body, head);
 
                     quickRespond.handle(incoming);
