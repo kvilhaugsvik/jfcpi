@@ -59,42 +59,7 @@ public class Uninterpreted implements FreecivConnection {
 
         final Uninterpreted parent = this;
 
-        Thread fastReader = new Thread(){
-            @Override
-            public void run() {
-                try {
-                    while(0 < in.available() || !parent.isOver()) {
-                        byte[] headerStart = readXBytesFrom(headerSize, in, parent);
-                        if (headerStart.length < headerSize)
-                            break; // incomplete data was returned as its over
-                        PacketHeader head =
-                                headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
-
-                        byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
-                        if (body.length < head.getBodySize())
-                            break; // incomplete data was returned as its over
-                        RawPacket incoming = new RawPacket(body, head);
-
-                        quickRespond.handle(incoming);
-
-                        synchronized (buffered) {
-                            buffered.add(incoming);
-                        }
-                    }
-                } catch (Exception e) {
-                    System.err.println("Problem in the thread that reads from the network");
-                    e.printStackTrace();
-                    parent.setOver();
-                } finally {
-                    try {
-                        connection.close();
-                    } catch (IOException e) {
-                        System.err.println("Problems while closing network connection. Packets may not have been sent");
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
+        Thread fastReader = new BackgroundReader(in, parent, connection);
         fastReader.setDaemon(true);
         fastReader.start();
     }
@@ -147,5 +112,52 @@ public class Uninterpreted implements FreecivConnection {
 
     public boolean isOver() {
         return over;
+    }
+
+    private class BackgroundReader extends Thread {
+        private final InputStream in;
+        private final Uninterpreted parent;
+        private final Socket connection;
+
+        public BackgroundReader(InputStream in, Uninterpreted parent, Socket connection) {
+            this.in = in;
+            this.parent = parent;
+            this.connection = connection;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while(0 < in.available() || !parent.isOver()) {
+                    byte[] headerStart = readXBytesFrom(headerSize, in, parent);
+                    if (headerStart.length < headerSize)
+                        break; // incomplete data was returned as its over
+                    PacketHeader head =
+                            headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
+
+                    byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
+                    if (body.length < head.getBodySize())
+                        break; // incomplete data was returned as its over
+                    RawPacket incoming = new RawPacket(body, head);
+
+                    quickRespond.handle(incoming);
+
+                    synchronized (buffered) {
+                        buffered.add(incoming);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Problem in the thread that reads from the network");
+                e.printStackTrace();
+                parent.setOver();
+            } finally {
+                try {
+                    connection.close();
+                } catch (IOException e) {
+                    System.err.println("Problems while closing network connection. Packets may not have been sent");
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
