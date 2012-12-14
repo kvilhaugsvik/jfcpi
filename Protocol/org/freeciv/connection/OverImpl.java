@@ -14,16 +14,17 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Packet;
+public class OverImpl implements Over {
+    boolean over = false;
 
-import java.io.IOException;
+    public OverImpl() {
+    }
 
-public interface FreecivConnection extends Over, PacketRead {
-    /**
-     * Send a packet via this connection
-     * @param toSend
-     * @throws IOException
-     */
-    void toSend(Packet toSend) throws IOException;
+    public void setOver() {
+        over = true;
+    }
 
+    public boolean isOver() {
+        return over;
+    }
 }

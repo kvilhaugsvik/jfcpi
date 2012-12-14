@@ -14,16 +14,15 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Packet;
-
-import java.io.IOException;
-
-public interface FreecivConnection extends Over, PacketRead {
+public interface Over {
     /**
-     * Send a packet via this connection
-     * @param toSend
-     * @throws IOException
+     * Close this connection as soon as its data has been read
      */
-    void toSend(Packet toSend) throws IOException;
+    void setOver();
 
+    /**
+     * Will this connection be closed (unless it already is) as soon as its empty?
+     * @return true if the connection is closed or soon will be
+     */
+    boolean isOver();
 }

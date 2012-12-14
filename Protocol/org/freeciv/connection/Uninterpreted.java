@@ -20,8 +20,8 @@ import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -30,10 +30,8 @@ public class Uninterpreted implements FreecivConnection {
     private final Socket connection;
 
     private final ReflexPacketKind quickRespond;
-    private final Constructor<? extends PacketHeader> headerReader;
-    private final int headerSize;
 
-    private boolean over = false;
+    private final OverImpl overImpl = new OverImpl();
 
     public Uninterpreted(
             final Socket connection,
@@ -44,57 +42,9 @@ public class Uninterpreted implements FreecivConnection {
         quickRespond = new ReflexPacketKind(reflexes, this);
         this.connection = connection;
 
-        try {
-            headerReader = packetHeaderClass.getConstructor(DataInput.class);
-            headerSize = packetHeaderClass.getField("HEADER_SIZE").getInt(null);
-        } catch (NoSuchMethodException e) {
-            throw new IOException("Could not find constructor for header interpreter", e);
-        } catch (NoSuchFieldException e) {
-            throw new IOException("Could not find header size in header interpreter", e);
-        } catch (IllegalAccessException e) {
-            throw new IOException("Could not access header size in header interpreter", e);
-        }
-
         final InputStream in = connection.getInputStream();
 
-        final Uninterpreted parent = this;
-
-        Thread fastReader = new Thread(new Runnable(){
-            @Override
-            public void run() {
-                try {
-                    while(0 < in.available() || !parent.isOver()) {
-                        byte[] headerStart = readXBytesFrom(headerSize, in, parent);
-                        if (headerStart.length < headerSize)
-                            break; // incomplete data was returned as its over
-                        PacketHeader head =
-                                headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
-
-                        byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
-                        if (body.length < head.getBodySize())
-                            break; // incomplete data was returned as its over
-                        RawPacket incoming = new RawPacket(body, head);
-
-                        quickRespond.handle(incoming);
-
-                        synchronized (buffered) {
-                            buffered.add(incoming);
-                        }
-                    }
-                } catch (Exception e) {
-                    System.err.println("Problem in the thread that reads from the network");
-                    e.printStackTrace();
-                    parent.setOver();
-                } finally {
-                    try {
-                        connection.close();
-                    } catch (IOException e) {
-                        System.err.println("Problems while closing network connection. Packets may not have been sent");
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+        Thread fastReader = new BackgroundReader(in, this, connection, packetHeaderClass);
         fastReader.setDaemon(true);
         fastReader.start();
     }
@@ -107,7 +57,7 @@ public class Uninterpreted implements FreecivConnection {
             if (0 <= bytesRead)
                 alreadyRead += bytesRead;
             else if (parent.isOver())
-                return Arrays.copyOfRange(out, 0, alreadyRead);
+                throw new EOFException("Nothing to read and nothing is waiting");
             if (alreadyRead < wanted)
                 Thread.yield();
         }
@@ -142,10 +92,71 @@ public class Uninterpreted implements FreecivConnection {
     }
 
     public void setOver() {
-        over = true;
+        overImpl.setOver();
     }
 
     public boolean isOver() {
-        return over;
+        return overImpl.isOver();
+    }
+
+    private class BackgroundReader extends Thread {
+        private final InputStream in;
+        private final Uninterpreted parent;
+        private final Socket connection;
+        private final Constructor<? extends PacketHeader> headerReader;
+        private final int headerSize;
+
+        public BackgroundReader(InputStream in, Uninterpreted parent, Socket connection,
+                                final Class<? extends PacketHeader> packetHeaderClass) throws IOException {
+            this.in = in;
+            this.parent = parent;
+            this.connection = connection;
+
+            try {
+                headerReader = packetHeaderClass.getConstructor(DataInput.class);
+                headerSize = packetHeaderClass.getField("HEADER_SIZE").getInt(null);
+            } catch (NoSuchMethodException e) {
+                throw new IOException("Could not find constructor for header interpreter", e);
+            } catch (NoSuchFieldException e) {
+                throw new IOException("Could not find header size in header interpreter", e);
+            } catch (IllegalAccessException e) {
+                throw new IOException("Could not access header size in header interpreter", e);
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                while(0 < in.available() || !parent.isOver()) {
+                    RawPacket incoming = readPacket();
+
+                    quickRespond.handle(incoming);
+
+                    synchronized (buffered) {
+                        buffered.add(incoming);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Problem in the thread that reads from the network");
+                e.printStackTrace();
+                parent.setOver();
+            } finally {
+                try {
+                    connection.close();
+                } catch (IOException e) {
+                    System.err.println("Problems while closing network connection. Packets may not have been sent");
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        private RawPacket readPacket() throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            byte[] headerStart = readXBytesFrom(headerSize, in, parent);
+            PacketHeader head =
+                    headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
+
+            byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
+            return new RawPacket(body, head);
+        }
     }
 }
