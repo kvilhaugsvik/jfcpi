@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
@@ -37,6 +38,21 @@ public class BuiltIn {
             public void writeAtoms(CodeAtoms to) {
                 to.add(THR);
                 error.writeAtoms(to);
+            }
+        };
+    }
+
+    public static Typed<NoValue> tryCatch(final Block toTry, final Var<AValue> toCatch, final Block ifCaught) {
+        return new Formatted.Type<NoValue>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(TRY);
+                toTry.writeAtoms(to);
+                to.add(CATCH);
+                to.add(LPR);
+                toCatch.writeAtoms(to);
+                to.add(RPR);
+                ifCaught.writeAtoms(to);
             }
         };
     }

@@ -288,6 +288,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenFirst(maker.condAtTheEnd(), DependsOn.ignore_tokens, maker.DO_NOTHING);
         maker.whenFirst(maker.condLeftIs(HasAtoms.LSC), maker.condRightIs(HasAtoms.RSC), DependsOn.token_both, maker.DO_NOTHING);
         maker.whenFirst(maker.condLeftIs(HasAtoms.RSC), maker.condRightIs(HasAtoms.ELSE), DependsOn.token_both, maker.INSERT_SPACE);
+        maker.whenFirst(maker.condLeftIs(HasAtoms.RSC), maker.condRightIs(HasAtoms.CATCH), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condRightIs(HasAtoms.RSC), DependsOn.token_right, maker.BREAK_LINE);
         maker.whenFirst(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
@@ -471,6 +472,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenFirst(maker.condLeftIs(HasAtoms.IF), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.FOR), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.RET), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
+        maker.whenFirst(maker.condLeftIs(HasAtoms.CATCH), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.ADD), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.MUL), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.DIV), maker.condRightIs(HasAtoms.LPR), DependsOn.token_both, maker.INSERT_SPACE);

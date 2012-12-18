@@ -54,6 +54,8 @@ public interface HasAtoms {
     public static final CodeAtom ELSE2 = new CodeAtom(":");
     public static final CodeAtom ASSRT = new IR.CodeAtom("assert");
     public static final CodeAtom THR = new CodeAtom("throw");
+    public static final CodeAtom TRY = new CodeAtom("try");
+    public static final CodeAtom CATCH = new CodeAtom("catch");
     public static final CodeAtom WHILE = new CodeAtom("while");
     public static final CodeAtom FOR = new CodeAtom("for");
     public static final CodeAtom FORSEP = new CodeAtom(";");
