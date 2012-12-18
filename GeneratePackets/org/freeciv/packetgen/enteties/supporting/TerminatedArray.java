@@ -73,6 +73,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                         return maxElements;
                                     }
                                 };
+    public static final String SELF_VALIDATOR_NAME = "verifyInsideLimits";
 
     private final boolean unterminatable;
     private final TransferArraySize transferArraySizeKind;
@@ -104,7 +105,7 @@ public class TerminatedArray extends FieldTypeBasic {
                            boolean elementTypeCanLimitVerify
     ) {
         super(dataIOType, publicType, javaType,
-                createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation),
+                createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, pLimits.ref())),
                 createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements),
                 createEncode(terminator, transferArraySizeKind, buffertype, numberOfElements, testIfTerminatorShouldBeAdded, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize),
                 createEnocedSize(transferArraySizeKind, numberOfElements, testIfTerminatorShouldBeAdded, transferSizeSerialize, valueGetByteLen),
@@ -228,7 +229,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 || noUpperLimitOnTheNumberOfElements(maxArraySizeKind));
     }
 
-    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation) {
+    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation, final MethodCall<Returnable> validateLimitsCall) {
         return new ExprFrom1<Block, Var>() {
             @Override
             public Block x(Var to) {
@@ -237,11 +238,9 @@ public class TerminatedArray extends FieldTypeBasic {
                 Typed<AnInt> relativeMaxArray = maxArraySizeVar(maxArraySizeKind, fullArraySizeLocation);
                 fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
                         transferArraySizeKind, null == numberOfElements ? null : numberOfElements.x(pValue))));
-                if (eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind))
-                    sizeIsInsideTheLimit(fromJavaTyped, maxArraySizeKind, transferArraySizeKind,
-                        numberOfElements.x(pValue), fMaxSize.ref(), terminatable);
-                theLimitIsSane(fromJavaTyped, relativeMaxArray, fMaxSize.ref(), transferArraySizeKind, maxArraySizeKind);
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
+                if (eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind))
+                    fromJavaTyped.addStatement(validateLimitsCall);
                 return fromJavaTyped;
             }
         };
@@ -304,11 +303,11 @@ public class TerminatedArray extends FieldTypeBasic {
             TargetClass elemtype = buffertype.getOf(); // arrayEater's are read element by element
             Var element = Var.local(elemtype, "element", null);
             verifyInsideLimits.addStatement(FOR(element, fValue.ref(), new Block(
-                    element.call("verifyInsideLimits", pLimits.<TargetClass>call("next"))
+                    element.call(SELF_VALIDATOR_NAME, pLimits.<TargetClass>call("next"))
             )));
         }
         return Method.newPublicDynamicMethod(Comment.no(),
-                new TargetClass("void", true), "verifyInsideLimits",
+                new TargetClass("void", true), SELF_VALIDATOR_NAME,
                 Arrays.asList(Hardcoded.pLimits),
                 Collections.<TargetClass>emptyList(),
                 verifyInsideLimits);
