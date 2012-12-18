@@ -388,25 +388,25 @@ public class GeneratedPacketTest {
                 packet.getTheArrayValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketSimpleStringToBig() {
         StringArray packet = new StringArray("Not an ArrayNot an Array",
                 new String[]{"Element 1", "Element 2", "Element 3"});
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketFistStringInArrayToBig() {
         StringArray packet = new StringArray("Not an Array",
                 new String[]{"Element 1Element 1", "Element 2", "Element 3"});
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketMiddleStringInArrayToBig() {
         StringArray packet = new StringArray("Not an Array",
                 new String[]{"Element 1", "Element 2Element 2", "Element 3"});
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketLastStringInArrayToBig() {
         StringArray packet = new StringArray("Not an Array",
                 new String[]{"Element 1", "Element 2", "Element 3Element 3"});
@@ -418,7 +418,7 @@ public class GeneratedPacketTest {
                 new String[]{"Element 1", "Element 2", "Element 3", "Element 4"});
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketStringToBig() {
         StringArray packet = new StringArray(new STRING("Not an ArrayNot an Array", ElementsLimit.limit(30)),
                 new STRING[]{

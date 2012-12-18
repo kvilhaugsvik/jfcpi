@@ -192,7 +192,7 @@ public class FieldTypeTests {
         assertEquals("Hello", smallButOk.getValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalLimitSizeException.class)
     public void STRING_more_this_time_than_max() throws IOException {
         STRING notOk = new STRING("Hello", ElementsLimit.limit(7, 20));
         fail(notOk.getValue() + " is smaller than 20 but 20 is smaller than 7");
@@ -203,7 +203,7 @@ public class FieldTypeTests {
         smallButOk.verifyInsideLimits(ElementsLimit.limit(20, 7));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void verifyInsideLimitsSmallerNotOK() throws IOException {
         UINT8S toSmall = new UINT8S(new UINT8[]{
                 new UINT8(2, ElementsLimit.noLimit()),
@@ -212,19 +212,19 @@ public class FieldTypeTests {
         toSmall.verifyInsideLimits(ElementsLimit.limit(20, 7));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void verifyInsideLimitsBigger() throws IOException {
         STRING toBigForStricterLimits = new STRING("Hello", ElementsLimit.limit(20, 7));
         toBigForStricterLimits.verifyInsideLimits(ElementsLimit.limit(4, 3));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalLimitSizeException.class)
     public void verifyInsideLimitsRelativeLimitToBig() throws IOException {
         STRING field = new STRING("Hello", ElementsLimit.limit(20, 7));
         field.verifyInsideLimits(ElementsLimit.limit(20, 21));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void verifyInsideLimitsWrongLenInDimension1() throws IOException {
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
         storeTo.write(new byte[]{1, 3, 7, 12, 44, 77});

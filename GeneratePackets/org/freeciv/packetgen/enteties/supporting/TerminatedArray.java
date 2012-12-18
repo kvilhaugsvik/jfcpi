@@ -1,5 +1,7 @@
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packet.fieldtype.IllegalLimitSizeException;
+import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
@@ -222,7 +224,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                        TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
         if (shouldValidateLimits(transferArraySizeKind, maxArraySizeKind))
             out.addStatement(IF(isSmallerThan(absoluteMaxArray, relativeMaxArray),
-                    new Block(THROW(IllegalArgumentException.class,
+                    new Block(THROW(IllegalLimitSizeException.class,
                             literal("The relative limit on the number of elements is " +
                                     "to large compared to the absolute limit")))));
     }
@@ -258,7 +260,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 isSmallerThan(limit, actualNumberOfElements) :
                 isNotSame(limit, actualNumberOfElements);
         out.addStatement(IF(check,
-                new Block(THROW(IllegalArgumentException.class, literal("Wrong number of elements")))));
+                new Block(THROW(IllegalNumberOfElementsException.class, literal("Wrong number of elements")))));
     }
 
     private static boolean noUpperLimitOnTheNumberOfElements(MaxArraySize maxArraySizeKind) {
