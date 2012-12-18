@@ -151,13 +151,13 @@ public class FieldTypeTests {
     }
 
     private void testString(String text, int maxLen) throws IOException {
-        STRING fromJava = new STRING(text, ElementsLimit.limit(maxLen, maxLen));
+        STRING fromJava = new STRING(text, ElementsLimit.limit(maxLen));
         checkString(text, fromJava, maxLen);
 
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
         fromJava.encodeTo(new DataOutputStream(storeTo));
         STRING fromData = new STRING(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
-                ElementsLimit.limit(maxLen, maxLen));
+                ElementsLimit.limit(maxLen));
         checkString(text, fromData, maxLen);
     }
 

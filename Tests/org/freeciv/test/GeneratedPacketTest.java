@@ -58,9 +58,9 @@ public class GeneratedPacketTest {
     public void testPacketWithFieldsFromFields() throws IOException {
         SERVER_JOIN_REQ packet =
                 new SERVER_JOIN_REQ(
-                        new STRING("FreecivJava", ElementsLimit.limit(100, 100)),
-                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100, 100)),
-                        new STRING("-dev", ElementsLimit.limit(100, 100)),
+                        new STRING("FreecivJava", ElementsLimit.limit(100)),
+                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100)),
+                        new STRING("-dev", ElementsLimit.limit(100)),
                         new UINT32(2L, ElementsLimit.noLimit()),
                         new UINT32(3L, ElementsLimit.noLimit()),
                         new UINT32(99L, ElementsLimit.noLimit()));
@@ -73,9 +73,9 @@ public class GeneratedPacketTest {
     public void testPacketWithFieldValuesFromFields() throws IOException {
         SERVER_JOIN_REQ packet =
                 new SERVER_JOIN_REQ(
-                        new STRING("FreecivJava", ElementsLimit.limit(100, 100)),
-                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100, 100)),
-                        new STRING("-dev", ElementsLimit.limit(100, 100)),
+                        new STRING("FreecivJava", ElementsLimit.limit(100)),
+                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100)),
+                        new STRING("-dev", ElementsLimit.limit(100)),
                         new UINT32(2L, ElementsLimit.noLimit()),
                         new UINT32(3L, ElementsLimit.noLimit()),
                         new UINT32(99L, ElementsLimit.noLimit()));
@@ -141,9 +141,9 @@ public class GeneratedPacketTest {
     }
 
     @Test public void testPacketGetFields() {
-        STRING username = new STRING("FreecivJava", ElementsLimit.limit(100, 100));
-        STRING capability = new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100, 100));
-        STRING version_label = new STRING("-dev", ElementsLimit.limit(100, 100));
+        STRING username = new STRING("FreecivJava", ElementsLimit.limit(100));
+        STRING capability = new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100));
+        STRING version_label = new STRING("-dev", ElementsLimit.limit(100));
         UINT32 major_version = new UINT32(2L, ElementsLimit.noLimit());
         UINT32 minor_version = new UINT32(3L, ElementsLimit.noLimit());
         UINT32 patch_version = new UINT32(99L, ElementsLimit.noLimit());
@@ -420,11 +420,11 @@ public class GeneratedPacketTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void generatedPacketStringToBig() {
-        StringArray packet = new StringArray(new STRING("Not an ArrayNot an Array", ElementsLimit.limit(30, 30)),
+        StringArray packet = new StringArray(new STRING("Not an ArrayNot an Array", ElementsLimit.limit(30)),
                 new STRING[]{
-                        new STRING("Element 1", ElementsLimit.limit(10, 10)),
-                        new STRING("Element 2", ElementsLimit.limit(10, 10)),
-                        new STRING("Element 3", ElementsLimit.limit(10, 10))
+                        new STRING("Element 1", ElementsLimit.limit(10)),
+                        new STRING("Element 2", ElementsLimit.limit(10)),
+                        new STRING("Element 3", ElementsLimit.limit(10))
                 });
     }
 }

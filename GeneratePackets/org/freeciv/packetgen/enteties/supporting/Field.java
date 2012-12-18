@@ -137,10 +137,10 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
     private String getLimits() throws UndefinedException {
         return ", " + (type.getBasicType().isArrayEater() ?
-                "ElementsLimit.limit(" + declarations[declarations.length - 1].getMaxSize() + ", " +
+                "ElementsLimit.limit(" + declarations[declarations.length - 1].getMaxSize() +
                         (declarations[declarations.length - 1].hasTransfer() ?
-                                declarations[declarations.length - 1].getElementsToTransfer() :
-                                declarations[declarations.length - 1].getMaxSize()) :
+                                ", " + declarations[declarations.length - 1].getElementsToTransfer() :
+                                "") :
                 "ElementsLimit.noLimit(") + ")";
     }
 
