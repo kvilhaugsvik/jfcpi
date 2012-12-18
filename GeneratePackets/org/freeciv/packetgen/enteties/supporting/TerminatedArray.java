@@ -221,8 +221,10 @@ public class TerminatedArray extends FieldTypeBasic {
     private static void theLimitIsSane(Block out, Typed<AnInt> relativeMaxArray, Typed<AnInt> absoluteMaxArray,
                                        TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
         if (shouldValidateLimits(transferArraySizeKind, maxArraySizeKind))
-            out.addStatement(Hardcoded.arrayEaterScopeCheck(isSmallerThan(absoluteMaxArray, relativeMaxArray),
-                    "The relative limit on the number of elements is to large compared to the absolute limit"));
+            out.addStatement(IF(isSmallerThan(absoluteMaxArray, relativeMaxArray),
+                    new Block(THROW(IllegalArgumentException.class,
+                            literal("The relative limit on the number of elements is " +
+                                    "to large compared to the absolute limit")))));
     }
 
     private static boolean shouldValidateLimits(TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
@@ -255,7 +257,8 @@ public class TerminatedArray extends FieldTypeBasic {
         Typed<ABool> check = tolerateSmaller ?
                 isSmallerThan(limit, actualNumberOfElements) :
                 isNotSame(limit, actualNumberOfElements);
-        out.addStatement(arrayEaterScopeCheck(check, "Wrong number of elements"));
+        out.addStatement(IF(check,
+                new Block(THROW(IllegalArgumentException.class, literal("Wrong number of elements")))));
     }
 
     private static boolean noUpperLimitOnTheNumberOfElements(MaxArraySize maxArraySizeKind) {
