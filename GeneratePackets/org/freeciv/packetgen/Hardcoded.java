@@ -276,8 +276,8 @@ public class Hardcoded {
             Constant.isInt("STRING_ENDER", IntExpression.integer("0"))
     );
 
-    public static Typed<NoValue> arrayEaterScopeCheck(Typed<ABool> check) {
-        return IF(check, new Block(THROW(IllegalArgumentException.class, literal("Value out of scope"))));
+    public static Typed<NoValue> arrayEaterScopeCheck(Typed<ABool> check, String message) {
+        return IF(check, new Block(THROW(IllegalArgumentException.class, literal(message))));
     }
 
     public static void applyManualChanges(PacketsStore toStorage) {
