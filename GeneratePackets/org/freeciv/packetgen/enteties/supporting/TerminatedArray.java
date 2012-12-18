@@ -81,6 +81,7 @@ public class TerminatedArray extends FieldTypeBasic {
     private final boolean elementTypeCanLimitVerify;
     private final TargetArray buffertype;
     private final HashSet<Method.Helper> helpers;
+    private final Method validateInsideLimits;
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
                            final Requirement terminator,
@@ -118,6 +119,10 @@ public class TerminatedArray extends FieldTypeBasic {
         this.numberOfElements = numberOfElements;
         this.elementTypeCanLimitVerify = elementTypeCanLimitVerify;
         this.buffertype = buffertype;
+
+        this.validateInsideLimits = eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind) ?
+                getValidateInsideLimits() :
+                null;
 
         helpers = new HashSet<Method.Helper>(helperMethods);
     }
@@ -284,6 +289,31 @@ public class TerminatedArray extends FieldTypeBasic {
         }
     }
 
+    private Method getValidateInsideLimits() {
+        Block verifyInsideLimits = new Block();
+        theLimitIsSane(verifyInsideLimits,
+                Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
+                Hardcoded.pLimits.<AnInt>read("full_array_size"),
+                transferArraySizeKind, maxArraySizeKind);
+        sizeIsInsideTheLimit(verifyInsideLimits,
+                maxArraySizeKind, transferArraySizeKind,
+                numberOfElements.x(fValue),
+                Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
+                !unterminatable);
+        if (elementTypeCanLimitVerify) {
+            TargetClass elemtype = buffertype.getOf(); // arrayEater's are read element by element
+            Var element = Var.local(elemtype, "element", null);
+            verifyInsideLimits.addStatement(FOR(element, fValue.ref(), new Block(
+                    element.call("verifyInsideLimits", pLimits.<TargetClass>call("next"))
+            )));
+        }
+        return Method.newPublicDynamicMethod(Comment.no(),
+                new TargetClass("void", true), "verifyInsideLimits",
+                Arrays.asList(Hardcoded.pLimits),
+                Collections.<TargetClass>emptyList(),
+                verifyInsideLimits);
+    }
+
     @Override
     public FieldTypeAlias createFieldType(String name) {
         return new FieldTypeAliasToTerminatedArray(name);
@@ -305,30 +335,8 @@ public class TerminatedArray extends FieldTypeBasic {
                 }
             }
 
-            boolean arrayEater = eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind);
-            if (arrayEater) {
-                Block verifyInsideLimits = new Block();
-                theLimitIsSane(verifyInsideLimits,
-                        Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
-                        Hardcoded.pLimits.<AnInt>read("full_array_size"),
-                        transferArraySizeKind, maxArraySizeKind);
-                sizeIsInsideTheLimit(verifyInsideLimits,
-                        maxArraySizeKind, transferArraySizeKind,
-                        numberOfElements.x(fValue),
-                        Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
-                        !unterminatable);
-                if (elementTypeCanLimitVerify) {
-                    TargetClass elemtype = buffertype.getOf(); // arrayEater's are read element by element
-                    Var element = Var.local(elemtype, "element", null);
-                    verifyInsideLimits.addStatement(FOR(element, fValue.ref(), new Block(
-                            element.call("verifyInsideLimits", pLimits.<TargetClass>call("next"))
-                    )));
-                }
-                addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                        new TargetClass("void", true), "verifyInsideLimits",
-                        Arrays.asList(Hardcoded.pLimits),
-                        Collections.<TargetClass>emptyList(),
-                        verifyInsideLimits));
+            if (eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind)) {
+                addMethod(validateInsideLimits);
             }
         }
 
