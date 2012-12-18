@@ -119,7 +119,7 @@ public class FieldTypeTests {
         STRINGS theArray = new STRINGS(new STRING[]{
             new STRING("1", ElementsLimit.limit(5, 4)),
             new STRING("win", ElementsLimit.limit(5, 4))
-        }, ElementsLimit.superLimit(2, 2, ElementsLimit.limit(5, 4)));
+        }, ElementsLimit.limit(2, 2, ElementsLimit.limit(5, 4)));
         theArray.encodeTo(new DataOutputStream(storeTo));
 
         // check the encoding
@@ -128,7 +128,7 @@ public class FieldTypeTests {
 
         // read it back
         STRINGS theReturnedArray = new STRINGS(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
-                ElementsLimit.superLimit(2, 2, ElementsLimit.limit(5, 4)));
+                ElementsLimit.limit(2, 2, ElementsLimit.limit(5, 4)));
 
         // compare the values
         assertEquals("1d + eater field type array didn't survive encoding followed by decoding",
@@ -142,7 +142,7 @@ public class FieldTypeTests {
         storeTo.write(new byte[]{1, 3, 7, 12});
 
         UINT8S2D result = new UINT8S2D(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
-                ElementsLimit.superLimit(2, 2, ElementsLimit.limit(2, 2)));
+                ElementsLimit.limit(2, 2, ElementsLimit.limit(2, 2)));
 
         assertEquals(1, result.getValue()[0].getValue()[0].getValue().intValue());
         assertEquals(3, result.getValue()[0].getValue()[1].getValue().intValue());
@@ -230,8 +230,8 @@ public class FieldTypeTests {
         storeTo.write(new byte[]{1, 3, 7, 12, 44, 77});
 
         UINT8S2D array = new UINT8S2D(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
-                ElementsLimit.superLimit(2, 2, ElementsLimit.limit(3, 3)));
+                ElementsLimit.limit(2, 2, ElementsLimit.limit(3, 3)));
 
-        array.verifyInsideLimits(ElementsLimit.superLimit(2, 2, ElementsLimit.limit(2, 2)));
+        array.verifyInsideLimits(ElementsLimit.limit(2, 2, ElementsLimit.limit(2, 2)));
     }
 }

@@ -53,10 +53,10 @@ public class ElementsLimit {
     }
 
     public static ElementsLimit limit(int full_array_size, int elements_to_transfer) {
-        return superLimit(full_array_size, elements_to_transfer, noLimit());
+        return limit(full_array_size, elements_to_transfer, noLimit());
     }
 
-    public static ElementsLimit superLimit(int full_array_size, int elements_to_transfer, ElementsLimit subLimit) {
+    public static ElementsLimit limit(int full_array_size, int elements_to_transfer, ElementsLimit subLimit) {
         if (null == subLimit)
             throw new NullPointerException("Sub limit can't be null. Did you mean noLimit()");
         if (full_array_size < 0)

@@ -184,7 +184,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
     private Typed getSuperLimit(int pos) throws UndefinedException {
         if (pos < declarations.length)
-        return new MethodCall("ElementsLimit.superLimit",
+        return new MethodCall("ElementsLimit.limit",
                 BuiltIn.<AnInt>toCode(declarations[pos].getMaxSize().toString()),
                 BuiltIn.<AnInt>toCode(declarations[pos].getSize()),
                 getSuperLimit(pos + 1));

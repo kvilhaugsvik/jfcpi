@@ -61,7 +61,7 @@ public class ElementsLimitTest {
 
     @Test
     public void superLimitsHasNext() {
-        ElementsLimit limit = ElementsLimit.superLimit(4, 1, ElementsLimit.limit(3, 2));
+        ElementsLimit limit = ElementsLimit.limit(4, 1, ElementsLimit.limit(3, 2));
 
         assertEquals(4, limit.full_array_size);
         assertEquals(1, limit.elements_to_transfer);
@@ -71,6 +71,6 @@ public class ElementsLimitTest {
 
     @Test(expected = NullPointerException.class)
     public void superLimitsSubNotNull() {
-        ElementsLimit limit = ElementsLimit.superLimit(3, 2, null);
+        ElementsLimit limit = ElementsLimit.limit(3, 2, null);
     }
 }
