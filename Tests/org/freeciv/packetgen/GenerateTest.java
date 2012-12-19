@@ -356,16 +356,13 @@ public class GenerateTest {
         writeJavaFile(result, targetFolder);
     }
 
-    @Test public void writeTerminatedArrayFieldArray() throws IOException {
+    @Test public void writeTerminatedArrayFieldArray() throws IOException, UndefinedException {
         writeTerminatedArrayFieldArray(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
     }
 
-    private static void writeTerminatedArrayFieldArray(String targetFolder) throws IOException {
-        TargetArray arrayOfFields = new TargetArray("UINT32", 1, false);
-        // add method enocodeTo to underlying type since it's field type
-        arrayOfFields.getOf().register(new TargetMethod("encodeTo"));
-
-        writeJavaFile(TerminatedArray.fieldArray("x", "y", arrayOfFields, false).createFieldType("UINT32S"), targetFolder);
+    private void writeTerminatedArrayFieldArray(String targetFolder) throws IOException, UndefinedException {
+        writeJavaFile(TerminatedArray.fieldArray("x", "y", createFieldTypeUINT32(new Parts()))
+                .createFieldType("UINT32S"), targetFolder);
     }
 
     @Test
