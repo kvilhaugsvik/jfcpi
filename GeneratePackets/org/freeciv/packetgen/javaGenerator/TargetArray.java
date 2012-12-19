@@ -14,9 +14,9 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.utility.Strings;
 
 public class TargetArray extends TargetClass {
     private final TargetClass of;
@@ -27,12 +27,12 @@ public class TargetArray extends TargetClass {
     }
 
     public TargetArray(TargetClass wrapped, int levels, boolean isInScope) {
-        super(wrapped.getName() + Util.repeat("[]", levels), isInScope);
+        super(wrapped.getName() + Strings.repeat("[]", levels), isInScope);
         this.of = wrapped;
     }
 
     public TargetArray(String wrapped, int levels, boolean isInScope) {
-        super(wrapped + Util.repeat("[]", levels), isInScope);
+        super(wrapped + Strings.repeat("[]", levels), isInScope);
         this.of = new TargetClass(wrapped, isInScope);
     }
 

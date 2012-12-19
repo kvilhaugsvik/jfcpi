@@ -14,7 +14,6 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
-import org.freeciv.Util;
 import org.freeciv.packet.fieldtype.*;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -27,6 +26,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
+import org.freeciv.utility.Strings;
 
 import java.util.*;
 
@@ -116,7 +116,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         int unhandledArrays = rawDeclarations;
         if (type.getBasicType().isArrayEater())
             unhandledArrays--;
-        return Util.repeat("[]", unhandledArrays);
+        return Strings.repeat("[]", unhandledArrays);
     }
 
     public String getArrayDeclaration() {
