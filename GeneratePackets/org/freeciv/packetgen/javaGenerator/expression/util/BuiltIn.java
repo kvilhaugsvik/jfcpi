@@ -276,6 +276,18 @@ public class BuiltIn {
         return BuiltIn.<ABool>binOp(HasAtoms.IS_NOT_SAME, small, largerThan);
     }
 
+    public static Typed<ABool> isInstanceOf(final Typed<? extends AValue> object,
+                                            final TargetClass type) {
+        return new Formatted.Type<ABool>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                object.writeAtoms(to);
+                to.add(HasAtoms.IS_INSTANCE_OF);
+                type.writeAtoms(to);
+            }
+        };
+    }
+
     public static MethodCall<AValue> arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
         return new MethodCall<AValue>("[]=", on.ref(), val) {
             @Override

@@ -37,6 +37,7 @@ public interface HasAtoms {
     public static final CodeAtom IS_BIGGER = new CodeAtom(">");
     public static final CodeAtom IS_SAME = new CodeAtom("==");
     public static final CodeAtom IS_NOT_SAME = new CodeAtom("!=");
+    public static final CodeAtom IS_INSTANCE_OF = new CodeAtom("instanceof");
     public static final CodeAtom AND = new CodeAtom("&&");
     public static final CodeAtom OR = new CodeAtom("||");
     public static final CodeAtom ADD = new CodeAtom("+");
