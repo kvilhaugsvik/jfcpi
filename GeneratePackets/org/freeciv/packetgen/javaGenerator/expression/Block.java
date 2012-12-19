@@ -56,6 +56,14 @@ public class Block extends Formatted implements Typed<NoValue> {
         differentGroupsAt.set(statements.size());
     }
 
+    /**
+     * Get the number of statements in the block. Statements inside statements don't count.
+     * @return the number of statements in the block
+     */
+    public int numberOfStatements() {
+        return statements.size();
+    }
+
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(LSC);

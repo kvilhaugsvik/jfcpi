@@ -119,11 +119,24 @@ public class TypedCodeTest {
     }
 
     @Test public void blockEmpty() {
+        Block empty = new Block();
+
+        assertEquals(0, empty.numberOfStatements());
+
         CodeAtoms result = new CodeAtoms();
-        (new Block()).writeAtoms(result);
+        empty.writeAtoms(result);
 
         assertEquals(HasAtoms.LSC, result.get(0).getAtom());
         assertEquals(HasAtoms.RSC, result.get(1).getAtom());
+    }
+
+    @Test
+    public void block2Statements() {
+        Var i = Var.local("int", "i", null);
+        Var j = Var.local("int", "j", null);
+        Block block = new Block(i, j);
+
+        assertEquals(2, block.numberOfStatements());
     }
 
     @Test(expected = IllegalArgumentException.class)
