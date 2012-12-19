@@ -175,6 +175,10 @@ public class FieldTypeBasic implements IDependency, ReqKind {
             return javaType.getName();
         }
 
+        public TargetClass getUnderType() {
+            return javaType;
+        }
+
         /**
          * Use this to provide another type and replace mentions of the other type with this in the generated code
          * @param alias Name of the field type alias to replace

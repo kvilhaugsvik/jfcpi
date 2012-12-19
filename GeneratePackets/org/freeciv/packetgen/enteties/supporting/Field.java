@@ -96,6 +96,10 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         return super.getName();
     }
 
+    public TargetClass getUnderType() {
+        return type.getUnderType();
+    }
+
     public String getFType() {
         return type.getName();
     }
