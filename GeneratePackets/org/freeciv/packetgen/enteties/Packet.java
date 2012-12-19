@@ -131,7 +131,6 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                             field.assign(BuiltIn.<AValue>toCode("new " + field.getFType() + field.getNewCreation())));
                 field.forElementsInField("this." + field.getFieldName() + "[i] = " +
                         field.getNewFromJavaType(), constructorBodyJ);
-                field.appendArrayEaterValidationTo(constructorBodyJ);
             }
             constructorBodyJ.addStatement(generateHeader(headerKind));
             addMethod(Method.newPublicConstructor(Comment.no(), getName(), params, constructorBodyJ));
