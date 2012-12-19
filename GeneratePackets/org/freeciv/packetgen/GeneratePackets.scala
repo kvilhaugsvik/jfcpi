@@ -19,7 +19,7 @@ import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 import xml.XML
-import org.freeciv.utility.ArgumentSettings
+import org.freeciv.utility.{ChangingConsoleLine, ArgumentSettings}
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
                       requested: List[(String, String)], logger: String,
@@ -62,6 +62,8 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
   def writeToDir(path: String): Unit = writeToDir(new File(path))
 
   def writeToDir(path: File) {
+    val statusPrinter = new ChangingConsoleLine("Writing the file ", System.out)
+
     val notFound = storage.getUnsolvedRequirements
     if (!notFound.isEmpty) {
       if (devMode) {
@@ -71,15 +73,21 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
         throw new UndefinedException("Missing dependencies: " + notFound)
       }
     }
+
     storage.getJavaCode.foreach((code) => {
       val packagePath = code.getPackage.replaceAll("""\.""", "/")
       val classFile = new File(path + "/" + packagePath + "/" + code.getName + ".java")
+
+      statusPrinter.printCurrent(classFile.getAbsolutePath)
+
       classFile.getParentFile.mkdirs()
       classFile.createNewFile
       val classWriter = new FileWriter(classFile)
       classWriter.write(code.toString)
       classWriter.close()
     })
+
+    statusPrinter.finished()
   }
 }
 
