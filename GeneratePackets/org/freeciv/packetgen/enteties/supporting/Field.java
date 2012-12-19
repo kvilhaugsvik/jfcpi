@@ -183,14 +183,17 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     private Typed getSuperLimit(int pos) throws UndefinedException {
-        if (pos < declarations.length)
-        return new MethodCall("ElementsLimit.limit",
-                BuiltIn.<AnInt>toCode(declarations[pos].getMaxSize().toString()),
-                BuiltIn.<AnInt>toCode(declarations[pos].getSize()),
-                getSuperLimit(pos + 1));
-        else
+        if (pos < declarations.length) {
+            LinkedList<Typed<AnInt>> args = new LinkedList<Typed<AnInt>>();
+            args.add(BuiltIn.<AnInt>toCode(declarations[pos].getMaxSize().toString()));
+            if (declarations[pos].hasTransfer())
+                args.add(BuiltIn.<AnInt>toCode(declarations[pos].getSize()));
+            if (pos + 1 < declarations.length)
+                args.add(getSuperLimit(pos + 1));
+            return new MethodCall("ElementsLimit.limit", args.toArray(new Typed[0]));
+        } else {
             return new MethodCall("ElementsLimit.noLimit");
-
+        }
     }
 
     public void appendValidationTo(boolean testArrayLength, Block to) throws UndefinedException {
