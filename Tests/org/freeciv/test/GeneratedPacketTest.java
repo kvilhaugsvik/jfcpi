@@ -22,6 +22,7 @@ import java.io.*;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GeneratedPacketTest {
     @Test
@@ -426,5 +427,21 @@ public class GeneratedPacketTest {
                         new STRING("Element 2", ElementsLimit.limit(10)),
                         new STRING("Element 3", ElementsLimit.limit(10))
                 });
+    }
+
+    @Test
+    public void generatedPacketExceptionTellsWhere() {
+        try {
+            StringArray packet = new StringArray(new STRING("Not an ArrayNot an Array", ElementsLimit.limit(30)),
+                    new STRING[]{
+                            new STRING("Element 1", ElementsLimit.limit(10)),
+                            new STRING("Element 2", ElementsLimit.limit(10)),
+                            new STRING("Element 3", ElementsLimit.limit(10))
+                    });
+            fail("No exception cast");
+        } catch (FieldTypeException e) {
+            assertEquals("StringArray", e.getInPacket());
+            assertEquals("notAnArray", e.getField());
+        }
     }
 }

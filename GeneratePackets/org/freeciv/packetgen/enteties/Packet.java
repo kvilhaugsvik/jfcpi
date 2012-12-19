@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packet.PacketHeader;
+import org.freeciv.packet.fieldtype.FieldTypeException;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.ReqKind;
@@ -89,14 +90,36 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
         addToString(name, fields);
 
-        addConstructorFromFields(fields, headerKind);
-
-        addConstructorFromJavaTypes(fields, headerKind);
-
-        addConstructorFromDataInput(name, fields, headerKind);
+        TargetMethod addExceptionLocation = addExceptionLocationAdder();
+        addConstructorFromFields(fields, headerKind, addExceptionLocation);
+        addConstructorFromJavaTypes(fields, headerKind, addExceptionLocation);
+        addConstructorFromDataInput(name, fields, headerKind, addExceptionLocation);
     }
 
-    private void addConstructorFromFields(Field[] fields, TargetClass headerKind) throws UndefinedException {
+    private TargetMethod addExceptionLocationAdder() {
+        Var<AValue> e = Var.param(RuntimeException.class, "e");
+        TargetClass ft = new TargetClass(FieldTypeException.class, true);
+        Var<AValue> fte = Var.local(ft, "fte", cast(ft, e.ref()));
+        Var<AString> pName = Var.param(String.class, "field");
+        Method.Helper addExceptionLocation = Method.newHelper(
+                Comment.no(),
+                e.getTType(),
+                "addExceptionLocation",
+                Arrays.asList(e, pName),
+                new Block(
+                        IF(
+                                isInstanceOf(e.ref(), ft),
+                                new Block(
+                                        fte,
+                                        fte.call("setInPacket", literal(getName())),
+                                        fte.call("setField", pName.ref()))),
+                        RETURN(e.ref())));
+        addMethod(addExceptionLocation);
+
+        return addExceptionLocation.getAddress();
+    }
+
+    private void addConstructorFromFields(Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation) throws UndefinedException {
         Block constructorBody = new Block();
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         for (Field field : fields) {
@@ -105,19 +128,35 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                     field.getFieldName()));
             field.appendValidationTo(true, constructorBody);
             constructorBody.addStatement(setFieldToVariableSameName(field.getFieldName()));
-            field.appendArrayEaterValidationTo(constructorBody);
+
+            Block validate = new Block();
+            field.appendArrayEaterValidationTo(validate);
+            if (0 < validate.numberOfStatements())
+                constructorBody.addStatement(labelExceptionsWithPacketAndField(field, validate, addExceptionLocation));
         }
-        constructorBody.addStatement(generateHeader(headerKind));
+        constructorBody.addStatement(generateHeader(headerKind, addExceptionLocation));
         addMethod(Method.newPublicConstructor(Comment.no(), getName(), params, constructorBody));
     }
 
-    private Typed<AValue> generateHeader(TargetClass headerKind) {
-        return getField("header").assign(headerKind.newInstance(
-                sum(BuiltIn.<AValue>toCode("calcBodyLen()"), headerKind.read("HEADER_SIZE")),
-                BuiltIn.<AValue>toCode("number")));
+    private Typed<NoValue> labelExceptionsWithPacketAndField(Var field, Block operation, TargetMethod addExceptionLocation) {
+        // TODO: When packet arrays are replaced by array as field type wrap all exceptions that isn't a
+        // FieldTypeException in a FieldTypeException and set packet and field
+        Var<AValue> e = Var.param(RuntimeException.class, "e");
+        return BuiltIn.tryCatch(
+                operation,
+                e,
+                new Block(THROW(addExceptionLocation.<AValue>call(e.ref(), literal(field.getName())))));
     }
 
-    private void addConstructorFromJavaTypes(Field[] fields, TargetClass headerKind) throws UndefinedException {
+    private Typed<NoValue> generateHeader(TargetClass headerKind, TargetMethod addExceptionLocation) {
+        Var header = getField("header");
+        return labelExceptionsWithPacketAndField(header, new Block(
+                header.assign(headerKind.newInstance(
+                        sum(BuiltIn.<AValue>toCode("calcBodyLen()"), headerKind.read("HEADER_SIZE")),
+                        BuiltIn.<AValue>toCode("number")))), addExceptionLocation);
+    }
+
+    private void addConstructorFromJavaTypes(Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation) throws UndefinedException {
         if (0 < fields.length) {
             LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
             Block constructorBodyJ = new Block();
@@ -125,31 +164,36 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 params.add(Var.param(
                         new TargetClass(field.getJType() + field.getArrayDeclaration(), true),
                         field.getFieldName()));
-                field.appendValidationTo(true, constructorBodyJ);
+
+                Block readAndValidate = new Block();
+                field.appendValidationTo(true, readAndValidate);
                 if (field.hasDeclarations())
-                    constructorBodyJ.addStatement(
+                    readAndValidate.addStatement(
                             field.assign(BuiltIn.<AValue>toCode("new " + field.getFType() + field.getNewCreation())));
                 field.forElementsInField("this." + field.getFieldName() + "[i] = " +
-                        field.getNewFromJavaType(), constructorBodyJ);
+                        field.getNewFromJavaType(), readAndValidate);
+                constructorBodyJ.addStatement(labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation));
             }
-            constructorBodyJ.addStatement(generateHeader(headerKind));
+            constructorBodyJ.addStatement(generateHeader(headerKind, addExceptionLocation));
             addMethod(Method.newPublicConstructor(Comment.no(), getName(), params, constructorBodyJ));
         }
     }
 
-    private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind) throws UndefinedException {
+    private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation) throws UndefinedException {
         Var<TargetClass> argHeader = Var.param(new TargetClass(PacketHeader.class, true), "header");
         final Var<TargetClass> streamName = Var.param(new TargetClass(DataInput.class, true), "from");
 
         Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
         for (Field field : fields) {
-            field.appendValidationTo(false, constructorBodyStream);
+            Block readAndValidate = new Block();
+            field.appendValidationTo(false, readAndValidate);
             if (field.hasDeclarations())
-                constructorBodyStream.addStatement(
+                readAndValidate.addStatement(
                         field.assign(BuiltIn.<AValue>toCode("new " + field.getFType() + field.getNewCreation())));
             field.forElementsInField(
                     "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName.getName()),
-                    constructorBodyStream);
+                    readAndValidate);
+            constructorBodyStream.addStatement(labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation));
         }
 
         constructorBodyStream.groupBoundary();
