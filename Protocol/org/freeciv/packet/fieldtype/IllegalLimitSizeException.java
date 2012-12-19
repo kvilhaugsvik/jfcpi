@@ -14,7 +14,7 @@
 
 package org.freeciv.packet.fieldtype;
 
-public class IllegalLimitSizeException extends IllegalStateException {
+public class IllegalLimitSizeException extends FieldTypeException {
     public IllegalLimitSizeException(String message) {
         super(message);
     }

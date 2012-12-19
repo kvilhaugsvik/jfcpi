@@ -14,7 +14,7 @@
 
 package org.freeciv.packet.fieldtype;
 
-public class IllegalNumberOfElementsException extends IllegalStateException {
+public class IllegalNumberOfElementsException extends FieldTypeException {
     public IllegalNumberOfElementsException(String message) {
         super(message);
     }
