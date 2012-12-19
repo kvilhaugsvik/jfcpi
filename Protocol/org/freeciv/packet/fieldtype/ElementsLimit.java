@@ -56,6 +56,10 @@ public class ElementsLimit {
         return limit(absolute_max, absolute_max);
     }
 
+    public static ElementsLimit limit(int absolute_max, ElementsLimit subLimit) {
+        return limit(absolute_max, absolute_max, subLimit);
+    }
+
     public static ElementsLimit limit(int full_array_size, int elements_to_transfer) {
         return limit(full_array_size, elements_to_transfer, noLimit());
     }
