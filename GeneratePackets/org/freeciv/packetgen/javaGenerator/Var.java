@@ -16,8 +16,10 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
+import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.expression.util.ValueHelper;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
@@ -199,19 +201,18 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         }
     }
 
-    public static class Reference<Contains extends AValue> extends Address implements Typed<Contains> {
+    public static class Reference<Contains extends AValue> extends Address implements Value<Contains> {
         private final Var of;
+        private final ValueHelper valueHelper;
 
         public Reference(Var of, CodeAtom... followedBy) {
             super(of.referName, followedBy);
             this.of = of;
+            this.valueHelper = new ValueHelper(of.type, this);
         }
 
         public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
-            Typed<? extends AValue>[] allParams = new Typed[params.length + 1];
-            allParams[0] = of.ref();
-            System.arraycopy(params, 0, allParams, 1, params.length);
-            return of.type.call(method, allParams);
+            return valueHelper.call(method, params);
         }
 
         public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {
