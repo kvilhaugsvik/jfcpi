@@ -208,15 +208,10 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         }
 
         public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
-            final MethodCall<AValue> toCall = of.type.call(method, params);
-            return new MethodCall<Ret>(method, params) {
-                @Override
-                public void writeAtoms(CodeAtoms to) {
-                    of.ref().writeAtoms(to);
-                    to.add(HAS);
-                    toCall.writeAtoms(to);
-                }
-            };
+            Typed<? extends AValue>[] allParams = new Typed[params.length + 1];
+            allParams[0] = of.ref();
+            System.arraycopy(params, 0, allParams, 1, params.length);
+            return of.type.call(method, allParams);
         }
 
         public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {

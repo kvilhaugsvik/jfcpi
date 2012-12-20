@@ -18,6 +18,7 @@ import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
@@ -158,5 +159,17 @@ public class TypedCodeTest {
                 " * deliver\n" +
                 " */",
                 Comment.c(asText).toString());
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void methodCallManuallyCrashIfNotHandled() {
+        MethodCall<AValue> call = new MethodCall<AValue>(TargetMethod.Called.MANUALLY, "call");
+        call.writeAtoms(new CodeAtoms());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void callNonExistingMethodOnVar() {
+        Var aVar = Var.param(Object.class, "aVar");
+        aVar.call("thisMethodIsNotOnObject");
     }
 }
