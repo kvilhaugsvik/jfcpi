@@ -415,11 +415,9 @@ public class TerminatedArray extends FieldTypeBasic {
                 new ExprFrom1<Typed<? extends AValue>, Var>() {
                     @Override
                     public Typed<? extends AValue> x(Var from) {
-                        TargetClass elemType = type.getOf();
-                        if (arrayEater)
-                            return elemType.newInstance(from.ref(), Hardcoded.pLimits.<TargetClass>call("next"));
-                        else
-                            return elemType.newInstance(from.ref(), new MethodCall<AValue>("ElementsLimit.noLimit"));
+                        return type.getOf().newInstance(from.ref(), arrayEater ?
+                                Hardcoded.pLimits.<TargetClass>call("next") :
+                                new MethodCall<AValue>("ElementsLimit.noLimit"));
                     }
                 },
                 TO_STRING_ARRAY,
