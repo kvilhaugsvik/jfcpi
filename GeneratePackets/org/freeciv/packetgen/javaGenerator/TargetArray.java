@@ -37,9 +37,9 @@ public class TargetArray extends TargetClass {
     }
 
     @Override
-    public MethodCall<AValue> newInstance(Typed<? extends AValue>... parameterList) {
+    public MethodCall.HasResult<AValue> newInstance(Typed<? extends AValue>... parameterList) {
         final TargetClass parent = this;
-        return new MethodCall<AValue>("new " + of.getName(), parameterList) {
+        return new MethodCall.HasResult<AValue>(TargetMethod.Called.MANUALLY, this, "new " + getName(), parameterList) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(newInst);

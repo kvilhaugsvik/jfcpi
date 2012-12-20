@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
@@ -135,9 +136,9 @@ public class TargetClass extends Address implements AValue {
     }
 
     protected final static CodeAtom newInst = new CodeAtom("new");
-    public MethodCall<AValue> newInstance(Typed<? extends AValue>... parameterList) {
+    public Value<AValue> newInstance(Typed<? extends AValue>... parameterList) {
         final TargetClass parent = this;
-        return new MethodCall<AValue>("new " + name.get(), parameterList) {
+        return new MethodCall.HasResult<AValue>(TargetMethod.Called.MANUALLY, this, "new " + name.get(), parameterList) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(newInst);

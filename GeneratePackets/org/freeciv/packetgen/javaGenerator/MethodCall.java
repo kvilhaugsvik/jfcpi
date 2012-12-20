@@ -15,9 +15,11 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.expression.util.ValueHelper;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
@@ -115,6 +117,20 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
             }
             to.add(RPR);
             to.hintEnd(MethodCall.class.getCanonicalName());
+        }
+    }
+
+    public static class HasResult<Returns extends AValue> extends MethodCall<Returns> implements Value<Returns> {
+        private final ValueHelper valueHelper;
+
+        public HasResult(TargetMethod.Called call, TargetClass type, String name, Typed<? extends AValue>... params) {
+            super(call, name, params);
+            valueHelper = new ValueHelper(type, this);
+        }
+
+        @Override
+        public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... params) {
+            return valueHelper.call(method, params);
         }
     }
 }
