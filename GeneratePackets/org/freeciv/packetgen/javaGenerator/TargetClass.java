@@ -43,7 +43,7 @@ public class TargetClass extends Address implements AValue {
 
         // While all classes have a toString this isn't true for all types.
         // As all types are assumed to be classes this may cause trouble
-        methods.put("toString", new TargetMethod("toString"));
+        methods.put("toString", new TargetMethod("toString", TargetMethod.Called.DYNAMIC));
     }
 
     private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w");

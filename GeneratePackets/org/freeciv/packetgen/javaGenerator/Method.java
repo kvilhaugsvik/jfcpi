@@ -50,7 +50,9 @@ public class Method extends Formatted implements HasAtoms {
     }
 
     public TargetMethod getAddress() {
-        return new TargetMethod(name);
+        return new TargetMethod(name, Scope.CLASS.equals(scope) ?
+                TargetMethod.Called.STATIC :
+                TargetMethod.Called.DYNAMIC);
     }
 
     @Override
