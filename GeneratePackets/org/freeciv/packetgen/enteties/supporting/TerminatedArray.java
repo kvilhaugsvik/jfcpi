@@ -109,7 +109,7 @@ public class TerminatedArray extends FieldTypeBasic {
         super(dataIOType, publicType, javaType,
                 createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, pLimits.ref())),
                 createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements),
-                createEncode(terminator, transferArraySizeKind, buffertype, numberOfElements, testIfTerminatorShouldBeAdded, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize),
+                createEncode(terminator, transferArraySizeKind, buffertype, numberOfElements, testIfTerminatorShouldBeAdded, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType),
                 createEnocedSize(transferArraySizeKind, numberOfElements, testIfTerminatorShouldBeAdded, transferSizeSerialize, valueGetByteLen),
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
@@ -158,7 +158,7 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
-    private static ExprFrom2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray, final ExprFrom2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize) {
+    private static ExprFrom2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray, final ExprFrom2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
         return new ExprFrom2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
@@ -166,7 +166,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     out.addStatement(to.call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
                 if (null == convertAllElementsToByteArray) {
-                    Var element = Var.param(buffertype.getOf(), "element");
+                    Var element = Var.param(((TargetArray)javaType).getOf(), "element");
                     out.addStatement(FOR(element, val.ref(), writeElementTo.x(to, element)));
                 } else {
                     out.addStatement(to.call("write", convertAllElementsToByteArray.x(val)));
