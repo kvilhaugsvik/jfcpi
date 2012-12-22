@@ -54,6 +54,8 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
                 return new CodeAtom(name);
             case MANUALLY:
                 return new NotAWriter("Should be handled manually");
+            case STATIC_ARRAY_INST:
+                throw new IllegalArgumentException("Two tokens shouldn't be sent as one String");
             default:
                 throw new UnsupportedOperationException("Can't formulate call for " + kind);
         }
@@ -73,6 +75,9 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
                 break;
             case DYNAMIC:
                 writer =  new DynamicWriter();
+                break;
+            case STATIC_ARRAY_INST:
+                writer = new ArrayInstWriter();
                 break;
             case MANUALLY:
                 writer = new NotAWriter("The call should have been handled manually");
@@ -101,18 +106,45 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
     }
 
     private class StaticWriter implements HasAtoms {
+        private final HasAtoms before;
+        private final HasAtoms between;
+        private final HasAtoms after;
+
+        public StaticWriter() {
+            this(LPR, SEP, RPR);
+        }
+
+        protected StaticWriter(HasAtoms before, HasAtoms between, HasAtoms after) {
+            this.before = before;
+            this.between = between;
+            this.after = after;
+        }
+
         public void writeAtoms(CodeAtoms to) {
             to.hintStart(MethodCall.class.getCanonicalName());
             comment.writeAtoms(to);
             method.writeAtoms(to);
-            to.add(LPR);
+            before.writeAtoms(to);
             if (0 < parameters.length) {
                 to.hintStart(CodeStyle.ARGUMENTS);
-                to.joinSep(SEP, parameters);
+                to.joinSep(between, parameters);
                 to.hintEnd(CodeStyle.ARGUMENTS);
             }
-            to.add(RPR);
+            after.writeAtoms(to);
             to.hintEnd(MethodCall.class.getCanonicalName());
+        }
+    }
+
+    private class ArrayInstWriter extends StaticWriter {
+        public ArrayInstWriter() {
+            super(ARRAY_ACCESS_START, new HasAtoms() {
+                @Override public void writeAtoms(CodeAtoms to) {
+                    to.hintEnd(CodeStyle.ARGUMENTS);
+                    to.add(ARRAY_ACCESS_END);
+                    to.add(ARRAY_ACCESS_START);
+                    to.hintStart(CodeStyle.ARGUMENTS);
+                }
+            }, ARRAY_ACCESS_END);
         }
     }
 
@@ -136,10 +168,6 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
 
     public static class HasResult<Returns extends AValue> extends MethodCall<Returns> implements Value<Returns> {
         private final ValueHelper valueHelper;
-
-        public HasResult(TargetMethod.Called call, TargetClass type, String name, Typed<? extends AValue>... params) {
-            this(call, type, transformName(call, name), params);
-        }
 
         public HasResult(TargetMethod.Called call, TargetClass type, HasAtoms name, Typed<? extends AValue>... params) {
             super(call, Comment.no(), name, params);

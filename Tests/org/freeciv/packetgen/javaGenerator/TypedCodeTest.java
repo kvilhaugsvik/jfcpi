@@ -31,6 +31,20 @@ import java.util.EnumSet;
 import static org.junit.Assert.*;
 
 public class TypedCodeTest {
+    @Test public void targetArrayNewInstance() {
+        TargetArray array = new TargetArray("Under", 2, true);
+        CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3), BuiltIn.literal(5)));
+
+        assertEquals("new", asAtoms.get(0).getAtom().get());
+        assertEquals("Under", asAtoms.get(1).getAtom().get());
+        assertEquals("[", asAtoms.get(2).getAtom().get());
+        assertEquals("3", asAtoms.get(3).getAtom().get());
+        assertEquals("]", asAtoms.get(4).getAtom().get());
+        assertEquals("[", asAtoms.get(5).getAtom().get());
+        assertEquals("5", asAtoms.get(6).getAtom().get());
+        assertEquals("]", asAtoms.get(7).getAtom().get());
+    }
+
     @Test public void annotatedField() {
         Annotate annotation = new Annotate("IsAField");
         Var field = Var.field(Arrays.asList(annotation),

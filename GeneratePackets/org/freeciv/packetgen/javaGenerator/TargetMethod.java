@@ -44,6 +44,7 @@ public class TargetMethod extends Address {
 
     public enum Called {
         STATIC, // a class method
+        STATIC_ARRAY_INST, // create a new array
         DYNAMIC, // an object method
         MANUALLY // handled manually
     }
