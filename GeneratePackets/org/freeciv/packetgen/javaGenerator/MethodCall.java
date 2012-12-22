@@ -26,6 +26,47 @@ import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import java.util.Arrays;
 
 public class MethodCall<Returns extends Returnable> extends Formatted implements HasAtoms, Typed<Returns> {
+    // Ways to write argument lists
+    private static final ArgList argListNormal = new ArgList(LPR, SEP, RPR);
+    private static final ArgList argListArray = new ArgList(ARRAY_ACCESS_START, new HasAtoms() {
+        @Override public void writeAtoms(CodeAtoms to) {
+            to.hintEnd(CodeStyle.ARGUMENTS);
+            to.add(ARRAY_ACCESS_END);
+            to.add(ARRAY_ACCESS_START);
+            to.hintStart(CodeStyle.ARGUMENTS);
+        }
+    }, ARRAY_ACCESS_END);
+
+    // Were to place the method
+    private static final MethodPosition placeMethodAfterTheFirstArgument = new MethodPosition() {
+        @Override public boolean hasPList(Typed<? extends AValue>[] parameters) {
+            return 1 < parameters.length;
+        }
+
+        @Override public Typed<? extends AValue>[] choose(Typed<? extends AValue>[] parameters) {
+            return Arrays.copyOfRange(parameters, 1, parameters.length);
+        }
+
+        @Override public void call(HasAtoms method, Typed<? extends AValue>[] parameters, CodeAtoms to) {
+            parameters[0].writeAtoms(to);
+            to.add(HAS);
+            method.writeAtoms(to);
+        }
+    };
+    private static final MethodPosition placeMethodBeforeTheFirstArgument = new MethodPosition() {
+        @Override public boolean hasPList(Typed<? extends AValue>[] parameters) {
+            return 0 < parameters.length;
+        }
+
+        @Override public Typed<? extends AValue>[] choose(Typed<? extends AValue>[] parameters) {
+            return parameters;
+        }
+
+        @Override public void call(HasAtoms method, Typed<? extends AValue>[] parameters, CodeAtoms to) {
+            method.writeAtoms(to);
+        }
+    };
+
     private final HasAtoms writer;
     private final Comment comment;
     protected final HasAtoms method;
@@ -71,13 +112,13 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
 
         switch (kind) {
             case STATIC:
-                writer = new StaticWriter();
+                writer = new AWriter(argListNormal, placeMethodBeforeTheFirstArgument);
                 break;
             case DYNAMIC:
-                writer =  new DynamicWriter();
+                writer =  new AWriter(argListNormal, placeMethodAfterTheFirstArgument);
                 break;
             case STATIC_ARRAY_INST:
-                writer = new ArrayInstWriter();
+                writer = new AWriter(argListArray, placeMethodBeforeTheFirstArgument);
                 break;
             case MANUALLY:
                 writer = new NotAWriter("The call should have been handled manually");
@@ -105,65 +146,46 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         }
     }
 
-    private class StaticWriter implements HasAtoms {
-        private final HasAtoms before;
-        private final HasAtoms between;
-        private final HasAtoms after;
+    private class AWriter implements HasAtoms {
+        private final ArgList argList;
+        private final MethodPosition place;
 
-        public StaticWriter() {
-            this(LPR, SEP, RPR);
+        public AWriter(ArgList argList, MethodPosition orderOfArgs) {
+            this.place = orderOfArgs;
+            this.argList = argList;
         }
 
-        protected StaticWriter(HasAtoms before, HasAtoms between, HasAtoms after) {
+        public void writeAtoms(CodeAtoms to) {
+            to.hintStart(MethodCall.class.getCanonicalName());
+            comment.writeAtoms(to);
+            place.call(method, parameters, to);
+            argList.before.writeAtoms(to);
+            if (place.hasPList(parameters)) {
+                to.hintStart(CodeStyle.ARGUMENTS);
+                to.joinSep(argList.between, place.choose(parameters));
+                to.hintEnd(CodeStyle.ARGUMENTS);
+            }
+            argList.after.writeAtoms(to);
+            to.hintEnd(MethodCall.class.getCanonicalName());
+        }
+    }
+
+    private static class ArgList {
+        public final HasAtoms before;
+        public final HasAtoms between;
+        public final HasAtoms after;
+
+        private ArgList(HasAtoms before, HasAtoms between, HasAtoms after) {
             this.before = before;
             this.between = between;
             this.after = after;
         }
-
-        public void writeAtoms(CodeAtoms to) {
-            to.hintStart(MethodCall.class.getCanonicalName());
-            comment.writeAtoms(to);
-            method.writeAtoms(to);
-            before.writeAtoms(to);
-            if (0 < parameters.length) {
-                to.hintStart(CodeStyle.ARGUMENTS);
-                to.joinSep(between, parameters);
-                to.hintEnd(CodeStyle.ARGUMENTS);
-            }
-            after.writeAtoms(to);
-            to.hintEnd(MethodCall.class.getCanonicalName());
-        }
     }
 
-    private class ArrayInstWriter extends StaticWriter {
-        public ArrayInstWriter() {
-            super(ARRAY_ACCESS_START, new HasAtoms() {
-                @Override public void writeAtoms(CodeAtoms to) {
-                    to.hintEnd(CodeStyle.ARGUMENTS);
-                    to.add(ARRAY_ACCESS_END);
-                    to.add(ARRAY_ACCESS_START);
-                    to.hintStart(CodeStyle.ARGUMENTS);
-                }
-            }, ARRAY_ACCESS_END);
-        }
-    }
-
-    private class DynamicWriter implements HasAtoms {
-        public void writeAtoms(CodeAtoms to) {
-            to.hintStart(MethodCall.class.getCanonicalName());
-            comment.writeAtoms(to);
-            parameters[0].writeAtoms(to);
-            to.add(HAS);
-            method.writeAtoms(to);
-            to.add(LPR);
-            if (1 < parameters.length) {
-                to.hintStart(CodeStyle.ARGUMENTS);
-                to.joinSep(SEP, Arrays.copyOfRange(parameters, 1, parameters.length));
-                to.hintEnd(CodeStyle.ARGUMENTS);
-            }
-            to.add(RPR);
-            to.hintEnd(MethodCall.class.getCanonicalName());
-        }
+    private static interface MethodPosition {
+        public abstract boolean hasPList(Typed<? extends AValue>[] parameters);
+        public abstract Typed<? extends AValue>[] choose(Typed<? extends AValue>[] parameters);
+        public abstract void call(HasAtoms method, Typed<? extends AValue>[] parameters, CodeAtoms to);
     }
 
     public static class HasResult<Returns extends AValue> extends MethodCall<Returns> implements Value<Returns> {
