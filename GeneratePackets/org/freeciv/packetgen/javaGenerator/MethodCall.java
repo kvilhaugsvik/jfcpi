@@ -17,10 +17,8 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.util.ValueHelper;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
@@ -30,7 +28,7 @@ import java.util.Arrays;
 public class MethodCall<Returns extends Returnable> extends Formatted implements HasAtoms, Typed<Returns> {
     private final HasAtoms writer;
     private final Comment comment;
-    protected final String method;
+    protected final HasAtoms method;
     protected final Typed<? extends AValue>[] parameters;
 
     public MethodCall(String name, Typed<? extends AValue>... params) {
@@ -45,7 +43,23 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         this(kind, Comment.no(), name, params);
     }
 
-    private MethodCall(TargetMethod.Called kind, Comment comment, String name, Typed<? extends AValue>... params) {
+    private MethodCall(TargetMethod.Called kind, Comment comment, final String name, Typed<? extends AValue>... params) {
+        this(kind, comment, transformName(kind, name), params);
+    }
+
+    private static HasAtoms transformName(TargetMethod.Called kind, final String name) {
+        switch (kind) {
+            case STATIC:
+            case DYNAMIC:
+                return new CodeAtom(name);
+            case MANUALLY:
+                return new NotAWriter("Should be handled manually");
+            default:
+                throw new UnsupportedOperationException("Can't formulate call for " + kind);
+        }
+    }
+
+    private MethodCall(TargetMethod.Called kind, Comment comment, HasAtoms name, Typed<? extends AValue>... params) {
         if (null == name)
             throw new IllegalArgumentException("No method name given to method call");
 
@@ -90,7 +104,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         public void writeAtoms(CodeAtoms to) {
             to.hintStart(MethodCall.class.getCanonicalName());
             comment.writeAtoms(to);
-            to.add(new CodeAtom(method));
+            method.writeAtoms(to);
             to.add(LPR);
             if (0 < parameters.length) {
                 to.hintStart(CodeStyle.ARGUMENTS);
@@ -108,7 +122,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
             comment.writeAtoms(to);
             parameters[0].writeAtoms(to);
             to.add(HAS);
-            to.add(new CodeAtom(method));
+            method.writeAtoms(to);
             to.add(LPR);
             if (1 < parameters.length) {
                 to.hintStart(CodeStyle.ARGUMENTS);
@@ -124,7 +138,11 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         private final ValueHelper valueHelper;
 
         public HasResult(TargetMethod.Called call, TargetClass type, String name, Typed<? extends AValue>... params) {
-            super(call, name, params);
+            this(call, type, transformName(call, name), params);
+        }
+
+        public HasResult(TargetMethod.Called call, TargetClass type, HasAtoms name, Typed<? extends AValue>... params) {
+            super(call, Comment.no(), name, params);
             valueHelper = new ValueHelper(type, this);
         }
 

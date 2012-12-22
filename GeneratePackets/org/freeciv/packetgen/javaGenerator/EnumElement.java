@@ -24,7 +24,7 @@ public class EnumElement extends MethodCall<NoValue> {
     }
 
     public String getEnumValueName() {
-        return super.method;
+        return super.method.toString();
     }
 
     public static EnumElement newEnumValue(String enumValueName, Typed<? extends AValue>... params) {

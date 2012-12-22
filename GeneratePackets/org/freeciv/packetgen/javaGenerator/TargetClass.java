@@ -135,20 +135,15 @@ public class TargetClass extends Address implements AValue {
         };
     }
 
-    protected final static CodeAtom newInst = new CodeAtom("new");
     public Value<AValue> newInstance(Typed<? extends AValue>... parameterList) {
-        final TargetClass parent = this;
-        return new MethodCall.HasResult<AValue>(TargetMethod.Called.MANUALLY, this, "new " + name.get(), parameterList) {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
+        return new MethodCall.HasResult<AValue>(TargetMethod.Called.STATIC, this, getNewMethod(this), parameterList);
+    }
+
+    protected static HasAtoms getNewMethod(final TargetClass type) {
+        return new HasAtoms() {
+            @Override public void writeAtoms(CodeAtoms to) {
                 to.add(newInst);
-                if (isInScope)
-                    to.add(name);
-                else
-                    parent.writeAtoms(to);
-                to.add(LPR);
-                to.joinSep(SEP, parameters);
-                to.add(RPR);
+                type.writeAtoms(to);
             }
         };
     }
