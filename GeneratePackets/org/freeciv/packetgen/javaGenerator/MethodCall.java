@@ -49,7 +49,6 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
 
         @Override public void call(HasAtoms method, Typed<? extends AValue>[] parameters, CodeAtoms to) {
             parameters[0].writeAtoms(to);
-            to.add(HAS);
             method.writeAtoms(to);
         }
     };
@@ -102,13 +101,31 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         }
     }
 
-    private MethodCall(TargetMethod.Called kind, Comment comment, HasAtoms name, Typed<? extends AValue>... params) {
+    private MethodCall(TargetMethod.Called kind, Comment comment, final HasAtoms name, Typed<? extends AValue>... params) {
         if (null == name)
             throw new IllegalArgumentException("No method name given to method call");
 
         this.comment = comment;
-        this.method = name;
         this.parameters = params;
+
+        switch (kind) {
+            case DYNAMIC:
+                this.method = new HasAtoms() {
+                    @Override
+                    public void writeAtoms(CodeAtoms to) {
+                        to.add(HAS);
+                        name.writeAtoms(to);
+                    }
+                };
+                break;
+            case STATIC:
+            case MANUALLY:
+            case STATIC_ARRAY_INST:
+                this.method = name;
+                break;
+            default:
+                throw new IllegalArgumentException("Can't formulate call for " + kind);
+        }
 
         switch (kind) {
             case STATIC:
