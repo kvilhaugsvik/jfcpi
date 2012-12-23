@@ -45,6 +45,55 @@ public class TypedCodeTest {
         assertEquals("]", asAtoms.get(7).getAtom().get());
     }
 
+    @Test public void targetArrayNewInstanceFewArgumentsPlacedRight() {
+        TargetArray array = new TargetArray("Under", 2, true);
+        CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3)));
+
+        assertEquals("new", asAtoms.get(0).getAtom().get());
+        assertEquals("Under", asAtoms.get(1).getAtom().get());
+        assertEquals("[", asAtoms.get(2).getAtom().get());
+        assertEquals("3", asAtoms.get(3).getAtom().get());
+        assertEquals("]", asAtoms.get(4).getAtom().get());
+        assertEquals("[", asAtoms.get(5).getAtom().get());
+        assertEquals("]", asAtoms.get(6).getAtom().get());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void targetArrayNewInstanceToManyArguments() {
+        TargetArray array = new TargetArray("Under", 2, true);
+        CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3), BuiltIn.literal(5), BuiltIn.literal(2)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void targetArrayNewInstanceDimensionsInText() {
+        TargetArray array = new TargetArray("Under[]", 1, true);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void targetArrayNewInstanceToManyDimensionsInClass() {
+        TargetArray array = new TargetArray(int[][].class, true);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void targetArrayNewInstanceDimensionsInTargetClass() {
+        TargetArray array = new TargetArray(new TargetClass("int[][]"), 1, true);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void targetArrayNewInstanceNoArrayFromClass() {
+        TargetArray array = new TargetArray(int.class, true);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void targetArrayNewInstanceNoArrayFromString() {
+        TargetArray array = new TargetArray("int", 0, true);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void targetArrayNewInstanceNoArrayFromTargetClass() {
+        TargetArray array = new TargetArray(new TargetClass(int.class), 0, true);
+    }
+
     @Test public void annotatedField() {
         Annotate annotation = new Annotate("IsAField");
         Var field = Var.field(Arrays.asList(annotation),
