@@ -14,10 +14,8 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.ReqKind;
-import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.*;
@@ -127,10 +125,12 @@ public class FieldTypeBasic implements IDependency, ReqKind {
             List<TargetClass> tIOExcept = Arrays.asList(new TargetClass("IOException"));
             Var<TargetClass> pValue = Var.param(javaType, "value");
 
-            List<Var<? extends AValue>> paramsConstructArgs = new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits));
-            List<Var<? extends AValue>> paramsConstructIO = new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits));
-
-            generateConstructors(tIOExcept, paramsConstructArgs, paramsConstructIO, constructorBody, decode);
+            addMethod(Method.newPublicConstructor(Comment.no(),
+                    getName(), new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
+                    constructorBody));
+            addMethod(Method.newPublicConstructorWithException(Comment.no(),
+                    getName(), new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits))), tIOExcept,
+                    decode));
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
                     new TargetClass(void.class, true), "encodeTo", Arrays.asList(pTo),
                     tIOExcept, encode));
@@ -152,19 +152,6 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                             BuiltIn.<ABool>toCode("other instanceof " + name),
                             new Block(RETURN(BuiltIn.<ABool>toCode("this.value == ((" + name + ")other).getValue()"))),
                             new Block(RETURN(FALSE))))));
-        }
-
-        private void generateConstructors(List<TargetClass> tIOExcept,
-                                          List<Var<? extends AValue>> paramsConstructArgs,
-                                          List<Var<? extends AValue>> paramsConstructIO,
-                                          Block javaVarsConstructor,
-                                          Block serializedConstructor) {
-            addMethod(Method.newPublicConstructor(Comment.no(),
-                    getName(), new ArrayList<Var<? extends AValue>>(paramsConstructArgs),
-                    javaVarsConstructor));
-            addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                    getName(), new ArrayList<Var<? extends AValue>>(paramsConstructIO), tIOExcept,
-                    serializedConstructor));
         }
 
         public FieldTypeBasic getBasicType() {
