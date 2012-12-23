@@ -94,6 +94,31 @@ public class TypedCodeTest {
         TargetArray array = new TargetArray(new TargetClass(int.class), 0, true);
     }
 
+    @Test public void targetArrayReadEnd() {
+        Var arrayVal = Var.param(new TargetArray("Under", 2, true), "arrayVal");
+        CodeAtoms asAtoms = new CodeAtoms(arrayVal.call("[]", BuiltIn.literal(3), BuiltIn.literal(5)));
+
+        assertEquals("arrayVal", asAtoms.get(0).getAtom().get());
+        assertEquals("[", asAtoms.get(1).getAtom().get());
+        assertEquals("3", asAtoms.get(2).getAtom().get());
+        assertEquals("]", asAtoms.get(3).getAtom().get());
+        assertEquals("[", asAtoms.get(4).getAtom().get());
+        assertEquals("5", asAtoms.get(5).getAtom().get());
+        assertEquals("]", asAtoms.get(6).getAtom().get());
+        assertEquals(7, asAtoms.toArray().length);
+    }
+
+    @Test public void targetArrayReadSubArray() {
+        Var arrayVal = Var.param(new TargetArray("Under", 2, true), "arrayVal");
+        CodeAtoms asAtoms = new CodeAtoms(arrayVal.call("[]", BuiltIn.literal(3)));
+
+        assertEquals("arrayVal", asAtoms.get(0).getAtom().get());
+        assertEquals("[", asAtoms.get(1).getAtom().get());
+        assertEquals("3", asAtoms.get(2).getAtom().get());
+        assertEquals("]", asAtoms.get(3).getAtom().get());
+        assertEquals(4, asAtoms.toArray().length);
+    }
+
     @Test public void annotatedField() {
         Annotate annotation = new Annotate("IsAField");
         Var field = Var.field(Arrays.asList(annotation),

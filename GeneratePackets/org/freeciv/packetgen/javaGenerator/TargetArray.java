@@ -36,6 +36,8 @@ public class TargetArray extends TargetClass {
         lookForDimensions(wrapped.getComponentType().getName());
 
         this.dimensions = 1;
+
+        registerBuiltIn();
     }
 
     public TargetArray(TargetClass wrapped, int levels, boolean isInScope) {
@@ -49,6 +51,8 @@ public class TargetArray extends TargetClass {
             lookForDimensions(wrapped.getName());
 
         this.dimensions = levels + (wrapped instanceof TargetArray ? ((TargetArray)wrapped).dimensions : 0);
+
+        registerBuiltIn();
     }
 
     public TargetArray(String wrapped, int levels, boolean isInScope) {
@@ -61,6 +65,12 @@ public class TargetArray extends TargetClass {
         lookForDimensions(wrapped);
 
         this.dimensions = levels;
+
+        registerBuiltIn();
+    }
+
+    private void registerBuiltIn() {
+        register(new TargetMethod("[]", TargetMethod.Called.DYNAMIC_ARRAY_GET));
     }
 
     private static final Pattern chechName = Pattern.compile("\\[");

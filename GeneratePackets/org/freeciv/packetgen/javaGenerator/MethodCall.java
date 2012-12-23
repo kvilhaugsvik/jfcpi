@@ -92,6 +92,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
             case STATIC:
             case DYNAMIC:
                 return new CodeAtom(name);
+            case DYNAMIC_ARRAY_GET:
             case MANUALLY:
                 return new NotAWriter("Should be handled manually");
             case STATIC_ARRAY_INST:
@@ -118,6 +119,11 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
                     }
                 };
                 break;
+            case DYNAMIC_ARRAY_GET:
+                this.method = new HasAtoms() {
+                    @Override public void writeAtoms(CodeAtoms to) {}
+                };
+                break;
             case STATIC:
             case MANUALLY:
             case STATIC_ARRAY_INST:
@@ -136,6 +142,9 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
                 break;
             case STATIC_ARRAY_INST:
                 writer = new AWriter(argListArray, placeMethodBeforeTheFirstArgument);
+                break;
+            case DYNAMIC_ARRAY_GET:
+                writer = new AWriter(argListArray, placeMethodAfterTheFirstArgument);
                 break;
             case MANUALLY:
                 writer = new NotAWriter("The call should have been handled manually");

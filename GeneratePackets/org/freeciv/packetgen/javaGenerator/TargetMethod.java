@@ -46,6 +46,7 @@ public class TargetMethod extends Address {
         STATIC, // a class method
         STATIC_ARRAY_INST, // create a new array
         DYNAMIC, // an object method
+        DYNAMIC_ARRAY_GET, // get the value of an array
         MANUALLY // handled manually
     }
 }
