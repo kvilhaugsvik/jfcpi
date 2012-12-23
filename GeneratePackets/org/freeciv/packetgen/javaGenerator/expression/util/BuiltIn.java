@@ -288,7 +288,7 @@ public class BuiltIn {
         };
     }
 
-    public static MethodCall<AValue> arraySetElement(final Var on, final Typed<AValue> number, final Typed<AValue> val) {
+    public static MethodCall<AValue> arraySetElement(final Var on, final Typed<? extends AValue> number, final Typed<AValue> val) {
         return new MethodCall<AValue>("[]=", on.ref(), val) {
             @Override
             public void writeAtoms(CodeAtoms to) {
