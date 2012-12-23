@@ -77,15 +77,15 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
     }
 
     public MethodCall(Comment comment, String name, Typed<? extends AValue>... params) {
-        this(TargetMethod.Called.STATIC, comment, name, params);
+        this(TargetMethod.Called.STATIC, comment, transformName(TargetMethod.Called.STATIC, name), params);
     }
 
     public MethodCall(TargetMethod.Called kind, String name, Typed<? extends AValue>... params) {
-        this(kind, Comment.no(), name, params);
+        this(kind, transformName(kind, name), params);
     }
 
-    private MethodCall(TargetMethod.Called kind, Comment comment, final String name, Typed<? extends AValue>... params) {
-        this(kind, comment, transformName(kind, name), params);
+    public MethodCall(TargetMethod.Called kind, HasAtoms name, Typed<? extends AValue>... params) {
+        this(kind, Comment.no(), name, params);
     }
 
     private static HasAtoms transformName(TargetMethod.Called kind, final String name) {

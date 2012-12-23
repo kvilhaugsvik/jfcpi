@@ -22,11 +22,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class TargetMethod extends Address {
-    private final String name;
+    private final HasAtoms name;
     private final Called kind;
 
     public TargetMethod(String named, Called kind) {
-        this.name = named;
+        this.name = new IR.CodeAtom(named);
         this.kind = kind;
     }
 
@@ -35,7 +35,7 @@ public class TargetMethod extends Address {
     }
 
     public String getName() {
-        return name;
+        return name.toString();
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(Typed<? extends AValue>... parameters) {
