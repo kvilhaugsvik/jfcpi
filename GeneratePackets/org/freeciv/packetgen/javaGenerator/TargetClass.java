@@ -160,6 +160,8 @@ public class TargetClass extends Address implements AValue {
         if (null == name)
             // TODO: Find a different way to mark constructors than giving them the return type null
             return null;
+        else if (cached.containsKey(name))
+            return (TargetClass)(cached.get(name));
         else
             return new TargetClass(name);
     }

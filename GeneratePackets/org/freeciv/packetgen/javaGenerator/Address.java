@@ -21,6 +21,8 @@ import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import java.util.*;
 
 public class Address extends Formatted implements HasAtoms {
+    protected static final HashMap<String, Address> cached = new HashMap<String, Address>();
+
     protected final CodeAtom[] components;
 
     public Address(String... parts) {
@@ -28,12 +30,16 @@ public class Address extends Formatted implements HasAtoms {
         for (String part : parts)
             build.add(new CodeAtom(part));
         components = build.toArray(new CodeAtom[build.size()]);
+
+        cached.put(this.getFullAddress(), this);
     }
 
     public Address(Address start, CodeAtom... parts) {
         this.components = new CodeAtom[start.components.length + parts.length];
         System.arraycopy(start.components, 0, this.components, 0, start.components.length);
         System.arraycopy(parts, 0, this.components, start.components.length, parts.length);
+
+        cached.put(this.getFullAddress(), this);
     }
 
     public String getFullAddress() {
