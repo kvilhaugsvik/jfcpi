@@ -45,6 +45,13 @@ public class TargetMethod extends Address {
         return new MethodCall<Ret>(kind, name, parameters);
     }
 
+    public <Ret extends AValue> MethodCall.HasResult<Ret> callV(Typed<? extends AValue>... parameters) {
+        if (void.class.getCanonicalName().equals(returns.getFullAddress()))
+            throw new IllegalArgumentException(getName() + ": Wrong return type");
+
+        return new MethodCall.HasResult<Ret>(kind, returns, name, parameters);
+    }
+
     public enum Called {
         STATIC, // a class method
         STATIC_ARRAY_INST, // create a new array

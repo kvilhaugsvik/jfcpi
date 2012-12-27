@@ -112,10 +112,18 @@ public class TargetClass extends Address implements AValue {
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
+        methodExists(method);
+        return methods.get(method).call(parameters);
+    }
+
+    private void methodExists(String method) {
         if (!methods.containsKey(method))
             throw new IllegalArgumentException("No method named " + method + " on " + name.get());
+    }
 
-        return methods.get(method).call(parameters);
+    public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... parameters) {
+        methodExists(method);
+        return methods.get(method).callV(parameters);
     }
 
     // TODO: Should this be seen as a function called on the type?

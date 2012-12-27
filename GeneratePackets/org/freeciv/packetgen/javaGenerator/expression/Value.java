@@ -31,4 +31,13 @@ public interface Value<Kind extends AValue> extends Typed<Kind> {
      * @return Typed code that calls the method on the value giving it the parameters.
      */
     public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... params);
+
+    /**
+     * Call a method that returns a Value on the value.
+     * @param method Name of the method to call
+     * @param params The parameters to pass in the call. The value it self should be the first parameter.
+     * @param <Ret> The return type of the call
+     * @return Typed code that calls the method on the value giving it the parameters.
+     */
+    public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... params);
 }

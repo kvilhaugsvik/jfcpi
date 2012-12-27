@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
@@ -259,5 +260,18 @@ public class TypedCodeTest {
     public void callNonExistingMethodOnVar() {
         Var aVar = Var.param(Object.class, "aVar");
         aVar.call("thisMethodIsNotOnObject");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void callValuedReturnsVoid() {
+        TargetClass o = new TargetClass(Object.class);
+        o.callV("notify");
+    }
+
+    @Test public void callValuedReturns() {
+        TargetClass o = new TargetClass(java.util.regex.Pattern.class);
+        Value<AValue> theCall = o.callV("compile", BuiltIn.literal("a*"));
+
+        assertNotNull(theCall);
     }
 }

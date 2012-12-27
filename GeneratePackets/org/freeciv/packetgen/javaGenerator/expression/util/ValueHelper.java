@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 
 import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.TargetClass;
+import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
@@ -30,10 +31,17 @@ public class ValueHelper {
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
+        return type.call(method, addSelfAsFirstParams(params));
+    }
+
+    public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... params) {
+        return type.callV(method, addSelfAsFirstParams(params));
+    }
+
+    private Typed<? extends AValue>[] addSelfAsFirstParams(Typed<? extends AValue>... params) {
         Typed<? extends AValue>[] allParams = new Typed[params.length + 1];
         allParams[0] = value;
         System.arraycopy(params, 0, allParams, 1, params.length);
-
-        return type.call(method, allParams);
+        return allParams;
     }
 }
