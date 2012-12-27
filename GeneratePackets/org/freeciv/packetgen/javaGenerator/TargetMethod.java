@@ -23,15 +23,18 @@ import java.lang.reflect.Modifier;
 
 public class TargetMethod extends Address {
     private final HasAtoms name;
+    private final TargetClass returns;
     private final Called kind;
 
-    public TargetMethod(String named, Called kind) {
+    public TargetMethod(String named, TargetClass returns, Called kind) {
         this.name = new IR.CodeAtom(named);
+        this.returns = returns;
         this.kind = kind;
     }
 
     public TargetMethod(Method has) {
-        this(has.getName(), Modifier.isStatic(has.getModifiers()) ? Called.STATIC : Called.DYNAMIC);
+        this(has.getName(), TargetClass.fromName(has.getReturnType().getCanonicalName()),
+                Modifier.isStatic(has.getModifiers()) ? Called.STATIC : Called.DYNAMIC);
     }
 
     public String getName() {

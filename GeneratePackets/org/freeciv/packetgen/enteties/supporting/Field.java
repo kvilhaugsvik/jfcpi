@@ -178,7 +178,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     public void appendArrayEaterValidationTo(Block body) throws UndefinedException {
         if (type.getBasicType().isArrayEater() && 1 == declarations.length) {
             // TODO: Remove 1 == declarations.length when field arrays are standard
-            this.getTType().register(new TargetMethod("verifyInsideLimits", TargetMethod.Called.DYNAMIC));
+            this.getTType().register(new TargetMethod("verifyInsideLimits", new TargetClass(void.class), TargetMethod.Called.DYNAMIC));
             // TODO: Remove the above hack when the code is cleaner
             // * constructor stops destroying type information to add arrayinfo as text
             // * type isn't stored twice
