@@ -313,6 +313,15 @@ class CParserSyntaxTest {
 #define SPECENUM_VALUE1 ELEMENT2
 #include "specenum_gen.h"
     """, ParseCCode)
+  @Test def specEnumTolerateNonSpecEnumDefInside =
+    parsesCorrectly(
+      """
+#define SPECENUM_NAME hasNonSpecEnumDefsInside
+#define SPECENUM_VALUE0 ELEMENT
+#define SPECENUM_VALUE1 ELEMENT2
+#define ITWAS ELEMENT
+#include "specenum_gen.h"
+      """, ParseCCode)
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of constants

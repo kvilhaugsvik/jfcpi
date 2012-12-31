@@ -103,7 +103,8 @@ object ParseCCode extends ExtractableParser {
       CComment ^^ {comment => "comment" -> comment} |
       se("NAMEOVERRIDE") ^^ {nameOverride => nameOverride._1 ->
         "override element names (probably from the ruleset)"} |
-      se("BITWISE") ^^ {bitwise => bitwise._1 -> bitwise._1}
+      se("BITWISE") ^^ {bitwise => bitwise._1 -> bitwise._1} |
+      constantValueDef ^^^ {"constant" -> "value"}
     ) ^^ {_.toMap[String, String]}) <~
     "#include" ~ "\"specenum_gen.h\""
 
