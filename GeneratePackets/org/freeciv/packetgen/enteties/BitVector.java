@@ -129,7 +129,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     @Override
     public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
         final TargetClass me = super.getAddress().scopeKnown();
-        me.register(new TargetMethod("getAsByteArray", new TargetClass(byte[].class), TargetMethod.Called.DYNAMIC));
+        me.register(new TargetMethod(me, "getAsByteArray", new TargetClass(byte[].class), TargetMethod.Called.DYNAMIC));
         return new TerminatedArray(
                 knowsSize ? "bitvector" : "bit_string",
                 iProvide.getName(),

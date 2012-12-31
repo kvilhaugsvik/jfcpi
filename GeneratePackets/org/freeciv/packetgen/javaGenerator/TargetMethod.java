@@ -23,17 +23,22 @@ import java.lang.reflect.Modifier;
 
 public class TargetMethod extends Address {
     private final HasAtoms name;
+    private final TargetClass where;
     private final TargetClass returns;
     private final Called kind;
 
-    public TargetMethod(String named, TargetClass returns, Called kind) {
+    public TargetMethod(TargetClass where, String named, TargetClass returns, Called kind) {
         this.name = new IR.CodeAtom(named);
+        this.where = where;
         this.returns = returns;
         this.kind = kind;
     }
 
     public TargetMethod(Method has) {
-        this(has.getName(), TargetClass.fromName(has.getReturnType().getCanonicalName()),
+        // TODO: Make TargetClass lazy and use fromClass in stead of fromName
+        this(TargetClass.fromName(has.getDeclaringClass().getCanonicalName()),
+                has.getName(),
+                TargetClass.fromName(has.getReturnType().getCanonicalName()),
                 Modifier.isStatic(has.getModifiers()) ? Called.STATIC : Called.DYNAMIC);
     }
 

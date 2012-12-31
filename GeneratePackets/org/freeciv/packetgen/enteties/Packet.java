@@ -116,7 +116,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                         RETURN(e.ref())));
         addMethod(addExceptionLocation);
 
-        return addExceptionLocation.getAddress();
+        return addExceptionLocation.getAddressOn(this.getAddress());
     }
 
     private void addConstructorFromFields(Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation) throws UndefinedException {

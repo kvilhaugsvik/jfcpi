@@ -118,7 +118,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     public void addMethod(Method toAdd) {
         methods.add(toAdd);
-        myAddress.register(toAdd.getAddress());
+        myAddress.register(toAdd.getAddressOn(this.getAddress()));
     }
 
     public void addConstructorFields() {
