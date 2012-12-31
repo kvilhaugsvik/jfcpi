@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class TargetClass extends Address implements AValue {
+    public static final TargetClass SELF_TYPED = null; // todo: Don't use null to signal the class using the code
+
     private final boolean isInScope;
     private final CodeAtom name;
     private final TargetPackage where;
@@ -173,10 +175,7 @@ public class TargetClass extends Address implements AValue {
     }
 
     public static TargetClass fromName(String name) {
-        if (null == name)
-            // TODO: Find a different way to mark constructors than giving them the return type null
-            return null;
-        else if (cached.containsKey(name))
+        if (cached.containsKey(name))
             return (TargetClass)(cached.get(name));
         else
             return new TargetClass(name);

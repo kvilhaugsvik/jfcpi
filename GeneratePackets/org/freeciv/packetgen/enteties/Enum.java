@@ -118,12 +118,12 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         Var<ABool> paramValid = Var.param(boolean.class, "valid");
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
-                TargetClass.fromName(null), enumName, Arrays.asList(paramNumber, paramToStrName),
+                TargetClass.SELF_TYPED, enumName, Arrays.asList(paramNumber, paramToStrName),
                 Collections.<TargetClass>emptyList(),
                 new Block(new MethodCall<Returnable>("this", paramNumber.ref(), paramToStrName.ref(), TRUE))));
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
-                TargetClass.fromName(null), enumName, Arrays.asList(paramNumber, paramToStrName, paramValid),
+                TargetClass.SELF_TYPED, enumName, Arrays.asList(paramNumber, paramToStrName, paramValid),
                 Collections.<TargetClass>emptyList(),
                 new Block(fieldNumber.assign(paramNumber.ref()),
                         fieldToStringName.assign(paramToStrName.ref()),

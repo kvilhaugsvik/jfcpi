@@ -95,7 +95,7 @@ public class Method extends Formatted implements HasAtoms {
                               List<? extends Var<? extends AValue>> paramList,
                               List<TargetClass> exceptionList,
                               Block body) {
-            super(comment, Visibility.PUBLIC, Scope.OBJECT, TargetClass.fromName(null), name, paramList, exceptionList, body);
+            super(comment, Visibility.PUBLIC, Scope.OBJECT, TargetClass.SELF_TYPED, name, paramList, exceptionList, body);
         }
     }
 
