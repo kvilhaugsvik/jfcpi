@@ -29,22 +29,21 @@ public class TargetClass extends Address implements AValue {
     public static final TargetClass SELF_TYPED = null; // todo: Don't use null to signal the class using the code
 
     private final boolean isInScope;
-    private final CodeAtom name;
-    private final TargetPackage where;
-    private final HashMap<String, TargetMethod> methods;
-
-    private boolean shallow = true;
+    private final Common shared;
 
     public TargetClass(String fullPath, boolean isInScope) {
         super(fullPath.split("\\."));
-        this.name = super.components[super.components.length - 1];
-        this.methods = new HashMap<String, TargetMethod>();
+        final CodeAtom name = super.components[super.components.length - 1];
+        final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
         this.isInScope = isInScope;
 
+        final TargetPackage where;
         if (1 < super.components.length)
-            this.where = new TargetPackage(fullPath.substring(0, fullPath.lastIndexOf(".")));
+            where = new TargetPackage(fullPath.substring(0, fullPath.lastIndexOf(".")));
         else
-            this.where = TargetPackage.TOP_LEVEL;
+            where = TargetPackage.TOP_LEVEL;
+
+        this.shared = new Common(name, where, methods);
 
         // While all classes have a toString this isn't true for all types.
         // As all types are assumed to be classes this may cause trouble
@@ -68,9 +67,9 @@ public class TargetClass extends Address implements AValue {
 
     private static void registerMethodsOf(TargetClass target, Class wrapped) {
         for (Method has : wrapped.getMethods())
-            target.methods.put(has.getName(), new TargetMethod(has));
+            target.shared.methods.put(has.getName(), new TargetMethod(has));
 
-        target.shallow = false;
+        target.shared.shallow = false;
     }
 
     public TargetClass(TargetPackage where, CodeAtom name, boolean isInScope) {
@@ -79,26 +78,24 @@ public class TargetClass extends Address implements AValue {
 
     private TargetClass(TargetPackage where, CodeAtom name, boolean isInScope, HashMap<String, TargetMethod> methods) {
         super(where, name);
-        this.where = where;
-        this.name = name;
-        this.methods = methods;
+        this.shared = new Common(name, where, methods);
         this.isInScope = isInScope;
     }
 
     public TargetPackage getPackage() {
-        return where;
+        return shared.where;
     }
 
     public CodeAtom getCName() {
-        return name;
+        return shared.name;
     }
 
     public String getName() {
-        return name.get();
+        return shared.name.get();
     }
 
     public TargetClass scopeKnown() {
-        TargetClass targetClass = new TargetClass(where, name, true, methods);
+        TargetClass targetClass = new TargetClass(shared.where, shared.name, true, shared.methods);
         return targetClass;
     }
 
@@ -108,7 +105,7 @@ public class TargetClass extends Address implements AValue {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 if (isInScope)
-                    to.add(name);
+                    to.add(shared.name);
                 else
                     parent.writeAtoms(to);
                 to.add(HAS);
@@ -118,22 +115,22 @@ public class TargetClass extends Address implements AValue {
     }
 
     public void register(TargetMethod has) {
-        methods.put(has.getName(), has);
+        shared.methods.put(has.getName(), has);
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
         methodExists(method);
-        return methods.get(method).call(parameters);
+        return shared.methods.get(method).call(parameters);
     }
 
     private void methodExists(String method) {
-        if (!methods.containsKey(method))
-            throw new IllegalArgumentException("No method named " + method + " on " + name.get());
+        if (!shared.methods.containsKey(method))
+            throw new IllegalArgumentException("No method named " + method + " on " + shared.name.get());
     }
 
     public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... parameters) {
         methodExists(method);
-        return methods.get(method).callV(parameters);
+        return shared.methods.get(method).callV(parameters);
     }
 
     // TODO: Should this be seen as a function called on the type?
@@ -144,7 +141,7 @@ public class TargetClass extends Address implements AValue {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 if (isInScope)
-                    to.add(name);
+                    to.add(shared.name);
                 else
                     parent.writeAtoms(to);
                 to.add(HAS);
@@ -169,9 +166,23 @@ public class TargetClass extends Address implements AValue {
     @Override
     public void writeAtoms(CodeAtoms to) {
         if (isInScope)
-            name.writeAtoms(to);
+            shared.name.writeAtoms(to);
         else
             super.writeAtoms(to);
+    }
+
+    private static class Common {
+        final CodeAtom name;
+        final TargetPackage where;
+        final HashMap<String, TargetMethod> methods;
+
+        boolean shallow = true;
+
+        private Common(CodeAtom name, TargetPackage where, HashMap<String, TargetMethod> methods) {
+            this.name = name;
+            this.where = where;
+            this.methods = methods;
+        }
     }
 
     public static TargetClass fromName(String name) {
@@ -187,7 +198,7 @@ public class TargetClass extends Address implements AValue {
         if (cached.containsKey(name)) {
             TargetClass targetClass = (TargetClass) (cached.get(name));
 
-            if (targetClass.shallow)
+            if (targetClass.shared.shallow)
                 registerMethodsOf(targetClass, cl);
 
             return targetClass;
