@@ -58,7 +58,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                               Import.classIn(java.util.logging.Logger.class),
                               Import.classIn(java.io.IOException.class)
                       }, "Freeciv's protocol definition", packetFlags, name,
-                      TargetClass.fromName(null), Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
+                      DEFAULT_PARENT, Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
 
         this.number = number;
         this.fields = fields;

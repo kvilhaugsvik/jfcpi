@@ -32,6 +32,8 @@ import java.util.*;
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 public class ClassWriter extends Formatted implements HasAtoms {
+    public static final TargetClass DEFAULT_PARENT = TargetClass.fromClass(Object.class);
+
     private final TargetClass myAddress;
     private final List<Import> imports;
     private final Visibility visibility;
@@ -205,7 +207,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         visibility.writeAtoms(to);
         kind.writeAtoms(to);
         to.add(myAddress.getCName());
-        if (null != parent) {
+        if (!DEFAULT_PARENT.equals(parent)) {
             to.add(EXTENDS);
             parent.writeAtoms(to);
         }

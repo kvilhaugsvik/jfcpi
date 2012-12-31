@@ -117,7 +117,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                                                   null,
                                                   Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()))
                                           }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
-                                          TargetClass.fromName(null), Arrays.asList(new TargetClass("FieldType<" + javaType.getName() + ">")));
+                                          DEFAULT_PARENT, Arrays.asList(new TargetClass("FieldType<" + javaType.getName() + ">")));
             this.requiredAs = requiredAs;
 
             addObjectConstant(javaType.getName(), "value");

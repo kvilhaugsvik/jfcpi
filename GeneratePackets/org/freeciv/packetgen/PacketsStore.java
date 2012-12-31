@@ -218,7 +218,7 @@ public class PacketsStore {
         ClassWriter versionData =
                 new ClassWriter(ClassKind.CLASS, new TargetPackage(Util.VERSION_DATA_CLASS.substring(0, border)), null,
                         "Freeciv C code", Collections.<Annotate>emptyList(), Util.VERSION_DATA_CLASS.substring(border + 1),
-                        TargetClass.fromName(null), Collections.<TargetClass>emptyList());
+                        ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
 
         for (Constant dep : constants)
             versionData.addField(dep);

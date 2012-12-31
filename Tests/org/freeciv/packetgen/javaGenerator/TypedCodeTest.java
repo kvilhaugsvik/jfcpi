@@ -234,7 +234,7 @@ public class TypedCodeTest {
         Var notAField = Var.local(Integer.class, "i", null);
         ClassWriter testcase = new ClassWriter(ClassKind.CLASS, new TargetPackage("top"), null, null,
                 Collections.<Annotate>emptyList(), "Testcase",
-                TargetClass.fromName(null), Collections.<TargetClass>emptyList());
+                ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
 
         testcase.addObjectConstantAndGetter(notAField);
     }

@@ -36,7 +36,7 @@ public class Struct extends ClassWriter implements IDependency {
         super(ClassKind.CLASS,
                 new TargetPackage(FCEnum.class.getPackage()),
                 null, "Freeciv C code", Collections.<Annotate>emptyList(), name,
-                TargetClass.fromName(null), Collections.<TargetClass>emptyList());
+                DEFAULT_PARENT, Collections.<TargetClass>emptyList());
 
         addConstructorFields();
 
