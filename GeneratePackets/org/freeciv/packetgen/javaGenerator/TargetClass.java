@@ -31,6 +31,8 @@ public class TargetClass extends Address implements AValue {
     private final TargetPackage where;
     private final HashMap<String, TargetMethod> methods;
 
+    private boolean shallow = true;
+
     public TargetClass(String fullPath, boolean isInScope) {
         super(fullPath.split("\\."));
         this.name = super.components[super.components.length - 1];
@@ -59,8 +61,14 @@ public class TargetClass extends Address implements AValue {
     public TargetClass(Class wrapped, boolean isInScope) {
         this(new TargetPackage(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
 
+        registerMethodsOf(this, wrapped);
+    }
+
+    private static void registerMethodsOf(TargetClass target, Class wrapped) {
         for (Method has : wrapped.getMethods())
-            methods.put(has.getName(), new TargetMethod(has));
+            target.methods.put(has.getName(), new TargetMethod(has));
+
+        target.shallow = false;
     }
 
     public TargetClass(TargetPackage where, CodeAtom name, boolean isInScope) {
@@ -172,5 +180,20 @@ public class TargetClass extends Address implements AValue {
             return (TargetClass)(cached.get(name));
         else
             return new TargetClass(name);
+    }
+
+    public static TargetClass fromClass(Class cl) {
+        String name = cl.getCanonicalName();
+
+        if (cached.containsKey(name)) {
+            TargetClass targetClass = (TargetClass) (cached.get(name));
+
+            if (targetClass.shallow)
+                registerMethodsOf(targetClass, cl);
+
+            return targetClass;
+        }
+
+        return new TargetClass(cl);
     }
 }

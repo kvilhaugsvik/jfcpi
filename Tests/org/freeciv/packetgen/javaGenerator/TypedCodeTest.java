@@ -274,4 +274,24 @@ public class TypedCodeTest {
 
         assertNotNull(theCall);
     }
+
+    @Test public void targetClassCacheStringAndClass() {
+        TargetClass fromString = TargetClass.fromName(String.class.getCanonicalName());
+        TargetClass fromClass = TargetClass.fromClass(String.class);
+
+        assertEquals("The representations are different", fromClass, fromString);
+    }
+
+    public static void justExist() {}
+    @Test public void targetClassFromClassAddsInfoToCached() {
+        TargetClass fromString = TargetClass.fromName(TypedCodeTest.class.getCanonicalName());
+        try {
+            fromString.call("justExist");
+            fail("Test makes bad assumption");
+        } catch (IllegalArgumentException e) {
+        }
+
+        TargetClass fromClass = TargetClass.fromClass(this.getClass());
+        assertNotNull(fromClass.call("justExist"));
+    }
 }
