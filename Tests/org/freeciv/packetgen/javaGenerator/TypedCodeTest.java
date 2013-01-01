@@ -275,6 +275,12 @@ public class TypedCodeTest {
         assertNotNull(theCall);
     }
 
+    @Test public void targetPackageCached() {
+        TargetPackage p1 = TargetPackage.from(Package.getPackage("org.freeciv.packetgen.javaGenerator"));
+        TargetPackage p2 = TargetPackage.from("org", "freeciv", "packetgen", "javaGenerator");
+        assertEquals("Did the work twice", p1, p2);
+    }
+
     @Test public void targetClassCacheStringAndClass() {
         TargetClass fromString = TargetClass.fromName(String.class.getCanonicalName());
         TargetClass fromClass = TargetClass.fromClass(String.class);

@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.Util;
+
 public class TargetPackage extends Address {
     public static final TargetPackage TOP_LEVEL = from();
 
@@ -28,10 +30,19 @@ public class TargetPackage extends Address {
     public static TargetPackage from(Package wrapped) {
         if (null == wrapped) // java.lang.Class gives null as the package for primitive Java types like int
             return TOP_LEVEL;
+
+        String name = wrapped.getName();
+        if (cached.containsKey(name))
+            return (TargetPackage)(cached.get(name));
+
         return new TargetPackage(wrapped);
     }
 
     public static TargetPackage from(String... parts) {
+        String name = Util.joinStringArray(parts, ".", "", "");
+        if (cached.containsKey(name))
+            return (TargetPackage)(cached.get(name));
+
         return new TargetPackage(parts);
     }
 }
