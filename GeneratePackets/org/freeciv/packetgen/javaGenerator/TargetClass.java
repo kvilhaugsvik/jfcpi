@@ -43,7 +43,7 @@ public class TargetClass extends Address implements AValue {
         else
             where = TargetPackage.TOP_LEVEL;
 
-        this.shared = new Common(name, where, methods);
+        this.shared = new Common(name, where, methods, this);
 
         // While all classes have a toString this isn't true for all types.
         // As all types are assumed to be classes this may cause trouble
@@ -78,8 +78,14 @@ public class TargetClass extends Address implements AValue {
 
     private TargetClass(TargetPackage where, CodeAtom name, boolean isInScope, HashMap<String, TargetMethod> methods) {
         super(where, name);
-        this.shared = new Common(name, where, methods);
         this.isInScope = isInScope;
+        this.shared = new Common(name, where, methods, this);
+    }
+
+    private TargetClass(Common common, boolean isInScope) {
+        super(common.where, common.name);
+        this.isInScope = isInScope;
+        this.shared = common;
     }
 
     public TargetPackage getPackage() {
@@ -95,8 +101,11 @@ public class TargetClass extends Address implements AValue {
     }
 
     public TargetClass scopeKnown() {
-        TargetClass targetClass = new TargetClass(shared.where, shared.name, true, shared.methods);
-        return targetClass;
+        return shared.variants.scopeKnown();
+    }
+
+    public TargetClass scopeUnknown() {
+        return shared.variants.scopeUnknown();
     }
 
     public <Kind extends AValue> Typed<Kind> read(final String field) {
@@ -172,16 +181,22 @@ public class TargetClass extends Address implements AValue {
     }
 
     private static class Common {
+        final AddressScopeHelper<TargetClass> variants;
+
         final CodeAtom name;
         final TargetPackage where;
         final HashMap<String, TargetMethod> methods;
 
         boolean shallow = true;
 
-        private Common(CodeAtom name, TargetPackage where, HashMap<String, TargetMethod> methods) {
+        private Common(CodeAtom name, TargetPackage where, HashMap<String, TargetMethod> methods, TargetClass existing) {
             this.name = name;
             this.where = where;
             this.methods = methods;
+
+            TargetClass inScope = existing.isInScope ? existing : new TargetClass(this, true);
+            TargetClass notInScope = existing.isInScope ? new TargetClass(this, false) : existing;
+            this.variants = new AddressScopeHelper<TargetClass>(inScope, notInScope);
         }
     }
 

@@ -294,4 +294,26 @@ public class TypedCodeTest {
         TargetClass fromClass = TargetClass.fromClass(this.getClass());
         assertNotNull(fromClass.call("justExist"));
     }
+
+    @Test public void targetClassMethodRegisteredOnOneScopeIsThereInTheOther() {
+        TargetClass aClass = new TargetClass("RandomName5792452", true);
+        try {
+            aClass.call("notThereYet");
+            fail("Test makes bad assumption");
+        } catch (IllegalArgumentException e) {}
+        aClass.scopeUnknown().register(new TargetMethod(aClass, "notThereYet",
+                TargetClass.fromClass(int.class), TargetMethod.Called.STATIC));
+
+        assertNotNull("Method registered in unknown scope not there in known scope.", aClass.call("notThereYet"));
+    }
+
+    @Test public void targetClassScopeChangeOnlyMakesTwoCopiesStartInScope() {
+        TargetClass aClass = new TargetClass("Thing", true);
+        assertEquals("The original wasn't kept. A new one was created.", aClass, aClass.scopeUnknown().scopeKnown());
+    }
+
+    @Test public void targetClassScopeChangeOnlyMakesTwoCopiesStartNotInScope() {
+        TargetClass aClass = new TargetClass("Thing", false);
+        assertEquals("The original isn't kept. A new one was created.", aClass, aClass.scopeKnown().scopeUnknown());
+    }
 }
