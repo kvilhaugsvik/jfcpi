@@ -62,7 +62,7 @@ public class TargetClass extends Address implements AValue {
     public TargetClass(Class wrapped, boolean isInScope) {
         this(new TargetPackage(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
 
-        registerMethodsOf(this, wrapped);
+        shared.represents = wrapped;
     }
 
     private static void registerMethodsOf(TargetClass target, Class wrapped) {
@@ -133,6 +133,8 @@ public class TargetClass extends Address implements AValue {
     }
 
     private void methodExists(String method) {
+        if (shared.shallow && null != shared.represents)
+            registerMethodsOf(this, shared.represents);
         if (!shared.methods.containsKey(method))
             throw new IllegalArgumentException("No method named " + method + " on " + shared.name.get());
     }
@@ -188,6 +190,7 @@ public class TargetClass extends Address implements AValue {
         final HashMap<String, TargetMethod> methods;
 
         boolean shallow = true;
+        Class represents = null;
 
         private Common(CodeAtom name, TargetPackage where, HashMap<String, TargetMethod> methods, TargetClass existing) {
             this.name = name;
@@ -213,8 +216,8 @@ public class TargetClass extends Address implements AValue {
         if (cached.containsKey(name)) {
             TargetClass targetClass = (TargetClass) (cached.get(name));
 
-            if (targetClass.shared.shallow)
-                registerMethodsOf(targetClass, cl);
+            if (null == targetClass.shared.represents)
+                targetClass.shared.represents = cl;
 
             return targetClass;
         }

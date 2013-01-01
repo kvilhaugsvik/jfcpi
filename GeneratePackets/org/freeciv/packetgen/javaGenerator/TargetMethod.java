@@ -35,10 +35,9 @@ public class TargetMethod extends Address {
     }
 
     public TargetMethod(Method has) {
-        // TODO: Make TargetClass lazy and use fromClass in stead of fromName
-        this(TargetClass.fromName(has.getDeclaringClass().getCanonicalName()),
+        this(TargetClass.fromClass(has.getDeclaringClass()),
                 has.getName(),
-                TargetClass.fromName(has.getReturnType().getCanonicalName()),
+                TargetClass.fromClass(has.getReturnType()),
                 Modifier.isStatic(has.getModifiers()) ? Called.STATIC : Called.DYNAMIC);
     }
 
