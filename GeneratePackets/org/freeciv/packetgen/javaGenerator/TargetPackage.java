@@ -23,10 +23,6 @@ public class TargetPackage extends Address {
         super(parts);
     }
 
-    private TargetPackage(Package wrapped) {
-        super(wrapped.getName().split("\\."));
-    }
-
     public static TargetPackage from(Package wrapped) {
         if (null == wrapped) // java.lang.Class gives null as the package for primitive Java types like int
             return TOP_LEVEL;
@@ -35,7 +31,7 @@ public class TargetPackage extends Address {
         if (cached.containsKey(name))
             return (TargetPackage)(cached.get(name));
 
-        return new TargetPackage(wrapped);
+        return new TargetPackage(wrapped.getName().split("\\."));
     }
 
     public static TargetPackage from(String... parts) {
