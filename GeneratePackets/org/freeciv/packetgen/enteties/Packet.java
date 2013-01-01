@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packet.PacketHeader;
+import org.freeciv.packet.fieldtype.FieldType;
 import org.freeciv.packet.fieldtype.FieldTypeException;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
@@ -27,6 +28,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.types.FCEnum;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -49,8 +51,8 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, new TargetPackage(org.freeciv.packet.Packet.class.getPackage()), new Import[]{
-                              Import.allIn(new TargetPackage(org.freeciv.packet.fieldtype.FieldType.class.getPackage())),
-                              Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage())),
+                              Import.allIn(FieldType.class.getPackage()),
+                              Import.allIn(FCEnum.class.getPackage()),
                               Import.classIn(org.freeciv.Util.class),
                               null,
                               Import.classIn(java.io.DataInput.class),

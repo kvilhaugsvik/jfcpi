@@ -26,6 +26,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.types.FCEnum;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -115,7 +116,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                                                   Import.classIn(java.io.DataOutput.class),
                                                   Import.classIn(java.io.IOException.class),
                                                   null,
-                                                  Import.allIn(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()))
+                                                  Import.allIn(FCEnum.class.getPackage())
                                           }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
                                           DEFAULT_PARENT, Arrays.asList(new TargetClass("FieldType<" + javaType.getName() + ">")));
             this.requiredAs = requiredAs;
