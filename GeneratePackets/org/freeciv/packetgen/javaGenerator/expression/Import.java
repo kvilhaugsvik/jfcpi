@@ -38,7 +38,7 @@ public class Import<Of extends Address> extends Formatted implements HasAtoms {
     }
 
     public static Import<TargetPackage> allIn(Package target) {
-        return allIn(new TargetPackage(target));
+        return allIn(TargetPackage.from(target));
     }
 
     public static Import<TargetPackage> allIn(TargetPackage target) {

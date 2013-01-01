@@ -60,7 +60,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
     protected Enum(String enumName, boolean nameOverride, boolean bitwise,
                    String cntCode, String cntString, Collection<Requirement> reqs,
                 List<EnumElementFC> values) {
-        super(ClassKind.ENUM, new TargetPackage(FCEnum.class.getPackage()), null, "Freeciv C code", Collections.<Annotate>emptyList(), enumName,
+        super(ClassKind.ENUM, TargetPackage.from(FCEnum.class.getPackage()), null, "Freeciv C code", Collections.<Annotate>emptyList(), enumName,
                 DEFAULT_PARENT, Arrays.asList(new TargetClass(FCEnum.class, true)));
 
         this.bitwise = bitwise;

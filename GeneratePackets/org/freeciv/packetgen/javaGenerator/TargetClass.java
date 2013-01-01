@@ -39,7 +39,7 @@ public class TargetClass extends Address implements AValue {
 
         final TargetPackage where;
         if (1 < super.components.length)
-            where = new TargetPackage(fullPath.substring(0, fullPath.lastIndexOf(".")));
+            where = TargetPackage.from(fullPath.substring(0, fullPath.lastIndexOf(".")));
         else
             where = TargetPackage.TOP_LEVEL;
 
@@ -60,7 +60,7 @@ public class TargetClass extends Address implements AValue {
     }
 
     public TargetClass(Class wrapped, boolean isInScope) {
-        this(new TargetPackage(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
+        this(TargetPackage.from(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
 
         shared.represents = wrapped;
     }

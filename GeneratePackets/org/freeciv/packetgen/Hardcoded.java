@@ -32,7 +32,6 @@ import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 
 import java.util.*;
 
@@ -280,7 +279,7 @@ public class Hardcoded {
         // TODO: autoconvert the enums
         // TODO: when given the location of the tables convert table items as well
         SpecialClass handRolledUniversal =
-                new SpecialClass(new TargetPackage(org.freeciv.types.FCEnum.class.getPackage()),
+                new SpecialClass(TargetPackage.from(org.freeciv.types.FCEnum.class.getPackage()),
                 "Freeciv source interpreted by hand", "universal",
                 new Requirement("struct universal", DataType.class),
                 Collections.<Requirement>emptySet());

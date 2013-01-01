@@ -232,7 +232,7 @@ public class TypedCodeTest {
     @Test(expected = IllegalArgumentException.class)
     public void addLocalAsFieldWhileAskingForGetter() {
         Var notAField = Var.local(Integer.class, "i", null);
-        ClassWriter testcase = new ClassWriter(ClassKind.CLASS, new TargetPackage("top"), null, null,
+        ClassWriter testcase = new ClassWriter(ClassKind.CLASS, TargetPackage.from("top"), null, null,
                 Collections.<Annotate>emptyList(), "Testcase",
                 ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
 

@@ -15,15 +15,23 @@
 package org.freeciv.packetgen.javaGenerator;
 
 public class TargetPackage extends Address {
-    public static final TargetPackage TOP_LEVEL = new TargetPackage();
+    public static final TargetPackage TOP_LEVEL = from();
 
-    public TargetPackage(String... parts) {
+    private TargetPackage(String... parts) {
         super(parts);
     }
 
-    public TargetPackage(Package wrapped) {
-        super(null == wrapped ?
-                new String[0] :
-                wrapped.getName().split("\\."));
+    private TargetPackage(Package wrapped) {
+        super(wrapped.getName().split("\\."));
+    }
+
+    public static TargetPackage from(Package wrapped) {
+        if (null == wrapped) // java.lang.Class gives null as the package for primitive Java types like int
+            return TOP_LEVEL;
+        return new TargetPackage(wrapped);
+    }
+
+    public static TargetPackage from(String... parts) {
+        return new TargetPackage(parts);
     }
 }

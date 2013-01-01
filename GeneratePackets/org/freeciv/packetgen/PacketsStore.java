@@ -216,7 +216,7 @@ public class PacketsStore {
     static ClassWriter generateVersionData(TreeMap<Integer, String> packets, Set<Constant> constants) {
         int border = Util.VERSION_DATA_CLASS.lastIndexOf('.');
         ClassWriter versionData =
-                new ClassWriter(ClassKind.CLASS, new TargetPackage(Util.VERSION_DATA_CLASS.substring(0, border)), null,
+                new ClassWriter(ClassKind.CLASS, TargetPackage.from(Util.VERSION_DATA_CLASS.substring(0, border)), null,
                         "Freeciv C code", Collections.<Annotate>emptyList(), Util.VERSION_DATA_CLASS.substring(border + 1),
                         ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
 
