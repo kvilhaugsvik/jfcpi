@@ -14,32 +14,42 @@
 
 package org.freeciv.packetgen.javaGenerator.expression;
 
-import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
-import org.freeciv.packetgen.javaGenerator.CodeAtoms;
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.TargetPackage;
+import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
-public class Import extends Formatted implements HasAtoms {
-    private final HasAtoms target;
+public class Import<Of extends Address> extends Formatted implements HasAtoms {
+    private final Of target;
+    private final boolean allIn;
 
-    private Import(HasAtoms target) {
+    private Import(Of target, boolean allIn) {
         this.target = target;
+        this.allIn = allIn;
     }
 
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(IMPORT);
         target.writeAtoms(to);
+        if (allIn) {
+            to.add(HAS);
+            to.add(EVERYTHING);
+        }
         to.add(EOL);
     }
 
-    public static Import allIn(TargetPackage target) {
-        return new Import(target.has("*"));
+    public static Import<TargetPackage> allIn(Package target) {
+        return allIn(new TargetPackage(target));
     }
 
-    public static Import classIn(Class target) {
-        TargetPackage pack = new TargetPackage(target.getPackage());
-        return new Import(pack.has(target.getSimpleName()));
+    public static Import<TargetPackage> allIn(TargetPackage target) {
+        return new Import<TargetPackage>(target, true);
+    }
+
+    public static Import<TargetClass> classIn(Class target) {
+        return classIn(new TargetClass(target));
+    }
+
+    public static Import<TargetClass> classIn(TargetClass target) {
+        return new Import<TargetClass>(target, false);
     }
 }

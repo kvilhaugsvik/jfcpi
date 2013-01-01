@@ -14,8 +14,6 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
-
 public class TargetPackage extends Address {
     public static final TargetPackage TOP_LEVEL = new TargetPackage();
 
@@ -27,9 +25,5 @@ public class TargetPackage extends Address {
         super(null == wrapped ?
                 new String[0] :
                 wrapped.getName().split("\\."));
-    }
-
-    public Address has(final String element) {
-        return new Address(this, new CodeAtom(element));
     }
 }

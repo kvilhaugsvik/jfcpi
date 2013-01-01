@@ -29,6 +29,7 @@ public interface HasAtoms {
     public static final CodeAtom ARRAY_ACCESS_START = new CodeAtom("[");
     public static final CodeAtom ARRAY_ACCESS_END = new CodeAtom("]");
     public static final CodeAtom HAS = new CodeAtom(".");
+    public static final CodeAtom EVERYTHING = new CodeAtom("*");
     public static final CodeAtom ALS = new CodeAtom("{");
     public static final CodeAtom ALE = new CodeAtom("}");
     public static final CodeAtom ASSIGN = new CodeAtom("=");
