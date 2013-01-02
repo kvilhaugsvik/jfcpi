@@ -44,7 +44,7 @@ public class Hardcoded {
     private static final Var pValue = Var.param(String.class, "value"); // can't know type
     public static final Var fMaxSize = Var.field(Collections.<Annotate>emptyList(),
             Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-            new TargetClass(int.class), "maxArraySize", null);
+            TargetClass.fromClass(ElementsLimit.class), "maxArraySize", null);
 
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
             new FieldTypeBasic("uint32", "int", new TargetClass(Long.class),
