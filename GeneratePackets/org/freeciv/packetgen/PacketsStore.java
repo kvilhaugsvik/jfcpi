@@ -169,7 +169,12 @@ public class PacketsStore {
     private List<Requirement> extractFieldRequirements(List<WeakField> fields) {
         LinkedList<Requirement> allNeeded = new LinkedList<Requirement>();
         for (WeakField fieldType : fields) {
-            allNeeded.add(new Requirement(fieldType.getType(), FieldTypeAlias.class));
+            String type = fieldType.getType();
+
+            if (0 < fieldType.getDeclarations().length)
+                type = type + "_" + fieldType.getDeclarations().length;
+
+            allNeeded.add(new Requirement(type, FieldTypeAlias.class));
         }
         return allNeeded;
     }

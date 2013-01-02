@@ -204,32 +204,32 @@ public class GeneratedPacketTest {
         assertArrayEquals("Result not the same as constructor", new Long[]{5L, 6L}, packet.getTheArrayValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketWithArrayFieldsSimpleFromJavaToSmallArray() {
         TestArray packet = new TestArray(new Long[]{5L});
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketWithArrayFieldsSimpleFromJavaToBigArray() {
         TestArray packet = new TestArray(new Long[]{5L, 6L, 7L});
     }
 
     @Test public void generatedPacketWithArrayFieldsSimpleFromFields() {
-        UINT32[] uint32s = {new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit())};
+        UINT32S uint32s = new UINT32S(new Long[]{5L, 6L}, ElementsLimit.limit(2));
         TestArray packet = new TestArray(uint32s);
-        assertArrayEquals("Result not the same as constructor",
+        assertEquals("Result not the same as constructor",
                 uint32s,
                 packet.getTheArray());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsSimpleFromFieldsToSmallArray() {
-        TestArray packet = new TestArray(new UINT32[]{new UINT32(5L, ElementsLimit.noLimit())});
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsSimpleFromFields_ArrayToSmall() {
+        TestArray packet = new TestArray(new UINT32S(new Long[]{5L}, ElementsLimit.limit(1)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsSimpleFromFieldsToBigArray() {
-        TestArray packet = new TestArray(new UINT32[]{new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit()), new UINT32(7L, ElementsLimit.noLimit())});
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsSimpleFromFields_ArrayToBig() {
+        TestArray packet = new TestArray(new UINT32S(new Long[]{5L, 6L, 7L}, ElementsLimit.limit(3)));
     }
 
     @Test public void generatedPacketWithArrayFieldsTransferFromJava() {
@@ -237,45 +237,45 @@ public class GeneratedPacketTest {
         assertArrayEquals("Result not the same as constructor", new Long[]{5L, 6L}, packet.getTheArrayValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketWithArrayFieldsTransferFromJavaToSmallArray() {
         TestArrayTransfer packet = new TestArrayTransfer(2, new Long[]{5L});
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketWithArrayFieldsTransferFromJavaToBigArray() {
         TestArrayTransfer packet = new TestArrayTransfer(2, new Long[]{5L, 6L, 7L});
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsTransferToBigArray() {
-        TestArrayTransfer packet = new TestArrayTransfer(5, new Long[]{5L, 6L, 7L, 6L, 7L});
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsTransfer_ArrayToBig() {
+        TestArrayTransfer packet = new TestArrayTransfer(3, new Long[]{5L, 6L, 7L, 6L, 7L});
     }
 
     @Test public void generatedPacketWithArrayFieldsTransferFromFields() {
-        UINT32[] uint32s = {new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit())};
+        UINT32S uint32s = new UINT32S(new Long[]{5L, 6L}, ElementsLimit.limit(2));
         TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()), uint32s);
-        assertArrayEquals("Result not the same as constructor",
+        assertEquals("Result not the same as constructor",
                 uint32s,
                 packet.getTheArray());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsTransferFromFieldsToSmallArray() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsTransferFromFields_ArrayToSmall() {
         TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()),
-                new UINT32[]{new UINT32(5L, ElementsLimit.noLimit())});
+                new UINT32S(new Long[]{5L}, ElementsLimit.limit(1)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsTransferFromFieldsToBigArray() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsTransferFromFields_ArrayToBig() {
         TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()),
-                new UINT32[]{new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit()), new UINT32(7L, ElementsLimit.noLimit())});
+                new UINT32S(new Long[]{5L, 6L, 7L}, ElementsLimit.limit(3)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsTransferFromFieldsToBigTransfer() {
-        UINT32[] uint32s = {new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit()), new UINT32(5L, ElementsLimit.noLimit()), new UINT32(6L, ElementsLimit.noLimit())};
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(4, ElementsLimit.noLimit()), uint32s);
+    @Test(expected = IllegalLimitSizeException.class)
+    public void generatedPacketWithArrayFieldsTransferFromFields_ToBigTransfer() {
+        UINT32S uint32s = new UINT32S(new Long[]{5L, 6L, 5L, 6L, 8L}, ElementsLimit.limit(5));
+        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(5, ElementsLimit.noLimit()), uint32s);
     }
 
     @Test public void generatedPacketWithArrayFieldsDoubleFromJava() {
@@ -285,29 +285,29 @@ public class GeneratedPacketTest {
         assertArrayEquals("Result not the same as constructor", array, packet.getTheArrayValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleFromJavaToSmall1stArray() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsDoubleFromJava_1stArrayToSmall() {
         Long[][] array = {{5L, 6L, 7L}};
         TestArrayDouble packet = new TestArrayDouble(array);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleFromJavaToSmall2ndArray() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsDoubleFromJava_2ndArrayToSmall() {
         Long[][] array = {{5L, 6L},
                           {5L, 6L}};
         TestArrayDouble packet = new TestArrayDouble(array);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleFromJavaToBig1stArray() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsDoubleFromJava_1stArrayToBig() {
         Long[][] array = {{5L, 6L, 7L},
                           {5L, 6L, 7L},
                           {5L, 6L, 7L}};
         TestArrayDouble packet = new TestArrayDouble(array);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleFromJavaToBig2ndArray() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsDoubleFromJava_2ndArrayToBig() {
         Long[][] array = {{5L, 6L, 7L, 8L},
                           {5L, 6L, 7L, 9L}};
         TestArrayDouble packet = new TestArrayDouble(array);
@@ -329,22 +329,22 @@ public class GeneratedPacketTest {
         assertArrayEquals("Result not the same as constructor", array, packet.getTheArrayValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleTransfer1stArrayToSmall() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsDoubleTransfer_1stArrayToSmall() {
         Long[][] array = {{8L, 9L, 10L}};
         TestArrayDoubleTransfer packet = new TestArrayDoubleTransfer(2, 3, array);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleTransfer2ndArrayToSmall() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsDoubleTransfer_2ndArrayToSmall() {
         Long[][] array = {
                 {5L, 6L},
                 {8L, 9L}};
         TestArrayDoubleTransfer packet = new TestArrayDoubleTransfer(2, 3, array);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleTransfer1stArrayToBig() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsDoubleTransfer_1stArrayToBig() {
         Long[][] array = {
                 {5L, 6L, 7L},
                 {8L, 9L, 10L},
@@ -352,16 +352,16 @@ public class GeneratedPacketTest {
         TestArrayDoubleTransfer packet = new TestArrayDoubleTransfer(2, 3, array);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleTransfer2ndArrayToBig() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacketWithArrayFieldsDoubleTransfer_2ndArrayToBig() {
         Long[][] array = {
                 {5L, 6L, 7L, 1L},
                 {8L, 9L, 10L, 2L}};
         TestArrayDoubleTransfer packet = new TestArrayDoubleTransfer(2, 3, array);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleTransfer1stSizeOverMax() {
+    @Test(expected = IllegalLimitSizeException.class)
+    public void generatedPacketWithArrayFieldsDoubleTransfer_1stSizeOverMax() {
         Long[][] array = {
                 {5L, 6L, 7L},
                 {8L, 9L, 10L},
@@ -371,8 +371,8 @@ public class GeneratedPacketTest {
         TestArrayDoubleTransfer packet = new TestArrayDoubleTransfer(5, 3, array);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketWithArrayFieldsDoubleTransfer2ndSizeOverMax() {
+    @Test(expected = IllegalLimitSizeException.class)
+    public void generatedPacketWithArrayFieldsDoubleTransfer_2ndSizeOverMax() {
         Long[][] array = {
                 {5L, 6L, 7L, 8L, 9L, 10L},
                 {11L, 12L, 17L, 18L, 19L, 30L}};
@@ -413,8 +413,8 @@ public class GeneratedPacketTest {
                 new String[]{"Element 1", "Element 2", "Element 3Element 3"});
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generatedPacketArrayToBig() {
+    @Test(expected = IllegalNumberOfElementsException.class)
+    public void generatedPacket_ArrayToBig() {
         StringArray packet = new StringArray("Not an Array",
                 new String[]{"Element 1", "Element 2", "Element 3", "Element 4"});
     }
@@ -422,22 +422,22 @@ public class GeneratedPacketTest {
     @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketStringToBig() {
         StringArray packet = new StringArray(new STRING("Not an ArrayNot an Array", ElementsLimit.limit(30)),
-                new STRING[]{
-                        new STRING("Element 1", ElementsLimit.limit(10)),
-                        new STRING("Element 2", ElementsLimit.limit(10)),
-                        new STRING("Element 3", ElementsLimit.limit(10))
-                });
+                new STRINGS(new String[]{
+                        "Element 1",
+                        "Element 2",
+                        "Element 3"
+                }, ElementsLimit.limit(3, ElementsLimit.limit(10))));
     }
 
     @Test
     public void generatedPacketExceptionTellsWhere() {
         try {
             StringArray packet = new StringArray(new STRING("Not an ArrayNot an Array", ElementsLimit.limit(30)),
-                    new STRING[]{
-                            new STRING("Element 1", ElementsLimit.limit(10)),
-                            new STRING("Element 2", ElementsLimit.limit(10)),
-                            new STRING("Element 3", ElementsLimit.limit(10))
-                    });
+                    new STRINGS(new String[]{
+                            "Element 1",
+                            "Element 2",
+                            "Element 3"
+                    }, ElementsLimit.limit(3, ElementsLimit.limit(10))));
             fail("No exception cast");
         } catch (FieldTypeException e) {
             assertEquals("StringArray", e.getInPacket());

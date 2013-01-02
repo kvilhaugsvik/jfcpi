@@ -126,9 +126,9 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         for (Field field : fields) {
             params.add(Var.param(
-                    new TargetClass(field.getFType() + field.getArrayDeclaration(), true),
+                    field.getTType().scopeKnown(),
                     field.getFieldName()));
-            field.appendValidationTo(true, constructorBody);
+            field.appendValidationTo(constructorBody);
             constructorBody.addStatement(setFieldToVariableSameName(field.getFieldName()));
 
             Block validate = new Block();
@@ -163,17 +163,14 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
             LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
             Block constructorBodyJ = new Block();
             for (Field field : fields) {
-                params.add(Var.param(
-                        new TargetClass(field.getJType() + field.getArrayDeclaration(), true),
-                        field.getFieldName()));
+                Var<AValue> asParam = Var.param(field.getUnderType().scopeKnown(),
+                        field.getFieldName());
+                params.add(asParam);
 
                 Block readAndValidate = new Block();
-                field.appendValidationTo(true, readAndValidate);
-                if (field.hasDeclarations())
-                    readAndValidate.addStatement(
-                            field.assign(BuiltIn.<AValue>toCode("new " + field.getFType() + field.getNewCreation())));
-                field.forElementsInField("this." + field.getFieldName() + "[i] = " +
-                        field.getNewFromJavaType(), readAndValidate);
+                field.appendValidationTo(readAndValidate);
+                readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(
+                        asParam.ref(), field.getSuperLimit(0))));
                 constructorBodyJ.addStatement(labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation));
             }
             constructorBodyJ.addStatement(generateHeader(headerKind, addExceptionLocation));
@@ -188,13 +185,9 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
         for (Field field : fields) {
             Block readAndValidate = new Block();
-            field.appendValidationTo(false, readAndValidate);
-            if (field.hasDeclarations())
-                readAndValidate.addStatement(
-                        field.assign(BuiltIn.<AValue>toCode("new " + field.getFType() + field.getNewCreation())));
-            field.forElementsInField(
-                    "this." + field.getFieldName() + "[i] = " + field.getNewFromDataStream(streamName.getName()),
-                    readAndValidate);
+            field.appendValidationTo(readAndValidate);
+            readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(streamName.ref(),
+                    field.getSuperLimit(0))));
             constructorBodyStream.addStatement(labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation));
         }
 
@@ -238,7 +231,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         body.addStatement(getField("header").call("encodeTo", BuiltIn.<AValue>toCode("to")));
         if (0 < fields.length) {
             for (Field field : fields)
-                field.forElementsInField("this." + field.getFieldName() + "[i].encodeTo(to)", body);
+                body.addStatement(field.call("encodeTo", pTo.ref()));
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.fromName("void"), "encodeTo", Arrays.asList(pTo),
@@ -247,12 +240,6 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
     private void addCalcBodyLen(Field[] fields) {
         Block encodeFieldsLen = new Block();
-        for (Field field : fields)
-            if (field.hasDeclarations()) {
-                encodeFieldsLen.addStatement(BuiltIn.<NoValue>toCode("int " + field.getFieldName() + "Len" + " = " + "0"));
-                field.forElementsInField(field.getFieldName() + "Len" + "+=" +
-                        "this." + field.getFieldName() + "[i].encodedLength()", encodeFieldsLen);
-            }
         if (0 < fields.length) {
             Typed<? extends AValue> summing = calcBodyLen(fields[0]);
             for (int i = 1; i < fields.length; i++)
@@ -269,9 +256,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     }
 
     private static Typed<? extends AValue> calcBodyLen(Field field) {
-        return (field.hasDeclarations() ?
-                BuiltIn.<AValue>toCode(field.getFieldName() + "Len") :
-                BuiltIn.<AValue>toCode("this." + field.getFieldName() + ".encodedLength()"));
+        return BuiltIn.<AValue>toCode("this." + field.getFieldName() + ".encodedLength()");
     }
 
     private void addToString(String name, Field[] fields) {
@@ -281,10 +266,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         for (Field field : fields)
             body.addStatement(BuiltIn.inc(buildOutput, sum(
                     literal("\\n\\t" + field.getFieldName() + " = "),
-                    (field.hasDeclarations() ?
-                            new MethodCall<AString>("Util.joinStringArray", field.ref(), literal(", "),
-                                    literal("("), literal(")")) :
-                            field.<AString>call("toString")))));
+                    field.<AString>call("toString"))));
         body.addStatement(RETURN(buildOutput.ref()));
         addMethod(Method.newPublicReadObjectState(Comment.no(), new TargetClass(String.class), "toString", body));
     }
@@ -292,18 +274,10 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private void addJavaGetter(Field field) throws UndefinedException {
         Block body;
 
-        if (field.hasDeclarations()) {
-            Var out = Var.local(field.getJType() + field.getArrayDeclaration(), "out",
-                    BuiltIn.<AValue>toCode("new " + field.getJType() + field.getNewCreation()));
-            body = new Block(out);
-            field.forElementsInField("out[i] = " + "this." + field.getFieldName() + "[i].getValue()", body);
-            body.addStatement(RETURN(out.ref()));
-        } else {
-            body = new Block(RETURN(BuiltIn.<AValue>toCode("this." + field.getFieldName() + ".getValue()")));
-        }
+        body = new Block(RETURN(BuiltIn.<AValue>toCode("this." + field.getFieldName() + ".getValue()")));
 
         addMethod(Method.newPublicReadObjectState(Comment.no(),
-                TargetClass.fromName(field.getJType() + field.getArrayDeclaration()),
+                field.getUnderType().scopeKnown(),
                 "get" + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1) + "Value",
                 body));
     }

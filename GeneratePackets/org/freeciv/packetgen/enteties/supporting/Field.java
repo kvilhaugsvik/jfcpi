@@ -40,7 +40,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket, List<WeakFlag> flags,
                  WeakField.ArrayDeclaration... declarations) {
         super(fieldFlagsToAnnotations(flags), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-                new TargetClass(typeAlias.getName() + getArrayDeclaration(typeAlias, declarations.length)),
+                typeAlias.getAddress().scopeKnown(),
                 fieldName, null);
 
         if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
@@ -108,55 +108,6 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         return type.getJavaType();
     }
 
-    public boolean hasDeclarations() {
-        return (0 < getNumberOfDeclarations());
-    }
-
-    public int getNumberOfDeclarations() {
-        return (type.getBasicType().isArrayEater()) ? declarations.length - 1 : declarations.length;
-    }
-
-    public static String getArrayDeclaration(FieldTypeBasic.FieldTypeAlias type, int rawDeclarations) {
-        int unhandledArrays = rawDeclarations;
-        if (type.getBasicType().isArrayEater())
-            unhandledArrays--;
-        return Strings.repeat("[]", unhandledArrays);
-    }
-
-    public String getArrayDeclaration() {
-        return getArrayDeclaration(type, declarations.length);
-    }
-
-    public String getNewCreation() throws UndefinedException {
-        String out = "";
-        for (int i = 0; i < getNumberOfDeclarations(); i++) {
-            out += "[" + declarations[i].getSize() + "]";
-        }
-        return out;
-    }
-
-    public String getNewFromDataStream(String streamName) throws UndefinedException {
-        return "new " + this.getFType() + "(" + streamName + getLimits() + ")";
-    }
-
-    private String getLimits() throws UndefinedException {
-        return ", " + (type.getBasicType().isArrayEater() ?
-                "ElementsLimit.limit(" + declarations[declarations.length - 1].getMaxSize() +
-                        (declarations[declarations.length - 1].hasTransfer() ?
-                                ", " + declarations[declarations.length - 1].getElementsToTransfer() :
-                                "") :
-                "ElementsLimit.noLimit(") + ")";
-    }
-
-    public String getNewFromJavaType() throws UndefinedException {
-        return "new " + this.getFType() + "(" + this.getFieldName() + "[i]" + getLimits() + ")";
-    }
-
-    private static void validateElementsToTransfer(ArrayDeclaration element, Collection<Typed<ABool>> to) throws UndefinedException {
-        if (null != element.getElementsToTransfer())
-            to.add(GROUP(isSmallerThanOrEq(BuiltIn.<AnInt>toCode(element.getMaxSize().toString()),
-                    BuiltIn.<AnInt>toCode(element.getElementsToTransfer()))));
-    }
 
     private static UndefinedException notSupportedIndex(String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
         String javaTypeOfTransfer = dec.getJavaTypeOfTransfer();
@@ -176,17 +127,12 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public void appendArrayEaterValidationTo(Block body) throws UndefinedException {
-        if (type.getBasicType().isArrayEater() && 1 == declarations.length) {
-            // TODO: Remove 1 == declarations.length when field arrays are standard
-            this.getTType().register(new TargetMethod(this.getTType(), "verifyInsideLimits", new TargetClass(void.class), TargetMethod.Called.DYNAMIC));
-            // TODO: Remove the above hack when the code is cleaner
-            // * constructor stops destroying type information to add arrayinfo as text
-            // * type isn't stored twice
+        if (type.getBasicType().isArrayEater()) {
             body.addStatement(this.call("verifyInsideLimits", getSuperLimit(0)));
         }
     }
 
-    private Typed getSuperLimit(int pos) throws UndefinedException {
+    public Typed getSuperLimit(int pos) throws UndefinedException {
         if (pos < declarations.length) {
             LinkedList<Typed<AnInt>> args = new LinkedList<Typed<AnInt>>();
             args.add(BuiltIn.<AnInt>toCode(declarations[pos].getMaxSize().toString()));
@@ -200,7 +146,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         }
     }
 
-    public void appendValidationTo(boolean testArrayLength, Block to) throws UndefinedException {
+    public void appendValidationTo(Block to) throws UndefinedException {
         LinkedList<Typed<ABool>> transferTypeCheck = new LinkedList<Typed<ABool>>();
         for (ArrayDeclaration dec : declarations) {
             if (dec.hasTransfer()) {
@@ -221,47 +167,6 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         if (!transferTypeCheck.isEmpty())
             to.addStatement(ASSERT(and(transferTypeCheck.toArray(new Typed[transferTypeCheck.size()])),
                     literal("Can't prove that index value will stay in the range Java's signed integers can represent.")));
-
-        LinkedList<Typed<ABool>> legalSize = new LinkedList<Typed<ABool>>();
-        String arrayLevel = "";
-
-        for (int i = 0; i < getNumberOfDeclarations(); i++) {
-            final ArrayDeclaration element = declarations[i];
-            validateElementsToTransfer(element, legalSize);
-            if (testArrayLength)
-                legalSize.add(GROUP(BuiltIn.<ABool>toCode(this.getFieldName() + arrayLevel + ".length != " + element.getSize())));
-            arrayLevel += "[0]";
-        }
-
-        if (!legalSize.isEmpty())
-            to.addStatement(BuiltIn.IF(or(legalSize.toArray(new Typed[legalSize.size()])),
-                    new Block(THROW(IllegalArgumentException.class, literal("Array " + this.getFieldName() +
-                            " constructed with value out of scope in packet " + onPacket)))));
-    }
-
-    // TODO: in should be a ExprFrom1
-    public void forElementsInField(String in, Block out) {
-        final int level = this.getNumberOfDeclarations();
-
-        String replaceWith = "";
-        Block ref = out;
-        for (int counter = 0; counter < level; counter++) {
-            Var count = Var.local("int", getCounterNumber(counter) + "", literal(0));
-            Block inner = new Block();
-
-            ref.addStatement(FOR(count,
-                    isSmallerThan(count.ref(), BuiltIn.<AValue>toCode("this." + this.getFieldName() + replaceWith + ".length")),
-                    inc(count),
-                    inner));
-            ref = inner;
-
-            replaceWith += "[" + getCounterNumber(counter) + "]";
-        }
-        ref.addStatement(BuiltIn.<NoValue>toCode(in.replaceAll("\\[i\\]", replaceWith)));
-    }
-
-    private char getCounterNumber(int counter) {
-        return ((char)('i' + counter));
     }
 
     private static String toInt(String elementsToTransferType, String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {

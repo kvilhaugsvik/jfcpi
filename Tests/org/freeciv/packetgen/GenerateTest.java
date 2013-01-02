@@ -133,20 +133,20 @@ public class GenerateTest {
                 926,
                 new TargetClass(Header_2_2.class.getSimpleName()),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
-                new Field("theArray", uint32, "TestArray", Collections.<WeakFlag>emptyList(),
+                new Field("theArray", uint32s, "TestArray", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("2"), null))), targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
                 new TargetClass(Header_2_2.class.getSimpleName()),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("toTransfer", uint8, "TestArrayTransfer", Collections.<WeakFlag>emptyList()),
-                new Field("theArray", uint32, "TestArrayTransfer", Collections.<WeakFlag>emptyList(),
+                new Field("theArray", uint32s, "TestArrayTransfer", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))), targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
                 new TargetClass(Header_2_2.class.getSimpleName()),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
-                new Field("theArray", uint32, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
+                new Field("theArray", uint32s2d, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
                         new WeakField.ArrayDeclaration(IntExpression.integer("3"), null))), targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
@@ -155,7 +155,7 @@ public class GenerateTest {
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("toTransfer", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
                 new Field("toTransfer2", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
-                new Field("theArray", uint32, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList(),
+                new Field("theArray", uint32s2d, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"),
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))), targetFolder);
         writePacket(new Packet("StringArray",
@@ -164,7 +164,7 @@ public class GenerateTest {
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("notAnArray", string, "StringArray", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
-                new Field("theArray", string, "StringArray", Collections.<WeakFlag>emptyList(),
+                new Field("theArray", strings, "StringArray", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("3"), null),
                         new WeakField.ArrayDeclaration(IntExpression.integer("10"), null))), targetFolder);
     }
