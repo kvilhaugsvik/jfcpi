@@ -96,10 +96,7 @@ public class FieldTypeTests {
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
 
         // create and write
-        UINT32S theArray = new UINT32S(new UINT32[]{
-            new UINT32(5L, ElementsLimit.noLimit()),
-            new UINT32(1000L, ElementsLimit.noLimit())
-        }, ElementsLimit.limit(2, 2));
+        UINT32S theArray = new UINT32S(new Long[]{5L, 1000L}, ElementsLimit.limit(2, 2));
         theArray.encodeTo(new DataOutputStream(storeTo));
 
         // read it back
@@ -107,24 +104,21 @@ public class FieldTypeTests {
 
         // compare the values
         assertEquals("1 dimensional field type array didn't survive encoding followed by decoding",
-                theArray.getValue()[0].getValue(), theReturnedArray.getValue()[0].getValue());
+                theArray.getValue()[0], theReturnedArray.getValue()[0]);
         assertEquals("1 dimensional field type array didn't survive encoding followed by decoding",
-                theArray.getValue()[1].getValue(), theReturnedArray.getValue()[1].getValue());
+                theArray.getValue()[1], theReturnedArray.getValue()[1]);
     }
 
     @Test public void STRING_1_dimensionalArray_round_trip() throws IOException {
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
 
         // create and write
-        STRINGS theArray = new STRINGS(new STRING[]{
-            new STRING("1", ElementsLimit.limit(5, 4)),
-            new STRING("win", ElementsLimit.limit(5, 4))
-        }, ElementsLimit.limit(2, 2, ElementsLimit.limit(5, 4)));
+        STRINGS theArray = new STRINGS(new String[]{"1", "win"}, ElementsLimit.limit(2, 2, ElementsLimit.limit(5, 4)));
         theArray.encodeTo(new DataOutputStream(storeTo));
 
         // check the encoding
-        assertEquals("1d + eater field type array encoded wrong", "1", theArray.getValue()[0].getValue());
-        assertEquals("1d + eater  field type array encoded wrong", "win", theArray.getValue()[1].getValue());
+        assertEquals("1d + eater field type array encoded wrong", "1", theArray.getValue()[0]);
+        assertEquals("1d + eater  field type array encoded wrong", "win", theArray.getValue()[1]);
 
         // read it back
         STRINGS theReturnedArray = new STRINGS(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
@@ -132,9 +126,9 @@ public class FieldTypeTests {
 
         // compare the values
         assertEquals("1d + eater field type array didn't survive encoding followed by decoding",
-                theArray.getValue()[0].getValue(), theReturnedArray.getValue()[0].getValue());
+                theArray.getValue()[0], theReturnedArray.getValue()[0]);
         assertEquals("1d + eater  field type array didn't survive encoding followed by decoding",
-                theArray.getValue()[1].getValue(), theReturnedArray.getValue()[1].getValue());
+                theArray.getValue()[1], theReturnedArray.getValue()[1]);
     }
 
     @Test public void UINT8_2D_understand() throws IOException {
@@ -144,10 +138,10 @@ public class FieldTypeTests {
         UINT8S2D result = new UINT8S2D(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
                 ElementsLimit.limit(2, 2, ElementsLimit.limit(2, 2)));
 
-        assertEquals(1, result.getValue()[0].getValue()[0].getValue().intValue());
-        assertEquals(3, result.getValue()[0].getValue()[1].getValue().intValue());
-        assertEquals(7, result.getValue()[1].getValue()[0].getValue().intValue());
-        assertEquals(12, result.getValue()[1].getValue()[1].getValue().intValue());
+        assertEquals(1, result.getValue()[0][0].intValue());
+        assertEquals(3, result.getValue()[0][1].intValue());
+        assertEquals(7, result.getValue()[1][0].intValue());
+        assertEquals(12, result.getValue()[1][1].intValue());
     }
 
     private void testString(String text, int maxLen) throws IOException {
@@ -205,10 +199,7 @@ public class FieldTypeTests {
 
     @Test(expected = IllegalNumberOfElementsException.class)
     public void verifyInsideLimitsSmallerNotOK() throws IOException {
-        UINT8S toSmall = new UINT8S(new UINT8[]{
-                new UINT8(2, ElementsLimit.noLimit()),
-                new UINT8(5, ElementsLimit.noLimit())
-        }, ElementsLimit.limit(3, 2));
+        UINT8S toSmall = new UINT8S(new Integer[]{2, 5}, ElementsLimit.limit(3, 2));
         toSmall.verifyInsideLimits(ElementsLimit.limit(20, 7));
     }
 

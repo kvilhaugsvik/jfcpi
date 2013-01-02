@@ -310,10 +310,11 @@ public class TerminatedArray extends FieldTypeBasic {
                 Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
                 !unterminatable);
         if (elementTypeCanLimitVerify) {
-            TargetClass elemtype = buffertype.getOf(); // arrayEater's are read element by element
+            TargetClass elemtype = ((TargetArray)(fValue.getTType())).getOf();
             Var element = Var.local(elemtype, "element", null);
             verifyInsideLimits.addStatement(FOR(element, fValue.ref(), new Block(
-                    element.call(SELF_VALIDATOR_NAME, pLimits.<TargetClass>call("next"))
+                    buffertype.getOf().newInstance(element.ref(), pLimits.<TargetClass>call("next"))
+                            .call(SELF_VALIDATOR_NAME, pLimits.<TargetClass>call("next"))
             )));
         }
         return Method.newPublicDynamicMethod(Comment.no(),
@@ -397,35 +398,54 @@ public class TerminatedArray extends FieldTypeBasic {
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
                                              final FieldTypeAlias kind) {
-        final TargetArray type = new TargetArray(kind.getAddress(), 1, true);
+        final TargetArray type = new TargetArray(kind.getUnderType(), 1, true);
         final boolean arrayEater = kind.getBasicType().isArrayEater();
         Var<AValue> helperParamValue = Var.param(type, "value");
         final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), new TargetClass(int.class), "lengthInBytes",
                 Arrays.<Var<?>>asList(helperParamValue), new Block(RETURN(helperParamValue.read("length"))));
+
+        Var<AValue> pBuf = Var.param(new TargetArray(kind.getAddress(), 1, true), "buf");
+        Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.<AnInt>read("length")));
+        Var<AnInt> count = Var.<AnInt>local(int.class, "i", literal(0));
+        final Method.Helper buffer2value = Method.newHelper(Comment.no(), type, "buffer2value",
+                Arrays.<Var<?>>asList(pBuf),
+                new Block(
+                        oVal,
+                        FOR(count, isSmallerThan(count.ref(), pBuf.read("length")), inc(count), new Block(
+                                arraySetElement(oVal, count.ref(), pBuf.ref().callV("[]", count.ref()).<AValue>call("getValue"))
+                        )),
+                        RETURN(oVal.ref())
+                ));
+
         return new TerminatedArray(dataIOType, publicType, type, null,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
-                type,
+                new TargetArray(kind.getAddress(), 1, true),
                 arrayLen,
                 neverAnythingAfter,
                 null,
-                valueIsBufferArray,
+                new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                    @Override
+                    public Typed<AValue> x(Typed<AValue> bytes) {
+                        return buffer2value.getAddress().call(bytes);
+                    }
+                },
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var elem) {
-                        return new Block(elem.call("encodeTo", to.ref()));
+                        return new Block(kind.getAddress()
+                                .newInstance(elem.ref(), fMaxSize.call("next"))
+                                .call("encodeTo", to.ref()));
                     }
                 },
                 new ExprFrom1<Typed<? extends AValue>, Var>() {
                     @Override
                     public Typed<? extends AValue> x(Var from) {
-                        return type.getOf().newInstance(from.ref(), arrayEater ?
-                                Hardcoded.pLimits.<TargetClass>call("next") :
-                                new MethodCall<AValue>("ElementsLimit.noLimit"));
+                        return kind.getAddress().newInstance(from.ref(), getNext(arrayEater));
                     }
                 },
                 TO_STRING_ARRAY,
-                Arrays.asList(new Requirement(type.getOf().getName(), FieldTypeAlias.class)),
+                Arrays.asList(kind.getIFulfillReq()),
                 null,
                 null,
                 new ExprFrom1<Typed<AnInt>, Var>() {
@@ -435,9 +455,15 @@ public class TerminatedArray extends FieldTypeBasic {
                     }
                 },
                 sameNumberOfBufferElementsAndValueElements,
-                Arrays.<Method.Helper>asList(lenInBytesHelper),
+                Arrays.<Method.Helper>asList(lenInBytesHelper, buffer2value),
                 arrayEater
         );
+    }
+
+    private static MethodCall<? extends AValue> getNext(boolean arrayEater) {
+        return arrayEater ?
+                Hardcoded.pLimits.<TargetClass>call("next") :
+                new MethodCall<AValue>("ElementsLimit.noLimit");
     }
 
     public enum MaxArraySize {
