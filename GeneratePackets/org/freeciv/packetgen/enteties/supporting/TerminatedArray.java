@@ -1,5 +1,6 @@
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packet.fieldtype.IllegalLimitSizeException;
 import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
@@ -65,7 +66,7 @@ public class TerminatedArray extends FieldTypeBasic {
             new ExprFrom1<Typed<ABool>, Typed<AnInt>>() {
                 @Override
                 public Typed<ABool> x(Typed<AnInt> size) {
-                    return isSmallerThan(size, fMaxSize.ref());
+                    return isSmallerThan(size, fMaxSize.read("full_array_size"));
                 }
             };
     public static final ExprFrom1<Typed<AnInt>, Typed<AnInt>> sameNumberOfBufferElementsAndValueElements =
@@ -107,8 +108,8 @@ public class TerminatedArray extends FieldTypeBasic {
                            boolean elementTypeCanLimitVerify
     ) {
         super(dataIOType, publicType, javaType,
-                createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, pLimits.ref())),
-                createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements),
+                createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
+                createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements, elementTypeCanLimitVerify),
                 createEncode(terminator, transferArraySizeKind, buffertype, numberOfElements, testIfTerminatorShouldBeAdded, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType),
                 createEnocedSize(transferArraySizeKind, numberOfElements, testIfTerminatorShouldBeAdded, transferSizeSerialize, valueGetByteLen),
                 toString,
@@ -180,12 +181,12 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
-    private static ExprFrom2<Block, Var, Var> createDecode(final Requirement terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final ExprFrom1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements) {
+    private static ExprFrom2<Block, Var, Var> createDecode(final Requirement terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final ExprFrom1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify) {
         return new ExprFrom2<Block, Var, Var>() {
             @Override
             public Block x(Var to, Var from) {
                 Var buf = Var.local(buffertype, "buffer",
-                        buffertype.newInstance(numberOfValueElementToNumberOfBufferElements.x(fMaxSize.ref())));
+                        buffertype.newInstance(numberOfValueElementToNumberOfBufferElements.x(fMaxSize.read("elements_to_transfer"))));
                 Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
                 Var pos = Var.local("int", "pos", literal(0));
 
@@ -196,11 +197,10 @@ public class TerminatedArray extends FieldTypeBasic {
 
                 Block out = new Block();
 
-                Typed<AnInt> relativeMaxArray = maxArraySizeVar(maxArraySizeKind, fullArraySizeLocation);
-                out.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
-                        transferArraySizeKind, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from))));
+                writeLimitsReading(out, maxArraySizeKind, fullArraySizeLocation, transferArraySizeKind, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from), elementTypeCanLimitVerify);
 
-                theLimitIsSane(out, relativeMaxArray, fMaxSize.ref(), transferArraySizeKind, maxArraySizeKind);
+                theLimitIsSane(out, fMaxSize.read("elements_to_transfer"), fMaxSize.read("full_array_size"),
+                        transferArraySizeKind, maxArraySizeKind);
 
                 out.addStatement(buf);
                 out.addStatement(current);
@@ -220,6 +220,39 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
+    private static void writeLimitsReading(Block to, MaxArraySize maxArraySizeKind, Typed<AnInt> fullArraySizeLocation,
+                                           TransferArraySize transferArraySizeKind, Typed<AnInt> serialLimit,
+                                           boolean elementTypeCanLimitVerify) {
+        LinkedList<Typed<? extends AValue>> limits = new LinkedList<Typed<? extends AValue>>();
+        switch (maxArraySizeKind) {
+            case NO_LIMIT:
+                break;
+            case CONSTRUCTOR_PARAM:
+                limits.add(pLimits.read("full_array_size"));
+                break;
+            case LIMITED_BY_TYPE:
+                limits.add(fullArraySizeLocation);
+                break;
+            default:
+                throw new UnsupportedOperationException("Source of max array size is not known");
+        }
+        switch (transferArraySizeKind) {
+            case MAX_ARRAY_SIZE:
+                break;
+            case CONSTRUCTOR_PARAM:
+                limits.add(Hardcoded.pLimits.read("elements_to_transfer"));
+                break;
+            case SERIALIZED:
+                limits.add(serialLimit);
+                break;
+            default:
+                throw new UnsupportedOperationException("Source of transfer array size is not known");
+        }
+        if (elementTypeCanLimitVerify)
+            limits.add(pLimits.<AValue>call("next"));
+        to.addStatement(fMaxSize.assign(new MethodCall("ElementsLimit.limit", limits.toArray(new Typed[0]))));
+    }
+
     private static void theLimitIsSane(Block out, Typed<AnInt> relativeMaxArray, Typed<AnInt> absoluteMaxArray,
                                        TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
         if (shouldValidateLimits(transferArraySizeKind, maxArraySizeKind))
@@ -234,15 +267,13 @@ public class TerminatedArray extends FieldTypeBasic {
                 || noUpperLimitOnTheNumberOfElements(maxArraySizeKind));
     }
 
-    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation, final MethodCall<Returnable> validateLimitsCall) {
+    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation, final MethodCall<Returnable> validateLimitsCall, final boolean elementTypeCanLimitVerify) {
         return new ExprFrom1<Block, Var>() {
             @Override
             public Block x(Var to) {
                 final Var pValue = Var.param(javaType, "value");
                 Block fromJavaTyped = new Block();
-                Typed<AnInt> relativeMaxArray = maxArraySizeVar(maxArraySizeKind, fullArraySizeLocation);
-                fromJavaTyped.addStatement(fMaxSize.assign(setFMaxSize(relativeMaxArray,
-                        transferArraySizeKind, null == numberOfElements ? null : numberOfElements.x(pValue))));
+                writeLimitsReading(fromJavaTyped, maxArraySizeKind, fullArraySizeLocation, transferArraySizeKind, null == numberOfElements ? null : numberOfElements.x(pValue), elementTypeCanLimitVerify);
                 fromJavaTyped.addStatement(to.assign(pValue.ref()));
                 if (eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind))
                     fromJavaTyped.addStatement(validateLimitsCall);
@@ -265,33 +296,6 @@ public class TerminatedArray extends FieldTypeBasic {
 
     private static boolean noUpperLimitOnTheNumberOfElements(MaxArraySize maxArraySizeKind) {
         return MaxArraySize.NO_LIMIT.equals(maxArraySizeKind);
-    }
-
-    private static Typed<AnInt> maxArraySizeVar(MaxArraySize maxArraySizeKind, Typed<AnInt> fullArraySizeLocation) {
-        switch (maxArraySizeKind) {
-            case CONSTRUCTOR_PARAM:
-                return Hardcoded.pLimits.read("elements_to_transfer");
-            case LIMITED_BY_TYPE:
-                return fullArraySizeLocation;
-            case NO_LIMIT:
-                return null;
-            default:
-                throw new UnsupportedOperationException("Source of max array size is not known");
-        }
-    }
-
-    private static Typed<AnInt> setFMaxSize(Typed<AnInt> relativeMaxArray, TransferArraySize transferArraySizeKind,
-                                            Typed<AnInt> numberOfElements) {
-        switch (transferArraySizeKind) {
-            case MAX_ARRAY_SIZE:
-                return relativeMaxArray;
-            case CONSTRUCTOR_PARAM:
-                return pLimits.read("full_array_size");
-            case SERIALIZED:
-                return numberOfElements;
-            default:
-                throw new UnsupportedOperationException("Source of transfer array size is not known");
-        }
     }
 
     private Method getValidateInsideLimits() {
@@ -332,7 +336,7 @@ public class TerminatedArray extends FieldTypeBasic {
         private FieldTypeAliasToTerminatedArray(String name, String alias) {
             super(name, alias);
 
-            addObjectConstant("int", "maxArraySize");
+            addObjectConstant("ElementsLimit", "maxArraySize");
 
             if (!helpers.isEmpty()) {
                 for (Method helper : helpers) {
