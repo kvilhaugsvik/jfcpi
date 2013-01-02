@@ -56,23 +56,25 @@ public class GenerateTest {
 
         writeStructThatHasAnArrayField(targetFolder);
 
-        writeTerminatedArrayFieldArray(targetFolder);
-
         writeConstantClass(targetFolder);
 
         Parts items = new Parts();
         FieldTypeBasic.FieldTypeAlias uint8 = writeFieldTypeUINT8(targetFolder, items);
         FieldTypeBasic.FieldTypeAlias uint32 = writeFieldTypeUINT32(targetFolder, items);
+        FieldTypeBasic.FieldTypeAlias uint32s = writeTerminatedArrayFieldArray(targetFolder, uint32);
+        FieldTypeBasic.FieldTypeAlias uint32s2D = writeTerminatedArrayFieldArray2D(targetFolder, uint32s);
         FieldTypeBasic.FieldTypeAlias string = writeFieldTypeString(targetFolder, items);
         FieldTypeBasic.FieldTypeAlias bool = writeFieldTypeBool(targetFolder, items);
         FieldTypeBasic.FieldTypeAlias connection = writeFieldTypeConnection(targetFolder, items);
 
-        remaining(targetFolder, uint8, uint32, string, bool, connection);
+        remaining(targetFolder, uint8, uint32, uint32s, uint32s2D, string, bool, connection);
     }
 
     public void remaining(String targetFolder,
                           FieldTypeBasic.FieldTypeAlias uint8,
                           FieldTypeBasic.FieldTypeAlias uint32,
+                          FieldTypeBasic.FieldTypeAlias uint32s,
+                          FieldTypeBasic.FieldTypeAlias uint32s2d,
                           FieldTypeBasic.FieldTypeAlias string,
                           FieldTypeBasic.FieldTypeAlias bool,
                           FieldTypeBasic.FieldTypeAlias connection) throws IOException, UndefinedException {
@@ -172,11 +174,14 @@ public class GenerateTest {
         Parts items = new Parts();
         FieldTypeBasic.FieldTypeAlias uint8 = createFieldTypeUINT8(items);
         FieldTypeBasic.FieldTypeAlias uint32 = createFieldTypeUINT32(items);
+        FieldTypeBasic.FieldTypeAlias uint32s = createUINT32_1d(uint32);
+        FieldTypeBasic.FieldTypeAlias uint32s2D = createUINT32_2D(uint32s);
         FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING(items);
         FieldTypeBasic.FieldTypeAlias bool = createFieldTypeBool(items);
         FieldTypeBasic.FieldTypeAlias connection = createFieldTypeConnection(items);
 
-        remaining(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, uint8, uint32, string, bool, connection);
+        remaining(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER,
+                uint8, uint32, uint32s, uint32s2D, string, bool, connection);
     }
 
     @BeforeClass
@@ -357,12 +362,31 @@ public class GenerateTest {
     }
 
     @Test public void writeTerminatedArrayFieldArray() throws IOException, UndefinedException {
-        writeTerminatedArrayFieldArray(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+        writeTerminatedArrayFieldArray(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, createFieldTypeUINT32(new Parts()));
     }
 
-    private void writeTerminatedArrayFieldArray(String targetFolder) throws IOException, UndefinedException {
-        writeJavaFile(TerminatedArray.fieldArray("x", "y", createFieldTypeUINT32(new Parts()))
-                .createFieldType("UINT32S"), targetFolder);
+    private FieldTypeBasic.FieldTypeAlias writeTerminatedArrayFieldArray(String targetFolder, FieldTypeBasic.FieldTypeAlias uint32) throws IOException, UndefinedException {
+        FieldTypeBasic.FieldTypeAlias array = createUINT32_1d(uint32);
+        writeJavaFile(array, targetFolder);
+        return array;
+    }
+
+    private FieldTypeBasic.FieldTypeAlias createUINT32_1d(FieldTypeBasic.FieldTypeAlias uint32) throws UndefinedException {
+        return TerminatedArray.fieldArray("x", "y", uint32).createFieldType("UINT32S");
+    }
+
+    @Test public void writeTerminatedArrayFieldArray2D() throws IOException, UndefinedException {
+        writeTerminatedArrayFieldArray(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, createFieldTypeUINT32(new Parts()));
+    }
+
+    private FieldTypeBasic.FieldTypeAlias writeTerminatedArrayFieldArray2D(String targetFolder, FieldTypeBasic.FieldTypeAlias uint32_1d) throws IOException, UndefinedException {
+        FieldTypeBasic.FieldTypeAlias array = createUINT32_2D(uint32_1d);
+        writeJavaFile(array, targetFolder);
+        return array;
+    }
+
+    private FieldTypeBasic.FieldTypeAlias createUINT32_2D(FieldTypeBasic.FieldTypeAlias uint32_1d) throws UndefinedException {
+        return TerminatedArray.fieldArray("x", "y", uint32_1d).createFieldType("UINT32S_2D");
     }
 
     @Test
