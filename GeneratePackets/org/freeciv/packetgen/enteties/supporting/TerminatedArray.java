@@ -84,7 +84,7 @@ public class TerminatedArray extends FieldTypeBasic {
     private final ExprFrom1<Typed<AnInt>, Var> numberOfElements;
     private final boolean elementTypeCanLimitVerify;
     private final TargetArray buffertype;
-    private final HashSet<Method.Helper> helpers;
+    private final List<Method.Helper> helpers;
     private final Method validateInsideLimits;
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
@@ -104,7 +104,7 @@ public class TerminatedArray extends FieldTypeBasic {
                            final NetworkIO transferSizeSerialize,
                            final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen,
                            final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
-                           final Collection<Method.Helper> helperMethods,
+                           final List<Method.Helper> helperMethods,
                            boolean elementTypeCanLimitVerify
     ) {
         super(dataIOType, publicType, javaType,
@@ -128,7 +128,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 getValidateInsideLimits() :
                 null;
 
-        helpers = new HashSet<Method.Helper>(helperMethods);
+        helpers = new ArrayList<Method.Helper>(helperMethods);
     }
 
     private static boolean eatsArrayLimitInformation(MaxArraySize maxArraySizeKind, TransferArraySize transferArraySizeKind) {
@@ -373,7 +373,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         null,
                         arrayLen,
                         sameNumberOfBufferElementsAndValueElements,
-                        Collections.<Method.Helper>emptySet(),
+                        Collections.<Method.Helper>emptyList(),
                 false
         );
     }
@@ -391,7 +391,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         null,
                         arrayLen,
                         sameNumberOfBufferElementsAndValueElements,
-                        Collections.<Method.Helper>emptySet(),
+                        Collections.<Method.Helper>emptyList(),
                 false
         );
     }

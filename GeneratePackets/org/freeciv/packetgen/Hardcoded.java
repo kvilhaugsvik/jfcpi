@@ -173,7 +173,7 @@ public class Hardcoded {
                         }
                     },
                     TerminatedArray.sameNumberOfBufferElementsAndValueElements,
-                    Collections.<Method.Helper>emptySet(),
+                    Collections.<Method.Helper>emptyList(),
                     false
             ),
             getFloat("100"),
@@ -216,7 +216,7 @@ public class Hardcoded {
                         }
                     },
                     TerminatedArray.sameNumberOfBufferElementsAndValueElements,
-                    Collections.<Method.Helper>emptySet(),
+                    Collections.<Method.Helper>emptyList(),
                     false
             ),
             TerminatedArray.maxSizedTerminated("tech_list", "int",
