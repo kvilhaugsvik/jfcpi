@@ -71,6 +71,9 @@ public class ElementsLimit {
             throw new IllegalArgumentException("The absolute largest possible number of elements can't be below 0");
         if (elements_to_transfer < 0)
             throw new IllegalArgumentException("How can less than 0 elements be transferred");
+        if (full_array_size < elements_to_transfer)
+            throw new IllegalLimitSizeException("The relative limit on the number of elements is " +
+                    "to large compared to the absolute limit");
 
         return new ElementsLimit(full_array_size, elements_to_transfer, subLimit);
     }

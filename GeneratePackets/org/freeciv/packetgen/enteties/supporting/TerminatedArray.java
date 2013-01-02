@@ -199,9 +199,6 @@ public class TerminatedArray extends FieldTypeBasic {
 
                 writeLimitsReading(out, maxArraySizeKind, fullArraySizeLocation, transferArraySizeKind, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from), elementTypeCanLimitVerify);
 
-                theLimitIsSane(out, fMaxSize.read("elements_to_transfer"), fMaxSize.read("full_array_size"),
-                        transferArraySizeKind, maxArraySizeKind);
-
                 out.addStatement(buf);
                 out.addStatement(current);
                 out.addStatement(pos);
@@ -253,15 +250,6 @@ public class TerminatedArray extends FieldTypeBasic {
         to.addStatement(fMaxSize.assign(new MethodCall("ElementsLimit.limit", limits.toArray(new Typed[0]))));
     }
 
-    private static void theLimitIsSane(Block out, Typed<AnInt> relativeMaxArray, Typed<AnInt> absoluteMaxArray,
-                                       TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
-        if (shouldValidateLimits(transferArraySizeKind, maxArraySizeKind))
-            out.addStatement(IF(isSmallerThan(absoluteMaxArray, relativeMaxArray),
-                    new Block(THROW(IllegalLimitSizeException.class,
-                            literal("The relative limit on the number of elements is " +
-                                    "to large compared to the absolute limit")))));
-    }
-
     private static boolean shouldValidateLimits(TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
         return !(TransferArraySize.MAX_ARRAY_SIZE.equals(transferArraySizeKind)
                 || noUpperLimitOnTheNumberOfElements(maxArraySizeKind));
@@ -300,10 +288,6 @@ public class TerminatedArray extends FieldTypeBasic {
 
     private Method getValidateInsideLimits() {
         Block verifyInsideLimits = new Block();
-        theLimitIsSane(verifyInsideLimits,
-                Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
-                Hardcoded.pLimits.<AnInt>read("full_array_size"),
-                transferArraySizeKind, maxArraySizeKind);
         sizeIsInsideTheLimit(verifyInsideLimits,
                 maxArraySizeKind, transferArraySizeKind,
                 numberOfElements.x(fValue),
