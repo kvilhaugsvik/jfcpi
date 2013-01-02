@@ -34,7 +34,7 @@ public class ElementsLimit {
     }
 
     public ElementsLimit next() {
-        if (noLimit().equals(child))
+        if (noLimit().equals(this))
             throw new NoSuchElementException("Limit has no sub limit");
 
         return child;

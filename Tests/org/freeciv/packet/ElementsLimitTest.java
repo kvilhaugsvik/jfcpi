@@ -44,9 +44,9 @@ public class ElementsLimitTest {
         assertEquals(2, limit.elements_to_transfer);
     }
 
-    @Test(expected = NoSuchElementException.class)
-    public void simpleLimitsHasNoNext() {
-        ElementsLimit.limit(3, 2).next();
+    @Test
+    public void simpleLimitsEndsInNoLimit() {
+        assertEquals(ElementsLimit.noLimit(), ElementsLimit.limit(3, 2).next());
     }
 
     @Test(expected = IllegalArgumentException.class)
