@@ -189,6 +189,8 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     }
 
     public static class Reference<Contains extends AValue> extends Address implements Value<Contains> {
+        public static final Reference<AValue> THIS = Var.<AValue>param(TargetClass.SELF_TYPED, "this").ref();
+
         private final ValueHelper valueHelper;
 
         public Reference(Var of) {
@@ -201,7 +203,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
                 case CLASS:
                     return new Address(TargetClass.SELF_TYPED, new CodeAtom(of.name));
                 case OBJECT:
-                    return new Address("this", of.name);
+                    return new Address(THIS, new CodeAtom(of.name));
                 case CODE_BLOCK:
                 default:
                     return new Address(of.name);
