@@ -275,6 +275,13 @@ public class TypedCodeTest {
         assertNotNull(theCall);
     }
 
+    @Test public void addressInTopLevelPackage_NoArtifactsAdded() {
+        Address inTop = new Address(TargetPackage.TOP_LEVEL, new CodeAtom("WhoNeedPackets"));
+        CodeAtoms atoms = new CodeAtoms(inTop);
+        assertEquals("WhoNeedPackets", atoms.get(0).getAtom().get());
+        assertEquals(1, atoms.toArray().length);
+    }
+
     @Test public void targetPackageCached() {
         TargetPackage p1 = TargetPackage.from(Package.getPackage("org.freeciv.packetgen.javaGenerator"));
         TargetPackage p2 = TargetPackage.from("org", "freeciv", "packetgen", "javaGenerator");
