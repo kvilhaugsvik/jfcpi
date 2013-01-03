@@ -20,13 +20,12 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
-import org.freeciv.utility.Strings;
 
 import java.util.*;
 
@@ -87,7 +86,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         for (Field other : others) {
             if (unsolvedReferences.containsKey(other.getFieldName())) { // the value of the field is used
                 ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getFieldName());
-                toIntroduce.setJavaTypeOfTransfer(other.getJType());
+                toIntroduce.setJavaTypeOfTransfer(other);
             }
         }
     }
@@ -137,7 +136,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
             LinkedList<Typed<AnInt>> args = new LinkedList<Typed<AnInt>>();
             args.add(BuiltIn.<AnInt>toCode(declarations[pos].getMaxSize().toString()));
             if (declarations[pos].hasTransfer())
-                args.add(BuiltIn.<AnInt>toCode(declarations[pos].getSize()));
+                args.add(declarations[pos].getTransferValue());
             if (pos + 1 < declarations.length)
                 args.add(getSuperLimit(pos + 1));
             return new MethodCall("ElementsLimit.limit", args.toArray(new Typed[0]));
@@ -169,17 +168,6 @@ public class Field<Kind extends AValue> extends Var<Kind> {
                     literal("Can't prove that index value will stay in the range Java's signed integers can represent.")));
     }
 
-    private static String toInt(String elementsToTransferType, String packetName, String fieldName, ArrayDeclaration dec) throws UndefinedException {
-        switch (intClassOf(elementsToTransferType)) {
-            case 0:
-                return "";
-            case 1:
-                return ".intValue()"; // safe since validated
-            default:
-                throw notSupportedIndex(packetName, fieldName, dec);
-        }
-    }
-
     public Collection<Requirement> getReqs() {
         HashSet<Requirement> reqs = new HashSet<Requirement>();
         reqs.add(new Requirement(getFType(), FieldTypeBasic.FieldTypeAlias.class));
@@ -195,7 +183,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         private final String elementsToTransfer;
         private final String onPacket, onField;
 
-        private String elementsToTransferType = null;
+        private Field elementsToTransferTyped = null;
 
         public ArrayDeclaration(IntExpression maxSize, String elementsToTransfer, String onPacket, String onField) {
             this.maxSize = maxSize;
@@ -208,13 +196,6 @@ public class Field<Kind extends AValue> extends Var<Kind> {
             return maxSize;
         }
 
-        public String getElementsToTransfer() throws UndefinedException {
-            return (hasTransfer() ?
-                    "this." + elementsToTransfer + ".getValue()" + toInt(elementsToTransferType,
-                                                                         onPacket, onField, this) :
-                    elementsToTransfer);
-        }
-
         public String getFieldThatHoldsSize() {
             return elementsToTransfer;
         }
@@ -223,10 +204,16 @@ public class Field<Kind extends AValue> extends Var<Kind> {
             return maxSize.getReqs();
         }
 
-        private String getSize() throws UndefinedException {
-            return (hasTransfer() ?
-                    getElementsToTransfer() :
-                    getMaxSize().toString());
+        private Typed<AnInt> getTransferValue() throws UndefinedException {
+            Value<AnInt> fieldValue = elementsToTransferTyped.ref().callV("getValue");
+            switch (intClassOf(getJavaTypeOfTransfer())) {
+                case 0:
+                    return fieldValue;
+                case 1:
+                    return fieldValue.callV("intValue");
+                default:
+                    throw notSupportedIndex(onPacket, onField, this);
+            }
         }
 
         public boolean hasTransfer() {
@@ -234,22 +221,22 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         }
 
         private void assumeInitialized() throws UndefinedException {
-            if (hasTransfer() && null == elementsToTransferType)
+            if (hasTransfer() && null == elementsToTransferTyped)
                 throw new UndefinedException("Field " + onField +
                     " in " + onPacket +
                     " refers to a field " + getFieldThatHoldsSize() + " that don't exist");
         }
 
-        public void setJavaTypeOfTransfer(String jType) {
-            if ((null == elementsToTransferType))
-                elementsToTransferType = jType;
+        public void setJavaTypeOfTransfer(Field jType) {
+            if ((null == elementsToTransferTyped))
+                elementsToTransferTyped = jType;
             else
                 throw new UnsupportedOperationException("tried to set the type of an array declaration twice");
         }
 
         public String getJavaTypeOfTransfer() throws UndefinedException {
             assumeInitialized();
-            return elementsToTransferType;
+            return elementsToTransferTyped.getJType();
         }
     }
 
