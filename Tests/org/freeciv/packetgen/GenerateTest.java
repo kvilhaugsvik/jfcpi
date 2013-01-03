@@ -89,7 +89,7 @@ public class GenerateTest {
 
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
-                new TargetClass(Header_2_1.class.getSimpleName()),
+                new TargetClass(Header_2_1.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("username", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
@@ -102,7 +102,7 @@ public class GenerateTest {
                 new Field("patch_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList())), targetFolder);
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
-                new TargetClass(Header_2_1.class.getSimpleName()),
+                new TargetClass(Header_2_1.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("you_can_join", bool, "you_can_join", Collections.<WeakFlag>emptyList()),
                 new Field("message", string, "you_can_join", Collections.<WeakFlag>emptyList(),
@@ -112,13 +112,13 @@ public class GenerateTest {
                 new Field("challenge_file", string, "you_can_join", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                 new Field("conn_id", connection, "you_can_join", Collections.<WeakFlag>emptyList())), targetFolder);
-        writePacket(new Packet("CONN_PING", 88, new TargetClass(Header_2_1.class.getSimpleName()),
+        writePacket(new Packet("CONN_PING", 88, new TargetClass(Header_2_1.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList()), targetFolder);
-        writePacket(new Packet("CONN_PONG", 89, new TargetClass(Header_2_1.class.getSimpleName()),
+        writePacket(new Packet("CONN_PONG", 89, new TargetClass(Header_2_1.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList()), targetFolder);
         writePacket(new Packet("SERVER_JOIN_REQ2ByteKind",
                 4,
-                new TargetClass(Header_2_2.class.getSimpleName()),
+                new TargetClass(Header_2_2.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("username", string, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
@@ -131,27 +131,27 @@ public class GenerateTest {
                 new Field("patch_version", uint32, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList())), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
-                new TargetClass(Header_2_2.class.getSimpleName()),
+                new TargetClass(Header_2_2.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("theArray", uint32s, "TestArray", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("2"), null))), targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
-                new TargetClass(Header_2_2.class.getSimpleName()),
+                new TargetClass(Header_2_2.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("toTransfer", uint8, "TestArrayTransfer", Collections.<WeakFlag>emptyList()),
                 new Field("theArray", uint32s, "TestArrayTransfer", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))), targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
-                new TargetClass(Header_2_2.class.getSimpleName()),
+                new TargetClass(Header_2_2.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("theArray", uint32s2d, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
                         new WeakField.ArrayDeclaration(IntExpression.integer("3"), null))), targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
-                new TargetClass(Header_2_2.class.getSimpleName()),
+                new TargetClass(Header_2_2.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("toTransfer", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
                 new Field("toTransfer2", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
@@ -160,7 +160,7 @@ public class GenerateTest {
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))), targetFolder);
         writePacket(new Packet("StringArray",
                 930,
-                new TargetClass(Header_2_2.class.getSimpleName()),
+                new TargetClass(Header_2_2.class, true),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(),
                 new Field("notAnArray", string, "StringArray", Collections.<WeakFlag>emptyList(),
                           new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),

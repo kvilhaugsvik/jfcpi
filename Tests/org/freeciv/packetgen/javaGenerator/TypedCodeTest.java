@@ -77,7 +77,7 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceDimensionsInTargetClass() {
-        TargetArray array = new TargetArray(new TargetClass("int[][]"), 1, true);
+        TargetArray array = new TargetArray(new TargetClass(int[][].class), 1, true);
     }
 
     @Test(expected = IllegalArgumentException.class)
