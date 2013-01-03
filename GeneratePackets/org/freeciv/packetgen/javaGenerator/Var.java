@@ -47,20 +47,18 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         this.name = name;
         this.value = value;
 
-        this.referName = new Address(accessLook(name));
-    }
-
-    private String accessLook(String name) {
         switch (scope) {
             case CLASS:
-                // TODO: Append class name
+                this.referName = new Address(TargetClass.SELF_TYPED, new CodeAtom(name));
                 break;
             case OBJECT:
-                return "this." + name;
+                this.referName = new Address("this", name);
+                break;
             case CODE_BLOCK:
+            default:
+                this.referName = new Address(name);
                 break;
         }
-        return name;
     }
 
     public Visibility getVisibility() {
