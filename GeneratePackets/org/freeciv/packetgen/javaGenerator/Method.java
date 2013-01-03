@@ -27,7 +27,7 @@ public class Method extends Formatted implements HasAtoms {
     private final Visibility visibility;
     private final Scope scope;
     private final TargetClass type;
-    private final String name;
+    private final IR.CodeAtom name;
     private final List<? extends Var<? extends AValue>> paramList;
     private final List<TargetClass> exceptionList;
     private final Block body;
@@ -39,7 +39,7 @@ public class Method extends Formatted implements HasAtoms {
         this.visibility = visibility;
         this.scope = scope;
         this.type = type;
-        this.name = name;
+        this.name = new IR.CodeAtom(name);
         this.paramList = paramList;
         this.exceptionList = exceptionList;
         this.body = body;
@@ -50,7 +50,7 @@ public class Method extends Formatted implements HasAtoms {
     }
 
     public TargetMethod getAddressOn(TargetClass on) {
-        return new TargetMethod(on, name, type, Scope.CLASS.equals(scope) ?
+        return new TargetMethod(on, name.get(), type, Scope.CLASS.equals(scope) ?
                 TargetMethod.Called.STATIC :
                 TargetMethod.Called.DYNAMIC);
     }
@@ -66,7 +66,7 @@ public class Method extends Formatted implements HasAtoms {
         visibility.writeAtoms(to);
         scope.writeAtoms(to);
         if (null != type) type.writeAtoms(to);
-        to.add(new IR.CodeAtom(name));
+        name.writeAtoms(to);
         to.add(HasAtoms.LPR);
         if (!paramList.isEmpty()) {
             to.hintStart(CodeStyle.ARGUMENTS);
