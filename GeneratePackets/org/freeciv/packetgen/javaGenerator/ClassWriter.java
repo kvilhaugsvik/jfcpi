@@ -26,6 +26,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder.*;
+import org.freeciv.packetgen.javaGenerator.formating.ScopeStack;
 
 import java.util.*;
 
@@ -525,12 +526,12 @@ public class ClassWriter extends Formatted implements HasAtoms {
         DEFAULT_STYLE_INDENT = maker.getStyle();
     }
 
-    public static class DefaultStyleScopeInfo extends CodeStyle.ScopeStack.ScopeInfo {
+    public static class DefaultStyleScopeInfo extends ScopeStack.ScopeInfo {
         private int lineBreakTry = 0;
         private boolean statementBroken = false;
         private LinkedList<Integer> toFar = new LinkedList<Integer>();
 
-        public DefaultStyleScopeInfo(CodeStyle.FormattingProcess process, CodeStyle.ScopeStack inStack,
+        public DefaultStyleScopeInfo(CodeStyle.FormattingProcess process, ScopeStack inStack,
                                      int beganAt, int beganAtLine, String lineUpToScope) {
             super(process, inStack, beganAt, beganAtLine, lineUpToScope);
         }

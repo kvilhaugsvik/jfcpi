@@ -16,7 +16,7 @@ package org.freeciv.packetgen.javaGenerator.formating;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.formating.CodeStyle.ScopeStack.ScopeInfo;
+import org.freeciv.packetgen.javaGenerator.formating.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
 import javax.naming.OperationNotSupportedException;
@@ -422,10 +422,10 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
     private static class ActiveRule<ScopeInfoKind extends ScopeInfo>
             implements Util.TwoConditions<CodeAtom, CodeAtom> {
         private final FormattingRule<ScopeInfoKind> check;
-        private final CodeStyle.ScopeStack<ScopeInfoKind> stack;
+        private final ScopeStack<ScopeInfoKind> stack;
         private final EnumSet<DependsOn> preConds;
 
-        private ActiveRule(FormattingRule<ScopeInfoKind> check, CodeStyle.ScopeStack<ScopeInfoKind> stack) {
+        private ActiveRule(FormattingRule<ScopeInfoKind> check, ScopeStack<ScopeInfoKind> stack) {
             this.check = check;
             this.stack = stack;
             this.preConds = check.getPreConds();
@@ -467,7 +467,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             this.preConds = reqs;
         }
 
-        public ActiveRule<ScopeInfoKind> forStack(CodeStyle.ScopeStack<ScopeInfoKind> scope) {
+        public ActiveRule<ScopeInfoKind> forStack(ScopeStack<ScopeInfoKind> scope) {
             return new ActiveRule<ScopeInfoKind>(this, scope);
         }
 
