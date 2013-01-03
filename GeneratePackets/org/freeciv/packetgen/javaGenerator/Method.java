@@ -45,10 +45,6 @@ public class Method extends Formatted implements HasAtoms {
         this.body = body;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public TargetMethod getAddress() {
         return getAddressOn(TargetClass.SELF_TYPED);
     }

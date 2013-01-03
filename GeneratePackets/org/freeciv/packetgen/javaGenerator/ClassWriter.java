@@ -230,7 +230,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         LinkedList<Method> constructors = new LinkedList<Method>();
         LinkedList<Method> other = new LinkedList<Method>();
         for (Method toSort : methods)
-            if (myAddress.getName().equals(toSort.getName()))
+            if (toSort instanceof Method.Constructor)
                 constructors.add(toSort);
             else
                 other.add(toSort);
