@@ -90,16 +90,17 @@ public class Method extends Formatted implements HasAtoms {
                                                     List<? extends Var<? extends AValue>> paramList,
                                                     List<TargetClass> exceptionList,
                                                     Block body) {
-        return new Constructor(comment, name, paramList, exceptionList, body);
+        return new Constructor(comment, Visibility.PUBLIC, name, paramList, exceptionList, body);
     }
 
     public static class Constructor extends Method {
         protected Constructor(Comment comment,
+                              Visibility visibility,
                               String name,
                               List<? extends Var<? extends AValue>> paramList,
                               List<TargetClass> exceptionList,
                               Block body) {
-            super(comment, Visibility.PUBLIC, Scope.OBJECT, TargetClass.SELF_TYPED, name, paramList, exceptionList, body);
+            super(comment, visibility, Scope.OBJECT, TargetClass.SELF_TYPED, name, paramList, exceptionList, body);
         }
     }
 
@@ -108,6 +109,14 @@ public class Method extends Formatted implements HasAtoms {
                                        List<? extends Var<? extends AValue>> paramList,
                                        Block body) {
         return newPublicConstructorWithException(comment, name, paramList, Collections.<TargetClass>emptyList(), body);
+    }
+
+    public static Method newConstructor(Comment comment,
+                                        Visibility visibility,
+                                        String name,
+                                        List<? extends Var<? extends AValue>> paramList,
+                                        Block body) {
+        return new Constructor(comment, visibility, name, paramList, Collections.<TargetClass>emptyList(), body);
     }
 
     public static Method newPublicReadObjectState(Comment comment,
