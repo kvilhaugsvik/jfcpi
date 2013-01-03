@@ -35,7 +35,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     private final String name;
     private final Typed<? extends AValue> value;
 
-    private final Address referName;
+    private final Reference reference;
 
     protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
                 TargetClass type, String name, Typed<Kind> value) {
@@ -47,18 +47,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         this.name = name;
         this.value = value;
 
-        switch (scope) {
-            case CLASS:
-                this.referName = new Address(TargetClass.SELF_TYPED, new CodeAtom(name));
-                break;
-            case OBJECT:
-                this.referName = new Address("this", name);
-                break;
-            case CODE_BLOCK:
-            default:
-                this.referName = new Address(name);
-                break;
-        }
+        this.reference = new Reference(this);
     }
 
     public Visibility getVisibility() {
@@ -115,7 +104,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
      * @return variable name access
      */
     public Reference<Kind> ref() {
-        return new Reference<Kind>(this);
+        return reference;
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
@@ -170,7 +159,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         return new Typed<Kind>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
-                referName.writeAtoms(to);
+                reference.writeAtoms(to);
                 to.add(HAS);
                 to.add(new CodeAtom(field));
             }
@@ -200,13 +189,23 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     }
 
     public static class Reference<Contains extends AValue> extends Address implements Value<Contains> {
-        private final Var of;
         private final ValueHelper valueHelper;
 
-        public Reference(Var of, CodeAtom... followedBy) {
-            super(of.referName, followedBy);
-            this.of = of;
+        public Reference(Var of) {
+            super(getFullAddress(of));
             this.valueHelper = new ValueHelper(of.type, this);
+        }
+
+        private static Address getFullAddress(Var of) {
+            switch (of.scope) {
+                case CLASS:
+                    return new Address(TargetClass.SELF_TYPED, new CodeAtom(of.name));
+                case OBJECT:
+                    return new Address("this", of.name);
+                case CODE_BLOCK:
+                default:
+                    return new Address(of.name);
+            }
         }
 
         public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
@@ -219,7 +218,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         }
 
         public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {
-            return new SetTo<Ret>(of.referName, value);
+            return new SetTo<Ret>(this, value);
         }
     }
 }
