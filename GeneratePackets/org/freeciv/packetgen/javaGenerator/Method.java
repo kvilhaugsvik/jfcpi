@@ -65,7 +65,7 @@ public class Method extends Formatted implements HasAtoms {
         comment.writeAtoms(to);
         visibility.writeAtoms(to);
         scope.writeAtoms(to);
-        if (null != type) type.writeAtoms(to);
+        if (!TargetClass.SELF_TYPED.equals(type)) type.writeAtoms(to);
         name.writeAtoms(to);
         to.add(HasAtoms.LPR);
         if (!paramList.isEmpty()) {

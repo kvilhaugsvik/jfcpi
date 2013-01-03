@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class TargetClass extends Address implements AValue {
-    public static final TargetClass SELF_TYPED = null; // todo: Don't use null to signal the class using the code
+    public static final TargetClass SELF_TYPED = new TargetClass();
 
     private final boolean isInScope;
     private final Common shared;
@@ -86,6 +86,12 @@ public class TargetClass extends Address implements AValue {
         super(common.where, common.name);
         this.isInScope = isInScope;
         this.shared = common;
+    }
+
+    private TargetClass() {
+        super(TargetPackage.TOP_LEVEL);
+        this.isInScope = true;
+        this.shared = new Common(new CodeAtom(""), TargetPackage.TOP_LEVEL, new HashMap<String, TargetMethod>(), this);
     }
 
     public TargetPackage getPackage() {
