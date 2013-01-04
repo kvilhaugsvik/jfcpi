@@ -58,7 +58,7 @@ public class Struct extends ClassWriter implements IDependency {
         }
         varsToString = sum(varsToString, literal(")"));
         addMethod(Method.newPublicReadObjectState(Comment.no(),
-                TargetClass.fromName("String"), "toString",
+                TargetClass.newKnown(String.class), "toString",
                 new Block(RETURN(varsToString))));
 
         iRequire = willNeed;

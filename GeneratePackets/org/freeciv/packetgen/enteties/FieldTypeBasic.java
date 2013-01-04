@@ -30,6 +30,7 @@ import org.freeciv.types.FCEnum;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
 import java.util.*;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
@@ -123,7 +124,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
 
             addObjectConstant(javaType.getName(), "value");
 
-            List<TargetClass> tIOExcept = Arrays.asList(new TargetClass("IOException"));
+            List<TargetClass> tIOExcept = Arrays.asList(new TargetClass(IOException.class, true));
             Var<TargetClass> pValue = Var.param(javaType, "value");
 
             addMethod(Method.newPublicConstructor(Comment.no(),
@@ -136,18 +137,18 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                     new TargetClass(void.class, true), "encodeTo", Arrays.asList(pTo),
                     tIOExcept, encode));
             addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    TargetClass.fromName("int"), "encodedLength",
+                    TargetClass.fromClass(int.class), "encodedLength",
                     encodedSize));
             addMethod(Method.newPublicReadObjectState(Comment.no(),
                     javaType, "getValue",
                     new Block(RETURN(getField("value").ref()))));
             addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    TargetClass.fromName("String"), "toString",
+                    TargetClass.newKnown(String.class), "toString",
                     new Block(RETURN(value2String.x(getField("value"))))));
             Var<TargetClass> paramOther = Var.param(new TargetClass(Object.class), "other");
             addMethod(Method.custom(Comment.no(),
                     Visibility.PUBLIC, Scope.OBJECT,
-                    TargetClass.fromName("boolean"), "equals", Arrays.asList(paramOther),
+                    TargetClass.fromClass(boolean.class), "equals", Arrays.asList(paramOther),
                     Collections.<TargetClass>emptyList(),
                     new Block(IF(
                             BuiltIn.<ABool>toCode("other instanceof " + name),

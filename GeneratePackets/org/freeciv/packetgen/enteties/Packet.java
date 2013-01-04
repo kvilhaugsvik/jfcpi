@@ -234,7 +234,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 body.addStatement(field.call("encodeTo", pTo.ref()));
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                TargetClass.fromName("void"), "encodeTo", Arrays.asList(pTo),
+                TargetClass.fromClass(void.class), "encodeTo", Arrays.asList(pTo),
                 Arrays.asList(ioexception), body));
     }
 
@@ -250,7 +250,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         }
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
-                TargetClass.fromName("int"), "calcBodyLen", Collections.<Var<AValue>>emptyList(),
+                TargetClass.fromClass(int.class), "calcBodyLen", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(),
                 encodeFieldsLen));
     }

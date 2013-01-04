@@ -104,7 +104,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         addObjectConstant("boolean", "valid");
         if (nameOverride)
             addField(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES,
-                    new TargetClass("String"), "toStringName", null));
+                    new TargetClass(String.class), "toStringName", null));
         else
             addObjectConstant("String", "toStringName");
 
@@ -125,11 +125,11 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
                         fieldToStringName.assign(paramToStrName.ref()),
                         fieldValid.assign(paramValid.ref()))));
 
-        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("int"), "getNumber",
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(int.class), "getNumber",
                 new Block(BuiltIn.RETURN(fieldNumber.ref()))));
-        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("boolean"), "isValid",
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(boolean.class), "isValid",
                 new Block(BuiltIn.RETURN(fieldValid.ref()))));
-        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromName("String"), "toString",
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.newKnown(String.class), "toString",
                 new Block(BuiltIn.RETURN(fieldToStringName.ref()))));
         if (nameOverride) {
             Var<AString> paramName = Var.param("String", "name");
@@ -142,7 +142,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         addMethod(Method.newReadClassState(Comment.doc("Is the enum bitwise?",
                 "An enum is bitwise if it's number increase by two's exponent.",
                 Comment.docReturns("true if the enum is bitwise")),
-                TargetClass.fromName("boolean"), "isBitWise", new Block(RETURN(BuiltIn.<ABool>toCode(bitwise + "")))));
+                TargetClass.fromClass(boolean.class), "isBitWise", new Block(RETURN(BuiltIn.<ABool>toCode(bitwise + "")))));
 
         Var element = Var.local(this.getName(), "element", null);
         addMethod(Method.custom(Comment.no(),

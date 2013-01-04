@@ -302,7 +302,7 @@ public class TerminatedArray extends FieldTypeBasic {
             )));
         }
         return Method.newPublicDynamicMethod(Comment.no(),
-                new TargetClass("void", true), SELF_VALIDATOR_NAME,
+                new TargetClass(void.class, true), SELF_VALIDATOR_NAME,
                 Arrays.asList(Hardcoded.pLimits),
                 Collections.<TargetClass>emptyList(),
                 verifyInsideLimits);
