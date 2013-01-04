@@ -154,8 +154,8 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         Var header = getField("header");
         return labelExceptionsWithPacketAndField(header, new Block(
                 header.assign(headerKind.newInstance(
-                        sum(BuiltIn.<AValue>toCode("calcBodyLen()"), headerKind.read("HEADER_SIZE")),
-                        BuiltIn.<AValue>toCode("number")))), addExceptionLocation);
+                        sum(new MethodCall<AnInt>("calcBodyLen"), headerKind.read("HEADER_SIZE")),
+                        getField("number").ref()))), addExceptionLocation);
     }
 
     private void addConstructorFromJavaTypes(Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation) throws UndefinedException {
@@ -181,6 +181,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation) throws UndefinedException {
         Var<TargetClass> argHeader = Var.param(new TargetClass(PacketHeader.class, true), "header");
         final Var<TargetClass> streamName = Var.param(new TargetClass(DataInput.class, true), "from");
+        MethodCall<AnInt> calcBodyLenCall = new MethodCall<AnInt>("calcBodyLen");
 
         Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
         for (Field field : fields) {
@@ -193,28 +194,28 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
         constructorBodyStream.groupBoundary();
 
-        constructorBodyStream.addStatement(IF(BuiltIn.<ABool>toCode("number != header.getPacketKind()"),
+        constructorBodyStream.addStatement(IF(isNotSame(getField("number").ref(), argHeader.<AnInt>call("getPacketKind")),
                 new Block(THROW((ioexception).newInstance(sum(
                         literal("Tried to create package " + name + " but packet number was "),
                         argHeader.<AnInt>call("getPacketKind")))))));
 
-        constructorBodyStream.addStatement(ASSERT(BuiltIn.<ABool>toCode("header instanceof " + headerKind.getName()),
+        constructorBodyStream.addStatement(ASSERT(isInstanceOf(argHeader.ref(), headerKind),
                 literal("Packet not generated for this kind of header")));
 
         Block wrongSize = new Block();
-        constructorBodyStream.addStatement(IF(BuiltIn.<ABool>toCode("header.getHeaderSize() + calcBodyLen() != header.getTotalSize()"),
-                wrongSize));
+        constructorBodyStream.addStatement(IF(isNotSame(sum(argHeader.<AnInt>call("getHeaderSize"),
+                calcBodyLenCall), argHeader.<AnInt>call("getTotalSize")), wrongSize));
         wrongSize.addStatement(new MethodCall<NoValue>("Logger.getLogger(" + logger + ").warning", sum(
                 literal("Probable misinterpretation: "),
                 literal("interpreted packet size ("),
-                GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), BuiltIn.<AnInt>toCode("calcBodyLen()"))),
+                GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), calcBodyLenCall)),
                 literal(") don't match header packet size ("), argHeader.<AnInt>call("getTotalSize"),
-                literal(") for "), BuiltIn.<AString>toCode("this.toString()"))));
+                literal(") for "), new MethodCall<AString>("this.toString"))));
         wrongSize.addStatement(THROW(ioexception.newInstance(sum(
                 literal("Packet size in header and Java packet not the same."),
                 literal(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
                 literal(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
-                literal(" Packet body size: "), BuiltIn.<AValue>toCode("calcBodyLen()")))));
+                literal(" Packet body size: "), calcBodyLenCall))));
         addMethod(Method.newPublicConstructorWithException(Comment.doc(
                 "Construct an object from a DataInput", new String(),
                 Comment.param(streamName, "data stream that is at the start of the package body"),
@@ -228,7 +229,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private void addEncoder(Field[] fields) {
         Var<TargetClass> pTo = Var.<TargetClass>param(new TargetClass(DataOutput.class, true), "to");
         Block body = new Block();
-        body.addStatement(getField("header").call("encodeTo", BuiltIn.<AValue>toCode("to")));
+        body.addStatement(getField("header").call("encodeTo", pTo.ref()));
         if (0 < fields.length) {
             for (Field field : fields)
                 body.addStatement(field.call("encodeTo", pTo.ref()));
@@ -256,7 +257,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     }
 
     private static Typed<? extends AValue> calcBodyLen(Field field) {
-        return BuiltIn.<AValue>toCode("this." + field.getFieldName() + ".encodedLength()");
+        return field.call("encodedLength");
     }
 
     private void addToString(String name, Field[] fields) {
@@ -274,7 +275,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private void addJavaGetter(Field field) throws UndefinedException {
         Block body;
 
-        body = new Block(RETURN(BuiltIn.<AValue>toCode("this." + field.getFieldName() + ".getValue()")));
+        body = new Block(RETURN(field.call("getValue")));
 
         addMethod(Method.newPublicReadObjectState(Comment.no(),
                 field.getUnderType().scopeKnown(),
