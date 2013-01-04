@@ -230,4 +230,12 @@ public class TargetClass extends Address implements AValue {
 
         return new TargetClass(cl);
     }
+
+    public static TargetClass newKnown(Class cl) {
+        return fromClass(cl).scopeKnown();
+    }
+
+    public static TargetClass newKnown(String name) {
+        return fromName(name).scopeKnown();
+    }
 }
