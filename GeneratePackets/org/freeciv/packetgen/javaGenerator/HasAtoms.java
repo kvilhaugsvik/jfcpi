@@ -70,5 +70,7 @@ public interface HasAtoms {
     public static final CodeAtom IMPLEMENTS = new IR.CodeAtom("implements");
     public static final CodeAtom THROWS = new IR.CodeAtom("throws");
 
+    public static final CodeAtom SELF = new CodeAtom("SELF (self typed)");
+
     public void writeAtoms(CodeAtoms to);
 }

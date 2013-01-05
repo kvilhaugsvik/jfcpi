@@ -194,6 +194,13 @@ public class ClassWriter extends Formatted implements HasAtoms {
     public void writeAtoms(CodeAtoms to) {
         to.hintStart(CodeStyle.OUTER_LEVEL);
 
+        to.rewriteRule(new Util.OneCondition<IR.CodeAtom>() {
+            @Override
+            public boolean isTrueFor(IR.CodeAtom argument) {
+                return HasAtoms.SELF.equals(argument);
+            }
+        }, myAddress.getCName());
+
         if (!TargetPackage.TOP_LEVEL.equals(myAddress.getPackage())) {
             to.add(HasAtoms.PACKAGE);
             myAddress.getPackage().writeAtoms(to);

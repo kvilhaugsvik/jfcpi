@@ -91,7 +91,7 @@ public class TargetClass extends Address implements AValue {
     private TargetClass() {
         super(TargetPackage.TOP_LEVEL);
         this.isInScope = true;
-        this.shared = new Common(new CodeAtom(""), TargetPackage.TOP_LEVEL, new HashMap<String, TargetMethod>(), this);
+        this.shared = new Common(HasAtoms.SELF, TargetPackage.TOP_LEVEL, new HashMap<String, TargetMethod>(), this);
     }
 
     public TargetPackage getPackage() {
