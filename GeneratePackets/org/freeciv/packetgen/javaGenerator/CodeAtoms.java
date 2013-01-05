@@ -22,12 +22,12 @@ import java.util.*;
 public class CodeAtoms {
     //TODO: Rename atoms
     private final LinkedList<IR> atoms;
-    private Util.OneCondition<CodeAtom> reason;
+    LinkedList<RewriteRule> rewrites;
     private List<IR.Hint> onNext;
 
     public CodeAtoms(HasAtoms... start) {
         atoms = new LinkedList<IR>();
-        reason = null;
+        rewrites = new LinkedList<RewriteRule>();
         onNext = new LinkedList<IR.Hint>();
 
         for (HasAtoms owner : start)
@@ -35,13 +35,42 @@ public class CodeAtoms {
     }
 
     public void add(CodeAtom atom) {
-        if (null == reason || !reason.isTrueFor(atom))
-            atoms.add(new IR(atom));
-        reason = null;
+        int atomsAtTheBeginning = atoms.size();
 
+        addAtomOrRewrite(atom);
+        cleanRewriteRules();
+
+        if (atomsAtTheBeginning < atoms.size()) {
+            hintsAddStoredBeginnings(atomsAtTheBeginning);
+        }
+    }
+
+    private void hintsAddStoredBeginnings(int atomsAtTheBeginning) {
         for (IR.Hint hint : onNext)
-            atoms.peekLast().addHint(hint);
+            atoms.get(atomsAtTheBeginning).addHint(hint);
         onNext = new LinkedList<IR.Hint>();
+    }
+
+    private void addAtomOrRewrite(CodeAtom atom) {
+        HasAtoms replacement = null;
+
+        for (RewriteRule test : rewrites)
+            if (test.isTrueFor(atom))
+                replacement = test.getReplacement();
+
+        if (null == replacement)
+            atoms.add(new IR(atom));
+        else
+            replacement.writeAtoms(this);
+    }
+
+    private void cleanRewriteRules() {
+        int elementToLookAt = 0;
+        while (elementToLookAt < rewrites.size())
+            if (rewrites.get(elementToLookAt).removeMeNow())
+                rewrites.remove(elementToLookAt);
+            else
+                elementToLookAt++;
     }
 
     public void hintStart(String name) {
@@ -56,7 +85,7 @@ public class CodeAtoms {
     }
 
     public void refuseNextIf(Util.OneCondition<CodeAtom> reason) {
-        this.reason = reason;
+        rewrites.add(new RefuseNextIf(reason));
     }
 
     public IR get(int number) {
@@ -80,6 +109,42 @@ public class CodeAtoms {
         for (int index = 1; index < toJoin.length; index++) {
             separator.writeAtoms(this);
             toJoin[index].writeAtoms(this);
+        }
+    }
+
+    private interface RewriteRule {
+        public boolean isTrueFor(CodeAtom atom);
+        public HasAtoms getReplacement();
+        public boolean removeMeNow();
+    }
+
+    private static class RefuseNextIf implements RewriteRule {
+        private final Util.OneCondition<CodeAtom> reason;
+
+        boolean used = false;
+
+        private RefuseNextIf(Util.OneCondition<CodeAtom> reason) {
+            this.reason = reason;
+        }
+
+        @Override
+        public boolean isTrueFor(CodeAtom atom) {
+            used = true;
+            return reason.isTrueFor(atom);
+        }
+
+        @Override
+        public HasAtoms getReplacement() {
+            return new HasAtoms() {
+                @Override
+                public void writeAtoms(CodeAtoms to) {
+                }
+            };
+        }
+
+        @Override
+        public boolean removeMeNow() {
+            return used;
         }
     }
 }
