@@ -137,7 +137,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 constructorBody.addStatement(labelExceptionsWithPacketAndField(field, validate, addExceptionLocation));
         }
         constructorBody.addStatement(generateHeader(headerKind, addExceptionLocation));
-        addMethod(Method.newPublicConstructor(Comment.no(), getName(), params, constructorBody));
+        addMethod(Method.newPublicConstructor(Comment.no(), params, constructorBody));
     }
 
     private Typed<NoValue> labelExceptionsWithPacketAndField(Var field, Block operation, TargetMethod addExceptionLocation) {
@@ -174,7 +174,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 constructorBodyJ.addStatement(labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation));
             }
             constructorBodyJ.addStatement(generateHeader(headerKind, addExceptionLocation));
-            addMethod(Method.newPublicConstructor(Comment.no(), getName(), params, constructorBodyJ));
+            addMethod(Method.newPublicConstructor(Comment.no(), params, constructorBodyJ));
         }
     }
 
@@ -221,7 +221,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 Comment.param(streamName, "data stream that is at the start of the package body"),
                 Comment.param(argHeader, "header data. Must contain size and number"),
                 Comment.docThrows(ioexception, "if the DataInput has a problem")),
-                getName(), Arrays.asList(streamName, argHeader),
+                Arrays.asList(streamName, argHeader),
                 Arrays.asList(ioexception),
                 constructorBodyStream));
     }

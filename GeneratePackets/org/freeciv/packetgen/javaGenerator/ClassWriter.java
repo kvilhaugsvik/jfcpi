@@ -182,7 +182,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(Var.param(dec.getType(), dec.getName()));
         }
-        Method.newPublicConstructor(Comment.no(), myAddress.getName(), args, body).writeAtoms(to);
+        Method.newPublicConstructor(Comment.no(), args, body).writeAtoms(to);
     }
 
     @Override

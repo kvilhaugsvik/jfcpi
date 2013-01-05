@@ -128,10 +128,10 @@ public class FieldTypeBasic implements IDependency, ReqKind {
             Var<TargetClass> pValue = Var.param(javaType, "value");
 
             addMethod(Method.newPublicConstructor(Comment.no(),
-                    getName(), new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
+                    new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
                     constructorBody));
             addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                    getName(), new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits))), tIOExcept,
+                    new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits))), tIOExcept,
                     decode));
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
                     new TargetClass(void.class, true), "encodeTo", Arrays.asList(pTo),

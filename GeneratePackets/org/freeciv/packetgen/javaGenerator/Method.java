@@ -65,8 +65,9 @@ public class Method extends Formatted implements HasAtoms {
         comment.writeAtoms(to);
         visibility.writeAtoms(to);
         scope.writeAtoms(to);
-        if (!TargetClass.SELF_TYPED.equals(type)) type.writeAtoms(to);
-        name.writeAtoms(to);
+        type.writeAtoms(to);
+        if (!(this instanceof Constructor))
+            name.writeAtoms(to);
         to.add(HasAtoms.LPR);
         if (!paramList.isEmpty()) {
             to.hintStart(CodeStyle.ARGUMENTS);
@@ -82,37 +83,33 @@ public class Method extends Formatted implements HasAtoms {
     }
 
     public static Method newPublicConstructorWithException(Comment comment,
-                                                    String name,
-                                                    List<? extends Var<? extends AValue>> paramList,
-                                                    List<TargetClass> exceptionList,
-                                                    Block body) {
-        return new Constructor(comment, Visibility.PUBLIC, name, paramList, exceptionList, body);
+                                                           List<? extends Var<? extends AValue>> paramList,
+                                                           List<TargetClass> exceptionList,
+                                                           Block body) {
+        return new Constructor(comment, Visibility.PUBLIC, paramList, exceptionList, body);
     }
 
     public static class Constructor extends Method {
         protected Constructor(Comment comment,
                               Visibility visibility,
-                              String name,
                               List<? extends Var<? extends AValue>> paramList,
                               List<TargetClass> exceptionList,
                               Block body) {
-            super(comment, visibility, Scope.OBJECT, TargetClass.SELF_TYPED, name, paramList, exceptionList, body);
+            super(comment, visibility, Scope.OBJECT, TargetClass.SELF_TYPED, null, paramList, exceptionList, body);
         }
     }
 
     public static Method newPublicConstructor(Comment comment,
-                                       String name,
-                                       List<? extends Var<? extends AValue>> paramList,
-                                       Block body) {
-        return newPublicConstructorWithException(comment, name, paramList, Collections.<TargetClass>emptyList(), body);
+                                              List<? extends Var<? extends AValue>> paramList,
+                                              Block body) {
+        return newPublicConstructorWithException(comment, paramList, Collections.<TargetClass>emptyList(), body);
     }
 
     public static Method newConstructor(Comment comment,
                                         Visibility visibility,
-                                        String name,
                                         List<? extends Var<? extends AValue>> paramList,
                                         Block body) {
-        return new Constructor(comment, visibility, name, paramList, Collections.<TargetClass>emptyList(), body);
+        return new Constructor(comment, visibility, paramList, Collections.<TargetClass>emptyList(), body);
     }
 
     public static Method newPublicReadObjectState(Comment comment,

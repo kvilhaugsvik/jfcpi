@@ -527,11 +527,11 @@ public class CodeGenTest {
 
     @Test public void testPublicConstructorNoExceptions() {
         String result = Method.newPublicConstructor(Comment.no(),
-                "PACKET_CITY_NAME_SUGGESTION_REQ", Arrays.asList(Var.param(Integer.class, "unit_id")),
+                Arrays.asList(Var.param(Integer.class, "unit_id")),
                 Block.fromStrings("this.unit_id = new UNIT(unit_id)")).toString();
 
         assertEquals("Generated source not as expected",
-                "\t" + "public PACKET_CITY_NAME_SUGGESTION_REQ(Integer unit_id) {" + "\n" +
+                "\t" + "public " + HasAtoms.SELF.get() + "(Integer unit_id) {" + "\n" +
                         "\t" + "\t" + "this.unit_id = new UNIT(unit_id);" + "\n" +
                         "\t" + "}" + "\n",
                 result);
@@ -560,7 +560,7 @@ public class CodeGenTest {
                         Comment.param(pHeaderLen, "length from header package"),
                         Comment.param(pPacket, "the number of the packet specified in the header"),
                         Comment.docThrows(new TargetClass(IOException.class, true), "if the DataInput has a problem")),
-                        "PACKET_CITY_NAME_SUGGESTION_REQ", Arrays.asList(pFrom, pHeaderLen, pPacket),
+                        Arrays.asList(pFrom, pHeaderLen, pPacket),
                         Arrays.asList(ioe),
                         body));
 
@@ -572,7 +572,7 @@ public class CodeGenTest {
                         "\t" + " * @param packet the number of the packet specified in the header" + "\n" +
                         "\t" + " * @throws IOException if the DataInput has a problem" + "\n" +
                         "\t" + " */" + "\n" +
-                        "\t" + "public PACKET_CITY_NAME_SUGGESTION_REQ(DataInput from, int headerLen, int packet) throws IOException {\n" +
+                        "\t" + "public " + HasAtoms.SELF.get() + "(DataInput from, int headerLen, int packet) throws IOException {\n" +
                         "\t" + "\t" + "this.unit_id = new UNIT(from);\n" +
                         "\t" + "\t" + "if (getNumber() != packet) {\n" +
                         "\t" + "\t" + "\t" + "throw new IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet);\n" +

@@ -47,13 +47,13 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
         Var<TargetArray> pFromBits = Var.param(boolArray, "from");
         Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
         addMethod(Method.newPublicConstructor(Comment.no(),
-                getName(), Arrays.asList(pFromByte),
+                Arrays.asList(pFromByte),
                 new Block(new MethodCall<Returnable>("super", getField("size").ref(), pFromByte.ref()))));
         addMethod(Method.newPublicConstructor(Comment.no(),
-                getName(), Arrays.asList(pFromBits),
+                Arrays.asList(pFromBits),
                 new Block(new MethodCall<Returnable>("super", pFromBits.ref()))));
         addMethod(Method.newPublicConstructor(Comment.no(),
-                getName(), Arrays.asList(pFromBit),
+                Arrays.asList(pFromBit),
                 new Block(new MethodCall<Returnable>("super", getField("size").ref(), pFromBit.ref()))));
 
         iRequire = bits.getReqs();
@@ -79,17 +79,17 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
         Var<AnInt> size = getField("size");
 
         addMethod(Method.newPublicConstructor(Comment.no(),
-                getName(), Arrays.asList(pFromByte, pSizeB),
+                Arrays.asList(pFromByte, pSizeB),
                 new Block(
                         new MethodCall("super", pSizeB.ref(), pFromByte.ref()),
                         size.assign(pSizeB.ref()))));
         addMethod(Method.newPublicConstructor(Comment.no(),
-                getName(), Arrays.asList(pFromBits),
+                Arrays.asList(pFromBits),
                 new Block(
                         new MethodCall<Returnable>("super", pFromBits.ref()),
                         size.assign(pFromBits.read("length")))));
         addMethod(Method.newPublicConstructor(Comment.no(),
-                getName(), Arrays.asList(pFromBit, pSize),
+                Arrays.asList(pFromBit, pSize),
                 new Block(
                         new MethodCall<Returnable>("super", pSize.ref(), pFromBit.ref()),
                         size.assign(pSize.ref()))));
