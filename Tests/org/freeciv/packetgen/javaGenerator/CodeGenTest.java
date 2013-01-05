@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
@@ -643,5 +644,103 @@ public class CodeGenTest {
         assertEquals(HasAtoms.ADD, atoms.get(0).getAtom());
         assertEquals(HasAtoms.SUB, atoms.get(1).getAtom());
         assertEquals(HasAtoms.ADD, atoms.get(2).getAtom());
+    }
+
+    @Test public void codeAtoms_rewriteRule_rewrites_usingAtom() {
+        CodeAtoms atoms = new CodeAtoms();
+        atoms.add(HasAtoms.ADD);
+        atoms.rewriteRule(new Util.OneCondition<IR.CodeAtom>() {
+            @Override
+            public boolean isTrueFor(IR.CodeAtom argument) {
+                return true;
+            }
+        }, HasAtoms.SUB);
+        atoms.add(HasAtoms.MUL);
+
+        assertEquals("Test assumption changed", HasAtoms.ADD, atoms.get(0).getAtom());
+        assertEquals("Didn't rewrite", HasAtoms.SUB, atoms.get(1).getAtom());
+    }
+
+    @Test public void codeAtoms_rewriteRule_rewrites_usingHasAtoms() {
+        CodeAtoms atoms = new CodeAtoms();
+        atoms.add(HasAtoms.ADD);
+        atoms.rewriteRule(
+                new Util.OneCondition<IR.CodeAtom>() {
+                    @Override
+                    public boolean isTrueFor(IR.CodeAtom argument) {
+                        return HasAtoms.MUL.equals(argument);
+                    }
+                },
+                new HasAtoms() {
+                    @Override
+                    public void writeAtoms(CodeAtoms to) {
+                        to.add(SUB);
+                        to.add(SUB);
+                    }
+                });
+        atoms.add(HasAtoms.MUL);
+
+        assertEquals("Test assumption changed", HasAtoms.ADD, atoms.get(0).getAtom());
+        assertEquals("Didn't rewrite", HasAtoms.SUB, atoms.get(1).getAtom());
+        assertEquals("Didn't rewrite", HasAtoms.SUB, atoms.get(2).getAtom());
+    }
+
+    @Test public void codeAtoms_rewriteRule_prioritizesTheNewestRule() {
+        CodeAtoms atoms = new CodeAtoms();
+        atoms.add(HasAtoms.ADD);
+        atoms.rewriteRule(new Util.OneCondition<IR.CodeAtom>() {
+            @Override
+            public boolean isTrueFor(IR.CodeAtom argument) {
+                return true;
+            }
+        }, HasAtoms.SUB);
+        atoms.rewriteRule(new Util.OneCondition<IR.CodeAtom>() {
+            @Override
+            public boolean isTrueFor(IR.CodeAtom argument) {
+                return true;
+            }
+        }, HasAtoms.ADD);
+        atoms.add(HasAtoms.MUL);
+
+        assertEquals("Test assumption changed", HasAtoms.ADD, atoms.get(0).getAtom());
+        assertNotSame("Picked the oldest rewrite rule", HasAtoms.SUB, atoms.get(1).getAtom());
+        assertEquals("Didn't rewrite", HasAtoms.ADD, atoms.get(1).getAtom());
+    }
+
+    @Test public void codeAtoms_rewriteRule_hintsAtTheRightPlaces() {
+        CodeAtoms atoms = new CodeAtoms();
+        atoms.add(HasAtoms.ADD);
+        atoms.rewriteRule(
+                new Util.OneCondition<IR.CodeAtom>() {
+                              @Override
+                              public boolean isTrueFor(IR.CodeAtom argument) {
+                                  return HasAtoms.MUL.equals(argument);
+                              }
+                          },
+                new HasAtoms() {
+                    @Override
+                    public void writeAtoms(CodeAtoms to) {
+                        to.add(new IR.CodeAtom("Here is the start"));
+                        to.add(new IR.CodeAtom("Here is the middle"));
+                        to.add(new IR.CodeAtom("Here is the end"));
+                    }
+                });
+        atoms.hintStart("The hint");
+        atoms.add(HasAtoms.MUL);
+        atoms.hintEnd("The hint");
+
+        assertEquals("Test assumption changed", HasAtoms.ADD, atoms.get(0).getAtom());
+
+        assertTrue("Wrong place for hint", atoms.get(0).getHintsBefore().isEmpty());
+        assertTrue("Wrong place for hint", atoms.get(0).getHintsAfter().isEmpty());
+
+        assertEquals("Hint not began", "The hint", atoms.get(1).getHintsBefore().get(0).get());
+        assertTrue("Wrong place for hint", atoms.get(1).getHintsAfter().isEmpty());
+
+        assertTrue("Wrong place for hint", atoms.get(2).getHintsBefore().isEmpty());
+        assertTrue("Wrong place for hint", atoms.get(2).getHintsAfter().isEmpty());
+
+        assertEquals("Hint not ended", "The hint", atoms.get(3).getHintsAfter().get(0).get());
+        assertTrue("Wrong place for hint", atoms.get(3).getHintsBefore().isEmpty());
     }
 }

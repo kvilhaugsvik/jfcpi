@@ -52,16 +52,16 @@ public class CodeAtoms {
     }
 
     private void addAtomOrRewrite(CodeAtom atom) {
-        HasAtoms replacement = null;
+        HasAtoms toAdd = atom;
 
         for (RewriteRule test : rewrites)
             if (test.isTrueFor(atom))
-                replacement = test.getReplacement();
+                toAdd = test.getReplacement();
 
-        if (null == replacement)
-            atoms.add(new IR(atom));
+        if (toAdd instanceof CodeAtom)
+            atoms.add(new IR((CodeAtom)toAdd));
         else
-            replacement.writeAtoms(this);
+            toAdd.writeAtoms(this);
     }
 
     private void cleanRewriteRules() {
@@ -86,6 +86,10 @@ public class CodeAtoms {
 
     public void refuseNextIf(Util.OneCondition<CodeAtom> reason) {
         rewrites.add(new RefuseNextIf(reason));
+    }
+
+    public void rewriteRule(Util.OneCondition<CodeAtom> trigger, HasAtoms replacement) {
+        rewrites.add(new Rewrite(trigger, replacement));
     }
 
     public IR get(int number) {
@@ -145,6 +149,31 @@ public class CodeAtoms {
         @Override
         public boolean removeMeNow() {
             return used;
+        }
+    }
+
+    private static class Rewrite implements RewriteRule {
+        private final Util.OneCondition<CodeAtom> condition;
+        private final HasAtoms replacement;
+
+        private Rewrite(Util.OneCondition<CodeAtom> condition, HasAtoms replacement) {
+            this.condition = condition;
+            this.replacement = replacement;
+        }
+
+        @Override
+        public boolean isTrueFor(CodeAtom atom) {
+            return condition.isTrueFor(atom);
+        }
+
+        @Override
+        public HasAtoms getReplacement() {
+            return replacement;
+        }
+
+        @Override
+        public boolean removeMeNow() {
+            return false;
         }
     }
 }
