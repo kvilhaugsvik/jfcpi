@@ -88,6 +88,12 @@ public class CodeAtoms {
         rewrites.add(new RefuseNextIf(reason));
     }
 
+    /**
+     * Rewrite an incoming code atom using a HasAtoms when the trigger is active. If many triggers fire the newest one
+     * will be used.
+     * @param trigger The condition that must be true for the rule to trigger.
+     * @param replacement the replacement for the atom
+     */
     public void rewriteRule(Util.OneCondition<CodeAtom> trigger, HasAtoms replacement) {
         rewrites.add(new Rewrite(trigger, replacement));
     }
