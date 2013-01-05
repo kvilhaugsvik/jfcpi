@@ -232,7 +232,7 @@ public class TypedCodeTest {
     @Test(expected = IllegalArgumentException.class)
     public void addLocalAsFieldWhileAskingForGetter() {
         Var notAField = Var.local(Integer.class, "i", null);
-        ClassWriter testcase = new ClassWriter(ClassKind.CLASS, TargetPackage.from("top"), null, null,
+        ClassWriter testcase = new ClassWriter(ClassKind.CLASS, TargetPackage.TOP_LEVEL, null, null,
                 Collections.<Annotate>emptyList(), "Testcase",
                 ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
 
@@ -284,7 +284,7 @@ public class TypedCodeTest {
 
     @Test public void targetPackageCached() {
         TargetPackage p1 = TargetPackage.from(Package.getPackage("org.freeciv.packetgen.javaGenerator"));
-        TargetPackage p2 = TargetPackage.from("org", "freeciv", "packetgen", "javaGenerator");
+        TargetPackage p2 = TargetPackage.from("org.freeciv.packetgen.javaGenerator");
         assertEquals("Did the work twice", p1, p2);
     }
 
