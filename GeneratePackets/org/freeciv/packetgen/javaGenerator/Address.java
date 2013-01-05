@@ -25,7 +25,12 @@ public class Address extends Formatted implements HasAtoms {
 
     protected final CodeAtom[] components;
 
-    public Address(String... parts) {
+    protected Address() {
+        components = new CodeAtom[0];
+    }
+
+    public Address(String address) {
+        String[] parts = address.split("\\.");
         ArrayList<CodeAtom> build = new ArrayList<CodeAtom>(parts.length);
         for (String part : parts)
             build.add(new CodeAtom(part));

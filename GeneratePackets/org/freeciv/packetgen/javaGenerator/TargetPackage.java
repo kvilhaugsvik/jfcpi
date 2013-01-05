@@ -14,12 +14,14 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.Util;
-
 public class TargetPackage extends Address {
-    public static final TargetPackage TOP_LEVEL = from();
+    public static final TargetPackage TOP_LEVEL = new TargetPackage();
 
-    private TargetPackage(String... parts) {
+    private TargetPackage() {
+        super();
+    }
+
+    private TargetPackage(String parts) {
         super(parts);
     }
 
@@ -27,15 +29,11 @@ public class TargetPackage extends Address {
         if (null == wrapped) // java.lang.Class gives null as the package for primitive Java types like int
             return TOP_LEVEL;
 
-        String name = wrapped.getName();
-        if (cached.containsKey(name))
-            return (TargetPackage)(cached.get(name));
-
-        return new TargetPackage(wrapped.getName().split("\\."));
+        return from(wrapped.getName());
     }
 
-    public static TargetPackage from(String... parts) {
-        String name = Util.joinStringArray(parts, ".", "", "");
+    public static TargetPackage from(String parts) {
+        String name = parts;
         if (cached.containsKey(name))
             return (TargetPackage)(cached.get(name));
 

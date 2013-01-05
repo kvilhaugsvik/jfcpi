@@ -32,7 +32,7 @@ public class TargetClass extends Address implements AValue {
     private final Common shared;
 
     public TargetClass(String fullPath, boolean isInScope) {
-        super(fullPath.split("\\."));
+        super(fullPath);
         final CodeAtom name = super.components[super.components.length - 1];
         final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
         this.isInScope = isInScope;
