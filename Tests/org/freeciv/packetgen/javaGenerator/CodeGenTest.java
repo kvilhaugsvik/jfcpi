@@ -596,4 +596,52 @@ public class CodeGenTest {
                         "\t}\n",
                 result);
     }
+
+    private CodeAtoms codeAtomsAddRefuseNextIfAdd() {
+        CodeAtoms atoms = new CodeAtoms();
+        atoms.add(HasAtoms.ADD);
+        atoms.refuseNextIf(new Util.OneCondition<IR.CodeAtom>() {
+            @Override
+            public boolean isTrueFor(IR.CodeAtom argument) {
+                return HasAtoms.ADD.equals(argument);
+            }
+        });
+        return atoms;
+    }
+
+    @Test public void codeAtoms_RefuseNextIf_RefusesNextWhenConditionTriggered() {
+        CodeAtoms atoms = codeAtomsAddRefuseNextIfAdd();
+        atoms.add(HasAtoms.ADD);
+
+        assertEquals(HasAtoms.ADD, atoms.get(0).getAtom());
+        assertEquals(1, atoms.toArray().length);
+    }
+
+    @Test public void codeAtoms_RefuseNextIf_AcceptsNextWhenConditionNotTriggered() {
+        CodeAtoms atoms = codeAtomsAddRefuseNextIfAdd();
+        atoms.add(HasAtoms.SUB);
+
+        assertEquals(HasAtoms.ADD, atoms.get(0).getAtom());
+        assertEquals(HasAtoms.SUB, atoms.get(1).getAtom());
+    }
+
+    @Test public void codeAtoms_RefuseNextIf_ConditionOnlyTriggeredOnNext_WhenWasTriggered() {
+        CodeAtoms atoms = codeAtomsAddRefuseNextIfAdd();
+        atoms.add(HasAtoms.ADD);
+        atoms.add(HasAtoms.ADD);
+
+        assertEquals(HasAtoms.ADD, atoms.get(0).getAtom());
+        assertEquals(HasAtoms.ADD, atoms.get(1).getAtom());
+        assertEquals(2, atoms.toArray().length);
+    }
+
+    @Test public void codeAtoms_RefuseNextIf_ConditionOnlyTriggeredOnNext_WhenWasNotTriggered() {
+        CodeAtoms atoms = codeAtomsAddRefuseNextIfAdd();
+        atoms.add(HasAtoms.SUB);
+        atoms.add(HasAtoms.ADD);
+
+        assertEquals(HasAtoms.ADD, atoms.get(0).getAtom());
+        assertEquals(HasAtoms.SUB, atoms.get(1).getAtom());
+        assertEquals(HasAtoms.ADD, atoms.get(2).getAtom());
+    }
 }
