@@ -184,7 +184,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         }
 
         public static <Ret extends AValue> SetTo<Ret> strToVal(String variable, Typed<Ret> value) {
-            return new SetTo<Ret>(new Address(variable), value);
+            return new SetTo<Ret>(new Address(Address.LOCAL_CODE_BLOCK, Address.addressString2Components(variable)), value);
         }
     }
 
