@@ -22,7 +22,7 @@ public class TargetPackage extends Address {
     }
 
     private TargetPackage(String parts) {
-        super(parts);
+        super(TOP_LEVEL, addressString2Components(parts));
     }
 
     public static TargetPackage from(Package wrapped) {
