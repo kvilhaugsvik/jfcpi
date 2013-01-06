@@ -153,7 +153,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<? extends AValue>, Var>() {
                         @Override
                         public Typed<AValue> x(Var from) {
-                            TargetClass universal = new TargetClass("org.freeciv.types.universal", true);
+                            TargetClass universal = TargetClass.newKnown("org.freeciv.types.universal");
                             return universal.newInstance(
                                     new MethodCall<AValue>(
                                             "universals_n.valueOf",
