@@ -144,7 +144,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
                 Comment.docReturns("true if the enum is bitwise")),
                 TargetClass.fromClass(boolean.class), "isBitWise", new Block(RETURN(BuiltIn.<ABool>toCode(bitwise + "")))));
 
-        Var element = Var.local(this.getName(), "element", null);
+        Var element = Var.local(this.getAddress().scopeKnown(), "element", null);
         addMethod(Method.custom(Comment.no(),
                 Visibility.PUBLIC, Scope.CLASS,
                 this.getAddress().scopeKnown(), "valueOf", Arrays.asList(paramNumber),
