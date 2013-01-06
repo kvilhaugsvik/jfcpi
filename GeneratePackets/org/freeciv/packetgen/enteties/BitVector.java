@@ -38,7 +38,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     public BitVector(String name, IntExpression bits) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), null,
                 "Freeciv C code", Collections.<Annotate>emptyList(), name,
-                new TargetClass(org.freeciv.types.BitVector.class, true), Collections.<TargetClass>emptyList());
+                TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
 
         addClassConstant(Visibility.PUBLIC, "int", "size", bits.toString());
         knowsSize = true;
@@ -66,7 +66,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), null,
                 "Freeciv C code", Collections.<Annotate>emptyList(), "BitString",
-                new TargetClass(org.freeciv.types.BitVector.class, true), Collections.<TargetClass>emptyList());
+                TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
 
         addPublicObjectConstant("int", "size");
         knowsSize = false;

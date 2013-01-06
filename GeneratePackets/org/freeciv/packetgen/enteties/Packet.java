@@ -46,7 +46,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private final Requirement iFulfill;
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
-    private final TargetClass ioexception = new TargetClass(IOException.class, true);
+    private final TargetClass ioexception = TargetClass.newKnown(IOException.class);
 
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, Field... fields) throws UndefinedException {
@@ -60,7 +60,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                               Import.classIn(java.util.logging.Logger.class),
                               Import.classIn(java.io.IOException.class)
                       }, "Freeciv's protocol definition", packetFlags, name,
-                      DEFAULT_PARENT, Arrays.asList(new TargetClass(org.freeciv.packet.Packet.class, true)));
+                      DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
 
         this.number = number;
         this.fields = fields;
@@ -100,7 +100,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
     private TargetMethod addExceptionLocationAdder() {
         Var<AValue> e = Var.param(RuntimeException.class, "e");
-        TargetClass ft = new TargetClass(FieldTypeException.class, true);
+        TargetClass ft = TargetClass.newKnown(FieldTypeException.class);
         Var<AValue> fte = Var.local(ft, "fte", cast(ft, e.ref()));
         Var<AString> pName = Var.param(String.class, "field");
         Method.Helper addExceptionLocation = Method.newHelper(
@@ -179,8 +179,8 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     }
 
     private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation) throws UndefinedException {
-        Var<TargetClass> argHeader = Var.param(new TargetClass(PacketHeader.class, true), "header");
-        final Var<TargetClass> streamName = Var.param(new TargetClass(DataInput.class, true), "from");
+        Var<TargetClass> argHeader = Var.param(TargetClass.newKnown(PacketHeader.class), "header");
+        final Var<TargetClass> streamName = Var.param(TargetClass.newKnown(DataInput.class), "from");
         MethodCall<AnInt> calcBodyLenCall = new MethodCall<AnInt>("calcBodyLen");
 
         Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
@@ -227,7 +227,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     }
 
     private void addEncoder(Field[] fields) {
-        Var<TargetClass> pTo = Var.<TargetClass>param(new TargetClass(DataOutput.class, true), "to");
+        Var<TargetClass> pTo = Var.<TargetClass>param(TargetClass.newKnown(DataOutput.class), "to");
         Block body = new Block();
         body.addStatement(getField("header").call("encodeTo", pTo.ref()));
         if (0 < fields.length) {

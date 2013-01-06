@@ -50,7 +50,7 @@ public class TargetClass extends Address implements AValue {
         methods.put("toString", new TargetMethod(this, "toString", fromClass(String.class), TargetMethod.Called.DYNAMIC));
     }
 
-    public TargetClass(Class wrapped, boolean isInScope) {
+    protected TargetClass(Class wrapped, boolean isInScope) {
         this(TargetPackage.from(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
 
         shared.represents = wrapped;

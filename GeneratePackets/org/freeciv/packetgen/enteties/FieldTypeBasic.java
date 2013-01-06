@@ -60,8 +60,8 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                           ExprFrom1<Typed<AnInt>, Var> encodedSize,
                           ExprFrom1<Typed<AString>, Var> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
-        pFromStream = Var.param(new TargetClass(DataInput.class, true), "from");
-        pTo = Var.param(new TargetClass(DataOutput.class, true), "to");
+        pFromStream = Var.param(TargetClass.newKnown(DataInput.class), "from");
+        pTo = Var.param(TargetClass.newKnown(DataOutput.class), "to");
         fValue = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                 javaType, "value", null);
 
@@ -124,7 +124,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
 
             addObjectConstant(javaType.getName(), "value");
 
-            List<TargetClass> tIOExcept = Arrays.asList(new TargetClass(IOException.class, true));
+            List<TargetClass> tIOExcept = Arrays.asList(TargetClass.newKnown(IOException.class));
             Var<TargetClass> pValue = Var.param(javaType, "value");
 
             addMethod(Method.newPublicConstructor(Comment.no(),
@@ -134,7 +134,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                     new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits))), tIOExcept,
                     decode));
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                    new TargetClass(void.class, true), "encodeTo", Arrays.asList(pTo),
+                    TargetClass.newKnown(void.class), "encodeTo", Arrays.asList(pTo),
                     tIOExcept, encode));
             addMethod(Method.newPublicReadObjectState(Comment.no(),
                     TargetClass.fromClass(int.class), "encodedLength",

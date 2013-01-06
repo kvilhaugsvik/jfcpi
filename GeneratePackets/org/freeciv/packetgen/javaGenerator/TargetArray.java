@@ -18,7 +18,6 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.utility.Strings;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TargetArray extends TargetClass {
@@ -31,7 +30,7 @@ public class TargetArray extends TargetClass {
         if (!wrapped.isArray())
             throw new IllegalArgumentException("Not an array");
 
-        this.of = new TargetClass(wrapped.getComponentType(), isInScope);
+        this.of = newKnown(wrapped.getComponentType());
 
         lookForDimensions(wrapped.getComponentType().getName());
 

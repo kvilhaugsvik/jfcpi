@@ -61,7 +61,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
                    String cntCode, String cntString, Collection<Requirement> reqs,
                 List<EnumElementFC> values) {
         super(ClassKind.ENUM, TargetPackage.from(FCEnum.class.getPackage()), null, "Freeciv C code", Collections.<Annotate>emptyList(), enumName,
-                DEFAULT_PARENT, Arrays.asList(new TargetClass(FCEnum.class, true)));
+                DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(FCEnum.class)));
 
         this.bitwise = bitwise;
         this.iRequire = reqs;
