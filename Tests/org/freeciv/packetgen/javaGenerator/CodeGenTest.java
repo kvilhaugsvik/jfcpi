@@ -506,7 +506,7 @@ public class CodeGenTest {
     @Test public void testClassWriterStyleConstantNoBlankLineAtTheEndOfTheClassScope() {
         ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(List.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
-        toWrite.addClassConstant("int", "five", "5");
+        toWrite.addClassConstant(Visibility.PRIVATE, int.class, "five", literal(5));
 
         String[] lines = toWrite.toString().split("\n");
 

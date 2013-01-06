@@ -84,22 +84,6 @@ public class ClassWriter extends Formatted implements HasAtoms {
         addField(Var.field(Collections.<Annotate>emptyList(), visibility, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
-    @Deprecated
-    public void addClassConstant(String type, String name, String value) {
-        fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
-                BuiltIn.<AValue>toCode(value)));
-    }
-
-    @Deprecated
-    public void addClassConstant(Visibility visibility, String type, String name, String value) {
-        fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, BuiltIn.<AValue>toCode(value)));
-    }
-
-    @Deprecated
-    public void addClassConstant(String type, String name, Typed<? extends AValue> value) {
-        fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
-    }
-
     public void addClassConstant(Visibility visibility, String type, String name, Typed<? extends AValue> value) {
         addClassConstant(visibility, TargetClass.fromName(type), name, value);
     }
@@ -130,11 +114,6 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     public void addPublicObjectConstant(Class type, String name) {
         addPublicObjectConstant(TargetClass.fromClass(type), name);
-    }
-
-    @Deprecated
-    public void addObjectConstantAndGetter(String type, String name) {
-        addObjectConstantAndGetter(Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addObjectConstantAndGetter(Var field) {
