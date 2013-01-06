@@ -112,7 +112,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     public void addObjectConstantAndGetter(Var field) {
         addField(field);
         addMethod(Method.newPublicReadObjectState(Comment.no(),
-                TargetClass.fromName(field.getType()),
+                field.getTType().scopeKnown(),
                 "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1),
                 new Block(RETURN(field.ref()))));
     }
