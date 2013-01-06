@@ -147,7 +147,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         Var element = Var.local(this.getName(), "element", null);
         addMethod(Method.custom(Comment.no(),
                 Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromName(this.getName()), "valueOf", Arrays.asList(paramNumber),
+                this.getAddress().scopeKnown(), "valueOf", Arrays.asList(paramNumber),
                 Collections.<TargetClass>emptyList(),
                 new Block(
                         FOR(element, new MethodCall<AValue>("values", new Typed[0]),
