@@ -80,31 +80,59 @@ public class ClassWriter extends Formatted implements HasAtoms {
         fields.add(field);
     }
 
+    public void addClassConstant(Visibility visibility, TargetClass type, String name, Typed<? extends AValue> value) {
+        addField(Var.field(Collections.<Annotate>emptyList(), visibility, Scope.CLASS, Modifiable.NO, type, name, value));
+    }
+
+    @Deprecated
     public void addClassConstant(String type, String name, String value) {
         fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name,
                 BuiltIn.<AValue>toCode(value)));
     }
 
+    @Deprecated
     public void addClassConstant(Visibility visibility, String type, String name, String value) {
         fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, BuiltIn.<AValue>toCode(value)));
     }
 
+    @Deprecated
     public void addClassConstant(String type, String name, Typed<? extends AValue> value) {
         fields.add(Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, type, name, value));
     }
 
     public void addClassConstant(Visibility visibility, String type, String name, Typed<? extends AValue> value) {
-        fields.add(Var.field(visibility, Scope.CLASS, Modifiable.NO, type, name, value));
+        addClassConstant(visibility, TargetClass.fromName(type), name, value);
+    }
+
+    public void addClassConstant(Visibility visibility, Class type, String name, Typed<? extends AValue> value) {
+        addClassConstant(visibility, TargetClass.fromClass(type), name, value);
+    }
+
+    public void addObjectConstant(TargetClass type, String name) {
+        addField(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addObjectConstant(String type, String name) {
-        fields.add(Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
+        addObjectConstant(TargetClass.fromName(type), name);
+    }
+
+    public void addObjectConstant(Class type, String name) {
+        addObjectConstant(TargetClass.fromClass(type), name);
+    }
+
+    public void addPublicObjectConstant(TargetClass type, String name) {
+        addField(Var.field(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
 
     public void addPublicObjectConstant(String type, String name) {
-        fields.add(Var.field(Visibility.PUBLIC, Scope.OBJECT, Modifiable.NO, type, name, null));
+        addPublicObjectConstant(TargetClass.fromName(type), name);
     }
 
+    public void addPublicObjectConstant(Class type, String name) {
+        addPublicObjectConstant(TargetClass.fromClass(type), name);
+    }
+
+    @Deprecated
     public void addObjectConstantAndGetter(String type, String name) {
         addObjectConstantAndGetter(Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, type, name, null));
     }
