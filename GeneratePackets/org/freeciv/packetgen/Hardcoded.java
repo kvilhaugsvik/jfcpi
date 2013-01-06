@@ -284,7 +284,7 @@ public class Hardcoded {
                 new Requirement("struct universal", DataType.class),
                 Collections.<Requirement>emptySet());
         handRolledUniversal.addPublicObjectConstant("universals_n", "kind");
-        handRolledUniversal.addPublicObjectConstant("int", "value");
+        handRolledUniversal.addPublicObjectConstant(int.class, "value");
         handRolledUniversal.addConstructorFields();
         handRolledUniversal.addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.newKnown(String.class), "toString",

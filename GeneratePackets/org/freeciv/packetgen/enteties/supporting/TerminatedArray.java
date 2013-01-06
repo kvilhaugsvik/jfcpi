@@ -1,5 +1,6 @@
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -319,7 +320,7 @@ public class TerminatedArray extends FieldTypeBasic {
         private FieldTypeAliasToTerminatedArray(String name, String alias) {
             super(name, alias);
 
-            addObjectConstant("ElementsLimit", "maxArraySize");
+            addObjectConstant(TargetClass.newKnown(ElementsLimit.class), "maxArraySize");
 
             if (!helpers.isEmpty()) {
                 for (Method helper : helpers) {

@@ -100,13 +100,13 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         this.invalidDefault = invalidCandidate;
         this.addEnumerated(this.invalidDefault);
 
-        addObjectConstant("int", "number");
-        addObjectConstant("boolean", "valid");
+        addObjectConstant(int.class, "number");
+        addObjectConstant(boolean.class, "valid");
         if (nameOverride)
             addField(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES,
                     TargetClass.fromClass(String.class), "toStringName", null));
         else
-            addObjectConstant("String", "toStringName");
+            addObjectConstant(String.class, "toStringName");
 
         Var<AString> fieldToStringName = this.getField("toStringName");
         Var<AnInt> fieldNumber = this.getField("number");

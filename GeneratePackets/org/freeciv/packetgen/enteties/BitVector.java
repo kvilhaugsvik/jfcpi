@@ -68,7 +68,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                 "Freeciv C code", Collections.<Annotate>emptyList(), "BitString",
                 TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
 
-        addPublicObjectConstant("int", "size");
+        addPublicObjectConstant(int.class, "size");
         knowsSize = false;
 
         Var<TargetArray> pFromByte = Var.param(byteArray, "from");
