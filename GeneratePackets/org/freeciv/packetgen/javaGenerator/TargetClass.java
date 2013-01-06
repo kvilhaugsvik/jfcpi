@@ -200,15 +200,22 @@ public class TargetClass extends Address implements AValue {
         }
     }
 
+    private static TargetClass getExisting(String name, boolean inScope) {
+        final Address found = cached.get(name);
+        if (!(found instanceof TargetClass))
+            throw new ClassCastException(found.getFullAddress() + " is a " +
+                    found.getClass().getCanonicalName() + " not a TargetClass");
+
+        return inScope ? ((TargetClass) found).scopeKnown() : ((TargetClass) found).scopeUnknown();
+    }
+
     private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w+");
     public static TargetClass fromName(String name) {
         boolean inScope = inJavaLang.matcher(name).matches();
-        if (cached.containsKey(name)) {
-            TargetClass target = (TargetClass) (cached.get(name));
-            return inScope ? target.scopeKnown() : target.scopeUnknown();
-        } else {
+        if (cached.containsKey(name))
+            return getExisting(name, inScope);
+        else
             return new TargetClass(name, inScope);
-        }
     }
 
     public static TargetClass fromClass(Class cl) {
@@ -216,12 +223,12 @@ public class TargetClass extends Address implements AValue {
         boolean inScope = Package.getPackage("java.lang").equals(cl.getPackage());
 
         if (cached.containsKey(name)) {
-            TargetClass targetClass = (TargetClass) (cached.get(name));
+            TargetClass targetClass = getExisting(name, inScope);
 
             if (null == targetClass.shared.represents)
                 targetClass.shared.represents = cl;
 
-            return inScope ? targetClass.scopeKnown() : targetClass.scopeUnknown();
+            return targetClass;
         }
 
         return new TargetClass(cl, inScope);
