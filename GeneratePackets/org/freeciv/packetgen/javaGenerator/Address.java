@@ -21,6 +21,8 @@ import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import java.util.*;
 
 public class Address extends Formatted implements HasAtoms {
+    public static final Address LOCAL_CODE_BLOCK = new Address();
+
     protected static final HashMap<String, Address> cached = new HashMap<String, Address>();
 
     protected final CodeAtom[] components;
