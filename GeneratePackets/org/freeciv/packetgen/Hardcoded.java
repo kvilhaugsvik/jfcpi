@@ -47,7 +47,7 @@ public class Hardcoded {
             TargetClass.fromClass(ElementsLimit.class), "maxArraySize", null);
 
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
-            new FieldTypeBasic("uint32", "int", new TargetClass(Long.class),
+            new FieldTypeBasic("uint32", "int", TargetClass.fromClass(Long.class),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -81,7 +81,7 @@ public class Hardcoded {
                     },
                     TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
-            new FieldTypeBasic("requirement", "struct requirement", new TargetClass("requirement"),
+            new FieldTypeBasic("requirement", "struct requirement", TargetClass.fromName("requirement"),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -91,8 +91,8 @@ public class Hardcoded {
                     new ExprFrom2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
-                            return new Block(to.assign((new TargetClass("requirement")).newInstance(
-                                    new TargetClass("universal").newInstance(
+                            return new Block(to.assign((TargetClass.fromName("requirement")).newInstance(
+                                    TargetClass.fromName("universal").newInstance(
                                             new MethodCall<AValue>("universals_n.valueOf",
                                                     from.<AValue>call("readUnsignedByte")),
                                             from.<AValue>call("readInt")),
@@ -179,7 +179,7 @@ public class Hardcoded {
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
-            new TerminatedArray("string", "char", new TargetClass(String.class),
+            new TerminatedArray("string", "char", TargetClass.fromClass(String.class),
                     new Requirement("STRING_ENDER", Constant.class),
                     TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
                     TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
@@ -200,7 +200,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
                         @Override
                         public Typed<AValue> x(Typed<AValue> bytes) {
-                            return (new TargetClass(String.class)).newInstance(bytes);
+                            return (TargetClass.fromClass(String.class)).newInstance(bytes);
                         }
                     },
                     TerminatedArray.elemIsByteArray,
@@ -226,7 +226,7 @@ public class Hardcoded {
             TerminatedArray.maxSizedTerminated("building_list", "int",
                     new Requirement("B_LAST", Constant.class)),
             TerminatedArray.xBytes("memory", "unsigned char"),
-            new FieldTypeBasic("bool8", "bool",  new TargetClass(Boolean.class),
+            new FieldTypeBasic("bool8", "bool", TargetClass.fromClass(Boolean.class),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -303,7 +303,7 @@ public class Hardcoded {
     }
 
     private static FieldTypeBasic getFloat(final String times) {
-        return new FieldTypeBasic("float" + times, "float",  new TargetClass(Float.class),
+        return new FieldTypeBasic("float" + times, "float", TargetClass.fromClass(Float.class),
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {

@@ -1,7 +1,5 @@
 package org.freeciv.packetgen.enteties.supporting;
 
-import org.freeciv.packet.fieldtype.ElementsLimit;
-import org.freeciv.packet.fieldtype.IllegalLimitSizeException;
 import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -385,7 +383,7 @@ public class TerminatedArray extends FieldTypeBasic {
         final TargetArray type = new TargetArray(kind.getUnderType(), 1, true);
         final boolean arrayEater = kind.getBasicType().isArrayEater();
         Var<AValue> helperParamValue = Var.param(type, "value");
-        final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), new TargetClass(int.class), "lengthInBytes",
+        final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.fromClass(int.class), "lengthInBytes",
                 Arrays.<Var<?>>asList(helperParamValue), new Block(RETURN(helperParamValue.read("length"))));
 
         Var<AValue> pBuf = Var.param(new TargetArray(kind.getAddress(), 1, true), "buf");

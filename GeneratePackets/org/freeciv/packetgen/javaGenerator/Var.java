@@ -117,11 +117,11 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
 
 
     public static <Kind extends AValue> Var<Kind> local(Class type, String name, Typed<Kind> value) {
-        return Var.<Kind>local(new TargetClass(type), name, value);
+        return Var.<Kind>local(TargetClass.fromClass(type), name, value);
     }
 
     public static <Kind extends AValue> Var<Kind> local(String type, String name, Typed<Kind> value) {
-        return Var.<Kind>local(new TargetClass(type), name, value);
+        return Var.<Kind>local(TargetClass.fromName(type), name, value);
     }
 
     public static <Kind extends AValue> Var<Kind> local(TargetClass type, String name, Typed<Kind> value) {
@@ -133,11 +133,11 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     }
 
     public static <Kind extends AValue> Var<Kind> param(Class kind, String name) {
-        return Var.<Kind>param(new TargetClass(kind), name);
+        return Var.<Kind>param(TargetClass.fromClass(kind), name);
     }
 
     public static <Kind extends AValue> Var<Kind> param(String kind, String name) {
-        return Var.<Kind>param(new TargetClass(kind), name);
+        return Var.<Kind>param(TargetClass.fromName(kind), name);
     }
 
     public static <Kind extends AValue> Var<Kind> field(Visibility visibility, Scope scope, Modifiable modifiable,
@@ -147,7 +147,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
 
     public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
                             String type, String name, Typed<Kind> value) {
-        return Var.<Kind>field(annotations, visibility, scope, modifiable, new TargetClass(type), name, value);
+        return Var.<Kind>field(annotations, visibility, scope, modifiable, TargetClass.fromName(type), name, value);
     }
 
     public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,

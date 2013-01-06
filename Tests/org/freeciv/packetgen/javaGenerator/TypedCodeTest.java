@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
@@ -77,7 +78,7 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceDimensionsInTargetClass() {
-        TargetArray array = new TargetArray(new TargetClass(int[][].class), 1, true);
+        TargetArray array = new TargetArray(TargetClass.fromClass(int[][].class), 1, true);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -92,7 +93,7 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceNoArrayFromTargetClass() {
-        TargetArray array = new TargetArray(new TargetClass(int.class), 0, true);
+        TargetArray array = new TargetArray(TargetClass.fromClass(int.class), 0, true);
     }
 
     @Test public void targetArrayReadEnd() {
@@ -264,12 +265,12 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void callValuedReturnsVoid() {
-        TargetClass o = new TargetClass(Object.class);
+        TargetClass o = TargetClass.fromClass(Object.class);
         o.callV("notify");
     }
 
     @Test public void callValuedReturns() {
-        TargetClass o = new TargetClass(java.util.regex.Pattern.class);
+        TargetClass o = TargetClass.fromClass(Pattern.class);
         Value<AValue> theCall = o.callV("compile", BuiltIn.literal("a*"));
 
         assertNotNull(theCall);

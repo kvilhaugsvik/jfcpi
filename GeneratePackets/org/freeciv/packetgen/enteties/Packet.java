@@ -80,7 +80,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         addClassConstant("int", "number", number + "");
 
         addObjectConstantAndGetter(Var.field(Collections.<Annotate>emptyList(),
-                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, new TargetClass(PacketHeader.class), "header", null));
+                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.fromClass(PacketHeader.class), "header", null));
 
         for (Field field : fields) {
             addObjectConstantAndGetter(field);
@@ -269,7 +269,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                     literal("\\n\\t" + field.getFieldName() + " = "),
                     field.<AString>call("toString"))));
         body.addStatement(RETURN(buildOutput.ref()));
-        addMethod(Method.newPublicReadObjectState(Comment.no(), new TargetClass(String.class), "toString", body));
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(String.class), "toString", body));
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {

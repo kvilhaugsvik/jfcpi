@@ -74,16 +74,16 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements IDepende
     }
 
     public static Constant<AnInt> isInt(String name, IntExpression expression) {
-        return new Constant<AnInt>(new TargetClass(int.class), name,
+        return new Constant<AnInt>(TargetClass.fromClass(int.class), name,
                 BuiltIn.<AnInt>toCode(expression.toString()), expression.getReqs());
     }
 
     public static Constant<AString> isString(String name, Typed<AString> expression) {
-        return new Constant<AString>(new TargetClass(String.class), name,
+        return new Constant<AString>(TargetClass.fromClass(String.class), name,
                 expression, Collections.<Requirement>emptySet());
     }
 
     public static Constant<ALong> isLong(String name, Typed<ALong> expression) {
-        return new Constant<ALong>(new TargetClass(long.class), name, expression, Collections.<Requirement>emptySet());
+        return new Constant<ALong>(TargetClass.fromClass(long.class), name, expression, Collections.<Requirement>emptySet());
     }
 }

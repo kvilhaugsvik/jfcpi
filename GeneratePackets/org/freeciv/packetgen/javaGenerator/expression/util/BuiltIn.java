@@ -17,7 +17,6 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
 
@@ -29,7 +28,7 @@ public class BuiltIn {
     public static final TargetArray boolArray = new TargetArray(boolean[].class, true);
 
     public static Typed<NoValue> THROW(final Class error, Typed<? extends AValue>... parms) {
-        return THROW((new TargetClass(error)).newInstance(parms));
+        return THROW((TargetClass.fromClass(error)).newInstance(parms));
     }
 
     public static Typed<NoValue> THROW(final Typed<? extends AValue> error) {
@@ -303,7 +302,7 @@ public class BuiltIn {
     }
 
     public static <Ret extends AValue> Typed<Ret> cast(final Class newType, final Typed<? extends AValue> val) {
-        return cast(new TargetClass(newType), val);
+        return cast(TargetClass.fromClass(newType), val);
     }
 
     public static <Ret extends AValue> Typed<Ret> cast(final TargetClass newType, final Typed<? extends AValue> val) {

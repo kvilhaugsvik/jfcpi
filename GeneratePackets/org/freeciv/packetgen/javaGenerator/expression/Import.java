@@ -46,7 +46,7 @@ public class Import<Of extends Address> extends Formatted implements HasAtoms {
     }
 
     public static Import<TargetClass> classIn(Class target) {
-        return classIn(new TargetClass(target));
+        return classIn(TargetClass.fromClass(target));
     }
 
     public static Import<TargetClass> classIn(TargetClass target) {

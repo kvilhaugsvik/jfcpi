@@ -47,16 +47,7 @@ public class TargetClass extends Address implements AValue {
 
         // While all classes have a toString this isn't true for all types.
         // As all types are assumed to be classes this may cause trouble
-        methods.put("toString", new TargetMethod(this, "toString", new TargetClass(String.class), TargetMethod.Called.DYNAMIC));
-    }
-
-    private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w");
-    public TargetClass(String fullPath) {
-        this(fullPath, inJavaLang.matcher(fullPath).matches());
-    }
-
-    public TargetClass(Class wrapped) {
-        this(wrapped, Package.getPackage("java.lang").equals(wrapped.getPackage()));
+        methods.put("toString", new TargetMethod(this, "toString", fromClass(String.class), TargetMethod.Called.DYNAMIC));
     }
 
     public TargetClass(Class wrapped, boolean isInScope) {
@@ -209,15 +200,20 @@ public class TargetClass extends Address implements AValue {
         }
     }
 
+    private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w+");
     public static TargetClass fromName(String name) {
-        if (cached.containsKey(name))
-            return (TargetClass)(cached.get(name));
-        else
-            return new TargetClass(name);
+        boolean inScope = inJavaLang.matcher(name).matches();
+        if (cached.containsKey(name)) {
+            TargetClass target = (TargetClass) (cached.get(name));
+            return inScope ? target.scopeKnown() : target.scopeUnknown();
+        } else {
+            return new TargetClass(name, inScope);
+        }
     }
 
     public static TargetClass fromClass(Class cl) {
         String name = cl.getCanonicalName();
+        boolean inScope = Package.getPackage("java.lang").equals(cl.getPackage());
 
         if (cached.containsKey(name)) {
             TargetClass targetClass = (TargetClass) (cached.get(name));
@@ -225,10 +221,10 @@ public class TargetClass extends Address implements AValue {
             if (null == targetClass.shared.represents)
                 targetClass.shared.represents = cl;
 
-            return targetClass;
+            return inScope ? targetClass.scopeKnown() : targetClass.scopeUnknown();
         }
 
-        return new TargetClass(cl);
+        return new TargetClass(cl, inScope);
     }
 
     public static TargetClass newKnown(Class cl) {

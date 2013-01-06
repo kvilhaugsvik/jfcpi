@@ -119,7 +119,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                                                   null,
                                                   Import.allIn(FCEnum.class.getPackage())
                                           }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
-                                          DEFAULT_PARENT, Arrays.asList(new TargetClass("FieldType<" + javaType.getName() + ">")));
+                                          DEFAULT_PARENT, Arrays.asList(TargetClass.fromName("FieldType<" + javaType.getName() + ">")));
             this.requiredAs = requiredAs;
 
             addObjectConstant(javaType.getName(), "value");
@@ -145,7 +145,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
             addMethod(Method.newPublicReadObjectState(Comment.no(),
                     TargetClass.newKnown(String.class), "toString",
                     new Block(RETURN(value2String.x(getField("value"))))));
-            Var<TargetClass> paramOther = Var.param(new TargetClass(Object.class), "other");
+            Var<TargetClass> paramOther = Var.param(TargetClass.fromClass(Object.class), "other");
             addMethod(Method.custom(Comment.no(),
                     Visibility.PUBLIC, Scope.OBJECT,
                     TargetClass.fromClass(boolean.class), "equals", Arrays.asList(paramOther),

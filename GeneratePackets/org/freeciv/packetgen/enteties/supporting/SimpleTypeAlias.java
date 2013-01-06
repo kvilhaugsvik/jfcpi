@@ -56,7 +56,7 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
     @Override
     public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
         final NetworkIO io = (NetworkIO)wasRequired[0];
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), new TargetClass(typeInJava),
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), TargetClass.fromName(typeInJava),
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {

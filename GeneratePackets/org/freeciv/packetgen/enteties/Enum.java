@@ -104,7 +104,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         addObjectConstant("boolean", "valid");
         if (nameOverride)
             addField(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES,
-                    new TargetClass(String.class), "toStringName", null));
+                    TargetClass.fromClass(String.class), "toStringName", null));
         else
             addObjectConstant("String", "toStringName");
 
@@ -134,7 +134,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         if (nameOverride) {
             Var<AString> paramName = Var.param("String", "name");
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                    new TargetClass(void.class), "setName", Arrays.asList(paramName),
+                    TargetClass.fromClass(void.class), "setName", Arrays.asList(paramName),
                     Collections.<TargetClass>emptyList(),
                     new Block(fieldToStringName.assign(paramName.ref()))));
         }
