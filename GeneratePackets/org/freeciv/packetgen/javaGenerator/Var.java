@@ -47,7 +47,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         this.name = name;
         this.value = value;
 
-        this.reference = new Reference(this);
+        this.reference = Reference.refOn(this);
     }
 
     public Visibility getVisibility() {
@@ -193,20 +193,21 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
 
         private final ValueHelper valueHelper;
 
-        public Reference(Var of) {
-            super(getFullAddress(of));
+        private Reference(Var of, Address where, CodeAtom name) {
+            super(where, name);
             this.valueHelper = new ValueHelper(of.type, this);
         }
 
-        private static Address getFullAddress(Var of) {
+        public static Reference refOn(Var of) {
+            CodeAtom name = new CodeAtom(of.name);
             switch (of.scope) {
                 case CLASS:
-                    return new Address(TargetClass.SELF_TYPED, new CodeAtom(of.name));
+                    return new Reference(of, TargetClass.SELF_TYPED, name);
                 case OBJECT:
-                    return new Address(THIS, new CodeAtom(of.name));
+                    return new Reference(of, THIS, name);
                 case CODE_BLOCK:
                 default:
-                    return new Address(of.name);
+                    return new Reference(of, Address.LOCAL_CODE_BLOCK, name);
             }
         }
 
