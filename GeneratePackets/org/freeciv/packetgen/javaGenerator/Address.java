@@ -19,6 +19,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class Address extends Formatted implements HasAtoms {
     public static final Address LOCAL_CODE_BLOCK = new Address();
@@ -32,13 +33,18 @@ public class Address extends Formatted implements HasAtoms {
     }
 
     public Address(String address) {
-        String[] parts = address.split("\\.");
+        components = addressString2Components(address);
+
+        cached.put(this.getFullAddress(), this);
+    }
+
+    private static final Pattern ADDRESS_SPLITTER = Pattern.compile("\\.");
+    protected static CodeAtom[] addressString2Components(String address) {
+        String[] parts = ADDRESS_SPLITTER.split(address);
         ArrayList<CodeAtom> build = new ArrayList<CodeAtom>(parts.length);
         for (String part : parts)
             build.add(new CodeAtom(part));
-        components = build.toArray(new CodeAtom[build.size()]);
-
-        cached.put(this.getFullAddress(), this);
+        return build.toArray(new CodeAtom[build.size()]);
     }
 
     public Address(Address start, CodeAtom... parts) {
