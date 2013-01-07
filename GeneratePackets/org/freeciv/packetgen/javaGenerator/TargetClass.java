@@ -23,6 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 public class TargetClass extends Address implements AValue {
@@ -201,37 +202,35 @@ public class TargetClass extends Address implements AValue {
     }
 
     private static TargetClass getExisting(String name, boolean inScope) {
-        final Address found = cached.get(name);
-        if (!(found instanceof TargetClass))
-            throw new ClassCastException(found.getFullAddress() + " is a " +
-                    found.getClass().getCanonicalName() + " not a TargetClass");
+        final TargetClass found = getExisting(name, TargetClass.class);
 
-        return inScope ? ((TargetClass) found).scopeKnown() : ((TargetClass) found).scopeUnknown();
+        return inScope ? found.scopeKnown() : found.scopeUnknown();
     }
 
     private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w+");
     public static TargetClass fromName(String name) {
         boolean inScope = inJavaLang.matcher(name).matches();
-        if (cached.containsKey(name))
+        try {
             return getExisting(name, inScope);
-        else
+        } catch (NoSuchElementException e) {
             return new TargetClass(name, inScope);
+        }
     }
 
     public static TargetClass fromClass(Class cl) {
         String name = cl.getCanonicalName();
         boolean inScope = Package.getPackage("java.lang").equals(cl.getPackage());
 
-        if (cached.containsKey(name)) {
+        try {
             TargetClass targetClass = getExisting(name, inScope);
 
             if (null == targetClass.shared.represents)
                 targetClass.shared.represents = cl;
 
             return targetClass;
+        } catch (NoSuchElementException e) {
+            return new TargetClass(cl, inScope);
         }
-
-        return new TargetClass(cl, inScope);
     }
 
     public static TargetClass newKnown(Class cl) {

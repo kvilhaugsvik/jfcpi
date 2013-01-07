@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import java.util.NoSuchElementException;
+
 public class TargetPackage extends Address {
     public static final TargetPackage TOP_LEVEL = new TargetPackage();
 
@@ -33,10 +35,10 @@ public class TargetPackage extends Address {
     }
 
     public static TargetPackage from(String parts) {
-        String name = parts;
-        if (cached.containsKey(name))
-            return (TargetPackage)(cached.get(name));
-
-        return new TargetPackage(parts);
+        try {
+            return getExisting(parts, TargetPackage.class);
+        } catch (NoSuchElementException e) {
+            return new TargetPackage(parts);
+        }
     }
 }

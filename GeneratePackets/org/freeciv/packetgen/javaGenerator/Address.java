@@ -63,4 +63,17 @@ public class Address extends Formatted implements HasAtoms {
     public void writeAtoms(CodeAtoms to) {
         to.joinSep(HAS, components);
     }
+
+    public static <A extends Address> A getExisting(String name, Class<A> kind) {
+        final Address found = cached.get(name);
+
+        if (null == found)
+            throw new NoSuchElementException(name + " not found");
+
+        if (!(kind.isInstance(found)))
+            throw new ClassCastException(found.getFullAddress() + " is a " +
+                    found.getClass().getSimpleName() + " not a " + kind.getSimpleName());
+
+        return kind.cast(found);
+    }
 }
