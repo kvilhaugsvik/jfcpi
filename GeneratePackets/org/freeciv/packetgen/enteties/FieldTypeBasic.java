@@ -75,6 +75,9 @@ public class FieldTypeBasic implements IDependency, ReqKind {
         this.value2String = toString;
         this.constructorBody = constructorBody.x(fValue);
 
+        // TODO: remove when fixed
+        this.javaType.register(new TargetMethod(javaType, "toString", TargetClass.fromClass(String.class), TargetMethod.Called.DYNAMIC));
+
         requirement = needs;
     }
 
@@ -122,7 +125,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                                           DEFAULT_PARENT, Arrays.asList(TargetClass.fromName("FieldType<" + javaType.getName() + ">")));
             this.requiredAs = requiredAs;
 
-            addObjectConstant(javaType.getName(), "value");
+            addObjectConstant(javaType, "value");
 
             List<TargetClass> tIOExcept = Arrays.asList(TargetClass.newKnown(IOException.class));
             Var<TargetClass> pValue = Var.param(javaType, "value");
