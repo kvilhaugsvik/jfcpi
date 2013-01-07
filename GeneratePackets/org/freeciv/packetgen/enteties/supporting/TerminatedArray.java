@@ -187,7 +187,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 Var buf = Var.local(buffertype, "buffer",
                         buffertype.newInstance(numberOfValueElementToNumberOfBufferElements.x(fMaxSize.read("elements_to_transfer"))));
                 Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
-                Var pos = Var.local("int", "pos", literal(0));
+                Var pos = Var.local(int.class, "pos", literal(0));
 
                 Typed<ABool> noTerminatorFound = (notTerminatable(terminator) ?
                         TRUE :

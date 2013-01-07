@@ -57,7 +57,7 @@ public class Hardcoded {
                     new ExprFrom2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
-                            Var buf = Var.local("int", "bufferValue", from.<AnInt>call("readInt"));
+                            Var buf = Var.local(int.class, "bufferValue", from.<AnInt>call("readInt"));
                             return new Block(buf, IF(BuiltIn.<ABool>toCode("0 <= bufferValue"), new Block(
                                     to.assign(BuiltIn.<AValue>toCode("(long)bufferValue"))), Block.fromStrings(
                                     "final long removedByCast = (-1L * Integer.MIN_VALUE) + Integer.MAX_VALUE + " + "1L",

@@ -125,7 +125,7 @@ public class TypedCodeTest {
         Annotate annotation = new Annotate("IsAField");
         Var field = Var.field(Arrays.asList(annotation),
                               Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-                              "int", "number", null);
+                              int.class, "number", null);
         CodeAtoms asAtoms = new CodeAtoms(field);
 
         assertEquals("@IsAField", asAtoms.get(0).getAtom().get());
@@ -183,8 +183,8 @@ public class TypedCodeTest {
         builder.whenFirst(builder.condAtTheBeginning(), EnumSet.<CodeStyleBuilder.DependsOn>noneOf(CodeStyleBuilder.DependsOn.class), builder.DO_NOTHING);
 
         Block haveStatementGroup = new Block();
-        Var i = Var.local("int", "i", null);
-        Var j = Var.local("int", "j", null);
+        Var i = Var.local(int.class, "i", null);
+        Var j = Var.local(int.class, "j", null);
 
         haveStatementGroup.groupBoundary(); // redundant. Causes exception unless handled
 
@@ -223,8 +223,8 @@ public class TypedCodeTest {
 
     @Test
     public void block2Statements() {
-        Var i = Var.local("int", "i", null);
-        Var j = Var.local("int", "j", null);
+        Var i = Var.local(int.class, "i", null);
+        Var j = Var.local(int.class, "j", null);
         Block block = new Block(i, j);
 
         assertEquals(2, block.numberOfStatements());

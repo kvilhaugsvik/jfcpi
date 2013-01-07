@@ -229,19 +229,19 @@ public class CodeGenTest {
     @Test public void testConstantDeclaration() {
         assertEquals("Generated source not as expected",
                 "private static final int integer = 25;",
-                (Var.field(Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, "int", "integer", literal(25))).toString());
+                (Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.CLASS, Modifiable.NO, int.class, "integer", literal(25))).toString());
     }
 
     @Test public void testObjectConstantDeclaration() {
         assertEquals("Generated source not as expected",
                 "private final int integer;",
-                (Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, "int", "integer", null)).toString());
+                (Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, int.class, "integer", null)).toString());
     }
 
     @Test public void testStateVarDeclaration() {
         assertEquals("Generated source not as expected",
                 "private int integer;",
-                (Var.field(Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES, "int", "integer", null)).toString());
+                (Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES, int.class, "integer", null)).toString());
     }
 
     @Test public void testPackageImport() {

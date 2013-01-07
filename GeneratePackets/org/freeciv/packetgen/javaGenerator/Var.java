@@ -140,19 +140,16 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         return Var.<Kind>param(TargetClass.fromName(kind), name);
     }
 
-    public static <Kind extends AValue> Var<Kind> field(Visibility visibility, Scope scope, Modifiable modifiable,
-                                            String type, String name, Typed<Kind> value) {
-        return Var.<Kind>field(Collections.<Annotate>emptyList(), visibility, scope, modifiable, type, name, value);
-    }
-
-    public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                            String type, String name, Typed<Kind> value) {
-        return Var.<Kind>field(annotations, visibility, scope, modifiable, TargetClass.fromName(type), name, value);
-    }
-
-    public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                            TargetClass type, String name, Typed<Kind> value) {
+    public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations,
+                                                        Visibility visibility, Scope scope, Modifiable modifiable,
+                                                        TargetClass type, String name, Typed<Kind> value) {
         return new Var<Kind>(annotations, visibility, scope, modifiable, type, name, value);
+    }
+
+    public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations,
+                                                        Visibility visibility, Scope scope, Modifiable modifiable,
+                                                        Class type, String name, Typed<Kind> value) {
+        return Var.<Kind>field(annotations, visibility, scope, modifiable, TargetClass.fromClass(type), name, value);
     }
 
     public <Kind extends AValue> Typed<Kind> read(final String field) {

@@ -114,7 +114,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
 
         //TODO: test private constructor generation. perhaps do via Methods.newPrivateConstructor
         Var<AnInt> paramNumber = Var.param(int.class, "number");
-        Var<AString> paramToStrName = Var.param("String", "toStringName");
+        Var<AString> paramToStrName = Var.param(String.class, "toStringName");
         Var<ABool> paramValid = Var.param(boolean.class, "valid");
         addMethod(Method.newConstructor(Comment.no(),
                 Visibility.PRIVATE, Arrays.asList(paramNumber, paramToStrName),
@@ -132,7 +132,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.newKnown(String.class), "toString",
                 new Block(BuiltIn.RETURN(fieldToStringName.ref()))));
         if (nameOverride) {
-            Var<AString> paramName = Var.param("String", "name");
+            Var<AString> paramName = Var.param(String.class, "name");
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
                     TargetClass.fromClass(void.class), "setName", Arrays.asList(paramName),
                     Collections.<TargetClass>emptyList(),
