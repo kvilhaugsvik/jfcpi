@@ -45,10 +45,6 @@ public class TargetClass extends Address implements AValue {
             where = TargetPackage.TOP_LEVEL;
 
         this.shared = new Common(name, where, methods, this);
-
-        // While all classes have a toString this isn't true for all types.
-        // As all types are assumed to be classes this may cause trouble
-        methods.put("toString", new TargetMethod(this, "toString", fromClass(String.class), TargetMethod.Called.DYNAMIC));
     }
 
     protected TargetClass(Class wrapped, boolean isInScope) {
