@@ -187,7 +187,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         LinkedList<Var<? extends AValue>> args = new LinkedList<Var<? extends AValue>>();
         for (Var dec : fields) {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
-            args.add(Var.param(dec.getType(), dec.getName()));
+            args.add(Var.param(dec.getTType(), dec.getName()));
         }
         Method.newPublicConstructor(Comment.no(), args, body).writeAtoms(to);
     }
