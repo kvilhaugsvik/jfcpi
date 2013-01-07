@@ -23,6 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
+import org.freeciv.packetgen.javaGenerator.testData.TheChildReferredToUseOnlyOnce;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -329,5 +330,53 @@ public class TypedCodeTest {
     @Test public void targetClassScopeChangeOnlyMakesTwoCopiesStartNotInScope() {
         TargetClass aClass = new TargetClass("Thing", false);
         assertEquals("The original isn't kept. A new one was created.", aClass, aClass.scopeKnown().scopeUnknown());
+    }
+
+    @Test public void targetClass_inheritance_fromParent() {
+        TargetClass child = TargetClass.fromName("testPack.Child");
+        TargetClass parent = TargetClass.fromName("testPack.Parent");
+        parent.register(new TargetMethod(parent, "methodNotOnChild", TargetClass.fromClass(int.class), TargetMethod.Called.STATIC));
+        child.setParent(parent);
+
+        assertNotNull(child.callV("methodNotOnChild"));
+    }
+
+    @Test public void targetClass_inheritance_fromGrandParent() {
+        TargetClass child = TargetClass.fromName("testPack.Child");
+        TargetClass parent = TargetClass.fromName("testPack.Parent");
+        child.setParent(parent);
+        TargetClass grandParent = TargetClass.fromName("testPack.GrandParent");
+        parent.setParent(grandParent);
+
+        grandParent.register(new TargetMethod(grandParent, "methodNotOnChildOrParent", TargetClass.fromClass(int.class), TargetMethod.Called.STATIC));
+
+        assertNotNull(child.callV("methodNotOnChildOrParent"));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void targetClass_inheritance_hasParentAlready() {
+        TargetClass child = TargetClass.fromName("testPack.Child");
+        TargetClass parent = TargetClass.fromName("testPack.Parent");
+        child.setParent(parent);
+        TargetClass triesToBeParent = TargetClass.fromName("testPack.StepParent");
+        child.setParent(triesToBeParent);
+    }
+
+    @Test public void targetClass_inheritance_fromClassFindsParent() {
+        TargetClass child = TargetClass.fromClass(String.class);
+        Var myString = Var.param(child, "myString");
+
+        assertNotNull("Failed to inherit dynamic method wait from Class Object", myString.call("wait"));
+    }
+
+    @Test public void targetClass_inheritance_Cache_FromStringWillNotDenyParentInfo() {
+        TargetClass child = TargetClass.fromName("org.freeciv.packetgen.javaGenerator.testData" +
+                "." + "TheChildReferredToUseOnlyOnce");
+        TargetClass parent = TargetClass.fromName("org.freeciv.packetgen.javaGenerator.testData" +
+                "." + "TheParentReferredToUseOnlyOnce");
+        child.setParent(parent);
+        TargetClass childIsClass = TargetClass.fromClass(TheChildReferredToUseOnlyOnce.class);
+
+        assertNotNull(childIsClass.callV("methodNotOnChild"));
     }
 }

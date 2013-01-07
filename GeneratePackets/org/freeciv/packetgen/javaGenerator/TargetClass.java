@@ -57,9 +57,15 @@ public class TargetClass extends Address implements AValue {
         shared.represents = wrapped;
     }
 
-    private static void registerMethodsOf(TargetClass target, Class wrapped) {
+    private static void convertMethods(TargetClass target, Class wrapped) {
         for (Method has : wrapped.getMethods())
             target.shared.methods.put(has.getName(), new TargetMethod(has));
+
+        if (null != wrapped.getSuperclass())
+            if (null == target.shared.parent)
+                target.setParent(TargetClass.fromClass(wrapped.getSuperclass()));
+            else if (null == target.shared.parent.shared.represents)
+                target.shared.parent.shared.represents = wrapped.getSuperclass();
 
         target.shared.shallow = false;
     }
@@ -125,21 +131,41 @@ public class TargetClass extends Address implements AValue {
         shared.methods.put(has.getName(), has);
     }
 
+    public void setParent(TargetClass parent) {
+        if (!(null == shared.parent || shared.parent.equals(parent)))
+            throw new IllegalStateException("Parent already set");
+        shared.parent = parent;
+    }
+
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
         methodExists(method);
-        return shared.methods.get(method).call(parameters);
+        if (shared.methods.containsKey(method))
+            return shared.methods.get(method).call(parameters);
+        else
+            return shared.parent.call(method, parameters);
     }
 
     private void methodExists(String method) {
-        if (shared.shallow && null != shared.represents)
-            registerMethodsOf(this, shared.represents);
-        if (!shared.methods.containsKey(method))
+        if (!hasMethod(method))
             throw new IllegalArgumentException("No method named " + method + " on " + shared.name.get());
     }
 
+    private void initIfPossibleAndNotDone() {
+        if (shared.shallow && null != shared.represents)
+            convertMethods(this, shared.represents);
+    }
+
+    private boolean hasMethod(String method) {
+        initIfPossibleAndNotDone();
+        return shared.methods.containsKey(method) || (null != shared.parent && shared.parent.hasMethod(method));
+    }
+
     public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... parameters) {
-        methodExists(method);
-        return shared.methods.get(method).callV(parameters);
+        methodExists(method); // exception if method don't exist here or on parent
+        if (shared.methods.containsKey(method)) // method exists here
+            return shared.methods.get(method).callV(parameters);
+        else // method exists at parent
+            return shared.parent.callV(method, parameters);
     }
 
     // TODO: Should this be seen as a function called on the type?
@@ -187,6 +213,8 @@ public class TargetClass extends Address implements AValue {
         final TargetPackage where;
         final HashMap<String, TargetMethod> methods;
 
+
+        TargetClass parent;
         boolean shallow = true;
         Class represents = null;
 

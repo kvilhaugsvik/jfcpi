@@ -59,6 +59,8 @@ public class ClassWriter extends Formatted implements HasAtoms {
             throw new IllegalArgumentException("null given as package. (Did you mean TargetPackage.TOP_LEVEL?)");
 
         this.myAddress = new TargetClass(where, new ClassWriter.Atom(name), false);
+        myAddress.setParent(parent);
+
         this.imports = null == imports ? new LinkedList<Import>() : new ArrayList<Import>(Arrays.asList(imports));
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
         this.parent = parent;
