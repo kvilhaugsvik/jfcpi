@@ -35,16 +35,24 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
     private final Pattern fieldTypeBasicForMe;
-    private final String typeInJava;
+    private final TargetClass typeInJava;
 
-    public SimpleTypeAlias(String name, String jType, Collection<Requirement> reqs) {
+    public SimpleTypeAlias(String name, TargetClass jType, Collection<Requirement> reqs) {
         this.iProvide = new Requirement(name, DataType.class);
         this.typeInJava = jType;
         this.willRequire = reqs;
         fieldTypeBasicForMe = Pattern.compile("(\\w+)\\((" + getIFulfillReq().getName() + ")\\)");
     }
 
-    public String getJavaType() {
+    public SimpleTypeAlias(String name, Class jType, Collection<Requirement> reqs) {
+        this(name, TargetClass.fromClass(jType), reqs);
+    }
+
+    public SimpleTypeAlias(String name, String jType, Collection<Requirement> reqs) {
+        this(name, TargetClass.fromName(jType), reqs);
+    }
+
+    public TargetClass getJavaType() {
         return typeInJava;
     }
 
@@ -56,7 +64,7 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
     @Override
     public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
         final NetworkIO io = (NetworkIO)wasRequired[0];
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), TargetClass.fromName(typeInJava),
+        return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), typeInJava,
                 new ExprFrom1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
@@ -69,7 +77,7 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
                     public Block x(Var to, Var from) {
                         return new Block(to.assign(willRequire.isEmpty() ?
                                         io.getRead().x(from) :
-                                        new MethodCall<AValue>(typeInJava + ".valueOf", io.getRead().x(from))));
+                                        typeInJava.call("valueOf", io.getRead().x(from))));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {

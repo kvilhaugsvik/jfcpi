@@ -25,7 +25,8 @@ import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader
 import java.util.Collection
 import org.freeciv.packetgen.UndefinedException
-import org.freeciv.packetgen.enteties.supporting.DataType
+import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, DataType}
+import org.freeciv.packetgen.javaGenerator.TargetClass
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
@@ -852,13 +853,13 @@ public enum test implements FCEnum {
   @Test def pointToIntIsIntVarArgs = {
     val result = parsesCorrectly("typedef int *more_complicated;", ParseCCode, ParseCCode.exprConverted).get
 
-    assertEquals("Integer...", result.asInstanceOf[org.freeciv.packetgen.enteties.supporting.SimpleTypeAlias].getJavaType)
+    assertEquals("Integer...", result.asInstanceOf[SimpleTypeAlias].getJavaType.getFullAddress)
   }
 
   @Test def pointToCharIsString = {
     val result = parsesCorrectly("typedef char *more_complicated;", ParseCCode, ParseCCode.exprConverted).get
 
-    assertEquals("String", result.asInstanceOf[org.freeciv.packetgen.enteties.supporting.SimpleTypeAlias].getJavaType)
+    assertEquals("String", result.asInstanceOf[SimpleTypeAlias].getJavaType.getFullAddress)
   }
 
   /*--------------------------------------------------------------------------------------------------------------------
