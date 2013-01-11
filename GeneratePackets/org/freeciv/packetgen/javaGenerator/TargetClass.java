@@ -39,7 +39,9 @@ public class TargetClass extends Address implements AValue {
         this.isInScope = isInScope;
 
         final TargetPackage where;
-        if (1 < super.components.length)
+        if (fullPath.endsWith("...") && 4 < super.components.length) // Chewing gum and baling wire
+            where = TargetPackage.from(fullPath.substring(0, fullPath.substring(0, fullPath.length() - 3).lastIndexOf(".")));
+        else if (!fullPath.endsWith("...") && 1 < super.components.length)
             where = TargetPackage.from(fullPath.substring(0, fullPath.lastIndexOf(".")));
         else
             where = TargetPackage.TOP_LEVEL;

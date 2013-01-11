@@ -44,6 +44,14 @@ public class Address extends Formatted implements HasAtoms {
         ArrayList<CodeAtom> build = new ArrayList<CodeAtom>(parts.length);
         for (String part : parts)
             build.add(new CodeAtom(part));
+
+        // TODO: Properly represent ... (and [])
+        if (address.endsWith("...")) {
+            build.add(new CodeAtom(""));
+            build.add(new CodeAtom(""));
+            build.add(new CodeAtom(""));
+        }
+
         return build.toArray(new CodeAtom[build.size()]);
     }
 

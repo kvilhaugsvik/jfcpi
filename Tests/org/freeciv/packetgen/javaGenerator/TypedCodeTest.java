@@ -379,4 +379,8 @@ public class TypedCodeTest {
 
         assertNotNull(childIsClass.callV("methodNotOnChild"));
     }
+
+    @Test public void targetClass_fromString_varArg() {
+        assertEquals("java.lang.Integer...", TargetClass.fromName("java.lang" + "." + "Integer...").getFullAddress());
+    }
 }
