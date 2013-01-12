@@ -284,6 +284,14 @@ public class TypedCodeTest {
         assertEquals(1, atoms.toArray().length);
     }
 
+    @Test public void targetPackage_topLevel_fromClass() {
+        assertEquals(TargetPackage.TOP_LEVEL, TargetPackage.from((Package)null));
+    }
+
+    @Test public void targetPackage_topLevel_fromString() {
+        assertEquals(TargetPackage.TOP_LEVEL, TargetPackage.from(TargetPackage.TOP_LEVEL_AS_STRING));
+    }
+
     @Test public void targetPackageCached() {
         TargetPackage p1 = TargetPackage.from(Package.getPackage("org.freeciv.packetgen.javaGenerator"));
         TargetPackage p2 = TargetPackage.from("org.freeciv.packetgen.javaGenerator");

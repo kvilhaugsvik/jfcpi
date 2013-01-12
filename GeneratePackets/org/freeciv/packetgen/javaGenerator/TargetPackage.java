@@ -18,6 +18,7 @@ import java.util.NoSuchElementException;
 
 public class TargetPackage extends Address {
     public static final TargetPackage TOP_LEVEL = new TargetPackage();
+    public static final String TOP_LEVEL_AS_STRING = "";
 
     private TargetPackage() {
         super();
@@ -35,6 +36,9 @@ public class TargetPackage extends Address {
     }
 
     public static TargetPackage from(String parts) {
+        if (TOP_LEVEL_AS_STRING.equals(parts))
+            return TOP_LEVEL;
+
         try {
             return getExisting(parts, TargetPackage.class);
         } catch (NoSuchElementException e) {
