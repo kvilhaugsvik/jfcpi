@@ -44,7 +44,7 @@ public class WeakVarDec {
     public TargetClass getJavaType() { // TODO: This method don't belong here. Query the storage in users
         int arrayLevels = declarations.length - eatenDeclartions;
         if (0 == arrayLevels)
-            return TargetClass.fromName(packageOfType + "." + type);
+            return TargetClass.fromName(packageOfType, type);
         else
             return new TargetArray(packageOfType + "." + type, arrayLevels, true);
     }

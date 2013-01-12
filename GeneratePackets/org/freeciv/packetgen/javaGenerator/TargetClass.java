@@ -234,7 +234,8 @@ public class TargetClass extends Address implements AValue {
     }
 
     private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w+");
-    public static TargetClass fromName(String name) {
+    public static TargetClass fromName(String inPackage, String className) {
+        String name = inPackage + "." + className;
         boolean inScope = inJavaLang.matcher(name).matches();
         try {
             return getExisting(name, inScope);
@@ -263,7 +264,7 @@ public class TargetClass extends Address implements AValue {
         return fromClass(cl).scopeKnown();
     }
 
-    public static TargetClass newKnown(String name) {
-        return fromName(name).scopeKnown();
+    public static TargetClass newKnown(String inPackage, String className) {
+        return fromName(inPackage, className).scopeKnown();
     }
 }

@@ -81,7 +81,7 @@ public class Hardcoded {
                     },
                     TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
-            new FieldTypeBasic("requirement", "struct requirement", TargetClass.fromName("requirement"),
+            new FieldTypeBasic("requirement", "struct requirement", TargetClass.newKnown("org.freeciv.types", "requirement"),
                     new ExprFrom1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -91,8 +91,8 @@ public class Hardcoded {
                     new ExprFrom2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
-                            return new Block(to.assign((TargetClass.fromName("requirement")).newInstance(
-                                    TargetClass.fromName("universal").newInstance(
+                            return new Block(to.assign((TargetClass.newKnown("org.freeciv.types", "requirement")).newInstance(
+                                    TargetClass.newKnown("org.freeciv.types", "universal").newInstance(
                                             new MethodCall<AValue>("universals_n.valueOf",
                                                     from.<AValue>call("readUnsignedByte")),
                                             from.<AValue>call("readInt")),
@@ -153,7 +153,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<? extends AValue>, Var>() {
                         @Override
                         public Typed<AValue> x(Var from) {
-                            TargetClass universal = TargetClass.newKnown("org.freeciv.types.universal");
+                            TargetClass universal = TargetClass.newKnown("org.freeciv.types", "universal");
                             return universal.newInstance(
                                     new MethodCall<AValue>(
                                             "universals_n.valueOf",
@@ -283,7 +283,7 @@ public class Hardcoded {
                 "Freeciv source interpreted by hand", "universal",
                 new Requirement("struct universal", DataType.class),
                 Collections.<Requirement>emptySet());
-        handRolledUniversal.addPublicObjectConstant("universals_n", "kind");
+        handRolledUniversal.addPublicObjectConstant(TargetClass.newKnown("org.freeciv.types", "universals_n"), "kind");
         handRolledUniversal.addPublicObjectConstant(int.class, "value");
         handRolledUniversal.addConstructorFields();
         handRolledUniversal.addMethod(Method.newPublicReadObjectState(Comment.no(),

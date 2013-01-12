@@ -299,7 +299,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClassCacheStringAndClass() {
-        TargetClass fromString = TargetClass.fromName(String.class.getCanonicalName());
+        TargetClass fromString = TargetClass.fromName("java.lang", "String");
         TargetClass fromClass = TargetClass.fromClass(String.class);
 
         assertEquals("The representations are different", fromClass, fromString);
@@ -307,7 +307,7 @@ public class TypedCodeTest {
 
     public static void justExist() {}
     @Test public void targetClassFromClassAddsInfoToCached() {
-        TargetClass fromString = TargetClass.fromName(TypedCodeTest.class.getCanonicalName());
+        TargetClass fromString = TargetClass.fromName("org.freeciv.packetgen.javaGenerator", "TypedCodeTest");
         try {
             fromString.call("justExist");
             fail("Test makes bad assumption");
@@ -341,8 +341,8 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClass_inheritance_fromParent() {
-        TargetClass child = TargetClass.fromName("testPack.Child");
-        TargetClass parent = TargetClass.fromName("testPack.Parent");
+        TargetClass child = TargetClass.fromName("testPack", "Child");
+        TargetClass parent = TargetClass.fromName("testPack", "Parent");
         parent.register(new TargetMethod(parent, "methodNotOnChild", TargetClass.fromClass(int.class), TargetMethod.Called.STATIC));
         child.setParent(parent);
 
@@ -350,10 +350,10 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClass_inheritance_fromGrandParent() {
-        TargetClass child = TargetClass.fromName("testPack.Child");
-        TargetClass parent = TargetClass.fromName("testPack.Parent");
+        TargetClass child = TargetClass.fromName("testPack", "Child");
+        TargetClass parent = TargetClass.fromName("testPack", "Parent");
         child.setParent(parent);
-        TargetClass grandParent = TargetClass.fromName("testPack.GrandParent");
+        TargetClass grandParent = TargetClass.fromName("testPack", "GrandParent");
         parent.setParent(grandParent);
 
         grandParent.register(new TargetMethod(grandParent, "methodNotOnChildOrParent", TargetClass.fromClass(int.class), TargetMethod.Called.STATIC));
@@ -363,10 +363,10 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalStateException.class)
     public void targetClass_inheritance_hasParentAlready() {
-        TargetClass child = TargetClass.fromName("testPack.Child");
-        TargetClass parent = TargetClass.fromName("testPack.Parent");
+        TargetClass child = TargetClass.fromName("testPack", "Child");
+        TargetClass parent = TargetClass.fromName("testPack", "Parent");
         child.setParent(parent);
-        TargetClass triesToBeParent = TargetClass.fromName("testPack.StepParent");
+        TargetClass triesToBeParent = TargetClass.fromName("testPack", "StepParent");
         child.setParent(triesToBeParent);
     }
 
@@ -378,10 +378,10 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClass_inheritance_Cache_FromStringWillNotDenyParentInfo() {
-        TargetClass child = TargetClass.fromName("org.freeciv.packetgen.javaGenerator.testData" +
-                "." + "TheChildReferredToUseOnlyOnce");
-        TargetClass parent = TargetClass.fromName("org.freeciv.packetgen.javaGenerator.testData" +
-                "." + "TheParentReferredToUseOnlyOnce");
+        TargetClass child = TargetClass.fromName("org.freeciv.packetgen.javaGenerator.testData",
+                "TheChildReferredToUseOnlyOnce");
+        TargetClass parent = TargetClass.fromName("org.freeciv.packetgen.javaGenerator.testData",
+                "TheParentReferredToUseOnlyOnce");
         child.setParent(parent);
         TargetClass childIsClass = TargetClass.fromClass(TheChildReferredToUseOnlyOnce.class);
 
@@ -389,6 +389,6 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClass_fromString_varArg() {
-        assertEquals("java.lang.Integer...", TargetClass.fromName("java.lang" + "." + "Integer...").getFullAddress());
+        assertEquals("java.lang.Integer...", TargetClass.fromName("java.lang", "Integer...").getFullAddress());
     }
 }

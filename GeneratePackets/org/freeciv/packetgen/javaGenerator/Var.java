@@ -120,10 +120,6 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         return Var.<Kind>local(TargetClass.fromClass(type), name, value);
     }
 
-    public static <Kind extends AValue> Var<Kind> local(String type, String name, Typed<Kind> value) {
-        return Var.<Kind>local(TargetClass.fromName(type), name, value);
-    }
-
     public static <Kind extends AValue> Var<Kind> local(TargetClass type, String name, Typed<Kind> value) {
         return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
     }
@@ -134,10 +130,6 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
 
     public static <Kind extends AValue> Var<Kind> param(Class kind, String name) {
         return Var.<Kind>param(TargetClass.fromClass(kind), name);
-    }
-
-    public static <Kind extends AValue> Var<Kind> param(String kind, String name) {
-        return Var.<Kind>param(TargetClass.fromName(kind), name);
     }
 
     public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations,

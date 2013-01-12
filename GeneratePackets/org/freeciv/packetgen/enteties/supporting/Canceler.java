@@ -31,7 +31,7 @@ public class Canceler extends Annotate {
         Typed<AValue>[] toCancel = new Typed[canceled.size()];
 
         for (int i = 0; i < canceled.size(); i++)
-            toCancel[i] = (TargetClass.fromName(canceled.get(i))).classVal();
+            toCancel[i] = (TargetClass.newKnown("org.freeciv.packet", canceled.get(i))).classVal();
 
         return new ArrayLiteral(toCancel);
     }

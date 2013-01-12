@@ -354,8 +354,8 @@ public class GenerateTest {
 
     private static void writeStructThatHasAnArrayField(String targetFolder) throws IOException {
         LinkedList<WeakVarDec> fields = new LinkedList<WeakVarDec>();
-        fields.add(new WeakVarDec("", "int", "aNumber"));
-        fields.add(new WeakVarDec("", "int", "theArray", new WeakVarDec.ArrayDeclaration(IntExpression.integer("5"))));
+        fields.add(new WeakVarDec(TargetPackage.TOP_LEVEL_AS_STRING, "int", "aNumber"));
+        fields.add(new WeakVarDec(TargetPackage.TOP_LEVEL_AS_STRING, "int", "theArray", new WeakVarDec.ArrayDeclaration(IntExpression.integer("5"))));
         Struct result = new Struct("StructArrayField", fields, Collections.<Requirement>emptySet());
 
         writeJavaFile(result, targetFolder);
