@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 
 public class TypedCodeTest {
     @Test public void targetArrayNewInstance() {
-        TargetArray array = new TargetArray("Under", 2, true);
+        TargetArray array = TargetArray.from("Under", 2);
         CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3), BuiltIn.literal(5)));
 
         assertEquals("new", asAtoms.get(0).getAtom().get());
@@ -49,7 +49,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetArrayNewInstanceFewArgumentsPlacedRight() {
-        TargetArray array = new TargetArray("Under", 2, true);
+        TargetArray array = TargetArray.from("Under", 2);
         CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3)));
 
         assertEquals("new", asAtoms.get(0).getAtom().get());
@@ -63,42 +63,42 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceToManyArguments() {
-        TargetArray array = new TargetArray("Under", 2, true);
+        TargetArray array = TargetArray.from("Under", 2);
         CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3), BuiltIn.literal(5), BuiltIn.literal(2)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceDimensionsInText() {
-        TargetArray array = new TargetArray("Under[]", 1, true);
+        TargetArray array = TargetArray.from("Under[]", 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceToManyDimensionsInClass() {
-        TargetArray array = new TargetArray(int[][].class, true);
+        TargetArray array = TargetArray.from(int[][].class);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceDimensionsInTargetClass() {
-        TargetArray array = new TargetArray(TargetClass.fromClass(int[][].class), 1, true);
+        TargetArray array = TargetArray.from(TargetClass.fromClass(int[][].class), 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceNoArrayFromClass() {
-        TargetArray array = new TargetArray(int.class, true);
+        TargetArray array = TargetArray.from(int.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceNoArrayFromString() {
-        TargetArray array = new TargetArray("int", 0, true);
+        TargetArray array = TargetArray.from("int", 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceNoArrayFromTargetClass() {
-        TargetArray array = new TargetArray(TargetClass.fromClass(int.class), 0, true);
+        TargetArray array = TargetArray.from(TargetClass.fromClass(int.class), 0);
     }
 
     @Test public void targetArrayReadEnd() {
-        Var arrayVal = Var.param(new TargetArray("Under", 2, true), "arrayVal");
+        Var arrayVal = Var.param(TargetArray.from("Under", 2), "arrayVal");
         CodeAtoms asAtoms = new CodeAtoms(arrayVal.call("[]", BuiltIn.literal(3), BuiltIn.literal(5)));
 
         assertEquals("arrayVal", asAtoms.get(0).getAtom().get());
@@ -112,7 +112,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetArrayReadSubArray() {
-        Var arrayVal = Var.param(new TargetArray("Under", 2, true), "arrayVal");
+        Var arrayVal = Var.param(TargetArray.from("Under", 2), "arrayVal");
         CodeAtoms asAtoms = new CodeAtoms(arrayVal.call("[]", BuiltIn.literal(3)));
 
         assertEquals("arrayVal", asAtoms.get(0).getAtom().get());

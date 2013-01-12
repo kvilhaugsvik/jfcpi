@@ -21,7 +21,7 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {
-    public static final TargetArray byteArray = new TargetArray(byte[].class, true);
+    public static final TargetArray byteArray = TargetArray.from(byte[].class);
 
     public static final ExprFrom1<Typed<AnInt>, Var> arrayLen = new ExprFrom1<Typed<AnInt>, Var>() {
         @Override
@@ -381,13 +381,13 @@ public class TerminatedArray extends FieldTypeBasic {
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
                                              final FieldTypeAlias kind) {
-        final TargetArray type = new TargetArray(kind.getUnderType(), 1, true);
+        final TargetArray type = TargetArray.from(kind.getUnderType(), 1);
         final boolean arrayEater = kind.getBasicType().isArrayEater();
         Var<AValue> helperParamValue = Var.param(type, "value");
         final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.fromClass(int.class), "lengthInBytes",
                 Arrays.<Var<?>>asList(helperParamValue), new Block(RETURN(helperParamValue.read("length"))));
 
-        Var<AValue> pBuf = Var.param(new TargetArray(kind.getAddress(), 1, true), "buf");
+        Var<AValue> pBuf = Var.param(TargetArray.from(kind.getAddress(), 1), "buf");
         Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.<AnInt>read("length")));
         Var<AnInt> count = Var.<AnInt>local(int.class, "i", literal(0));
         final Method.Helper buffer2value = Method.newHelper(Comment.no(), type, "buffer2value",
@@ -403,7 +403,7 @@ public class TerminatedArray extends FieldTypeBasic {
         return new TerminatedArray(dataIOType, publicType, type, null,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
-                new TargetArray(kind.getAddress(), 1, true),
+                TargetArray.from(kind.getAddress(), 1),
                 arrayLen,
                 neverAnythingAfter,
                 null,

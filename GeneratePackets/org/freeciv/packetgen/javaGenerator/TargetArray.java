@@ -24,8 +24,8 @@ public class TargetArray extends TargetClass {
     private final TargetClass of;
     private final int dimensions;
 
-    public TargetArray(Class wrapped, boolean isInScope) {
-        super(wrapped, isInScope);
+    private TargetArray(Class wrapped) {
+        super(wrapped, true);
 
         if (!wrapped.isArray())
             throw new IllegalArgumentException("Not an array");
@@ -39,8 +39,8 @@ public class TargetArray extends TargetClass {
         registerBuiltIn();
     }
 
-    public TargetArray(TargetClass wrapped, int levels, boolean isInScope) {
-        super(wrapped.getName() + Strings.repeat("[]", levels), isInScope);
+    private TargetArray(TargetClass wrapped, int levels) {
+        super(wrapped.getName() + Strings.repeat("[]", levels), true);
         this.of = wrapped;
 
         if (levels < 1)
@@ -54,9 +54,9 @@ public class TargetArray extends TargetClass {
         registerBuiltIn();
     }
 
-    public TargetArray(String wrapped, int levels, boolean isInScope) {
-        super(wrapped + Strings.repeat("[]", levels), isInScope);
-        this.of = new TargetClass(wrapped, isInScope);
+    private TargetArray(String wrapped, int levels) {
+        super(wrapped + Strings.repeat("[]", levels), true);
+        this.of = new TargetClass(wrapped, true);
 
         if (levels < 1)
             throw new IllegalArgumentException("Not an array");
@@ -107,5 +107,17 @@ public class TargetArray extends TargetClass {
             return ((TargetArray) of).getDeepestOf();
         else
             return of;
+    }
+
+    public static TargetArray from(TargetClass wrapped, int levels) {
+        return new TargetArray(wrapped, levels);
+    }
+
+    public static TargetArray from(Class wrapped) {
+        return new TargetArray(wrapped);
+    }
+
+    public static TargetArray from(String wrapped, int levels) {
+        return new TargetArray(wrapped, levels);
     }
 }
