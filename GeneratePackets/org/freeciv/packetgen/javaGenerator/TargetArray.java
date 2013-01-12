@@ -117,7 +117,7 @@ public class TargetArray extends TargetClass {
         return new TargetArray(wrapped);
     }
 
-    public static TargetArray from(String wrapped, int levels) {
-        return new TargetArray(wrapped, levels);
+    public static TargetArray from(String inPacket, String className, int levels) {
+        return new TargetArray((TargetPackage.TOP_LEVEL_AS_STRING.equals(inPacket) ? "" : inPacket + ".") + className, levels);
     }
 }

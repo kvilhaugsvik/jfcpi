@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 
 public class TypedCodeTest {
     @Test public void targetArrayNewInstance() {
-        TargetArray array = TargetArray.from("Under", 2);
+        TargetArray array = TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2);
         CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3), BuiltIn.literal(5)));
 
         assertEquals("new", asAtoms.get(0).getAtom().get());
@@ -49,7 +49,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetArrayNewInstanceFewArgumentsPlacedRight() {
-        TargetArray array = TargetArray.from("Under", 2);
+        TargetArray array = TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2);
         CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3)));
 
         assertEquals("new", asAtoms.get(0).getAtom().get());
@@ -63,13 +63,13 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceToManyArguments() {
-        TargetArray array = TargetArray.from("Under", 2);
+        TargetArray array = TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2);
         CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3), BuiltIn.literal(5), BuiltIn.literal(2)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceDimensionsInText() {
-        TargetArray array = TargetArray.from("Under[]", 1);
+        TargetArray array = TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under[]", 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -89,7 +89,7 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceNoArrayFromString() {
-        TargetArray array = TargetArray.from("int", 0);
+        TargetArray array = TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "int", 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -98,7 +98,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetArrayReadEnd() {
-        Var arrayVal = Var.param(TargetArray.from("Under", 2), "arrayVal");
+        Var arrayVal = Var.param(TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2), "arrayVal");
         CodeAtoms asAtoms = new CodeAtoms(arrayVal.call("[]", BuiltIn.literal(3), BuiltIn.literal(5)));
 
         assertEquals("arrayVal", asAtoms.get(0).getAtom().get());
@@ -112,7 +112,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetArrayReadSubArray() {
-        Var arrayVal = Var.param(TargetArray.from("Under", 2), "arrayVal");
+        Var arrayVal = Var.param(TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2), "arrayVal");
         CodeAtoms asAtoms = new CodeAtoms(arrayVal.call("[]", BuiltIn.literal(3)));
 
         assertEquals("arrayVal", asAtoms.get(0).getAtom().get());

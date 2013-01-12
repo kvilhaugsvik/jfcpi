@@ -127,11 +127,11 @@ public class Hardcoded {
                             new Requirement("enum universals_n", DataType.class),
                             new Requirement("struct universal", DataType.class))
             ),
-            new TerminatedArray("worklist", "struct worklist", TargetArray.from("universal", 1),
+            new TerminatedArray("worklist", "struct worklist", TargetArray.from("org.freeciv.types", "universal", 1),
                     null,
                     TerminatedArray.MaxArraySize.NO_LIMIT,
                     TerminatedArray.TransferArraySize.SERIALIZED,
-                    TargetArray.from("universal", 1),
+                    TargetArray.from("org.freeciv.types", "universal", 1),
                     TerminatedArray.arrayLen,
                     TerminatedArray.neverAnythingAfter,
                     null,

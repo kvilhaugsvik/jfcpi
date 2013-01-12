@@ -46,7 +46,7 @@ public class WeakVarDec {
         if (0 == arrayLevels)
             return TargetClass.fromName(packageOfType, type);
         else
-            return TargetArray.from(packageOfType + "." + type, arrayLevels);
+            return TargetArray.from(packageOfType, type, arrayLevels);
     }
 
     public String getName() {
