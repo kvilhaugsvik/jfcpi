@@ -41,9 +41,10 @@ public class Struct extends ClassWriter implements IDependency {
         addConstructorFields();
 
         for (WeakVarDec field: fields) {
-            addObjectConstant(field.getTypeIncludingArrayBraces(), field.getName());
+            final TargetClass type = field.getJavaType().scopeKnown();
+            addObjectConstant(type, field.getName());
             addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    TargetClass.fromName(field.getTypeIncludingArrayBraces()), "get" + field.getName(),
+                    type, "get" + field.getName(),
                     new Block(RETURN(getField(field.getName()).ref()))));
         }
 

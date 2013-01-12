@@ -14,21 +14,24 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
-import org.freeciv.utility.Strings;
+import org.freeciv.packetgen.javaGenerator.TargetArray;
+import org.freeciv.packetgen.javaGenerator.TargetClass;
 
 public class WeakVarDec {
     protected final String name;
+    protected final String packageOfType; // TODO: This information don't belong here. Query the storage in users
     protected final String type;
     protected final ArrayDeclaration[] declarations;
-    protected final int eatenDeclartions;
+    protected final int eatenDeclartions; // TODO: This information don't belong here. Query the storage in users
 
     @Deprecated
-    public WeakVarDec(String kind, String name, ArrayDeclaration... declarations) {
-        this(kind, name, 0, declarations);
+    public WeakVarDec(String packageOfType, String kind, String name, ArrayDeclaration... declarations) {
+        this(packageOfType, kind, name, 0, declarations);
     }
 
-    public WeakVarDec(String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
+    public WeakVarDec(String packageOfType, String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
         this.type = kind;
+        this.packageOfType = packageOfType;
         this.declarations = declarations;
         this.eatenDeclartions = eatenDeclartions;
         this.name = name;
@@ -38,8 +41,12 @@ public class WeakVarDec {
         return type;
     }
 
-    public String getTypeIncludingArrayBraces() {
-        return type + Strings.repeat("[]", declarations.length - eatenDeclartions);
+    public TargetClass getJavaType() { // TODO: This method don't belong here. Query the storage in users
+        int arrayLevels = declarations.length - eatenDeclartions;
+        if (0 == arrayLevels)
+            return TargetClass.fromName(packageOfType + "." + type);
+        else
+            return new TargetArray(packageOfType + "." + type, arrayLevels, true);
     }
 
     public String getName() {

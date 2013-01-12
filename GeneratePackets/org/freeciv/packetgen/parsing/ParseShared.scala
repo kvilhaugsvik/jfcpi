@@ -116,7 +116,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
       }
     ) ^^ {Intish(_)}
 
-  def cTypeDecsToJava(cTypeDecs: ParseType): (String, java.util.Set[Requirement], Int) = {
+  def cTypeDecsToJava(cTypeDecs: ParseType): (String, String, java.util.Set[Requirement], Int) = {
     def needAsJava(name: String): java.util.Set[Requirement] = {
       val out = new java.util.HashSet[Requirement]();
       out.add(new Requirement(name, classOf[DataType]));
@@ -125,7 +125,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
     val nativeJava = java.util.Collections.emptySet[Requirement]()
 
-    def pickJavaInt(sizeInBytes: Int, isSigned: Boolean): String = {
+    def pickJavaInt(sizeInBytes: Int, isSigned: Boolean): (String, String) = {
       // TODO: isSigned and bits can be used to check range
 
       // Java don't have unsigned so something bigger is needed...
@@ -133,9 +133,9 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
       // Java really really likes int so don't use shorter values
       if (realSize <= 32)
-        "Integer"
+        "java.lang" -> "Integer"
       else if (realSize <= 64)
-        "Long"
+        "java.lang" -> "Long"
       else
         throw new UnsupportedOperationException("No Java integer supports " + realSize + " bits." +
           " BigInteger may be used when users of this method can handle making a constructor for it.")
@@ -152,28 +152,30 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     }
 
     cTypeDecs match {
-      case Pointer(Intish("char" :: Nil)) => ("String", nativeJava, 0)
-      case ArrayOf(Intish("char" :: Nil), dim) if (0 < dim) => ("String", nativeJava, 1)
+      case Pointer(Intish("char" :: Nil)) => ("java.lang", "String", nativeJava, 0)
+      case ArrayOf(Intish("char" :: Nil), dim) if (0 < dim) => ("java.lang", "String", nativeJava, 1)
 
       case Intish(anInteger) => anInteger match { // signed is default for int. The compiler choose for char.
         case "unsigned" :: tail =>
-          (pickJavaInt(normalizedIntSize(tail), false), nativeJava, 0)
+          val chosen: (String, String) = pickJavaInt(normalizedIntSize(tail), false)
+          (chosen._1, chosen._2, nativeJava, 0)
         case signed =>
-          (pickJavaInt(normalizedIntSize(signed), true), nativeJava, 0)
+          val chosen: (String, String) = pickJavaInt(normalizedIntSize(signed), true)
+          (chosen._1, chosen._2, nativeJava, 0)
       }
 
-      case Simple("bool") => ("Boolean", nativeJava, 0)
-      case Simple("float") => ("Float", nativeJava, 0)
-      case Simple("double") => ("Double", nativeJava, 0)
-      case Simple(other) => (other, needAsJava(other), 0)
+      case Simple("bool") => ("java.lang", "Boolean", nativeJava, 0)
+      case Simple("float") => ("java.lang", "Float", nativeJava, 0)
+      case Simple("double") => ("java.lang", "Double", nativeJava, 0)
+      case Simple(other) => ("java.lang", other, needAsJava(other), 0)
 
-      case Complex("enum", name) => (name, needAsJava("enum" + " " + name), 0)
-      case Complex("struct", name) => (name, needAsJava("struct" + " " + name), 0)
-      case Complex("union", name) => (name, needAsJava("union" + " " + name), 0)
+      case Complex("enum", name) => ("org.freeciv.types", name, needAsJava("enum" + " " + name), 0)
+      case Complex("struct", name) => ("org.freeciv.types", name, needAsJava("struct" + " " + name), 0)
+      case Complex("union", name) => ("org.freeciv.types", name, needAsJava("union" + " " + name), 0)
 
       case Pointer(targetType) => {
         val targetJ = cTypeDecsToJava(targetType)
-        (targetJ._1 + "...", targetJ._2, 0)
+        (targetJ._1, targetJ._2 + "...", targetJ._3, 0)
       }
 
       // TODO: Handle more of Array here

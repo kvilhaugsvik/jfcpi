@@ -223,7 +223,7 @@ object ParseCCode extends ExtractableParser {
   def typedefConverted = typedef ^^ {
     case types ~ name => {
       val translatedTypes = cTypeDecsToJava(types)
-      new SimpleTypeAlias(name, translatedTypes._1, translatedTypes._2)
+      new SimpleTypeAlias(name, translatedTypes._1, translatedTypes._2, translatedTypes._3)
     }
   }
 
@@ -235,9 +235,9 @@ object ParseCCode extends ExtractableParser {
     (cType ~ identifierRegEx ~ rep("[" ~> intExpr <~ "]") <~ ";") ^^ {
       case cTypeDecs ~ name ~ arrayDecs =>
         val typeNotArray = cTypeDecsToJava(ArrayOf(cTypeDecs, arrayDecs.size))
-        val reqs = new java.util.HashSet(typeNotArray._2)
+        val reqs = new java.util.HashSet(typeNotArray._3)
         arrayDecs.foreach(req => reqs.addAll(req.getReqs))
-        new WeakVarDec(typeNotArray._1, name, typeNotArray._3, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*) ->
+        new WeakVarDec(typeNotArray._1, typeNotArray._2, name, typeNotArray._4, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*) ->
           reqs
   }
 

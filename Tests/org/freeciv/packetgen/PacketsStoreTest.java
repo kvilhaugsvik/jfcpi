@@ -50,7 +50,7 @@ public class PacketsStoreTest {
     @Test public void registerTypePreCondKnownLater() throws UndefinedException {
         PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("ALIAS", "sint16", "fbbf");
-        storage.addDependency(new SimpleTypeAlias("fbbf", "BitString", Collections.<Requirement>emptySet()));
+        storage.addDependency(new SimpleTypeAlias("fbbf", "org.freeciv.types", "BitString", Collections.<Requirement>emptySet()));
 
         assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
     }

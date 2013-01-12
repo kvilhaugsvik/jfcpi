@@ -48,8 +48,8 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
         this(name, TargetClass.fromClass(jType), reqs);
     }
 
-    public SimpleTypeAlias(String name, String jType, Collection<Requirement> reqs) {
-        this(name, TargetClass.fromName(jType), reqs);
+    public SimpleTypeAlias(String name, String jTypePackage, String jType, Collection<Requirement> reqs) {
+        this(name, TargetClass.fromName(jTypePackage + "." + jType), reqs);
     }
 
     public TargetClass getJavaType() {
