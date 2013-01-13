@@ -212,5 +212,12 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {
             return new SetTo<Ret>(this, value);
         }
+
+        @Override
+        public void writeAtoms(CodeAtoms to) {
+            to.hintStart(Reference.class.getCanonicalName());
+            super.writeAtoms(to);
+            to.hintEnd(Reference.class.getCanonicalName());
+        }
     }
 }

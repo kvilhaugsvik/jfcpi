@@ -45,4 +45,11 @@ public class TargetPackage extends Address<TargetPackage> {
             return new TargetPackage(parts);
         }
     }
+
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        to.hintStart(TargetPackage.class.getCanonicalName());
+        super.writeAtoms(to);
+        to.hintEnd(TargetPackage.class.getCanonicalName());
+    }
 }

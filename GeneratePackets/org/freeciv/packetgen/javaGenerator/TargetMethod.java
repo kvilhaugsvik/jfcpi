@@ -55,6 +55,13 @@ public class TargetMethod extends Address<TargetClass> {
         return new MethodCall.HasResult<Ret>(kind, returns, name, parameters);
     }
 
+    @Override
+    public void writeAtoms(CodeAtoms to) {
+        to.hintStart(TargetMethod.class.getCanonicalName());
+        super.writeAtoms(to);
+        to.hintEnd(TargetMethod.class.getCanonicalName());
+    }
+
     public enum Called {
         STATIC, // a class method
         STATIC_ARRAY_INST, // create a new array
