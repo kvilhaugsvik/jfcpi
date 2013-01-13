@@ -32,19 +32,13 @@ public class TargetClass extends Address implements AValue {
     private final boolean isInScope;
     private final Common shared;
 
-    public TargetClass(String fullPath, boolean isInScope) {
-        super(fullPath);
+    public TargetClass(String inPackage, String className, boolean isInScope) {
+        super(TargetPackage.from(inPackage), addressString2Components(className));
         final CodeAtom name = super.components[super.components.length - 1];
         final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
         this.isInScope = isInScope;
 
-        final TargetPackage where;
-        if (fullPath.endsWith("...") && 4 < super.components.length) // Chewing gum and baling wire
-            where = TargetPackage.from(fullPath.substring(0, fullPath.substring(0, fullPath.length() - 3).lastIndexOf(".")));
-        else if (!fullPath.endsWith("...") && 1 < super.components.length)
-            where = TargetPackage.from(fullPath.substring(0, fullPath.lastIndexOf(".")));
-        else
-            where = TargetPackage.TOP_LEVEL;
+        final TargetPackage where = TargetPackage.from(inPackage);
 
         this.shared = new Common(name, where, methods, this);
     }
@@ -233,14 +227,13 @@ public class TargetClass extends Address implements AValue {
         return inScope ? found.scopeKnown() : found.scopeUnknown();
     }
 
-    private static final Pattern inJavaLang = Pattern.compile("java\\.lang\\.\\w+");
     public static TargetClass fromName(String inPackage, String className) {
-        String name = inPackage + "." + className;
-        boolean inScope = inJavaLang.matcher(name).matches();
+        boolean inScope = "java.lang".equals(inPackage);
         try {
-            return getExisting(name, inScope);
+            return getExisting((TargetPackage.TOP_LEVEL_AS_STRING.equals(inPackage) ? "" : inPackage + ".") + className,
+                    inScope);
         } catch (NoSuchElementException e) {
-            return new TargetClass(name, inScope);
+            return new TargetClass(inPackage, className, inScope);
         }
     }
 

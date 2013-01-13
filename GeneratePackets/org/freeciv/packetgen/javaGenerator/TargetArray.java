@@ -40,7 +40,7 @@ public class TargetArray extends TargetClass {
     }
 
     private TargetArray(TargetClass wrapped, int levels) {
-        super(wrapped.getName() + Strings.repeat("[]", levels), true);
+        super(wrapped.getPackage().getFullAddress(), wrapped.getName() + Strings.repeat("[]", levels), true);
         this.of = wrapped;
 
         if (levels < 1)
@@ -54,14 +54,14 @@ public class TargetArray extends TargetClass {
         registerBuiltIn();
     }
 
-    private TargetArray(String wrapped, int levels) {
-        super(wrapped + Strings.repeat("[]", levels), true);
-        this.of = new TargetClass(wrapped, true);
+    private TargetArray(String inPacket, String inClass, int levels) {
+        super(inPacket, inClass + Strings.repeat("[]", levels), true);
+        this.of = TargetClass.newKnown(inPacket, inClass);
 
         if (levels < 1)
             throw new IllegalArgumentException("Not an array");
 
-        lookForDimensions(wrapped);
+        lookForDimensions(inClass);
 
         this.dimensions = levels;
 
@@ -118,6 +118,6 @@ public class TargetArray extends TargetClass {
     }
 
     public static TargetArray from(String inPacket, String className, int levels) {
-        return new TargetArray((TargetPackage.TOP_LEVEL_AS_STRING.equals(inPacket) ? "" : inPacket + ".") + className, levels);
+        return new TargetArray(inPacket, className, levels);
     }
 }

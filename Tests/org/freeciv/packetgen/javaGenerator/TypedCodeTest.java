@@ -319,7 +319,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClassMethodRegisteredOnOneScopeIsThereInTheOther() {
-        TargetClass aClass = new TargetClass("RandomName5792452", true);
+        TargetClass aClass = new TargetClass(TargetPackage.TOP_LEVEL_AS_STRING, "RandomName5792452", true);
         try {
             aClass.call("notThereYet");
             fail("Test makes bad assumption");
@@ -331,12 +331,12 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClassScopeChangeOnlyMakesTwoCopiesStartInScope() {
-        TargetClass aClass = new TargetClass("Thing", true);
+        TargetClass aClass = new TargetClass(TargetPackage.TOP_LEVEL_AS_STRING, "Thing", true);
         assertEquals("The original wasn't kept. A new one was created.", aClass, aClass.scopeUnknown().scopeKnown());
     }
 
     @Test public void targetClassScopeChangeOnlyMakesTwoCopiesStartNotInScope() {
-        TargetClass aClass = new TargetClass("Thing", false);
+        TargetClass aClass = new TargetClass(TargetPackage.TOP_LEVEL_AS_STRING, "Thing", false);
         assertEquals("The original isn't kept. A new one was created.", aClass, aClass.scopeKnown().scopeUnknown());
     }
 

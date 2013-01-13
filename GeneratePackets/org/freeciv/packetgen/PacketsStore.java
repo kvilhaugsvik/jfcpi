@@ -228,7 +228,7 @@ public class PacketsStore {
         for (Constant dep : constants)
             versionData.addField(dep);
 
-        versionData.addClassConstant(Visibility.PUBLIC, String[].class,
+        versionData.addClassConstant(Visibility.PUBLIC, TargetArray.from(String[].class),
                 Util.PACKET_MAP_NAME, new ArrayLiteral(formatPacketMap(packets)));
 
         return versionData;
