@@ -21,21 +21,17 @@ import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class Address extends Formatted implements HasAtoms {
+public class Address<On extends Address<?>> extends Formatted implements HasAtoms {
     public static final Address LOCAL_CODE_BLOCK = new Address();
 
     protected static final HashMap<String, Address> cached = new HashMap<String, Address>();
 
+    protected final On where;
     protected final CodeAtom[] components;
 
     protected Address() {
+        where = null;
         components = new CodeAtom[0];
-    }
-
-    public Address(String address) {
-        components = addressString2Components(address);
-
-        cached.put(this.getFullAddress(), this);
     }
 
     private static final Pattern ADDRESS_SPLITTER = Pattern.compile("\\.");
@@ -55,20 +51,30 @@ public class Address extends Formatted implements HasAtoms {
         return build.toArray(new CodeAtom[build.size()]);
     }
 
-    public Address(Address start, CodeAtom... parts) {
-        this.components = new CodeAtom[start.components.length + parts.length];
-        System.arraycopy(start.components, 0, this.components, 0, start.components.length);
-        System.arraycopy(parts, 0, this.components, start.components.length, parts.length);
+    public Address(On start, CodeAtom... parts) {
+        this.where = start;
+        this.components = parts;
 
         cached.put(this.getFullAddress(), this);
     }
 
     public String getFullAddress() {
-        return Util.joinStringArray(components, ".", "", "");
+        if (includeWhere())
+            return where.getFullAddress() + "." + Util.joinStringArray(components, ".", "", "");
+        else
+            return Util.joinStringArray(components, ".", "", "");
+    }
+
+    private boolean includeWhere() {
+        return !(null == where || LOCAL_CODE_BLOCK.equals(where) || TargetPackage.TOP_LEVEL.equals(where));
     }
 
     @Override
     public void writeAtoms(CodeAtoms to) {
+        if (includeWhere()) {
+            where.writeAtoms(to);
+            to.add(HasAtoms.HAS);
+        }
         to.joinSep(HAS, components);
     }
 

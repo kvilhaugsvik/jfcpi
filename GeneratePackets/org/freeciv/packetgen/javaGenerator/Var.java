@@ -191,7 +191,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
             CodeAtom name = new CodeAtom(of.name);
             switch (of.scope) {
                 case CLASS:
-                    return new Reference(of, TargetClass.SELF_TYPED, name);
+                    return new Reference(of, Address.LOCAL_CODE_BLOCK, name);
                 case OBJECT:
                     return new Reference(of, THIS, name);
                 case CODE_BLOCK:

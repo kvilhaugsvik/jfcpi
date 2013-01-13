@@ -16,7 +16,7 @@ package org.freeciv.packetgen.javaGenerator;
 
 import java.util.NoSuchElementException;
 
-public class TargetPackage extends Address {
+public class TargetPackage extends Address<TargetPackage> {
     public static final TargetPackage TOP_LEVEL = new TargetPackage();
     public static final String TOP_LEVEL_AS_STRING = "";
 

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
-public class TargetClass extends Address implements AValue {
+public class TargetClass extends Address<TargetPackage> implements AValue {
     public static final TargetClass SELF_TYPED = new TargetClass();
 
     private final boolean isInScope;
@@ -37,8 +37,6 @@ public class TargetClass extends Address implements AValue {
         final CodeAtom name = super.components[super.components.length - 1];
         final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
         this.isInScope = isInScope;
-
-        final TargetPackage where = TargetPackage.from(inPackage);
 
         this.shared = new Common(name, where, methods, this);
     }

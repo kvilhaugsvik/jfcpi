@@ -21,15 +21,14 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-public class TargetMethod extends Address {
+public class TargetMethod extends Address<TargetClass> {
     private final HasAtoms name;
-    private final TargetClass where;
     private final TargetClass returns;
     private final Called kind;
 
     public TargetMethod(TargetClass where, String named, TargetClass returns, Called kind) {
-        this.name = new IR.CodeAtom(named);
-        this.where = where;
+        super(where, new IR.CodeAtom(named));
+        this.name = super.components[super.components.length - 1];
         this.returns = returns;
         this.kind = kind;
     }
