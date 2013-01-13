@@ -34,6 +34,13 @@ public class Address<On extends Address<?>> extends Formatted implements HasAtom
         components = new CodeAtom[0];
     }
 
+    public Address(On start, CodeAtom... parts) {
+        this.where = start;
+        this.components = parts;
+
+        cached.put(this.getFullAddress(), this);
+    }
+
     private static final Pattern ADDRESS_SPLITTER = Pattern.compile("\\.");
     protected static CodeAtom[] addressString2Components(String address) {
         String[] parts = ADDRESS_SPLITTER.split(address);
@@ -49,13 +56,6 @@ public class Address<On extends Address<?>> extends Formatted implements HasAtom
         }
 
         return build.toArray(new CodeAtom[build.size()]);
-    }
-
-    public Address(On start, CodeAtom... parts) {
-        this.where = start;
-        this.components = parts;
-
-        cached.put(this.getFullAddress(), this);
     }
 
     public String getFullAddress() {
