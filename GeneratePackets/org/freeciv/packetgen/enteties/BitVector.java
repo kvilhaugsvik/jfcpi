@@ -36,7 +36,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     private final Required bvFieldType;
 
     public BitVector(String name, IntExpression bits) {
-        super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), null,
+        super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), Imports.are(),
                 "Freeciv C code", Collections.<Annotate>emptyList(), name,
                 TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
 
@@ -64,7 +64,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     }
 
     public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
-        super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), null,
+        super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), Imports.are(),
                 "Freeciv C code", Collections.<Annotate>emptyList(), "BitString",
                 TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
 

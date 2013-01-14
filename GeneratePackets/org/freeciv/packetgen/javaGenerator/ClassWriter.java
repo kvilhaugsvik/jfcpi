@@ -50,7 +50,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     private boolean constructorFromAllFields = false;
 
-    public ClassWriter(ClassKind kind, TargetPackage where, Import[] imports,
+    public ClassWriter(ClassKind kind, TargetPackage where, Imports startImports,
                        String madeFrom, List<Annotate> classAnnotate,
                        String name,
                        TargetClass parent, List<TargetClass> implementsInterface) {
@@ -61,7 +61,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         this.myAddress = new TargetClass(where, new ClassWriter.Atom(name), false);
         myAddress.setParent(parent);
 
-        this.imports = new Imports(imports);
+        this.imports = startImports;
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
         this.parent = parent;
         this.implementsInterface = implementsInterface;
@@ -141,8 +141,8 @@ public class ClassWriter extends Formatted implements HasAtoms {
     public static class Imports implements HasAtoms {
         private final List<Import<?>> imports;
 
-        public Imports(Import<?>... first) {
-            this.imports = null == first ? new LinkedList<Import<?>>() : new ArrayList<Import<?>>(Arrays.asList(first));
+        private Imports(Import<?>... first) {
+            this.imports = new ArrayList<Import<?>>(Arrays.asList(first));
         }
 
         @Override
@@ -164,6 +164,10 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
         void add(Import<?> toImport) {
             imports.add(toImport);
+        }
+
+        public static Imports are(Import<?>... first) {
+            return new Imports(first);
         }
     }
 

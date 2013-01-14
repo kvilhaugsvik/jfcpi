@@ -50,16 +50,16 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, Field... fields) throws UndefinedException {
-        super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()), new Import[]{
-                              Import.allIn(FieldType.class.getPackage()),
-                              Import.allIn(FCEnum.class.getPackage()),
-                              Import.classIn(org.freeciv.Util.class),
-                              null,
-                              Import.classIn(java.io.DataInput.class),
-                              Import.classIn(java.io.DataOutput.class),
-                              Import.classIn(java.util.logging.Logger.class),
-                              Import.classIn(java.io.IOException.class)
-                      }, "Freeciv's protocol definition", packetFlags, name,
+        super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
+                Imports.are(Import.allIn(FieldType.class.getPackage()),
+                        Import.allIn(FCEnum.class.getPackage()),
+                        Import.classIn(org.freeciv.Util.class),
+                        null,
+                        Import.classIn(DataInput.class),
+                        Import.classIn(DataOutput.class),
+                        Import.classIn(java.util.logging.Logger.class),
+                        Import.classIn(IOException.class)),
+                "Freeciv's protocol definition", packetFlags, name,
                       DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
 
         this.number = number;

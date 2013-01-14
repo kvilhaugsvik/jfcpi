@@ -35,7 +35,7 @@ public class Struct extends ClassWriter implements IDependency {
     public Struct(String name, List<WeakVarDec> fields, Set<Requirement> willNeed) {
         super(ClassKind.CLASS,
                 TargetPackage.from(FCEnum.class.getPackage()),
-                null, "Freeciv C code", Collections.<Annotate>emptyList(), name,
+                Imports.are(), "Freeciv C code", Collections.<Annotate>emptyList(), name,
                 DEFAULT_PARENT, Collections.<TargetClass>emptyList());
 
         addConstructorFields();

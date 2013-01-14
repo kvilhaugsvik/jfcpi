@@ -264,7 +264,7 @@ public class CodeGenTest {
 
     @Test public void testClassWriterEmptyClass() {
         ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"),
-                new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing",
+                ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing",
                 Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         assertEquals("Generated source not as expected",
@@ -279,7 +279,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoPackage() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.TOP_LEVEL, new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.TOP_LEVEL, ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         assertEquals("Generated source not as expected",
                         "import org.freeciv.packet.Packet;" + "\n" +
@@ -291,7 +291,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoImports() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), null, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
@@ -304,7 +304,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoSourceGiven() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, null, Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), null, Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
@@ -316,7 +316,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyNoInterfaceGiven() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
@@ -331,12 +331,12 @@ public class CodeGenTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testClassWriterEmptyNoNameGiven() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), null,
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), null,
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
     }
 
     @Test public void testClassWriterEmptyEnum() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
@@ -350,7 +350,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEnumWithOneElement() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1), literal("one")));
         assertEquals("Generated source not as expected",
@@ -367,7 +367,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEnumWithThreeElements() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1)));
         toWrite.addEnumerated(EnumElement.newEnumValue("TWO", literal(2)));
@@ -388,7 +388,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEnumWithFiveElementsSomeNegative() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1)));
         toWrite.addEnumerated(EnumElement.newEnumValue("TWO", literal(2)));
@@ -413,7 +413,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEnumWithThreeElementsOneIsCommented() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1)));
         toWrite.addEnumerated(EnumElement.newEnumValue(Comment.c("Not a prime number"), "TWO", literal(2)));
@@ -434,7 +434,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEnumWithThreeElementsTwoAreTheSame() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.ENUM, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         toWrite.addEnumerated(EnumElement.newEnumValue("ONE", literal(1), literal("one")));
         toWrite.addEnumerated(EnumElement.newEnumValue("2nd", literal(2), literal("2nd")));
@@ -456,17 +456,17 @@ public class CodeGenTest {
 
     @Test(expected = AssertionError.class)
     public void testNotEnumAddsEnumerated() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(org.freeciv.packet.Packet.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         toWrite.addEnumerated(EnumElement.newEnumValue("One", literal(1)));
     }
 
     @Test public void testClassWriterEmptyTwoBlocksOfImports() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{
-                                        Import.classIn(org.freeciv.packet.Packet.class),
-                                        null,
-                                        Import.classIn(List.class)
-                                }, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"),
+                ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class),
+                        null,
+                        Import.classIn(List.class)),
+                "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
 
         assertEquals("Generated source not as expected",
@@ -483,12 +483,12 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterEmptyTwoBlocksOfImportsSeparatedByEmpthy() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{
-                                        Import.classIn(org.freeciv.packet.Packet.class),
-                                        null,
-                                        Import.classIn(List.class)
-                                }, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
-                                ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"),
+                ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class),
+                        null,
+                        Import.classIn(List.class)),
+                "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+                ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
 
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
@@ -504,7 +504,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterStyleConstantNoBlankLineAtTheEndOfTheClassScope() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(List.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(List.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         toWrite.addClassConstant(Visibility.PRIVATE, int.class, "five", literal(5));
 
@@ -517,7 +517,7 @@ public class CodeGenTest {
     }
 
     @Test public void testClassWriterStyleAlwaysEndWithNewLine() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), new Import[]{Import.classIn(List.class)}, "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
+        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"), ClassWriter.Imports.are(Import.classIn(List.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
 
         assertTrue("File should end with line break", toWrite.toString().endsWith("\n"));

@@ -115,13 +115,13 @@ public class FieldTypeBasic implements IDependency, ReqKind {
         }
 
         protected FieldTypeAlias(String name, String requiredAs) {
-            super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.fieldtype.FieldType.class.getPackage()), new Import[]{
-                                                  Import.classIn(java.io.DataInput.class),
-                                                  Import.classIn(java.io.DataOutput.class),
-                                                  Import.classIn(java.io.IOException.class),
-                                                  null,
-                                                  Import.allIn(FCEnum.class.getPackage())
-                                          }, "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
+            super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
+                    Imports.are(Import.classIn(DataInput.class),
+                            Import.classIn(DataOutput.class),
+                            Import.classIn(IOException.class),
+                            null,
+                            Import.allIn(FCEnum.class.getPackage())),
+                    "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
                                           DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getName() + ">")));
             this.requiredAs = requiredAs;
 

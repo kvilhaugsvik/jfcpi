@@ -28,7 +28,7 @@ public class SpecialClass extends ClassWriter implements IDependency {
 
     public SpecialClass(TargetPackage where, String madeFrom, String name,
                         Requirement iProvide, Set<Requirement> iRequire) {
-        super(ClassKind.CLASS, where, null, madeFrom, Collections.<Annotate>emptyList(), name,
+        super(ClassKind.CLASS, where, Imports.are(), madeFrom, Collections.<Annotate>emptyList(), name,
                 DEFAULT_PARENT, Collections.<TargetClass>emptyList());
 
         this.iProvide = iProvide;
