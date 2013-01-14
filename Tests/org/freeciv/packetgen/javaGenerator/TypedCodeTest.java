@@ -125,8 +125,8 @@ public class TypedCodeTest {
     @Test public void annotatedField() {
         Annotate annotation = new Annotate("IsAField");
         Var field = Var.field(Arrays.asList(annotation),
-                              Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-                              int.class, "number", null);
+                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+                int.class, "number", null);
         CodeAtoms asAtoms = new CodeAtoms(field);
 
         assertEquals("@IsAField", asAtoms.get(0).getAtom().get());
@@ -282,6 +282,35 @@ public class TypedCodeTest {
         CodeAtoms atoms = new CodeAtoms(inTop);
         assertEquals("WhoNeedPackets", atoms.get(0).getAtom().get());
         assertEquals(1, atoms.toArray().length);
+    }
+
+    @Test public void address_HintsIdentifyTheRightParts() {
+        CodeAtoms atoms = new CodeAtoms();
+        atoms.rewriteRule(new Util.OneCondition<CodeAtom>() {
+            @Override
+            public boolean isTrueFor(CodeAtom atom) {
+                return HasAtoms.SELF.equals(atom);
+            }
+        }, TargetClass.fromName("myPackage", "MyClass").scopeUnknown());
+        Address bigAddress = Var.field(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
+                int.class, "myField", null).ref();
+        bigAddress.writeAtoms(atoms);
+
+        assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(0).getHintsBefore().get(0).get());
+        assertEquals(TargetClass.class.getCanonicalName(), atoms.get(0).getHintsBefore().get(1).get());
+        assertEquals(TargetPackage.class.getCanonicalName(), atoms.get(0).getHintsBefore().get(2).get());
+        assertEquals("myPackage", atoms.get(0).getAtom().get());
+        assertEquals(TargetPackage.class.getCanonicalName(), atoms.get(0).getHintsAfter().get(0).get());
+
+        assertEquals(".", atoms.get(1).getAtom().get());
+
+        assertEquals("MyClass", atoms.get(2).getAtom().get());
+        assertEquals(TargetClass.class.getCanonicalName(), atoms.get(2).getHintsAfter().get(0).get());
+
+        assertEquals(".", atoms.get(3).getAtom().get());
+
+        assertEquals("myField", atoms.get(4).getAtom().get());
+        assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(4).getHintsAfter().get(0).get());
     }
 
     @Test public void targetPackage_topLevel_fromClass() {

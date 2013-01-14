@@ -190,12 +190,14 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        to.hintStart(TargetClass.class.getName());
+        if (!SELF_TYPED.equals(this))
+            to.hintStart(TargetClass.class.getName());
         if (isInScope)
             shared.name.writeAtoms(to);
         else
             super.writeAtoms(to);
-        to.hintEnd(TargetClass.class.getName());
+        if (!SELF_TYPED.equals(this))
+            to.hintEnd(TargetClass.class.getName());
     }
 
     private static class Common {
