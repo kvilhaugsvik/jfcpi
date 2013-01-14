@@ -26,6 +26,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.*;
 
@@ -127,7 +128,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
     public void appendArrayEaterValidationTo(Block body) throws UndefinedException {
         if (type.getBasicType().isArrayEater()) {
-            body.addStatement(this.call("verifyInsideLimits", getSuperLimit(0)));
+            body.addStatement(ref().<Returnable>call("verifyInsideLimits", getSuperLimit(0)));
         }
     }
 

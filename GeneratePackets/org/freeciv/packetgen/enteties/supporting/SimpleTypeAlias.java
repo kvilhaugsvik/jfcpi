@@ -17,7 +17,6 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
@@ -83,9 +82,9 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var val, Var to) {
-                        return new Block(to.<Returnable>call(io.getWrite(), willRequire.isEmpty() ?
+                        return new Block(to.ref().<Returnable>call(io.getWrite(), willRequire.isEmpty() ?
                                 val.ref() :
-                                val.call("getNumber")));
+                                val.ref().<Returnable>call("getNumber")));
                     }
                 },
                                   io.getSize(),

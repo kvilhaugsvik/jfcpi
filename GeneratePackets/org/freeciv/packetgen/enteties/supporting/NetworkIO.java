@@ -22,6 +22,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -85,7 +86,7 @@ public class NetworkIO implements IDependency, ReqKind {
                 new ExprFrom1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var from) {
-                        Typed<AnInt> out = from.call(readFunction);
+                        Typed<AnInt> out = from.ref().<Returnable>call(readFunction);
                         if (!noCastNeeded)
                             out = BuiltIn.<AnInt>cast(int.class, out);
                         return out;

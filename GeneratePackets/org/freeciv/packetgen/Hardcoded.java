@@ -32,6 +32,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 import java.util.*;
 
@@ -57,7 +58,7 @@ public class Hardcoded {
                     new ExprFrom2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
-                            Var buf = Var.local(int.class, "bufferValue", from.<AnInt>call("readInt"));
+                            Var buf = Var.local(int.class, "bufferValue", from.ref().<AnInt>call("readInt"));
                             return new Block(buf, IF(BuiltIn.<ABool>toCode("0 <= bufferValue"), new Block(
                                     to.assign(BuiltIn.<AValue>toCode("(long)bufferValue"))), Block.fromStrings(
                                     "final long removedByCast = (-1L * Integer.MIN_VALUE) + Integer.MAX_VALUE + " + "1L",
@@ -68,7 +69,7 @@ public class Hardcoded {
                         @Override
                         public Block x(Var val, Var to) {
                             Block out = new Block();
-                            out.addStatement(new Statement(to.call("writeInt", val.<AnInt>call("intValue")),
+                            out.addStatement(new Statement(to.ref().<Returnable>call("writeInt", val.ref().<AnInt>call("intValue")),
                                     Comment.c("int is two's compliment so a uint32 don't lose information")));
                             return out;
                         }
@@ -94,12 +95,12 @@ public class Hardcoded {
                             return new Block(to.assign((TargetClass.newKnown("org.freeciv.types", "requirement")).newInstance(
                                     TargetClass.newKnown("org.freeciv.types", "universal").newInstance(
                                             new MethodCall<AValue>("universals_n.valueOf",
-                                                    from.<AValue>call("readUnsignedByte")),
-                                            from.<AValue>call("readInt")),
+                                                    from.ref().<AValue>call("readUnsignedByte")),
+                                            from.ref().<AValue>call("readInt")),
                                     new MethodCall<AValue>("req_range.valueOf",
-                                            from.<AValue>call("readUnsignedByte")),
-                                    from.<AValue>call("readBoolean"),
-                                    from.<AValue>call("readBoolean"))));
+                                            from.ref().<AValue>call("readUnsignedByte")),
+                                    from.ref().<AValue>call("readBoolean"),
+                                    from.ref().<AValue>call("readBoolean"))));
                         }
                     },
                     new ExprFrom2<Block, Var, Var>() {
@@ -145,8 +146,8 @@ public class Hardcoded {
                         @Override
                         public Block x(Var to, Var elem) {
                             return new Block(
-                                    to.call("writeByte", elem.<AnInt>read("kind.getNumber()")), // TODO: stop abusing read
-                                    to.call("writeByte", elem.read("value"))
+                                    to.ref().<Returnable>call("writeByte", elem.<AnInt>read("kind.getNumber()")), // TODO: stop abusing read
+                                    to.ref().<Returnable>call("writeByte", elem.read("value"))
                             );
                         }
                     },
@@ -157,8 +158,8 @@ public class Hardcoded {
                             return universal.newInstance(
                                     new MethodCall<AValue>(
                                             "universals_n.valueOf",
-                                            from.<AValue>call("readUnsignedByte")),
-                                    from.<AValue>call("readUnsignedByte"));
+                                            from.ref().<AValue>call("readUnsignedByte")),
+                                    from.ref().<AValue>call("readUnsignedByte"));
                         }
                     },
                     TO_STRING_ARRAY,
@@ -194,7 +195,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AValue>, Var>() {
                         @Override
                         public Typed<AValue> x(Var everything) {
-                            return everything.call("getBytes");
+                            return everything.ref().<Returnable>call("getBytes");
                         }
                     },
                     new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
@@ -236,13 +237,13 @@ public class Hardcoded {
                     new ExprFrom2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
-                            return new Block(to.assign(from.<ABool>call("readBoolean")));
+                            return new Block(to.assign(from.ref().<ABool>call("readBoolean")));
                         }
                     },
                     new ExprFrom2<Block, Var, Var>() {
                         @Override
                         public Block x(Var value, Var to) {
-                            return new Block(to.call("writeBoolean", value.ref()));
+                            return new Block(to.ref().<Returnable>call("writeBoolean", value.ref()));
                         }
                     },
                     new ExprFrom1<Typed<AnInt>, Var>() {
@@ -313,13 +314,13 @@ public class Hardcoded {
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var out, Var inn) {
-                        return new Block(out.assign(divide(inn.<AValue>call("readFloat"), BuiltIn.<AValue>toCode(times))));
+                        return new Block(out.assign(divide(inn.ref().<AValue>call("readFloat"), BuiltIn.<AValue>toCode(times))));
                     }
                 },
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var value, Var to) {
-                        return new Block(to.call("writeFloat", BuiltIn.<AnInt>multiply(value.ref(), BuiltIn.<AnInt>toCode(times))));
+                        return new Block(to.ref().<Returnable>call("writeFloat", BuiltIn.<AnInt>multiply(value.ref(), BuiltIn.<AnInt>toCode(times))));
                     }
                 },
                 new ExprFrom1<Typed<AnInt>, Var>() {

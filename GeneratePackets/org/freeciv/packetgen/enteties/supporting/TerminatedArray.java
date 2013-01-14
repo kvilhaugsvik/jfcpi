@@ -32,7 +32,7 @@ public class TerminatedArray extends FieldTypeBasic {
     public static final ExprFrom2<Block, Var, Var> elemIsByteArray = new ExprFrom2<Block, Var, Var>() {
         @Override
         public Block x(Var a, Var b) {
-            return new Block(a.call("writeByte", b.ref()));
+            return new Block(a.ref().<Returnable>call("writeByte", b.ref()));
         }
     };
     private static final ExprFrom1<Typed<AValue>, Var> fullIsByteArray = new ExprFrom1<Typed<AValue>, Var>() {
@@ -58,7 +58,7 @@ public class TerminatedArray extends FieldTypeBasic {
     public static final ExprFrom1<Typed<? extends AValue>, Var> readByte = new ExprFrom1<Typed<? extends AValue>, Var>() {
         @Override
         public Typed<? extends AValue> x(Var from) {
-            return from.call("readByte");
+            return from.ref().<Returnable>call("readByte");
         }
     };
     public static final ExprFrom1<Typed<ABool>, Typed<AnInt>> addAfterIfSmallerThanMaxSize =
@@ -164,17 +164,17 @@ public class TerminatedArray extends FieldTypeBasic {
             public Block x(Var val, Var to) {
                 Block out = new Block();
                 if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
-                    out.addStatement(to.call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
+                    out.addStatement(to.ref().<Returnable>call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
                 if (null == convertAllElementsToByteArray) {
                     Var element = Var.param(((TargetArray)javaType).getOf(), "element");
                     out.addStatement(FOR(element, val.ref(), writeElementTo.x(to, element)));
                 } else {
-                    out.addStatement(to.call("write", convertAllElementsToByteArray.x(val)));
+                    out.addStatement(to.ref().<Returnable>call("write", convertAllElementsToByteArray.x(val)));
                 }
                 Typed<ABool> addAfterResult = testIfTerminatorShouldBeAdded.x(numberOfElements.x(val));
                 if (!FALSE.equals(addAfterResult))
                     out.addStatement(IF(addAfterResult,
-                            new Block(to.call("writeByte", BuiltIn.<AValue>toCode(Constant.referToInJavaCode(terminator))))));
+                            new Block(to.ref().<Returnable>call("writeByte", BuiltIn.<AValue>toCode(Constant.referToInJavaCode(terminator))))));
                 return out;
             }
         };
@@ -245,7 +245,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 throw new UnsupportedOperationException("Source of transfer array size is not known");
         }
         if (elementTypeCanLimitVerify)
-            limits.add(pLimits.<AValue>call("next"));
+            limits.add(pLimits.ref().<AValue>call("next"));
         to.addStatement(fMaxSize.assign(new MethodCall("ElementsLimit.limit", limits.toArray(new Typed[0]))));
     }
 
@@ -296,8 +296,8 @@ public class TerminatedArray extends FieldTypeBasic {
             TargetClass elemtype = ((TargetArray)(fValue.getTType())).getOf();
             Var element = Var.local(elemtype, "element", null);
             verifyInsideLimits.addStatement(FOR(element, fValue.ref(), new Block(
-                    buffertype.getOf().newInstance(element.ref(), pLimits.<TargetClass>call("next"))
-                            .call(SELF_VALIDATOR_NAME, pLimits.<TargetClass>call("next"))
+                    buffertype.getOf().newInstance(element.ref(), pLimits.ref().<TargetClass>call("next"))
+                            .call(SELF_VALIDATOR_NAME, pLimits.ref().<TargetClass>call("next"))
             )));
         }
         return Method.newPublicDynamicMethod(Comment.no(),
@@ -417,7 +417,7 @@ public class TerminatedArray extends FieldTypeBasic {
                     @Override
                     public Block x(Var to, Var elem) {
                         return new Block(kind.getAddress()
-                                .newInstance(elem.ref(), fMaxSize.call("next"))
+                                .newInstance(elem.ref(), fMaxSize.ref().<Returnable>call("next"))
                                 .call("encodeTo", to.ref()));
                     }
                 },
@@ -445,7 +445,7 @@ public class TerminatedArray extends FieldTypeBasic {
 
     private static MethodCall<? extends AValue> getNext(boolean arrayEater) {
         return arrayEater ?
-                Hardcoded.pLimits.<TargetClass>call("next") :
+                Hardcoded.pLimits.ref().<TargetClass>call("next") :
                 new MethodCall<AValue>("ElementsLimit.noLimit");
     }
 

@@ -113,8 +113,8 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                                 isInstanceOf(e.ref(), ft),
                                 new Block(
                                         fte,
-                                        fte.call("setInPacket", literal(getName())),
-                                        fte.call("setField", pName.ref()))),
+                                        fte.ref().<Returnable>call("setInPacket", literal(getName())),
+                                        fte.ref().<Returnable>call("setField", pName.ref()))),
                         RETURN(e.ref())));
         addMethod(addExceptionLocation);
 
@@ -194,27 +194,27 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
         constructorBodyStream.groupBoundary();
 
-        constructorBodyStream.addStatement(IF(isNotSame(getField("number").ref(), argHeader.<AnInt>call("getPacketKind")),
+        constructorBodyStream.addStatement(IF(isNotSame(getField("number").ref(), argHeader.ref().<AnInt>call("getPacketKind")),
                 new Block(THROW((ioexception).newInstance(sum(
                         literal("Tried to create package " + name + " but packet number was "),
-                        argHeader.<AnInt>call("getPacketKind")))))));
+                        argHeader.ref().<AnInt>call("getPacketKind")))))));
 
         constructorBodyStream.addStatement(ASSERT(isInstanceOf(argHeader.ref(), headerKind),
                 literal("Packet not generated for this kind of header")));
 
         Block wrongSize = new Block();
-        constructorBodyStream.addStatement(IF(isNotSame(sum(argHeader.<AnInt>call("getHeaderSize"),
-                calcBodyLenCall), argHeader.<AnInt>call("getTotalSize")), wrongSize));
+        constructorBodyStream.addStatement(IF(isNotSame(sum(argHeader.ref().<AnInt>call("getHeaderSize"),
+                calcBodyLenCall), argHeader.ref().<AnInt>call("getTotalSize")), wrongSize));
         wrongSize.addStatement(new MethodCall<NoValue>("Logger.getLogger(" + logger + ").warning", sum(
                 literal("Probable misinterpretation: "),
                 literal("interpreted packet size ("),
-                GROUP(sum(argHeader.<AnInt>call("getHeaderSize"), calcBodyLenCall)),
-                literal(") don't match header packet size ("), argHeader.<AnInt>call("getTotalSize"),
+                GROUP(sum(argHeader.ref().<AnInt>call("getHeaderSize"), calcBodyLenCall)),
+                literal(") don't match header packet size ("), argHeader.ref().<AnInt>call("getTotalSize"),
                 literal(") for "), new MethodCall<AString>("this.toString"))));
         wrongSize.addStatement(THROW(ioexception.newInstance(sum(
                 literal("Packet size in header and Java packet not the same."),
-                literal(" Header packet size: "), argHeader.<AnInt>call("getTotalSize"),
-                literal(" Header size: "), argHeader.<AnInt>call("getHeaderSize"),
+                literal(" Header packet size: "), argHeader.ref().<AnInt>call("getTotalSize"),
+                literal(" Header size: "), argHeader.ref().<AnInt>call("getHeaderSize"),
                 literal(" Packet body size: "), calcBodyLenCall))));
         addMethod(Method.newPublicConstructorWithException(Comment.doc(
                 "Construct an object from a DataInput", new String(),
@@ -229,10 +229,10 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private void addEncoder(Field[] fields) {
         Var<TargetClass> pTo = Var.<TargetClass>param(TargetClass.newKnown(DataOutput.class), "to");
         Block body = new Block();
-        body.addStatement(getField("header").call("encodeTo", pTo.ref()));
+        body.addStatement(getField("header").ref().<Returnable>call("encodeTo", pTo.ref()));
         if (0 < fields.length) {
             for (Field field : fields)
-                body.addStatement(field.call("encodeTo", pTo.ref()));
+                body.addStatement(field.ref().<Returnable>call("encodeTo", pTo.ref()));
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.fromClass(void.class), "encodeTo", Arrays.asList(pTo),
@@ -257,7 +257,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     }
 
     private static Typed<? extends AValue> calcBodyLen(Field field) {
-        return field.call("encodedLength");
+        return field.ref().<Returnable>call("encodedLength");
     }
 
     private void addToString(String name, Field[] fields) {
@@ -267,7 +267,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         for (Field field : fields)
             body.addStatement(BuiltIn.inc(buildOutput, sum(
                     literal("\\n\\t" + field.getFieldName() + " = "),
-                    field.<AString>call("toString"))));
+                    field.ref().<AString>call("toString"))));
         body.addStatement(RETURN(buildOutput.ref()));
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(String.class), "toString", body));
     }
@@ -275,7 +275,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private void addJavaGetter(Field field) throws UndefinedException {
         Block body;
 
-        body = new Block(RETURN(field.call("getValue")));
+        body = new Block(RETURN(field.ref().<Returnable>call("getValue")));
 
         addMethod(Method.newPublicReadObjectState(Comment.no(),
                 field.getUnderType().scopeKnown(),

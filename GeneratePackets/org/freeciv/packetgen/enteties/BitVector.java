@@ -151,7 +151,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                 new ExprFrom1<Typed<AValue>, Var>() {
                     @Override
                     public Typed<AValue> x(Var buffer) {
-                        return buffer.call("getAsByteArray");
+                        return buffer.ref().<Returnable>call("getAsByteArray");
                     }
                 },
                 knowsSize ?

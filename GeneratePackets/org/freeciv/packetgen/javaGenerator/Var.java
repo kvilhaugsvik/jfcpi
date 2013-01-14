@@ -107,10 +107,6 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         return reference;
     }
 
-    public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
-        return ref().<Ret>call(method, params);
-    }
-
     public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {
         return ref().assign(value);
     }

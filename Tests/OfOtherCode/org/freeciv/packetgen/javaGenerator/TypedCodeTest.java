@@ -20,6 +20,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
 import org.freeciv.packetgen.javaGenerator.formating.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
@@ -99,7 +100,7 @@ public class TypedCodeTest {
 
     @Test public void targetArrayReadEnd() {
         Var arrayVal = Var.param(TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2), "arrayVal");
-        CodeAtoms asAtoms = new CodeAtoms(arrayVal.call("[]", BuiltIn.literal(3), BuiltIn.literal(5)));
+        CodeAtoms asAtoms = new CodeAtoms(arrayVal.ref().<Returnable>call("[]", BuiltIn.literal(3), BuiltIn.literal(5)));
 
         assertEquals("arrayVal", asAtoms.get(0).getAtom().get());
         assertEquals("[", asAtoms.get(1).getAtom().get());
@@ -113,7 +114,7 @@ public class TypedCodeTest {
 
     @Test public void targetArrayReadSubArray() {
         Var arrayVal = Var.param(TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2), "arrayVal");
-        CodeAtoms asAtoms = new CodeAtoms(arrayVal.call("[]", BuiltIn.literal(3)));
+        CodeAtoms asAtoms = new CodeAtoms(arrayVal.ref().<Returnable>call("[]", BuiltIn.literal(3)));
 
         assertEquals("arrayVal", asAtoms.get(0).getAtom().get());
         assertEquals("[", asAtoms.get(1).getAtom().get());
@@ -261,7 +262,7 @@ public class TypedCodeTest {
     @Test(expected = IllegalArgumentException.class)
     public void callNonExistingMethodOnVar() {
         Var aVar = Var.param(Object.class, "aVar");
-        aVar.call("thisMethodIsNotOnObject");
+        aVar.ref().<Returnable>call("thisMethodIsNotOnObject");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -403,7 +404,7 @@ public class TypedCodeTest {
         TargetClass child = TargetClass.fromClass(String.class);
         Var myString = Var.param(child, "myString");
 
-        assertNotNull("Failed to inherit dynamic method wait from Class Object", myString.call("wait"));
+        assertNotNull("Failed to inherit dynamic method wait from Class Object", myString.ref().<Returnable>call("wait"));
     }
 
     @Test public void targetClass_inheritance_Cache_FromStringWillNotDenyParentInfo() {

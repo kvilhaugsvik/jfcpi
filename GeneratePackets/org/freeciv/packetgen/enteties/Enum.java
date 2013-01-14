@@ -227,7 +227,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
                 new ExprFrom2<Block, Var, Var>() {
                     @Override
                     public Block x(Var val, Var to) {
-                        return new Block(to.<Returnable>call(io.getWrite(), val.<AValue>call("getNumber")));
+                        return new Block(to.ref().<Returnable>call(io.getWrite(), val.ref().<AValue>call("getNumber")));
                     }
                 },
                                   io.getSize(),
