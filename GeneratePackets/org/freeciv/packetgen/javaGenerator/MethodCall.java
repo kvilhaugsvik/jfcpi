@@ -224,12 +224,12 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
 
         @Override
         public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... params) {
-            return valueHelper.call(method, params);
+            return valueHelper.<Ret>call(method, params);
         }
 
         @Override
         public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... params) {
-            return valueHelper.callV(method, params);
+            return valueHelper.<Ret>callV(method, params);
         }
     }
 }

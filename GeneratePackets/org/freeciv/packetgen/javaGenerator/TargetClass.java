@@ -130,9 +130,9 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
         methodExists(method);
         if (shared.methods.containsKey(method))
-            return shared.methods.get(method).call(parameters);
+            return shared.methods.get(method).<Ret>call(parameters);
         else
-            return shared.parent.call(method, parameters);
+            return shared.parent.<Ret>call(method, parameters);
     }
 
     private void methodExists(String method) {
@@ -153,9 +153,9 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... parameters) {
         methodExists(method); // exception if method don't exist here or on parent
         if (shared.methods.containsKey(method)) // method exists here
-            return shared.methods.get(method).callV(parameters);
+            return shared.methods.get(method).<Ret>callV(parameters);
         else // method exists at parent
-            return shared.parent.callV(method, parameters);
+            return shared.parent.<Ret>callV(method, parameters);
     }
 
     // TODO: Should this be seen as a function called on the type?

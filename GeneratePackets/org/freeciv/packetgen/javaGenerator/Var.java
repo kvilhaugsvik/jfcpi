@@ -197,12 +197,12 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         }
 
         public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
-            return valueHelper.call(method, params);
+            return valueHelper.<Ret>call(method, params);
         }
 
         @Override
         public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... params) {
-            return valueHelper.callV(method, params);
+            return valueHelper.<Ret>callV(method, params);
         }
 
         public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {

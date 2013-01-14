@@ -31,11 +31,11 @@ public class ValueHelper {
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
-        return type.call(method, addSelfAsFirstParams(params));
+        return type.<Ret>call(method, addSelfAsFirstParams(params));
     }
 
     public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... params) {
-        return type.callV(method, addSelfAsFirstParams(params));
+        return type.<Ret>callV(method, addSelfAsFirstParams(params));
     }
 
     private Typed<? extends AValue>[] addSelfAsFirstParams(Typed<? extends AValue>... params) {
