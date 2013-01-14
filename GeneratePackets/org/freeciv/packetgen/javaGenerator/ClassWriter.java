@@ -36,7 +36,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     public static final TargetClass DEFAULT_PARENT = TargetClass.fromClass(Object.class);
 
     private final TargetClass myAddress;
-    private final List<Import> imports;
+    private final Imports imports;
     private final Visibility visibility;
     private final ClassKind kind;
     private final LinkedList<Annotate> classAnnotate;
@@ -61,7 +61,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         this.myAddress = new TargetClass(where, new ClassWriter.Atom(name), false);
         myAddress.setParent(parent);
 
-        this.imports = null == imports ? new LinkedList<Import>() : new ArrayList<Import>(Arrays.asList(imports));
+        this.imports = new Imports(imports);
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
         this.parent = parent;
         this.implementsInterface = implementsInterface;
@@ -138,19 +138,32 @@ public class ClassWriter extends Formatted implements HasAtoms {
         return getField(field).assign(BuiltIn.<AValue>toCode(field));
     }
 
-    private void formatImports(CodeAtoms to) {
-        if (!imports.isEmpty()) {
-            to.hintStart(CodeStyle.GROUP);
+    public static class Imports implements HasAtoms {
+        private final List<Import<?>> imports;
 
-            for (Import anImport : imports) {
-                if (null != anImport)
-                    anImport.writeAtoms(to);
-                else {
-                    to.hintEnd(CodeStyle.GROUP);
-                    to.hintStart(CodeStyle.GROUP);
+        public Imports(Import<?>... first) {
+            this.imports = null == first ? new LinkedList<Import<?>>() : new ArrayList<Import<?>>(Arrays.asList(first));
+        }
+
+        @Override
+        public void writeAtoms(CodeAtoms to) {
+            if (!imports.isEmpty()) {
+                to.hintStart(CodeStyle.GROUP);
+
+                for (Import anImport : imports) {
+                    if (null != anImport)
+                        anImport.writeAtoms(to);
+                    else {
+                        to.hintEnd(CodeStyle.GROUP);
+                        to.hintStart(CodeStyle.GROUP);
+                    }
                 }
+                to.hintEnd(CodeStyle.GROUP);
             }
-            to.hintEnd(CodeStyle.GROUP);
+        }
+
+        void add(Import<?> toImport) {
+            imports.add(toImport);
         }
     }
 
@@ -204,7 +217,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
             to.add(HasAtoms.EOL);
         }
 
-        formatImports(to);
+        imports.writeAtoms(to);
 
         for (Annotate ann : classAnnotate)
             ann.writeAtoms(to);
