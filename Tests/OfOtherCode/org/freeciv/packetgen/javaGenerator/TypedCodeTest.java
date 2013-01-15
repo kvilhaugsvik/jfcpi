@@ -30,6 +30,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -283,6 +284,21 @@ public class TypedCodeTest {
         CodeAtoms atoms = new CodeAtoms(inTop);
         assertEquals("WhoNeedPackets", atoms.get(0).getAtom().get());
         assertEquals(1, atoms.toArray().length);
+    }
+
+    @Test public void address_getFirstComponent_onOther_correctComponent() {
+        CodeAtom firstComponent = TargetPackage.from("test.of").getFirstComponent();
+        assertEquals("test", firstComponent.get());
+    }
+
+    @Test public void address_getFirstComponent_onAbstract_correctComponent() {
+        CodeAtom firstComponent = new Address(TargetPackage.TOP_LEVEL, new CodeAtom("WhoNeedPackets")).getFirstComponent();
+        assertEquals("WhoNeedPackets", firstComponent.get());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void address_special_hasNoFirstComponent() {
+        TargetPackage.TOP_LEVEL.getFirstComponent();
     }
 
     @Test public void address_HintsIdentifyTheRightParts() {

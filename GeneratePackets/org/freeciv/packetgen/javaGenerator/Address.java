@@ -58,6 +58,15 @@ public class Address<On extends Address<?>> extends Formatted implements HasAtom
         return build.toArray(new CodeAtom[build.size()]);
     }
 
+    public CodeAtom getFirstComponent() {
+        if (includeWhere())
+            return where.getFirstComponent();
+        else if (0 < components.length)
+            return components[0];
+        else
+            throw new NoSuchElementException("No components at all");
+    }
+
     public String getFullAddress() {
         if (includeWhere())
             return where.getFullAddress() + "." + Util.joinStringArray(components, ".", "", "");
