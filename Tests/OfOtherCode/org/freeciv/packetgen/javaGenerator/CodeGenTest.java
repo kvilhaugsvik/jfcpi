@@ -461,28 +461,7 @@ public class CodeGenTest {
         toWrite.addEnumerated(EnumElement.newEnumValue("One", literal(1)));
     }
 
-    @Test public void testClassWriterEmptyTwoBlocksOfImports() {
-        ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"),
-                ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class),
-                        null,
-                        Import.classIn(List.class)),
-                "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
-                                ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
-
-        assertEquals("Generated source not as expected",
-                "package org.freeciv.packetgen;" + "\n" +
-                        "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
-                        "import java.util.List;" + "\n" +
-                        "import javax.annotation.Generated;" + "\n" +
-                        "\n" +
-                        "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public class NameOfClass implements Packet {" + "}" + "\n",
-                toWrite.toString());
-    }
-
-    @Test public void testClassWriterEmptyTwoBlocksOfImportsSeparatedByEmpthy() {
+    @Test public void testClassWriter_Imports_AreSeparated() {
         ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"),
                 ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class),
                         null,
