@@ -41,11 +41,12 @@ public class IR {
         return Collections.unmodifiableList(hintsAfter);
     }
 
-    public void addHint(Hint hint) {
-        if (hint.isStart)
-            hintsBefore.add(hint);
-        else
-            hintsAfter.add(hint);
+    public void hintBegin(String hint) {
+        hintsBefore.add(Hint.begin(hint));
+    }
+
+    public void hintEnd(String hint) {
+        hintsAfter.add(Hint.end(hint));
     }
 
     public String toString() {

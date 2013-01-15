@@ -23,12 +23,12 @@ public class CodeAtoms {
     //TODO: Rename atoms
     private final LinkedList<IR> atoms;
     LinkedList<RewriteRule> rewrites;
-    private List<IR.Hint> onNext;
+    private List<String> onNext;
 
     public CodeAtoms(HasAtoms... start) {
         atoms = new LinkedList<IR>();
         rewrites = new LinkedList<RewriteRule>();
-        onNext = new LinkedList<IR.Hint>();
+        onNext = new LinkedList<String>();
 
         for (HasAtoms owner : start)
             owner.writeAtoms(this);
@@ -46,9 +46,9 @@ public class CodeAtoms {
     }
 
     private void hintsAddStoredBeginnings(int atomsAtTheBeginning) {
-        for (IR.Hint hint : onNext)
-            atoms.get(atomsAtTheBeginning).addHint(hint);
-        onNext = new LinkedList<IR.Hint>();
+        for (String hint : onNext)
+            atoms.get(atomsAtTheBeginning).hintBegin(hint);
+        onNext = new LinkedList<String>();
     }
 
     private void addAtomOrRewrite(CodeAtom atom) {
@@ -74,14 +74,14 @@ public class CodeAtoms {
     }
 
     public void hintStart(String name) {
-        onNext.add(IR.Hint.begin(name));
+        onNext.add(name);
     }
 
     public void hintEnd(String name) {
         assert !atoms.isEmpty() : "Tried to end a hint before an element was added";
         assert onNext.isEmpty() : "Can't add hint after accepting hints for next element";
 
-        atoms.peekLast().addHint(IR.Hint.end(name));
+        atoms.peekLast().hintEnd(name);
     }
 
     public void refuseNextIf(Util.OneCondition<CodeAtom> reason) {
