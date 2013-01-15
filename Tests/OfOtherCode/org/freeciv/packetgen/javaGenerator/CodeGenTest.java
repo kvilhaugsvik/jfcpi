@@ -271,6 +271,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -283,6 +284,7 @@ public class CodeGenTest {
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         assertEquals("Generated source not as expected",
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -322,6 +324,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -342,6 +345,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -357,6 +361,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -376,6 +381,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -399,6 +405,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -422,6 +429,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -443,6 +451,7 @@ public class CodeGenTest {
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
@@ -475,6 +484,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "import java.util.List;" + "\n" +
+                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
