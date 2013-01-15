@@ -138,41 +138,6 @@ public class ClassWriter extends Formatted implements HasAtoms {
         return getField(field).assign(BuiltIn.<AValue>toCode(field));
     }
 
-    public static class Imports implements HasAtoms {
-        private final TreeSet<Import<?>> imports;
-
-        private Imports(Import<?>... first) {
-            this.imports = new TreeSet<Import<?>>(Arrays.asList(first));
-        }
-
-        @Override
-        public void writeAtoms(CodeAtoms to) {
-            if (!imports.isEmpty()) {
-                to.hintStart(CodeStyle.GROUP);
-
-                Import previous = imports.first();
-                for (Import anImport : imports) {
-                    if (!previous.sameFirstComponent(anImport)) {
-                        to.hintEnd(CodeStyle.GROUP);
-                        to.hintStart(CodeStyle.GROUP);
-                    }
-                    anImport.writeAtoms(to);
-                    previous = anImport;
-                }
-
-                to.hintEnd(CodeStyle.GROUP);
-            }
-        }
-
-        void add(Import<?> toImport) {
-            imports.add(toImport);
-        }
-
-        public static Imports are(Import<?>... first) {
-            return new Imports(first);
-        }
-    }
-
     private static void formatVariableDeclarations(CodeAtoms to, final List<Var> fields) {
         if (!fields.isEmpty()) {
             to.hintStart(CodeStyle.GROUP);
