@@ -30,6 +30,14 @@ public class Import<Of extends Address> extends Formatted implements HasAtoms, C
         return target.getFirstComponent().toString().equals(other.target.getFirstComponent().toString());
     }
 
+    public Of getTarget() {
+        return target;
+    }
+
+    public boolean isAllIn() {
+        return allIn;
+    }
+
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(IMPORT);

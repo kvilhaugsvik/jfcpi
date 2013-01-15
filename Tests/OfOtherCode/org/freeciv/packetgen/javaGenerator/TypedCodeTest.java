@@ -17,6 +17,7 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
@@ -436,5 +437,60 @@ public class TypedCodeTest {
 
     @Test public void targetClass_fromString_varArg() {
         assertEquals("java.lang.Integer...", TargetClass.fromName("java.lang", "Integer...").getFullAddress());
+    }
+
+    @Test public void scopeData_class_notInScope() {
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.one", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.fromName("org.other", "Used"));
+
+        assertFalse("Not imported. In other package. Shouldn't be in scope", scopeData.isInScope(used.toArray()));
+    }
+
+    @Test public void scopeData_class_inScope_sinceInSamePackage() {
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.here", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.fromName("org.here", "Used"));
+
+        assertTrue("Should be in scope since in same package", scopeData.isInScope(used.toArray()));
+    }
+
+    @Test public void scopeData_class_inScope_sincePackageImported() {
+        scopeData_class_inScope_sinceImported(Import.allIn(TargetPackage.from("org.there")), "all classes in package");
+    }
+
+    private void scopeData_class_inScope_sinceImported(Import<?> theImport, String wasImported) {
+        Imports.ScopeDataForJavaFile scopeData = Imports.are(theImport)
+                .getScopeData(TargetClass.fromName("org.here", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.fromName("org.there", "Used"));
+
+        assertTrue("Should be in scope since " + wasImported + " was imported", scopeData.isInScope(used.toArray()));
+    }
+
+    @Test public void scopeData_class_inScope_sinceClassImported() {
+        scopeData_class_inScope_sinceImported(Import.classIn(TargetClass.fromName("org.there", "Used")), "the class");
+    }
+
+    @Test public void scopeData_class_inScope_sinceInJavaLang() {
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.here", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.fromClass(String.class).scopeUnknown());
+
+        assertTrue("String is in scope since its in java.lang", scopeData.isInScope(used.toArray()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void scopeData_invalidEnd() {
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.one", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.fromName("org.other", "Used"));
+        used.add(new CodeAtom("Failer"));
+
+        assertFalse(scopeData.isInScope(used.toArray()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void scopeData_invalidStart() {
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.one", "User"));
+        CodeAtoms used = new CodeAtoms(new CodeAtom("Failer"));
+        TargetClass.fromName("org.other", "Used").writeAtoms(used);
+
+        assertFalse(scopeData.isInScope(used.toArray()));
     }
 }
