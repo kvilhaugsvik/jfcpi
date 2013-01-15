@@ -139,10 +139,10 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     public static class Imports implements HasAtoms {
-        private final List<Import<?>> imports;
+        private final TreeSet<Import<?>> imports;
 
         private Imports(Import<?>... first) {
-            this.imports = new ArrayList<Import<?>>(Arrays.asList(first));
+            this.imports = new TreeSet<Import<?>>(Arrays.asList(first));
         }
 
         @Override
@@ -150,7 +150,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
             if (!imports.isEmpty()) {
                 to.hintStart(CodeStyle.GROUP);
 
-                Import previous = imports.get(0);
+                Import previous = imports.first();
                 for (Import anImport : imports) {
                     if (!previous.sameFirstComponent(anImport)) {
                         to.hintEnd(CodeStyle.GROUP);

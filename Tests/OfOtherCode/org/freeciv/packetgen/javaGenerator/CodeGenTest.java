@@ -270,9 +270,9 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public class NameOfClass implements Packet {" + "}" + "\n",
@@ -283,9 +283,9 @@ public class CodeGenTest {
         ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.TOP_LEVEL, ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class)), "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
         assertEquals("Generated source not as expected",
-                        "import org.freeciv.packet.Packet;" + "\n" +
+                "import javax.annotation.Generated;" + "\n" +
                         "\n" +
-                        "import javax.annotation.Generated;" + "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public class NameOfClass implements Packet {" + "}" + "\n",
@@ -323,9 +323,9 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public class NameOfClass {" + "}" + "\n",
@@ -344,9 +344,9 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "}" + "\n",
@@ -360,9 +360,9 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
@@ -380,9 +380,9 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
@@ -404,9 +404,9 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
@@ -428,9 +428,9 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
@@ -450,9 +450,9 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public enum NameOfClass implements Packet {" + "\n" +
@@ -480,11 +480,11 @@ public class CodeGenTest {
         assertEquals("Generated source not as expected",
                 "package org.freeciv.packetgen;" + "\n" +
                         "\n" +
-                        "import org.freeciv.packet.Packet;" + "\n" +
-                        "\n" +
                         "import java.util.List;" + "\n" +
                         "\n" +
                         "import javax.annotation.Generated;" + "\n" +
+                        "\n" +
+                        "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
                         "public class NameOfClass implements Packet {" + "}" + "\n",

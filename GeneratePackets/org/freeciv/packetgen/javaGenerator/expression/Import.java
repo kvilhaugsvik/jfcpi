@@ -17,7 +17,7 @@ package org.freeciv.packetgen.javaGenerator.expression;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 
-public class Import<Of extends Address> extends Formatted implements HasAtoms {
+public class Import<Of extends Address> extends Formatted implements HasAtoms, Comparable<Import<?>> {
     private final Of target;
     private final boolean allIn;
 
@@ -39,6 +39,16 @@ public class Import<Of extends Address> extends Formatted implements HasAtoms {
             to.add(EVERYTHING);
         }
         to.add(EOL);
+    }
+
+    @Override
+    public int compareTo(Import<?> other) {
+        int compared = target.getFullAddress().compareTo(other.target.getFullAddress());
+
+        if (0 == compared && allIn != other.allIn)
+            throw new UnsupportedOperationException("Comparing the import of an address and the import of all in it");
+
+        return compared;
     }
 
     public static Import<TargetPackage> allIn(Package target) {
