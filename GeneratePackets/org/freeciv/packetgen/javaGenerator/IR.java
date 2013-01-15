@@ -20,74 +20,50 @@ import java.util.List;
 
 public class IR {
     private final CodeAtom atom;
-    private final List<Hint> hintsBegin;
-    private final List<Hint> hintsEnd;
+    private final List<String> hintsBegin;
+    private final List<String> hintsEnd;
 
     public IR(CodeAtom atom) {
         this.atom = atom;
-        this.hintsBegin = new LinkedList<Hint>();
-        this.hintsEnd = new LinkedList<Hint>();
+        this.hintsBegin = new LinkedList<String>();
+        this.hintsEnd = new LinkedList<String>();
     }
 
     public CodeAtom getAtom() {
         return atom;
     }
 
-    public List<Hint> getHintsBegin() {
+    public List<String> getHintsBegin() {
         return Collections.unmodifiableList(hintsBegin);
     }
 
-    public List<Hint> getHintsEnd() {
+    public List<String> getHintsEnd() {
         return Collections.unmodifiableList(hintsEnd);
     }
 
     public void hintBegin(String hint) {
-        hintsBegin.add(Hint.begin(hint));
+        hintsBegin.add(hint);
     }
 
     public void hintEnd(String hint) {
-        hintsEnd.add(Hint.end(hint));
+        hintsEnd.add(hint);
     }
 
     public String toString() {
         StringBuilder out = new StringBuilder("IR[");
-        for (Hint hint : hintsBegin) {
-            out.append(hint.get());
+        for (String hint : hintsBegin) {
+            out.append(hint);
             out.append(" ");
         }
         out.append(":");
         out.append(atom.get());
         out.append(":");
-        for (Hint hint : hintsEnd) {
+        for (String hint : hintsEnd) {
             out.append(" ");
-            out.append(hint.get());
+            out.append(hint);
         }
         out.append("]");
         return out.toString();
-    }
-
-
-    public static class Hint {
-        private final boolean isStart;
-        private final String hint;
-
-        private Hint(String hint, boolean isStart) {
-            this.isStart = isStart;
-            this.hint = hint;
-        }
-
-
-        public static Hint begin(String hint) {
-            return new Hint(hint, true);
-        }
-
-        public static Hint end(String hint) {
-            return new Hint(hint, false);
-        }
-
-        public String get() {
-            return hint;
-        }
     }
 
     public static class CodeAtom implements HasAtoms {

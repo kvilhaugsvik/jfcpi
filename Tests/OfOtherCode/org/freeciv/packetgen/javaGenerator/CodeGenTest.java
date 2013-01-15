@@ -722,13 +722,13 @@ public class CodeGenTest {
         assertTrue("Wrong place for hint", atoms.get(0).getHintsBegin().isEmpty());
         assertTrue("Wrong place for hint", atoms.get(0).getHintsEnd().isEmpty());
 
-        assertEquals("Hint not began", "The hint", atoms.get(1).getHintsBegin().get(0).get());
+        assertEquals("Hint not began", "The hint", atoms.get(1).getHintsBegin().get(0));
         assertTrue("Wrong place for hint", atoms.get(1).getHintsEnd().isEmpty());
 
         assertTrue("Wrong place for hint", atoms.get(2).getHintsBegin().isEmpty());
         assertTrue("Wrong place for hint", atoms.get(2).getHintsEnd().isEmpty());
 
-        assertEquals("Hint not ended", "The hint", atoms.get(3).getHintsEnd().get(0).get());
+        assertEquals("Hint not ended", "The hint", atoms.get(3).getHintsEnd().get(0));
         assertTrue("Wrong place for hint", atoms.get(3).getHintsBegin().isEmpty());
     }
 }
