@@ -21,19 +21,20 @@ import java.util.Arrays;
 import java.util.TreeSet;
 
 public class Imports implements HasAtoms {
-    private final TreeSet<Import<?>> imports;
+    private final TreeSet<Import<?>> imported;
+    private final Imports imports = this;
 
     Imports(Import<?>... first) {
-        this.imports = new TreeSet<Import<?>>(Arrays.asList(first));
+        this.imported = new TreeSet<Import<?>>(Arrays.asList(first));
     }
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        if (!imports.isEmpty()) {
+        if (!imported.isEmpty()) {
             to.hintStart(CodeStyle.GROUP);
 
-            Import previous = imports.first();
-            for (Import anImport : imports) {
+            Import previous = imported.first();
+            for (Import anImport : imported) {
                 if (!previous.sameFirstComponent(anImport)) {
                     to.hintEnd(CodeStyle.GROUP);
                     to.hintStart(CodeStyle.GROUP);
@@ -47,7 +48,30 @@ public class Imports implements HasAtoms {
     }
 
     void add(Import<?> toImport) {
-        imports.add(toImport);
+        imported.add(toImport);
+    }
+
+    class ScopeDataForJavaFile implements HasAtoms {
+        private final TargetClass on;
+
+        private ScopeDataForJavaFile(TargetClass self) {
+            this.on = self;
+        }
+
+        @Override
+        public void writeAtoms(CodeAtoms to) {
+            if (!TargetPackage.TOP_LEVEL.equals(on.getPackage())) {
+                to.add(HasAtoms.PACKAGE);
+                on.getPackage().writeAtoms(to);
+                to.add(HasAtoms.EOL);
+            }
+
+            imports.writeAtoms(to);
+        }
+    }
+
+    public ScopeDataForJavaFile getScopeData(TargetClass on) {
+        return new ScopeDataForJavaFile(on);
     }
 
     public static Imports are(Import<?>... first) {
