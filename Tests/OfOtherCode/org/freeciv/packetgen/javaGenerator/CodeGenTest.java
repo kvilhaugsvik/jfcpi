@@ -586,6 +586,103 @@ public class CodeGenTest {
                 result);
     }
 
+    @Test public void ir_joinSqueeze() {
+        CodeAtoms orig = new CodeAtoms();
+        orig.add(new IR.CodeAtom("java"));
+        orig.add(HasAtoms.HAS);
+        orig.add(new IR.CodeAtom("io"));
+        orig.add(HasAtoms.HAS);
+        orig.add(new IR.CodeAtom("BufferedInputStream"));
+
+        assertEquals("java.io.BufferedInputStream", IR.joinSqueeze(orig.toArray()));
+    }
+
+    @Test public void ir_cutByHint_simple() {
+        CodeAtoms orig = new CodeAtoms();
+        orig.hintStart("simple");
+        orig.add(new IR.CodeAtom("1"));
+        orig.add(new IR.CodeAtom("2"));
+        orig.hintEnd("simple");
+        orig.add(new IR.CodeAtom("3"));
+
+        assertEquals("12", IR.joinSqueeze(IR.cutByHint(orig.toArray(), 0, "simple")));
+    }
+
+    @Test public void ir_cutByHint_single() {
+        CodeAtoms orig = new CodeAtoms();
+        orig.hintStart("simple");
+        orig.add(new IR.CodeAtom("1"));
+        orig.hintEnd("simple");
+        orig.add(new IR.CodeAtom("2"));
+
+        assertEquals("1", IR.joinSqueeze(IR.cutByHint(orig.toArray(), 0, "simple")));
+    }
+
+    @Test public void ir_cutByHint_nested() {
+        CodeAtoms orig = new CodeAtoms();
+        orig.hintStart("outside");
+        orig.hintStart("innside");
+        orig.add(new IR.CodeAtom("1"));
+        orig.add(new IR.CodeAtom("2"));
+        orig.hintEnd("innside");
+        orig.add(new IR.CodeAtom("3"));
+        orig.hintEnd("outside");
+
+        assertEquals("12", IR.joinSqueeze(IR.cutByHint(orig.toArray(), 0, "innside")));
+        assertEquals("123", IR.joinSqueeze(IR.cutByHint(orig.toArray(), 0, "outside")));
+    }
+
+    @Test public void ir_cutByHint_nested_sameHint_startsSamePlace() {
+        CodeAtoms orig = new CodeAtoms();
+        orig.hintStart("innside");
+        orig.hintStart("innside");
+        orig.add(new IR.CodeAtom("1"));
+        orig.add(new IR.CodeAtom("2"));
+        orig.hintEnd("innside");
+        orig.add(new IR.CodeAtom("3"));
+        orig.hintEnd("innside");
+
+        assertEquals("123", IR.joinSqueeze(IR.cutByHint(orig.toArray(), 0, "innside")));
+    }
+
+    @Test public void ir_cutByHint_nested_sameHint_startsDifferently() {
+        CodeAtoms orig = new CodeAtoms();
+        orig.hintStart("innside");
+        orig.add(new IR.CodeAtom("1"));
+        orig.hintStart("innside");
+        orig.add(new IR.CodeAtom("2"));
+        orig.hintEnd("innside");
+        orig.add(new IR.CodeAtom("3"));
+        orig.hintEnd("innside");
+
+        assertEquals("2", IR.joinSqueeze(IR.cutByHint(orig.toArray(), 1, "innside")));
+        assertEquals("123", IR.joinSqueeze(IR.cutByHint(orig.toArray(), 0, "innside")));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void ir_cutByHint_startAtWrongPlace() {
+        CodeAtoms orig = new CodeAtoms();
+        orig.add(new IR.CodeAtom("0"));
+        orig.hintStart("simple");
+        orig.add(new IR.CodeAtom("1"));
+        orig.add(new IR.CodeAtom("2"));
+        orig.hintEnd("simple");
+        orig.add(new IR.CodeAtom("3"));
+
+        IR.joinSqueeze(IR.cutByHint(orig.toArray(), 0, "simple"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void ir_cutByHint_startNoEnd() {
+        CodeAtoms orig = new CodeAtoms();
+        orig.add(new IR.CodeAtom("0"));
+        orig.hintStart("simple");
+        orig.add(new IR.CodeAtom("1"));
+        orig.add(new IR.CodeAtom("2"));
+
+        IR.joinSqueeze(IR.cutByHint(orig.toArray(), 0, "simple"));
+    }
+
     private CodeAtoms codeAtomsAddRefuseNextIfAdd() {
         CodeAtoms atoms = new CodeAtoms();
         atoms.add(HasAtoms.ADD);

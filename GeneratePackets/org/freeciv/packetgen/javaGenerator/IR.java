@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,6 +65,39 @@ public class IR {
         }
         out.append("]");
         return out.toString();
+    }
+
+    /**
+     * Joint the atoms of the elements without space between or other formatting
+     * @param irs an array containing the IR
+     * @return the atoms of the elements of irs without space between or other formatting
+     */
+    public static String joinSqueeze(IR[] irs) {
+        StringBuilder out = new StringBuilder();
+
+        for (IR a : irs)
+            out.append(a.getAtom().get());
+
+        return out.toString();
+    }
+
+    public static IR[] cutByHint(final IR[] components, final int at, final String hint) {
+        if (!components[at].getHintsBegin().contains(hint))
+            throw new IllegalArgumentException(hint + " didn't begin at " + at);
+
+        int levels = 0;
+        for (int i = at; i < components.length; i++) {
+            for (String considered : components[i].getHintsBegin())
+                if (considered.equals(hint))
+                    levels++;
+            for (String considered : components[i].getHintsEnd())
+                if (considered.equals(hint))
+                    levels--;
+            if (levels < 1)
+                return Arrays.copyOfRange(components, at, i + 1);
+        }
+
+        throw new IllegalArgumentException("No end");
     }
 
     public static class CodeAtom implements HasAtoms {
