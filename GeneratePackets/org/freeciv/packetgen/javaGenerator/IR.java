@@ -20,45 +20,45 @@ import java.util.List;
 
 public class IR {
     private final CodeAtom atom;
-    private final List<Hint> hintsBefore;
-    private final List<Hint> hintsAfter;
+    private final List<Hint> hintsBegin;
+    private final List<Hint> hintsEnd;
 
     public IR(CodeAtom atom) {
         this.atom = atom;
-        this.hintsBefore = new LinkedList<Hint>();
-        this.hintsAfter = new LinkedList<Hint>();
+        this.hintsBegin = new LinkedList<Hint>();
+        this.hintsEnd = new LinkedList<Hint>();
     }
 
     public CodeAtom getAtom() {
         return atom;
     }
 
-    public List<Hint> getHintsBefore() {
-        return Collections.unmodifiableList(hintsBefore);
+    public List<Hint> getHintsBegin() {
+        return Collections.unmodifiableList(hintsBegin);
     }
 
-    public List<Hint> getHintsAfter() {
-        return Collections.unmodifiableList(hintsAfter);
+    public List<Hint> getHintsEnd() {
+        return Collections.unmodifiableList(hintsEnd);
     }
 
     public void hintBegin(String hint) {
-        hintsBefore.add(Hint.begin(hint));
+        hintsBegin.add(Hint.begin(hint));
     }
 
     public void hintEnd(String hint) {
-        hintsAfter.add(Hint.end(hint));
+        hintsEnd.add(Hint.end(hint));
     }
 
     public String toString() {
         StringBuilder out = new StringBuilder("IR[");
-        for (Hint hint : hintsBefore) {
+        for (Hint hint : hintsBegin) {
             out.append(hint.get());
             out.append(" ");
         }
         out.append(":");
         out.append(atom.get());
         out.append(":");
-        for (Hint hint : hintsAfter) {
+        for (Hint hint : hintsEnd) {
             out.append(" ");
             out.append(hint.get());
         }

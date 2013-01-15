@@ -313,21 +313,21 @@ public class TypedCodeTest {
                 int.class, "myField", null).ref();
         bigAddress.writeAtoms(atoms);
 
-        assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(0).getHintsBefore().get(0).get());
-        assertEquals(TargetClass.class.getCanonicalName(), atoms.get(0).getHintsBefore().get(1).get());
-        assertEquals(TargetPackage.class.getCanonicalName(), atoms.get(0).getHintsBefore().get(2).get());
+        assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(0).getHintsBegin().get(0).get());
+        assertEquals(TargetClass.class.getCanonicalName(), atoms.get(0).getHintsBegin().get(1).get());
+        assertEquals(TargetPackage.class.getCanonicalName(), atoms.get(0).getHintsBegin().get(2).get());
         assertEquals("myPackage", atoms.get(0).getAtom().get());
-        assertEquals(TargetPackage.class.getCanonicalName(), atoms.get(0).getHintsAfter().get(0).get());
+        assertEquals(TargetPackage.class.getCanonicalName(), atoms.get(0).getHintsEnd().get(0).get());
 
         assertEquals(".", atoms.get(1).getAtom().get());
 
         assertEquals("MyClass", atoms.get(2).getAtom().get());
-        assertEquals(TargetClass.class.getCanonicalName(), atoms.get(2).getHintsAfter().get(0).get());
+        assertEquals(TargetClass.class.getCanonicalName(), atoms.get(2).getHintsEnd().get(0).get());
 
         assertEquals(".", atoms.get(3).getAtom().get());
 
         assertEquals("myField", atoms.get(4).getAtom().get());
-        assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(4).getHintsAfter().get(0).get());
+        assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(4).getHintsEnd().get(0).get());
     }
 
     @Test public void targetPackage_topLevel_fromClass() {

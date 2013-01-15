@@ -719,16 +719,16 @@ public class CodeGenTest {
 
         assertEquals("Test assumption changed", HasAtoms.ADD, atoms.get(0).getAtom());
 
-        assertTrue("Wrong place for hint", atoms.get(0).getHintsBefore().isEmpty());
-        assertTrue("Wrong place for hint", atoms.get(0).getHintsAfter().isEmpty());
+        assertTrue("Wrong place for hint", atoms.get(0).getHintsBegin().isEmpty());
+        assertTrue("Wrong place for hint", atoms.get(0).getHintsEnd().isEmpty());
 
-        assertEquals("Hint not began", "The hint", atoms.get(1).getHintsBefore().get(0).get());
-        assertTrue("Wrong place for hint", atoms.get(1).getHintsAfter().isEmpty());
+        assertEquals("Hint not began", "The hint", atoms.get(1).getHintsBegin().get(0).get());
+        assertTrue("Wrong place for hint", atoms.get(1).getHintsEnd().isEmpty());
 
-        assertTrue("Wrong place for hint", atoms.get(2).getHintsBefore().isEmpty());
-        assertTrue("Wrong place for hint", atoms.get(2).getHintsAfter().isEmpty());
+        assertTrue("Wrong place for hint", atoms.get(2).getHintsBegin().isEmpty());
+        assertTrue("Wrong place for hint", atoms.get(2).getHintsEnd().isEmpty());
 
-        assertEquals("Hint not ended", "The hint", atoms.get(3).getHintsAfter().get(0).get());
-        assertTrue("Wrong place for hint", atoms.get(3).getHintsBefore().isEmpty());
+        assertEquals("Hint not ended", "The hint", atoms.get(3).getHintsEnd().get(0).get());
+        assertTrue("Wrong place for hint", atoms.get(3).getHintsBegin().isEmpty());
     }
 }

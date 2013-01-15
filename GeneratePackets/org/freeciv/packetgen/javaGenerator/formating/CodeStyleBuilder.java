@@ -378,12 +378,12 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             }
 
             private void updateHintsBefore(ScopeStack<ScopeInfoKind> scopeStack, IR element) {
-                for (IR.Hint hint : element.getHintsBefore())
+                for (IR.Hint hint : element.getHintsBegin())
                     scopeStack.get().addHint(hint.get());
             }
 
             private void updateHintsAfter(ScopeStack<ScopeInfoKind> scopeStack, IR element) {
-                for (IR.Hint hint : element.getHintsAfter())
+                for (IR.Hint hint : element.getHintsEnd())
                     scopeStack.get().removeTopHint(hint.get());
             }
 
