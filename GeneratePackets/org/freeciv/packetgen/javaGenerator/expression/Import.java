@@ -26,6 +26,10 @@ public class Import<Of extends Address> extends Formatted implements HasAtoms {
         this.allIn = allIn;
     }
 
+    public boolean sameFirstComponent(Import other) {
+        return target.getFirstComponent().toString().equals(other.target.getFirstComponent().toString());
+    }
+
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(IMPORT);

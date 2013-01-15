@@ -54,7 +54,6 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 Imports.are(Import.allIn(FieldType.class.getPackage()),
                         Import.allIn(FCEnum.class.getPackage()),
                         Import.classIn(org.freeciv.Util.class),
-                        null,
                         Import.classIn(DataInput.class),
                         Import.classIn(DataOutput.class),
                         Import.classIn(java.util.logging.Logger.class),

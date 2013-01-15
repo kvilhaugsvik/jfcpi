@@ -473,7 +473,6 @@ public class CodeGenTest {
     @Test public void testClassWriter_Imports_AreSeparated() {
         ClassWriter toWrite = new ClassWriter(ClassKind.CLASS, TargetPackage.from("org.freeciv.packetgen"),
                 ClassWriter.Imports.are(Import.classIn(org.freeciv.packet.Packet.class),
-                        null,
                         Import.classIn(List.class)),
                 "nothing", Collections.<Annotate>emptyList(), "NameOfClass",
                 ClassWriter.DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));

@@ -119,7 +119,6 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                     Imports.are(Import.classIn(DataInput.class),
                             Import.classIn(DataOutput.class),
                             Import.classIn(IOException.class),
-                            null,
                             Import.allIn(FCEnum.class.getPackage())),
                     "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
                                           DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getName() + ">")));
