@@ -128,55 +128,6 @@ public class Hardcoded {
                             new Requirement("enum universals_n", DataType.class),
                             new Requirement("struct universal", DataType.class))
             ),
-            new TerminatedArray("worklist", "struct worklist", TargetArray.from("org.freeciv.types", "universal", 1),
-                    null,
-                    TerminatedArray.MaxArraySize.NO_LIMIT,
-                    TerminatedArray.TransferArraySize.SERIALIZED,
-                    TargetArray.from("org.freeciv.types", "universal", 1),
-                    TerminatedArray.arrayLen,
-                    TerminatedArray.neverAnythingAfter,
-                    null,
-                    new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
-                        @Override
-                        public Typed<AValue> x(Typed<AValue> bytes) {
-                            return bytes; // TODO: Fix
-                        }
-                    },
-                    new ExprFrom2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var to, Var elem) {
-                            return new Block(
-                                    to.ref().<Returnable>call("writeByte", elem.<AnInt>read("kind.getNumber()")), // TODO: stop abusing read
-                                    to.ref().<Returnable>call("writeByte", elem.read("value"))
-                            );
-                        }
-                    },
-                    new ExprFrom1<Typed<? extends AValue>, Var>() {
-                        @Override
-                        public Typed<AValue> x(Var from) {
-                            TargetClass universal = TargetClass.newKnown("org.freeciv.types", "universal");
-                            return universal.newInstance(
-                                    new MethodCall<AValue>(
-                                            "universals_n.valueOf",
-                                            from.ref().<AValue>call("readUnsignedByte")),
-                                    from.ref().<AValue>call("readUnsignedByte"));
-                        }
-                    },
-                    TO_STRING_ARRAY,
-                    Arrays.asList(new Requirement("enum universals_n", DataType.class),
-                            new Requirement("struct universal", DataType.class)),
-                    null,
-                    NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
-                    new ExprFrom1<Typed<AnInt>, Var>() {
-                        @Override
-                        public Typed<AnInt> x(Var val) {
-                            return multiply(literal(2), val.read("length"));
-                        }
-                    },
-                    TerminatedArray.sameNumberOfBufferElementsAndValueElements,
-                    Collections.<Method.Helper>emptyList(),
-                    false
-            ),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
@@ -188,7 +139,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
-                            return value.read("getBytes().length");
+                            return value.ref().callV("getBytes").callV("length");
                         }
                     },
                     TerminatedArray.addAfterIfSmallerThanMaxSize,
@@ -213,7 +164,7 @@ public class Hardcoded {
                     new ExprFrom1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
-                            return value.read("getBytes().length");
+                            return value.ref().callV("getBytes").callV("length");
                         }
                     },
                     TerminatedArray.sameNumberOfBufferElementsAndValueElements,
@@ -295,6 +246,58 @@ public class Hardcoded {
                         handRolledUniversal.getField("value").ref(),
                         literal(")"))))));
         toStorage.addDependency(handRolledUniversal);
+
+        TargetArray universalArray = TargetArray.from(handRolledUniversal.getAddress().scopeKnown(), 1);
+        FieldTypeBasic workListNeedsUniversal = new TerminatedArray("worklist", "struct worklist", universalArray,
+                null,
+                TerminatedArray.MaxArraySize.NO_LIMIT,
+                TerminatedArray.TransferArraySize.SERIALIZED,
+                universalArray,
+                TerminatedArray.arrayLen,
+                TerminatedArray.neverAnythingAfter,
+                null,
+                new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                    @Override
+                    public Typed<AValue> x(Typed<AValue> bytes) {
+                        return bytes; // TODO: Fix
+                    }
+                },
+                new ExprFrom2<Block, Var, Var>() {
+                    @Override
+                    public Block x(Var to, Var elem) {
+                        return new Block(
+                                to.ref().<Returnable>call("writeByte", elem.ref().callV("kind").callV("getNumber")),
+                                to.ref().<Returnable>call("writeByte", elem.read("value"))
+                        );
+                    }
+                },
+                new ExprFrom1<Typed<? extends AValue>, Var>() {
+                    @Override
+                    public Typed<AValue> x(Var from) {
+                        TargetClass universal = TargetClass.newKnown("org.freeciv.types", "universal");
+                        return universal.newInstance(
+                                new MethodCall<AValue>(
+                                        "universals_n.valueOf",
+                                        from.ref().<AValue>call("readUnsignedByte")),
+                                from.ref().<AValue>call("readUnsignedByte"));
+                    }
+                },
+                TO_STRING_ARRAY,
+                Arrays.asList(new Requirement("enum universals_n", DataType.class),
+                        new Requirement("struct universal", DataType.class)),
+                null,
+                NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
+                new ExprFrom1<Typed<AnInt>, Var>() {
+                    @Override
+                    public Typed<AnInt> x(Var val) {
+                        return multiply(literal(2), val.read("length"));
+                    }
+                },
+                TerminatedArray.sameNumberOfBufferElementsAndValueElements,
+                Collections.<Method.Helper>emptyList(),
+                false
+        );
+        toStorage.addDependency(workListNeedsUniversal);
     }
 
     public static Collection<IDependency> values() {
