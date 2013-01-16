@@ -40,6 +40,8 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         this.isInScope = isInScope;
 
         this.shared = new Common(name, where, methods, this);
+
+        registerBuiltIn();
     }
 
     protected TargetClass(Class wrapped, boolean isInScope) {
@@ -72,6 +74,8 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         super(where, name);
         this.isInScope = isInScope;
         this.shared = new Common(name, where, methods, this);
+
+        registerBuiltIn();
     }
 
     private TargetClass(Common common, boolean isInScope) {
@@ -84,6 +88,12 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         super(TargetPackage.TOP_LEVEL);
         this.isInScope = true;
         this.shared = new Common(HasAtoms.SELF, TargetPackage.TOP_LEVEL, new HashMap<String, TargetMethod>(), this);
+
+        registerBuiltIn();
+    }
+
+    private void registerBuiltIn() {
+        register(new TargetMethod(this, "class", TargetClass.fromClass(Class.class), TargetMethod.Called.STATIC_FIELD));
     }
 
     public TargetPackage getPackage() {
