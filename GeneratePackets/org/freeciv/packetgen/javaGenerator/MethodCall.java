@@ -28,6 +28,7 @@ import java.util.Arrays;
 public class MethodCall<Returns extends Returnable> extends Formatted implements HasAtoms, Typed<Returns> {
     // Ways to write argument lists
     private static final ArgList argListNormal = new ArgList(LPR, SEP, RPR);
+    private static final ArgList argListNo = new ArgList(BLANK, BLANK, BLANK);
     private static final ArgList argListArray = new ArgList(ARRAY_ACCESS_START, new HasAtoms() {
         @Override public void writeAtoms(CodeAtoms to) {
             to.hintEnd(CodeStyle.ARGUMENTS);
@@ -110,6 +111,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         this.parameters = params;
 
         switch (kind) {
+            case DYNAMIC_FIELD:
             case DYNAMIC:
                 this.method = new HasAtoms() {
                     @Override
@@ -123,6 +125,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
                 this.method = HasAtoms.BLANK;
                 break;
             case STATIC:
+            case STATIC_FIELD:
             case MANUALLY:
             case STATIC_ARRAY_INST:
                 this.method = name;
@@ -137,6 +140,12 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
                 break;
             case DYNAMIC:
                 writer =  new AWriter(argListNormal, placeMethodAfterTheFirstArgument);
+                break;
+            case STATIC_FIELD:
+                writer = new AWriter(argListNo, placeMethodBeforeTheFirstArgument);
+                break;
+            case DYNAMIC_FIELD:
+                writer =  new AWriter(argListNo, placeMethodAfterTheFirstArgument);
                 break;
             case STATIC_ARRAY_INST:
                 writer = new AWriter(argListArray, placeMethodBeforeTheFirstArgument);

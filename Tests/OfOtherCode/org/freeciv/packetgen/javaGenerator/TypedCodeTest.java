@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
+import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
@@ -278,6 +279,20 @@ public class TypedCodeTest {
         Value<AValue> theCall = o.callV("compile", BuiltIn.literal("a*"));
 
         assertNotNull(theCall);
+    }
+
+    @Test public void targetMethod_readField_static() throws NoSuchFieldException {
+        TargetMethod method = new TargetMethod(Pattern.class.getField("LITERAL"));
+        Value<AValue> theCall = method.callV();
+
+        assertEquals("java.util.regex.Pattern.LITERAL", IR.joinSqueeze(new CodeAtoms(theCall).toArray()));
+    }
+
+    @Test public void targetMethod_readField_dynamic() throws NoSuchFieldException {
+        TargetMethod method = new TargetMethod(ElementsLimit.class.getField("full_array_size"));
+        Value<AValue> theCall = method.callV(BuiltIn.<AValue>toCode("a"));
+
+        assertEquals("a.full_array_size", IR.joinSqueeze(new CodeAtoms(theCall).toArray()));
     }
 
     @Test public void addressInTopLevelPackage_NoArtifactsAdded() {

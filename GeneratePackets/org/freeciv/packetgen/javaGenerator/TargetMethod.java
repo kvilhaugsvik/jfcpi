@@ -18,6 +18,7 @@ import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -40,19 +41,26 @@ public class TargetMethod extends Address<TargetClass> {
                 Modifier.isStatic(has.getModifiers()) ? Called.STATIC : Called.DYNAMIC);
     }
 
+    public TargetMethod(Field has) {
+        this(TargetClass.fromClass(has.getDeclaringClass()).scopeUnknown(),
+                has.getName(),
+                TargetClass.fromClass(has.getType()).scopeUnknown(),
+                Modifier.isStatic(has.getModifiers()) ? Called.STATIC_FIELD : Called.DYNAMIC_FIELD);
+    }
+
     public String getName() {
         return name.toString();
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(Typed<? extends AValue>... parameters) {
-        return new MethodCall<Ret>(kind, name, parameters);
+        return new MethodCall<Ret>(kind, (Called.STATIC_FIELD.equals(kind) ? this : name), parameters);
     }
 
     public <Ret extends AValue> MethodCall.HasResult<Ret> callV(Typed<? extends AValue>... parameters) {
         if (void.class.getCanonicalName().equals(returns.getFullAddress()))
             throw new IllegalArgumentException(getName() + ": Wrong return type");
 
-        return new MethodCall.HasResult<Ret>(kind, returns, name, parameters);
+        return new MethodCall.HasResult<Ret>(kind, returns, (Called.STATIC_FIELD.equals(kind) ? this : name), parameters);
     }
 
     @Override
@@ -67,6 +75,8 @@ public class TargetMethod extends Address<TargetClass> {
         STATIC_ARRAY_INST, // create a new array
         DYNAMIC, // an object method
         DYNAMIC_ARRAY_GET, // get the value of an array
+        STATIC_FIELD, // get the field value
+        DYNAMIC_FIELD, // get the field value
         MANUALLY // handled manually
     }
 }
