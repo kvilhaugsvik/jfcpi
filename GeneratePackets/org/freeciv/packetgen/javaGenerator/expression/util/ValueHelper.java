@@ -30,7 +30,7 @@ public class ValueHelper {
         this.value = value;
     }
 
-    public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
+    public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... params) {
         return type.<Ret>call(method, addSelfAsFirstParams(params));
     }
 

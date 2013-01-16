@@ -196,7 +196,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
             }
         }
 
-        public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... params) {
+        public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... params) {
             return valueHelper.<Ret>call(method, params);
         }
 

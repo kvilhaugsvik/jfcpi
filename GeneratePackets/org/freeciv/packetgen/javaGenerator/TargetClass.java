@@ -127,7 +127,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         shared.parent = parent;
     }
 
-    public <Ret extends Returnable> MethodCall<Ret> call(String method, Typed<? extends AValue>... parameters) {
+    public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... parameters) {
         methodExists(method);
         if (shared.methods.containsKey(method))
             return shared.methods.get(method).<Ret>call(parameters);
