@@ -80,6 +80,11 @@ public class ClassWriter extends Formatted implements HasAtoms {
         if (field.getScope().equals(Scope.CODE_BLOCK))
             throw new IllegalArgumentException("Can't add a local variable declaration as a field");
 
+        myAddress.register(new TargetMethod(getAddress(), field.getName(), field.getTType(),
+                Modifiable.NO.equals(field.getModifiable()) ?
+                        TargetMethod.Called.STATIC_FIELD :
+                        TargetMethod.Called.DYNAMIC_FIELD));
+
         fields.add(field);
     }
 

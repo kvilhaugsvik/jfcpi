@@ -21,6 +21,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
@@ -49,6 +50,9 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     private static void convertMethods(TargetClass target, Class wrapped) {
         for (Method has : wrapped.getMethods())
+            target.shared.methods.put(has.getName(), new TargetMethod(has));
+
+        for (Field has : wrapped.getFields())
             target.shared.methods.put(has.getName(), new TargetMethod(has));
 
         if (null != wrapped.getSuperclass())

@@ -295,6 +295,12 @@ public class TypedCodeTest {
         assertEquals("a.full_array_size", IR.joinSqueeze(new CodeAtoms(theCall).toArray()));
     }
 
+    @Test public void targetMethod_readField_madeInTargetClass() throws NoSuchFieldException {
+        Value<AValue> theCall = TargetClass.fromClass(Pattern.class).callV("LITERAL");
+
+        assertEquals("java.util.regex.Pattern.LITERAL", IR.joinSqueeze(new CodeAtoms(theCall).toArray()));
+    }
+
     @Test public void addressInTopLevelPackage_NoArtifactsAdded() {
         Address inTop = new Address(TargetPackage.TOP_LEVEL, new CodeAtom("WhoNeedPackets"));
         CodeAtoms atoms = new CodeAtoms(inTop);
