@@ -126,6 +126,14 @@ public class TypedCodeTest {
         assertEquals(4, asAtoms.toArray().length);
     }
 
+    @Test public void targetArray_read_length() {
+        Value<AValue> arrayVal = Var.param(TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 1), "arrayVal")
+                .ref().callV("length");
+        CodeAtoms asAtoms = new CodeAtoms(arrayVal);
+
+        assertEquals("arrayVal.length", IR.joinSqueeze(asAtoms.toArray()));
+    }
+
     @Test public void annotatedField() {
         Annotate annotation = new Annotate("IsAField");
         Var field = Var.field(Arrays.asList(annotation),

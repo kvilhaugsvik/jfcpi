@@ -70,6 +70,7 @@ public class TargetArray extends TargetClass {
 
     private void registerBuiltIn() {
         register(new TargetMethod(this, "[]", of, TargetMethod.Called.DYNAMIC_ARRAY_GET));
+        register(new TargetMethod(this, "length", TargetClass.fromClass(int.class), TargetMethod.Called.DYNAMIC_FIELD));
     }
 
     private static final Pattern chechName = Pattern.compile("\\[");
