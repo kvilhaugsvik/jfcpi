@@ -120,9 +120,7 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
                 };
                 break;
             case DYNAMIC_ARRAY_GET:
-                this.method = new HasAtoms() {
-                    @Override public void writeAtoms(CodeAtoms to) {}
-                };
+                this.method = HasAtoms.BLANK;
                 break;
             case STATIC:
             case MANUALLY:

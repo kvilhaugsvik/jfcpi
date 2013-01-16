@@ -145,11 +145,7 @@ public class CodeAtoms {
 
         @Override
         public HasAtoms getReplacement() {
-            return new HasAtoms() {
-                @Override
-                public void writeAtoms(CodeAtoms to) {
-                }
-            };
+            return HasAtoms.BLANK;
         }
 
         @Override

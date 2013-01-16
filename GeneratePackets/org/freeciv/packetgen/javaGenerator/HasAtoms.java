@@ -72,5 +72,11 @@ public interface HasAtoms {
 
     public static final CodeAtom SELF = new CodeAtom("SELF (self typed)");
 
+    public static final HasAtoms BLANK = new HasAtoms() {
+        @Override
+        public void writeAtoms(CodeAtoms to) {
+        }
+    };
+
     public void writeAtoms(CodeAtoms to);
 }
