@@ -23,8 +23,8 @@ import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class Address<On extends Address<?>> extends Formatted implements HasAtoms {
-    public static final Address LOCAL_CODE_BLOCK = new Address();
+public abstract class Address<On extends Address<?>> extends Formatted implements HasAtoms {
+    public static final Address LOCAL_CODE_BLOCK = new Address() {};
 
     protected static final HashMap<String, Address> cached = new HashMap<String, Address>();
 
