@@ -363,6 +363,11 @@ public class TypedCodeTest {
         assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(4).getHintsEnd().get(0));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void reference_toUndeclaredLocalOfUnknownType_mustBeLocal() {
+        Var.Reference.toUndeclaredLocalOfUnknownType("java.util.regex.Pattern.COMMENTS");
+    }
+
     @Test public void targetPackage_topLevel_fromClass() {
         assertEquals(TargetPackage.TOP_LEVEL, TargetPackage.from((Package)null));
     }

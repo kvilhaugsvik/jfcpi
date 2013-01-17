@@ -31,6 +31,7 @@ import java.util.NoSuchElementException;
 
 public class TargetClass extends Address<TargetPackage> implements AValue {
     public static final TargetClass SELF_TYPED = new TargetClass();
+    public static final TargetClass TYPE_NOT_KNOWN = new TargetClass();
 
     private final boolean isInScope;
     private final Common shared;

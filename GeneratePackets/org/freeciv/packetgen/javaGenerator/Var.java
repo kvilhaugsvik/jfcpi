@@ -197,6 +197,13 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
             }
         }
 
+        public static Reference toUndeclaredLocalOfUnknownType(String variable) {
+            if (0 == variable.indexOf('.'))
+                return new Reference(TargetClass.TYPE_NOT_KNOWN, Address.LOCAL_CODE_BLOCK, new CodeAtom(variable));
+            else
+                throw new IllegalArgumentException("Not local");
+        }
+
         public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... params) {
             return valueHelper.<Ret>call(method, params);
         }
