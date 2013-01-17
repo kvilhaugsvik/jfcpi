@@ -73,6 +73,24 @@ public class CodeAtoms {
                 elementToLookAt++;
     }
 
+    public void childrenFollows(CodeAtom parent) {
+        // TODO: Implement for real
+        level.add(parent);
+        add(parent);
+    }
+
+    private LinkedList<CodeAtom> level = new LinkedList<CodeAtom>();
+    public void childrenAdded(CodeAtom parent) {
+        // TODO: Implement for real
+        if (level.size() - 1 < 0)
+            throw new IllegalStateException("Wasn't writing children");
+        if (level.peekLast().equals(parent))
+            level.removeLast();
+        else
+            throw new IllegalArgumentException("Writing children of " + level.peekLast().get() +
+                    " but asked to stop writing children of " + parent.get());
+    }
+
     public void hintStart(String name) {
         onNext.add(name);
     }
@@ -104,6 +122,10 @@ public class CodeAtoms {
 
     public IR[] toArray() {
         assert onNext.isEmpty() : "Tried to read when the last element was half finished (start hints but no code)";
+
+        if (0 != level.size())
+            throw new IllegalStateException("Not finished writing children");
+
         return atoms.toArray(new IR[atoms.size()]);
     }
 
