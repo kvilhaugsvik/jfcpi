@@ -24,7 +24,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.FCEnum;
 
@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
 
 public class Enum extends ClassWriter implements IDependency, IDependency.Maker {
     private final boolean bitwise;

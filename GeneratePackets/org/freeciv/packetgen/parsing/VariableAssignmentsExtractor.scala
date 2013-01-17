@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.parsing
 
 import org.freeciv.packetgen.enteties.Constant
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn._
+import org.freeciv.packetgen.javaGenerator.util.BuiltIn._
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AString
 

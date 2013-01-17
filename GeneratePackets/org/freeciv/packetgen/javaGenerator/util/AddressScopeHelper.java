@@ -12,7 +12,9 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator;
+package org.freeciv.packetgen.javaGenerator.util;
+
+import org.freeciv.packetgen.javaGenerator.Address;
 
 public class AddressScopeHelper<Of extends Address> {
     private final Of inScope;

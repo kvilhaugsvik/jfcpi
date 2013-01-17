@@ -28,7 +28,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
@@ -36,7 +36,7 @@ import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
 
 //TODO: Move data to file
 public class Hardcoded {

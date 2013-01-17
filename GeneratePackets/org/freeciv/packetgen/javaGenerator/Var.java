@@ -19,8 +19,8 @@ import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Value;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
-import org.freeciv.packetgen.javaGenerator.expression.util.ValueHelper;
+import org.freeciv.packetgen.javaGenerator.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.util.ValueHelper;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 

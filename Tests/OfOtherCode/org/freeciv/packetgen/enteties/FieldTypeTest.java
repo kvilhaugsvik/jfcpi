@@ -24,13 +24,13 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
 import org.junit.Test;
 
 import java.util.Collections;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.TO_STRING_OBJECT;
+import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.TO_STRING_OBJECT;
 import static org.junit.Assert.*;
 
 public class FieldTypeTest {

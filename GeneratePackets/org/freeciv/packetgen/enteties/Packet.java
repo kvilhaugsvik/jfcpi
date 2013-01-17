@@ -26,7 +26,7 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.FCEnum;
 
@@ -35,7 +35,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
 
 public class Packet extends ClassWriter implements IDependency, ReqKind {
     private final int number;

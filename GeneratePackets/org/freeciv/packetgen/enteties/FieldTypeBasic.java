@@ -24,7 +24,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.FCEnum;
 
@@ -33,7 +33,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
 
 public class FieldTypeBasic implements IDependency, ReqKind {
     private final String fieldTypeBasic;

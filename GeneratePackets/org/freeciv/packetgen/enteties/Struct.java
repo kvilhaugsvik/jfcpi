@@ -26,7 +26,7 @@ import org.freeciv.types.FCEnum;
 
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
 
 public class Struct extends ClassWriter implements IDependency {
     private final Set<Requirement> iRequire;

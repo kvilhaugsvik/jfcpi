@@ -19,8 +19,8 @@ import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
@@ -33,7 +33,7 @@ import org.freeciv.packetgen.javaGenerator.representation.IR;
 
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
+import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
 
 public class ClassWriter extends Formatted implements HasAtoms {
     public static final TargetClass DEFAULT_PARENT = TargetClass.fromClass(Object.class);

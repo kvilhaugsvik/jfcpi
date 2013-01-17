@@ -18,7 +18,7 @@ import org.freeciv.packet.Sent;
 import org.freeciv.packetgen.javaGenerator.Annotate;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
+import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 
 public class Sender extends Annotate {
