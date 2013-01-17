@@ -23,7 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
-import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder.*;
 import org.freeciv.packetgen.javaGenerator.formating.ScopeStack;
@@ -146,19 +146,19 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     private static void formatVariableDeclarations(CodeAtoms to, final List<Var> fields) {
         if (!fields.isEmpty()) {
-            to.hintStart(CodeStyle.GROUP);
+            to.hintStart(TokensToStringStyle.GROUP);
             Scope scopeOfPrevious = fields.get(0).getScope();
 
             for (Var variable : fields) {
                 if (!variable.getScope().equals(scopeOfPrevious)) {
-                    to.hintEnd(CodeStyle.GROUP);
-                    to.hintStart(CodeStyle.GROUP);
+                    to.hintEnd(TokensToStringStyle.GROUP);
+                    to.hintStart(TokensToStringStyle.GROUP);
                 }
                 new Statement(variable).writeAtoms(to);
                 scopeOfPrevious = variable.getScope();
             }
 
-            to.hintEnd(CodeStyle.GROUP);
+            to.hintEnd(TokensToStringStyle.GROUP);
         }
     }
 
@@ -179,7 +179,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        to.hintStart(CodeStyle.OUTER_LEVEL);
+        to.hintStart(TokensToStringStyle.OUTER_LEVEL);
 
         to.rewriteRule(new Util.OneCondition<IR.CodeAtom>() {
             @Override
@@ -230,7 +230,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
         to.add(HasAtoms.RSC);
 
-        to.hintEnd(CodeStyle.OUTER_LEVEL);
+        to.hintEnd(TokensToStringStyle.OUTER_LEVEL);
     }
 
     public String getName() {
@@ -267,7 +267,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         return new Annotate("Generated", comments, value);
     }
 
-    public static final CodeStyle DEFAULT_STYLE_INDENT;
+    public static final TokensToStringStyle DEFAULT_STYLE_INDENT;
 
     static {
         final CodeStyleBuilder<DefaultStyleScopeInfo> maker =
@@ -284,16 +284,16 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenFirst(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return !CodeStyle.GROUP.equals(argument.seeTopHint());
+                return !TokensToStringStyle.GROUP.equals(argument.seeTopHint());
             }
         }, maker.condLeftIs(HasAtoms.RSC), DependsOn.token_left, maker.BREAK_LINE_BLOCK);
         maker.whenFirst(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
-                return !CodeStyle.GROUP.equals(argument.seeTopHint());
+                return !TokensToStringStyle.GROUP.equals(argument.seeTopHint());
             }
         }, maker.condLeftIs(HasAtoms.EOL), DependsOn.token_left, maker.BREAK_LINE_BLOCK);
-        maker.whenFirst(maker.condTopHintIs(CodeStyle.OUTER_LEVEL), maker.condLeftIs(HasAtoms.EOL),
+        maker.whenFirst(maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL), maker.condLeftIs(HasAtoms.EOL),
                 DependsOn.token_left, maker.BREAK_LINE_BLOCK);
         maker.whenFirst(
                 maker.condRightIs(Annotate.Atom.class),
@@ -323,16 +323,16 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         context.getRunningFormatting().insertStar();
                     }
                 });
-        maker.whenFirst(maker.condRightIs(Annotate.Atom.class), maker.condTopHintIs(CodeStyle.OUTER_LEVEL),
+        maker.whenFirst(maker.condRightIs(Annotate.Atom.class), maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL),
                 DependsOn.token_right, maker.BREAK_LINE);
-        maker.whenFirst(maker.condRightIs(Visibility.Atom.class), maker.condTopHintIs(CodeStyle.OUTER_LEVEL),
+        maker.whenFirst(maker.condRightIs(Visibility.Atom.class), maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL),
                 DependsOn.token_right, maker.BREAK_LINE);
         maker.whenFirst(
-                maker.condTopHintIs(CodeStyle.OUTER_LEVEL),
+                maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL),
                 maker.condLeftIs(Visibility.Atom.class),
                 DependsOn.token_left,
                 maker.INSERT_SPACE);
-        maker.whenFirst(maker.condRightIs(ClassKind.Atom.class), maker.condTopHintIs(CodeStyle.OUTER_LEVEL),
+        maker.whenFirst(maker.condRightIs(ClassKind.Atom.class), maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL),
                 DependsOn.token_right, maker.BREAK_LINE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.EOL), DependsOn.token_left, maker.BREAK_LINE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.LSC), DependsOn.token_left, maker.BREAK_LINE);
@@ -352,7 +352,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                     @Override public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                         return 1 < argument.getLineBreakTry() &&
                                 argument.approachingTheEdge() &&
-                                CodeStyle.ARGUMENTS.equals(argument.seeTopHint());
+                                TokensToStringStyle.ARGUMENTS.equals(argument.seeTopHint());
                     }
                 },
                 DependsOn.token_left,
@@ -423,7 +423,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
                 return 2 < argument.getLineBreakTry() &&
-                        !CodeStyle.ARGUMENTS.equals(argument.seeTopHint());
+                        !TokensToStringStyle.ARGUMENTS.equals(argument.seeTopHint());
             }
         }, maker.condLeftIs(HasAtoms.SEP), DependsOn.token_left, maker.BREAK_LINE);
         maker.whenFirst(
@@ -474,7 +474,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.whenFirst(maker.condRightIs(HasAtoms.ARRAY_ACCESS_START), DependsOn.token_right, maker.DO_NOTHING);
         maker.whenFirst(maker.condLeftIs(HasAtoms.ARRAY_ACCESS_START), DependsOn.token_left, maker.DO_NOTHING);
         maker.whenFirst(maker.condRightIs(HasAtoms.ARRAY_ACCESS_END), DependsOn.token_right, maker.DO_NOTHING);
-        maker.whenFirst(maker.condTopHintIs(CodeStyle.OUTER_LEVEL), maker.condLeftIs(HasAtoms.CCommentEnd),
+        maker.whenFirst(maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL), maker.condLeftIs(HasAtoms.CCommentEnd),
                 DependsOn.token_left, maker.BREAK_LINE);
         maker.whenFirst(maker.condRightIs(HasAtoms.OR), DependsOn.token_right, maker.DO_NOTHING);
         maker.whenFirst(maker.condRightIs(HasAtoms.AND), DependsOn.token_right, maker.DO_NOTHING);
@@ -519,7 +519,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         private boolean statementBroken = false;
         private LinkedList<Integer> toFar = new LinkedList<Integer>();
 
-        public DefaultStyleScopeInfo(CodeStyle.FormattingProcess process, ScopeStack inStack,
+        public DefaultStyleScopeInfo(TokensToStringStyle.FormattingProcess process, ScopeStack inStack,
                                      int beganAt, int beganAtLine, String lineUpToScope) {
             super(process, inStack, beganAt, beganAtLine, lineUpToScope);
         }

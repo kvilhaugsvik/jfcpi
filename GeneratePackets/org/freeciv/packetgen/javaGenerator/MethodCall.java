@@ -21,7 +21,7 @@ import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.util.ValueHelper;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
-import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 
 import java.util.Arrays;
 
@@ -31,10 +31,10 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
     private static final ArgList argListNo = new ArgList(BLANK, BLANK, BLANK);
     private static final ArgList argListArray = new ArgList(ARRAY_ACCESS_START, new HasAtoms() {
         @Override public void writeAtoms(CodeAtoms to) {
-            to.hintEnd(CodeStyle.ARGUMENTS);
+            to.hintEnd(TokensToStringStyle.ARGUMENTS);
             to.add(ARRAY_ACCESS_END);
             to.add(ARRAY_ACCESS_START);
-            to.hintStart(CodeStyle.ARGUMENTS);
+            to.hintStart(TokensToStringStyle.ARGUMENTS);
         }
     }, ARRAY_ACCESS_END);
 
@@ -194,9 +194,9 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
             place.call(method, parameters, to);
             argList.before.writeAtoms(to);
             if (place.hasPList(parameters)) {
-                to.hintStart(CodeStyle.ARGUMENTS);
+                to.hintStart(TokensToStringStyle.ARGUMENTS);
                 to.joinSep(argList.between, place.choose(parameters));
-                to.hintEnd(CodeStyle.ARGUMENTS);
+                to.hintEnd(TokensToStringStyle.ARGUMENTS);
             }
             argList.after.writeAtoms(to);
             to.hintEnd(MethodCall.class.getCanonicalName());

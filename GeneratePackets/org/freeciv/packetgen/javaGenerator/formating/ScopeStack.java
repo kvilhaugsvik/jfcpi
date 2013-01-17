@@ -21,17 +21,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 public class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
-    private final CodeStyle.FormattingProcess process;
+    private final TokensToStringStyle.FormattingProcess process;
     private final Constructor<Scope> kind;
     private final LinkedList<Scope> stack;
     private final LinkedList<String> hints;
     private IR leftToken = null;
     private IR rightToken = null;
 
-    public ScopeStack(CodeStyle.FormattingProcess process, Class<Scope> kind,
+    public ScopeStack(TokensToStringStyle.FormattingProcess process, Class<Scope> kind,
                       int beganAt, int beganAtLine, String lineUpToScope)
             throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
-        this.kind = kind.getConstructor(CodeStyle.FormattingProcess.class, this.getClass(),
+        this.kind = kind.getConstructor(TokensToStringStyle.FormattingProcess.class, this.getClass(),
                 int.class, int.class, String.class);
         this.stack = new LinkedList<Scope>();
         this.process = process;
@@ -85,9 +85,9 @@ public class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
         private int lineLength = 0;
 
         private int extraIndent = 0;
-        private final CodeStyle.FormattingProcess runningFormatting;
+        private final TokensToStringStyle.FormattingProcess runningFormatting;
 
-        public ScopeInfo(CodeStyle.FormattingProcess runningFormatting, ScopeStack inStack,
+        public ScopeInfo(TokensToStringStyle.FormattingProcess runningFormatting, ScopeStack inStack,
                          int beganAt, int beganAtLine, String lineUpToScope) {
             this.inStack = inStack;
             this.beganAt = beganAt;
@@ -192,7 +192,7 @@ public class ScopeStack<Scope extends ScopeStack.ScopeInfo> {
             return nowAt;
         }
 
-        public CodeStyle.FormattingProcess getRunningFormatting() {
+        public TokensToStringStyle.FormattingProcess getRunningFormatting() {
             return runningFormatting;
         }
     }

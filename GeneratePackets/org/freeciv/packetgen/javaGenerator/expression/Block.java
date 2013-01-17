@@ -23,7 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.NoValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -68,18 +68,18 @@ public class Block extends Formatted implements Typed<NoValue> {
     public void writeAtoms(CodeAtoms to) {
         to.add(LSC);
         if (0 < statements.size()) {
-            to.hintStart(CodeStyle.GROUP);
+            to.hintStart(TokensToStringStyle.GROUP);
             for (int i = 0; i < statements.size(); i++) {
                 if (!differentGroupsAt.isEmpty() && differentGroupsAt.get(i)) {
                     // Before the first and after the last line are already grouped
                     if (0 < i) {
-                        to.hintEnd(CodeStyle.GROUP);
-                        to.hintStart(CodeStyle.GROUP);
+                        to.hintEnd(TokensToStringStyle.GROUP);
+                        to.hintStart(TokensToStringStyle.GROUP);
                     }
                 }
                 statements.get(i).writeAtoms(to);
             }
-            to.hintEnd(CodeStyle.GROUP);
+            to.hintEnd(TokensToStringStyle.GROUP);
         }
         to.add(RSC);
         to.refuseNextIf(eolKiller);

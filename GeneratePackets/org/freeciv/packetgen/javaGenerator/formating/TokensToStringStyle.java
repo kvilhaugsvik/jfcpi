@@ -19,7 +19,7 @@ import org.freeciv.packetgen.javaGenerator.CodeAtoms;
 import javax.naming.OperationNotSupportedException;
 import java.util.List;
 
-public interface CodeStyle {
+public interface TokensToStringStyle {
     public static final String OUTER_LEVEL = "Outside";
     public static final String GROUP = "Group";
     public static final String ARGUMENTS = "Arguments";

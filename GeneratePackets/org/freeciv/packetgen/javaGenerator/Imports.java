@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Import;
-import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -33,19 +33,19 @@ public class Imports implements HasAtoms {
     @Override
     public void writeAtoms(CodeAtoms to) {
         if (!imported.isEmpty()) {
-            to.hintStart(CodeStyle.GROUP);
+            to.hintStart(TokensToStringStyle.GROUP);
 
             Import previous = imported.first();
             for (Import anImport : imported) {
                 if (!previous.sameFirstComponent(anImport)) {
-                    to.hintEnd(CodeStyle.GROUP);
-                    to.hintStart(CodeStyle.GROUP);
+                    to.hintEnd(TokensToStringStyle.GROUP);
+                    to.hintStart(TokensToStringStyle.GROUP);
                 }
                 anImport.writeAtoms(to);
                 previous = anImport;
             }
 
-            to.hintEnd(CodeStyle.GROUP);
+            to.hintEnd(TokensToStringStyle.GROUP);
         }
     }
 

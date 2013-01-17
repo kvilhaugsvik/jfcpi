@@ -27,7 +27,7 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 import org.junit.Test;
 
 import java.io.DataInput;
@@ -61,9 +61,9 @@ public class CodeGenTest {
 
     private String toStringAsIfInAClass(Method toSurround) {
         CodeAtoms result = new CodeAtoms();
-        result.hintStart(CodeStyle.OUTER_LEVEL);
+        result.hintStart(TokensToStringStyle.OUTER_LEVEL);
         toSurround.writeAtoms(result);
-        result.hintEnd(CodeStyle.OUTER_LEVEL);
+        result.hintEnd(TokensToStringStyle.OUTER_LEVEL);
 
         String start = "\t";
 

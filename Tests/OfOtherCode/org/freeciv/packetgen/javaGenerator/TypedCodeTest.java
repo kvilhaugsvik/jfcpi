@@ -23,7 +23,7 @@ import org.freeciv.packetgen.javaGenerator.expression.Value;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
-import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 import org.freeciv.packetgen.javaGenerator.formating.ScopeStack.ScopeInfo;
 import org.freeciv.packetgen.javaGenerator.formating.CodeStyleBuilder;
 import org.freeciv.packetgen.javaGenerator.testData.TheChildReferredToUseOnlyOnce;
@@ -185,7 +185,7 @@ public class TypedCodeTest {
         builder.whenFirst(new Util.OneCondition<ScopeInfo>() {
             @Override
             public boolean isTrueFor(ScopeInfo argument) {
-                return CodeStyle.GROUP.equals(argument.seeTopHint());
+                return TokensToStringStyle.GROUP.equals(argument.seeTopHint());
             }
         }, builder.condLeftIs(HasAtoms.EOL), CodeStyleBuilder.DependsOn.token_left, builder.BREAK_LINE);
         builder.whenFirst(builder.condLeftIs(HasAtoms.EOL), CodeStyleBuilder.DependsOn.token_left, builder.BREAK_LINE_BLOCK);

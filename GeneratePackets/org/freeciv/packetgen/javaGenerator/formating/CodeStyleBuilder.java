@@ -201,8 +201,8 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         }
     };
 
-    public CodeStyle getStyle() {
-        return new CodeStyle() {
+    public TokensToStringStyle getStyle() {
+        return new TokensToStringStyle() {
             // Prevent rules added to the builder after style construction from being added to the style
             final ArrayList<FormattingRule<ScopeInfoKind>> firstMatchOnly;
             {

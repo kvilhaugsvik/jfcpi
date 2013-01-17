@@ -17,7 +17,7 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.formating.CodeStyle;
+import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 
 import java.util.Collections;
 import java.util.List;
@@ -70,9 +70,9 @@ public class Method extends Formatted implements HasAtoms {
             name.writeAtoms(to);
         to.add(HasAtoms.LPR);
         if (!paramList.isEmpty()) {
-            to.hintStart(CodeStyle.ARGUMENTS);
+            to.hintStart(TokensToStringStyle.ARGUMENTS);
             to.joinSep(SEP, paramList);
-            to.hintEnd(CodeStyle.ARGUMENTS);
+            to.hintEnd(TokensToStringStyle.ARGUMENTS);
         }
         to.add(HasAtoms.RPR);
         if (!exceptionList.isEmpty()) {
