@@ -17,12 +17,9 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Value;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.util.Formatted;
-import org.freeciv.packetgen.javaGenerator.util.ValueHelper;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.Collections;
 import java.util.List;
@@ -108,7 +105,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         return reference;
     }
 
-    public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {
+    public <Ret extends AValue> Reference.SetTo<Ret> assign(final Typed<Ret> value) {
         return ref().assign(value);
     }
 
@@ -150,78 +147,5 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
                 to.add(new CodeAtom(field));
             }
         };
-    }
-
-
-    public static class SetTo<Ret extends AValue> extends Formatted.Type<Ret> {
-        private final Address referName;
-        private final Typed<Ret> value;
-
-        private SetTo(Address referName, Typed<Ret> value) {
-            this.referName = referName;
-            this.value = value;
-        }
-
-        @Override
-        public void writeAtoms(CodeAtoms to) {
-            referName.writeAtoms(to);
-            to.add(ASSIGN);
-            value.writeAtoms(to);
-        }
-
-        public static <Ret extends AValue> SetTo<Ret> strToVal(String variable, Typed<Ret> value) {
-            return new SetTo<Ret>(new Address(Address.LOCAL_CODE_BLOCK, Address.addressString2Components(variable)), value);
-        }
-    }
-
-    public static class Reference<Contains extends AValue> extends Address implements Value<Contains> {
-        public static final Reference<AValue> THIS = Var.<AValue>param(TargetClass.SELF_TYPED, "this").ref();
-
-        private final ValueHelper valueHelper;
-
-        private Reference(TargetClass type, Address where, CodeAtom name) {
-            super(where, name);
-            this.valueHelper = new ValueHelper(type, this);
-        }
-
-        public static Reference refOn(Var of) {
-            CodeAtom name = new CodeAtom(of.getName());
-            switch (of.getScope()) {
-                case CLASS:
-                    return new Reference(of.getTType(), TargetClass.SELF_TYPED, name);
-                case OBJECT:
-                    return new Reference(of.getTType(), THIS, name);
-                case CODE_BLOCK:
-                default:
-                    return new Reference(of.getTType(), Address.LOCAL_CODE_BLOCK, name);
-            }
-        }
-
-        public static Reference toUndeclaredLocalOfUnknownType(String variable) {
-            if (0 == variable.indexOf('.'))
-                return new Reference(TargetClass.TYPE_NOT_KNOWN, Address.LOCAL_CODE_BLOCK, new CodeAtom(variable));
-            else
-                throw new IllegalArgumentException("Not local");
-        }
-
-        public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... params) {
-            return valueHelper.<Ret>call(method, params);
-        }
-
-        @Override
-        public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... params) {
-            return valueHelper.<Ret>callV(method, params);
-        }
-
-        public <Ret extends AValue> SetTo<Ret> assign(final Typed<Ret> value) {
-            return new SetTo<Ret>(this, value);
-        }
-
-        @Override
-        public void writeAtoms(CodeAtoms to) {
-            to.hintStart(Reference.class.getCanonicalName());
-            super.writeAtoms(to);
-            to.hintEnd(Reference.class.getCanonicalName());
-        }
     }
 }

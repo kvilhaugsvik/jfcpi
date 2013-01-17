@@ -21,9 +21,9 @@ import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 
 public class Annotate extends Formatted implements HasAtoms {
     private final String annotation;
-    private final Var.SetTo[] arguments;
+    private final Reference.SetTo[] arguments;
 
-    public Annotate(String annotation, Var.SetTo... arguments) {
+    public Annotate(String annotation, Reference.SetTo... arguments) {
         this.annotation = annotation;
         this.arguments = arguments;
     }

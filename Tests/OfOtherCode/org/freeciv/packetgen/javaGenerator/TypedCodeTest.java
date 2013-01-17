@@ -346,7 +346,7 @@ public class TypedCodeTest {
                 int.class, "myField", null).ref();
         bigAddress.writeAtoms(atoms);
 
-        assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(0).getHintsBegin().get(0));
+        assertEquals(Reference.class.getCanonicalName(), atoms.get(0).getHintsBegin().get(0));
         assertEquals(TargetClass.class.getCanonicalName(), atoms.get(0).getHintsBegin().get(1));
         assertEquals(TargetPackage.class.getCanonicalName(), atoms.get(0).getHintsBegin().get(2));
         assertEquals("myPackage", atoms.get(0).getAtom().get());
@@ -360,12 +360,12 @@ public class TypedCodeTest {
         assertEquals(".", atoms.get(3).getAtom().get());
 
         assertEquals("myField", atoms.get(4).getAtom().get());
-        assertEquals(Var.Reference.class.getCanonicalName(), atoms.get(4).getHintsEnd().get(0));
+        assertEquals(Reference.class.getCanonicalName(), atoms.get(4).getHintsEnd().get(0));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void reference_toUndeclaredLocalOfUnknownType_mustBeLocal() {
-        Var.Reference.toUndeclaredLocalOfUnknownType("java.util.regex.Pattern.COMMENTS");
+        Reference.toUndeclaredLocalOfUnknownType("java.util.regex.Pattern.COMMENTS");
     }
 
     @Test public void targetPackage_topLevel_fromClass() {
