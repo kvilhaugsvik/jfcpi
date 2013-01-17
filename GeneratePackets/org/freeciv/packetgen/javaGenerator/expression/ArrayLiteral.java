@@ -16,9 +16,9 @@ package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 
 public class ArrayLiteral extends Formatted implements Typed<AValue> {
     private final Typed<? extends AValue>[] elements;

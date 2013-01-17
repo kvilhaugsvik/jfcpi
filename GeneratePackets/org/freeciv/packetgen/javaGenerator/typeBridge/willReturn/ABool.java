@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression.willReturn;
+package org.freeciv.packetgen.javaGenerator.typeBridge.willReturn;
 
-public interface ALong extends AValue {
+public interface ABool extends AValue {
 }

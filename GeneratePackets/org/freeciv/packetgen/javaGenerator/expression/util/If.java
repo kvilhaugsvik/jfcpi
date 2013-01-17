@@ -15,11 +15,11 @@
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.creators.*;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 
-class If implements From2or3<Typed<NoValue>, Typed<ABool>, Block, Block>, ExprFrom2<Typed<NoValue>, Typed<ABool>, Block> {
+class If implements From2or3<Typed<NoValue>, Typed<ABool>, Block, Block>, From2<Typed<NoValue>, Typed<ABool>, Block> {
     @Override
     public Typed<NoValue> x(Typed<ABool> cond, Block then) {
         return x(cond, then, null);

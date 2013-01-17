@@ -14,10 +14,10 @@
 
 package org.freeciv.packetgen.parsing
 
-import org.freeciv.packetgen.javaGenerator.expression.willReturn._
 import org.freeciv.packetgen.enteties.Constant
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn._
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AString
 
 object ParseVariableAssignments extends ExtractableParser {
   protected def isNewLineIgnored(source: CharSequence, offset: Int) = false

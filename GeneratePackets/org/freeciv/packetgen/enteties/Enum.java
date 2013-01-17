@@ -21,11 +21,11 @@ import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
@@ -212,19 +212,19 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         req.add(new Requirement("enum " + named, DataType.class));
         final TargetClass parent = getAddress().scopeKnown();
         return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named, parent,
-                new ExprFrom1<Block, Var>() {
+                new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
                         return new Block(arg1.assign(BuiltIn.<AValue>toCode("value")));
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
                         return new Block(to.assign(new MethodCall<AValue>(named + ".valueOf", io.getRead().x(from))));
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var val, Var to) {
                         return new Block(to.ref().<Returnable>call(io.getWrite(), val.ref().<AValue>call("getNumber")));

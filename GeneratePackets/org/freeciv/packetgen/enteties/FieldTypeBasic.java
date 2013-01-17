@@ -21,11 +21,11 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Import;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.FCEnum;
 
 import java.io.DataInput;
@@ -43,7 +43,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
     private final Block decode;
     private final Block encode;
     private final Block encodedSize;
-    private final ExprFrom1<Typed<AString>, Var> value2String;
+    private final From1<Typed<AString>, Var> value2String;
     private final boolean arrayEater;
 
     protected final Var<TargetClass> fValue;
@@ -54,11 +54,11 @@ public class FieldTypeBasic implements IDependency, ReqKind {
     private final FieldTypeBasic basicType = this;
 
     public FieldTypeBasic(String dataIOType, String publicType, TargetClass javaType,
-                          ExprFrom1<Block, Var> constructorBody,
-                          ExprFrom2<Block, Var, Var> decode,
-                          ExprFrom2<Block, Var, Var> encode,
-                          ExprFrom1<Typed<AnInt>, Var> encodedSize,
-                          ExprFrom1<Typed<AString>, Var> toString,
+                          From1<Block, Var> constructorBody,
+                          From2<Block, Var, Var> decode,
+                          From2<Block, Var, Var> encode,
+                          From1<Typed<AnInt>, Var> encodedSize,
+                          From1<Typed<AString>, Var> toString,
                           boolean arrayEater, Collection<Requirement> needs) {
         pFromStream = Var.param(TargetClass.newKnown(DataInput.class), "from");
         pTo = Var.param(TargetClass.newKnown(DataOutput.class), "to");

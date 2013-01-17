@@ -12,7 +12,10 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression.willReturn;
+package org.freeciv.packetgen.javaGenerator.typeBridge;
 
-public interface Returnable {
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
+
+public interface From2or3<Returns extends HasAtoms, Argument1 extends HasAtoms, Argument2 extends HasAtoms, Argument3 extends HasAtoms>
+        extends From2<Returns, Argument1, Argument2>, From3<Returns, Argument1, Argument2, Argument3> {
 }

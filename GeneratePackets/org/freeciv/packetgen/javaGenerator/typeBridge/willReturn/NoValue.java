@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression.willReturn;
+package org.freeciv.packetgen.javaGenerator.typeBridge.willReturn;
 
-public interface AnInt extends AValue {
+public interface NoValue extends Returnable {
 }

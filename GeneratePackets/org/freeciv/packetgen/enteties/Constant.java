@@ -20,9 +20,9 @@ import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 
 import java.util.*;

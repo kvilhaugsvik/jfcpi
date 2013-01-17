@@ -18,11 +18,11 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.Var;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,19 +32,19 @@ import java.util.Collections;
 public class NetworkIO implements IDependency, ReqKind {
     private final Requirement me;
     private final int size;
-    private final ExprFrom1<Typed<AnInt>, Var> readNoArgs;
+    private final From1<Typed<AnInt>, Var> readNoArgs;
     private final String write;
 
     private NetworkIO(String type, int size, String write, Class<? extends ReqKind> kind,
-                      final ExprFrom1<Typed<AnInt>, Var> readNoArgs) {
+                      final From1<Typed<AnInt>, Var> readNoArgs) {
         this.me = new Requirement(type, kind);
         this.size = size;
         this.readNoArgs = readNoArgs;
         this.write = write;
     }
 
-    public ExprFrom1<Typed<AnInt>, Var> getSize() {
-        return new ExprFrom1<Typed<AnInt>, Var>() {
+    public From1<Typed<AnInt>, Var> getSize() {
+        return new From1<Typed<AnInt>, Var>() {
             @Override
             public Typed<AnInt> x(Var arg1) {
                 return BuiltIn.literal(size);
@@ -52,7 +52,7 @@ public class NetworkIO implements IDependency, ReqKind {
         };
     }
 
-    public final ExprFrom1<Typed<AnInt>, Var> getRead() {
+    public final From1<Typed<AnInt>, Var> getRead() {
         return readNoArgs;
     }
 
@@ -83,7 +83,7 @@ public class NetworkIO implements IDependency, ReqKind {
                                                  final String readFunction, final boolean noCastNeeded,
                                                  String write) {
         return new NetworkIO(type, size, write, NetworkIO.class,
-                new ExprFrom1<Typed<AnInt>, Var>() {
+                new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var from) {
                         Typed<AnInt> out = from.ref().<Returnable>call(readFunction);

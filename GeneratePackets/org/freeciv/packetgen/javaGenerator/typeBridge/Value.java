@@ -12,11 +12,10 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator.typeBridge;
 
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 
 /**
  * Code typed with a value (not void)

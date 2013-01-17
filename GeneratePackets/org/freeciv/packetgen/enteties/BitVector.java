@@ -11,13 +11,13 @@ import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.ABool;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -141,27 +141,27 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                         TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE :
                         TerminatedArray.TransferArraySize.SERIALIZED,
                 TerminatedArray.byteArray,
-                new ExprFrom1<Typed<AnInt>, Var>() {
+                new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var val) {
                         return val.read("size");
                     }
                 },
                 TerminatedArray.neverAnythingAfter,
-                new ExprFrom1<Typed<AValue>, Var>() {
+                new From1<Typed<AValue>, Var>() {
                     @Override
                     public Typed<AValue> x(Var buffer) {
                         return buffer.ref().<Returnable>call("getAsByteArray");
                     }
                 },
                 knowsSize ?
-                        new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                        new From1<Typed<AValue>, Typed<AValue>>() {
                             @Override
                             public Typed<AValue> x(Typed<AValue> bv) {
                                 return me.newInstance(bv);
                             }
                         } :
-                        new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                        new From1<Typed<AValue>, Typed<AValue>>() {
                             @Override
                             public Typed<AValue> x(Typed<AValue> bv) {
                                 return me.newInstance(bv, Hardcoded.pLimits.read("elements_to_transfer"));
@@ -176,19 +176,19 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                         null :
                         NetworkIO.witIntAsIntermediate("uint16", 2, "readUnsignedShort", false, "writeShort"),
                 knowsSize ?
-                        new ExprFrom1<Typed<AnInt>, Var>() {
+                        new From1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var val) {
                                 return neededBytes(me.<AnInt>read("size"));
                             }
                         } :
-                        new ExprFrom1<Typed<AnInt>, Var>() {
+                        new From1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var arg1) {
                                 return neededBytes(arg1.read("size"));
                             }
                         },
-                new ExprFrom1<Typed<AnInt>, Typed<AnInt>>() {
+                new From1<Typed<AnInt>, Typed<AnInt>>() {
                     @Override
                     public Typed<AnInt> x(Typed<AnInt> val) {
                         return neededBytes(val);

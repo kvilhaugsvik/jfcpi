@@ -20,11 +20,11 @@ import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -64,14 +64,14 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
     public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
         final NetworkIO io = (NetworkIO)wasRequired[0];
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), typeInJava,
-                new ExprFrom1<Block, Var>() {
+                new From1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
                         return new Block(
                                 to.assign(BuiltIn.<AValue>toCode("value")));
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
                         return new Block(to.assign(willRequire.isEmpty() ?
@@ -79,7 +79,7 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
                                         typeInJava.call("valueOf", io.getRead().x(from))));
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var val, Var to) {
                         return new Block(to.ref().<Returnable>call(io.getWrite(), willRequire.isEmpty() ?

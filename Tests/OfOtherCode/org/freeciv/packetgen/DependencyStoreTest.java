@@ -17,7 +17,7 @@ package org.freeciv.packetgen;
 import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AString;
 import org.junit.Test;
 
 import java.util.*;

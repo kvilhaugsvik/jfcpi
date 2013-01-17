@@ -12,14 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression.creators;
+package org.freeciv.packetgen.javaGenerator.typeBridge.willReturn;
 
-import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
-
-/**
- * An expression that returns a value of type Returns without needing any other values
- * @param <Returns> The value the expression returns
- */
-public interface Typed<Returns extends Returnable> extends HasAtoms {
+public interface AnInt extends AValue {
 }

@@ -21,11 +21,11 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -48,25 +48,25 @@ public class FieldTypeTest {
 
     private static FieldTypeBasic simpleBasicFT() {
         return new FieldTypeBasic("net", "c", TargetClass.fromClass(Integer.class),
-                new ExprFrom1<Block, Var>() {
+                new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
                         return new Block();
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var out, Var inn) {
                         return new Block();
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var value, Var to) {
                         return new Block();
                     }
                 },
-                new ExprFrom1<Typed<AnInt>, Var>() {
+                new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var arg1) {
                         return BuiltIn.literal(1);

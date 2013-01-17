@@ -12,22 +12,20 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression.creators;
+package org.freeciv.packetgen.javaGenerator.typeBridge;
 
 import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 
 /**
- * An expression that returns a value of type Return given Argument1 and Argument2
+ * An expression that returns a value of type Return given Argument1
  * @param <Returns>
  * @param <Argument1>
- * @param <Argument2>
  */
-public interface ExprFrom2<Returns extends HasAtoms, Argument1 extends HasAtoms, Argument2 extends HasAtoms> {
+public interface From1<Returns extends HasAtoms, Argument1 extends HasAtoms> {
     /**
      * Source code for an expression that will return a value of the type represented by Returns
-     * @param arg1 the first argument taken
-     * @param arg2 the second argument taken
+     * @param arg1 the argument taken
      * @return The source code
      */
-    public abstract Returns x(Argument1 arg1, Argument2 arg2);
+    public abstract Returns x(Argument1 arg1);
 }

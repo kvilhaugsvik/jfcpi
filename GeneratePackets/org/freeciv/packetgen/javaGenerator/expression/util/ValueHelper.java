@@ -14,12 +14,11 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.packetgen.javaGenerator.MethodCall;
 import org.freeciv.packetgen.javaGenerator.TargetClass;
-import org.freeciv.packetgen.javaGenerator.expression.Value;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Value;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 
 public class ValueHelper {
     private final TargetClass type;

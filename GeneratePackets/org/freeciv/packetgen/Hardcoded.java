@@ -25,14 +25,14 @@ import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.Statement;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.ABool;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.ABool;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.*;
 
@@ -49,13 +49,13 @@ public class Hardcoded {
 
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
             new FieldTypeBasic("uint32", "int", TargetClass.fromClass(Long.class),
-                    new ExprFrom1<Block, Var>() {
+                    new From1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
                             return new Block(arg1.assign(pValue.ref()));
                         }
                     },
-                    new ExprFrom2<Block, Var, Var>() {
+                    new From2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
                             Var buf = Var.local(int.class, "bufferValue", from.ref().<AnInt>call("readInt"));
@@ -65,7 +65,7 @@ public class Hardcoded {
                                     "this.value = (long)bufferValue + removedByCast")));
                         }
                     },
-                    new ExprFrom2<Block, Var, Var>() {
+                    new From2<Block, Var, Var>() {
                         @Override
                         public Block x(Var val, Var to) {
                             Block out = new Block();
@@ -74,7 +74,7 @@ public class Hardcoded {
                             return out;
                         }
                     },
-                    new ExprFrom1<Typed<AnInt>, Var>() {
+                    new From1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
                             return literal(4);
@@ -83,13 +83,13 @@ public class Hardcoded {
                     TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
             new FieldTypeBasic("requirement", "struct requirement", TargetClass.newKnown("org.freeciv.types", "requirement"),
-                    new ExprFrom1<Block, Var>() {
+                    new From1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
                             return new Block(arg1.assign(pValue.ref()));
                         }
                     },
-                    new ExprFrom2<Block, Var, Var>() {
+                    new From2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
                             return new Block(to.assign((TargetClass.newKnown("org.freeciv.types", "requirement")).newInstance(
@@ -103,7 +103,7 @@ public class Hardcoded {
                                     from.ref().<AValue>call("readBoolean"))));
                         }
                     },
-                    new ExprFrom2<Block, Var, Var>() {
+                    new From2<Block, Var, Var>() {
                         @Override
                         public Block x(Var val, Var to) {
                             return Block.fromStrings(
@@ -114,7 +114,7 @@ public class Hardcoded {
                                     "to.writeBoolean(this.value.getnegated())");
                         }
                     },
-                    new ExprFrom1<Typed<AnInt>, Var>() {
+                    new From1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
                             return literal(8);
@@ -136,20 +136,20 @@ public class Hardcoded {
                     TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
                     TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
                     TerminatedArray.byteArray,
-                    new ExprFrom1<Typed<AnInt>, Var>() {
+                    new From1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
                             return value.ref().callV("getBytes").callV("length");
                         }
                     },
                     TerminatedArray.addAfterIfSmallerThanMaxSize,
-                    new ExprFrom1<Typed<AValue>, Var>() {
+                    new From1<Typed<AValue>, Var>() {
                         @Override
                         public Typed<AValue> x(Var everything) {
                             return everything.ref().<Returnable>call("getBytes");
                         }
                     },
-                    new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                    new From1<Typed<AValue>, Typed<AValue>>() {
                         @Override
                         public Typed<AValue> x(Typed<AValue> bytes) {
                             return (TargetClass.fromClass(String.class)).newInstance(bytes);
@@ -161,7 +161,7 @@ public class Hardcoded {
                     Arrays.asList(new Requirement("STRING_ENDER", Constant.class)),
                     null,
                     null,
-                    new ExprFrom1<Typed<AnInt>, Var>() {
+                    new From1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var value) {
                             return value.ref().callV("getBytes").callV("length");
@@ -179,25 +179,25 @@ public class Hardcoded {
                     new Requirement("B_LAST", Constant.class)),
             TerminatedArray.xBytes("memory", "unsigned char"),
             new FieldTypeBasic("bool8", "bool", TargetClass.fromClass(Boolean.class),
-                    new ExprFrom1<Block, Var>() {
+                    new From1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
                             return new Block(arg1.assign(pValue.ref()));
                         }
                     },
-                    new ExprFrom2<Block, Var, Var>() {
+                    new From2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
                             return new Block(to.assign(from.ref().<ABool>call("readBoolean")));
                         }
                     },
-                    new ExprFrom2<Block, Var, Var>() {
+                    new From2<Block, Var, Var>() {
                         @Override
                         public Block x(Var value, Var to) {
                             return new Block(to.ref().<Returnable>call("writeBoolean", value.ref()));
                         }
                     },
-                    new ExprFrom1<Typed<AnInt>, Var>() {
+                    new From1<Typed<AnInt>, Var>() {
                         @Override
                         public Typed<AnInt> x(Var arg1) {
                             return literal(1);
@@ -256,13 +256,13 @@ public class Hardcoded {
                 TerminatedArray.arrayLen,
                 TerminatedArray.neverAnythingAfter,
                 null,
-                new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                new From1<Typed<AValue>, Typed<AValue>>() {
                     @Override
                     public Typed<AValue> x(Typed<AValue> bytes) {
                         return bytes; // TODO: Fix
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var elem) {
                         return new Block(
@@ -271,7 +271,7 @@ public class Hardcoded {
                         );
                     }
                 },
-                new ExprFrom1<Typed<? extends AValue>, Var>() {
+                new From1<Typed<? extends AValue>, Var>() {
                     @Override
                     public Typed<AValue> x(Var from) {
                         TargetClass universal = TargetClass.newKnown("org.freeciv.types", "universal");
@@ -287,7 +287,7 @@ public class Hardcoded {
                         new Requirement("struct universal", DataType.class)),
                 null,
                 NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
-                new ExprFrom1<Typed<AnInt>, Var>() {
+                new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var val) {
                         return multiply(literal(2), val.read("length"));
@@ -308,25 +308,25 @@ public class Hardcoded {
 
     private static FieldTypeBasic getFloat(final String times) {
         return new FieldTypeBasic("float" + times, "float", TargetClass.fromClass(Float.class),
-                new ExprFrom1<Block, Var>() {
+                new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
                         return new Block(arg1.assign(pValue.ref()));
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var out, Var inn) {
                         return new Block(out.assign(divide(inn.ref().<AValue>call("readFloat"), BuiltIn.<AValue>toCode(times))));
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var value, Var to) {
                         return new Block(to.ref().<Returnable>call("writeFloat", BuiltIn.<AnInt>multiply(value.ref(), BuiltIn.<AnInt>toCode(times))));
                     }
                 },
-                new ExprFrom1<Typed<AnInt>, Var>() {
+                new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var arg1) {
                         return BuiltIn.<AnInt>toCode("4");

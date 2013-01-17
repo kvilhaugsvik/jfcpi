@@ -17,8 +17,8 @@ package org.freeciv.packetgen.javaGenerator.expression.util;
 import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 
 /**
  * Wrap a string of source code by declaring what it is

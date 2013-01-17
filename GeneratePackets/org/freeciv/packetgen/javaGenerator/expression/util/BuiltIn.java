@@ -19,8 +19,8 @@ import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.creators.*;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 
 public class BuiltIn {
     public static final Typed<ABool> TRUE = BuiltIn.<ABool>toCode("true");
@@ -159,8 +159,8 @@ public class BuiltIn {
         return BuiltIn.<AnInt>toCode(inte + "");
     }
 
-    public static final ExprFrom1<Typed<AString>, Var> TO_STRING_OBJECT =
-            new ExprFrom1<Typed<AString>, Var>() {
+    public static final From1<Typed<AString>, Var> TO_STRING_OBJECT =
+            new From1<Typed<AString>, Var>() {
                 @Override
                 public Typed<AString> x(Var arg1) {
                     return arg1.ref().<AString>call("toString");
@@ -168,7 +168,7 @@ public class BuiltIn {
             };
 
 
-    public static final ExprFrom1<Typed<AString>, Var> TO_STRING_ARRAY = new ExprFrom1<Typed<AString>, Var>() {
+    public static final From1<Typed<AString>, Var> TO_STRING_ARRAY = new From1<Typed<AString>, Var>() {
         @Override
         public Typed<AString> x(Var arg1) {
             return new MethodCall<AString>("org.freeciv.Util.joinStringArray",

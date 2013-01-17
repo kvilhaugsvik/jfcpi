@@ -12,9 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression.willReturn;
+package org.freeciv.packetgen.javaGenerator.typeBridge.willReturn;
 
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
-
-public interface NoValue extends Returnable {
+public interface AValue extends Returnable {
 }

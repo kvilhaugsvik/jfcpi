@@ -20,8 +20,8 @@ import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.WeakVarDec;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;

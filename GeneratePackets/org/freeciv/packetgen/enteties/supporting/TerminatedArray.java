@@ -8,11 +8,11 @@ import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom1;
-import org.freeciv.packetgen.javaGenerator.expression.creators.ExprFrom2;
-import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
+import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
+import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 
 import java.util.*;
 
@@ -23,53 +23,53 @@ import static org.freeciv.packetgen.javaGenerator.expression.util.BuiltIn.*;
 public class TerminatedArray extends FieldTypeBasic {
     public static final TargetArray byteArray = TargetArray.from(byte[].class);
 
-    public static final ExprFrom1<Typed<AnInt>, Var> arrayLen = new ExprFrom1<Typed<AnInt>, Var>() {
+    public static final From1<Typed<AnInt>, Var> arrayLen = new From1<Typed<AnInt>, Var>() {
         @Override
         public Typed<AnInt> x(Var value) {
             return value.read("length");
         }
     };
-    public static final ExprFrom2<Block, Var, Var> elemIsByteArray = new ExprFrom2<Block, Var, Var>() {
+    public static final From2<Block, Var, Var> elemIsByteArray = new From2<Block, Var, Var>() {
         @Override
         public Block x(Var a, Var b) {
             return new Block(a.ref().<Returnable>call("writeByte", b.ref()));
         }
     };
-    private static final ExprFrom1<Typed<AValue>, Var> fullIsByteArray = new ExprFrom1<Typed<AValue>, Var>() {
+    private static final From1<Typed<AValue>, Var> fullIsByteArray = new From1<Typed<AValue>, Var>() {
         @Override
         public Typed<AValue> x(Var everything) {
             return everything.ref();
         }
     };
-    private static final ExprFrom1<Typed<AValue>, Typed<AValue>> valueIsBufferArray =
-            new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+    private static final From1<Typed<AValue>, Typed<AValue>> valueIsBufferArray =
+            new From1<Typed<AValue>, Typed<AValue>>() {
                 @Override
                 public Typed<AValue> x(Typed<AValue> bytes) {
                     return bytes;
                 }
             };
-    public static final ExprFrom1<Typed<ABool>, Typed<AnInt>> neverAnythingAfter =
-            new ExprFrom1<Typed<ABool>, Typed<AnInt>>() {
+    public static final From1<Typed<ABool>, Typed<AnInt>> neverAnythingAfter =
+            new From1<Typed<ABool>, Typed<AnInt>>() {
                 @Override
                 public Typed<ABool> x(Typed<AnInt> size) {
                     return FALSE;
                 }
             };
-    public static final ExprFrom1<Typed<? extends AValue>, Var> readByte = new ExprFrom1<Typed<? extends AValue>, Var>() {
+    public static final From1<Typed<? extends AValue>, Var> readByte = new From1<Typed<? extends AValue>, Var>() {
         @Override
         public Typed<? extends AValue> x(Var from) {
             return from.ref().<Returnable>call("readByte");
         }
     };
-    public static final ExprFrom1<Typed<ABool>, Typed<AnInt>> addAfterIfSmallerThanMaxSize =
-            new ExprFrom1<Typed<ABool>, Typed<AnInt>>() {
+    public static final From1<Typed<ABool>, Typed<AnInt>> addAfterIfSmallerThanMaxSize =
+            new From1<Typed<ABool>, Typed<AnInt>>() {
                 @Override
                 public Typed<ABool> x(Typed<AnInt> size) {
                     return isSmallerThan(size, fMaxSize.read("full_array_size"));
                 }
             };
-    public static final ExprFrom1<Typed<AnInt>, Typed<AnInt>> sameNumberOfBufferElementsAndValueElements =
-                                new ExprFrom1<Typed<AnInt>, Typed<AnInt>>() {
+    public static final From1<Typed<AnInt>, Typed<AnInt>> sameNumberOfBufferElementsAndValueElements =
+                                new From1<Typed<AnInt>, Typed<AnInt>>() {
                                     @Override
                                     public Typed<AnInt> x(Typed<AnInt> maxElements) {
                                         return maxElements;
@@ -80,7 +80,7 @@ public class TerminatedArray extends FieldTypeBasic {
     private final boolean unterminatable;
     private final TransferArraySize transferArraySizeKind;
     private final MaxArraySize maxArraySizeKind;
-    private final ExprFrom1<Typed<AnInt>, Var> numberOfElements;
+    private final From1<Typed<AnInt>, Var> numberOfElements;
     private final boolean elementTypeCanLimitVerify;
     private final TargetArray buffertype;
     private final List<Method.Helper> helpers;
@@ -91,18 +91,18 @@ public class TerminatedArray extends FieldTypeBasic {
                            final MaxArraySize maxArraySizeKind,
                            final TransferArraySize transferArraySizeKind,
                            final TargetArray buffertype,
-                           final ExprFrom1<Typed<AnInt>, Var> numberOfElements,
-                           final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded,
-                           final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray,
-                           final ExprFrom1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue,
-                           final ExprFrom2<Block, Var, Var> writeElementTo,
-                           final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom,
-                           final ExprFrom1<Typed<AString>, Var> toString,
+                           final From1<Typed<AnInt>, Var> numberOfElements,
+                           final From1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded,
+                           final From1<Typed<AValue>, Var> convertAllElementsToByteArray,
+                           final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue,
+                           final From2<Block, Var, Var> writeElementTo,
+                           final From1<Typed<? extends AValue>, Var> readElementFrom,
+                           final From1<Typed<AString>, Var> toString,
                            final Collection<Requirement> uses,
                            final Typed<AnInt> fullArraySizeLocation,
                            final NetworkIO transferSizeSerialize,
-                           final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen,
-                           final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
+                           final From1<Typed<AnInt>, Var> valueGetByteLen,
+                           final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
                            final List<Method.Helper> helperMethods,
                            boolean elementTypeCanLimitVerify
     ) {
@@ -139,8 +139,8 @@ public class TerminatedArray extends FieldTypeBasic {
         return null == terminator;
     }
 
-    private static ExprFrom1<Typed<AnInt>, Var> createEnocedSize(final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Var> valueGetByteLen) {
-        return new ExprFrom1<Typed<AnInt>, Var>() {
+    private static From1<Typed<AnInt>, Var> createEnocedSize(final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final From1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Var> valueGetByteLen) {
+        return new From1<Typed<AnInt>, Var>() {
             @Override
             public Typed<AnInt> x(Var value) {
                 Typed<AnInt> length = valueGetByteLen.x(value);
@@ -158,8 +158,8 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
-    private static ExprFrom2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final ExprFrom1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final ExprFrom1<Typed<AValue>, Var> convertAllElementsToByteArray, final ExprFrom2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
-        return new ExprFrom2<Block, Var, Var>() {
+    private static From2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AnInt>, Var> numberOfElements, final From1<Typed<ABool>, Typed<AnInt>> testIfTerminatorShouldBeAdded, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
+        return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
                 Block out = new Block();
@@ -180,8 +180,8 @@ public class TerminatedArray extends FieldTypeBasic {
         };
     }
 
-    private static ExprFrom2<Block, Var, Var> createDecode(final Requirement terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final ExprFrom1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final ExprFrom1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final ExprFrom1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify) {
-        return new ExprFrom2<Block, Var, Var>() {
+    private static From2<Block, Var, Var> createDecode(final Requirement terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify) {
+        return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var to, Var from) {
                 Var buf = Var.local(buffertype, "buffer",
@@ -254,8 +254,8 @@ public class TerminatedArray extends FieldTypeBasic {
                 || noUpperLimitOnTheNumberOfElements(maxArraySizeKind));
     }
 
-    private static ExprFrom1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final ExprFrom1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation, final MethodCall<Returnable> validateLimitsCall, final boolean elementTypeCanLimitVerify) {
-        return new ExprFrom1<Block, Var>() {
+    private static From1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation, final MethodCall<Returnable> validateLimitsCall, final boolean elementTypeCanLimitVerify) {
+        return new From1<Block, Var>() {
             @Override
             public Block x(Var to) {
                 final Var pValue = Var.param(javaType, "value");
@@ -407,13 +407,13 @@ public class TerminatedArray extends FieldTypeBasic {
                 arrayLen,
                 neverAnythingAfter,
                 null,
-                new ExprFrom1<Typed<AValue>, Typed<AValue>>() {
+                new From1<Typed<AValue>, Typed<AValue>>() {
                     @Override
                     public Typed<AValue> x(Typed<AValue> bytes) {
                         return buffer2value.getAddress().call(bytes);
                     }
                 },
-                new ExprFrom2<Block, Var, Var>() {
+                new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var elem) {
                         return new Block(kind.getAddress()
@@ -421,7 +421,7 @@ public class TerminatedArray extends FieldTypeBasic {
                                 .call("encodeTo", to.ref()));
                     }
                 },
-                new ExprFrom1<Typed<? extends AValue>, Var>() {
+                new From1<Typed<? extends AValue>, Var>() {
                     @Override
                     public Typed<? extends AValue> x(Var from) {
                         return kind.getAddress().newInstance(from.ref(), getNext(arrayEater));
@@ -431,7 +431,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 Arrays.asList(kind.getIFulfillReq()),
                 null,
                 null,
-                new ExprFrom1<Typed<AnInt>, Var>() {
+                new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var value) {
                         return lenInBytesHelper.getAddress().call(value.ref());
