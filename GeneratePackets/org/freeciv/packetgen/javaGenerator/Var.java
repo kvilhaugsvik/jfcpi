@@ -179,21 +179,21 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
 
         private final ValueHelper valueHelper;
 
-        private Reference(Var of, Address where, CodeAtom name) {
+        private Reference(TargetClass type, Address where, CodeAtom name) {
             super(where, name);
-            this.valueHelper = new ValueHelper(of.type, this);
+            this.valueHelper = new ValueHelper(type, this);
         }
 
         public static Reference refOn(Var of) {
-            CodeAtom name = new CodeAtom(of.name);
-            switch (of.scope) {
+            CodeAtom name = new CodeAtom(of.getName());
+            switch (of.getScope()) {
                 case CLASS:
-                    return new Reference(of, TargetClass.SELF_TYPED, name);
+                    return new Reference(of.getTType(), TargetClass.SELF_TYPED, name);
                 case OBJECT:
-                    return new Reference(of, THIS, name);
+                    return new Reference(of.getTType(), THIS, name);
                 case CODE_BLOCK:
                 default:
-                    return new Reference(of, Address.LOCAL_CODE_BLOCK, name);
+                    return new Reference(of.getTType(), Address.LOCAL_CODE_BLOCK, name);
             }
         }
 
