@@ -28,7 +28,7 @@ import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 import java.util.BitSet;
 import java.util.LinkedList;
 
-public class Block extends Formatted implements Typed<NoValue> {
+public class Block extends Formatted {
     private static final Util.OneCondition<CodeAtom> eolKiller = new Util.OneCondition<CodeAtom>() {
         @Override
         public boolean isTrueFor(CodeAtom argument) {
