@@ -73,10 +73,10 @@ public class Reference<Contains extends AValue> extends Address implements Value
     }
 
     public static class SetTo<Ret extends AValue> extends Type<Ret> {
-        private final Address referName;
+        private final Reference referName;
         private final Typed<Ret> value;
 
-        private SetTo(Address referName, Typed<Ret> value) {
+        private SetTo(Reference referName, Typed<Ret> value) {
             this.referName = referName;
             this.value = value;
         }
@@ -89,7 +89,7 @@ public class Reference<Contains extends AValue> extends Address implements Value
         }
 
         public static <Ret extends AValue> SetTo<Ret> strToVal(String variable, Typed<Ret> value) {
-            return new SetTo<Ret>(new Address(LOCAL_CODE_BLOCK, addressString2Components(variable)), value);
+            return new SetTo<Ret>(Reference.toUndeclaredLocalOfUnknownType(variable), value);
         }
     }
 }
