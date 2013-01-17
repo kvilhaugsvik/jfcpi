@@ -31,7 +31,11 @@ public class Address<On extends Address<?>> extends Formatted implements HasAtom
     protected final On where;
     protected final CodeAtom[] components;
 
+    protected final boolean symbolic;
+
     protected Address() {
+        symbolic = true;
+
         where = null;
         components = new CodeAtom[0];
     }
@@ -39,6 +43,8 @@ public class Address<On extends Address<?>> extends Formatted implements HasAtom
     public Address(On start, CodeAtom... parts) {
         this.where = start;
         this.components = parts;
+
+        symbolic = false;
 
         cached.put(this.getFullAddress(), this);
     }
@@ -77,7 +83,7 @@ public class Address<On extends Address<?>> extends Formatted implements HasAtom
     }
 
     private boolean includeWhere() {
-        return !(null == where || LOCAL_CODE_BLOCK.equals(where) || TargetPackage.TOP_LEVEL.equals(where));
+        return !(symbolic || where.symbolic);
     }
 
     @Override
