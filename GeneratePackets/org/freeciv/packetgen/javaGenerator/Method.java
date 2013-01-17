@@ -14,7 +14,6 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;

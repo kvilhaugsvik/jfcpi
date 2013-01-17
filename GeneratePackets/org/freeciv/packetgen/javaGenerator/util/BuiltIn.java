@@ -15,10 +15,11 @@
 package org.freeciv.packetgen.javaGenerator.util;
 
 import org.freeciv.packetgen.javaGenerator.*;
+import org.freeciv.packetgen.javaGenerator.expression.MethodCall;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
-import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.Block;
 import org.freeciv.packetgen.javaGenerator.typeBridge.*;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 

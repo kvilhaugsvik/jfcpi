@@ -12,8 +12,9 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator;
+package org.freeciv.packetgen.javaGenerator.expression;
 
+import org.freeciv.packetgen.javaGenerator.Comment;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.NoValue;

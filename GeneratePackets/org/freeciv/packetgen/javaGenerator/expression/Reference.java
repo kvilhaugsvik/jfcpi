@@ -12,8 +12,11 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator;
+package org.freeciv.packetgen.javaGenerator.expression;
 
+import org.freeciv.packetgen.javaGenerator.Address;
+import org.freeciv.packetgen.javaGenerator.TargetClass;
+import org.freeciv.packetgen.javaGenerator.Var;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.IR;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;

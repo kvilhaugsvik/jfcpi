@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.util;
 
-import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.Block;
 import org.freeciv.packetgen.javaGenerator.typeBridge.*;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;

@@ -15,9 +15,8 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
-import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.Import;
-import org.freeciv.packetgen.javaGenerator.expression.Statement;
+import org.freeciv.packetgen.javaGenerator.expression.EnumElement;
+import org.freeciv.packetgen.javaGenerator.expression.Reference;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.util.Formatted;

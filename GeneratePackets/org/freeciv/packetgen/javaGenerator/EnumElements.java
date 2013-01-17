@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.expression.EnumElement;
 import org.freeciv.packetgen.javaGenerator.util.Formatted;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;

@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.expression.MethodCall;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;

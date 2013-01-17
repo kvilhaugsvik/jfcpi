@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator.expression;
+package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;

@@ -16,12 +16,12 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
 import org.freeciv.packet.fieldtype.ElementsLimit;
+import org.freeciv.packetgen.javaGenerator.expression.MethodCall;
+import org.freeciv.packetgen.javaGenerator.expression.Reference;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.IR;
 import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
-import org.freeciv.packetgen.javaGenerator.expression.Block;
-import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Value;
 import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;

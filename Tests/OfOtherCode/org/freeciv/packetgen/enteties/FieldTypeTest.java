@@ -20,7 +20,7 @@ package org.freeciv.packetgen.enteties;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.javaGenerator.TargetClass;
 import org.freeciv.packetgen.javaGenerator.Var;
-import org.freeciv.packetgen.javaGenerator.expression.Block;
+import org.freeciv.packetgen.javaGenerator.Block;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
 import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;

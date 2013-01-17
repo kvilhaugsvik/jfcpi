@@ -16,7 +16,7 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packet.Sent;
 import org.freeciv.packetgen.javaGenerator.Annotate;
-import org.freeciv.packetgen.javaGenerator.Reference;
+import org.freeciv.packetgen.javaGenerator.expression.Reference;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;

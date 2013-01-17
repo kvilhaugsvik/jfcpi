@@ -14,7 +14,6 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
-import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
 import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
