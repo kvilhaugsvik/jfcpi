@@ -14,13 +14,10 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.util;
 
-import org.freeciv.Util;
 import org.freeciv.packetgen.javaGenerator.expression.Block;
 import org.freeciv.packetgen.javaGenerator.expression.creators.*;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.*;
-import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
-import org.freeciv.packetgen.javaGenerator.CodeAtoms;
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 
 class If implements From2or3<Typed<NoValue>, Typed<ABool>, Block, Block>, ExprFrom2<Typed<NoValue>, Typed<ABool>, Block> {
     @Override

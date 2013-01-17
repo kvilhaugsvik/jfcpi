@@ -20,8 +20,8 @@ import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.ClassWriter;
-import org.freeciv.packetgen.javaGenerator.CodeAtoms;
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 import org.junit.Test;
 
 import java.util.*;

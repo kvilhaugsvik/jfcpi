@@ -17,6 +17,9 @@ package org.freeciv.packetgen.javaGenerator;
 import org.freeciv.packetgen.javaGenerator.expression.creators.Typed;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.IR;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

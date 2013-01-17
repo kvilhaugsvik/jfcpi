@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator;
+package org.freeciv.packetgen.javaGenerator.representation;
 
 import java.util.Arrays;
 import java.util.Collections;

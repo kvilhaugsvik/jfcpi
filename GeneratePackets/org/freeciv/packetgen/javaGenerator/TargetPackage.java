@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.javaGenerator;
 
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
+
 import java.util.NoSuchElementException;
 
 public class TargetPackage extends Address<TargetPackage> {

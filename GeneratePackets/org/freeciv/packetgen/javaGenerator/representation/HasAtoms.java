@@ -12,9 +12,9 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.javaGenerator;
+package org.freeciv.packetgen.javaGenerator.representation;
 
-import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 
 public interface HasAtoms {
     public static final CodeAtom JDocStart = new CodeAtom("/**");

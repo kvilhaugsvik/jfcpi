@@ -14,9 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.creators;
 
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 
 /**
  * An expression that returns a value of type Return given Argument1 and Argument2

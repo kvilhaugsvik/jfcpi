@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.formating;
 
-import org.freeciv.packetgen.javaGenerator.IR;
+import org.freeciv.packetgen.javaGenerator.representation.IR;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

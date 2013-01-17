@@ -28,6 +28,9 @@ import org.freeciv.packetgen.javaGenerator.expression.willReturn.AString;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AValue;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.AnInt;
 import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.IR;
 import org.junit.Test;
 
 import java.io.DataInput;

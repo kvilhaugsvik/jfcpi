@@ -14,8 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.creators;
 
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
-import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 
 public interface ExprFrom3<Returns extends HasAtoms,
         Argument1 extends HasAtoms,

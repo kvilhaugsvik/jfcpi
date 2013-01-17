@@ -15,9 +15,10 @@
 package org.freeciv.packetgen.javaGenerator.formating;
 
 import org.freeciv.Util;
-import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.formating.ScopeStack.ScopeInfo;
-import org.freeciv.packetgen.javaGenerator.IR.CodeAtom;
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.IR;
+import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 
 import javax.naming.OperationNotSupportedException;
 import java.lang.reflect.InvocationTargetException;

@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.formating;
 
-import org.freeciv.packetgen.javaGenerator.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.List;

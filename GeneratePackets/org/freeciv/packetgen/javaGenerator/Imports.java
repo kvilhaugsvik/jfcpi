@@ -16,6 +16,9 @@ package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.packetgen.javaGenerator.expression.Import;
 import org.freeciv.packetgen.javaGenerator.formating.TokensToStringStyle;
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.IR;
 
 import java.util.Arrays;
 import java.util.HashSet;

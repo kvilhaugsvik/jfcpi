@@ -16,6 +16,8 @@ package org.freeciv.packetgen.javaGenerator.expression;
 
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.util.Formatted;
+import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 
 public class Import<Of extends Address> extends Formatted implements HasAtoms, Comparable<Import<?>> {
     private final Of target;

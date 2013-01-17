@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.javaGenerator.expression.creators;
 
-import org.freeciv.packetgen.javaGenerator.HasAtoms;
+import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
 import org.freeciv.packetgen.javaGenerator.expression.willReturn.Returnable;
 
 /**
