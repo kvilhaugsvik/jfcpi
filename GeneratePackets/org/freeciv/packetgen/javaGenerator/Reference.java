@@ -46,7 +46,7 @@ public class Reference<Contains extends AValue> extends Address implements Value
     }
 
     public static Reference toUndeclaredLocalOfUnknownType(String variable) {
-        if (0 == variable.indexOf('.'))
+        if (-1 == variable.indexOf('.'))
             return new Reference(TargetClass.TYPE_NOT_KNOWN, Address.LOCAL_CODE_BLOCK, new IR.CodeAtom(variable));
         else
             throw new IllegalArgumentException("Not local");

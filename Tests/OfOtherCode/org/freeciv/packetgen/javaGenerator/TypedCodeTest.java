@@ -368,6 +368,10 @@ public class TypedCodeTest {
         Reference.toUndeclaredLocalOfUnknownType("java.util.regex.Pattern.COMMENTS");
     }
 
+    @Test public void reference_toUndeclaredLocalOfUnknownType_possible() {
+        Reference.toUndeclaredLocalOfUnknownType("value");
+    }
+
     @Test public void targetPackage_topLevel_fromClass() {
         assertEquals(TargetPackage.TOP_LEVEL, TargetPackage.from((Package)null));
     }
