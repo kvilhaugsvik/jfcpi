@@ -20,7 +20,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class Tree {
+public class TestTreeIR {
     @Test public void ir_flatten_noChildren() {
         IR top = new IR(HasAtoms.HAS);
 
