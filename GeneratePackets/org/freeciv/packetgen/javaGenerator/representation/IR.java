@@ -14,20 +14,19 @@
 
 package org.freeciv.packetgen.javaGenerator.representation;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class IR {
     private final CodeAtom atom;
     private final List<String> hintsBegin;
     private final List<String> hintsEnd;
+    private final List<IR> children;
 
     public IR(CodeAtom atom) {
         this.atom = atom;
         this.hintsBegin = new LinkedList<String>();
         this.hintsEnd = new LinkedList<String>();
+        children = new LinkedList<IR>();
     }
 
     public CodeAtom getAtom() {
@@ -99,6 +98,24 @@ public class IR {
 
         throw new IllegalArgumentException("No end");
     }
+
+    public void addChild(IR elem) {
+        children.add(elem);
+    }
+
+    public List<IR> flattenTree() {
+        LinkedList<IR> out = new LinkedList<IR>();
+        flattenTree(out);
+        return out;
+    }
+
+    private void flattenTree(LinkedList<IR> out) {
+        out.add(this);
+
+        for (IR child : children)
+            out.addAll(child.flattenTree());
+    }
+
 
     public static class CodeAtom implements HasAtoms {
         private final String atom;
