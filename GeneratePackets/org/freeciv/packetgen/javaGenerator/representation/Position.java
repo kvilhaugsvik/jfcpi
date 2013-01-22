@@ -42,6 +42,10 @@ class Position {
         return next;
     }
 
+    public boolean isFirst() {
+        return null == previous;
+    }
+
     void use(IR current) {
         if (null == contains)
             this.contains = current;

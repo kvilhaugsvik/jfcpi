@@ -45,6 +45,16 @@ public class TestPosition {
     }
 
     @Test
+    public void first_isFirst() {
+        assertTrue("First should know it's first", Position.first().isFirst());
+    }
+
+    @Test
+    public void notFirst_isNotFirst() {
+        assertFalse("Not first should not lie", Position.first().next().isFirst());
+    }
+
+    @Test
     public void use_unused_isUnused() {
         Position first = Position.first();
         assertFalse("The position shouldn't be in use", first.isUsed());
