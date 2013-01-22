@@ -38,7 +38,10 @@ class Position {
 
     public Position next() {
         if (null == next)
-            next = new Position(this);
+            if (isUsed())
+                next = new Position(this);
+            else
+                throw new IllegalStateException("Use this one before requesting a new one.");
         return next;
     }
 

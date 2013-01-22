@@ -27,15 +27,24 @@ public class TestPosition {
         assertNotSame("Different chains should have different beginning", first, Position.first());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void creation_unused_canNotHaveNext() {
+        Position first = Position.first();
+        first.next();
+        fail("Don't allow next when not used. This avoids \"holes\"");
+    }
+
     @Test
     public void creation_next_isSame() {
         Position first = Position.first();
+        first.use(new IR(HasAtoms.AND));
         assertSame("Should not create a new next position when next already exist", first.next(), first.next());
     }
 
     @Test
     public void creation_previousOfNext_isSame() {
         Position first = Position.first();
+        first.use(new IR(HasAtoms.AND));
         assertSame("The next value's previous value should be the start", first, first.next().previous());
     }
 
@@ -51,7 +60,9 @@ public class TestPosition {
 
     @Test
     public void notFirst_isNotFirst() {
-        assertFalse("Not first should not lie", Position.first().next().isFirst());
+        Position first = Position.first();
+        first.use(new IR(HasAtoms.AND));
+        assertFalse("Not first should not lie", first.next().isFirst());
     }
 
     @Test
