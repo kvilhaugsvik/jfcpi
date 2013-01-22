@@ -16,73 +16,66 @@ package org.freeciv.packetgen.javaGenerator.representation;
 
 import org.junit.Test;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TestTreeIR {
-    @Test public void ir_flatten_noChildren() {
+    @Test public void ir_noChildren() {
         IR top = new IR(HasAtoms.HAS);
 
-        final List<IR> irs = top.flattenTree();
-        assertEquals(HasAtoms.HAS, irs.get(0).getAtom());
-        assertEquals(1, irs.size());
+        assertFalse(top.getChildren().hasNext());
     }
 
-    @Test public void ir_flatten_aChild() {
+    @Test public void ir_aChild() {
         IR dad = new IR(HasAtoms.HAS);
         dad.addChild(new IR(HasAtoms.ADD));
 
-        final List<IR> irs = dad.flattenTree();
-        assertEquals(HasAtoms.HAS, irs.get(0).getAtom());
-        assertEquals(HasAtoms.ADD, irs.get(1).getAtom());
-        assertEquals(2, irs.size());
+        Iterator<IR> childrenOfParent = dad.getChildren();
+        assertTrue("No child", childrenOfParent.hasNext());
+
+        IR child = childrenOfParent.next();
+        assertEquals("Wrong child", HasAtoms.ADD, child.getAtom());
+
+        assertFalse("To many children", childrenOfParent.hasNext());
+        assertFalse("No grand children", child.getChildren().hasNext());
     }
 
-    @Test public void ir_flatten_twoChildren() {
+    @Test public void ir_twoChildren() {
         IR dad = new IR(HasAtoms.HAS);
         dad.addChild(new IR(HasAtoms.ADD));
         dad.addChild(new IR(HasAtoms.SUB));
 
-        final List<IR> irs = dad.flattenTree();
-        assertEquals(HasAtoms.HAS, irs.get(0).getAtom());
-        assertEquals(HasAtoms.ADD, irs.get(1).getAtom());
-        assertEquals(HasAtoms.SUB, irs.get(2).getAtom());
-        assertEquals(3, irs.size());
+        final Iterator<IR> irs = dad.getChildren();
+        assertEquals(HasAtoms.ADD, irs.next().getAtom());
+        assertEquals(HasAtoms.SUB, irs.next().getAtom());
     }
 
-    @Test public void ir_flatten_aGrandChild() {
+    @Test public void ir_aGrandChild() {
         IR dad = new IR(HasAtoms.HAS);
         IR son = new IR(HasAtoms.ADD);
         dad.addChild(son);
         son.addChild(new IR(HasAtoms.AND));
 
-        final List<IR> irsDad = dad.flattenTree();
-        assertEquals(HasAtoms.HAS, irsDad.get(0).getAtom());
-        assertEquals(HasAtoms.ADD, irsDad.get(1).getAtom());
-        assertEquals(HasAtoms.AND, irsDad.get(2).getAtom());
-        assertEquals(3, irsDad.size());
-
-        final List<IR> irsSon = son.flattenTree();
-        assertEquals(HasAtoms.ADD, irsSon.get(0).getAtom());
-        assertEquals(HasAtoms.AND, irsSon.get(1).getAtom());
-        assertEquals(2, irsSon.size());
+        assertEquals(son, dad.getChildren().next());
+        assertEquals(HasAtoms.AND, son.getChildren().next().getAtom());
     }
 
-    @Test public void ir_flatten_3GenerationsSameAtom() {
+    @Test public void ir_3GenerationsSameAtom() {
         IR dad = new IR(HasAtoms.HAS);
         IR son = new IR(HasAtoms.HAS);
         dad.addChild(son);
         son.addChild(new IR(HasAtoms.HAS));
 
-        final List<IR> irsDad = dad.flattenTree();
-        assertEquals(HasAtoms.HAS, irsDad.get(0).getAtom());
-        assertEquals(HasAtoms.HAS, irsDad.get(1).getAtom());
-        assertEquals(HasAtoms.HAS, irsDad.get(2).getAtom());
-        assertEquals(3, irsDad.size());
+        assertEquals(HasAtoms.HAS, dad.getAtom());
+        assertEquals(HasAtoms.HAS, dad.getChildren().next().getAtom());
+        assertEquals(HasAtoms.HAS, dad.getChildren().next().getChildren().next().getAtom());
     }
 
-    @Test public void ir_flatten_grandChildrenDifferentParents() {
+    @Test public void ir_grandChildrenDifferentParents() {
         IR dad = new IR(HasAtoms.HAS);
 
         IR son = new IR(HasAtoms.ADD);
@@ -94,24 +87,15 @@ public class TestTreeIR {
         daughter.addChild(new IR(HasAtoms.EOL));
         daughter.addChild(new IR(HasAtoms.MUL));
 
-        final List<IR> irsDad = dad.flattenTree();
-        assertEquals(HasAtoms.HAS, irsDad.get(0).getAtom());
-        assertEquals(HasAtoms.ADD, irsDad.get(1).getAtom());
-        assertEquals(HasAtoms.AND, irsDad.get(2).getAtom());
-        assertEquals(HasAtoms.DIV, irsDad.get(3).getAtom());
-        assertEquals(HasAtoms.EOL, irsDad.get(4).getAtom());
-        assertEquals(HasAtoms.MUL, irsDad.get(5).getAtom());
-        assertEquals(6, irsDad.size());
+        final Iterator<IR> irsDad = dad.getChildren();
+        assertEquals(son, irsDad.next());
+        assertEquals(daughter, irsDad.next());
 
-        final List<IR> irsSon = son.flattenTree();
-        assertEquals(HasAtoms.ADD, irsSon.get(0).getAtom());
-        assertEquals(HasAtoms.AND, irsSon.get(1).getAtom());
-        assertEquals(2, irsSon.size());
+        final Iterator<IR> irsSon = son.getChildren();
+        assertEquals(HasAtoms.AND, irsSon.next().getAtom());
 
-        final List<IR> irsDaughter = daughter.flattenTree();
-        assertEquals(HasAtoms.DIV, irsDaughter.get(0).getAtom());
-        assertEquals(HasAtoms.EOL, irsDaughter.get(1).getAtom());
-        assertEquals(HasAtoms.MUL, irsDaughter.get(2).getAtom());
-        assertEquals(3, irsDaughter.size());
+        final Iterator<IR> irsDaughter = daughter.getChildren();
+        assertEquals(HasAtoms.EOL, irsDaughter.next().getAtom());
+        assertEquals(HasAtoms.MUL, irsDaughter.next().getAtom());
     }
 }

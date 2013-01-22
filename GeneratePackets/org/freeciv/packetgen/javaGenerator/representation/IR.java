@@ -103,17 +103,8 @@ public class IR {
         children.add(elem);
     }
 
-    public List<IR> flattenTree() {
-        LinkedList<IR> out = new LinkedList<IR>();
-        flattenTree(out);
-        return out;
-    }
-
-    private void flattenTree(LinkedList<IR> out) {
-        out.add(this);
-
-        for (IR child : children)
-            out.addAll(child.flattenTree());
+    public Iterator<IR> getChildren() {
+        return Collections.unmodifiableList(children).iterator();
     }
 
 
