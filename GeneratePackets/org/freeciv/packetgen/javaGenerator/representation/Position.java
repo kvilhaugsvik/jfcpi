@@ -14,9 +14,10 @@
 
 package org.freeciv.packetgen.javaGenerator.representation;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-class Position {
+class Position implements Iterable<Position> {
     private IR contains = null;
     private Position next = null;
     private final Position previous;
@@ -65,5 +66,32 @@ class Position {
             throw new NoSuchElementException("The position isn't used");
 
         return contains;
+    }
+
+    @Override
+    public Iterator<Position> iterator() {
+        final Position start = this;
+        return new Iterator<Position>() {
+            private Position where = start;
+
+            @Override
+            public boolean hasNext() {
+                return where.isUsed();
+            }
+
+            @Override
+            public Position next() {
+                if (!hasNext())
+                    throw new NoSuchElementException("No more elements");
+
+                where = where.next();
+                return where.previous();
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Can't remove position");
+            }
+        };
     }
 }

@@ -16,6 +16,7 @@ package org.freeciv.packetgen.javaGenerator.representation;
 
 import org.junit.Test;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
@@ -97,5 +98,41 @@ public class TestPosition {
         IR ir = new IR(HasAtoms.ADD);
         first.use(ir);
         assertEquals("Should be what was put in", ir, first.get());
+    }
+
+    @Test
+    public void iterator_empty_noNext() {
+        Position first = Position.first();
+        assertFalse("Empty has no next", first.iterator().hasNext());
+    }
+
+    @Test
+    public void iterator_one_hasNext() {
+        Position first = Position.first();
+        first.use(new IR(HasAtoms.ASSIGN));
+
+        assertTrue("First element is next", first.iterator().hasNext());
+    }
+
+    @Test
+    public void iterator_one_next_IsFirst() {
+        Position first = Position.first();
+        first.use(new IR(HasAtoms.ASSIGN));
+
+        assertEquals("First element is next", first, first.iterator().next());
+    }
+
+    @Test
+    public void iterator_iterates_twoElements() {
+        Position first = Position.first();
+        first.use(new IR(HasAtoms.ASSIGN));
+        first.next().use(new IR(HasAtoms.IS_SMALLER_OR_EQUAL));
+
+        Iterator<Position> iterator = first.iterator();
+        assertTrue(iterator.hasNext());
+        assertEquals(first, iterator.next());
+        assertTrue(iterator.hasNext());
+        assertEquals(first.next(), iterator.next());
+        assertFalse(iterator.hasNext());
     }
 }
