@@ -20,13 +20,12 @@ import org.freeciv.packetgen.javaGenerator.representation.IR.CodeAtom;
 import java.util.*;
 
 public class CodeAtoms {
-    //TODO: Rename atoms
-    private final LinkedList<IR> atoms;
+    private final IRHolder ir;
     LinkedList<RewriteRule> rewrites;
     private List<String> onNext;
 
     public CodeAtoms(HasAtoms... start) {
-        atoms = new LinkedList<IR>();
+        this.ir = new IRHolder();
         rewrites = new LinkedList<RewriteRule>();
         onNext = new LinkedList<String>();
 
@@ -35,23 +34,27 @@ public class CodeAtoms {
     }
 
     public void add(CodeAtom atom) {
-        int atomsAtTheBeginning = atoms.size();
+        addInternal(atom, false);
+    }
 
-        addAtomOrRewrite(atom);
+    private void addInternal(CodeAtom atom, boolean childrenFollows) {
+        Position position = ir.getCurrent();
+
+        addAtomOrRewrite(atom, childrenFollows);
         cleanRewriteRules();
 
-        if (atomsAtTheBeginning < atoms.size()) {
-            hintsAddStoredBeginnings(atomsAtTheBeginning);
+        if (position.isUsed()) {
+            hintsAddStoredBeginnings(position);
         }
     }
 
-    private void hintsAddStoredBeginnings(int atomsAtTheBeginning) {
+    private void hintsAddStoredBeginnings(Position pos) {
         for (String hint : onNext)
-            atoms.get(atomsAtTheBeginning).hintBegin(hint);
+            pos.get().hintBegin(hint);
         onNext = new LinkedList<String>();
     }
 
-    private void addAtomOrRewrite(CodeAtom atom) {
+    private void addAtomOrRewrite(CodeAtom atom, boolean childrenFollows) {
         HasAtoms toAdd = atom;
 
         for (RewriteRule test : rewrites)
@@ -59,7 +62,10 @@ public class CodeAtoms {
                 toAdd = test.getReplacement();
 
         if (toAdd instanceof CodeAtom)
-            atoms.add(new IR((CodeAtom)toAdd));
+            if (childrenFollows)
+                ir.childrenFollows(new IR((CodeAtom) toAdd));
+            else
+                ir.add(new IR((CodeAtom) toAdd));
         else
             toAdd.writeAtoms(this);
     }
@@ -74,21 +80,11 @@ public class CodeAtoms {
     }
 
     public void childrenFollows(CodeAtom parent) {
-        // TODO: Implement for real
-        level.add(parent);
-        add(parent);
+        addInternal(parent, true);
     }
 
-    private LinkedList<CodeAtom> level = new LinkedList<CodeAtom>();
     public void childrenAdded(CodeAtom parent) {
-        // TODO: Implement for real
-        if (level.size() - 1 < 0)
-            throw new IllegalStateException("Wasn't writing children");
-        if (level.peekLast().equals(parent))
-            level.removeLast();
-        else
-            throw new IllegalArgumentException("Writing children of " + level.peekLast().get() +
-                    " but asked to stop writing children of " + parent.get());
+        ir.stopForwarding(parent);
     }
 
     public void hintStart(String name) {
@@ -96,10 +92,10 @@ public class CodeAtoms {
     }
 
     public void hintEnd(String name) {
-        assert !atoms.isEmpty() : "Tried to end a hint before an element was added";
+        assert !ir.isEmpty() : "Tried to end a hint before an element was added";
         assert onNext.isEmpty() : "Can't add hint after accepting hints for next element";
 
-        atoms.peekLast().hintEnd(name);
+        ir.getCurrent().previous().get().hintEnd(name);
     }
 
     public void refuseNextIf(Util.OneCondition<CodeAtom> reason) {
@@ -117,16 +113,19 @@ public class CodeAtoms {
     }
 
     public IR get(int number) {
-        return atoms.get(number);
+        return toArray()[number];
     }
 
     public IR[] toArray() {
         assert onNext.isEmpty() : "Tried to read when the last element was half finished (start hints but no code)";
 
-        if (0 != level.size())
-            throw new IllegalStateException("Not finished writing children");
+        return ir.flatArray();
+    }
 
-        return atoms.toArray(new IR[atoms.size()]);
+    public Iterator<IR> asTree() {
+        assert onNext.isEmpty() : "Tried to read when the last element was half finished (start hints but no code)";
+
+        return ir.asTree();
     }
 
     public void joinSep(HasAtoms separator, Collection<? extends HasAtoms> toJoin) {
