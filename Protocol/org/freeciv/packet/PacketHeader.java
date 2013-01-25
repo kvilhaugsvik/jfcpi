@@ -78,4 +78,10 @@ public abstract class PacketHeader {
      * @throws java.io.IOException when problem writing
      */
     public abstract void encodeTo(DataOutput to) throws IOException;
+
+    public boolean equals(PacketHeader other) {
+        return this.getClass().equals(other.getClass()) &&
+                other.getPacketKind() == this.getPacketKind() &&
+                other.getTotalSize() == this.getTotalSize();
+    }
 }

@@ -19,6 +19,9 @@ import org.junit.Test;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+
 public class HeaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void headerNegativePacketNumber() {
@@ -54,5 +57,33 @@ public class HeaderTest {
             public void encodeTo(DataOutput to) throws IOException {
             }
         };
+    }
+
+    @Test
+    public void sameKindAndSizeEquals() {
+        PacketHeader one = new Header_2_2(5, 5);
+        PacketHeader two = new Header_2_2(5, 5);
+        assertTrue(one.equals(two));
+    }
+
+    @Test
+    public void notEqualDifferentHeaderKind() {
+        PacketHeader one = new Header_2_1(5, 5);
+        PacketHeader two = new Header_2_2(5, 5);
+        assertFalse(one.equals(two));
+    }
+
+    @Test
+    public void notEqualDifferentPacketKind() {
+        PacketHeader one = new Header_2_2(5, 4);
+        PacketHeader two = new Header_2_2(5, 5);
+        assertFalse(one.equals(two));
+    }
+
+    @Test
+    public void notEqualDifferentSize() {
+        PacketHeader one = new Header_2_2(4, 5);
+        PacketHeader two = new Header_2_2(5, 5);
+        assertFalse(one.equals(two));
     }
 }
