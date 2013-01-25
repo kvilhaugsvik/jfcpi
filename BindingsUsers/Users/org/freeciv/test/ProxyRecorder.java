@@ -18,6 +18,7 @@ import org.freeciv.connection.Interpretated;
 import org.freeciv.connection.NotReadyYetException;
 import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.Packet;
+import org.freeciv.packet.RawPacket;
 import org.freeciv.utility.ArgumentSettings;
 
 import java.io.*;
@@ -31,6 +32,7 @@ public class ProxyRecorder implements Runnable {
     private static final String TRACE_NAME_START = "trace-name-start";
     private static final String TRACE_NAME_END = "trace-name-end";
     private static final String TRACE_DYNAMIC = "record-time";
+    private static final String VERBOSE = "verbose";
 
     private final int proxyNumber;
     private final ArgumentSettings settings;
@@ -49,6 +51,8 @@ public class ProxyRecorder implements Runnable {
             put(TRACE_NAME_START, "FreecivCon");
             put(TRACE_NAME_END, ".fct");
             put(TRACE_DYNAMIC, "true");
+
+            put(VERBOSE, "false");
         }}, args);
 
         System.out.println("Listening for Freeciv clients on port " + settings.getSetting(PROXY_PORT));
@@ -59,6 +63,8 @@ public class ProxyRecorder implements Runnable {
                 settings.getSetting(TRACE_NAME_END));
         System.out.println("Time data " + (Boolean.parseBoolean(settings.getSetting(TRACE_DYNAMIC)) ? "is" : "isn't") +
                 " included in the trace.");
+        System.out.println((Boolean.parseBoolean(settings.getSetting(VERBOSE)) ? "Will" : "Won't") +
+                " be verbose in output here.");
 
         try {
             ServerSocket serverProxy = new ServerSocket(Integer.parseInt(settings.getSetting(PROXY_PORT)));
@@ -145,7 +151,8 @@ public class ProxyRecorder implements Runnable {
     private void proxyPacket(Interpretated readFrom, Interpretated writeTo, boolean clientToServer) {
         try {
             Packet fromClient = readFrom.getPacket();
-            System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);
+            if (Boolean.parseBoolean(settings.getSetting(VERBOSE)) || fromClient instanceof RawPacket)
+                System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);
             trace.writeBoolean(clientToServer);
             if (Boolean.parseBoolean(settings.getSetting(TRACE_DYNAMIC)))
                 trace.writeLong(System.currentTimeMillis());
