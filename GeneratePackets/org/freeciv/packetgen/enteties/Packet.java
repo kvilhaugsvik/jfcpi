@@ -77,7 +77,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
         iFulfill = new Requirement(getName(), Packet.class);
 
-        addClassConstant(Visibility.PRIVATE, int.class, "number", literal(number));
+        addClassConstant(Visibility.PUBLIC, int.class, "number", literal(number));
 
         addObjectConstantAndGetter(Var.field(Collections.<Annotate>emptyList(),
                 Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.fromClass(PacketHeader.class), "header", null));

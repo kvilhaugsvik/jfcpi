@@ -400,12 +400,12 @@ public class GenerateTest {
             if (stringEnd instanceof Constant && "STRING_ENDER".equals(((Constant) stringEnd).getName()))
                 constants.add((Constant)stringEnd);
 
-        TreeMap<Integer, String> packets = new TreeMap<Integer, String>();
-        packets.put(926, "TestArray");
-        packets.put(927, "TestArrayTransfer");
-        packets.put(928, "TestArrayDouble");
-        packets.put(929, "TestArrayDoubleTransfer");
-        packets.put(930, "StringArray");
+        TreeMap<Integer, TargetClass> packets = new TreeMap<Integer, TargetClass>();
+        packets.put(926, TargetClass.fromName("org.freeciv.packet", "TestArray"));
+        packets.put(927, TargetClass.fromName("org.freeciv.packet", "TestArrayTransfer"));
+        packets.put(928, TargetClass.fromName("org.freeciv.packet", "TestArrayDouble"));
+        packets.put(929, TargetClass.fromName("org.freeciv.packet", "TestArrayDoubleTransfer"));
+        packets.put(930, TargetClass.fromName("org.freeciv.packet", "StringArray"));
 
         writeJavaFile(PacketsStore.generateVersionData(packets, constants), targetFolder);
     }

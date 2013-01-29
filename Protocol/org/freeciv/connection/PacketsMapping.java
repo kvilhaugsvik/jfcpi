@@ -36,7 +36,7 @@ public class PacketsMapping {
     public PacketsMapping() throws IOException {
         try {
             Class constants = Class.forName(Util.VERSION_DATA_CLASS);
-            String[] understandsPackets = (String[])constants.getField(Util.PACKET_MAP_NAME).get(null);
+            Class[] understoodPackets = (Class[])constants.getField(Util.PACKET_MAP_NAME).get(null);
             packetNumberBytes = constants.getField(Util.PACKET_NUMBER_SIZE_NAME).getInt(null);
             capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
             capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
@@ -45,15 +45,15 @@ public class PacketsMapping {
             versionMinor = Long.parseLong((String)constants.getField("MINOR_VERSION").get(null));
             versionPatch = Long.parseLong((String)constants.getField("PATCH_VERSION").get(null));
 
-            for (int number = 0; number < understandsPackets.length; number++) {
+            for (Class understood : understoodPackets) {
                 try {
-                    this.packetMakers.put(number,
-                                          Class.forName(understandsPackets[number]).getConstructor(DataInput.class, PacketHeader.class));
-                } catch (ClassNotFoundException e) {
-                    throw new IOException("List of packets claims that " +
-                                                  understandsPackets[number] + " is generated but it was not found.");
+                    this.packetMakers.put(understood.getField("number").getInt(null),
+                                          understood.getConstructor(DataInput.class, PacketHeader.class));
+                } catch (NoSuchFieldException e) {
+                    throw new IOException(understood.getSimpleName() + " is not compatible.\n" +
+                            "(The static field number is missing)", e);
                 } catch (NoSuchMethodException e) {
-                    throw new IOException(understandsPackets[number] + " is not compatible.\n" +
+                    throw new IOException(understood.getSimpleName() + " is not compatible.\n" +
                                                   "(No constructor from DataInput, PacketHeader found)");
                 }
             }

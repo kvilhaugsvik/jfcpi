@@ -26,7 +26,7 @@ import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.ArrayLiteral;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
 import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AString;
+import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 
 import java.util.*;
 
@@ -199,7 +199,7 @@ public class PacketsStore {
         Collection<IDependency> inn = requirements.getResolved();
         HashSet<ClassWriter> out = new HashSet<ClassWriter>();
 
-        TreeMap<Integer, String> resolvedPackets = new TreeMap<Integer, String>();
+        TreeMap<Integer, TargetClass> resolvedPackets = new TreeMap<Integer, TargetClass>();
         TreeSet<Constant> sortedConstants =
                 new TreeSet<Constant>(new TotalOrderNoCircles(inn));
 
@@ -207,8 +207,7 @@ public class PacketsStore {
             if (dep instanceof ClassWriter) {
                 out.add((ClassWriter) dep);
                 if (dep instanceof Packet) {
-                    resolvedPackets.put(((Packet) dep).getNumber(),
-                            ((Packet) dep).getPackage() + "." + ((Packet) dep).getName());
+                    resolvedPackets.put(((Packet) dep).getNumber(), ((Packet) dep).getAddress());
                 }
             } else if (dep instanceof Constant)
                 sortedConstants.add((Constant)dep);
@@ -218,7 +217,7 @@ public class PacketsStore {
         return out;
     }
 
-    static ClassWriter generateVersionData(TreeMap<Integer, String> packets, Set<Constant> constants) {
+    static ClassWriter generateVersionData(TreeMap<Integer, TargetClass> packets, Set<Constant> constants) {
         int border = Util.VERSION_DATA_CLASS.lastIndexOf('.');
         ClassWriter versionData =
                 new ClassWriter(ClassKind.CLASS, TargetPackage.from(Util.VERSION_DATA_CLASS.substring(0, border)), Imports.are(),
@@ -228,25 +227,20 @@ public class PacketsStore {
         for (Constant dep : constants)
             versionData.addField(dep);
 
-        versionData.addClassConstant(Visibility.PUBLIC, TargetArray.from(String[].class),
+        versionData.addClassConstant(Visibility.PUBLIC, TargetArray.from(Class[].class),
                 Util.PACKET_MAP_NAME, new ArrayLiteral(formatPacketMap(packets)));
 
         return versionData;
     }
 
-    private static Typed<AString>[] formatPacketMap(TreeMap<Integer, String> pNumToPName) {
+    private static Typed<AValue>[] formatPacketMap(TreeMap<Integer, TargetClass> pNumToPName) {
         if (pNumToPName.isEmpty())
             return new Typed[0];
 
-        Typed<AString> raw = BuiltIn.literal(RawPacket.class.getCanonicalName());
-
-        Typed<AString>[] packets = new Typed[pNumToPName.lastKey() + 1];
-        for (int packetNumber = 0; packetNumber <= pNumToPName.lastKey(); packetNumber++)
-            if (pNumToPName.containsKey(packetNumber))
-                packets[packetNumber] = BuiltIn.literal(pNumToPName.get(packetNumber));
-            else
-                packets[packetNumber] = raw;
-        return packets;
+        List<Typed<AValue>> packets = new LinkedList<Typed<AValue>>();
+        for (Integer packetNumber : pNumToPName.keySet())
+            packets.add(pNumToPName.get(packetNumber).callV("class"));
+        return packets.toArray(new Typed[packets.size()]);
     }
 
     public Collection<Requirement> getUnsolvedRequirements() {

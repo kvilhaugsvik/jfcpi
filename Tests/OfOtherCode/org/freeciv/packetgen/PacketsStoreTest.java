@@ -272,7 +272,7 @@ public class PacketsStoreTest {
         PacketsStore storage = defaultStorage();
         storage.registerPacket("PACKET_HELLO", 0, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
 
-        assertEquals("{\"org.freeciv.packet.PACKET_HELLO\"}",
+        assertEquals("{org.freeciv.packet.PACKET_HELLO.class}",
                 Util.joinStringArray(ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(
                         new CodeAtoms(getVersionData(storage).getField("understandsPackets").getValue())).toArray(),
                         "\n", "", ""));
