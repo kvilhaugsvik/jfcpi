@@ -101,21 +101,19 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private TargetMethod addExceptionLocationAdder() {
         Var<AValue> e = Var.param(RuntimeException.class, "e");
         TargetClass ft = TargetClass.newKnown(FieldTypeException.class);
-        Var<AValue> fte = Var.local(ft, "fte", cast(ft, e.ref()));
+        Var<AValue> fte = Var.local(ft, "fte",
+                R_IF(isInstanceOf(e.ref(), ft), cast(ft, e.ref()), ft.newInstance(literal("Run time exception"), e.ref())));
         Var<AString> pName = Var.param(String.class, "field");
         Method.Helper addExceptionLocation = Method.newHelper(
                 Comment.no(),
-                e.getTType(),
+                ft,
                 "addExceptionLocation",
                 Arrays.asList(e, pName),
                 new Block(
-                        IF(
-                                isInstanceOf(e.ref(), ft),
-                                new Block(
-                                        fte,
-                                        fte.ref().<Returnable>call("setInPacket", literal(getName())),
-                                        fte.ref().<Returnable>call("setField", pName.ref()))),
-                        RETURN(e.ref())));
+                        fte,
+                        fte.ref().<Returnable>call("setInPacket", literal(getName())),
+                        fte.ref().<Returnable>call("setField", pName.ref()),
+                        RETURN(fte.ref())));
         addMethod(addExceptionLocation);
 
         return addExceptionLocation.getAddressOn(this.getAddress());
@@ -141,8 +139,6 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     }
 
     private Typed<NoValue> labelExceptionsWithPacketAndField(Var field, Block operation, TargetMethod addExceptionLocation) {
-        // TODO: When packet arrays are replaced by array as field type wrap all exceptions that isn't a
-        // FieldTypeException in a FieldTypeException and set packet and field
         Var<AValue> e = Var.param(RuntimeException.class, "e");
         return BuiltIn.tryCatch(
                 operation,
