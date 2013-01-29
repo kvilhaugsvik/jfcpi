@@ -45,11 +45,8 @@ public class Interpretated implements FreecivConnection {
             out = toProcess.getNext();
 
         try {
-            if (interpreter.canInterpret(out.getHeader().getPacketKind()))
-                return interpreter.interpret(out.getHeader(),
-                        new DataInputStream(new ByteArrayInputStream(out.getBodyBytes())));
-            else
-                return out;
+            return interpreter.interpret(out.getHeader(),
+                    new DataInputStream(new ByteArrayInputStream(out.getBodyBytes())));
         } catch (IOException e) {
             return out;
         }

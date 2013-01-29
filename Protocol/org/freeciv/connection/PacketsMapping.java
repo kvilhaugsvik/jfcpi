@@ -21,6 +21,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 public class PacketsMapping {
     private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
@@ -66,6 +67,8 @@ public class PacketsMapping {
     }
 
     public Packet interpret(PacketHeader header, DataInputStream in) throws IOException {
+        if (!canInterpret(header.getPacketKind()))
+            throw packetReadingError(header.getPacketKind(), new NoSuchElementException("Don't know how to interpret"));
         try {
             return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header);
         } catch (InstantiationException e) {
@@ -81,7 +84,7 @@ public class PacketsMapping {
         return new IOException("Internal error while trying to read packet numbered " + kind + " from network", exception);
     }
 
-    public boolean canInterpret(int kind) {
+    boolean canInterpret(int kind) {
         return packetMakers.containsKey(kind);
     }
 
