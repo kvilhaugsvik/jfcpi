@@ -384,9 +384,17 @@ public class TerminatedArray extends FieldTypeBasic {
                                              final FieldTypeAlias kind) {
         final TargetArray type = TargetArray.from(kind.getUnderType(), 1);
         final boolean arrayEater = kind.getBasicType().isArrayEater();
-        Var<AValue> helperParamValue = Var.param(type, "value");
+
+        Var<AValue> helperParamValue = Var.param(type, "values");
+        Var<AValue> helperParamLimits = Var.param(ElementsLimit.class, "limits");
+        Var<AValue> elem = Var.<AValue>param(kind.getUnderType(), "elem");
+        Var<AnInt> outVar = Var.<AnInt>local(int.class, "totalSize", literal(0));
         final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.fromClass(int.class), "lengthInBytes",
-                Arrays.<Var<?>>asList(helperParamValue), new Block(RETURN(helperParamValue.read("length"))));
+                Arrays.<Var<?>>asList(helperParamValue, helperParamLimits),
+                new Block(outVar,
+                        FOR(elem, helperParamValue.ref(),
+                                new Block(inc(outVar, kind.getAddress().newInstance(elem.ref(), helperParamLimits.ref()).callV("encodedLength")))),
+                        RETURN(outVar.ref())));
 
         Var<AValue> pBuf = Var.param(TargetArray.from(kind.getAddress(), 1), "buf");
         Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.<AnInt>read("length")));
@@ -435,7 +443,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var value) {
-                        return lenInBytesHelper.getAddress().call(value.ref());
+                        return lenInBytesHelper.getAddress().call(value.ref(), fMaxSize.ref().<AValue>call("next"));
                     }
                 },
                 sameNumberOfBufferElementsAndValueElements,
