@@ -207,16 +207,16 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         constructorBodyStream.addStatement(ASSERT(isInstanceOf(argHeader.ref(), headerKind),
                 literal("Packet not generated for this kind of header")));
 
-        Block wrongSize = new Block();
         constructorBodyStream.addStatement(IF(isNotSame(sum(argHeader.ref().<AnInt>call("getHeaderSize"),
-                calcBodyLenCall), argHeader.ref().<AnInt>call("getTotalSize")), wrongSize));
-        wrongSize.addStatement(THROW(addExceptionLocation.callV(
-                TargetClass.fromClass(FieldTypeException.class).newInstance(sum(
-                        literal("interpreted packet size ("),
-                        GROUP(sum(argHeader.ref().<AnInt>call("getHeaderSize"), calcBodyLenCall)),
-                        literal(") don't match header packet size ("), argHeader.ref().<AnInt>call("getTotalSize"),
-                        literal(") for "), new MethodCall<AString>("this.toString"))),
-                literal("header"))));
+                calcBodyLenCall), argHeader.ref().<AnInt>call("getTotalSize")),
+                new Block(THROW(addExceptionLocation.callV(
+                        TargetClass.fromClass(FieldTypeException.class).newInstance(sum(
+                                literal("interpreted packet size ("),
+                                GROUP(sum(argHeader.ref().<AnInt>call("getHeaderSize"), calcBodyLenCall)),
+                                literal(") don't match header packet size ("),
+                                argHeader.ref().<AnInt>call("getTotalSize"),
+                                literal(") for "), new MethodCall<AString>("this.toString"))),
+                        literal("header"))))));
 
         addMethod(Method.newPublicConstructorWithException(Comment.doc(
                 "Construct an object from a DataInput", new String(),
