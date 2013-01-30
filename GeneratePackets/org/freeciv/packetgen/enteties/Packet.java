@@ -207,17 +207,14 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         Block wrongSize = new Block();
         constructorBodyStream.addStatement(IF(isNotSame(sum(argHeader.ref().<AnInt>call("getHeaderSize"),
                 calcBodyLenCall), argHeader.ref().<AnInt>call("getTotalSize")), wrongSize));
-        wrongSize.addStatement(new MethodCall<NoValue>("Logger.getLogger(" + logger + ").warning", sum(
-                literal("Probable misinterpretation: "),
-                literal("interpreted packet size ("),
-                GROUP(sum(argHeader.ref().<AnInt>call("getHeaderSize"), calcBodyLenCall)),
-                literal(") don't match header packet size ("), argHeader.ref().<AnInt>call("getTotalSize"),
-                literal(") for "), new MethodCall<AString>("this.toString"))));
-        wrongSize.addStatement(THROW(ioexception.newInstance(sum(
-                literal("Packet size in header and Java packet not the same."),
-                literal(" Header packet size: "), argHeader.ref().<AnInt>call("getTotalSize"),
-                literal(" Header size: "), argHeader.ref().<AnInt>call("getHeaderSize"),
-                literal(" Packet body size: "), calcBodyLenCall))));
+        wrongSize.addStatement(THROW(addExceptionLocation.callV(
+                TargetClass.fromClass(FieldTypeException.class).newInstance(sum(
+                        literal("interpreted packet size ("),
+                        GROUP(sum(argHeader.ref().<AnInt>call("getHeaderSize"), calcBodyLenCall)),
+                        literal(") don't match header packet size ("), argHeader.ref().<AnInt>call("getTotalSize"),
+                        literal(") for "), new MethodCall<AString>("this.toString"))),
+                literal("header"))));
+
         addMethod(Method.newPublicConstructorWithException(Comment.doc(
                 "Construct an object from a DataInput", new String(),
                 Comment.param(streamName, "data stream that is at the start of the package body"),

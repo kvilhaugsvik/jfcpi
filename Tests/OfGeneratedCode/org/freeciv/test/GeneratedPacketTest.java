@@ -132,7 +132,7 @@ public class GeneratedPacketTest {
         SERVER_JOIN_REQ packet = new SERVER_JOIN_REQ(inputStream, new Header_2_1(64, 5));
    }
 
-    @Test(expected = IOException.class)
+    @Test(expected = FieldTypeException.class)
     public void testPacketWithFieldsFromStreamFailsOnWrongSize() throws IOException {
         DataInput inputStream = new DataInputStream(new ByteArrayInputStream(
                 new byte[]{/*0, 64, 4, */70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
