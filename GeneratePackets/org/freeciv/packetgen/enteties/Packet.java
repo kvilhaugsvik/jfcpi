@@ -48,8 +48,6 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private final Requirement iFulfill;
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
 
-    private final TargetClass ioexception = TargetClass.newKnown(IOException.class);
-
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
@@ -222,9 +220,9 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 "Construct an object from a DataInput", new String(),
                 Comment.param(streamName, "data stream that is at the start of the package body"),
                 Comment.param(argHeader, "header data. Must contain size and number"),
-                Comment.docThrows(ioexception, "if the DataInput has a problem")),
+                Comment.docThrows(TargetClass.newKnown(FieldTypeException.class), "if there is a problem")),
                 Arrays.asList(streamName, argHeader),
-                Arrays.asList(ioexception),
+                Arrays.asList(TargetClass.newKnown(FieldTypeException.class)),
                 constructorBodyStream));
     }
 
@@ -238,7 +236,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.fromClass(void.class), "encodeTo", Arrays.asList(pTo),
-                Arrays.asList(ioexception), body));
+                Arrays.asList(TargetClass.newKnown(IOException.class)), body));
     }
 
     private void addCalcBodyLen(Field[] fields) {
