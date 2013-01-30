@@ -100,10 +100,11 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     }
 
     private TargetMethod addExceptionLocationAdder() {
-        Var<AValue> e = Var.param(RuntimeException.class, "e");
+        Var<AValue> e = Var.param(Throwable.class, "e");
         TargetClass ft = TargetClass.newKnown(FieldTypeException.class);
         Var<AValue> fte = Var.local(ft, "fte",
-                R_IF(isInstanceOf(e.ref(), ft), cast(ft, e.ref()), ft.newInstance(literal("Run time exception"), e.ref())));
+                R_IF(isInstanceOf(e.ref(), ft), cast(ft, e.ref()),
+                        ft.newInstance(sum(literal("threw "), e.ref().callV("getClass").callV("getName")), e.ref())));
         Var<AString> pName = Var.param(String.class, "field");
         Method.Helper addExceptionLocation = Method.newHelper(
                 Comment.no(),
@@ -144,7 +145,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     }
 
     private Typed<NoValue> labelExceptionsWithPacketAndField(Var field, Block operation, TargetMethod addExceptionLocation) {
-        Var<AValue> e = Var.param(RuntimeException.class, "e");
+        Var<AValue> e = Var.param(Throwable.class, "e");
         return BuiltIn.tryCatch(
                 operation,
                 e,
