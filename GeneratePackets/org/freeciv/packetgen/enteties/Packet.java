@@ -35,6 +35,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
 
@@ -113,6 +114,10 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                         fte,
                         fte.ref().<Returnable>call("setInPacket", literal(getName())),
                         fte.ref().<Returnable>call("setField", pName.ref()),
+                        new MethodCall<NoValue>("Logger.getLogger(" + logger + ").log",
+                                TargetClass.fromClass(Level.class).callV("WARNING"),
+                                sum(literal("Misinterpretation. "), fte.ref().callV("getMessage")),
+                                fte.ref()),
                         RETURN(fte.ref())));
         addMethod(addExceptionLocation);
 
