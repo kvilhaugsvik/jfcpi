@@ -56,6 +56,8 @@ public class GenerateTest {
 
         writeStructThatHasAnArrayField(targetFolder);
 
+        writeBitStringTestPeers(targetFolder);
+
         writeConstantClass(targetFolder);
 
         Parts items = new Parts();
@@ -387,6 +389,42 @@ public class GenerateTest {
 
     private FieldTypeBasic.FieldTypeAlias createUINT32_2D(FieldTypeBasic.FieldTypeAlias uint32_1d) throws UndefinedException {
         return TerminatedArray.fieldArray("x", "y", uint32_1d).createFieldType("UINT32S_2D");
+    }
+
+    @Test public void writeBitStringTestPeers() throws IOException, UndefinedException {
+        writeBitStringTestPeers(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    private void writeBitStringTestPeers(String targetFolder) throws IOException, UndefinedException {
+        BitVector type = writeBitStringType(targetFolder);
+
+        FieldTypeBasic.FieldTypeAlias fieldAlias = writeBitStringFieldType(targetFolder, type);
+
+        writeBitStringUsingPacket(targetFolder, fieldAlias);
+    }
+
+    private BitVector writeBitStringType(String targetFolder) throws IOException {
+        BitVector type = new BitVector();
+        writeJavaFile(type, targetFolder);
+        return type;
+    }
+
+    private FieldTypeBasic.FieldTypeAlias writeBitStringFieldType(String targetFolder, BitVector type) throws UndefinedException, IOException {
+        FieldTypeBasic.FieldTypeAlias fieldAlias =
+                ((FieldTypeBasic) type.produce(new Requirement("bit_string" + "(" + "BIT" + ")", FieldTypeBasic.class)))
+                        .createFieldType("BITSTRING");
+        writeJavaFile(fieldAlias, targetFolder);
+        return fieldAlias;
+    }
+
+    private void writeBitStringUsingPacket(String targetFolder, FieldTypeBasic.FieldTypeAlias fieldAlias) throws UndefinedException, IOException {
+        Packet packet = new Packet("TestBitString", 931,
+                TargetClass.newKnown(Header_2_2.class),
+                GeneratorDefaults.LOG_TO,
+                Collections.<Annotate>emptyList(),
+                new Field("theBitStingField", fieldAlias, "TestBitString", Collections.<WeakFlag>emptyList(),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("9"), null)));
+        writeJavaFile(packet, targetFolder);
     }
 
     @Test
