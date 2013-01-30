@@ -200,6 +200,9 @@ public class TerminatedArray extends FieldTypeBasic {
                 writeLimitsReading(out, maxArraySizeKind, fullArraySizeLocation, transferArraySizeKind, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from), elementTypeCanLimitVerify);
 
                 out.addStatement(buf);
+                out.addStatement(IF(isSame(literal(0), buf.ref().callV("length")),
+                        new Block(to.assign(convertBufferArrayToValue.x(buf.ref())),
+                                BuiltIn.toCode("return"))));
                 out.addStatement(current);
                 out.addStatement(pos);
                 out.addStatement(
