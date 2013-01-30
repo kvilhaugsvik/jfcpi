@@ -161,7 +161,7 @@ public class ProxyRecorder implements Runnable {
         } catch (NotReadyYetException e) {
             Thread.yield();
         } catch (IOException e) {
-            System.err.println("Couldn't get packet. Finishing...");
+            System.err.println("Couldn't get or couldn't write packet. Finishing...");
             e.printStackTrace();
             readFrom.setOver();
             serverCon.setOver();
