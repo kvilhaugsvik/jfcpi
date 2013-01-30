@@ -165,7 +165,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                         new From1<Typed<AValue>, Typed<AValue>>() {
                             @Override
                             public Typed<AValue> x(Typed<AValue> bv) {
-                                return me.newInstance(bv, Hardcoded.pLimits.read("elements_to_transfer"));
+                                return me.newInstance(bv, Hardcoded.fMaxSize.read("elements_to_transfer"));
                             }
                         },
                 null,

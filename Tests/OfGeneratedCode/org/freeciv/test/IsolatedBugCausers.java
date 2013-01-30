@@ -16,6 +16,7 @@ package org.freeciv.test;
 
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packet.TestArrayTransfer;
+import org.freeciv.packet.TestBitString;
 import org.junit.Test;
 
 import java.io.*;
@@ -32,5 +33,12 @@ public class IsolatedBugCausers {
 
         assertEquals("Wrong size", 0, fromData.getToTransferValue().intValue());
         assertArrayEquals("Wrong data", new Long[0], fromData.getTheArrayValue());
+    }
+
+    @Test public void fromNetwork_PacketHasBitString_InstanceLimitSmallerThanAbsoluteLimit() throws IOException {
+        DataInput inputStream = new DataInputStream(new ByteArrayInputStream(
+                new byte[]{0, 8, -1} // size is 8 bits. Data is 11111111
+        ));
+        TestBitString fromData = new TestBitString(inputStream, new Header_2_2(7, 931));
     }
 }
