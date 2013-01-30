@@ -197,9 +197,12 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         constructorBodyStream.groupBoundary();
 
         constructorBodyStream.addStatement(IF(isNotSame(getField("number").ref(), argHeader.ref().<AnInt>call("getPacketKind")),
-                new Block(THROW((ioexception).newInstance(sum(
-                        literal("Tried to create package " + name + " but packet number was "),
-                        argHeader.ref().<AnInt>call("getPacketKind")))))));
+                new Block(THROW(addExceptionLocation.callV(
+                        TargetClass.fromClass(FieldTypeException.class).newInstance(sum(
+                                literal("Wrong packet number. "),
+                                literal("Packet is " + name + " (" + number + ") but header is for packet number "),
+                                argHeader.ref().<AnInt>call("getPacketKind"))),
+                        literal("header"))))));
 
         constructorBodyStream.addStatement(ASSERT(isInstanceOf(argHeader.ref(), headerKind),
                 literal("Packet not generated for this kind of header")));
