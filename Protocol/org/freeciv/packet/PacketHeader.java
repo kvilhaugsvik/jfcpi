@@ -84,4 +84,10 @@ public abstract class PacketHeader {
                 other.getPacketKind() == this.getPacketKind() &&
                 other.getTotalSize() == this.getTotalSize();
     }
+
+    @Override
+    public String toString() {
+        return  this.getClass().getCanonicalName() +
+                "(" + "kind = " + getPacketKind() + ", size = " + getTotalSize() + ")";
+    }
 }

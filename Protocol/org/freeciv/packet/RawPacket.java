@@ -48,7 +48,8 @@ public class RawPacket implements Packet {
 
     @Override public String toString() {
         return header.getPacketKind() + " (not interpreted)" +
-                Util.joinStringArray(content, ", ", "\n\traw data = (", ")");
+                "\n\theader = " + header +
+                Util.joinStringArray(content, ", ", "\n\tbody (raw data) = (", ")");
     }
 
     public int getNumber() {
