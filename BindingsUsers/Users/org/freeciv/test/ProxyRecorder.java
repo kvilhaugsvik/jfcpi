@@ -73,6 +73,8 @@ public class ProxyRecorder implements Runnable {
                 " included in the trace.");
         System.out.println((settings.<Boolean>getSetting(VERBOSE) ? "Will" : "Won't") +
                 " be verbose in output here.");
+        if (settings.<Boolean>getSetting(DEBUG))
+            System.out.println("In debug mode.");
 
         try {
             ServerSocket serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
