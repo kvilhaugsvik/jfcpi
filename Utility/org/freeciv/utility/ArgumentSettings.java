@@ -14,6 +14,7 @@
 
 package org.freeciv.utility;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,19 +26,15 @@ public class ArgumentSettings {
     private final List<String> unrecognized_optionish;
     private final List<String> unrecognized_unknown;
 
-    private final HashMap<String, String> settings;
+    private final HashMap<String, Setting.Settable> settings;
 
     /**
      * A store for setting that may be overridden on the command line
      * @param defaults The default settings. No setting without a default will be considered.
      * @param args arguments given as "--setting=value". "--setting" is a shortcut for "--setting=true"
      */
-    public ArgumentSettings(Map<String, String> defaults, String... args) {
-        for (String name : defaults.keySet())
-            if (!(extractor.matcher("--" + name).matches()))
-                throw new IllegalArgumentException("Name of setting \"" + name + "\" not allowed.");
-
-        this.settings = new HashMap<String, String>(defaults);
+    public ArgumentSettings(List<Setting<?>> defaults, String... args) throws InvocationTargetException {
+        this.settings = prepareSettable(defaults);
 
         List<String> probablyMisspelled = new LinkedList<String>();
         List<String> unknown = new LinkedList<String>();
@@ -45,10 +42,9 @@ public class ArgumentSettings {
             Matcher result = extractor.matcher(argument);
             if (result.matches()) {
                 String key = result.group(1);
-                if (defaults.containsKey(key)) {
+                if (settings.containsKey(key)) {
                     String value = result.group(3);
-                    if (null == value) value = "true";
-                    settings.put(key, value);
+                    settings.get(key).setTo(value);
                 } else {
                     probablyMisspelled.add(argument);
                 }
@@ -64,9 +60,18 @@ public class ArgumentSettings {
         unrecognized_all = Collections.unmodifiableList(all_unrecognized);
     }
 
-    public String getSetting(String named) {
+    static HashMap<String, Setting.Settable> prepareSettable(List<Setting<?>> settings) {
+        HashMap<String, Setting.Settable> out = new HashMap<String, Setting.Settable>();
+
+        for (Setting<?> setting : settings)
+            out.put(setting.getName(), setting.getSettable());
+
+        return out;
+    }
+
+    public <As> As getSetting(String named) {
         if (settings.containsKey(named))
-            return settings.get(named);
+            return (As)settings.get(named).get();
         else
             throw new IllegalArgumentException("No setting " + named + " stored");
     }

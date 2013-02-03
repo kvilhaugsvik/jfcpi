@@ -14,7 +14,9 @@
 
 package org.freeciv.utility;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
@@ -23,83 +25,83 @@ import static org.junit.Assert.*;
 
 public class TestArgumentSettings {
     @Test
-    public void getExistingSetting() {
+    public void getExistingSetting() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults());
 
-        assertEquals("Existing setting (came as a default) is missing", "5", settings.getSetting("setting1"));
+        assertEquals("Existing setting (came as a default) is missing", 5, settings.getSetting("setting1"));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void getNonExistingSetting() {
+    public void getNonExistingSetting() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults());
 
         settings.getSetting("randomStuffThat");
     }
 
     @Test
-    public void defaultNotChangedIsStillDefault() {
+    public void defaultNotChangedIsStillDefault() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--setting2=3");
 
-        assertEquals("This default shouldn't change", "15", settings.getSetting("setting3"));
+        assertEquals("This default shouldn't change", false, settings.getSetting("setting3"));
     }
 
     @Test
-    public void defaultChangedIsNewValue() {
+    public void defaultChangedIsNewValue() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--setting2=3");
 
-        assertEquals("Failed to return new value", "3", settings.getSetting("setting2"));
+        assertEquals("Failed to return new value", 3, settings.getSetting("setting2"));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void doNotAcceptSettingWithNoDefault() {
+    public void doNotAcceptSettingWithNoDefault() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--days=560");
         settings.getSetting("days");
     }
 
     @Test
-    public void syntaxMinusMinusEquals() {
+    public void syntaxMinusMinusEquals() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--setting3=true");
 
-        assertEquals("Wrong value", "true", settings.getSetting("setting3"));
+        assertEquals("Wrong value", true, settings.getSetting("setting3"));
     }
 
     @Test
-    public void syntaxMinusEquals() {
+    public void syntaxMinusEquals() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "-setting3=true");
 
-        assertEquals("Wrong value", "true", settings.getSetting("setting3"));
+        assertEquals("Wrong value", true, settings.getSetting("setting3"));
     }
 
     @Test
-    public void syntaxMinusMinus() {
+    public void syntaxMinusMinus() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--setting3");
 
-        assertEquals("Wrong value", "true", settings.getSetting("setting3"));
+        assertEquals("Wrong value", true, settings.getSetting("setting3"));
     }
 
     @Test
-    public void syntaxMinus() {
+    public void syntaxMinus() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "-setting3");
 
-        assertEquals("Wrong value", "true", settings.getSetting("setting3"));
+        assertEquals("Wrong value", true, settings.getSetting("setting3"));
     }
 
     @Test
-    public void defaultSurvivesUnknown() {
+    public void defaultSurvivesUnknown() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--settingggg=3");
 
-        assertEquals("This default shouldn't change", "15", settings.getSetting("setting3"));
+        assertEquals("This default shouldn't change", false, settings.getSetting("setting3"));
     }
 
     @Test
-    public void laterOptionSurvivesUnknown() {
+    public void laterOptionSurvivesUnknown() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--settingggg=3", "-setting3");
 
-        assertEquals("This default shouldn't change", "true", settings.getSetting("setting3"));
+        assertEquals("This default should change", true, settings.getSetting("setting3"));
     }
 
     @Test
-    public void unrecognized_PROBABLE_MISSPELLINGS() {
+    public void unrecognized_PROBABLE_MISSPELLINGS() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--settingggg=3", "-setting3", "7");
 
         List<String> unrecognized = settings.getUnrecognized(ArgumentSettings.UnrecognizedKind.PROBABLE_MISSPELLINGS);
@@ -110,7 +112,7 @@ public class TestArgumentSettings {
     }
 
     @Test
-    public void unrecognized_UNKNOWN() {
+    public void unrecognized_UNKNOWN() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--settingggg=3", "-setting3", "7");
 
         List<String> unrecognized = settings.getUnrecognized(ArgumentSettings.UnrecognizedKind.UNKNOWN);
@@ -121,7 +123,7 @@ public class TestArgumentSettings {
     }
 
     @Test
-    public void unrecognized_ALL() {
+    public void unrecognized_ALL() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--settingggg=3", "-setting3", "7");
 
         List<String> unrecognized = settings.getUnrecognized(ArgumentSettings.UnrecognizedKind.ALL);
@@ -132,34 +134,31 @@ public class TestArgumentSettings {
     }
 
     @Test
-    public void namesPermitMinusInSide() {
-        ArgumentSettings settings = new ArgumentSettings(new HashMap<String, String>(){{
-            put("setting-like-this", "fail");
-        }}, "--setting-like-this=win");
+    public void name_permitMinusInSettingName() throws InvocationTargetException {
+        List<Setting<?>> defaults = new LinkedList<Setting<?>>();
+        defaults.add(new Setting.StringSetting("setting-like-this", "fail"));
+        ArgumentSettings settings = new ArgumentSettings(defaults, "--setting-like-this=win");
 
         assertEquals("Should override default", "win", settings.getSetting("setting-like-this"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void namesForbidMinusAtTheStart() {
-        ArgumentSettings settings = new ArgumentSettings(new HashMap<String, String>(){{
-            put("-forgot", "fail");
-        }});
-    }
+    @Test
+    public void implementationDetail_ArgumentSettings_prepareSettable_converts() throws NoSuchMethodException {
+        final List<Setting<?>> settings = new LinkedList<Setting<?>>();
+        settings.add(new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class)));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void namesForbidSpaceInName() {
-        ArgumentSettings settings = new ArgumentSettings(new HashMap<String, String>(){{
-            put("setting containing space", "fail");
-        }});
+        final HashMap<String, Setting.Settable> result = ArgumentSettings.prepareSettable(settings);
+
+        assertTrue(result.containsKey("number"));
+        assertEquals(5, result.get("number").get());
     }
 
 
-    private HashMap<String, String> simpleDefaults() {
-        HashMap<String, String> defaults = new HashMap<String, String>();
-        defaults.put("setting1", "5");
-        defaults.put("setting2", "10");
-        defaults.put("setting3", "15");
+    private List<Setting<?>> simpleDefaults() {
+        List<Setting<?>> defaults = new LinkedList<Setting<?>>();
+        defaults.add(new Setting.IntSetting("setting1", 5));
+        defaults.add(new Setting.IntSetting("setting2", 10));
+        defaults.add(new Setting.BoolSetting("setting3", false));
 
         return defaults;
     }

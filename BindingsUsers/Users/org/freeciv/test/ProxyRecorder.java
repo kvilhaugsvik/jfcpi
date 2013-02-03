@@ -20,8 +20,10 @@ import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.RawPacket;
 import org.freeciv.utility.ArgumentSettings;
+import org.freeciv.utility.Setting;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.util.*;
 
@@ -42,17 +44,17 @@ public class ProxyRecorder implements Runnable {
 
     private boolean started = false;
 
-    public static void main(String[] args) throws InterruptedException {
-        ArgumentSettings settings = new ArgumentSettings(new HashMap<String, String>(){{
-            put(PROXY_PORT, "5556");
-            put(REAL_SERVER_PORT, "55555");
-            put(REAL_SERVER_ADDRESS, "127.0.0.1");
+    public static void main(String[] args) throws InterruptedException, InvocationTargetException {
+        ArgumentSettings settings = new ArgumentSettings(new LinkedList<Setting<?>>(){{
+            add(new Setting.IntSetting(PROXY_PORT, 5556));
+            add(new Setting.IntSetting(REAL_SERVER_PORT, 55555));
+            add(new Setting.StringSetting(REAL_SERVER_ADDRESS, "127.0.0.1"));
 
-            put(TRACE_NAME_START, "FreecivCon");
-            put(TRACE_NAME_END, ".fct");
-            put(TRACE_DYNAMIC, "true");
+            add(new Setting.StringSetting(TRACE_NAME_START, "FreecivCon"));
+            add(new Setting.StringSetting(TRACE_NAME_END, ".fct"));
+            add(new Setting.BoolSetting(TRACE_DYNAMIC, true));
 
-            put(VERBOSE, "false");
+            add(new Setting.BoolSetting(VERBOSE, false));
         }}, args);
 
         System.out.println("Listening for Freeciv clients on port " + settings.getSetting(PROXY_PORT));
@@ -61,13 +63,13 @@ public class ProxyRecorder implements Runnable {
         System.out.println("Trace files will have a name starting with " + settings.getSetting(TRACE_NAME_START) +
                 " followed by the number the proxy has given to the connection and ending in " +
                 settings.getSetting(TRACE_NAME_END));
-        System.out.println("Time data " + (Boolean.parseBoolean(settings.getSetting(TRACE_DYNAMIC)) ? "is" : "isn't") +
+        System.out.println("Time data " + (settings.<Boolean>getSetting(TRACE_DYNAMIC) ? "is" : "isn't") +
                 " included in the trace.");
-        System.out.println((Boolean.parseBoolean(settings.getSetting(VERBOSE)) ? "Will" : "Won't") +
+        System.out.println((settings.<Boolean>getSetting(VERBOSE) ? "Will" : "Won't") +
                 " be verbose in output here.");
 
         try {
-            ServerSocket serverProxy = new ServerSocket(Integer.parseInt(settings.getSetting(PROXY_PORT)));
+            ServerSocket serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
             ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
             while (!serverProxy.isClosed())
                 try {
@@ -75,8 +77,8 @@ public class ProxyRecorder implements Runnable {
                             new Interpretated(serverProxy.accept(), Collections.<Integer, ReflexReaction>emptyMap());
                     ProxyRecorder proxy = new ProxyRecorder(clientCon, connections.size(),
                             new DataOutputStream(new BufferedOutputStream(
-                                    new FileOutputStream(settings.getSetting(TRACE_NAME_START) + connections.size() +
-                                            settings.getSetting(TRACE_NAME_END)))),
+                                    new FileOutputStream(settings.<String>getSetting(TRACE_NAME_START) +
+                                            connections.size() + settings.<String>getSetting(TRACE_NAME_END)))),
                             settings);
                     connections.add(proxy);
                     (new Thread(proxy)).start();
@@ -99,8 +101,8 @@ public class ProxyRecorder implements Runnable {
         this.trace = trace;
         this.clientCon = clientCon;
         try {
-            serverCon = new Interpretated(settings.getSetting(REAL_SERVER_ADDRESS),
-                    Integer.parseInt(settings.getSetting(REAL_SERVER_PORT)),
+            serverCon = new Interpretated(settings.<String>getSetting(REAL_SERVER_ADDRESS),
+                    settings.<Integer>getSetting(REAL_SERVER_PORT),
                     Collections.<Integer, ReflexReaction>emptyMap());
         } catch (IOException e) {
             throw new IOException(proxyNumber + ": Unable to connect to server", e);
@@ -118,7 +120,7 @@ public class ProxyRecorder implements Runnable {
             // the version of the trace format
             trace.writeChar(1);
             // is the time a packet arrived included in the trace
-            trace.writeBoolean(Boolean.parseBoolean(settings.getSetting(TRACE_DYNAMIC)));
+            trace.writeBoolean(settings.<Boolean>getSetting(TRACE_DYNAMIC));
         } catch (IOException e) {
             System.err.println(proxyNumber + ": Unable to write trace");
             e.printStackTrace();
@@ -151,10 +153,10 @@ public class ProxyRecorder implements Runnable {
     private void proxyPacket(Interpretated readFrom, Interpretated writeTo, boolean clientToServer) {
         try {
             Packet fromClient = readFrom.getPacket();
-            if (Boolean.parseBoolean(settings.getSetting(VERBOSE)) || fromClient instanceof RawPacket)
+            if (settings.<Boolean>getSetting(VERBOSE) || fromClient instanceof RawPacket)
                 System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);
             trace.writeBoolean(clientToServer);
-            if (Boolean.parseBoolean(settings.getSetting(TRACE_DYNAMIC)))
+            if (settings.<Boolean>getSetting(TRACE_DYNAMIC))
                 trace.writeLong(System.currentTimeMillis());
             fromClient.encodeTo(trace);
             writeTo.toSend(fromClient);

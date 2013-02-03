@@ -163,6 +163,7 @@ compileUtilsTests: folderTestOut compileUtils
 
 runUtilsTests: compileUtilsTests
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestArgumentSettings
+	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestSettings
 	touch runUtilsTests
 
 compilePacketTest: folderTestOut compileBasicProtocol

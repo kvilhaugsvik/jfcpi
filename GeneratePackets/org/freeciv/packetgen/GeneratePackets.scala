@@ -19,7 +19,7 @@ import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 import xml.XML
-import org.freeciv.utility.{ChangingConsoleLine, ArgumentSettings}
+import org.freeciv.utility.{ChangingConsoleLine, ArgumentSettings, Setting}
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
                       requested: List[(String, String)], logger: String,
@@ -98,19 +98,19 @@ object GeneratePackets {
   private val IGNORE_PROBLEMS = "ignore-problems"
 
   def main(args: Array[String]) {
-    val settings = new ArgumentSettings(Map(
-      SOURCE_CODE_LOCATION -> GeneratorDefaults.FREECIV_SOURCE_PATH,
-      VERSION_INFORMATION -> GeneratorDefaults.VERSIONCONFIGURATION,
-      PACKETS_SHOULD_LOG_TO -> GeneratorDefaults.LOG_TO,
-      IGNORE_PROBLEMS -> GeneratorDefaults.DEVMODE
+    val settings = new ArgumentSettings(List(
+      new Setting.StringSetting(SOURCE_CODE_LOCATION, GeneratorDefaults.FREECIV_SOURCE_PATH),
+      new Setting.StringSetting(VERSION_INFORMATION, GeneratorDefaults.VERSIONCONFIGURATION),
+      new Setting.StringSetting(PACKETS_SHOULD_LOG_TO, GeneratorDefaults.LOG_TO),
+      new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.DEVMODE.toBoolean)
     ), args: _*)
 
-    val versionConfiguration = readVersionParameters(new File(settings.getSetting(VERSION_INFORMATION)))
+    val versionConfiguration = readVersionParameters(new File(settings.getSetting[String](VERSION_INFORMATION)))
 
     val bytesInPacketNumber = versionConfiguration.attribute("packetNumberSize").get.text.toInt
 
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem \ "file").map(settings.getSetting(SOURCE_CODE_LOCATION) + "/" + _.text)).toMap
+      elem.attribute("parseAs").get.text -> (elem \ "file").map(settings.getSetting[String](SOURCE_CODE_LOCATION) + "/" + _.text)).toMap
 
     val requested: List[(String, String)] =
       ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
@@ -119,8 +119,8 @@ object GeneratePackets {
       inputSources("variables").head,
       inputSources("C").toList,
       requested,
-      settings.getSetting(PACKETS_SHOULD_LOG_TO),
-      settings.getSetting(IGNORE_PROBLEMS).toBoolean,
+      settings.getSetting[String](PACKETS_SHOULD_LOG_TO),
+      settings.getSetting[Boolean](IGNORE_PROBLEMS),
       bytesInPacketNumber)
 
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
