@@ -35,12 +35,17 @@ public class ProxyRecorder implements Runnable {
     private static final String TRACE_NAME_END = "trace-name-end";
     private static final String TRACE_DYNAMIC = "record-time";
     private static final String VERBOSE = "verbose";
+    private static final String DEBUG = "debug";
 
     private final int proxyNumber;
     private final ArgumentSettings settings;
     private final Interpretated clientCon;
     private final Interpretated serverCon;
     private final DataOutputStream trace;
+
+    // Debug data
+    private final HashSet<Integer> debugHadProblem = new HashSet<Integer>();
+    private final HashSet<Integer> debugDidWork = new HashSet<Integer>();
 
     private boolean started = false;
 
@@ -55,6 +60,7 @@ public class ProxyRecorder implements Runnable {
             add(new Setting.BoolSetting(TRACE_DYNAMIC, true));
 
             add(new Setting.BoolSetting(VERBOSE, false));
+            add(new Setting.BoolSetting(DEBUG, false));
         }}, args);
 
         System.out.println("Listening for Freeciv clients on port " + settings.getSetting(PROXY_PORT));
@@ -153,12 +159,21 @@ public class ProxyRecorder implements Runnable {
     private void proxyPacket(Interpretated readFrom, Interpretated writeTo, boolean clientToServer) {
         try {
             Packet fromClient = readFrom.getPacket();
-            if (settings.<Boolean>getSetting(VERBOSE) || fromClient instanceof RawPacket)
+
+            if (printPacket(fromClient))
                 System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);
+
+            if (settings.<Boolean>getSetting(DEBUG)) {
+                debugUpdate(fromClient);
+                if (debugFailsSometimes(fromClient))
+                    System.out.println("Debug: " + fromClient.getHeader().getPacketKind() + " fails but not always");
+            }
+
             trace.writeBoolean(clientToServer);
             if (settings.<Boolean>getSetting(TRACE_DYNAMIC))
                 trace.writeLong(System.currentTimeMillis());
             fromClient.encodeTo(trace);
+
             writeTo.toSend(fromClient);
         } catch (NotReadyYetException e) {
             Thread.yield();
@@ -169,4 +184,21 @@ public class ProxyRecorder implements Runnable {
             serverCon.setOver();
         }
     }
+
+    private boolean printPacket(Packet fromClient) {
+        return settings.<Boolean>getSetting(VERBOSE) || fromClient instanceof RawPacket || debugFailsSometimes(fromClient);
+    }
+
+    private boolean debugFailsSometimes(Packet fromClient) {
+        return debugHadProblem.contains(fromClient.getHeader().getPacketKind()) &&
+                debugDidWork.contains(fromClient.getHeader().getPacketKind());
+    }
+
+    private void debugUpdate(Packet fromClient) {
+        if (fromClient instanceof RawPacket)
+            debugHadProblem.add(fromClient.getHeader().getPacketKind());
+        else
+            debugDidWork.add(fromClient.getHeader().getPacketKind());
+    }
+
 }
