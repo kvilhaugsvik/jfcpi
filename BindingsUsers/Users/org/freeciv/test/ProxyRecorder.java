@@ -136,11 +136,9 @@ public class ProxyRecorder implements Runnable {
         else
             throw new IllegalStateException("Already started");
 
+        final Sink traceSink;
         try {
-            // the version of the trace format
-            trace.writeChar(1);
-            // is the time a packet arrived included in the trace
-            trace.writeBoolean(settings.<Boolean>getSetting(TRACE_DYNAMIC));
+            traceSink = new SinkWriteToDisk();
         } catch (IOException e) {
             System.err.println(proxyNumber + ": Unable to write trace");
             e.printStackTrace();
@@ -148,10 +146,13 @@ public class ProxyRecorder implements Runnable {
             cleanUp();
             return;
         }
+        final Sink cons = new SinkInformUser();
+        final SinkForward sinkServer = new SinkForward(serverCon);
+        final SinkForward sinkClient = new SinkForward(clientCon);
 
         while (clientCon.isOpen() && serverCon.isOpen()) {
-            proxyPacket(clientCon, serverCon, true);
-            proxyPacket(serverCon, clientCon, false);
+            proxyPacket(clientCon, true, traceSink, cons, sinkServer);
+            proxyPacket(serverCon, false, traceSink, cons, sinkClient);
         }
 
         cleanUp();
@@ -170,7 +171,7 @@ public class ProxyRecorder implements Runnable {
         }
     }
 
-    private void proxyPacket(Interpretated readFrom, Interpretated writeTo, boolean clientToServer) {
+    private void proxyPacket(Interpretated readFrom, boolean clientToServer, Sink traceSink, Sink cons, SinkForward sinkForward) {
         try {
             Packet fromClient = readFrom.getPacket();
 
@@ -178,17 +179,14 @@ public class ProxyRecorder implements Runnable {
                 step.update(fromClient);
 
             if (printPacket(fromClient))
-                System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);
+                cons.write(clientToServer, fromClient);
 
             for (Feature step : steps)
                 step.inform(fromClient);
 
-            trace.writeBoolean(clientToServer);
-            if (settings.<Boolean>getSetting(TRACE_DYNAMIC))
-                trace.writeLong(System.currentTimeMillis());
-            fromClient.encodeTo(trace);
+            traceSink.write(clientToServer, fromClient);
 
-            writeTo.toSend(fromClient);
+            sinkForward.write(clientToServer, fromClient);
         } catch (NotReadyYetException e) {
             Thread.yield();
         } catch (IOException e) {
@@ -208,6 +206,44 @@ public class ProxyRecorder implements Runnable {
                 return true;
 
         return false;
+    }
+
+    interface Sink {
+        public void write(boolean clientToServer, Packet packet) throws IOException;
+    }
+
+    class SinkWriteToDisk implements Sink {
+        public SinkWriteToDisk() throws IOException {
+            // the version of the trace format
+            trace.writeChar(1);
+            // is the time a packet arrived included in the trace
+            trace.writeBoolean(settings.<Boolean>getSetting(TRACE_DYNAMIC));
+        }
+
+        public void write(boolean clientToServer, Packet packet) throws IOException {
+            trace.writeBoolean(clientToServer);
+            if (settings.<Boolean>getSetting(TRACE_DYNAMIC))
+                trace.writeLong(System.currentTimeMillis());
+            packet.encodeTo(trace);
+        }
+    }
+
+    class SinkForward implements Sink {
+        private final Interpretated writeTo;
+
+        SinkForward(Interpretated writeTo) {
+            this.writeTo = writeTo;
+        }
+
+        public void write(boolean clientToServer, Packet packet) throws IOException {
+            writeTo.toSend(packet);
+        }
+    }
+
+    class SinkInformUser implements Sink {
+        public void write(boolean clientToServer, Packet packet) {
+            System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + packet);
+        }
     }
 
     interface Feature {
