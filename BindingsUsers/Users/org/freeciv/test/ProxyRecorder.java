@@ -45,7 +45,9 @@ public class ProxyRecorder implements Runnable {
     private final DataOutputStream trace;
 
     // Stuff to do to the data
-    private final List<Feature> steps;
+    private final List<Filter> consoleFilters;
+    private final List<Filter> diskFilters;
+    private final List<Filter> forwardFilters;
 
     private boolean started = false;
 
@@ -121,15 +123,21 @@ public class ProxyRecorder implements Runnable {
             throw new IOException(proxyNumber + ": Unable to connect to server", e);
         }
 
-        this.steps = new LinkedList<Feature>();
+        this.forwardFilters = new LinkedList<Filter>();
+        this.forwardFilters.add(new Wants()); // Forward everything
+
+        this.diskFilters = new LinkedList<Filter>();
+        this.diskFilters.add(new Wants()); // Write everything
+
+        this.consoleFilters = new LinkedList<Filter>();
 
         if (settings.<Boolean>getSetting(VERBOSE))
-            steps.add(new Wants());
+            consoleFilters.add(new Wants());
 
-        steps.add(new PrintRaw());
+        consoleFilters.add(new PrintRaw());
 
         if (settings.<Boolean>getSetting(DEBUG))
-            steps.add(new Debug());
+            consoleFilters.add(new Debug());
     }
 
     @Override
@@ -141,7 +149,7 @@ public class ProxyRecorder implements Runnable {
 
         final Sink traceSink;
         try {
-            traceSink = new SinkWriteToDisk();
+            traceSink = new SinkWriteToDisk(diskFilters);
         } catch (IOException e) {
             System.err.println(proxyNumber + ": Unable to write trace");
             e.printStackTrace();
@@ -149,13 +157,16 @@ public class ProxyRecorder implements Runnable {
             cleanUp();
             return;
         }
-        final Sink cons = new SinkInformUser();
-        final SinkForward sinkServer = new SinkForward(serverCon);
-        final SinkForward sinkClient = new SinkForward(clientCon);
+        final Sink cons = new SinkInformUser(consoleFilters);
+        final SinkForward sinkServer = new SinkForward(serverCon, forwardFilters);
+        final SinkForward sinkClient = new SinkForward(clientCon, forwardFilters);
+
+        List<Sink> c2sSinks = Arrays.asList(cons, traceSink, sinkServer);
+        List<Sink> s2cSinks = Arrays.asList(cons, traceSink, sinkClient);
 
         while (clientCon.isOpen() && serverCon.isOpen()) {
-            proxyPacket(clientCon, true, traceSink, cons, sinkServer);
-            proxyPacket(serverCon, false, traceSink, cons, sinkClient);
+            proxyPacket(clientCon, true, c2sSinks);
+            proxyPacket(serverCon, false, s2cSinks);
         }
 
         cleanUp();
@@ -174,22 +185,13 @@ public class ProxyRecorder implements Runnable {
         }
     }
 
-    private void proxyPacket(Interpretated readFrom, boolean clientToServer, Sink traceSink, Sink cons, SinkForward sinkForward) {
+    private void proxyPacket(Interpretated readFrom, boolean clientToServer, List<Sink> sinks) {
         try {
-            Packet fromClient = readFrom.getPacket();
+            Packet packet = readFrom.getPacket();
 
-            for (Feature step : steps)
-                step.update(fromClient);
+            for (Sink sink : sinks)
+                sink.filteredWrite(clientToServer, packet);
 
-            if (printPacket(fromClient))
-                cons.write(clientToServer, fromClient);
-
-            for (Feature step : steps)
-                step.inform(fromClient);
-
-            traceSink.write(clientToServer, fromClient);
-
-            sinkForward.write(clientToServer, fromClient);
         } catch (NotReadyYetException e) {
             Thread.yield();
         } catch (IOException e) {
@@ -200,20 +202,39 @@ public class ProxyRecorder implements Runnable {
         }
     }
 
-    private boolean printPacket(Packet fromClient) {
-        for (Feature step : steps)
-            if (step.wantsAtConsole(fromClient))
-                return true;
+    abstract static class Sink {
+        private final List<Filter> filters;
 
-        return false;
+        protected Sink(List<Filter> filters) {
+            this.filters = filters;
+        }
+
+        public abstract void write(boolean clientToServer, Packet packet) throws IOException;
+
+        public void filteredWrite(boolean clientToServer, Packet packet) throws IOException {
+            for (Filter step : filters)
+                step.update(packet);
+
+            if (isPacketWanted(packet, filters))
+                this.write(clientToServer, packet);
+
+            for (Filter step : filters)
+                step.inform(packet);
+        }
+
+        private boolean isPacketWanted(Packet packet, List<Filter> filters) {
+            for (Filter step : filters)
+                if (step.isRequested(packet))
+                    return true;
+
+            return false;
+        }
     }
 
-    interface Sink {
-        public void write(boolean clientToServer, Packet packet) throws IOException;
-    }
+    class SinkWriteToDisk extends Sink {
+        public SinkWriteToDisk(List<Filter> filters) throws IOException {
+            super(filters);
 
-    class SinkWriteToDisk implements Sink {
-        public SinkWriteToDisk() throws IOException {
             // the version of the trace format
             trace.writeChar(1);
             // is the time a packet arrived included in the trace
@@ -228,10 +249,11 @@ public class ProxyRecorder implements Runnable {
         }
     }
 
-    class SinkForward implements Sink {
+    class SinkForward extends Sink {
         private final Interpretated writeTo;
 
-        SinkForward(Interpretated writeTo) {
+        SinkForward(Interpretated writeTo, List<Filter> filters) {
+            super(filters);
             this.writeTo = writeTo;
         }
 
@@ -240,39 +262,43 @@ public class ProxyRecorder implements Runnable {
         }
     }
 
-    class SinkInformUser implements Sink {
+    class SinkInformUser extends Sink {
+        SinkInformUser(List<Filter> filters) {
+            super(filters);
+        }
+
         public void write(boolean clientToServer, Packet packet) {
             System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + packet);
         }
     }
 
-    interface Feature {
+    interface Filter {
         public void update(Packet packet);
-        public boolean wantsAtConsole(Packet packet);
+        public boolean isRequested(Packet packet);
         public void inform(Packet packet);
     }
 
-    static class Wants implements Feature {
+    static class Wants implements Filter {
         public void update(Packet packet) {}
 
-        public boolean wantsAtConsole(Packet packet) {
+        public boolean isRequested(Packet packet) {
             return true;
         }
 
         public void inform(Packet packet) {}
     }
 
-    static class PrintRaw implements Feature {
+    static class PrintRaw implements Filter {
         public void update(Packet packet) {}
 
-        public boolean wantsAtConsole(Packet packet) {
+        public boolean isRequested(Packet packet) {
             return packet instanceof RawPacket;
         }
 
         public void inform(Packet packet) {}
     }
 
-    static class Debug implements Feature {
+    static class Debug implements Filter {
         private final HashSet<Integer> debugHadProblem = new HashSet<Integer>();
         private final HashSet<Integer> debugDidWork = new HashSet<Integer>();
 
@@ -283,13 +309,13 @@ public class ProxyRecorder implements Runnable {
                 debugDidWork.add(packet.getHeader().getPacketKind());
         }
 
-        public boolean wantsAtConsole(Packet packet) {
+        public boolean isRequested(Packet packet) {
             return debugHadProblem.contains(packet.getHeader().getPacketKind()) &&
                     debugDidWork.contains(packet.getHeader().getPacketKind());
         }
 
         public void inform(Packet packet) {
-            if (wantsAtConsole(packet))
+            if (isRequested(packet))
                 System.out.println("Debug: " + packet.getHeader().getPacketKind() + " fails but not always");
         }
     }
