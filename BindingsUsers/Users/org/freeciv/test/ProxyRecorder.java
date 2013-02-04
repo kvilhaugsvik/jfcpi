@@ -44,9 +44,8 @@ public class ProxyRecorder implements Runnable {
     private final Interpretated serverCon;
     private final DataOutputStream trace;
 
-    // Debug data
-    private final HashSet<Integer> debugHadProblem = new HashSet<Integer>();
-    private final HashSet<Integer> debugDidWork = new HashSet<Integer>();
+    // Stuff to do to the data
+    private final List<Feature> steps;
 
     private boolean started = false;
 
@@ -121,6 +120,13 @@ public class ProxyRecorder implements Runnable {
         } catch (IOException e) {
             throw new IOException(proxyNumber + ": Unable to connect to server", e);
         }
+
+        this.steps = new LinkedList<Feature>();
+
+        steps.add(new PrintRaw());
+
+        if (settings.<Boolean>getSetting(DEBUG))
+            steps.add(new Debug());
     }
 
     @Override
@@ -168,14 +174,14 @@ public class ProxyRecorder implements Runnable {
         try {
             Packet fromClient = readFrom.getPacket();
 
+            for (Feature step : steps)
+                step.update(fromClient);
+
             if (printPacket(fromClient))
                 System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + fromClient);
 
-            if (settings.<Boolean>getSetting(DEBUG)) {
-                debugUpdate(fromClient);
-                if (debugFailsSometimes(fromClient))
-                    System.out.println("Debug: " + fromClient.getHeader().getPacketKind() + " fails but not always");
-            }
+            for (Feature step : steps)
+                step.inform(fromClient);
 
             trace.writeBoolean(clientToServer);
             if (settings.<Boolean>getSetting(TRACE_DYNAMIC))
@@ -194,19 +200,51 @@ public class ProxyRecorder implements Runnable {
     }
 
     private boolean printPacket(Packet fromClient) {
-        return settings.<Boolean>getSetting(VERBOSE) || fromClient instanceof RawPacket || debugFailsSometimes(fromClient);
+        if (settings.<Boolean>getSetting(VERBOSE))
+            return true;
+
+        for (Feature step : steps)
+            if (step.wantsAtConsole(fromClient))
+                return true;
+
+        return false;
     }
 
-    private boolean debugFailsSometimes(Packet fromClient) {
-        return debugHadProblem.contains(fromClient.getHeader().getPacketKind()) &&
-                debugDidWork.contains(fromClient.getHeader().getPacketKind());
+    interface Feature {
+        public void update(Packet packet);
+        public boolean wantsAtConsole(Packet packet);
+        public void inform(Packet packet);
     }
 
-    private void debugUpdate(Packet fromClient) {
-        if (fromClient instanceof RawPacket)
-            debugHadProblem.add(fromClient.getHeader().getPacketKind());
-        else
-            debugDidWork.add(fromClient.getHeader().getPacketKind());
+    static class PrintRaw implements Feature {
+        public void update(Packet packet) {}
+
+        public boolean wantsAtConsole(Packet packet) {
+            return packet instanceof RawPacket;
+        }
+
+        public void inform(Packet packet) {}
     }
 
+    static class Debug implements Feature {
+        private final HashSet<Integer> debugHadProblem = new HashSet<Integer>();
+        private final HashSet<Integer> debugDidWork = new HashSet<Integer>();
+
+        public void update(Packet packet) {
+            if (packet instanceof RawPacket)
+                debugHadProblem.add(packet.getHeader().getPacketKind());
+            else
+                debugDidWork.add(packet.getHeader().getPacketKind());
+        }
+
+        public boolean wantsAtConsole(Packet packet) {
+            return debugHadProblem.contains(packet.getHeader().getPacketKind()) &&
+                    debugDidWork.contains(packet.getHeader().getPacketKind());
+        }
+
+        public void inform(Packet packet) {
+            if (wantsAtConsole(packet))
+                System.out.println("Debug: " + packet.getHeader().getPacketKind() + " fails but not always");
+        }
+    }
 }
