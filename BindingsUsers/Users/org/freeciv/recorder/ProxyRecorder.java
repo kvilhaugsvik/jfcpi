@@ -18,7 +18,6 @@ import org.freeciv.connection.Interpretated;
 import org.freeciv.connection.NotReadyYetException;
 import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.Packet;
-import org.freeciv.packet.RawPacket;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -124,20 +123,20 @@ public class ProxyRecorder implements Runnable {
         }
 
         this.forwardFilters = new LinkedList<Filter>();
-        this.forwardFilters.add(new Wants()); // Forward everything
+        this.forwardFilters.add(new FilterAllAccepted()); // Forward everything
 
         this.diskFilters = new LinkedList<Filter>();
-        this.diskFilters.add(new Wants()); // Write everything
+        this.diskFilters.add(new FilterAllAccepted()); // Write everything
 
         this.consoleFilters = new LinkedList<Filter>();
 
         if (settings.<Boolean>getSetting(VERBOSE))
-            consoleFilters.add(new Wants());
+            consoleFilters.add(new FilterAllAccepted());
 
-        consoleFilters.add(new PrintRaw());
+        consoleFilters.add(new FilterIsRaw());
 
         if (settings.<Boolean>getSetting(DEBUG))
-            consoleFilters.add(new Debug());
+            consoleFilters.add(new FilterSometimesWorking());
     }
 
     @Override
@@ -149,7 +148,7 @@ public class ProxyRecorder implements Runnable {
 
         final Sink traceSink;
         try {
-            traceSink = new SinkWriteToDisk(diskFilters);
+            traceSink = new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC));
         } catch (IOException e) {
             System.err.println(proxyNumber + ": Unable to write trace");
             e.printStackTrace();
@@ -157,7 +156,7 @@ public class ProxyRecorder implements Runnable {
             cleanUp();
             return;
         }
-        final Sink cons = new SinkInformUser(consoleFilters);
+        final Sink cons = new SinkInformUser(consoleFilters, proxyNumber);
         final SinkForward sinkServer = new SinkForward(serverCon, forwardFilters);
         final SinkForward sinkClient = new SinkForward(clientCon, forwardFilters);
 
@@ -199,124 +198,6 @@ public class ProxyRecorder implements Runnable {
             e.printStackTrace();
             readFrom.setOver();
             serverCon.setOver();
-        }
-    }
-
-    abstract static class Sink {
-        private final List<Filter> filters;
-
-        protected Sink(List<Filter> filters) {
-            this.filters = filters;
-        }
-
-        public abstract void write(boolean clientToServer, Packet packet) throws IOException;
-
-        public void filteredWrite(boolean clientToServer, Packet packet) throws IOException {
-            for (Filter step : filters)
-                step.update(packet);
-
-            if (isPacketWanted(packet, filters))
-                this.write(clientToServer, packet);
-
-            for (Filter step : filters)
-                step.inform(packet);
-        }
-
-        private boolean isPacketWanted(Packet packet, List<Filter> filters) {
-            for (Filter step : filters)
-                if (step.isRequested(packet))
-                    return true;
-
-            return false;
-        }
-    }
-
-    class SinkWriteToDisk extends Sink {
-        public SinkWriteToDisk(List<Filter> filters) throws IOException {
-            super(filters);
-
-            // the version of the trace format
-            trace.writeChar(1);
-            // is the time a packet arrived included in the trace
-            trace.writeBoolean(settings.<Boolean>getSetting(TRACE_DYNAMIC));
-        }
-
-        public void write(boolean clientToServer, Packet packet) throws IOException {
-            trace.writeBoolean(clientToServer);
-            if (settings.<Boolean>getSetting(TRACE_DYNAMIC))
-                trace.writeLong(System.currentTimeMillis());
-            packet.encodeTo(trace);
-        }
-    }
-
-    class SinkForward extends Sink {
-        private final Interpretated writeTo;
-
-        SinkForward(Interpretated writeTo, List<Filter> filters) {
-            super(filters);
-            this.writeTo = writeTo;
-        }
-
-        public void write(boolean clientToServer, Packet packet) throws IOException {
-            writeTo.toSend(packet);
-        }
-    }
-
-    class SinkInformUser extends Sink {
-        SinkInformUser(List<Filter> filters) {
-            super(filters);
-        }
-
-        public void write(boolean clientToServer, Packet packet) {
-            System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + packet);
-        }
-    }
-
-    interface Filter {
-        public void update(Packet packet);
-        public boolean isRequested(Packet packet);
-        public void inform(Packet packet);
-    }
-
-    static class Wants implements Filter {
-        public void update(Packet packet) {}
-
-        public boolean isRequested(Packet packet) {
-            return true;
-        }
-
-        public void inform(Packet packet) {}
-    }
-
-    static class PrintRaw implements Filter {
-        public void update(Packet packet) {}
-
-        public boolean isRequested(Packet packet) {
-            return packet instanceof RawPacket;
-        }
-
-        public void inform(Packet packet) {}
-    }
-
-    static class Debug implements Filter {
-        private final HashSet<Integer> debugHadProblem = new HashSet<Integer>();
-        private final HashSet<Integer> debugDidWork = new HashSet<Integer>();
-
-        public void update(Packet packet) {
-            if (packet instanceof RawPacket)
-                debugHadProblem.add(packet.getHeader().getPacketKind());
-            else
-                debugDidWork.add(packet.getHeader().getPacketKind());
-        }
-
-        public boolean isRequested(Packet packet) {
-            return debugHadProblem.contains(packet.getHeader().getPacketKind()) &&
-                    debugDidWork.contains(packet.getHeader().getPacketKind());
-        }
-
-        public void inform(Packet packet) {
-            if (isRequested(packet))
-                System.out.println("Debug: " + packet.getHeader().getPacketKind() + " fails but not always");
         }
     }
 }
