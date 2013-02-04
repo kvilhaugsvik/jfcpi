@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.test;
+package org.freeciv.recorder;
 
 import org.freeciv.connection.Interpretated;
 import org.freeciv.connection.NotReadyYetException;
