@@ -35,6 +35,10 @@ class FilterSometimesWorking implements Filter {
                 debugDidWork.contains(packet.getHeader().getPacketKind());
     }
 
+    public boolean isRequested(Packet packet, boolean clientToServer) {
+        return isRequested(packet);
+    }
+
     public void inform(Packet packet) {
         if (isRequested(packet))
             System.out.println("Debug: " + packet.getHeader().getPacketKind() + " fails but not always");

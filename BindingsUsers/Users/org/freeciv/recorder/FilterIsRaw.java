@@ -20,7 +20,7 @@ import org.freeciv.packet.RawPacket;
 class FilterIsRaw implements Filter {
     public void update(Packet packet) {}
 
-    public boolean isRequested(Packet packet) {
+    public boolean isRequested(Packet packet, boolean clientToServer) {
         return packet instanceof RawPacket;
     }
 

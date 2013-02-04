@@ -28,7 +28,7 @@ class FilterPacketKind implements Filter {
 
     public void update(Packet packet) {}
 
-    public boolean isRequested(Packet packet) {
+    public boolean isRequested(Packet packet, boolean clientToServer) {
         return lookFor.contains(packet.getHeader().getPacketKind());
     }
 

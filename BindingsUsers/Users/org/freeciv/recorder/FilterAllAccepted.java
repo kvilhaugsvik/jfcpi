@@ -19,7 +19,7 @@ import org.freeciv.packet.Packet;
 class FilterAllAccepted implements Filter {
     public void update(Packet packet) {}
 
-    public boolean isRequested(Packet packet) {
+    public boolean isRequested(Packet packet, boolean clientToServer) {
         return true;
     }
 

@@ -32,16 +32,16 @@ abstract class Sink {
         for (Filter step : filters)
             step.update(packet);
 
-        if (isPacketWanted(packet, filters))
+        if (isPacketWanted(packet, clientToServer, filters))
             this.write(clientToServer, packet);
 
         for (Filter step : filters)
             step.inform(packet);
     }
 
-    private boolean isPacketWanted(Packet packet, List<Filter> filters) {
+    private boolean isPacketWanted(Packet packet, boolean clientToServer, List<Filter> filters) {
         for (Filter step : filters)
-            if (step.isRequested(packet))
+            if (step.isRequested(packet, clientToServer))
                 return true;
 
         return false;
