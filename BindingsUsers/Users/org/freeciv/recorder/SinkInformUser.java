@@ -21,8 +21,8 @@ import java.util.List;
 class SinkInformUser extends Sink {
     private final int proxyNumber;
 
-    SinkInformUser(List<Filter> filters, int proxyNumber) {
-        super(filters);
+    SinkInformUser(Filter filter, int proxyNumber) {
+        super(filter);
         this.proxyNumber = proxyNumber;
     }
 

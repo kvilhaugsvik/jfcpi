@@ -35,7 +35,7 @@ class FilterSometimesWorking implements Filter {
                 debugDidWork.contains(packet.getHeader().getPacketKind());
     }
 
-    public boolean isRequested(Packet packet, boolean clientToServer) {
+    public boolean isAccepted(Packet packet, boolean clientToServer) {
         return isRequested(packet);
     }
 

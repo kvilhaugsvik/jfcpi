@@ -18,6 +18,6 @@ import org.freeciv.packet.Packet;
 
 interface Filter {
     public void update(Packet packet);
-    public boolean isRequested(Packet packet, boolean clientToServer);
+    public boolean isAccepted(Packet packet, boolean clientToServer);
     public void inform(Packet packet);
 }

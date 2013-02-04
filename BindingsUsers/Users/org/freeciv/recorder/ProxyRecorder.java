@@ -44,9 +44,9 @@ public class ProxyRecorder implements Runnable {
     private final DataOutputStream trace;
 
     // Stuff to do to the data
-    private final List<Filter> consoleFilters;
-    private final List<Filter> diskFilters;
-    private final List<Filter> forwardFilters;
+    private final Filter consoleFilters;
+    private final Filter diskFilters;
+    private final Filter forwardFilters;
 
     private boolean started = false;
 
@@ -122,21 +122,25 @@ public class ProxyRecorder implements Runnable {
             throw new IOException(proxyNumber + ": Unable to connect to server", e);
         }
 
-        this.forwardFilters = new LinkedList<Filter>();
-        this.forwardFilters.add(new FilterAllAccepted()); // Forward everything
+        this.forwardFilters = new FilterAllAccepted(); // Forward everything
 
-        this.diskFilters = new LinkedList<Filter>();
-        this.diskFilters.add(new FilterAllAccepted()); // Write everything
+        this.diskFilters = new FilterAllAccepted(); // Write everything
 
-        this.consoleFilters = new LinkedList<Filter>();
+        this.consoleFilters = buildConsoleFilters(settings);
+    }
+
+    static private Filter buildConsoleFilters(ArgumentSettings settings) {
+        LinkedList<Filter> out = new LinkedList<Filter>();
 
         if (settings.<Boolean>getSetting(VERBOSE))
-            consoleFilters.add(new FilterAllAccepted());
+            out.add(new FilterAllAccepted());
 
-        consoleFilters.add(new FilterIsRaw());
+        out.add(new FilterIsRaw());
 
         if (settings.<Boolean>getSetting(DEBUG))
-            consoleFilters.add(new FilterSometimesWorking());
+            out.add(new FilterSometimesWorking());
+
+        return new FilterOr(out);
     }
 
     @Override

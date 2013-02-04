@@ -15,14 +15,37 @@
 package org.freeciv.recorder;
 
 import org.freeciv.packet.Packet;
-import org.freeciv.packet.RawPacket;
 
-class FilterIsRaw implements Filter {
-    public void update(Packet packet) {}
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    public boolean isAccepted(Packet packet, boolean clientToServer) {
-        return packet instanceof RawPacket;
+class FilterOr implements Filter {
+    private final List<Filter> filters;
+
+    FilterOr(Filter... any) {
+        this(Arrays.asList(any));
     }
 
-    public void inform(Packet packet) {}
+    FilterOr(List<Filter> any) {
+        this.filters = new ArrayList<Filter>(any);
+    }
+
+    public void update(Packet packet) {
+        for (Filter step : filters)
+            step.update(packet);
+    }
+
+    public boolean isAccepted(Packet packet, boolean clientToServer) {
+        for (Filter step : filters)
+        if (step.isAccepted(packet, clientToServer))
+            return true;
+
+        return false;
+    }
+
+    public void inform(Packet packet) {
+        for (Filter step : filters)
+            step.inform(packet);
+    }
 }

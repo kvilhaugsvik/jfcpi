@@ -17,33 +17,22 @@ package org.freeciv.recorder;
 import org.freeciv.packet.Packet;
 
 import java.io.IOException;
-import java.util.List;
 
 abstract class Sink {
-    private final List<Filter> filters;
+    private final Filter filter;
 
-    Sink(List<Filter> filters) {
-        this.filters = filters;
+    Sink(Filter filter) {
+        this.filter = filter;
     }
 
     public abstract void write(boolean clientToServer, Packet packet) throws IOException;
 
     public void filteredWrite(boolean clientToServer, Packet packet) throws IOException {
-        for (Filter step : filters)
-            step.update(packet);
+        filter.update(packet);
 
-        if (isPacketWanted(packet, clientToServer, filters))
+        if (filter.isAccepted(packet, clientToServer))
             this.write(clientToServer, packet);
 
-        for (Filter step : filters)
-            step.inform(packet);
-    }
-
-    private boolean isPacketWanted(Packet packet, boolean clientToServer, List<Filter> filters) {
-        for (Filter step : filters)
-            if (step.isRequested(packet, clientToServer))
-                return true;
-
-        return false;
+        filter.inform(packet);
     }
 }

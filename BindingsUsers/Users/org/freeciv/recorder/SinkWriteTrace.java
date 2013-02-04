@@ -24,8 +24,8 @@ class SinkWriteTrace extends Sink {
     private final boolean isDynamic;
     private final DataOutputStream traceFile;
 
-    public SinkWriteTrace(List<Filter> filters, DataOutputStream traceFile, boolean isDynamic) throws IOException {
-        super(filters);
+    public SinkWriteTrace(Filter filter, DataOutputStream traceFile, boolean isDynamic) throws IOException {
+        super(filter);
 
         this.isDynamic = isDynamic;
         this.traceFile = traceFile;

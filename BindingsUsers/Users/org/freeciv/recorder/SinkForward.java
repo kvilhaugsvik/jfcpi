@@ -23,8 +23,8 @@ import java.util.List;
 class SinkForward extends Sink {
     private final Interpretated writeTo;
 
-    SinkForward(Interpretated writeTo, List<Filter> filters) {
-        super(filters);
+    SinkForward(Interpretated writeTo, Filter filter) {
+        super(filter);
         this.writeTo = writeTo;
     }
 
