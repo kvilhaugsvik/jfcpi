@@ -19,7 +19,7 @@ import util.parsing.input.StreamReader
 import java.io._
 import collection.JavaConversions._
 import xml.XML
-import org.freeciv.utility.{ChangingConsoleLine, ArgumentSettings, Setting}
+import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
                       requested: List[(String, String)], logger: String,
@@ -99,11 +99,18 @@ object GeneratePackets {
 
   def main(args: Array[String]) {
     val settings = new ArgumentSettings(List(
-      new Setting.StringSetting(SOURCE_CODE_LOCATION, GeneratorDefaults.FREECIV_SOURCE_PATH),
-      new Setting.StringSetting(VERSION_INFORMATION, GeneratorDefaults.VERSIONCONFIGURATION),
-      new Setting.StringSetting(PACKETS_SHOULD_LOG_TO, GeneratorDefaults.LOG_TO),
-      new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.DEVMODE.toBoolean)
+      new Setting.StringSetting(SOURCE_CODE_LOCATION, GeneratorDefaults.FREECIV_SOURCE_PATH,
+        "the location of the Freeciv source code to generate from"),
+      new Setting.StringSetting(VERSION_INFORMATION, GeneratorDefaults.VERSIONCONFIGURATION,
+        "file containing settings for the version of Freeciv"),
+      new Setting.StringSetting(PACKETS_SHOULD_LOG_TO, GeneratorDefaults.LOG_TO,
+        "the logger the generated code should use"),
+      new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.DEVMODE.toBoolean,
+        "should problems be ignored?"),
+      UI.HELP_SETTING
     ), args: _*)
+
+    UI.printAndExitOnHelp(settings, classOf[GeneratePackets])
 
     val versionConfiguration = readVersionParameters(new File(settings.getSetting[String](VERSION_INFORMATION)))
 

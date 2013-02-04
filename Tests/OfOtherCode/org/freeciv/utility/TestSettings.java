@@ -25,68 +25,73 @@ import static org.junit.Assert.assertTrue;
 public class TestSettings {
     @Test
     public void setting_constructor_works() throws NoSuchMethodException {
-        new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+        new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_noName() throws NoSuchMethodException {
-        new Setting<Integer>(null, 5, Integer.class, Integer.class.getMethod("decode", String.class));
+        new Setting<Integer>(null, 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_name_forbidMinusAtTheStart() throws NoSuchMethodException {
-        new Setting<Integer>("-forgot", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+        new Setting<Integer>("-forgot", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
     }
 
     @Test
     public void setting_constructor_name_permitMinusInside() throws NoSuchMethodException {
-        new Setting<Integer>("setting-like-this", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+        new Setting<Integer>("setting-like-this", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_name_forbidSpaceInName() throws NoSuchMethodException {
-        new Setting<Integer>("setting containing space", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+        new Setting<Integer>("setting containing space", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_name_forbidEmptyString() throws NoSuchMethodException {
-        new Setting<Integer>("", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+        new Setting<Integer>("", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setting_constructor_help_isNull() throws NoSuchMethodException {
+        new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_noKind() throws NoSuchMethodException {
-        new Setting<Integer>("number", 5, null, Integer.class.getMethod("decode", String.class));
+        new Setting<Integer>("number", 5, null, Integer.class.getMethod("decode", String.class), "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_noConverter() throws NoSuchMethodException {
-        new Setting<Integer>("number", 5, Integer.class, null);
+        new Setting<Integer>("number", 5, Integer.class, null, "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_wrongMethod_dynamic() throws NoSuchMethodException {
-        new Setting<Integer>("number", 5, Integer.class, WrongMethods.class.getMethod("dynamic", String.class));
+        new Setting<Integer>("number", 5, Integer.class, WrongMethods.class.getMethod("dynamic", String.class), "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_wrongMethod_returnsObject() throws NoSuchMethodException {
-        new Setting<Integer>("number", 5, Integer.class, WrongMethods.class.getMethod("wrongReturn", String.class));
+        new Setting<Integer>("number", 5, Integer.class, WrongMethods.class.getMethod("wrongReturn", String.class), "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_wrongMethod_twoParams() throws NoSuchMethodException {
-        new Setting<Integer>("number", 5, Integer.class, WrongMethods.class.getMethod("two_params", String.class, String.class));
+        new Setting<Integer>("number", 5, Integer.class, WrongMethods.class.getMethod("two_params", String.class, String.class), "undocumented");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setting_constructor_wrongMethod_wrongParamType() throws NoSuchMethodException {
-        new Setting<Integer>("number", 5, Integer.class, WrongMethods.class.getMethod("wrongParamType", Integer.class));
+        new Setting<Integer>("number", 5, Integer.class, WrongMethods.class.getMethod("wrongParamType", Integer.class), "undocumented");
     }
 
     @Test
     public void setting_name() throws NoSuchMethodException {
         final Setting<Integer> setting =
-                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
 
         assertEquals("number", setting.getName());
     }
@@ -94,7 +99,7 @@ public class TestSettings {
     @Test
     public void setting_settable_Exist() throws NoSuchMethodException {
         final Setting<Integer> setting =
-                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
 
         assertNotNull(setting.getSettable());
     }
@@ -102,7 +107,7 @@ public class TestSettings {
     @Test
     public void setting_settable_defaultWhenNotSet() throws NoSuchMethodException {
         final Setting<Integer> setting =
-                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
         final Setting<Integer>.Settable settable = setting.getSettable();
 
         assertEquals(5, settable.get().intValue());
@@ -111,7 +116,7 @@ public class TestSettings {
     @Test
     public void setting_settable_isSet() throws NoSuchMethodException, InvocationTargetException {
         final Setting<Integer> setting =
-                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
         final Setting<Integer>.Settable settable = setting.getSettable();
 
         settable.setTo("3");
@@ -122,7 +127,7 @@ public class TestSettings {
     @Test
     public void setting_settable_isSet_boolean() throws InvocationTargetException, NoSuchMethodException {
         final Setting<Boolean> setting =
-                new Setting<Boolean>("switch", false, Boolean.class, Boolean.class.getMethod("valueOf", String.class));
+                new Setting<Boolean>("switch", false, Boolean.class, Boolean.class.getMethod("valueOf", String.class), "undocumented");
         final Setting<Boolean>.Settable settable = setting.getSettable();
 
         settable.setTo("true");
@@ -133,7 +138,7 @@ public class TestSettings {
     @Test
     public void setting_settable_boolean_isSet_nullIsTrue() throws NoSuchMethodException, InvocationTargetException {
         final Setting<Boolean> setting =
-                new Setting<Boolean>("switch", false, Boolean.class, Boolean.class.getMethod("valueOf", String.class));
+                new Setting<Boolean>("switch", false, Boolean.class, Boolean.class.getMethod("valueOf", String.class), "undocumented");
         final Setting<Boolean>.Settable settable = setting.getSettable();
 
         settable.setTo(null);
@@ -144,15 +149,31 @@ public class TestSettings {
     @Test(expected = IllegalArgumentException.class)
     public void setting_settable_integerNotNull() throws NoSuchMethodException, InvocationTargetException {
         final Setting<Integer> setting =
-                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class));
+                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
         final Setting<Integer>.Settable settable = setting.getSettable();
 
         settable.setTo(null);
     }
 
     @Test
+    public void setting_settable_name_isForwarded() throws NoSuchMethodException {
+        final Setting<Integer> setting =
+                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented");
+
+        assertEquals("number", setting.getSettable().name());
+    }
+
+    @Test
+    public void setting_settable_help_isForwarded() throws NoSuchMethodException {
+        final Setting<Integer> setting =
+                new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "a number");
+
+        assertEquals("a number", setting.getSettable().describe());
+    }
+
+    @Test
     public void setting_boolHelper() throws InvocationTargetException {
-        final Setting<Boolean>.Settable settable = new Setting.BoolSetting("switch", false).getSettable();
+        final Setting<Boolean>.Settable settable = new Setting.BoolSetting("switch", false, "undocumented").getSettable();
 
         settable.setTo("true");
 
@@ -161,7 +182,7 @@ public class TestSettings {
 
     @Test
     public void setting_intHelper() throws InvocationTargetException {
-        final Setting<Integer>.Settable settable = new Setting.IntSetting("switch", 5).getSettable();
+        final Setting<Integer>.Settable settable = new Setting.IntSetting("switch", 5, "undocumented").getSettable();
 
         settable.setTo("3");
 
@@ -170,7 +191,7 @@ public class TestSettings {
 
     @Test
     public void setting_stringHelper() throws InvocationTargetException {
-        final Setting<String>.Settable settable = new Setting.StringSetting("field", "value").getSettable();
+        final Setting<String>.Settable settable = new Setting.StringSetting("field", "value", "undocumented").getSettable();
 
         settable.setTo("other");
 

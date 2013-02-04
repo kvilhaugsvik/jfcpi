@@ -26,8 +26,9 @@ public class Setting<Kind> {
 
     private final Class<Kind> kind;
     private final Method fromString;
+    private final String description;
 
-    public Setting(String name, Kind defaultValue, Class<Kind> kind, Method fromString) {
+    public Setting(String name, Kind defaultValue, Class<Kind> kind, Method fromString, String description) {
         validateSettingName(name);
         this.name = name;
 
@@ -39,6 +40,9 @@ public class Setting<Kind> {
 
         Setting.<Kind>validateMethodSignature(kind, fromString);
         this.fromString = fromString;
+
+        validateNotNull(description, "description");
+        this.description = description;
     }
 
     private void validateSettingName(String name) {
@@ -93,6 +97,14 @@ public class Setting<Kind> {
                 throw new IllegalStateException("Wrong conversion data provided to setting " + name, e);
             }
         }
+
+        public String name() {
+            return name;
+        }
+
+        public String describe() {
+            return description;
+        }
     }
 
 
@@ -105,20 +117,20 @@ public class Setting<Kind> {
     }
 
     public static class IntSetting extends Setting<Integer> {
-        public IntSetting(String name, Integer defaultValue) {
-            super(name, defaultValue, Integer.class, getBuiltInMethod(Integer.class, "decode", String.class));
+        public IntSetting(String name, Integer defaultValue, String helpText) {
+            super(name, defaultValue, Integer.class, getBuiltInMethod(Integer.class, "decode", String.class), helpText);
         }
     }
 
     public static class BoolSetting extends Setting<Boolean> {
-        public BoolSetting(String name, Boolean defaultValue) {
-            super(name, defaultValue, Boolean.class, getBuiltInMethod(Boolean.class, "valueOf", String.class));
+        public BoolSetting(String name, Boolean defaultValue, String helpText) {
+            super(name, defaultValue, Boolean.class, getBuiltInMethod(Boolean.class, "valueOf", String.class), helpText);
         }
     }
 
     public static class StringSetting extends Setting<String> {
-        public StringSetting(String name, String defaultValue) {
-            super(name, defaultValue, String.class, getBuiltInMethod(String.class, "valueOf", Object.class));
+        public StringSetting(String name, String defaultValue, String helpText) {
+            super(name, defaultValue, String.class, getBuiltInMethod(String.class, "valueOf", Object.class), helpText);
         }
     }
 }

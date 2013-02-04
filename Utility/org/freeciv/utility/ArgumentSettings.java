@@ -26,7 +26,7 @@ public class ArgumentSettings {
     private final List<String> unrecognized_optionish;
     private final List<String> unrecognized_unknown;
 
-    private final HashMap<String, Setting.Settable> settings;
+    private final LinkedHashMap<String, Setting.Settable> settings;
 
     /**
      * A store for setting that may be overridden on the command line
@@ -60,8 +60,8 @@ public class ArgumentSettings {
         unrecognized_all = Collections.unmodifiableList(all_unrecognized);
     }
 
-    static HashMap<String, Setting.Settable> prepareSettable(List<Setting<?>> settings) {
-        HashMap<String, Setting.Settable> out = new HashMap<String, Setting.Settable>();
+    static LinkedHashMap<String, Setting.Settable> prepareSettable(List<Setting<?>> settings) {
+        LinkedHashMap<String, Setting.Settable> out = new LinkedHashMap<String, Setting.Settable>();
 
         for (Setting<?> setting : settings)
             out.put(setting.getName(), setting.getSettable());
@@ -74,6 +74,13 @@ public class ArgumentSettings {
             return (As)settings.get(named).get();
         else
             throw new IllegalArgumentException("No setting " + named + " stored");
+    }
+
+    public List<Setting.Settable> getAll() {
+        LinkedList<Setting.Settable> keys = new LinkedList<Setting.Settable>();
+        for (String key : settings.keySet())
+            keys.add(settings.get(key));
+        return keys;
     }
 
     public List<String> getUnrecognized(UnrecognizedKind kind) {

@@ -21,6 +21,7 @@ import org.freeciv.packet.Packet;
 import org.freeciv.packet.RawPacket;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
+import org.freeciv.utility.UI;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -51,17 +52,22 @@ public class ProxyRecorder implements Runnable {
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(new LinkedList<Setting<?>>(){{
-            add(new Setting.IntSetting(PROXY_PORT, 5556));
-            add(new Setting.IntSetting(REAL_SERVER_PORT, 55555));
-            add(new Setting.StringSetting(REAL_SERVER_ADDRESS, "127.0.0.1"));
+            add(new Setting.IntSetting(PROXY_PORT, 5556, "listen for the Freeciv client on this port"));
+            add(new Setting.IntSetting(REAL_SERVER_PORT, 55555, "connect to the Freeciv server on ths port"));
+            add(new Setting.StringSetting(REAL_SERVER_ADDRESS,
+                    "127.0.0.1", "connect to the Freeciv server on this address"));
 
-            add(new Setting.StringSetting(TRACE_NAME_START, "FreecivCon"));
-            add(new Setting.StringSetting(TRACE_NAME_END, ".fct"));
-            add(new Setting.BoolSetting(TRACE_DYNAMIC, true));
+            add(new Setting.StringSetting(TRACE_NAME_START, "FreecivCon", "prefix of the trace file names"));
+            add(new Setting.StringSetting(TRACE_NAME_END, ".fct", "suffix of the trace file names"));
+            add(new Setting.BoolSetting(TRACE_DYNAMIC, true, "should time be recorded in the trace"));
 
-            add(new Setting.BoolSetting(VERBOSE, false));
-            add(new Setting.BoolSetting(DEBUG, false));
+            add(UI.HELP_SETTING);
+
+            add(new Setting.BoolSetting(VERBOSE, false, "print all packets to the terminal"));
+            add(new Setting.BoolSetting(DEBUG, false, "print debug information to the terminal"));
         }}, args);
+
+        UI.printAndExitOnHelp(settings, ProxyRecorder.class);
 
         System.out.println("Listening for Freeciv clients on port " + settings.getSetting(PROXY_PORT));
         System.out.println("Will connect to Freeciv server at " + settings.getSetting(REAL_SERVER_ADDRESS) +

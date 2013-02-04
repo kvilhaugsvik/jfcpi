@@ -134,9 +134,20 @@ public class TestArgumentSettings {
     }
 
     @Test
+    public void getSettings_preserve_order() throws InvocationTargetException {
+        ArgumentSettings settings = new ArgumentSettings(simpleDefaults());
+
+        List<Setting.Settable> names = settings.getAll();
+
+        assertEquals("setting1", names.get(0).name());
+        assertEquals("setting2", names.get(1).name());
+        assertEquals("setting3", names.get(2).name());
+    }
+
+    @Test
     public void name_permitMinusInSettingName() throws InvocationTargetException {
         List<Setting<?>> defaults = new LinkedList<Setting<?>>();
-        defaults.add(new Setting.StringSetting("setting-like-this", "fail"));
+        defaults.add(new Setting.StringSetting("setting-like-this", "fail", "undocumented"));
         ArgumentSettings settings = new ArgumentSettings(defaults, "--setting-like-this=win");
 
         assertEquals("Should override default", "win", settings.getSetting("setting-like-this"));
@@ -145,7 +156,7 @@ public class TestArgumentSettings {
     @Test
     public void implementationDetail_ArgumentSettings_prepareSettable_converts() throws NoSuchMethodException {
         final List<Setting<?>> settings = new LinkedList<Setting<?>>();
-        settings.add(new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class)));
+        settings.add(new Setting<Integer>("number", 5, Integer.class, Integer.class.getMethod("decode", String.class), "undocumented"));
 
         final HashMap<String, Setting.Settable> result = ArgumentSettings.prepareSettable(settings);
 
@@ -156,9 +167,9 @@ public class TestArgumentSettings {
 
     private List<Setting<?>> simpleDefaults() {
         List<Setting<?>> defaults = new LinkedList<Setting<?>>();
-        defaults.add(new Setting.IntSetting("setting1", 5));
-        defaults.add(new Setting.IntSetting("setting2", 10));
-        defaults.add(new Setting.BoolSetting("setting3", false));
+        defaults.add(new Setting.IntSetting("setting1", 5, "undocumented"));
+        defaults.add(new Setting.IntSetting("setting2", 10, "undocumented"));
+        defaults.add(new Setting.BoolSetting("setting3", false, "undocumented"));
 
         return defaults;
     }

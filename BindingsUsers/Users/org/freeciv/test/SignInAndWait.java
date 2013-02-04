@@ -23,6 +23,7 @@ import org.freeciv.packet.PACKET_SERVER_JOIN_REQ;
 import org.freeciv.packet.RawPacket;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
+import org.freeciv.utility.UI;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -38,11 +39,14 @@ public class SignInAndWait {
     public static void main(String[] cmd) throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(
                 new LinkedList<Setting<?>>(){{
-                    add(new Setting.StringSetting(ADDRESS, "127.0.0.1"));
-                    add(new Setting.IntSetting(PORT, 5556));
-                    add(new Setting.StringSetting(USER_NAME, "FreecivJava"));
+                    add(new Setting.StringSetting(ADDRESS, "127.0.0.1", "connect to the Freeciv server on this address"));
+                    add(new Setting.IntSetting(PORT, 5556, "connect to the Freeciv server on ths port"));
+                    add(new Setting.StringSetting(USER_NAME, "FreecivJava", "sign inn using user name"));
+                    add(UI.HELP_SETTING);
                 }},
                 cmd);
+
+        UI.printAndExitOnHelp(settings, SignInAndWait.class);
 
         String address = settings.getSetting(ADDRESS);
         int portNumber = settings.<Integer>getSetting(PORT);
