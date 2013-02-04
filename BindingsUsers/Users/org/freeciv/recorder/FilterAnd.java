@@ -19,21 +19,21 @@ import org.freeciv.packet.Packet;
 import java.util.Arrays;
 import java.util.List;
 
-class FilterOr extends FilterMany {
-    FilterOr(Filter... any) {
+class FilterAnd extends FilterMany {
+    FilterAnd(Filter... any) {
         this(Arrays.asList(any));
     }
 
-    FilterOr(List<Filter> any) {
+    FilterAnd(List<Filter> any) {
         super(any);
     }
 
     @Override
     public boolean isAccepted(Packet packet, boolean clientToServer) {
         for (Filter step : filters)
-            if (step.isAccepted(packet, clientToServer))
-                return true;
+            if (!step.isAccepted(packet, clientToServer))
+                return false;
 
-        return false;
+        return true;
     }
 }

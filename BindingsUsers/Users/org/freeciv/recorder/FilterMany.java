@@ -16,24 +16,25 @@ package org.freeciv.recorder;
 
 import org.freeciv.packet.Packet;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
-class FilterOr extends FilterMany {
-    FilterOr(Filter... any) {
-        this(Arrays.asList(any));
+public abstract class FilterMany implements Filter {
+    protected final List<Filter> filters;
+
+    public FilterMany(List<Filter> any) {
+        this.filters = new ArrayList<Filter>(any);
     }
 
-    FilterOr(List<Filter> any) {
-        super(any);
-    }
-
-    @Override
-    public boolean isAccepted(Packet packet, boolean clientToServer) {
+    public void update(Packet packet) {
         for (Filter step : filters)
-            if (step.isAccepted(packet, clientToServer))
-                return true;
+            step.update(packet);
+    }
 
-        return false;
+    public abstract boolean isAccepted(Packet packet, boolean clientToServer);
+
+    public void inform(Packet packet) {
+        for (Filter step : filters)
+            step.inform(packet);
     }
 }
