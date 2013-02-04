@@ -123,6 +123,9 @@ public class ProxyRecorder implements Runnable {
 
         this.steps = new LinkedList<Feature>();
 
+        if (settings.<Boolean>getSetting(VERBOSE))
+            steps.add(new Wants());
+
         steps.add(new PrintRaw());
 
         if (settings.<Boolean>getSetting(DEBUG))
@@ -198,9 +201,6 @@ public class ProxyRecorder implements Runnable {
     }
 
     private boolean printPacket(Packet fromClient) {
-        if (settings.<Boolean>getSetting(VERBOSE))
-            return true;
-
         for (Feature step : steps)
             if (step.wantsAtConsole(fromClient))
                 return true;
@@ -250,6 +250,16 @@ public class ProxyRecorder implements Runnable {
         public void update(Packet packet);
         public boolean wantsAtConsole(Packet packet);
         public void inform(Packet packet);
+    }
+
+    static class Wants implements Feature {
+        public void update(Packet packet) {}
+
+        public boolean wantsAtConsole(Packet packet) {
+            return true;
+        }
+
+        public void inform(Packet packet) {}
     }
 
     static class PrintRaw implements Feature {
