@@ -35,6 +35,8 @@ public class ProxyRecorder implements Runnable {
     private static final String TRACE_NAME_END = "trace-name-end";
     private static final String TRACE_DYNAMIC = "record-time";
     private static final String TRACE_EXCLUDE_CONNECTION = "trace-exclude-connection";
+    private static final String TRACE_EXCLUDE_C2S = "trace-exclude-from-client";
+    private static final String TRACE_EXCLUDE_S2C = "trace-exclude-from-server";
     private static final String VERBOSE = "verbose";
     private static final String DEBUG = "debug";
 
@@ -65,6 +67,10 @@ public class ProxyRecorder implements Runnable {
             add(new Setting.BoolSetting(TRACE_DYNAMIC, true, "should time be recorded in the trace"));
             add(new Setting.BoolSetting(TRACE_EXCLUDE_CONNECTION, false,
                     "don't record connection packets in the trace"));
+            add(new Setting.BoolSetting(TRACE_EXCLUDE_C2S, false,
+                    "don't record packets sent by the client in the trace"));
+            add(new Setting.BoolSetting(TRACE_EXCLUDE_S2C, false,
+                    "don't record packets sent by the server in the trace"));
 
             add(UI.HELP_SETTING);
 
@@ -139,6 +145,12 @@ public class ProxyRecorder implements Runnable {
 
         if (settings.<Boolean>getSetting(TRACE_EXCLUDE_CONNECTION))
             out.add(new FilterNot(CONNECTION_PACKETS));
+
+        if (settings.<Boolean>getSetting(TRACE_EXCLUDE_C2S))
+            out.add(new FilterNot(new FilterPacketFromClientToServer()));
+
+        if (settings.<Boolean>getSetting(TRACE_EXCLUDE_S2C))
+            out.add(new FilterPacketFromClientToServer());
 
         return new FilterAnd(out);
     }
