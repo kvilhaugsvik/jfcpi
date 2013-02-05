@@ -74,7 +74,7 @@ public class ProxyRecorder implements Runnable {
 
             add(UI.HELP_SETTING);
 
-            add(new Setting.BoolSetting(VERBOSE, false, "print all packets to the terminal"));
+            add(new Setting.BoolSetting(VERBOSE, false, "be verbose"));
             add(new Setting.BoolSetting(DEBUG, false, "print debug information to the terminal"));
         }}, args);
 
@@ -83,15 +83,11 @@ public class ProxyRecorder implements Runnable {
         System.out.println("Listening for Freeciv clients on port " + settings.getSetting(PROXY_PORT));
         System.out.println("Will connect to Freeciv server at " + settings.getSetting(REAL_SERVER_ADDRESS) +
                 ", port " + settings.getSetting(REAL_SERVER_PORT));
-        System.out.println("Trace files will have a name starting with " + settings.getSetting(TRACE_NAME_START) +
-                " followed by the number the proxy has given to the connection and ending in " +
-                settings.getSetting(TRACE_NAME_END));
-        System.out.println("Time data " + (settings.<Boolean>getSetting(TRACE_DYNAMIC) ? "is" : "isn't") +
-                " included in the trace.");
-        System.out.println((settings.<Boolean>getSetting(VERBOSE) ? "Will" : "Won't") +
-                " be verbose in output here.");
-        if (settings.<Boolean>getSetting(DEBUG))
-            System.out.println("In debug mode.");
+        System.out.println("Trace files will be named " + settings.getSetting(TRACE_NAME_START) + "#" +
+                settings.getSetting(TRACE_NAME_END) + " (# is the logged connection number)");
+        if (settings.<Boolean>getSetting(VERBOSE))
+            for (Setting.Settable option : settings.getAll())
+                System.out.println(option.name() + " = " + option.get() + "\t" + option.describe());
 
         try {
             ServerSocket serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
