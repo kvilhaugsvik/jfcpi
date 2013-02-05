@@ -89,62 +89,74 @@ public class ProxyRecorder implements Runnable {
             for (Setting.Settable option : settings.getAll())
                 System.out.println(option.name() + " = " + option.get() + "\t" + option.describe());
 
+        final ServerSocket serverProxy;
         try {
-            ServerSocket serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
-            ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
-            while (!serverProxy.isClosed()) {
-                final Socket client;
-                try {
-                    client = serverProxy.accept();
-                } catch (IOException e) {
-                    System.err.println("Incoming connection: Failed accepting new connection");
-                    e.printStackTrace();
-                    continue; // Todo: Should this exit the program?
-                }
-
-                final Socket server;
-                try {
-                    server = new Socket(settings.<String>getSetting(REAL_SERVER_ADDRESS),
-                            settings.<Integer>getSetting(REAL_SERVER_PORT));
-                } catch (IOException e) {
-                    System.err.println("Incoming connection: Failed connecting to server");
-                    e.printStackTrace();
-                    client.close();
-                    continue; // Todo: Should this exit the program?
-                }
-
-                final OutputStream traceOut;
-                try {
-                    traceOut = new BufferedOutputStream(
-                            new FileOutputStream(settings.<String>getSetting(TRACE_NAME_START) +
-                                    connections.size() + settings.<String>getSetting(TRACE_NAME_END)));
-                } catch (IOException e) {
-                    System.err.println("Incoming connection: Failed opening trace file");
-                    e.printStackTrace();
-                    client.close();
-                    server.close();
-                    continue; // Todo: Should this exit the program?
-                }
-
-                try {
-                    final ProxyRecorder proxy = new ProxyRecorder(client, server, traceOut, connections.size(), settings);
-                    connections.add(proxy);
-                    (new Thread(proxy)).start();
-                } catch (IOException e) {
-                    System.err.println("Incoming connection: Failed starting");
-                    e.printStackTrace();
-                    client.close();
-                    server.close();
-                    traceOut.close();
-                    continue; // Todo: Should this exit the program?
-                }
-            }
+            serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
         } catch (IOException e) {
-            System.err.println("Port not free");
-            e.printStackTrace();
+            System.err.println("Port " + settings.<Integer>getSetting(PROXY_PORT) + " not free");
             System.exit(1);
+            return;
         }
+
+        ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
+        while (!serverProxy.isClosed()) {
+            final Socket client;
+            try {
+                client = serverProxy.accept();
+            } catch (IOException e) {
+                System.err.println("Incoming connection: Failed accepting new connection");
+                e.printStackTrace();
+                continue; // Todo: Should this exit the program?
+            }
+
+            final Socket server;
+            try {
+                server = new Socket(settings.<String>getSetting(REAL_SERVER_ADDRESS),
+                        settings.<Integer>getSetting(REAL_SERVER_PORT));
+            } catch (IOException e) {
+                System.err.println("Incoming connection: Failed connecting to server");
+                e.printStackTrace();
+                closeIt(client);
+                continue; // Todo: Should this exit the program?
+            }
+
+            final OutputStream traceOut;
+            try {
+                traceOut = new BufferedOutputStream(
+                        new FileOutputStream(settings.<String>getSetting(TRACE_NAME_START) +
+                                connections.size() + settings.<String>getSetting(TRACE_NAME_END)));
+            } catch (IOException e) {
+                System.err.println("Incoming connection: Failed opening trace file");
+                e.printStackTrace();
+                closeIt(client);
+                closeIt(server);
+                continue; // Todo: Should this exit the program?
+            }
+
+            try {
+                final ProxyRecorder proxy = new ProxyRecorder(client, server, traceOut, connections.size(), settings);
+                connections.add(proxy);
+                (new Thread(proxy)).start();
+            } catch (IOException e) {
+                System.err.println("Incoming connection: Failed starting");
+                e.printStackTrace();
+                closeIt(traceOut);
+                closeIt(client);
+                closeIt(server);
+                continue; // Todo: Should this exit the program?
+            }
+        }
+
         System.exit(0);
+    }
+
+    private static void closeIt(Closeable toClose) {
+        try {
+            toClose.close();
+        } catch (IOException e) {
+            System.err.println("Problems while closing " + toClose);
+            e.printStackTrace();
+        }
     }
 
     public ProxyRecorder(Socket client, Socket server, OutputStream trace, int proxyNumber, ArgumentSettings settings)
