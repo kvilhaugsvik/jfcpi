@@ -37,6 +37,7 @@ public class ProxyRecorder implements Runnable {
     private static final String TRACE_EXCLUDE_C2S = "trace-exclude-from-client";
     private static final String TRACE_EXCLUDE_S2C = "trace-exclude-from-server";
     private static final String VERBOSE = "verbose";
+    private static final String UNDERSTAND = "understand";
     private static final String DEBUG = "debug";
     private static final String TO_TRACE = "trace-to-console";
 
@@ -59,6 +60,8 @@ public class ProxyRecorder implements Runnable {
         add(UI.HELP_SETTING);
 
         add(new Setting.BoolSetting(VERBOSE, false, "be verbose"));
+        add(new Setting.BoolSetting(UNDERSTAND, false,
+                "interpret the packets before processing. Warn if not understood."));
         add(new Setting.BoolSetting(DEBUG, false, "print debug information to the terminal"));
         add(new Setting.BoolSetting(TO_TRACE, false, "print all packets going to the trace to the terminal"));
     }};
@@ -163,8 +166,17 @@ public class ProxyRecorder implements Runnable {
             throws IOException, InterruptedException {
         this.proxyNumber = proxyNumber;
         this.trace = trace;
-        this.clientCon = new Interpreted(client, Collections.<Integer, ReflexReaction>emptyMap());
-        this.serverCon = new Interpreted(server, Collections.<Integer, ReflexReaction>emptyMap());
+
+        if (settings.<Boolean>getSetting(UNDERSTAND)) {
+            this.clientCon = new Interpreted(client, Collections.<Integer, ReflexReaction>emptyMap());
+            this.serverCon = new Interpreted(server, Collections.<Integer, ReflexReaction>emptyMap());
+        } else {
+            PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
+            this.clientCon = new Uninterpreted(client, versionKnowledge.getPacketHeaderClass(),
+                    Collections.<Integer, ReflexReaction>emptyMap());
+            this.serverCon = new Uninterpreted(server, versionKnowledge.getPacketHeaderClass(),
+                    Collections.<Integer, ReflexReaction>emptyMap());
+        }
 
         Filter forwardFilters = new FilterAllAccepted(); // Forward everything
         Filter diskFilters = buildTraceFilters(settings);
@@ -201,7 +213,8 @@ public class ProxyRecorder implements Runnable {
         if (settings.<Boolean>getSetting(VERBOSE))
             out.add(new FilterAllAccepted());
 
-        out.add(new FilterIsRaw());
+        if (settings.<Boolean>getSetting(UNDERSTAND))
+            out.add(new FilterIsRaw());
 
         if (settings.<Boolean>getSetting(DEBUG))
             out.add(new FilterSometimesWorking());
