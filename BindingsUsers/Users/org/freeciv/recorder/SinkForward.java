@@ -31,8 +31,7 @@ class SinkForward extends Sink {
         try {
             writeTo.toSend(packet);
         } catch (IOException e) {
-            System.err.println("Couldn't forward packet to " + (clientToServer ? "server" : "client"));
-            throw e;
+            throw new IOException("Couldn't forward packet to " + (clientToServer ? "server" : "client"), e);
         }
     }
 }

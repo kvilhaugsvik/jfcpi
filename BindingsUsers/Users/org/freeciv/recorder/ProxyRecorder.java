@@ -124,6 +124,8 @@ public class ProxyRecorder implements Runnable {
                     settings.<Integer>getSetting(REAL_SERVER_PORT),
                     Collections.<Integer, ReflexReaction>emptyMap());
         } catch (IOException e) {
+            trace.close();
+            clientCon.setOver();
             throw new IOException(proxyNumber + ": Unable to connect to server", e);
         }
 
@@ -133,11 +135,8 @@ public class ProxyRecorder implements Runnable {
 
         final Sink traceSink;
         try {
-            traceSink = new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC));
+            traceSink = new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
         } catch (IOException e) {
-            System.err.println(proxyNumber + ": Unable to write trace");
-            e.printStackTrace();
-
             cleanUp();
             throw e;
         }
@@ -216,8 +215,7 @@ public class ProxyRecorder implements Runnable {
             try {
                 packet = readFrom.getPacket();
             } catch (IOException e) {
-                System.err.println("Couldn't read packet from " + (clientToServer ? "client" : "server"));
-                throw e;
+                throw new IOException("Couldn't read packet from " + (clientToServer ? "client" : "server"), e);
             }
 
             for (Sink sink : sinks)
