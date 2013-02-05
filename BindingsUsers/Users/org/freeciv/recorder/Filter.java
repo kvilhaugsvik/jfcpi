@@ -17,6 +17,11 @@ package org.freeciv.recorder;
 import org.freeciv.packet.Packet;
 
 interface Filter {
+    /**
+     * Update the filter in a step that is guaranteed to be called even if the filter won't be used on this packet.
+     * Had isAccepted been responsible for updating it would not always be called
+     * @param packet the current packet
+     */
     public void update(Packet packet);
     public boolean isAccepted(Packet packet, boolean clientToServer);
     public void inform(Packet packet);
