@@ -23,6 +23,7 @@ import org.freeciv.utility.UI;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.*;
 
 public class ProxyRecorder implements Runnable {
@@ -67,7 +68,7 @@ public class ProxyRecorder implements Runnable {
     private final int proxyNumber;
     private final FreecivConnection clientCon;
     private final FreecivConnection serverCon;
-    private final DataOutputStream trace;
+    private final OutputStream trace;
 
     private final List<Sink> c2sSinks;
     private final List<Sink> s2cSinks;
@@ -91,21 +92,53 @@ public class ProxyRecorder implements Runnable {
         try {
             ServerSocket serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
             ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
-            while (!serverProxy.isClosed())
+            while (!serverProxy.isClosed()) {
+                final Socket client;
                 try {
-                    FreecivConnection clientCon =
-                            new Interpreted(serverProxy.accept(), Collections.<Integer, ReflexReaction>emptyMap());
-                    ProxyRecorder proxy = new ProxyRecorder(clientCon, connections.size(),
-                            new DataOutputStream(new BufferedOutputStream(
-                                    new FileOutputStream(settings.<String>getSetting(TRACE_NAME_START) +
-                                            connections.size() + settings.<String>getSetting(TRACE_NAME_END)))),
-                            settings);
+                    client = serverProxy.accept();
+                } catch (IOException e) {
+                    System.err.println("Incoming connection: Failed accepting new connection");
+                    e.printStackTrace();
+                    continue; // Todo: Should this exit the program?
+                }
+
+                final Socket server;
+                try {
+                    server = new Socket(settings.<String>getSetting(REAL_SERVER_ADDRESS),
+                            settings.<Integer>getSetting(REAL_SERVER_PORT));
+                } catch (IOException e) {
+                    System.err.println("Incoming connection: Failed connecting to server");
+                    e.printStackTrace();
+                    client.close();
+                    continue; // Todo: Should this exit the program?
+                }
+
+                final OutputStream traceOut;
+                try {
+                    traceOut = new BufferedOutputStream(
+                            new FileOutputStream(settings.<String>getSetting(TRACE_NAME_START) +
+                                    connections.size() + settings.<String>getSetting(TRACE_NAME_END)));
+                } catch (IOException e) {
+                    System.err.println("Incoming connection: Failed opening trace file");
+                    e.printStackTrace();
+                    client.close();
+                    server.close();
+                    continue; // Todo: Should this exit the program?
+                }
+
+                try {
+                    final ProxyRecorder proxy = new ProxyRecorder(client, server, traceOut, connections.size(), settings);
                     connections.add(proxy);
                     (new Thread(proxy)).start();
                 } catch (IOException e) {
-                    System.err.println("Failed accepting new connection");
+                    System.err.println("Incoming connection: Failed starting");
                     e.printStackTrace();
+                    client.close();
+                    server.close();
+                    traceOut.close();
+                    continue; // Todo: Should this exit the program?
                 }
+            }
         } catch (IOException e) {
             System.err.println("Port not free");
             e.printStackTrace();
@@ -114,32 +147,19 @@ public class ProxyRecorder implements Runnable {
         System.exit(0);
     }
 
-    public ProxyRecorder(FreecivConnection clientCon, int proxyNumber, DataOutputStream trace, ArgumentSettings settings)
+    public ProxyRecorder(Socket client, Socket server, OutputStream trace, int proxyNumber, ArgumentSettings settings)
             throws IOException, InterruptedException {
         this.proxyNumber = proxyNumber;
         this.trace = trace;
-        this.clientCon = clientCon;
-        try {
-            serverCon = new Interpreted(settings.<String>getSetting(REAL_SERVER_ADDRESS),
-                    settings.<Integer>getSetting(REAL_SERVER_PORT),
-                    Collections.<Integer, ReflexReaction>emptyMap());
-        } catch (IOException e) {
-            trace.close();
-            clientCon.setOver();
-            throw new IOException(proxyNumber + ": Unable to connect to server", e);
-        }
+        this.clientCon = new Interpreted(client, Collections.<Integer, ReflexReaction>emptyMap());
+        this.serverCon = new Interpreted(server, Collections.<Integer, ReflexReaction>emptyMap());
 
         Filter forwardFilters = new FilterAllAccepted(); // Forward everything
         Filter diskFilters = buildTraceFilters(settings);
         Filter consoleFilters = buildConsoleFilters(settings, diskFilters);
 
-        final Sink traceSink;
-        try {
-            traceSink = new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
-        } catch (IOException e) {
-            cleanUp();
-            throw e;
-        }
+        final Sink traceSink =
+                new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
         final Sink cons = new SinkInformUser(consoleFilters, proxyNumber);
         final SinkForward sinkServer = new SinkForward(serverCon, forwardFilters);
         final SinkForward sinkClient = new SinkForward(clientCon, forwardFilters);

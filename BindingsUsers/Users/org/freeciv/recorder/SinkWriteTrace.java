@@ -18,24 +18,25 @@ import org.freeciv.packet.Packet;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 class SinkWriteTrace extends Sink {
     private final boolean isDynamic;
     private final int id;
     private final DataOutputStream traceFile;
 
-    public SinkWriteTrace(Filter filter, DataOutputStream traceFile, boolean isDynamic, int id) throws IOException {
+    public SinkWriteTrace(Filter filter, OutputStream traceFile, boolean isDynamic, int id) throws IOException {
         super(filter);
 
         this.isDynamic = isDynamic;
         this.id = id;
-        this.traceFile = traceFile;
+        this.traceFile = new DataOutputStream(traceFile);
 
         try {
             // the version of the trace format
-            traceFile.writeChar(1);
+            this.traceFile.writeChar(1);
             // is the time a packet arrived included in the trace
-            traceFile.writeBoolean(isDynamic);
+            this.traceFile.writeBoolean(isDynamic);
         } catch (IOException e) {
             throw new IOException(id + ": Unable to write trace headers", e);
         }
