@@ -49,21 +49,6 @@ public class Uninterpreted implements FreecivConnection {
         fastReader.start();
     }
 
-    private static byte[] readXBytesFrom(int wanted, InputStream from, Uninterpreted parent) throws IOException {
-        byte[] out = new byte[wanted];
-        int alreadyRead = 0;
-        while(alreadyRead < wanted) {
-            int bytesRead = from.read(out, alreadyRead, wanted - alreadyRead);
-            if (0 <= bytesRead)
-                alreadyRead += bytesRead;
-            else if (parent.isOver())
-                throw new EOFException("Nothing to read and nothing is waiting");
-            if (alreadyRead < wanted)
-                Thread.yield();
-        }
-        return out;
-    }
-
     public boolean packetReady() {
         return !buffered.isEmpty();
     }
@@ -126,7 +111,7 @@ public class Uninterpreted implements FreecivConnection {
         @Override
         public void run() {
             try {
-                while(0 < in.available() || !parent.isOver()) {
+                while(true) {
                     RawPacket incoming = readPacket();
 
                     quickRespond.handle(incoming);
@@ -135,6 +120,8 @@ public class Uninterpreted implements FreecivConnection {
                         buffered.add(incoming);
                     }
                 }
+            } catch (DoneReading e) {
+                // Looks good
             } catch (Exception e) {
                 System.err.println("Problem in the thread that reads from the network");
                 e.printStackTrace();
@@ -149,13 +136,39 @@ public class Uninterpreted implements FreecivConnection {
             }
         }
 
-        private RawPacket readPacket() throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException {
-            byte[] headerStart = readXBytesFrom(headerSize, in, parent);
+        private RawPacket readPacket()
+                throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException, DoneReading {
+            final byte[] headerStart = readXBytesFrom(headerSize, in, parent, true);
             PacketHeader head =
                     headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
 
-            byte[] body = readXBytesFrom(head.getBodySize(), in, parent);
+            byte[] body = readXBytesFrom(head.getBodySize(), in, parent, false);
             return new RawPacket(body, head);
+        }
+
+        private byte[] readXBytesFrom(int wanted, InputStream from, Uninterpreted parent, boolean clean)
+                throws IOException, DoneReading {
+            byte[] out = new byte[wanted];
+            int alreadyRead = 0;
+            while(alreadyRead < wanted) {
+                int bytesRead = from.read(out, alreadyRead, wanted - alreadyRead);
+                if (0 <= bytesRead)
+                    alreadyRead += bytesRead;
+                else if (parent.isOver())
+                    if (clean && 0 == alreadyRead)
+                        throw new DoneReading("Nothing to read and nothing is waiting");
+                    else
+                        throw new EOFException("Nothing to read and nothing is waiting." +
+                                "Read " + alreadyRead + " of " + wanted + " bytes");
+                Thread.yield();
+            }
+            return out;
+        }
+    }
+
+    static class DoneReading extends Exception {
+        public DoneReading(String message) {
+            super(message);
         }
     }
 }
