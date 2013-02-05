@@ -34,8 +34,11 @@ public class ProxyRecorder implements Runnable {
     private static final String TRACE_NAME_START = "trace-name-start";
     private static final String TRACE_NAME_END = "trace-name-end";
     private static final String TRACE_DYNAMIC = "record-time";
+    private static final String TRACE_EXCLUDE_CONNECTION = "trace-exclude-connection";
     private static final String VERBOSE = "verbose";
     private static final String DEBUG = "debug";
+
+    private static final Filter CONNECTION_PACKETS = new FilterPacketKind(Arrays.asList(88, 89, 115, 116, 119));
 
     private final int proxyNumber;
     private final ArgumentSettings settings;
@@ -60,6 +63,8 @@ public class ProxyRecorder implements Runnable {
             add(new Setting.StringSetting(TRACE_NAME_START, "FreecivCon", "prefix of the trace file names"));
             add(new Setting.StringSetting(TRACE_NAME_END, ".fct", "suffix of the trace file names"));
             add(new Setting.BoolSetting(TRACE_DYNAMIC, true, "should time be recorded in the trace"));
+            add(new Setting.BoolSetting(TRACE_EXCLUDE_CONNECTION, false,
+                    "don't record connection packets in the trace"));
 
             add(UI.HELP_SETTING);
 
@@ -124,9 +129,18 @@ public class ProxyRecorder implements Runnable {
 
         this.forwardFilters = new FilterAllAccepted(); // Forward everything
 
-        this.diskFilters = new FilterAllAccepted(); // Write everything
+        this.diskFilters = buildTraceFilters(settings);
 
         this.consoleFilters = buildConsoleFilters(settings);
+    }
+
+    static private Filter buildTraceFilters(ArgumentSettings settings) {
+        LinkedList<Filter> out = new LinkedList<Filter>();
+
+        if (settings.<Boolean>getSetting(TRACE_EXCLUDE_CONNECTION))
+            out.add(new FilterNot(CONNECTION_PACKETS));
+
+        return new FilterAnd(out);
     }
 
     static private Filter buildConsoleFilters(ArgumentSettings settings) {
