@@ -16,6 +16,7 @@ package org.freeciv.recorder;
 
 import org.freeciv.connection.*;
 import org.freeciv.packet.Packet;
+import org.freeciv.packet.RawPacket;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -24,6 +25,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.*;
 
 public class ProxyRecorder implements Runnable {
@@ -76,7 +78,10 @@ public class ProxyRecorder implements Runnable {
     private final List<Sink> c2sSinks;
     private final List<Sink> s2cSinks;
 
+    private static boolean timeToExit = false;
+
     private boolean started = false;
+    private boolean finished = false;
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(SETTINGS, args);
@@ -95,17 +100,20 @@ public class ProxyRecorder implements Runnable {
         final ServerSocket serverProxy;
         try {
             serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
+            serverProxy.setSoTimeout(2500);
         } catch (IOException e) {
-            System.err.println("Port " + settings.<Integer>getSetting(PROXY_PORT) + " not free");
+            System.err.println("Error starting to listen to port " + settings.<Integer>getSetting(PROXY_PORT));
             System.exit(1);
             return;
         }
 
         ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
-        while (!serverProxy.isClosed()) {
+        while (!timeToExit) {
             final Socket client;
             try {
                 client = serverProxy.accept();
+            } catch (SocketTimeoutException e) {
+                continue;
             } catch (IOException e) {
                 System.err.println("Incoming connection: Failed accepting new connection");
                 e.printStackTrace();
@@ -150,6 +158,14 @@ public class ProxyRecorder implements Runnable {
             }
         }
 
+        closeIt(serverProxy);
+
+        // wait for all the connections
+        for (ProxyRecorder connection : connections)
+            while (!connection.isFinished()) {
+                Thread.yield();
+            }
+
         System.exit(0);
     }
 
@@ -169,13 +185,13 @@ public class ProxyRecorder implements Runnable {
 
         if (settings.<Boolean>getSetting(UNDERSTAND)) {
             this.clientCon = new Interpreted(client, Collections.<Integer, ReflexReaction>emptyMap());
-            this.serverCon = new Interpreted(server, Collections.<Integer, ReflexReaction>emptyMap());
+            this.serverCon = new Interpreted(server, getServerConnectionReflexes());
         } else {
             PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
             this.clientCon = new Uninterpreted(client, versionKnowledge.getPacketHeaderClass(),
                     Collections.<Integer, ReflexReaction>emptyMap());
             this.serverCon = new Uninterpreted(server, versionKnowledge.getPacketHeaderClass(),
-                    Collections.<Integer, ReflexReaction>emptyMap());
+                    getServerConnectionReflexes());
         }
 
         Filter forwardFilters = new FilterAllAccepted(); // Forward everything
@@ -225,6 +241,17 @@ public class ProxyRecorder implements Runnable {
         return new FilterOr(out);
     }
 
+    private static HashMap<Integer, ReflexReaction> getServerConnectionReflexes() {
+        HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
+        reflexes.put(8, new ReflexReaction() {
+            @Override
+            public void apply(RawPacket incoming, FreecivConnection connection) {
+                timeToExit = true;
+            }
+        });
+        return reflexes;
+    }
+
     @Override
     public void run() {
         if (!started)
@@ -235,10 +262,12 @@ public class ProxyRecorder implements Runnable {
         while (clientCon.isOpen() && serverCon.isOpen()) {
             proxyPacket(clientCon, true, c2sSinks);
             proxyPacket(serverCon, false, s2cSinks);
+            checkIfGlobalOver();
         }
 
         cleanUp();
 
+        finished = true;
         System.out.println(proxyNumber + " is finished");
     }
 
@@ -274,5 +303,16 @@ public class ProxyRecorder implements Runnable {
             clientCon.setOver();
             serverCon.setOver();
         }
+    }
+
+    private void checkIfGlobalOver() {
+        if (timeToExit) {
+            clientCon.setOver();
+            serverCon.setOver();
+        }
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 }
