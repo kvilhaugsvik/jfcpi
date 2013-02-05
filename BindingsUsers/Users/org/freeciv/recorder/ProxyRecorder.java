@@ -65,15 +65,12 @@ public class ProxyRecorder implements Runnable {
     private static final Filter CONNECTION_PACKETS = new FilterPacketKind(Arrays.asList(88, 89, 115, 116, 119));
 
     private final int proxyNumber;
-    private final ArgumentSettings settings;
     private final FreecivConnection clientCon;
     private final FreecivConnection serverCon;
     private final DataOutputStream trace;
 
-    // Stuff to do to the data
-    private final Filter consoleFilters;
-    private final Filter diskFilters;
-    private final Filter forwardFilters;
+    private final List<Sink> c2sSinks;
+    private final List<Sink> s2cSinks;
 
     private boolean started = false;
 
@@ -120,7 +117,6 @@ public class ProxyRecorder implements Runnable {
     public ProxyRecorder(FreecivConnection clientCon, int proxyNumber, DataOutputStream trace, ArgumentSettings settings)
             throws IOException, InterruptedException {
         this.proxyNumber = proxyNumber;
-        this.settings = settings;
         this.trace = trace;
         this.clientCon = clientCon;
         try {
@@ -131,11 +127,26 @@ public class ProxyRecorder implements Runnable {
             throw new IOException(proxyNumber + ": Unable to connect to server", e);
         }
 
-        this.forwardFilters = new FilterAllAccepted(); // Forward everything
+        Filter forwardFilters = new FilterAllAccepted(); // Forward everything
+        Filter diskFilters = buildTraceFilters(settings);
+        Filter consoleFilters = buildConsoleFilters(settings, diskFilters);
 
-        this.diskFilters = buildTraceFilters(settings);
+        final Sink traceSink;
+        try {
+            traceSink = new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC));
+        } catch (IOException e) {
+            System.err.println(proxyNumber + ": Unable to write trace");
+            e.printStackTrace();
 
-        this.consoleFilters = buildConsoleFilters(settings, this.diskFilters);
+            cleanUp();
+            throw e;
+        }
+        final Sink cons = new SinkInformUser(consoleFilters, proxyNumber);
+        final SinkForward sinkServer = new SinkForward(serverCon, forwardFilters);
+        final SinkForward sinkClient = new SinkForward(clientCon, forwardFilters);
+
+        this.c2sSinks = Arrays.asList(cons, traceSink, sinkServer);
+        this.s2cSinks = Arrays.asList(cons, traceSink, sinkClient);
     }
 
     static private Filter buildTraceFilters(ArgumentSettings settings) {
@@ -176,23 +187,6 @@ public class ProxyRecorder implements Runnable {
             started = true;
         else
             throw new IllegalStateException("Already started");
-
-        final Sink traceSink;
-        try {
-            traceSink = new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC));
-        } catch (IOException e) {
-            System.err.println(proxyNumber + ": Unable to write trace");
-            e.printStackTrace();
-
-            cleanUp();
-            return;
-        }
-        final Sink cons = new SinkInformUser(consoleFilters, proxyNumber);
-        final SinkForward sinkServer = new SinkForward(serverCon, forwardFilters);
-        final SinkForward sinkClient = new SinkForward(clientCon, forwardFilters);
-
-        List<Sink> c2sSinks = Arrays.asList(cons, traceSink, sinkServer);
-        List<Sink> s2cSinks = Arrays.asList(cons, traceSink, sinkClient);
 
         while (clientCon.isOpen() && serverCon.isOpen()) {
             proxyPacket(clientCon, true, c2sSinks);
