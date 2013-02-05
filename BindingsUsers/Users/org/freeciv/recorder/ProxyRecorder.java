@@ -39,6 +39,7 @@ public class ProxyRecorder implements Runnable {
     private static final String TRACE_EXCLUDE_S2C = "trace-exclude-from-server";
     private static final String VERBOSE = "verbose";
     private static final String DEBUG = "debug";
+    private static final String TO_TRACE = "trace-to-console";
 
     private static final Filter CONNECTION_PACKETS = new FilterPacketKind(Arrays.asList(88, 89, 115, 116, 119));
 
@@ -76,6 +77,7 @@ public class ProxyRecorder implements Runnable {
 
             add(new Setting.BoolSetting(VERBOSE, false, "be verbose"));
             add(new Setting.BoolSetting(DEBUG, false, "print debug information to the terminal"));
+            add(new Setting.BoolSetting(TO_TRACE, false, "print all packets going to the trace to the terminal"));
         }}, args);
 
         UI.printAndExitOnHelp(settings, ProxyRecorder.class);
@@ -133,7 +135,7 @@ public class ProxyRecorder implements Runnable {
 
         this.diskFilters = buildTraceFilters(settings);
 
-        this.consoleFilters = buildConsoleFilters(settings);
+        this.consoleFilters = buildConsoleFilters(settings, this.diskFilters);
     }
 
     static private Filter buildTraceFilters(ArgumentSettings settings) {
@@ -151,7 +153,7 @@ public class ProxyRecorder implements Runnable {
         return new FilterAnd(out);
     }
 
-    static private Filter buildConsoleFilters(ArgumentSettings settings) {
+    static private Filter buildConsoleFilters(ArgumentSettings settings, Filter diskFilters) {
         LinkedList<Filter> out = new LinkedList<Filter>();
 
         if (settings.<Boolean>getSetting(VERBOSE))
@@ -161,6 +163,9 @@ public class ProxyRecorder implements Runnable {
 
         if (settings.<Boolean>getSetting(DEBUG))
             out.add(new FilterSometimesWorking());
+
+        if (settings.<Boolean>getSetting(TO_TRACE))
+            out.add(diskFilters);
 
         return new FilterOr(out);
     }
