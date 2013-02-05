@@ -14,9 +14,7 @@
 
 package org.freeciv.recorder;
 
-import org.freeciv.connection.Interpreted;
-import org.freeciv.connection.NotReadyYetException;
-import org.freeciv.connection.ReflexReaction;
+import org.freeciv.connection.*;
 import org.freeciv.packet.Packet;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
@@ -68,8 +66,8 @@ public class ProxyRecorder implements Runnable {
 
     private final int proxyNumber;
     private final ArgumentSettings settings;
-    private final Interpreted clientCon;
-    private final Interpreted serverCon;
+    private final FreecivConnection clientCon;
+    private final FreecivConnection serverCon;
     private final DataOutputStream trace;
 
     // Stuff to do to the data
@@ -98,7 +96,7 @@ public class ProxyRecorder implements Runnable {
             ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
             while (!serverProxy.isClosed())
                 try {
-                    Interpreted clientCon =
+                    FreecivConnection clientCon =
                             new Interpreted(serverProxy.accept(), Collections.<Integer, ReflexReaction>emptyMap());
                     ProxyRecorder proxy = new ProxyRecorder(clientCon, connections.size(),
                             new DataOutputStream(new BufferedOutputStream(
@@ -119,7 +117,7 @@ public class ProxyRecorder implements Runnable {
         System.exit(0);
     }
 
-    public ProxyRecorder(Interpreted clientCon, int proxyNumber, DataOutputStream trace, ArgumentSettings settings)
+    public ProxyRecorder(FreecivConnection clientCon, int proxyNumber, DataOutputStream trace, ArgumentSettings settings)
             throws IOException, InterruptedException {
         this.proxyNumber = proxyNumber;
         this.settings = settings;
@@ -217,7 +215,7 @@ public class ProxyRecorder implements Runnable {
         }
     }
 
-    private void proxyPacket(Interpreted readFrom, boolean clientToServer, List<Sink> sinks) {
+    private void proxyPacket(PacketRead readFrom, boolean clientToServer, List<Sink> sinks) {
         try {
             Packet packet;
 
