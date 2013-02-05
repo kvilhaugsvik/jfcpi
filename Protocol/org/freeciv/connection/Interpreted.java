@@ -38,11 +38,7 @@ public class Interpreted implements FreecivConnection {
     }
 
     public Packet getPacket() throws IOException, NotReadyYetException {
-        RawPacket out;
-        if (!toProcess.packetReady())
-            throw new NotReadyYetException("No packets waiting");
-        else
-            out = toProcess.getNext();
+        RawPacket out = toProcess.getPacket();
 
         try {
             return interpreter.interpret(out.getHeader(),

@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 public class NetworkUninterpreted {
     @Test
-    public void pureHeader() throws IOException, ExecutionException, TimeoutException, InterruptedException {
+    public void pureHeader() throws IOException, ExecutionException, TimeoutException, InterruptedException, NotReadyYetException {
         Socket other = helperDataSender(new byte[]{0, 4, 0, 0});
         Uninterpreted self = new Uninterpreted(other, Header_2_2.class,
                 Collections.<Integer, ReflexReaction>emptyMap());
@@ -36,7 +36,7 @@ public class NetworkUninterpreted {
         helperWaitSomeSecondsForAPacket(self, 4);
 
         assertTrue("There should be a packet here", self.packetReady());
-        Packet packet = self.getNext();
+        Packet packet = self.getPacket();
 
         assertEquals("Wrong kind", 0, packet.getHeader().getPacketKind());
         assertEquals("Wrong size", 4, packet.getHeader().getHeaderSize());
