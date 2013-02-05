@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Sveinung Kvilhaugsvik
+ * Copyright (c) 2013 Sveinung Kvilhaugsvik.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,5 +14,15 @@
 
 package org.freeciv.connection;
 
-public interface FreecivConnection extends Over, PacketRead, PacketWrite {
+import org.freeciv.packet.Packet;
+
+import java.io.IOException;
+
+public interface PacketWrite {
+    /**
+     * Send a packet via this connection
+     * @param toSend the packet to send
+     * @throws java.io.IOException if there is a problem sending the packet
+     */
+    void toSend(Packet toSend) throws IOException;
 }
