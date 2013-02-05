@@ -37,9 +37,14 @@ class SinkWriteTrace extends Sink {
     }
 
     public void write(boolean clientToServer, Packet packet) throws IOException {
-        traceFile.writeBoolean(clientToServer);
-        if (isDynamic)
-            traceFile.writeLong(System.currentTimeMillis());
-        packet.encodeTo(traceFile);
+        try {
+            traceFile.writeBoolean(clientToServer);
+            if (isDynamic)
+                traceFile.writeLong(System.currentTimeMillis());
+            packet.encodeTo(traceFile);
+        } catch (IOException e) {
+            System.err.println("Couldn't write packet to trace");
+            throw e;
+        }
     }
 }

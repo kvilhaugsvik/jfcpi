@@ -219,7 +219,14 @@ public class ProxyRecorder implements Runnable {
 
     private void proxyPacket(Interpreted readFrom, boolean clientToServer, List<Sink> sinks) {
         try {
-            Packet packet = readFrom.getPacket();
+            Packet packet;
+
+            try {
+                packet = readFrom.getPacket();
+            } catch (IOException e) {
+                System.err.println("Couldn't read packet from " + (clientToServer ? "client" : "server"));
+                throw e;
+            }
 
             for (Sink sink : sinks)
                 sink.filteredWrite(clientToServer, packet);
@@ -227,9 +234,9 @@ public class ProxyRecorder implements Runnable {
         } catch (NotReadyYetException e) {
             Thread.yield();
         } catch (IOException e) {
-            System.err.println("Couldn't get or couldn't write packet. Finishing...");
+            System.err.println("Finishing...");
             e.printStackTrace();
-            readFrom.setOver();
+            clientCon.setOver();
             serverCon.setOver();
         }
     }
