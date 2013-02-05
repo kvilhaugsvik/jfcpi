@@ -18,7 +18,7 @@
 package org.freeciv.packetgen.javaGenerator;
 
 import org.freeciv.Util;
-import org.freeciv.connection.Interpretated;
+import org.freeciv.connection.Interpreted;
 import org.freeciv.packet.fieldtype.FieldType;
 import org.freeciv.packetgen.javaGenerator.expression.EnumElement;
 import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
@@ -248,8 +248,8 @@ public class CodeGenTest {
 
     @Test public void testPackageImport() {
         assertEquals("Generated source not as expected",
-                "import org.freeciv.connection.Interpretated;",
-                Import.classIn(Interpretated.class).toString());
+                "import org.freeciv.connection.Interpreted;",
+                Import.classIn(Interpreted.class).toString());
     }
 
     @Test public void testImportAllInPackageOf() {

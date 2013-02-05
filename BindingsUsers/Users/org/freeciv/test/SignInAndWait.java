@@ -14,7 +14,7 @@
 
 package org.freeciv.test;
 
-import org.freeciv.connection.Interpretated;
+import org.freeciv.connection.Interpreted;
 import org.freeciv.connection.NotReadyYetException;
 import org.freeciv.connection.FreecivConnection;
 import org.freeciv.connection.ReflexReaction;
@@ -70,7 +70,7 @@ public class SignInAndWait {
             }
         });
         try {
-            Interpretated con = new Interpretated(address, portNumber, reflexes);
+            Interpreted con = new Interpreted(address, portNumber, reflexes);
 
             con.toSend(new PACKET_SERVER_JOIN_REQ(userName,
                     con.getCapStringMandatory(),

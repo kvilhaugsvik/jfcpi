@@ -22,16 +22,16 @@ import java.util.Map;
 
 //TODO: Implement delta protocol
 //TODO: Implement compression in protocol
-public class Interpretated implements FreecivConnection {
+public class Interpreted implements FreecivConnection {
     private final Uninterpreted toProcess;
 
     private final PacketsMapping interpreter;
 
-    public Interpretated(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
+    public Interpreted(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
         this(new Socket(address, port), reflexes);
     }
 
-    public Interpretated(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
+    public Interpreted(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
         interpreter = new PacketsMapping();
 
         toProcess = new Uninterpreted(connection, interpreter.getPacketHeaderClass(), reflexes);

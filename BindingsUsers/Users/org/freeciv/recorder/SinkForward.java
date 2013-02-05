@@ -14,16 +14,15 @@
 
 package org.freeciv.recorder;
 
-import org.freeciv.connection.Interpretated;
+import org.freeciv.connection.Interpreted;
 import org.freeciv.packet.Packet;
 
 import java.io.IOException;
-import java.util.List;
 
 class SinkForward extends Sink {
-    private final Interpretated writeTo;
+    private final Interpreted writeTo;
 
-    SinkForward(Interpretated writeTo, Filter filter) {
+    SinkForward(Interpreted writeTo, Filter filter) {
         super(filter);
         this.writeTo = writeTo;
     }
