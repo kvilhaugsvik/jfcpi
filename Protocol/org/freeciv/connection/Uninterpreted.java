@@ -86,7 +86,6 @@ public class Uninterpreted implements FreecivConnection {
     private class BackgroundReader extends Thread {
         private final InputStream in;
         private final Uninterpreted parent;
-        private final Socket connection;
         private final Constructor<? extends PacketHeader> headerReader;
         private final int headerSize;
 
@@ -94,7 +93,6 @@ public class Uninterpreted implements FreecivConnection {
                                 final Class<? extends PacketHeader> packetHeaderClass) throws IOException {
             this.in = in;
             this.parent = parent;
-            this.connection = connection;
 
             try {
                 headerReader = packetHeaderClass.getConstructor(DataInput.class);
@@ -128,7 +126,7 @@ public class Uninterpreted implements FreecivConnection {
                 parent.setOver();
             } finally {
                 try {
-                    connection.close();
+                    in.close();
                 } catch (IOException e) {
                     System.err.println("Problems while closing network connection. Packets may not have been sent");
                     e.printStackTrace();
