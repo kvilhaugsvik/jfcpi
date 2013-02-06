@@ -28,7 +28,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.*;
 
-public class ProxyRecorder implements Runnable {
+public class ProxyRecorder extends Thread {
     private static final String PROXY_PORT = "proxy-port";
     private static final String REAL_SERVER_PORT = "real-server-port";
     private static final String REAL_SERVER_ADDRESS = "real-server-address";
@@ -147,7 +147,7 @@ public class ProxyRecorder implements Runnable {
             try {
                 final ProxyRecorder proxy = new ProxyRecorder(client, server, traceOut, connections.size(), settings);
                 connections.add(proxy);
-                (new Thread(proxy)).start();
+                proxy.start();
             } catch (IOException e) {
                 System.err.println("Incoming connection: Failed starting");
                 e.printStackTrace();
