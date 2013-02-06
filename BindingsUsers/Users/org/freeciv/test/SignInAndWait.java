@@ -27,6 +27,7 @@ import org.freeciv.utility.UI;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -70,7 +71,7 @@ public class SignInAndWait {
             }
         });
         try {
-            Interpreted con = new Interpreted(address, portNumber, reflexes);
+            Interpreted con = new Interpreted(new Socket(address, portNumber), reflexes);
 
             con.toSend(new PACKET_SERVER_JOIN_REQ(userName,
                     con.getCapStringMandatory(),

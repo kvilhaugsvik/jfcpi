@@ -27,10 +27,6 @@ public class Interpreted implements FreecivConnection {
 
     private final PacketsMapping interpreter;
 
-    public Interpreted(String address, int port, Map<Integer, ReflexReaction> reflexes) throws IOException {
-        this(new Socket(address, port), reflexes);
-    }
-
     public Interpreted(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
         interpreter = new PacketsMapping();
 
