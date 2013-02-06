@@ -28,9 +28,17 @@ public class Interpreted implements FreecivConnection {
     private final PacketsMapping interpreter;
 
     public Interpreted(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
-        interpreter = new PacketsMapping();
+        this(connection, reflexes, new PacketsMapping());
+    }
 
-        toProcess = new Uninterpreted(connection, interpreter.getPacketHeaderClass(), reflexes);
+    private Interpreted(Socket connection, Map<Integer, ReflexReaction> reflexes, PacketsMapping interpreter)
+            throws IOException {
+        this(new Uninterpreted(connection, interpreter.getPacketHeaderClass(), reflexes), interpreter);
+    }
+
+    public Interpreted(Uninterpreted connection, PacketsMapping interpreter) throws IOException {
+        this.interpreter = interpreter;
+        this.toProcess = connection;
     }
 
     public Packet getPacket() throws IOException, NotReadyYetException {
