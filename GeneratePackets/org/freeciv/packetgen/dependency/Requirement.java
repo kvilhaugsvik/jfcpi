@@ -62,6 +62,6 @@ public class Requirement implements Comparable<Requirement>, Required {
 
     @Override
     public String toString() {
-        return "The " + kind + " " + name;
+        return "The " + kind.getSimpleName() + " " + name;
     }
 }
