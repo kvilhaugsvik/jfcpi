@@ -26,6 +26,7 @@
         <file>common/tech.h</file>
         <file>common/terrain.h</file>
         <file>common/tile.h</file>
+        <file>common/traderoutes.h</file>
         <file>common/unit.h</file>
 
         <file>server/settings.c</file>
