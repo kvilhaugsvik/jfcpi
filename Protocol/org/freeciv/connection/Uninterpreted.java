@@ -27,11 +27,14 @@ import java.util.Map;
 
 public class Uninterpreted implements FreecivConnection {
     private final LinkedList<RawPacket> buffered;
-    private final Socket connection;
+
+    private final OutputStream out;
 
     private final ReflexPacketKind quickRespond;
 
     private final OverImpl overImpl = new OverImpl();
+
+    private boolean stillOpen;
 
     public Uninterpreted(
             final Socket connection,
@@ -40,11 +43,11 @@ public class Uninterpreted implements FreecivConnection {
     ) throws IOException {
         buffered = new LinkedList<RawPacket>();
         quickRespond = new ReflexPacketKind(reflexes, this);
-        this.connection = connection;
+        this.stillOpen = true;
 
-        final InputStream in = connection.getInputStream();
+        this.out = connection.getOutputStream();
 
-        Thread fastReader = new BackgroundReader(in, this, connection, packetHeaderClass);
+        Thread fastReader = new BackgroundReader(connection.getInputStream(), this, packetHeaderClass);
         fastReader.setDaemon(true);
         fastReader.start();
     }
@@ -63,7 +66,7 @@ public class Uninterpreted implements FreecivConnection {
     }
 
     public boolean isOpen() {
-        return !connection.isClosed();
+        return stillOpen;
     }
 
     public void toSend(Packet toSend) throws IOException {
@@ -72,7 +75,7 @@ public class Uninterpreted implements FreecivConnection {
 
         toSend.encodeTo(packet);
 
-        connection.getOutputStream().write(packetSerialized.toByteArray());
+        out.write(packetSerialized.toByteArray());
     }
 
     public void setOver() {
@@ -89,7 +92,7 @@ public class Uninterpreted implements FreecivConnection {
         private final Constructor<? extends PacketHeader> headerReader;
         private final int headerSize;
 
-        public BackgroundReader(InputStream in, Uninterpreted parent, Socket connection,
+        public BackgroundReader(InputStream in, Uninterpreted parent,
                                 final Class<? extends PacketHeader> packetHeaderClass) throws IOException {
             this.in = in;
             this.parent = parent;
@@ -126,6 +129,7 @@ public class Uninterpreted implements FreecivConnection {
                 parent.setOver();
             } finally {
                 try {
+                    stillOpen = false;
                     in.close();
                 } catch (IOException e) {
                     System.err.println("Problems while closing network connection. Packets may not have been sent");
