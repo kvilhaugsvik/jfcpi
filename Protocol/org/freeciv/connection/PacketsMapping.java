@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
 
 public class PacketsMapping {
     private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
-    private final int packetNumberBytes;
+    private final Class<? extends PacketHeader> packetNumberBytes;
     private final String capStringMandatory;
     private final String capStringOptional;
     private final String versionLabel;
@@ -37,7 +37,8 @@ public class PacketsMapping {
         try {
             Class constants = Class.forName(Util.VERSION_DATA_CLASS);
             Class[] understoodPackets = (Class[])constants.getField(Util.PACKET_MAP_NAME).get(null);
-            packetNumberBytes = constants.getField(Util.PACKET_NUMBER_SIZE_NAME).getInt(null);
+            packetNumberBytes =
+                    (Class<? extends PacketHeader>) constants.getField(Util.HEADER_NAME).get(null);
             capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
             capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
             versionLabel = (String)constants.getField("VERSION_LABEL").get(null);
@@ -60,6 +61,8 @@ public class PacketsMapping {
         } catch (ClassNotFoundException e) {
             throw new IOException("Version information missing", e);
         } catch (NoSuchFieldException e) {
+            throw new IOException("Version information not compatible", e);
+        } catch (ClassCastException e) {
             throw new IOException("Version information not compatible", e);
         } catch (IllegalAccessException e) {
             throw new IOException("Refused to read version information", e);
@@ -89,14 +92,7 @@ public class PacketsMapping {
     }
 
     public Class<? extends PacketHeader> getPacketHeaderClass() {
-        switch (packetNumberBytes) {
-            case 1:
-                return Header_2_1.class;
-            case 2:
-                return Header_2_2.class;
-            default:
-                throw new IllegalArgumentException("The packet number in the header can only be 1 or 2 bytes long.");
-        }
+        return packetNumberBytes;
     }
 
     public String getCapStringMandatory() {

@@ -20,7 +20,7 @@ import java.util.List;
 public class Util {
     /* Constants */
     public static final String VERSION_DATA_CLASS = "org.freeciv.VersionData";
-    public static final String PACKET_NUMBER_SIZE_NAME = "networkHeaderPacketNumberBytes";
+    public static final String HEADER_NAME = "headerKind";
     public static final String PACKET_MAP_NAME = "understandsPackets";
 
     /* Utility methods */

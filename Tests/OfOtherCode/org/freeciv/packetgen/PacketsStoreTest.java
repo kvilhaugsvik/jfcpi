@@ -253,7 +253,7 @@ public class PacketsStoreTest {
 
     @Test public void versionDataHasNetworkHeaderPacketNumberBytes() {
         assertTrue("Could not find the number of bytes of the packet header the packet number should take",
-                getVersionData(defaultStorage()).hasConstant("networkHeaderPacketNumberBytes"));
+                getVersionData(defaultStorage()).hasConstant(Util.HEADER_NAME));
     }
 
     @Test public void versionDataUnderstandsPackets() {

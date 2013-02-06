@@ -25,7 +25,6 @@ import org.freeciv.packetgen.enteties.supporting.*;
 import org.freeciv.packetgen.javaGenerator.*;
 import org.freeciv.packetgen.javaGenerator.expression.ArrayLiteral;
 import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
 
 import java.util.*;
@@ -66,8 +65,8 @@ public class PacketsStore {
                                                                 "for packet kind field in packet header");
         }
 
-        requirements.addWanted(Constant.isInt(Util.PACKET_NUMBER_SIZE_NAME,
-                                            IntExpression.integer(bytesInPacketNumber + "")));
+        requirements.addWanted(Constant.isClass(Util.HEADER_NAME,
+                packetHeaderType.scopeUnknown().classVal()));
     }
 
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
