@@ -144,7 +144,7 @@ public class Uninterpreted implements FreecivConnection {
         }
 
         private RawPacket readPacket()
-                throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException, DoneReading {
+                throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException {
             final byte[] headerStart = readXBytesFrom(headerSize, in, parent, true);
             PacketHeader head =
                     headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
@@ -154,22 +154,31 @@ public class Uninterpreted implements FreecivConnection {
         }
 
         private static byte[] readXBytesFrom(int wanted, InputStream from, Uninterpreted parent, boolean clean)
-                throws IOException, DoneReading {
+                throws IOException {
             byte[] out = new byte[wanted];
             int alreadyRead = 0;
             while(alreadyRead < wanted) {
-                int bytesRead = from.read(out, alreadyRead, wanted - alreadyRead);
+                final int bytesRead;
+                try {
+                    bytesRead = from.read(out, alreadyRead, wanted - alreadyRead);
+                } catch (EOFException e) {
+                    throw done(wanted, clean, alreadyRead);
+                }
                 if (0 <= bytesRead)
                     alreadyRead += bytesRead;
                 else if (parent.isOver())
-                    if (clean && 0 == alreadyRead)
-                        throw new DoneReading("Nothing to read and nothing is waiting");
-                    else
-                        throw new EOFException("Nothing to read and nothing is waiting." +
-                                "Read " + alreadyRead + " of " + wanted + " bytes");
+                    throw done(wanted, clean, alreadyRead);
                 Thread.yield();
             }
             return out;
+        }
+
+        private static IOException done(int wanted, boolean clean, int alreadyRead) throws DoneReading, EOFException {
+            if (clean && 0 == alreadyRead)
+                return new DoneReading("Nothing to read and nothing is waiting");
+            else
+                return new EOFException("Nothing to read and nothing is waiting." +
+                        "Read " + alreadyRead + " of " + wanted + " bytes");
         }
 
         public boolean hasPacket() {
@@ -185,7 +194,7 @@ public class Uninterpreted implements FreecivConnection {
         }
     }
 
-    static class DoneReading extends Exception {
+    static class DoneReading extends IOException {
         public DoneReading(String message) {
             super(message);
         }
