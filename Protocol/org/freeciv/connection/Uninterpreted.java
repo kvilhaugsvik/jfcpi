@@ -73,12 +73,21 @@ public class Uninterpreted implements FreecivConnection {
     }
 
     public void toSend(Packet toSend) throws IOException {
+        if (!isOpen()) {
+            throw new IOException("Is closed. Can't send.");
+        }
+
         ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getHeader().getTotalSize());
         DataOutputStream packet = new DataOutputStream(packetSerialized);
 
         toSend.encodeTo(packet);
 
-        out.write(packetSerialized.toByteArray());
+        try {
+            out.write(packetSerialized.toByteArray());
+        } catch (IOException e) {
+            close();
+            throw new IOException("Can't send", e);
+        }
     }
 
     public void setOver() {
