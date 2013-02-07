@@ -26,11 +26,8 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class Uninterpreted implements FreecivConnection {
-    private final LinkedList<RawPacket> buffered;
-
+    private final BackgroundReader in;
     private final OutputStream out;
-
-    private final ReflexPacketKind quickRespond;
 
     private final OverImpl overImpl = new OverImpl();
 
@@ -41,32 +38,38 @@ public class Uninterpreted implements FreecivConnection {
             final Class<? extends PacketHeader> packetHeaderClass,
             final Map<Integer, ReflexReaction> reflexes
     ) throws IOException {
-        buffered = new LinkedList<RawPacket>();
-        quickRespond = new ReflexPacketKind(reflexes, this);
         this.stillOpen = true;
-
         this.out = connection.getOutputStream();
+        this.in = new BackgroundReader(connection.getInputStream(), this,
+                new ReflexPacketKind(reflexes, this), packetHeaderClass);
 
-        Thread fastReader = new BackgroundReader(connection.getInputStream(), this, packetHeaderClass);
-        fastReader.setDaemon(true);
-        fastReader.start();
+        this.in.start();
     }
 
     public boolean packetReady() {
-        return !buffered.isEmpty();
+        return in.hasPacket();
     }
 
     public RawPacket getPacket() throws NotReadyYetException {
         if (!packetReady())
             throw new NotReadyYetException("No packets waiting");
 
-        synchronized (buffered) {
-            return buffered.removeFirst();
-        }
+        return in.getPacket();
     }
 
     public boolean isOpen() {
         return stillOpen;
+    }
+
+    public void close() {
+        setOver();
+        stillOpen = false;
+        try {
+            out.close(); // Since out is from a Socket this closes it as well
+        } catch (IOException e) {
+            System.err.println("Problems while closing network connection. Packets may not have been sent");
+            e.printStackTrace();
+        }
     }
 
     public void toSend(Packet toSend) throws IOException {
@@ -86,16 +89,22 @@ public class Uninterpreted implements FreecivConnection {
         return overImpl.isOver();
     }
 
-    private class BackgroundReader extends Thread {
+    private static class BackgroundReader extends Thread {
         private final InputStream in;
+        private final LinkedList<RawPacket> buffered;
         private final Uninterpreted parent;
         private final Constructor<? extends PacketHeader> headerReader;
         private final int headerSize;
 
-        public BackgroundReader(InputStream in, Uninterpreted parent,
-                                final Class<? extends PacketHeader> packetHeaderClass) throws IOException {
+        private final ReflexPacketKind quickRespond;
+
+        public BackgroundReader(InputStream in, Uninterpreted parent, ReflexPacketKind quickRespond,
+                                final Class<? extends PacketHeader> packetHeaderClass)
+                throws IOException {
             this.in = in;
             this.parent = parent;
+            this.quickRespond = quickRespond;
+            this.buffered = new LinkedList<RawPacket>();
 
             try {
                 headerReader = packetHeaderClass.getConstructor(DataInput.class);
@@ -107,6 +116,8 @@ public class Uninterpreted implements FreecivConnection {
             } catch (IllegalAccessException e) {
                 throw new IOException("Could not access header size in header interpreter", e);
             }
+
+            this.setDaemon(true);
         }
 
         @Override
@@ -128,13 +139,7 @@ public class Uninterpreted implements FreecivConnection {
                 e.printStackTrace();
                 parent.setOver();
             } finally {
-                try {
-                    stillOpen = false;
-                    in.close();
-                } catch (IOException e) {
-                    System.err.println("Problems while closing network connection. Packets may not have been sent");
-                    e.printStackTrace();
-                }
+                parent.close();
             }
         }
 
@@ -148,7 +153,7 @@ public class Uninterpreted implements FreecivConnection {
             return new RawPacket(body, head);
         }
 
-        private byte[] readXBytesFrom(int wanted, InputStream from, Uninterpreted parent, boolean clean)
+        private static byte[] readXBytesFrom(int wanted, InputStream from, Uninterpreted parent, boolean clean)
                 throws IOException, DoneReading {
             byte[] out = new byte[wanted];
             int alreadyRead = 0;
@@ -165,6 +170,18 @@ public class Uninterpreted implements FreecivConnection {
                 Thread.yield();
             }
             return out;
+        }
+
+        public boolean hasPacket() {
+            synchronized (buffered) {
+                return !buffered.isEmpty();
+            }
+        }
+
+        public RawPacket getPacket() {
+            synchronized (buffered) {
+                return buffered.removeFirst();
+            }
         }
     }
 
