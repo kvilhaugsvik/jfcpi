@@ -37,6 +37,9 @@ PROTOCOL_DISTRIBUTION = FreecivProto.jar
 all: tests compileTestSignInToServer compileProxyRecorder protojar
 	touch all
 
+code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder sourceDefaultsForGenerator sourceTestPeers sourceFromFreeciv
+	touch code
+
 tests: runTests
 	touch tests
 
@@ -57,15 +60,19 @@ sourceDefaultsForGenerator:
 	echo "}" >>${GENERATORDEFAULTS}
 	touch sourceDefaultsForGenerator
 
-compileCodeGenerator: sourceDefaultsForGenerator compileBasicProtocol compileUtils
+scriptPacketsExtract:
+	echo "${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} org.freeciv.packetgen.GeneratePackets \"\$$@\"" > packetsExtract
+	chmod +x packetsExtract
+	touch scriptPacketsExtract
+
+compileCodeGenerator: sourceDefaultsForGenerator compileBasicProtocol compileUtils scriptPacketsExtract
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
 	${JAVAC} -cp ${COMPILED_PROTOCOL_FOLDER}:${SCALALIB} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
 	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.scala"`
-	echo "${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_PROTOCOL_FOLDER} org.freeciv.packetgen.GeneratePackets \"\$$@\"" > compileCodeGenerator
-	chmod +x compileCodeGenerator || rm compileCodeGenerator
+	touch compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
-	sh compileCodeGenerator --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${DEVMODE}
+	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${DEVMODE}
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv
@@ -128,20 +135,25 @@ compileBindingsUsers: compileFromFreeciv compileUtils
 	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find BindingsUsers/Users -iname "*.java"`
 	touch compileBindingsUsers
 
-compileTestSignInToServer: compileBindingsUsers
+scriptTestSignInToServer:
 	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \"\$$@\"" > testSignInToServer
 	chmod +x testSignInToServer
-	touch compileTestSignInToServer
+	touch scriptTestSignInToServer
+
+compileTestSignInToServer: compileBindingsUsers scriptTestSignInToServer
 
 # not included in tests since it needs a running Freeciv server
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
-compileProxyRecorder: compileFromFreeciv compileUtils
-	mkdir -p ${COMPILED_RECORDER_FOLDER}
-	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find FreecivRecorder/src -iname "*.java"`
+scriptRunProxyRecorder:
 	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
+	touch scriptRunProxyRecorder
+
+compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder
+	mkdir -p ${COMPILED_RECORDER_FOLDER}
+	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find FreecivRecorder/src -iname "*.java"`
 	touch compileProxyRecorder
 
 # not included in tests since it needs a running Freeciv server and client
@@ -205,12 +217,15 @@ clean:
 	rm -rf ${COMPILED_BINDINGS_USERS_FOLDER}
 	rm -f ${PROTOCOL_DISTRIBUTION} protojar
 	rm -f all
+	rm -f code
 	rm -rf compileTestSignInToServer testSignInToServer runtestsignintoserver
 	rm -rf ${PROTOCOL_DISTRIBUTION}
 	rm -rf sourceFromFreeciv
 	rm -rf compileFromFreeciv
 	rm -rf compileBindingsUsers
 	rm -rf compileProxyRecorder proxyRecorder runProxyRecorer
+	rm -f scriptRunProxyRecorder scriptTestSignInToServer scriptPacketsExtract
+	rm -f packetsExtract
 	rm -rf compileUtils compileUtilsTests runUtilsTests
 
 distclean: clean
