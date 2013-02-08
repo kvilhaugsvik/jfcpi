@@ -15,11 +15,11 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packet.Cancel;
-import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.expression.ArrayLiteral;
-import org.freeciv.packetgen.javaGenerator.expression.Reference;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
+import com.kvilhaugsvik.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.expression.ArrayLiteral;
+import com.kvilhaugsvik.javaGenerator.expression.Reference;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 
 import java.util.List;
 

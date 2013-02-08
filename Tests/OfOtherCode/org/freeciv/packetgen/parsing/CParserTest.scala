@@ -26,7 +26,7 @@ import util.parsing.input.CharArrayReader
 import java.util.Collection
 import org.freeciv.packetgen.UndefinedException
 import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, DataType}
-import org.freeciv.packetgen.javaGenerator.TargetClass
+import com.kvilhaugsvik.javaGenerator.TargetClass
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
@@ -708,7 +708,7 @@ enum implicitFirst {
 import javax.annotation.Generated;
 
 @Generated(comments = "Auto generated from Freeciv C code",
-""" + "\t" + """value = "org.freeciv.packetgen.javaGenerator.ClassWriter")
+""" + "\t" + """value = "com.kvilhaugsvik.javaGenerator.ClassWriter")
 public enum test implements FCEnum {
 	ONE(0, "ONE"),
 	TWO(1, "TWO"),

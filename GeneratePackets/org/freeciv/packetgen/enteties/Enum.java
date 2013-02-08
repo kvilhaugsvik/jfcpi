@@ -19,22 +19,22 @@ import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
-import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.Block;
-import org.freeciv.packetgen.javaGenerator.expression.EnumElement;
-import org.freeciv.packetgen.javaGenerator.expression.MethodCall;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
+import com.kvilhaugsvik.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.Block;
+import com.kvilhaugsvik.javaGenerator.expression.EnumElement;
+import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class Enum extends ClassWriter implements IDependency, IDependency.Maker {
     private final boolean bitwise;

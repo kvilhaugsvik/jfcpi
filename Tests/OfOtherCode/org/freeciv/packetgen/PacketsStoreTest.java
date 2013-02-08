@@ -19,9 +19,9 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.supporting.*;
-import org.freeciv.packetgen.javaGenerator.ClassWriter;
-import org.freeciv.packetgen.javaGenerator.representation.CodeAtoms;
-import org.freeciv.packetgen.javaGenerator.representation.HasAtoms;
+import com.kvilhaugsvik.javaGenerator.ClassWriter;
+import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
+import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import org.junit.Test;
 
 import java.util.*;

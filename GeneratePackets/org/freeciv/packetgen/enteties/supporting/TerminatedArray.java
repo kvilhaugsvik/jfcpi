@@ -6,19 +6,19 @@ import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.Block;
-import org.freeciv.packetgen.javaGenerator.expression.MethodCall;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
+import com.kvilhaugsvik.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.Block;
+import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 
 import java.util.*;
 
 import static org.freeciv.packetgen.Hardcoded.*;
-import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
 public class TerminatedArray extends FieldTypeBasic {

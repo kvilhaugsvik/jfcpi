@@ -22,13 +22,13 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.Field;
-import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.Block;
-import org.freeciv.packetgen.javaGenerator.Import;
-import org.freeciv.packetgen.javaGenerator.expression.MethodCall;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.*;
+import com.kvilhaugsvik.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.Block;
+import com.kvilhaugsvik.javaGenerator.Import;
+import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.FCEnum;
 
 import java.io.DataInput;
@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
-import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class Packet extends ClassWriter implements IDependency, ReqKind {
     private final int number;

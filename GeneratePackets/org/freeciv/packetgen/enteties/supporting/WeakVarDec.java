@@ -14,8 +14,8 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
-import org.freeciv.packetgen.javaGenerator.TargetArray;
-import org.freeciv.packetgen.javaGenerator.TargetClass;
+import com.kvilhaugsvik.javaGenerator.TargetArray;
+import com.kvilhaugsvik.javaGenerator.TargetClass;
 
 public class WeakVarDec {
     protected final String name;

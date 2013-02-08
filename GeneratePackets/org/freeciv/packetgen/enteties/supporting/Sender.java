@@ -15,11 +15,11 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packet.Sent;
-import org.freeciv.packetgen.javaGenerator.Annotate;
-import org.freeciv.packetgen.javaGenerator.expression.Reference;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
+import com.kvilhaugsvik.javaGenerator.Annotate;
+import com.kvilhaugsvik.javaGenerator.expression.Reference;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 
 public class Sender extends Annotate {
     public Sender(int number) {

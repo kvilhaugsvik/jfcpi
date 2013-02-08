@@ -16,7 +16,7 @@ package org.freeciv.packetgen.parsing
 
 import collection.mutable.ListBuffer
 import org.freeciv.packetgen.dependency.Requirement
-import org.freeciv.packetgen.javaGenerator.ClassWriter
+import com.kvilhaugsvik.javaGenerator.ClassWriter
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import org.freeciv.packetgen.enteties.{Struct, Enum, Constant, BitVector}
 import org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.{newEnumValue, newInvalidEnum}

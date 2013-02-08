@@ -16,13 +16,9 @@ package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.enteties.*;
-import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
-import org.freeciv.packetgen.javaGenerator.Comment;
-import org.freeciv.packetgen.javaGenerator.Modifiable;
-import org.freeciv.packetgen.javaGenerator.Var;
+import com.kvilhaugsvik.javaGenerator.Comment;
 import org.junit.Test;
 
 import java.util.*;

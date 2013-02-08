@@ -18,19 +18,19 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.javaGenerator.TargetClass;
-import org.freeciv.packetgen.javaGenerator.Var;
-import org.freeciv.packetgen.javaGenerator.Block;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
+import com.kvilhaugsvik.javaGenerator.TargetClass;
+import com.kvilhaugsvik.javaGenerator.Var;
+import com.kvilhaugsvik.javaGenerator.Block;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import org.junit.Test;
 
 import java.util.Collections;
 
-import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.TO_STRING_OBJECT;
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.TO_STRING_OBJECT;
 import static org.junit.Assert.*;
 
 public class FieldTypeTest {

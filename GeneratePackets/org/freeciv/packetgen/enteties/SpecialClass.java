@@ -16,7 +16,7 @@ package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.*;
 
 import java.util.Collection;
 import java.util.Collections;

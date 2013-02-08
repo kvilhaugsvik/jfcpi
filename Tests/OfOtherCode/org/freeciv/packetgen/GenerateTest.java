@@ -24,7 +24,7 @@ import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
-import org.freeciv.packetgen.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

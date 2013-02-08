@@ -18,15 +18,15 @@ import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.WeakVarDec;
-import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.Block;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
+import com.kvilhaugsvik.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.Block;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.types.FCEnum;
 
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class Struct extends ClassWriter implements IDependency {
     private final Set<Requirement> iRequire;

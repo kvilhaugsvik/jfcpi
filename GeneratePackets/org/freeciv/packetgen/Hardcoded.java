@@ -22,22 +22,22 @@ import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
 import org.freeciv.packetgen.enteties.SpecialClass;
 import org.freeciv.packetgen.enteties.supporting.*;
-import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.Block;
-import org.freeciv.packetgen.javaGenerator.Statement;
-import org.freeciv.packetgen.javaGenerator.expression.MethodCall;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From2;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.ABool;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
+import com.kvilhaugsvik.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.Block;
+import com.kvilhaugsvik.javaGenerator.Statement;
+import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.*;
 
-import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 //TODO: Move data to file
 public class Hardcoded {

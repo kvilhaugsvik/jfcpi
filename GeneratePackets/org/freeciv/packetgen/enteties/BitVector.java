@@ -9,23 +9,23 @@ import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
-import org.freeciv.packetgen.javaGenerator.*;
-import org.freeciv.packetgen.javaGenerator.Block;
-import org.freeciv.packetgen.javaGenerator.expression.MethodCall;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.ABool;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AValue;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
+import com.kvilhaugsvik.javaGenerator.*;
+import com.kvilhaugsvik.javaGenerator.Block;
+import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.freeciv.packetgen.javaGenerator.util.BuiltIn.*;
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class BitVector extends ClassWriter implements IDependency, IDependency.Maker {
     private final Collection<Requirement> iRequire;

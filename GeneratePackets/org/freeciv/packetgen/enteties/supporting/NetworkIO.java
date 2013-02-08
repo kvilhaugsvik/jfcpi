@@ -17,12 +17,12 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.javaGenerator.Var;
-import org.freeciv.packetgen.javaGenerator.typeBridge.From1;
-import org.freeciv.packetgen.javaGenerator.typeBridge.Typed;
-import org.freeciv.packetgen.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.AnInt;
-import org.freeciv.packetgen.javaGenerator.typeBridge.willReturn.Returnable;
+import com.kvilhaugsvik.javaGenerator.Var;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.Collection;
 import java.util.Collections;
