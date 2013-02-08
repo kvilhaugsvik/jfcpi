@@ -43,14 +43,19 @@ public class ProxyRecorder extends Thread {
     private static final String DEBUG = "debug";
     private static final String TO_TRACE = "trace-to-console";
 
+    public static final Filter CONNECTION_PACKETS = new FilterPacketKind(Arrays.asList(88, 89, 115, 116, 119));
+
+    public static final String DEFAULT_TRACE_PREFIX = "FreecivCon";
+    public static final String DEFAULT_TRACE_SUFFIX = ".fct";
+
     public static final LinkedList<Setting<?>> SETTINGS = new LinkedList<Setting<?>>() {{
         add(new Setting.IntSetting(PROXY_PORT, 5556, "listen for the Freeciv client on this port"));
         add(new Setting.IntSetting(REAL_SERVER_PORT, 55555, "connect to the Freeciv server on ths port"));
         add(new Setting.StringSetting(REAL_SERVER_ADDRESS,
                 "127.0.0.1", "connect to the Freeciv server on this address"));
 
-        add(new Setting.StringSetting(TRACE_NAME_START, "FreecivCon", "prefix of the trace file names"));
-        add(new Setting.StringSetting(TRACE_NAME_END, ".fct", "suffix of the trace file names"));
+        add(new Setting.StringSetting(TRACE_NAME_START, DEFAULT_TRACE_PREFIX, "prefix of the trace file names"));
+        add(new Setting.StringSetting(TRACE_NAME_END, DEFAULT_TRACE_SUFFIX, "suffix of the trace file names"));
         add(new Setting.BoolSetting(TRACE_DYNAMIC, true, "should time be recorded in the trace"));
         add(new Setting.BoolSetting(TRACE_EXCLUDE_CONNECTION, false,
                 "don't record connection packets in the trace"));
@@ -67,8 +72,6 @@ public class ProxyRecorder extends Thread {
         add(new Setting.BoolSetting(DEBUG, false, "print debug information to the terminal"));
         add(new Setting.BoolSetting(TO_TRACE, false, "print all packets going to the trace to the terminal"));
     }};
-
-    private static final Filter CONNECTION_PACKETS = new FilterPacketKind(Arrays.asList(88, 89, 115, 116, 119));
 
     private final int proxyNumber;
     private final FreecivConnection clientCon;
