@@ -29,6 +29,7 @@ COMPILED_PROTOCOL_FOLDER ?= out/Protocol
 COMPILED_GENERATOR_FOLDER ?= out/GeneratePackages
 COMPILED_TESTS_FOLDER ?= out/Tests
 COMPILED_BINDINGS_USERS_FOLDER ?= out/BindingsUsers
+COMPILED_RECORDER_FOLDER ?= out/FreecivRecorder
 
 # Generated jars
 PROTOCOL_DISTRIBUTION = FreecivProto.jar
@@ -136,8 +137,10 @@ compileTestSignInToServer: compileBindingsUsers
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
-compileProxyRecorder: compileBindingsUsers
-	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
+compileProxyRecorder: compileFromFreeciv compileUtils
+	mkdir -p ${COMPILED_RECORDER_FOLDER}
+	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find FreecivRecorder/src -iname "*.java"`
+	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
 	touch compileProxyRecorder
 
