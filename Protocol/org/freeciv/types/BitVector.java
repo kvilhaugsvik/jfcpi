@@ -20,10 +20,8 @@ import java.util.Arrays;
 
 public abstract class BitVector {
     protected final boolean[] vec;
-    protected final int sizeInBits;
 
     private BitVector(final int size) {
-        this.sizeInBits = size;
         this.vec = new boolean[size];
     }
 
@@ -42,7 +40,6 @@ public abstract class BitVector {
 
     protected BitVector(final boolean[] normal) {
         vec = normal.clone();
-        sizeInBits = normal.length;
     }
 
     private int isBitNumberInAByte(final int pos) {
@@ -63,9 +60,9 @@ public abstract class BitVector {
     }
 
     public byte[] getAsByteArray() {
-        byte[] out = new byte[1 + isInByteNumber((sizeInBits - 1))];
+        byte[] out = new byte[1 + isInByteNumber((vec.length - 1))];
         Arrays.fill(out, (byte)0);
-        for (int bit = 0; bit < sizeInBits; bit++) {
+        for (int bit = 0; bit < vec.length; bit++) {
             if (vec[bit])
                 out[isInByteNumber(bit)] += 1 << isBitNumberInAByte(bit);
         }
