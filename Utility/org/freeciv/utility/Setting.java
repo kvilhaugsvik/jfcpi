@@ -16,8 +16,9 @@ package org.freeciv.utility;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
+import static org.freeciv.utility.Validation.validateMethodIsAConverter;
+import static org.freeciv.utility.Validation.validateMethodIsStatic;
 import static org.freeciv.utility.Validation.validateNotNull;
 
 public class Setting<Kind> {
@@ -53,13 +54,8 @@ public class Setting<Kind> {
 
     private static <Kind> void validateMethodSignature(Class<Kind> kind, Method fromString) {
         validateNotNull(fromString, "from String converter");
-        if (!Modifier.isStatic(fromString.getModifiers()))
-            throw new IllegalArgumentException(fromString + " isn't static");
-        if (!kind.isAssignableFrom(fromString.getReturnType()))
-            throw new IllegalArgumentException(fromString + " doesn't convert to a " + kind);
-        final Class<?>[] params = fromString.getParameterTypes();
-        if (!(1 == params.length && params[0].isAssignableFrom(String.class)))
-            throw new IllegalArgumentException(fromString + " doesn't convert from one String");
+        validateMethodIsStatic(fromString);
+        validateMethodIsAConverter(fromString, kind, String.class);
     }
 
     public String getName() {
