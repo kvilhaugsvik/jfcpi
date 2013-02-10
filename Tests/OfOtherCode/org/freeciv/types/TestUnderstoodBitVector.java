@@ -109,12 +109,7 @@ public class TestUnderstoodBitVector {
         }
 
         public static Understanding valueOf(int number) {
-            for (Understanding element : values()) {
-                if (element.getNumber() == number) {
-                    return element;
-                }
-            }
-            return null;
+            return Helper.valueOfUnknownIsIllegal(number, values());
         }
     }
 }

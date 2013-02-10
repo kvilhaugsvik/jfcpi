@@ -16,4 +16,15 @@ package org.freeciv.types;
 
 public interface FCEnum {
     public int getNumber();
+
+    class Helper {
+        public static <Flags extends FCEnum> Flags valueOfUnknownIsIllegal(int number, Flags[] values) {
+            for (Flags element : values) {
+                if (element.getNumber() == number) {
+                    return element;
+                }
+            }
+            throw new IllegalArgumentException(number + " not known");
+        }
+    }
 }
