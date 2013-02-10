@@ -191,12 +191,14 @@ runUtilsTests: compileUtilsTests
 
 compilePacketTest: folderTestOut compileBasicProtocol
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/OfOtherCode/org/freeciv/packet/ -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT} `find Tests/OfOtherCode/org/freeciv/types/ -iname "*.java"`
 	touch compilePacketTest
 
 runPacketTest: compilePacketTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.PacketTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.HeaderTest
 	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.ElementsLimitTest
+	${JAVA} -cp ${COMPILED_PROTOCOL_FOLDER}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.types.TestUnderstoodBitVector
 	touch runPacketTest
 
 runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnectionTests runUtilsTests
