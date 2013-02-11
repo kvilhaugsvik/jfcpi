@@ -125,10 +125,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         return new Typed<Kind>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
-                if (isInScope)
-                    to.add(shared.name);
-                else
-                    parent.writeAtoms(to);
+                parent.writeAtoms(to);
                 to.add(HAS);
                 to.add(new CodeAtom(field));
             }
@@ -183,10 +180,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         return new Formatted.Type<AValue>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
-                if (isInScope)
-                    to.add(shared.name);
-                else
-                    parent.writeAtoms(to);
+                parent.writeAtoms(to);
                 to.add(HAS);
                 to.add(typeClassField);
             }
