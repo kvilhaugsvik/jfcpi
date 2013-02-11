@@ -38,7 +38,7 @@ PROTOCOL_DISTRIBUTION = FreecivProto.jar
 all: tests compileTestSignInToServer compileProxyRecorder protojar
 	touch all
 
-code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder sourceDefaultsForGenerator sourceTestPeers sourceFromFreeciv
+code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder scriptRunPlayToServer sourceDefaultsForGenerator sourceTestPeers sourceFromFreeciv
 	touch code
 
 tests: runTests
@@ -158,7 +158,12 @@ scriptRunProxyRecorder:
 	chmod +x proxyRecorder
 	touch scriptRunProxyRecorder
 
-compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder
+scriptRunPlayToServer:
+	echo "${JAVA} -ea -cp ${COMPILED_PROTOCOL_FOLDER}:${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
+	chmod +x playRecord
+	touch scriptRunPlayToServer
+
+compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
 	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${COMPILED_PROTOCOL_FOLDER} `find FreecivRecorder/src -iname "*.java"`
 	touch compileProxyRecorder
@@ -237,6 +242,7 @@ clean:
 	rm -rf compileProxyRecorder proxyRecorder runProxyRecorer
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer scriptPacketsExtract
 	rm -f packetsExtract
+	rm -f scriptRunPlayToServer playRecord
 	rm -rf compileUtils compileUtilsTests runUtilsTests
 
 distclean: clean

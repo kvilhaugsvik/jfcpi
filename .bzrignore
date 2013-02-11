@@ -7,6 +7,7 @@ FreecivProto.jar
 packetsExtract
 testSignInToServer
 proxyRecorder
+playRecord
 
 # Make targets
 all
