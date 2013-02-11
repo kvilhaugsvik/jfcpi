@@ -18,14 +18,14 @@ import static org.freeciv.Util.*;
 
 import java.util.Arrays;
 
-public abstract class BitVector {
+public class BitVector {
     protected final boolean[] vec;
 
     private BitVector(final int size) {
         this.vec = new boolean[size];
     }
 
-    protected BitVector(final int sizeInBits, final byte[] src) {
+    public BitVector(final int sizeInBits, final byte[] src) {
         this(sizeInBits);
         for (int pos = 0; pos < sizeInBits; pos++)
             vec[pos] = 0 != (src[isInByteNumber(pos)] & (1 << isBitNumberInAByte(pos)));
