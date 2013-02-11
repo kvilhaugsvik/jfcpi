@@ -32,19 +32,22 @@ public class PlayToServer {
     private static final String TRACE_FILE = "file";
     private static final String ADDRESS = "address";
     private static final String PORT = "port";
+    private static final String IGNORE_TIME = "ignore-time";
     public static final LinkedList<Setting<?>> SETTINGS = new LinkedList<Setting<?>>() {{
         add(new Setting.StringSetting(TRACE_FILE,
                 ProxyRecorder.DEFAULT_TRACE_PREFIX + "0" + ProxyRecorder.DEFAULT_TRACE_SUFFIX,
                 "the file containing the trace to play back"));
         add(new Setting.StringSetting(ADDRESS, "127.0.0.1", "connect to the Freeciv server on this address"));
         add(new Setting.IntSetting(PORT, 5556, "connect to the Freeciv server on ths port"));
+        add(new Setting.BoolSetting(IGNORE_TIME, false, "ignore time data in the trace"));
         add(UI.HELP_SETTING);
     }};
 
     private final TraceFormat2Read source;
     private final SinkForward toServer;
+    private final boolean ignoreDynamic;
 
-    public PlayToServer(InputStream source, Socket server) throws IOException {
+    public PlayToServer(InputStream source, Socket server, boolean ignoreDynamic) throws IOException {
         final PacketsMapping versionKnowledge = new PacketsMapping();
         final Class<? extends PacketHeader> packetHeaderClass = versionKnowledge.getPacketHeaderClass();
         this.source = new TraceFormat2Read(source, new OverImpl(), packetHeaderClass);
@@ -70,6 +73,7 @@ public class PlayToServer {
         this.toServer = new SinkForward(conn, new FilterNot(new FilterOr(
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));
+        this.ignoreDynamic = ignoreDynamic;
     }
 
     public void run() throws IOException, InvocationTargetException {
@@ -82,7 +86,7 @@ public class PlayToServer {
             if (rec.ignoreMe)
                 continue;
 
-            sendNextAt = source.isDynamic() ? beganPlaying + rec.when : sendNextAt + 1000;
+            sendNextAt = source.isDynamic() && !ignoreDynamic ? beganPlaying + rec.when : sendNextAt + 1000;
             while (System.currentTimeMillis() < sendNextAt) // TODO: Evaluate if more precision is needed
                 Thread.yield();
 
@@ -118,7 +122,7 @@ public class PlayToServer {
 
         PlayToServer me;
         try {
-            me = new PlayToServer(traceInn, server);
+            me = new PlayToServer(traceInn, server, settings.<Boolean>getSetting(IGNORE_TIME));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
