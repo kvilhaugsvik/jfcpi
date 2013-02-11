@@ -18,6 +18,7 @@ import org.freeciv.connection.*;
 import org.freeciv.packet.PACKET_CONN_PONG;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
+import org.freeciv.recorder.traceFormat2.RecordTF2;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -79,11 +80,11 @@ public class PlayToServer {
     public void run() throws IOException, InvocationTargetException {
         final long beganPlaying = System.currentTimeMillis();
 
-        TraceFormat2Read.Record rec = source.readRecord();
+        RecordTF2 rec = source.readRecord();
         long sendNextAt = beganPlaying;
 
         while (true) {
-            if (rec.ignoreMe || !rec.client2server) {
+            if (rec.ignoreMe || !rec.isClientToServer()) {
                 rec = source.readRecord();
                 continue;
             }
@@ -92,7 +93,7 @@ public class PlayToServer {
             while (System.currentTimeMillis() < sendNextAt) // TODO: Evaluate if more precision is needed
                 Thread.yield();
 
-            toServer.filteredWrite(rec.client2server, rec.packet);
+            toServer.filteredWrite(rec.isClientToServer(), rec.packet);
 
             rec = source.readRecord();
         }
