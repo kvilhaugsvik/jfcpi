@@ -66,7 +66,7 @@ public class PacketsStore {
         }
 
         requirements.addWanted(Constant.isClass(Util.HEADER_NAME,
-                packetHeaderType.scopeUnknown().classVal()));
+                packetHeaderType.scopeUnknown().callV("class")));
     }
 
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {

@@ -173,20 +173,6 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
             return shared.parent.<Ret>callV(method, parameters);
     }
 
-    // TODO: Should this be seen as a function called on the type?
-    private final static CodeAtom typeClassField = new CodeAtom("class");
-    public Typed<AValue> classVal() {
-        final TargetClass parent = this;
-        return new Formatted.Type<AValue>() {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                parent.writeAtoms(to);
-                to.add(HAS);
-                to.add(typeClassField);
-            }
-        };
-    }
-
     public Value<AValue> newInstance(Typed<? extends AValue>... parameterList) {
         return new MethodCall.HasResult<AValue>(TargetMethod.Called.STATIC, this, getNewMethod(this), parameterList);
     }
