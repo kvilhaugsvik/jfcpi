@@ -69,14 +69,14 @@ class SinkWriteTrace extends Sink {
         return flags;
     }
 
-    private static int calculateFileHeaderSize(boolean dynamic) {
+    static int calculateFileHeaderSize(boolean dynamic) {
         int size = 5; // 2 bytes for version, 1 for header size, 1 for record header size and 1 for flags
         if (dynamic)
             size += 8; // the start time
         return size;
     }
 
-    private static int calculateRecordHeaderSize(boolean dynamic) {
+    static int calculateRecordHeaderSize(boolean dynamic) {
         int size = 1; // flags. For now only client to server
         if (dynamic)
             size += 8; // the time of the record
