@@ -83,8 +83,10 @@ public class PlayToServer {
         long sendNextAt = beganPlaying;
 
         while (true) {
-            if (rec.ignoreMe)
+            if (rec.ignoreMe || !rec.client2server) {
+                rec = source.readRecord();
                 continue;
+            }
 
             sendNextAt = source.isDynamic() && !ignoreDynamic ? beganPlaying + rec.when : sendNextAt + 1000;
             while (System.currentTimeMillis() < sendNextAt) // TODO: Evaluate if more precision is needed
