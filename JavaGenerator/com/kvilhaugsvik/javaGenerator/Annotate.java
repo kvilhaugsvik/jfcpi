@@ -29,6 +29,10 @@ public class Annotate extends Formatted implements HasAtoms {
         this.arguments = arguments;
     }
 
+    public String getName() {
+        return annotation;
+    }
+
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.add(new Annotate.Atom(annotation));

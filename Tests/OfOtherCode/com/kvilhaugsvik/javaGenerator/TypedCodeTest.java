@@ -137,7 +137,7 @@ public class TypedCodeTest {
         assertEquals("arrayVal.length", IR.joinSqueeze(asAtoms.toArray()));
     }
 
-    @Test public void annotatedField() {
+    @Test public void annotatedField_codeGen() {
         Annotate annotation = new Annotate("IsAField");
         Var field = Var.field(Arrays.asList(annotation),
                 Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
@@ -149,6 +149,16 @@ public class TypedCodeTest {
         assertEquals("final", asAtoms.get(2).getAtom().get());
         assertEquals("int", asAtoms.get(3).getAtom().get());
         assertEquals("number", asAtoms.get(4).getAtom().get());
+    }
+
+    @Test public void annotatedField_isAnnotated() {
+        Annotate annotation = new Annotate("IsAField");
+        Var field = Var.field(Arrays.asList(annotation),
+                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+                int.class, "number", null);
+
+        assertTrue("Annotation missing", field.isAnnotatedUsing("IsAField"));
+        assertFalse("Wrong annotation", field.isAnnotatedUsing("NotAnnotatedUsing"));
     }
 
     @Test public void breakLineBlock() {

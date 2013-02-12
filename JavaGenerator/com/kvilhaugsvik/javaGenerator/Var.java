@@ -142,4 +142,11 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     public <Kind extends AValue> Value<Kind> read(final String field) {
         return ref().callV(field);
     }
+
+    public boolean isAnnotatedUsing(String name) {
+        for (Annotate annotation : annotations)
+            if (annotation.getName().equals(name))
+                return true;
+        return false;
+    }
 }
