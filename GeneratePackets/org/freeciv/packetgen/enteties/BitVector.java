@@ -76,23 +76,22 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
         Var<TargetArray> pFromBits = Var.param(boolArray, "from");
         Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
         Var<AnInt> pSize = Var.param(int.class, "sizeInBits");
-        Var<AnInt> size = getField("size");
 
         addMethod(Method.newPublicConstructor(Comment.no(),
                 Arrays.asList(pFromByte, pSize),
                 new Block(
                         new MethodCall("super", pSize.ref(), pFromByte.ref()),
-                        size.assign(pSize.ref()))));
+                        getField("size").assign(pSize.ref()))));
         addMethod(Method.newPublicConstructor(Comment.no(),
                 Arrays.asList(pFromBits),
                 new Block(
                         new MethodCall<Returnable>("super", pFromBits.ref()),
-                        size.assign(pFromBits.read("length")))));
+                        getField("size").assign(pFromBits.read("length")))));
         addMethod(Method.newPublicConstructor(Comment.no(),
                 Arrays.asList(pFromBit, pSize),
                 new Block(
                         new MethodCall<Returnable>("super", pSize.ref(), pFromBit.ref()),
-                        size.assign(pSize.ref()))));
+                        getField("size").assign(pSize.ref()))));
 
         iRequire = Collections.<Requirement>emptySet();
         iProvide = new Requirement("char", DataType.class);
