@@ -1,5 +1,6 @@
 package org.freeciv.packetgen.enteties;
 
+import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.IDependency;
@@ -37,66 +38,62 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     private final Required bvFieldType;
 
     public BitVector(String name, IntExpression bits) {
+        this(name, bits, true);
+    }
+
+    public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
+        this("BitString", null, false);
+    }
+
+    private BitVector(String name, IntExpression sizeInBits, boolean knowsSize) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), Imports.are(),
                 "Freeciv C code", Collections.<Annotate>emptyList(), name,
                 TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
 
-        addClassConstant(Visibility.PUBLIC, int.class, "size", BuiltIn.<AnInt>toCode(bits.toString()));
-        knowsSize = true;
+        if (knowsSize)
+            addClassConstant(Visibility.PUBLIC, int.class, "size", BuiltIn.<AnInt>toCode(sizeInBits.toString()));
+        else
+            addPublicObjectConstant(int.class, "size");
+
+        this.knowsSize = knowsSize;
 
         Var<TargetArray> pFromByte = Var.param(byteArray, "from");
         Var<TargetArray> pFromBits = Var.param(boolArray, "from");
         Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
-        addMethod(Method.newPublicConstructor(Comment.no(),
-                Arrays.asList(pFromByte),
-                new Block(new MethodCall<Returnable>("super", getField("size").ref(), pFromByte.ref()))));
-        addMethod(Method.newPublicConstructor(Comment.no(),
-                Arrays.asList(pFromBits),
-                new Block(new MethodCall<Returnable>("super", pFromBits.ref()))));
-        addMethod(Method.newPublicConstructor(Comment.no(),
-                Arrays.asList(pFromBit),
-                new Block(new MethodCall<Returnable>("super", getField("size").ref(), pFromBit.ref()))));
 
-        iRequire = bits.getReqs();
-        iProvide = new Requirement(getName(), DataType.class);
-        arrayEater = false;
-        bvFieldType = new Requirement((knowsSize ? "bitvector" : "bit_string") +
-                "(" + iProvide.getName() + ")", FieldTypeBasic.class);
-    }
-
-    public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
-        super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), Imports.are(),
-                "Freeciv C code", Collections.<Annotate>emptyList(), "BitString",
-                TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
-
-        addPublicObjectConstant(int.class, "size");
-        knowsSize = false;
-
-        Var<TargetArray> pFromByte = Var.param(byteArray, "from");
-        Var<TargetArray> pFromBits = Var.param(boolArray, "from");
-        Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
         Var<AnInt> pSize = Var.param(int.class, "sizeInBits");
 
-        addMethod(Method.newPublicConstructor(Comment.no(),
-                Arrays.asList(pFromByte, pSize),
-                new Block(
-                        new MethodCall("super", pSize.ref(), pFromByte.ref()),
-                        getField("size").assign(pSize.ref()))));
-        addMethod(Method.newPublicConstructor(Comment.no(),
-                Arrays.asList(pFromBits),
-                new Block(
-                        new MethodCall<Returnable>("super", pFromBits.ref()),
-                        getField("size").assign(pFromBits.read("length")))));
-        addMethod(Method.newPublicConstructor(Comment.no(),
-                Arrays.asList(pFromBit, pSize),
-                new Block(
-                        new MethodCall<Returnable>("super", pSize.ref(), pFromBit.ref()),
-                        getField("size").assign(pSize.ref()))));
+        Reference sizeForNotFromData = knowsSize ? getField("size").ref() : pSize.ref();
+        {
+            List<? extends Var<? extends AValue>> pList = knowsSize ?
+                    Arrays.asList(pFromByte) :
+                    Arrays.asList(pFromByte, pSize);
+            Block constructorBody = new Block(new MethodCall<Returnable>("super", sizeForNotFromData, pFromByte.ref()));
+            if (!knowsSize)
+                constructorBody.addStatement(getField("size").assign(pSize.ref()));
+            addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
+        }
+        {
+            List<? extends Var<? extends AValue>> pList = Arrays.asList(pFromBits);
+            Block constructorBody = new Block(new MethodCall<Returnable>("super", pFromBits.ref()));
+            if (!knowsSize)
+                constructorBody.addStatement(getField("size").assign(pFromBits.read("length")));
+            addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
+        }
+        {
+            List<? extends Var<? extends AValue>> pList = knowsSize ?
+                    Arrays.asList(pFromBit) :
+                    Arrays.asList(pFromBit, pSize);
+            Block constructorBody = new Block(new MethodCall<Returnable>("super", sizeForNotFromData, pFromBit.ref()));
+            if (!knowsSize)
+                constructorBody.addStatement(getField("size").assign(pSize.ref()));
+            addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
+        }
 
-        iRequire = Collections.<Requirement>emptySet();
-        iProvide = new Requirement("char", DataType.class);
-        arrayEater = true;
-        bvFieldType = new Requirement((knowsSize ? "bitvector" : "bit_string") +
+        this.iRequire = knowsSize ? sizeInBits.getReqs() : Collections.<Requirement>emptySet();
+        this.iProvide = new Requirement(knowsSize ? getName() : "char", DataType.class);
+        this.arrayEater = !knowsSize;
+        this.bvFieldType = new Requirement((knowsSize ? "bitvector" : "bit_string") +
                 "(" + iProvide.getName() + ")", FieldTypeBasic.class);
     }
 
