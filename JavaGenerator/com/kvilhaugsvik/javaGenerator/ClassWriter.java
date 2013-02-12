@@ -45,7 +45,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     private final TargetClass parent;
     private final List<TargetClass> implementsInterface;
 
-    private final LinkedList<Var> fields = new LinkedList<Var>();
+    private final LinkedHashMap<String, Var> fields = new LinkedHashMap<String, Var>();
 
     private final LinkedList<Method> methods = new LinkedList<Method>();
     protected final EnumElements enums = new EnumElements();
@@ -87,7 +87,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                         TargetMethod.Called.STATIC_FIELD :
                         TargetMethod.Called.DYNAMIC_FIELD));
 
-        fields.add(field);
+        fields.put(field.getName(), field);
     }
 
     public void addClassConstant(Visibility visibility, TargetClass type, String name, Typed<? extends AValue> value) {
@@ -146,10 +146,10 @@ public class ClassWriter extends Formatted implements HasAtoms {
         return getField(field).assign(BuiltIn.<AValue>toCode(field));
     }
 
-    private static void formatVariableDeclarations(CodeAtoms to, final List<Var> fields) {
+    private static void formatVariableDeclarations(CodeAtoms to, final Collection<Var> fields) {
         if (!fields.isEmpty()) {
             to.hintStart(TokensToStringStyle.GROUP);
-            Scope scopeOfPrevious = fields.get(0).getScope();
+            Scope scopeOfPrevious = fields.iterator().next().getScope();
 
             for (Var variable : fields) {
                 if (!variable.getScope().equals(scopeOfPrevious)) {
@@ -167,7 +167,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     private void constructorFromFields(CodeAtoms to) {
         Block body = new Block();
         LinkedList<Var<? extends AValue>> args = new LinkedList<Var<? extends AValue>>();
-        for (Var dec : fields) {
+        for (Var dec : fields.values()) {
             body.addStatement(setFieldToVariableSameName(dec.getName()));
             args.add(Var.param(dec.getTType(), dec.getName()));
         }
@@ -212,7 +212,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         if (ClassKind.ENUM == kind && !enums.isEmpty())
             enums.writeAtoms(to);
 
-        formatVariableDeclarations(to, fields);
+        formatVariableDeclarations(to, fields.values());
 
         if (constructorFromAllFields)
             constructorFromFields(to);
@@ -248,12 +248,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     public Var getField(String name) {
-        HashSet<Var> allFields = new HashSet<Var>(fields);
-        allFields.addAll(fields);
-        for (Var field : allFields) {
-            if (field.getName().equals(name)) return field;
-        }
-        return null;
+        return fields.get(name);
     }
 
     public boolean hasConstant(String name) {
