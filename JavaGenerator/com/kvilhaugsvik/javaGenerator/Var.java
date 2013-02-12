@@ -18,6 +18,7 @@ import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 
@@ -138,14 +139,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         return Var.<Kind>field(annotations, visibility, scope, modifiable, TargetClass.fromClass(type), name, value);
     }
 
-    public <Kind extends AValue> Typed<Kind> read(final String field) {
-        return new Typed<Kind>() {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                reference.writeAtoms(to);
-                to.add(HAS);
-                to.add(new CodeAtom(field));
-            }
-        };
+    public <Kind extends AValue> Value<Kind> read(final String field) {
+        return ref().callV(field);
     }
 }

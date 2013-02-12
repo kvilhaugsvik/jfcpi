@@ -120,16 +120,8 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         return shared.variants.scopeUnknown();
     }
 
-    public <Kind extends AValue> Typed<Kind> read(final String field) {
-        final TargetClass parent = this;
-        return new Typed<Kind>() {
-            @Override
-            public void writeAtoms(CodeAtoms to) {
-                parent.writeAtoms(to);
-                to.add(HAS);
-                to.add(new CodeAtom(field));
-            }
-        };
+    public <Kind extends AValue> Value<Kind> read(final String field) {
+        return callV(field);
     }
 
     public void register(TargetMethod has) {
