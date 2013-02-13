@@ -19,9 +19,7 @@ import org.junit.Test;
 
 import java.io.*;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class FieldTypeTests {
     private static long roundTripUINT32(long number) throws IOException {
@@ -224,5 +222,31 @@ public class FieldTypeTests {
                 ElementsLimit.limit(2, 2, ElementsLimit.limit(3, 3)));
 
         array.verifyInsideLimits(ElementsLimit.limit(2, 2, ElementsLimit.limit(2, 2)));
+    }
+
+    @Test
+    public void BVGeneral_construct_fromData() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        storeTo.write(new byte[]{1, 3});
+        DataInputStream inn = new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray()));
+
+        BV_GENERAL bits = new BV_GENERAL(inn, ElementsLimit.limit(11));
+        boolean[] result = bits.getValue().getBits();
+
+        assertEquals(11, result.length);
+
+        assertTrue(result[0]);
+
+        assertFalse(result[1]);
+        assertFalse(result[2]);
+        assertFalse(result[3]);
+        assertFalse(result[4]);
+        assertFalse(result[5]);
+        assertFalse(result[6]);
+        assertFalse(result[7]);
+
+        assertTrue(result[8]);
+        assertTrue(result[9]);
+        assertFalse(result[10]);
     }
 }

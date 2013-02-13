@@ -45,14 +45,18 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     private final Required bvFieldType;
 
     public BitVector(String name, IntExpression knownSize) {
-        this(name, knownSize, TerminatedArray.MaxArraySize.LIMITED_BY_TYPE, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE);
+        this(name, knownSize, TerminatedArray.MaxArraySize.LIMITED_BY_TYPE, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name);
     }
 
     public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
-        this("BitString", null, TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.SERIALIZED);
+        this("BitString", null, TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.SERIALIZED, "char");
     }
 
-    private BitVector(String name, IntExpression knownSize, TerminatedArray.MaxArraySize maxArraySizeKind, TerminatedArray.TransferArraySize transferArraySizeKind) {
+    public BitVector(String name) {
+        this(name, null, TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name);
+    }
+
+    private BitVector(String name, IntExpression knownSize, TerminatedArray.MaxArraySize maxArraySizeKind, TerminatedArray.TransferArraySize transferArraySizeKind, String reqName) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), Imports.are(),
                 "Freeciv C code", Collections.<Annotate>emptyList(), name,
                 TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
@@ -94,7 +98,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
         }
 
         this.iRequire = knowsSize ? knownSize.getReqs() : Collections.<Requirement>emptySet();
-        this.iProvide = new Requirement(knowsSize ? getName() : "char", DataType.class);
+        this.iProvide = new Requirement(reqName, DataType.class);
         this.dataIOType = knowsSize ? "bitvector" : "bit_string";
         this.bvFieldType = new Requirement(dataIOType +
                 "(" + iProvide.getName() + ")", FieldTypeBasic.class);
@@ -140,9 +144,14 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                         }
                     };
                 else
-                    throw new UnsupportedOperationException(maxArraySizeKind + " not supported");
+                    convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
+                        @Override
+                        public Typed<AValue> x(Typed<AValue> bv) {
+                            return me.newInstance(bv, Hardcoded.fMaxSize.read("full_array_size"));
+                        }
+                    };
                 break;
-            case SERIALIZED:
+            default:
                 convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
                     @Override
                     public Typed<AValue> x(Typed<AValue> bv) {
@@ -150,8 +159,6 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                     }
                 };
                 break;
-            default:
-                throw new UnsupportedOperationException(transferArraySizeKind + " not supported");
         }
 
         final NetworkIO transferSizeSerialize;

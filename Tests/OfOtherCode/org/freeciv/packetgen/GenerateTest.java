@@ -56,6 +56,7 @@ public class GenerateTest {
 
         writeStructThatHasAnArrayField(targetFolder);
 
+        writeGenBVTestPeers(targetFolder);
         writeBitStringTestPeers(targetFolder);
 
         writeConstantClass(targetFolder);
@@ -425,6 +426,30 @@ public class GenerateTest {
                 new Field("theBitStingField", fieldAlias, "TestBitString", Collections.<WeakFlag>emptyList(),
                         new WeakField.ArrayDeclaration(IntExpression.integer("9"), null)));
         writeJavaFile(packet, targetFolder);
+    }
+
+    @Test public void writeGenBVTestPeers() throws IOException, UndefinedException {
+        writeGenBVTestPeers(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
+    }
+
+    private void writeGenBVTestPeers(String targetFolder) throws IOException, UndefinedException {
+        BitVector type = writeGenBVType(targetFolder);
+
+        FieldTypeBasic.FieldTypeAlias fieldAlias = writeGenBVFieldType(targetFolder, type);
+    }
+
+    private BitVector writeGenBVType(String targetFolder) throws IOException {
+        BitVector type = new BitVector("BV_General");
+        writeJavaFile(type, targetFolder);
+        return type;
+    }
+
+    private FieldTypeBasic.FieldTypeAlias writeGenBVFieldType(String targetFolder, BitVector type) throws UndefinedException, IOException {
+        FieldTypeBasic.FieldTypeAlias fieldAlias =
+                ((FieldTypeBasic) type.produce(new Requirement("bit_string" + "(" + "BIT" + ")", FieldTypeBasic.class)))
+                        .createFieldType("BV_GENERAL");
+        writeJavaFile(fieldAlias, targetFolder);
+        return fieldAlias;
     }
 
     @Test
