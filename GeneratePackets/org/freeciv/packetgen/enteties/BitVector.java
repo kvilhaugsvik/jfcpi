@@ -29,6 +29,11 @@ import java.util.List;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class BitVector extends ClassWriter implements IDependency, IDependency.Maker {
+    private static final Var<TargetArray> pFromByte = Var.param(byteArray, "from");
+    private static final Var<TargetArray> pFromBits = Var.param(boolArray, "from");
+    private static final Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
+    private static final Var<AnInt> pSize = Var.param(int.class, "sizeInBits");
+
     private final Collection<Requirement> iRequire;
     private final Requirement iProvide;
 
@@ -55,12 +60,6 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
             addPublicObjectConstant(int.class, "size");
 
         this.knowsSize = knowsSize;
-
-        Var<TargetArray> pFromByte = Var.param(byteArray, "from");
-        Var<TargetArray> pFromBits = Var.param(boolArray, "from");
-        Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
-
-        Var<AnInt> pSize = Var.param(int.class, "sizeInBits");
 
         Reference sizeForNotFromData = knowsSize ? getField("size").ref() : pSize.ref();
         {
