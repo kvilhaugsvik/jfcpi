@@ -26,6 +26,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 public class BuiltIn {
     public static final Typed<ABool> TRUE = BuiltIn.<ABool>toCode("true");
     public static final Typed<ABool> FALSE = BuiltIn.<ABool>toCode("false");
+    public static final Typed<ABool> NULL = BuiltIn.<ABool>toCode("null");
 
     public static final TargetArray byteArray = TargetArray.from(byte[].class);
     public static final TargetArray boolArray = TargetArray.from(boolean[].class);
