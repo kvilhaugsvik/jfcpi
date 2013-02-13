@@ -34,9 +34,13 @@ import java.util.*;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class Field<Kind extends AValue> extends Var<Kind> {
+    private final static int DELTA_NUMBER_NOT_SET = -1;
+
     private final String onPacket;
     private final FieldTypeBasic.FieldTypeAlias type;
     private final ArrayDeclaration[] declarations;
+
+    private int deltaFieldNumber = DELTA_NUMBER_NOT_SET;
 
     public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket, List<WeakFlag> flags,
                  WeakField.ArrayDeclaration... declarations) {
@@ -107,6 +111,26 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
     public String getJType() {
         return type.getJavaType();
+    }
+
+    public void setDelta(int deltaNumber) {
+        if (deltaNumber < 0)
+            throw new IllegalArgumentException("Delta number can't be negative");
+        if (this.deltaFieldNumber != DELTA_NUMBER_NOT_SET)
+            throw new IllegalStateException("Delta number already set");
+
+        this.deltaFieldNumber = deltaNumber;
+    }
+
+    public boolean isDelta() {
+        return DELTA_NUMBER_NOT_SET != this.deltaFieldNumber;
+    }
+
+    public int getDeltaFieldNumber() {
+        if (DELTA_NUMBER_NOT_SET == this.deltaFieldNumber)
+            throw new IllegalStateException("Not delta (yet)");
+
+        return deltaFieldNumber;
     }
 
 

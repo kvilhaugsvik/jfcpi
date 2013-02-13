@@ -20,9 +20,7 @@ import org.junit.Test;
 
 import java.io.*;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class GeneratedPacketTest {
     @Test
@@ -443,5 +441,98 @@ public class GeneratedPacketTest {
             assertEquals("StringArray", e.getInPacket());
             assertEquals("notAnArray", e.getField());
         }
+    }
+
+    @Test
+    public void delta_fromData_allThere() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        storeTo.write(new byte[]{3, 50, 'w', 'o', 'r', 'k', 's', 0, 0, 0, 1, 0});
+        DataInputStream inn = new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray()));
+
+        DeltaVectorTest packet = new DeltaVectorTest(inn, new Header_2_2(16, 933));
+
+        assertEquals(50, packet.getId().getValue().intValue());
+        assertEquals("works", packet.getField1().getValue());
+        assertEquals(256, packet.getField2().getValue().intValue());
+    }
+
+    @Test
+    public void delta_fromData_someThere() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        storeTo.write(new byte[]{2, 50, 0, 0, 1, 0});
+        DataInputStream inn = new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray()));
+
+        DeltaVectorTest packet = new DeltaVectorTest(inn, new Header_2_2(10, 933));
+
+        assertEquals(50, packet.getId().getValue().intValue());
+        assertNull(packet.getField1());
+        assertEquals(256, packet.getField2().getValue().intValue());
+    }
+
+    @Test
+    public void delta_fromJavaTypes_someThere_data() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(8, "works", null);
+
+        // the data
+        assertEquals(8, packet.getId().getValue().intValue());
+        assertEquals("works", packet.getField1().getValue());
+        assertNull(packet.getField2());
+    }
+
+    @Test
+    public void delta_fromJavaTypes_someThere_metaData() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(8, "works", null);
+
+        // meta data
+        assertEquals(8, packet.getHeader().getBodySize());
+    }
+
+    @Test
+    public void delta_fromJavaTypes_someThere_encode() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(8, "works", null);
+
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        packet.encodeTo(new DataOutputStream(storeTo));
+
+        // encode
+        assertArrayEquals(new byte[]{0, 12, 3, -91, 1, 8, 'w', 'o', 'r', 'k', 's', 0}, storeTo.toByteArray());
+    }
+
+    @Test
+    public void delta_fromFields_someThere_data() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(
+                new UINT8(8, ElementsLimit.noLimit()),
+                new STRING("works", ElementsLimit.limit(100)),
+                null);
+
+        // the data
+        assertEquals(8, packet.getId().getValue().intValue());
+        assertEquals("works", packet.getField1().getValue());
+        assertNull(packet.getField2());
+    }
+
+    @Test
+    public void delta_fromFields_someThere_metadata() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(
+                new UINT8(8, ElementsLimit.noLimit()),
+                new STRING("works", ElementsLimit.limit(100)),
+                null);
+
+        // meta data
+        assertEquals(8, packet.getHeader().getBodySize());
+    }
+
+    @Test
+    public void delta_fromFields_someThere_encode() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(
+                new UINT8(8, ElementsLimit.noLimit()),
+                new STRING("works", ElementsLimit.limit(100)),
+                null);
+
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        packet.encodeTo(new DataOutputStream(storeTo));
+
+        // encode
+        assertArrayEquals(new byte[]{0, 12, 3, -91, 1, 8, 'w', 'o', 'r', 'k', 's', 0}, storeTo.toByteArray());
     }
 }

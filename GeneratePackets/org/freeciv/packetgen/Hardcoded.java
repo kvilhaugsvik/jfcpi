@@ -48,6 +48,18 @@ public class Hardcoded {
             Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
             TargetClass.fromClass(ElementsLimit.class), "maxArraySize", null);
 
+    public static final BitVector deltaBasic;
+    public static final FieldTypeBasic.FieldTypeAlias deltaField;
+    static {
+        deltaBasic = new BitVector("bv_delta_fields");
+        try {
+            deltaField = ((FieldTypeBasic) deltaBasic.produce(new Requirement("bit_string(bv_delta_fields)", FieldTypeBasic.class)))
+                    .createFieldType("BV_DELTA_FIELDS");
+        } catch (UndefinedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
             new FieldTypeBasic("uint32", "int", TargetClass.fromClass(Long.class),
                     new From1<Block, Var>() {
@@ -208,6 +220,11 @@ public class Hardcoded {
                                false, Collections.<Requirement>emptySet()),
 
             /************************************************************************************************
+             * Built in field type aliases
+             ************************************************************************************************/
+            deltaField,
+
+            /************************************************************************************************
              * Read from and write to the network
              ************************************************************************************************/
             NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
@@ -221,6 +238,7 @@ public class Hardcoded {
              * Built in types
              ************************************************************************************************/
             (IDependency)(new SimpleTypeAlias("int", "java.lang", "Integer", Collections.<Requirement>emptySet())),
+            deltaBasic,
 
             /************************************************************************************************
              * Built in constants
@@ -307,7 +325,7 @@ public class Hardcoded {
         return out;
     }
 
-    private static FieldTypeBasic getFloat(final String times) {
+    public static FieldTypeBasic getFloat(final String times) {
         return new FieldTypeBasic("float" + times, "float", TargetClass.fromClass(Float.class),
                 new From1<Block, Var>() {
                     @Override

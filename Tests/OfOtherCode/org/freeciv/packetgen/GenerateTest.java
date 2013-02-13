@@ -70,6 +70,8 @@ public class GenerateTest {
         FieldTypeBasic.FieldTypeAlias bool = writeFieldTypeBool(targetFolder, items);
         FieldTypeBasic.FieldTypeAlias connection = writeFieldTypeConnection(targetFolder, items);
 
+        writeDeltaVectorTestPeerPacket(targetFolder, uint8, uint32, string);
+
         remaining(targetFolder, uint8, uint32, uint32s, uint32s2D, string, bool, connection);
     }
 
@@ -450,6 +452,29 @@ public class GenerateTest {
                         .createFieldType("BV_GENERAL");
         writeJavaFile(fieldAlias, targetFolder);
         return fieldAlias;
+    }
+
+    @Test public void writeDeltaVectorTestPeer() throws IOException, UndefinedException {
+        Parts items = new Parts();
+        FieldTypeBasic.FieldTypeAlias uint8 = createFieldTypeUINT8(items);
+        FieldTypeBasic.FieldTypeAlias uint32 = createFieldTypeUINT32(items);
+        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING(items);
+
+        writeDeltaVectorTestPeerPacket(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, uint8, uint32, string);
+    }
+
+    private void writeDeltaVectorTestPeerPacket(String targetFolder, FieldTypeBasic.FieldTypeAlias uint8, FieldTypeBasic.FieldTypeAlias uint32, FieldTypeBasic.FieldTypeAlias string) throws UndefinedException, IOException {
+        writeJavaFile(Hardcoded.deltaBasic, targetFolder);
+        writeJavaFile(Hardcoded.deltaField, targetFolder);
+        writePacket(new Packet("DeltaVectorTest",
+                933,
+                TargetClass.newKnown(Header_2_2.class),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), true,
+                new Field("id", uint8, "DeltaTest", Arrays.asList(new WeakFlag("key"))),
+                new Field("field1", string, "DeltaTest", Collections.<WeakFlag>emptyList(),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
+                new Field("field2", uint32, "DeltaTest", Collections.<WeakFlag>emptyList())),
+                targetFolder);
     }
 
     @Test
