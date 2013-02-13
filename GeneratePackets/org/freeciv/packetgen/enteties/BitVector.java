@@ -33,7 +33,6 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     private final Requirement iProvide;
 
     private final boolean knowsSize;
-    private final boolean arrayEater;
 
     private final Required bvFieldType;
 
@@ -92,7 +91,6 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
 
         this.iRequire = knowsSize ? sizeInBits.getReqs() : Collections.<Requirement>emptySet();
         this.iProvide = new Requirement(knowsSize ? getName() : "char", DataType.class);
-        this.arrayEater = !knowsSize;
         this.bvFieldType = new Requirement((knowsSize ? "bitvector" : "bit_string") +
                 "(" + iProvide.getName() + ")", FieldTypeBasic.class);
     }
