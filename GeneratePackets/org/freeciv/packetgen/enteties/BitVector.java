@@ -38,28 +38,33 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     private final Requirement iProvide;
 
     private final boolean knowsSize;
+    private final String dataIOType;
+    private final TerminatedArray.MaxArraySize maxArraySizeKind;
+    private TerminatedArray.TransferArraySize transferArraySizeKind;
 
     private final Required bvFieldType;
 
-    public BitVector(String name, IntExpression bits) {
-        this(name, bits, true);
+    public BitVector(String name, IntExpression knownSize) {
+        this(name, knownSize, TerminatedArray.MaxArraySize.LIMITED_BY_TYPE, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE);
     }
 
     public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
-        this("BitString", null, false);
+        this("BitString", null, TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.SERIALIZED);
     }
 
-    private BitVector(String name, IntExpression sizeInBits, boolean knowsSize) {
+    private BitVector(String name, IntExpression knownSize, TerminatedArray.MaxArraySize maxArraySizeKind, TerminatedArray.TransferArraySize transferArraySizeKind) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), Imports.are(),
                 "Freeciv C code", Collections.<Annotate>emptyList(), name,
                 TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
+        this.knowsSize = null != knownSize;
+
+        this.maxArraySizeKind = maxArraySizeKind;
+        this.transferArraySizeKind = transferArraySizeKind;
 
         if (knowsSize)
-            addClassConstant(Visibility.PUBLIC, int.class, "size", BuiltIn.<AnInt>toCode(sizeInBits.toString()));
+            addClassConstant(Visibility.PUBLIC, int.class, "size", BuiltIn.<AnInt>toCode(knownSize.toString()));
         else
             addPublicObjectConstant(int.class, "size");
-
-        this.knowsSize = knowsSize;
 
         Reference sizeForNotFromData = knowsSize ? getField("size").ref() : pSize.ref();
         {
@@ -88,9 +93,10 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
         }
 
-        this.iRequire = knowsSize ? sizeInBits.getReqs() : Collections.<Requirement>emptySet();
+        this.iRequire = knowsSize ? knownSize.getReqs() : Collections.<Requirement>emptySet();
         this.iProvide = new Requirement(knowsSize ? getName() : "char", DataType.class);
-        this.bvFieldType = new Requirement((knowsSize ? "bitvector" : "bit_string") +
+        this.dataIOType = knowsSize ? "bitvector" : "bit_string";
+        this.bvFieldType = new Requirement(dataIOType +
                 "(" + iProvide.getName() + ")", FieldTypeBasic.class);
     }
 
@@ -122,17 +128,49 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     @Override
     public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
         final TargetClass me = super.getAddress().scopeKnown();
+
+        final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue;
+        switch (transferArraySizeKind) {
+            case MAX_ARRAY_SIZE:
+                if (TerminatedArray.MaxArraySize.LIMITED_BY_TYPE.equals(maxArraySizeKind))
+                    convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
+                        @Override
+                        public Typed<AValue> x(Typed<AValue> bv) {
+                            return me.newInstance(bv);
+                        }
+                    };
+                else
+                    throw new UnsupportedOperationException(maxArraySizeKind + " not supported");
+                break;
+            case SERIALIZED:
+                convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
+                    @Override
+                    public Typed<AValue> x(Typed<AValue> bv) {
+                        return me.newInstance(bv, Hardcoded.fMaxSize.read("elements_to_transfer"));
+                    }
+                };
+                break;
+            default:
+                throw new UnsupportedOperationException(transferArraySizeKind + " not supported");
+        }
+
+        final NetworkIO transferSizeSerialize;
+        switch (transferArraySizeKind) {
+            case SERIALIZED:
+                transferSizeSerialize = NetworkIO.witIntAsIntermediate("uint16", 2, "readUnsignedShort", false, "writeShort");
+                break;
+            default:
+                transferSizeSerialize = null;
+                break;
+        }
+
         return new TerminatedArray(
-                knowsSize ? "bitvector" : "bit_string",
+                dataIOType,
                 iProvide.getName(),
                 me,
                 null,
-                knowsSize ?
-                        TerminatedArray.MaxArraySize.LIMITED_BY_TYPE :
-                        TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
-                knowsSize ?
-                        TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE :
-                        TerminatedArray.TransferArraySize.SERIALIZED,
+                maxArraySizeKind,
+                transferArraySizeKind,
                 TerminatedArray.byteArray,
                 new From1<Typed<AnInt>, Var>() {
                     @Override
@@ -147,27 +185,13 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                         return buffer.ref().<Returnable>call("getAsByteArray");
                     }
                 },
-                knowsSize ?
-                        new From1<Typed<AValue>, Typed<AValue>>() {
-                            @Override
-                            public Typed<AValue> x(Typed<AValue> bv) {
-                                return me.newInstance(bv);
-                            }
-                        } :
-                        new From1<Typed<AValue>, Typed<AValue>>() {
-                            @Override
-                            public Typed<AValue> x(Typed<AValue> bv) {
-                                return me.newInstance(bv, Hardcoded.fMaxSize.read("elements_to_transfer"));
-                            }
-                        },
+                convertBufferArrayToValue,
                 null,
                 TerminatedArray.readByte,
                 BuiltIn.TO_STRING_OBJECT,
                 Arrays.asList(iProvide),
                 me.<AnInt>read("size"),
-                knowsSize ?
-                        null :
-                        NetworkIO.witIntAsIntermediate("uint16", 2, "readUnsignedShort", false, "writeShort"),
+                transferSizeSerialize,
                 knowsSize ?
                         new From1<Typed<AnInt>, Var>() {
                             @Override
