@@ -267,7 +267,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         for (Field field : fields)
             body.addStatement(BuiltIn.inc(buildOutput, sum(
                     literal("\\n\\t" + field.getFieldName() + " = "),
-                    field.ref().<AString>call("toString"))));
+                    field.ref())));
         body.addStatement(RETURN(buildOutput.ref()));
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(String.class), "toString", body));
     }
