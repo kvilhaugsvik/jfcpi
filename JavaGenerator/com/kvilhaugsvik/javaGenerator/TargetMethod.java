@@ -57,20 +57,31 @@ public class TargetMethod extends Address<TargetClass> {
     }
 
     public <Ret extends Returnable> MethodCall<Ret> call(Typed<? extends AValue>... parameters) {
-        return new MethodCall<Ret>(kind, (Called.STATIC_FIELD.equals(kind) ? this : name), parameters);
+        return new MethodCall<Ret>(kind, this, parameters);
     }
 
     public <Ret extends AValue> MethodCall.HasResult<Ret> callV(Typed<? extends AValue>... parameters) {
         if (void.class.getCanonicalName().equals(returns.getFullAddress()))
             throw new IllegalArgumentException(getName() + ": Wrong return type");
 
-        return new MethodCall.HasResult<Ret>(kind, returns, (Called.STATIC_FIELD.equals(kind) ? this : name), parameters);
+        return new MethodCall.HasResult<Ret>(kind, returns, this, parameters);
     }
 
     @Override
     public void writeAtoms(CodeAtoms to) {
         to.hintStart(TargetMethod.class.getCanonicalName());
-        super.writeAtoms(to);
+        switch (kind) {
+            case DYNAMIC:
+            case DYNAMIC_ARRAY_GET:
+            case DYNAMIC_FIELD:
+                name.writeAtoms(to);
+                break;
+            case STATIC:
+            case STATIC_FIELD:
+            default:
+                super.writeAtoms(to);
+                break;
+        }
         to.hintEnd(TargetMethod.class.getCanonicalName());
     }
 
