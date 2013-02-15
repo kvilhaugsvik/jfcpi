@@ -84,11 +84,19 @@ public class Method extends Formatted implements HasAtoms {
         body.writeAtoms(to);
     }
 
+    public static Method newConstructor(Comment comment,
+                                        Visibility visibility,
+                                        List<? extends Var<? extends AValue>> paramList,
+                                        List<TargetClass> exceptionList,
+                                        Block body) {
+        return new Constructor(comment, visibility, paramList, exceptionList, body);
+    }
+
     public static Method newPublicConstructorWithException(Comment comment,
                                                            List<? extends Var<? extends AValue>> paramList,
                                                            List<TargetClass> exceptionList,
                                                            Block body) {
-        return new Constructor(comment, Visibility.PUBLIC, paramList, exceptionList, body);
+        return newConstructor(comment, Visibility.PUBLIC, paramList, exceptionList, body);
     }
 
     public static class Constructor extends Method {

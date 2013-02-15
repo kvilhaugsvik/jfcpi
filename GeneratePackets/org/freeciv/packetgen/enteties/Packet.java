@@ -33,8 +33,10 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.*;
+import org.freeciv.utility.EndlessZeroInputStream;
 
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
@@ -95,6 +97,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         int deltaFields = 0;
         if (delta) {
             requirements.add(new Requirement("BV_DELTA_FIELDS", FieldTypeBasic.FieldTypeAlias.class));
+
             addObjectConstant(TargetClass.fromName("org.freeciv.packet.fieldtype", "BV_DELTA_FIELDS"), "delta");
             for (Field field : fields) {
                 if (!field.isAnnotatedUsing(Key.class.getSimpleName())) {
@@ -115,6 +118,12 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         addToString(name, fields);
 
         TargetMethod addExceptionLocation = addExceptionLocationAdder();
+
+        if (delta) {
+            addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields);
+            addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().newInstance());
+        }
+
         addConstructorFromFields(fields, headerKind, addExceptionLocation, deltaFields);
         addConstructorFromJavaTypes(fields, headerKind, addExceptionLocation, deltaFields);
         addConstructorFromDataInput(name, fields, headerKind, addExceptionLocation, deltaFields);
@@ -158,6 +167,29 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
         addMethod(addExceptionLocation);
 
         return addExceptionLocation.getAddressOn(this.getAddress());
+    }
+
+    private void addConstructorZero(Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation,
+                                    int deltaFields) throws UndefinedException {
+        Block body = new Block();
+
+        addDeltaField(addExceptionLocation, deltaFields, body);
+
+        Var<AValue> zeroes = Var.local(TargetClass.fromClass(DataInputStream.class).scopeUnknown(), "zeroStream",
+                TargetClass.fromClass(DataInputStream.class).scopeUnknown()
+                        .newInstance(TargetClass.fromClass(EndlessZeroInputStream.class).scopeUnknown().newInstance()));
+        body.addStatement(zeroes);
+
+        for (Field field : fields)
+            body.addStatement(labelExceptionsWithPacketAndField(field,
+                    new Block(field.ref().assign(field.getTType().scopeKnown()
+                            .newInstance(zeroes.ref(), field.getSuperLimit(0)))),
+                    addExceptionLocation));
+
+        body.addStatement(generateHeader(headerKind, addExceptionLocation));
+
+        addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE,
+                Collections.<Var<?>>emptyList(), Collections.<TargetClass>emptyList(), body));
     }
 
     private void addConstructorFromFields(Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields) throws UndefinedException {
