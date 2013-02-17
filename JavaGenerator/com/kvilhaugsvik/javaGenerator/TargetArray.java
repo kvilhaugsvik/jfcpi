@@ -20,6 +20,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import org.freeciv.utility.Strings;
 
+import java.lang.reflect.Array;
 import java.util.regex.Pattern;
 
 public class TargetArray extends TargetClass {
@@ -44,6 +45,9 @@ public class TargetArray extends TargetClass {
     private TargetArray(TargetClass wrapped, int levels) {
         super(wrapped.getPackage().getFullAddress(), wrapped.getName() + Strings.repeat("[]", levels), true);
         this.of = wrapped;
+
+        if (null != wrapped.getRepresents())
+            this.setRepresents(Array.newInstance(wrapped.getRepresents(), levels).getClass());
 
         if (levels < 1)
             throw new IllegalArgumentException("Not an array");
