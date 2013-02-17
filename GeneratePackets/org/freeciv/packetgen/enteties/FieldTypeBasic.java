@@ -154,7 +154,7 @@ public class FieldTypeBasic implements IDependency, ReqKind {
                     Collections.<TargetClass>emptyList(),
                     new Block(IF(
                             BuiltIn.<ABool>toCode("other instanceof " + name),
-                            new Block(RETURN(BuiltIn.<ABool>toCode("this.value == ((" + name + ")other).getValue()"))),
+                            new Block(RETURN(BuiltIn.<ABool>toCode("this.value.equals(((" + name + ")other).getValue())"))),
                             new Block(RETURN(FALSE))))));
         }
 
