@@ -56,10 +56,10 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     private static void convertMethods(TargetClass target, Class wrapped) {
         for (Method has : wrapped.getMethods())
-            target.shared.methods.put(has.getName(), new TargetMethod(has));
+            target.register(new TargetMethod(has));
 
         for (Field has : wrapped.getFields())
-            target.shared.methods.put(has.getName(), new TargetMethod(has));
+            target.register(new TargetMethod(has));
 
         if (null != wrapped.getSuperclass())
             if (null == target.shared.parent)
@@ -125,6 +125,12 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     public void register(TargetMethod has) {
+        // TODO: Fix underlying issue. For now work around by sparing dynamic non void methods from over writing
+        if (shared.methods.containsKey(has.getName())
+                && shared.methods.get(has.getName()).isDynamic()
+                && shared.methods.get(has.getName()).returnsAValue())
+            return;
+
         shared.methods.put(has.getName(), has);
     }
 

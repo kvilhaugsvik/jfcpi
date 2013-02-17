@@ -56,6 +56,14 @@ public class TargetMethod extends Address<TargetClass> {
         return name.toString();
     }
 
+    public boolean isDynamic() {
+        return Called.DYNAMIC.equals(kind);
+    }
+
+    public boolean returnsAValue() {
+        return !void.class.getCanonicalName().equals(returns.getFullAddress());
+    }
+
     public <Ret extends Returnable> MethodCall<Ret> call(Typed<? extends AValue>... parameters) {
         return new MethodCall<Ret>(kind, this, parameters);
     }
