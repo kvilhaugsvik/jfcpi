@@ -309,12 +309,12 @@ public class BuiltIn {
         };
     }
 
-    public static <Ret extends AValue> Typed<Ret> cast(final Class newType, final Typed<? extends AValue> val) {
+    public static <Ret extends AValue> Value<Ret> cast(final Class newType, final Typed<? extends AValue> val) {
         return cast(TargetClass.fromClass(newType), val);
     }
 
-    public static <Ret extends AValue> Typed<Ret> cast(final TargetClass newType, final Typed<? extends AValue> val) {
-        return new Typed<Ret>() {
+    public static <Ret extends AValue> Value<Ret> cast(final TargetClass newType, final Typed<? extends AValue> val) {
+        return new MethodCall.HasResult<Ret>(TargetMethod.Called.MANUALLY, newType, new CodeAtom("(cast)"), val) {
             @Override
             public void writeAtoms(CodeAtoms to) {
                 to.add(LPR);
