@@ -237,7 +237,7 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in types
              ************************************************************************************************/
-            (IDependency)(new SimpleTypeAlias("int", "java.lang", "Integer", Collections.<Requirement>emptySet())),
+            (IDependency)(new SimpleTypeAlias("int", Integer.class, Collections.<Requirement>emptySet())),
             deltaBasic,
 
             /************************************************************************************************
