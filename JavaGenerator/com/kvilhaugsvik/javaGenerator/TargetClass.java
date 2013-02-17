@@ -51,7 +51,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     protected TargetClass(Class wrapped, boolean isInScope) {
         this(TargetPackage.from(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
 
-        shared.represents = wrapped;
+        setRepresents(wrapped);
     }
 
     private static void convertMethods(TargetClass target, Class wrapped) {
@@ -65,7 +65,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
             if (null == target.shared.parent)
                 target.setParent(TargetClass.fromClass(wrapped.getSuperclass()));
             else if (null == target.shared.parent.shared.represents)
-                target.shared.parent.shared.represents = wrapped.getSuperclass();
+                target.shared.parent.setRepresents(wrapped.getSuperclass());
 
         target.shared.shallow = false;
     }
@@ -110,6 +110,17 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     public String getName() {
         return shared.name.get();
+    }
+
+    protected Class<?> getRepresents() {
+        return this.shared.represents;
+    }
+
+    protected void setRepresents(Class<?> rep) {
+        /*if (null != this.shared.represents) // TODO: track down double writes and uncomment
+            throw new IllegalStateException("Class already set");*/
+
+        this.shared.represents = rep;
     }
 
     public TargetClass scopeKnown() {
@@ -243,7 +254,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
             TargetClass targetClass = getExisting(name, inScope);
 
             if (null == targetClass.shared.represents)
-                targetClass.shared.represents = cl;
+                targetClass.setRepresents(cl);
 
             return targetClass;
         } catch (NoSuchElementException e) {
