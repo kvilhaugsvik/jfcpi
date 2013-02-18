@@ -21,6 +21,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class PacketsMapping {
@@ -51,13 +52,13 @@ public class PacketsMapping {
             for (Class understood : understoodPackets) {
                 try {
                     this.packetMakers.put(understood.getField("number").getInt(null),
-                                          understood.getConstructor(DataInput.class, PacketHeader.class));
+                                          understood.getConstructor(DataInput.class, PacketHeader.class, Map.class));
                 } catch (NoSuchFieldException e) {
                     throw new IOException(understood.getSimpleName() + " is not compatible.\n" +
                             "(The static field number is missing)", e);
                 } catch (NoSuchMethodException e) {
                     throw new IOException(understood.getSimpleName() + " is not compatible.\n" +
-                                                  "(No constructor from DataInput, PacketHeader found)");
+                                                  "(No constructor from DataInput, PacketHeader, Map found)");
                 }
             }
         } catch (ClassNotFoundException e) {
@@ -71,11 +72,11 @@ public class PacketsMapping {
         }
     }
 
-    public Packet interpret(PacketHeader header, DataInputStream in) throws IOException {
+    public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException {
         if (!canInterpret(header.getPacketKind()))
             throw packetReadingError(header.getPacketKind(), new NoSuchElementException("Don't know how to interpret"));
         try {
-            return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header);
+            return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header, old);
         } catch (InstantiationException e) {
             throw packetReadingError(header.getPacketKind(), e);
         } catch (IllegalAccessException e) {

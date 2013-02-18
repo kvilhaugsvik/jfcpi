@@ -18,6 +18,7 @@ import org.freeciv.packet.*;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
 
 //TODO: Implement delta protocol
@@ -26,6 +27,7 @@ public class Interpreted implements FreecivConnection {
     private final Uninterpreted toProcess;
 
     private final PacketsMapping interpreter;
+    private final HashMap<DeltaKey, Packet> oldRead;
 
     public Interpreted(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
         this(connection, reflexes, new PacketsMapping());
@@ -39,6 +41,7 @@ public class Interpreted implements FreecivConnection {
     public Interpreted(Uninterpreted connection, PacketsMapping interpreter) throws IOException {
         this.interpreter = interpreter;
         this.toProcess = connection;
+        this.oldRead = new HashMap<DeltaKey, Packet>();
     }
 
     public Packet getPacket() throws IOException, NotReadyYetException {
@@ -46,7 +49,8 @@ public class Interpreted implements FreecivConnection {
 
         try {
             return interpreter.interpret(out.getHeader(),
-                    new DataInputStream(new ByteArrayInputStream(out.getBodyBytes())));
+                    new DataInputStream(new ByteArrayInputStream(out.getBodyBytes())),
+                    oldRead);
         } catch (IOException e) {
             return out;
         }
