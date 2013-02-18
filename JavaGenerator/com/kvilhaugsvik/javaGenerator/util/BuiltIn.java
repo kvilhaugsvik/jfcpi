@@ -165,6 +165,10 @@ public class BuiltIn {
         return BuiltIn.<AnInt>toCode(num + "f");
     }
 
+    public static Typed<ABool> literal(boolean b) {
+        return b ? TRUE : FALSE;
+    }
+
     public static final From1<Typed<AString>, Var> TO_STRING_OBJECT =
             new From1<Typed<AString>, Var>() {
                 @Override
