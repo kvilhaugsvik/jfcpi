@@ -23,17 +23,17 @@ import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
                       requested: List[(String, String)], logger: String,
-                      devMode: Boolean, bytesInPacketNumber: Int) {
+                      devMode: Boolean, bytesInPacketNumber: Int, enableDelta: Boolean) {
 
   def this(packetsDefPathString: String, versionPath: String, cPathsString: List[String],
            requested: List[(String, String)], logger: String,
-           devMode: Boolean, bytesInPacketNumber: Int) = {
+           devMode: Boolean, bytesInPacketNumber: Int, enableDelta: Boolean) = {
     this(new File(packetsDefPathString), new File(versionPath), cPathsString.map(new File(_)),
       requested, logger,
-      devMode, bytesInPacketNumber)
+      devMode, bytesInPacketNumber, enableDelta)
   }
 
-  private val storage = new PacketsStore(bytesInPacketNumber, logger)
+  private val storage = new PacketsStore(bytesInPacketNumber, logger, enableDelta)
   private val Parser = new ParsePacketsDef(storage)
 
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
@@ -116,6 +116,8 @@ object GeneratePackets {
 
     val bytesInPacketNumber = versionConfiguration.attribute("packetNumberSize").get.text.toInt
 
+    val enableDelta = versionConfiguration.attribute("enableDelta").get.text.toBoolean
+
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
       elem.attribute("parseAs").get.text -> (elem \ "file").map(settings.getSetting[String](SOURCE_CODE_LOCATION) + "/" + _.text)).toMap
 
@@ -128,7 +130,8 @@ object GeneratePackets {
       requested,
       settings.getSetting[String](PACKETS_SHOULD_LOG_TO),
       settings.getSetting[Boolean](IGNORE_PROBLEMS),
-      bytesInPacketNumber)
+      bytesInPacketNumber,
+      enableDelta)
 
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
   }

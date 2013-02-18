@@ -32,6 +32,7 @@ import java.util.*;
 public class PacketsStore {
     private final TargetClass packetHeaderType;
     private final String logger;
+    private final boolean enableDelta;
 
     private final DependencyStore requirements;
 
@@ -41,10 +42,10 @@ public class PacketsStore {
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
     @Deprecated public PacketsStore(int bytesInPacketNumber) {
-        this(bytesInPacketNumber, GeneratorDefaults.LOG_TO);
+        this(bytesInPacketNumber, GeneratorDefaults.LOG_TO, false);
     }
 
-    public PacketsStore(int bytesInPacketNumber, String logger) {
+    public PacketsStore(int bytesInPacketNumber, String logger, boolean enableDelta) {
         requirements = new DependencyStore();
         for (IDependency primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
@@ -53,6 +54,7 @@ public class PacketsStore {
         requirements.addMaker(new FieldAliasArrayMaker());
 
         this.logger = logger;
+        this.enableDelta = enableDelta;
 
         switch (bytesInPacketNumber) {
             case 1:
@@ -119,7 +121,7 @@ public class PacketsStore {
                             fieldType.getDeclarations()));
                 }
 
-                return new Packet(name, number, packetHeaderType, logger, packetFlags, fieldList.toArray(new Field[0]));
+                return new Packet(name, number, packetHeaderType, logger, packetFlags, enableDelta, fieldList.toArray(new Field[0]));
             }
         });
 

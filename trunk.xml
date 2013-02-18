@@ -1,4 +1,4 @@
-<fcsource name="trunk" packetNumberSize="2">
+<fcsource name="trunk" packetNumberSize="2" enableDelta="false">
 
     <inputSource parseAs="packets">
         <file>common/packets.def</file>
