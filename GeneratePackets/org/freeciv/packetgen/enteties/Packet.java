@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.NoDelta;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.fieldtype.FieldType;
@@ -114,6 +115,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
         addEncoder(fields);
         addCalcBodyLen(fields);
+        addGetDeltaKey(number, fields);
 
         addToString(name, fields);
 
@@ -420,6 +422,29 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                     field.ref())));
         body.addStatement(RETURN(buildOutput.ref()));
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(String.class), "toString", body));
+    }
+
+    private void addGetDeltaKey(int number, Field[] fields) {
+        List<Typed<? extends AValue>> params = new LinkedList<Typed<? extends AValue>>();
+        params.add(literal(number));
+        for (Field<?> field : getKeyFields(fields))
+            params.add(field.ref());
+        addMethod(Method.newPublicReadObjectState(
+                Comment.doc("Get a delta key for this packet",
+                        "A DeltaKey used in a HashMap makes it easy to find the previous packet of " +
+                                "the same packet kind where all key fields are the same.",
+                        Comment.docReturns("a delta key matching the packet.")),
+                TargetClass.fromClass(DeltaKey.class), "getKey",
+                new Block(RETURN(TargetClass.fromClass(DeltaKey.class)
+                        .newInstance(params.toArray(new Typed[params.size()]))))));
+    }
+
+    private static List<Field<?>> getKeyFields(Field[] fields) {
+        List<Field<?>> out = new LinkedList<Field<?>>();
+        for (Field field : fields)
+            if (field.isAnnotatedUsing(Key.class.getSimpleName()))
+                out.add(field);
+        return out;
     }
 
     private void addJavaGetter(Field field) throws UndefinedException {
