@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.Util;
 import org.freeciv.packet.*;
 import org.freeciv.packetgen.enteties.FieldTypeBasic.FieldTypeAlias;
@@ -69,6 +70,8 @@ public class PacketsStore {
 
         requirements.addWanted(Constant.isClass(Util.HEADER_NAME,
                 packetHeaderType.scopeUnknown().callV("class")));
+
+        requirements.addWanted(Constant.isBool("enableDelta", BuiltIn.literal(enableDelta)));
     }
 
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {

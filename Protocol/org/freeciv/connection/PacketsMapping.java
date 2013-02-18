@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 public class PacketsMapping {
     private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
     private final Class<? extends PacketHeader> packetNumberBytes;
+    private final boolean isDeltaEnabled;
     private final String capStringMandatory;
     private final String capStringOptional;
     private final String versionLabel;
@@ -39,6 +40,7 @@ public class PacketsMapping {
             Class[] understoodPackets = (Class[])constants.getField(Util.PACKET_MAP_NAME).get(null);
             packetNumberBytes =
                     (Class<? extends PacketHeader>) constants.getField(Util.HEADER_NAME).get(null);
+            this.isDeltaEnabled = constants.getField("enableDelta").getBoolean(null);
             capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
             capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
             versionLabel = (String)constants.getField("VERSION_LABEL").get(null);

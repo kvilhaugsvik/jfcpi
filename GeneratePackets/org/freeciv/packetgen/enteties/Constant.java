@@ -89,6 +89,11 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements IDepende
                 expression, Collections.<Requirement>emptySet());
     }
 
+    public static Constant<ABool> isBool(String name, Typed<ABool> expression) {
+        return new Constant<ABool>(TargetClass.fromClass(boolean.class), name,
+                expression, Collections.<Requirement>emptySet());
+    }
+
     public static Constant<ALong> isLong(String name, Typed<ALong> expression) {
         return new Constant<ALong>(TargetClass.fromClass(long.class), name, expression, Collections.<Requirement>emptySet());
     }
