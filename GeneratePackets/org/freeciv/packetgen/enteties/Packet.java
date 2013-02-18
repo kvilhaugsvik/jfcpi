@@ -121,8 +121,9 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
         TargetMethod addExceptionLocation = addExceptionLocationAdder();
 
-        if (delta) {
-            addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields);
+        if (deltaIsOn) {
+            if (0 < fields.length)
+                addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields);
             addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().newInstance());
         }
 
@@ -175,7 +176,8 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                                     int deltaFields) throws UndefinedException {
         Block body = new Block();
 
-        addDeltaField(addExceptionLocation, deltaFields, body);
+        if (delta)
+            addDeltaField(addExceptionLocation, deltaFields, body);
 
         Var<AValue> zeroes = Var.local(TargetClass.fromClass(DataInputStream.class).scopeUnknown(), "zeroStream",
                 TargetClass.fromClass(DataInputStream.class).scopeUnknown()
