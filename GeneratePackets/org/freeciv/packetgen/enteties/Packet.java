@@ -297,6 +297,8 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
     private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields) throws UndefinedException {
         Var<TargetClass> argHeader = Var.param(TargetClass.newKnown(PacketHeader.class), "header");
         final Var<TargetClass> streamName = Var.param(TargetClass.newKnown(DataInput.class), "from");
+        final Var<TargetClass> old =
+                Var.param(TargetClass.fromName("java.util", "Map<DeltaKey, Packet>").scopeUnknown(), "old");
         MethodCall<AnInt> calcBodyLenCall = new MethodCall<AnInt>("calcBodyLen");
 
         Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
@@ -349,6 +351,16 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 Comment.param(argHeader, "header data. Must contain size and number"),
                 Comment.docThrows(TargetClass.newKnown(FieldTypeException.class), "if there is a problem")),
                 Arrays.asList(streamName, argHeader),
+                Arrays.asList(TargetClass.newKnown(FieldTypeException.class)),
+                new Block(toCode("this(from, header, new java.util.HashMap<DeltaKey, Packet>())"))));
+
+        addMethod(Method.newPublicConstructorWithException(Comment.doc(
+                "Construct an object from a DataInput", new String(),
+                Comment.param(streamName, "data stream that is at the start of the package body"),
+                Comment.param(argHeader, "header data. Must contain size and number"),
+                Comment.param(old, "where the Delta protocol should look for older packets"),
+                Comment.docThrows(TargetClass.newKnown(FieldTypeException.class), "if there is a problem")),
+                Arrays.asList(streamName, argHeader, old),
                 Arrays.asList(TargetClass.newKnown(FieldTypeException.class)),
                 constructorBodyStream));
     }
