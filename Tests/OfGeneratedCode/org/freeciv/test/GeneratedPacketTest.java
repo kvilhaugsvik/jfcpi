@@ -487,6 +487,22 @@ public class GeneratedPacketTest {
     }
 
     @Test
+    public void delta_fromData_sameKeySameKindBefore_missingIsPrevious() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        storeTo.write(new byte[]{3, 50, 'w', 'o', 'r', 'k', 's', 0, 0, 0, 1, 0}); // packet 1
+        storeTo.write(new byte[]{2, 50, 0, 0, 1, 0}); // packet 2
+        DataInputStream inn = new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray()));
+
+        HashMap<DeltaKey, Packet> old = new HashMap<DeltaKey, Packet>();
+        new DeltaVectorTest(inn, new Header_2_2(16, 933), old);
+        DeltaVectorTest packet = new DeltaVectorTest(inn, new Header_2_2(10, 933), old);
+
+        assertEquals(50, packet.getId().getValue().intValue());
+        assertEquals("works", packet.getField1().getValue());
+        assertEquals(256, packet.getField2().getValue().intValue());
+    }
+
+    @Test
     public void delta_fromJavaTypes_someThere_data() throws IOException {
         DeltaVectorTest packet = new DeltaVectorTest(8, "works", null);
 

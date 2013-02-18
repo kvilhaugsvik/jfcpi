@@ -23,9 +23,13 @@ public class DeltaKey {
     private final int packetType;
     private final FieldType<?>[] keys;
 
+    private final int hashCode;
+
     public DeltaKey(int packetType, FieldType<?>... keys) {
         this.packetType = packetType;
         this.keys = keys;
+
+        this.hashCode = hashCodeCalc();
     }
 
     @Override
@@ -45,13 +49,17 @@ public class DeltaKey {
         return true;
     }
 
-    @Override
-    public int hashCode() {
+    public int hashCodeCalc() {
         int out = packetType << 16;
 
         for (FieldType<?> key : keys)
-            out += key.hashCode();
+            out += key.getValue().hashCode();
 
         return out;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
     }
 }
