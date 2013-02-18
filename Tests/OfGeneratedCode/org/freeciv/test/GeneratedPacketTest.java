@@ -465,7 +465,7 @@ public class GeneratedPacketTest {
         DeltaVectorTest packet = new DeltaVectorTest(inn, new Header_2_2(10, 933));
 
         assertEquals(50, packet.getId().getValue().intValue());
-        assertNull(packet.getField1());
+        assertEquals("", packet.getField1().getValue());
         assertEquals(256, packet.getField2().getValue().intValue());
     }
 

@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
+import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.NoDelta;
@@ -54,6 +55,21 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
     private final Requirement iFulfill;
     private final HashSet<Requirement> requirements = new HashSet<Requirement>();
+
+    static { // TODO: Make target class support generics and remove this work arround
+        try {
+            TargetClass.fromName("java.util", "Map<DeltaKey, Packet>")
+                    .register(new TargetMethod(Map.class.getMethod("get", Object.class)));
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("Is this Java? Map is supposed to have get(Object)...", e);
+        }
+        try {
+            TargetClass.fromName("java.util", "Map<DeltaKey, Packet>")
+                    .register(new TargetMethod(Map.class.getMethod("put", Object.class, Object.class)));
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("Is this Java? Map is supposed to have put...", e);
+        }
+    }
 
     @Deprecated
     public Packet(String name, int number, TargetClass headerKind, String logger,
@@ -312,13 +328,31 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                     operation,
                     addExceptionLocation));
         }
+
+        boolean oldNeeded = true;
+        final Var<? extends AValue> chosenOld;
+        if (delta)
+            chosenOld = Var.local(getAddress().scopeKnown(), "chosenOld", R_IF(
+                    isSame(NULL, old.ref().callV("get", getAddress().scopeKnown().callV("getKey", Reference.THIS))),
+                    getField("zero").ref(),
+                    cast(getAddress(), old.ref().callV("get", getAddress().scopeKnown().callV("getKey", Reference.THIS)))));
+        else
+            chosenOld = null;
         for (Field field : fields) {
+            if (delta && oldNeeded) {
+                if (!field.isAnnotatedUsing(Key.class.getSimpleName())) {
+                    oldNeeded = false;
+                    constructorBodyStream.addStatement(chosenOld);
+                }
+            }
             Block readAndValidate = new Block();
             field.appendValidationTo(readAndValidate);
             readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(streamName.ref(),
                     field.getSuperLimit(0))));
             final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
-            constructorBodyStream.addStatement(ifDeltaElse(field, readLabeled, field.assign(NULL)));
+            constructorBodyStream.addStatement(ifDeltaElse(field, readLabeled, delta ?
+                    field.assign(chosenOld.ref().callV(getterNameJavaish(field))) :
+                    literal("Never run")));
         }
 
         constructorBodyStream.groupBoundary();
@@ -344,6 +378,11 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                                 argHeader.ref().<AnInt>call("getTotalSize"),
                                 literal(") for "), new MethodCall<AString>("this.toString"))),
                         literal("header"))))));
+
+        if (delta)
+            constructorBodyStream.addStatement(old.ref().callV("put",
+                    getAddress().scopeKnown().callV("getKey", Reference.THIS),
+                    Reference.THIS));
 
         addMethod(Method.newPublicConstructorWithException(Comment.doc(
                 "Construct an object from a DataInput", new String(),
