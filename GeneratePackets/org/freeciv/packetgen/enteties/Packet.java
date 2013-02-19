@@ -233,26 +233,12 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                     field.getFieldName());
             params.add(asParam);
 
-            setDeltaStatus(constructorBody, field, asParam);
-
-            final Block writeReadingTo;
-            if (deltaApplies(field)) {
-                final Block nullChecked = new Block();
-                writeReadingTo = nullChecked;
-                constructorBody.addStatement(IF(
-                        deltaHas(field),
-                        nullChecked,
-                        new Block(field.ref().assign(asParam.ref()))));
-            } else {
-                writeReadingTo = constructorBody;
-            }
-
-            field.appendValidationTo(writeReadingTo);
-            writeReadingTo.addStatement(field.ref().assign(asParam.ref()));
+            field.appendValidationTo(constructorBody);
+            constructorBody.addStatement(field.ref().assign(asParam.ref()));
             Block validate = new Block();
             field.appendArrayEaterValidationTo(validate);
             if (0 < validate.numberOfStatements())
-                writeReadingTo.addStatement(labelExceptionsWithPacketAndField(field, validate, addExceptionLocation));
+                constructorBody.addStatement(labelExceptionsWithPacketAndField(field, validate, addExceptionLocation));
         }
         constructorBody.addStatement(generateHeader(headerKind, addExceptionLocation));
         addMethod(Method.newPublicConstructor(Comment.no(), params, constructorBody));
@@ -302,19 +288,11 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(
                         asParam.ref(), field.getSuperLimit(0))));
                 final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
-                setDeltaStatus(constructorBodyJ, field, asParam);
-                constructorBodyJ.addStatement(ifDeltaElse(field, readLabeled, field.assign(NULL)));
+                constructorBodyJ.addStatement(readLabeled);
             }
             constructorBodyJ.addStatement(generateHeader(headerKind, addExceptionLocation));
             addMethod(Method.newPublicConstructor(Comment.no(), params, constructorBodyJ));
         }
-    }
-
-    private void setDeltaStatus(Block body, Field field, Var<AValue> asParam) {
-        if (deltaApplies(field))
-            body.addStatement(getField("delta").ref().callV("getValue").call("set",
-                    literal(field.getDeltaFieldNumber()),
-                    isNotSame(NULL, asParam.ref())));
     }
 
     private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields) throws UndefinedException {
