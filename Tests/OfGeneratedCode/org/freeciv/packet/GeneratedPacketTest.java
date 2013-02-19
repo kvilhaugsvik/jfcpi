@@ -12,9 +12,8 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.test;
+package org.freeciv.packet;
 
-import org.freeciv.packet.*;
 import org.freeciv.packet.fieldtype.*;
 import org.junit.Test;
 
