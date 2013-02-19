@@ -502,6 +502,21 @@ public class GeneratedPacketTest {
     }
 
     @Test
+    public void delta_roundTrip_fromData_encodeTo() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        storeTo.write(new byte[]{2, 50, 0, 0, 1, 0});
+        DataInputStream inn = new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray()));
+
+        DeltaVectorTest packet = new DeltaVectorTest(inn, new Header_2_2(10, 933));
+
+        final ByteArrayOutputStream reserialized = new ByteArrayOutputStream();
+        DataOutputStream writeTo = new DataOutputStream(reserialized);
+        packet.encodeTo(writeTo);
+
+        assertArrayEquals(new byte[]{0, 10, 3, -91, 2, 50, 0, 0, 1, 0}, reserialized.toByteArray());
+    }
+
+    @Test
     public void delta_deltaVector_noPrevious() throws IOException {
         DeltaVectorTest packet = new DeltaVectorTest(8, "works", 1260L);
 
