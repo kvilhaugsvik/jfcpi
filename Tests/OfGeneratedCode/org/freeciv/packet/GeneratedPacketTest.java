@@ -502,6 +502,17 @@ public class GeneratedPacketTest {
     }
 
     @Test
+    public void delta_deltaVector_noPrevious() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(8, "works", 1260L);
+
+        boolean[] dv = packet.getDeltaVector();
+
+        assertEquals("Wrong delta vector size", 2, dv.length);
+        assertTrue("Should be sent", dv[0]);
+        assertTrue("Should be sent", dv[1]);
+    }
+
+    @Test
     public void delta_fromJavaTypes_someThere_data() throws IOException {
         DeltaVectorTest packet = new DeltaVectorTest(8, "works", null);
 

@@ -116,6 +116,13 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
             requirements.add(new Requirement("BV_DELTA_FIELDS", FieldTypeBasic.FieldTypeAlias.class));
 
             addObjectConstant(TargetClass.fromName("org.freeciv.packet.fieldtype", "BV_DELTA_FIELDS"), "delta");
+
+            addMethod(Method.custom(Comment.no(), Visibility.PROTECTED, Scope.OBJECT,
+                    TargetClass.fromClass(boolean[].class), "getDeltaVector",
+                    Collections.<Var<? extends AValue>>emptyList(),
+                    Collections.<TargetClass>emptyList(),
+                    new Block(RETURN(getField("delta").ref().callV("getValue").callV("getBits")))));
+
             for (Field field : fields) {
                 if (!field.isAnnotatedUsing(Key.class.getSimpleName())) {
                     field.setDelta(deltaFields);
