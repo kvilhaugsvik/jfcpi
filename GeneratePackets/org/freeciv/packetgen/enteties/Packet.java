@@ -413,9 +413,12 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
 
     private Typed<?> ifDeltaElse(Field field, Typed<?> defaultAction, Typed<?> deltaDisabledAction) {
         return deltaApplies(field) ?
-                IF(deltaHas(field),
-                        new Block(defaultAction),
-                        new Block(deltaDisabledAction)) :
+                (null == deltaDisabledAction ?
+                        IF(deltaHas(field),
+                                new Block(defaultAction)) :
+                        IF(deltaHas(field),
+                                new Block(defaultAction),
+                                new Block(deltaDisabledAction))) :
                 defaultAction;
     }
 
@@ -435,8 +438,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
             if (delta)
                 body.addStatement(getField("delta").ref().call("encodeTo", pTo.ref()));
             for (Field field : fields)
-                body.addStatement(ifDeltaElse(field, field.ref().<Returnable>call("encodeTo", pTo.ref()),
-                        ASSERT(isSame(NULL, field.ref()), literal("Claims to not exist, is not null"))));
+                body.addStatement(ifDeltaElse(field, field.ref().<Returnable>call("encodeTo", pTo.ref()), null));
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.fromClass(void.class), "encodeTo", Arrays.asList(pTo),
