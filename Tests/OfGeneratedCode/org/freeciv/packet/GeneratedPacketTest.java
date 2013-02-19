@@ -68,6 +68,14 @@ public class GeneratedPacketTest {
         assertEquals(4, packet.getHeader().getPacketKind());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void packet_fromFields_notNull() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(
+                new UINT8(8, ElementsLimit.noLimit()),
+                new STRING("works", ElementsLimit.limit(100)),
+                null);
+    }
+
     @Test
     public void testPacketWithFieldValuesFromFields() throws IOException {
         SERVER_JOIN_REQ packet =
@@ -85,6 +93,11 @@ public class GeneratedPacketTest {
         assertEquals(2L, packet.getMajor_versionValue().longValue());
         assertEquals(3L, packet.getMinor_versionValue().longValue());
         assertEquals(99L, packet.getPatch_versionValue().longValue());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void packet_fromJava_notNull() throws IOException {
+        DeltaVectorTest packet = new DeltaVectorTest(8, null, 1260L);
     }
 
     @Test

@@ -36,6 +36,7 @@ import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.*;
 import org.freeciv.utility.EndlessZeroInputStream;
+import org.freeciv.utility.Validation;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -47,6 +48,8 @@ import java.util.logging.Level;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class Packet extends ClassWriter implements IDependency, ReqKind {
+    private static final TargetClass validation = TargetClass.fromClass(Validation.class);
+
     private final int number;
     private final Field[] fields;
 
@@ -232,6 +235,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                     field.getTType().scopeKnown(),
                     field.getFieldName());
             params.add(asParam);
+            constructorBody.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
             field.appendValidationTo(constructorBody);
             constructorBody.addStatement(field.ref().assign(asParam.ref()));
@@ -282,6 +286,7 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 Var<AValue> asParam = Var.param(field.getUnderType().scopeKnown(),
                         field.getFieldName());
                 params.add(asParam);
+                constructorBodyJ.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
                 Block readAndValidate = new Block();
                 field.appendValidationTo(readAndValidate);
@@ -302,7 +307,13 @@ public class Packet extends ClassWriter implements IDependency, ReqKind {
                 Var.param(TargetClass.fromName("java.util", "Map<DeltaKey, Packet>").scopeUnknown(), "old");
         MethodCall<AnInt> calcBodyLenCall = new MethodCall<AnInt>("calcBodyLen");
 
-        Block constructorBodyStream = new Block(getField("header").assign(argHeader.ref()));
+        Block constructorBodyStream = new Block();
+        constructorBodyStream.addStatement(validation.call("validateNotNull", argHeader.ref(), literal(argHeader.getName())));
+        constructorBodyStream.addStatement(validation.call("validateNotNull", streamName.ref(), literal(streamName.getName())));
+        constructorBodyStream.addStatement(validation.call("validateNotNull", old.ref(), literal(old.getName())));
+        constructorBodyStream.groupBoundary();
+
+        constructorBodyStream.addStatement(getField("header").assign(argHeader.ref()));
         if (delta) {
             Block operation = new Block();
             operation.addStatement(getField("delta").assign(getField("delta").getTType().scopeKnown().newInstance(

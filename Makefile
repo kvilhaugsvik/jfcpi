@@ -182,7 +182,7 @@ runConnectionTests: compileConnectionTests
 	touch runConnectionTests
 
 compileUtils: compileBasicProtocol
-	${JAVAC} -d ${COMPILED_PROTOCOL_FOLDER} `find Utility -iname "*.java"`
+	${JAVAC} -cp ${COMPILED_PROTOCOL_FOLDER} -d ${COMPILED_PROTOCOL_FOLDER} `find Utility -iname "*.java"`
 	touch compileUtils
 
 compileUtilsTests: folderTestOut compileUtils
