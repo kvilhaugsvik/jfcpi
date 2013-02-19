@@ -526,4 +526,19 @@ public class GeneratedPacketTest {
         assertTrue("Should be sent", dv[0]);
         assertTrue("Should be sent", dv[1]);
     }
+
+    @Test
+    public void delta_deltaVector_fromData() throws IOException {
+        ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
+        storeTo.write(new byte[]{2, 50, 0, 0, 1, 0});
+        DataInputStream inn = new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray()));
+
+        DeltaVectorTest packet = new DeltaVectorTest(inn, new Header_2_2(10, 933));
+
+        boolean[] dv = packet.getDeltaVector();
+
+        assertEquals("Wrong delta vector size", 2, dv.length);
+        assertFalse("Should not be sent", dv[0]);
+        assertTrue("Should be sent", dv[1]);
+    }
 }
