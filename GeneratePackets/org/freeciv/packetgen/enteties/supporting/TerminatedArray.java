@@ -299,8 +299,8 @@ public class TerminatedArray extends FieldTypeBasic {
     }
 
     @Override
-    public FieldTypeAlias createFieldType(String name) {
-        return new FieldTypeAliasToTerminatedArray(name);
+    public FieldTypeAlias createFieldType(String name, String reqName) {
+        return new FieldTypeAliasToTerminatedArray(name, reqName);
     }
 
     private class FieldTypeAliasToTerminatedArray extends FieldTypeAlias {

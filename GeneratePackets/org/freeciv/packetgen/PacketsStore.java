@@ -53,6 +53,7 @@ public class PacketsStore {
         }
 
         requirements.addMaker(new FieldAliasArrayMaker());
+        requirements.addMaker(new BasicFieldTypeAsFieldTypeAlias());
 
         this.logger = logger;
         this.enableDelta = enableDelta;

@@ -100,7 +100,11 @@ public class FieldTypeBasic implements IDependency, ReqKind {
     }
 
     public FieldTypeAlias createFieldType(String name) {
-        return new FieldTypeAlias(name);
+        return createFieldType(name, name);
+    }
+
+    public FieldTypeAlias createFieldType(String name, String reqName) {
+        return new FieldTypeAlias(name, reqName);
     }
 
     public boolean isArrayEater() {
