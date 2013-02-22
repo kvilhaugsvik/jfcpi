@@ -95,7 +95,7 @@ public class TerminatedArray extends FieldTypeBasic {
         super(dataIOType, publicType, javaType,
                 createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
                 createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements, elementTypeCanLimitVerify),
-                createEncode(terminator, transferArraySizeKind, buffertype, numberOfElements, null != terminator, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType),
+                createEncode(terminator, transferArraySizeKind, numberOfElements, null != terminator, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType),
                 createEnocedSize(transferArraySizeKind, numberOfElements, null != terminator, transferSizeSerialize, valueGetByteLen),
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
@@ -147,7 +147,7 @@ public class TerminatedArray extends FieldTypeBasic {
         return isSmallerThan(size, fMaxSize.read("full_array_size"));
     }
 
-    private static From2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
+    private static From2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
