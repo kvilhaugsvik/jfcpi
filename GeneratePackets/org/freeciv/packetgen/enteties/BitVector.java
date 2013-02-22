@@ -185,7 +185,6 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
                         return val.read("size");
                     }
                 },
-                TerminatedArray.neverAnythingAfter,
                 new From1<Typed<AValue>, Var>() {
                     @Override
                     public Typed<AValue> x(Var buffer) {

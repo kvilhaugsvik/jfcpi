@@ -155,7 +155,6 @@ public class Hardcoded {
                             return value.ref().callV("getBytes").callV("length");
                         }
                     },
-                    TerminatedArray.addAfterIfSmallerThanMaxSize,
                     new From1<Typed<AValue>, Var>() {
                         @Override
                         public Typed<AValue> x(Var everything) {
@@ -273,7 +272,6 @@ public class Hardcoded {
                 TerminatedArray.TransferArraySize.SERIALIZED,
                 universalArray,
                 TerminatedArray.arrayLen,
-                TerminatedArray.neverAnythingAfter,
                 null,
                 new From1<Typed<AValue>, Typed<AValue>>() {
                     @Override
