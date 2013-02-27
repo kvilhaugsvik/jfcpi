@@ -233,8 +233,8 @@ public class Hardcoded {
                             @Override
                             public Block x(Var to, Var elem) {
                                 return new Block(
-                                        universals_n.newInstance(elem.ref().callV("kind"), noLimit).call("encodeTo", to.ref()),
-                                        to.ref().<Returnable>call("writeByte", elem.read("value"))
+                                        universals_n.newInstance(elem.ref().callV("getkind"), noLimit).call("encodeTo", to.ref()),
+                                        to.ref().<Returnable>call("writeByte", elem.ref().callV("getvalue"))
                                 );
                             }
                         },
@@ -299,8 +299,8 @@ public class Hardcoded {
                             @Override
                             public Block x(Var val, Var to) {
                                 return Block.fromStrings(
-                                        "to.writeByte(this.value.getsource().kind.getNumber())",
-                                        "to.writeInt(this.value.getsource().value)",
+                                        "to.writeByte(this.value.getsource().getkind().getNumber())",
+                                        "to.writeInt(this.value.getsource().getvalue())",
                                         "to.writeByte(this.value.getrange().getNumber())",
                                         "to.writeBoolean(this.value.getsurvives())",
                                         "to.writeBoolean(this.value.getnegated())");
@@ -329,22 +329,13 @@ public class Hardcoded {
     public static void applyManualChanges(PacketsStore toStorage) {
         // TODO: autoconvert the enums
         // TODO: when given the location of the tables convert table items as well
-        SpecialClass handRolledUniversal =
-                new SpecialClass(TargetPackage.from(org.freeciv.types.FCEnum.class.getPackage()),
-                "Freeciv source interpreted by hand", "universal",
-                new Requirement("struct universal", DataType.class),
-                Collections.<Requirement>emptySet());
-        handRolledUniversal.addPublicObjectConstant(TargetClass.newKnown("org.freeciv.types", "universals_n"), "kind");
-        handRolledUniversal.addPublicObjectConstant(int.class, "value");
-        handRolledUniversal.addConstructorFields();
-        handRolledUniversal.addMethod(Method.newPublicReadObjectState(Comment.no(),
-                TargetClass.newKnown(String.class), "toString",
-                new Block(RETURN(sum(literal("("),
-                        handRolledUniversal.getField("kind").ref(),
-                        literal(":"),
-                        handRolledUniversal.getField("value").ref(),
-                        literal(")"))))));
-        toStorage.addDependency(handRolledUniversal);
+        final HashSet<Requirement> willNeed = new HashSet<Requirement>();
+        willNeed.add(new Requirement("enum universals_n", DataType.class));
+        toStorage.addDependency(new Struct("universal",
+                Arrays.asList(
+                        new WeakVarDec("org.freeciv.types", "universals_n", "kind", 0),
+                        new WeakVarDec(TargetPackage.TOP_LEVEL_AS_STRING, "int", "value", 0)),
+                willNeed));
     }
 
     public static Collection<IDependency> values() {
