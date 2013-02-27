@@ -51,6 +51,9 @@ public class PacketsStore {
         for (IDependency primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
         }
+        for (IDependency.Maker maker : Hardcoded.makers()) {
+            requirements.addMaker(maker);
+        }
 
         requirements.addMaker(new FieldAliasArrayMaker());
         requirements.addMaker(new BasicFieldTypeAsFieldTypeAlias());

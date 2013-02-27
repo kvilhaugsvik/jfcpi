@@ -14,13 +14,11 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.enteties.BitVector;
-import org.freeciv.packetgen.enteties.Constant;
-import org.freeciv.packetgen.enteties.FieldTypeBasic;
-import org.freeciv.packetgen.enteties.SpecialClass;
+import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.supporting.*;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
@@ -47,6 +45,7 @@ public class Hardcoded {
     public static final Var fMaxSize = Var.field(Collections.<Annotate>emptyList(),
             Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
             TargetClass.fromClass(ElementsLimit.class), "maxArraySize", null);
+    private static final Value<AValue> noLimit = TargetClass.fromClass(ElementsLimit.class).callV("noLimit");
 
     public static final BitVector deltaBasic;
     public static final FieldTypeBasic.FieldTypeAlias deltaField;
@@ -95,52 +94,6 @@ public class Hardcoded {
                     },
                     TO_STRING_OBJECT,
                                false, Collections.<Requirement>emptySet()),
-            new FieldTypeBasic("requirement", "struct requirement", TargetClass.newKnown("org.freeciv.types", "requirement"),
-                    new From1<Block, Var>() {
-                        @Override
-                        public Block x(Var arg1) {
-                            return new Block(arg1.assign(pValue.ref()));
-                        }
-                    },
-                    new From2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var to, Var from) {
-                            return new Block(to.assign((TargetClass.newKnown("org.freeciv.types", "requirement")).newInstance(
-                                    TargetClass.newKnown("org.freeciv.types", "universal").newInstance(
-                                            new MethodCall<AValue>("universals_n.valueOf",
-                                                    from.ref().<AValue>call("readUnsignedByte")),
-                                            from.ref().<AValue>call("readInt")),
-                                    new MethodCall<AValue>("req_range.valueOf",
-                                            from.ref().<AValue>call("readUnsignedByte")),
-                                    from.ref().<AValue>call("readBoolean"),
-                                    from.ref().<AValue>call("readBoolean"))));
-                        }
-                    },
-                    new From2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var val, Var to) {
-                            return Block.fromStrings(
-                                    "to.writeByte(this.value.getsource().kind.getNumber())",
-                                    "to.writeInt(this.value.getsource().value)",
-                                    "to.writeByte(this.value.getrange().getNumber())",
-                                    "to.writeBoolean(this.value.getsurvives())",
-                                    "to.writeBoolean(this.value.getnegated())");
-                        }
-                    },
-                    new From1<Typed<AnInt>, Var>() {
-                        @Override
-                        public Typed<AnInt> x(Var arg1) {
-                            return literal(8);
-                        }
-                    },
-                    TO_STRING_OBJECT,
-                    false,
-                    Arrays.asList(
-                            new Requirement("struct requirement", DataType.class),
-                            new Requirement("enum req_range", DataType.class),
-                            new Requirement("enum universals_n", DataType.class),
-                            new Requirement("struct universal", DataType.class))
-            ),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
@@ -245,6 +198,134 @@ public class Hardcoded {
             Constant.isInt("STRING_ENDER", IntExpression.integer("0"))
     );
 
+    private static final Set<IDependency.Maker> hardCodedMakers;
+    static {
+        final Requirement require_universals_n =
+                new Requirement("uint8(enum universals_n)", FieldTypeBasic.FieldTypeAlias.class);
+        final Requirement require_universal = new Requirement("struct universal", DataType.class);
+
+        HashSet<IDependency.Maker> makers = new HashSet<IDependency.Maker>();
+
+        makers.add(new IDependency.Maker.Simple(
+                new Requirement("worklist(struct worklist)", FieldTypeBasic.class),
+                require_universals_n, require_universal
+        ) {
+            @Override
+            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+                final TargetClass universals_n = ((ClassWriter) wasRequired[0]).getAddress();
+                final TargetClass universal = ((ClassWriter) wasRequired[1]).getAddress();
+
+                TargetArray universalArray = TargetArray.from(universal.scopeKnown(), 1);
+                return new TerminatedArray("worklist", "struct worklist", universalArray,
+                        null,
+                        TerminatedArray.MaxArraySize.NO_LIMIT,
+                        TerminatedArray.TransferArraySize.SERIALIZED,
+                        universalArray,
+                        TerminatedArray.arrayLen,
+                        null,
+                        new From1<Typed<AValue>, Typed<AValue>>() {
+                            @Override
+                            public Typed<AValue> x(Typed<AValue> bytes) {
+                                return bytes; // TODO: Fix
+                            }
+                        },
+                        new From2<Block, Var, Var>() {
+                            @Override
+                            public Block x(Var to, Var elem) {
+                                return new Block(
+                                        universals_n.newInstance(elem.ref().callV("kind"), noLimit).call("encodeTo", to.ref()),
+                                        to.ref().<Returnable>call("writeByte", elem.read("value"))
+                                );
+                            }
+                        },
+                        new From1<Typed<? extends AValue>, Var>() {
+                            @Override
+                            public Typed<AValue> x(Var from) {
+                                return universal.newInstance(
+                                        universals_n.newInstance(from.ref(), noLimit).callV("getValue"),
+                                        from.ref().<AValue>call("readUnsignedByte"));
+                            }
+                        },
+                        TO_STRING_ARRAY,
+                        Arrays.asList(require_universals_n,
+                                new Requirement("struct universal", DataType.class)),
+                        null,
+                        NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
+                        new From1<Typed<AnInt>, Var>() {
+                            @Override
+                            public Typed<AnInt> x(Var val) {
+                                return multiply(literal(2), val.read("length"));
+                            }
+                        },
+                        TerminatedArray.sameNumberOfBufferElementsAndValueElements,
+                        Collections.<Method.Helper>emptyList(),
+                        false
+                );
+            }
+        });
+
+        final Requirement requirementReq = new Requirement("struct requirement", DataType.class);
+        makers.add(new IDependency.Maker.Simple(
+                new Requirement("requirement(struct requirement)", FieldTypeBasic.class),
+                require_universals_n, requirementReq, require_universal
+        ) {
+            @Override
+            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+                final TargetClass universals_n = ((ClassWriter) wasRequired[0]).getAddress();
+                final TargetClass requirementDataType = ((ClassWriter) wasRequired[1]).getAddress();
+                final TargetClass universal = ((ClassWriter) wasRequired[2]).getAddress();
+
+                return new FieldTypeBasic("requirement", "struct requirement", requirementDataType,
+                        new From1<Block, Var>() {
+                            @Override
+                            public Block x(Var arg1) {
+                                return new Block(arg1.assign(pValue.ref()));
+                            }
+                        },
+                        new From2<Block, Var, Var>() {
+                            @Override
+                            public Block x(Var to, Var from) {
+                                return new Block(to.assign(requirementDataType.newInstance(
+                                        universal.newInstance(
+                                                universals_n.newInstance(from.ref(), noLimit).callV("getValue"),
+                                                from.ref().<AValue>call("readInt")),
+                                        new MethodCall<AValue>("req_range.valueOf",
+                                                from.ref().<AValue>call("readUnsignedByte")),
+                                        from.ref().<AValue>call("readBoolean"),
+                                        from.ref().<AValue>call("readBoolean"))));
+                            }
+                        },
+                        new From2<Block, Var, Var>() {
+                            @Override
+                            public Block x(Var val, Var to) {
+                                return Block.fromStrings(
+                                        "to.writeByte(this.value.getsource().kind.getNumber())",
+                                        "to.writeInt(this.value.getsource().value)",
+                                        "to.writeByte(this.value.getrange().getNumber())",
+                                        "to.writeBoolean(this.value.getsurvives())",
+                                        "to.writeBoolean(this.value.getnegated())");
+                            }
+                        },
+                        new From1<Typed<AnInt>, Var>() {
+                            @Override
+                            public Typed<AnInt> x(Var arg1) {
+                                return literal(8);
+                            }
+                        },
+                        TO_STRING_OBJECT,
+                        false,
+                        Arrays.asList(
+                                new Requirement("struct requirement", DataType.class),
+                                new Requirement("enum req_range", DataType.class),
+                                require_universals_n,
+                                new Requirement("struct universal", DataType.class))
+                );
+            }
+        });
+
+        hardCodedMakers = Collections.unmodifiableSet(makers);
+    }
+
     public static void applyManualChanges(PacketsStore toStorage) {
         // TODO: autoconvert the enums
         // TODO: when given the location of the tables convert table items as well
@@ -264,63 +345,16 @@ public class Hardcoded {
                         handRolledUniversal.getField("value").ref(),
                         literal(")"))))));
         toStorage.addDependency(handRolledUniversal);
-
-        TargetArray universalArray = TargetArray.from(handRolledUniversal.getAddress().scopeKnown(), 1);
-        FieldTypeBasic workListNeedsUniversal = new TerminatedArray("worklist", "struct worklist", universalArray,
-                null,
-                TerminatedArray.MaxArraySize.NO_LIMIT,
-                TerminatedArray.TransferArraySize.SERIALIZED,
-                universalArray,
-                TerminatedArray.arrayLen,
-                null,
-                new From1<Typed<AValue>, Typed<AValue>>() {
-                    @Override
-                    public Typed<AValue> x(Typed<AValue> bytes) {
-                        return bytes; // TODO: Fix
-                    }
-                },
-                new From2<Block, Var, Var>() {
-                    @Override
-                    public Block x(Var to, Var elem) {
-                        return new Block(
-                                to.ref().<Returnable>call("writeByte", elem.ref().callV("kind").callV("getNumber")),
-                                to.ref().<Returnable>call("writeByte", elem.read("value"))
-                        );
-                    }
-                },
-                new From1<Typed<? extends AValue>, Var>() {
-                    @Override
-                    public Typed<AValue> x(Var from) {
-                        TargetClass universal = TargetClass.newKnown("org.freeciv.types", "universal");
-                        return universal.newInstance(
-                                new MethodCall<AValue>(
-                                        "universals_n.valueOf",
-                                        from.ref().<AValue>call("readUnsignedByte")),
-                                from.ref().<AValue>call("readUnsignedByte"));
-                    }
-                },
-                TO_STRING_ARRAY,
-                Arrays.asList(new Requirement("enum universals_n", DataType.class),
-                        new Requirement("struct universal", DataType.class)),
-                null,
-                NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
-                new From1<Typed<AnInt>, Var>() {
-                    @Override
-                    public Typed<AnInt> x(Var val) {
-                        return multiply(literal(2), val.read("length"));
-                    }
-                },
-                TerminatedArray.sameNumberOfBufferElementsAndValueElements,
-                Collections.<Method.Helper>emptyList(),
-                false
-        );
-        toStorage.addDependency(workListNeedsUniversal);
     }
 
     public static Collection<IDependency> values() {
         HashSet<IDependency> out = new HashSet<IDependency>(hardCodedElements);
         out.add(new BitVector());
         return out;
+    }
+
+    public static Collection<IDependency.Maker> makers() {
+        return hardCodedMakers;
     }
 
     public static FieldTypeBasic getFloat(final String times) {
