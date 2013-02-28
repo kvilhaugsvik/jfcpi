@@ -24,11 +24,6 @@ public class WeakVarDec {
     protected final ArrayDeclaration[] declarations;
     protected final int eatenDeclartions; // TODO: This information don't belong here. Query the storage in users
 
-    @Deprecated
-    public WeakVarDec(String packageOfType, String kind, String name, ArrayDeclaration... declarations) {
-        this(packageOfType, kind, name, 0, declarations);
-    }
-
     public WeakVarDec(String packageOfType, String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
         this.type = kind;
         this.packageOfType = packageOfType;
