@@ -74,17 +74,13 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        return new Block(to.assign(willRequire.isEmpty() ?
-                                        io.getRead().x(from) :
-                                        typeInJava.call("valueOf", io.getRead().x(from))));
+                        return new Block(to.assign(io.getRead().x(from)));
                     }
                 },
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var val, Var to) {
-                        return new Block(to.ref().<Returnable>call(io.getWrite(), willRequire.isEmpty() ?
-                                val.ref() :
-                                val.ref().<Returnable>call("getNumber")));
+                        return new Block(to.ref().<Returnable>call(io.getWrite(), val.ref()));
                     }
                 },
                                   io.getSize(),
