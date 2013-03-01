@@ -1,6 +1,6 @@
 package org.freeciv.packetgen.enteties.supporting;
 
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import scala.Function1;
@@ -96,7 +96,7 @@ public class IntExpression {
         return new IntExpression(expression, null, null, reqs);
     }
 
-    public static IntExpression readFromOther(IDependency other, String readStatement) {
+    public static IntExpression readFromOther(Dependency.Item other, String readStatement) {
         return new IntExpression(readStatement, null, null, other.getIFulfillReq());
     }
 

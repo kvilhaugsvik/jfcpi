@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
 import com.kvilhaugsvik.javaGenerator.Var;
@@ -29,7 +29,7 @@ import java.util.Collections;
 
 // TODO: Quick: Split based on kind of fulfillment so a dummy don't have get for the nulls or throw excpetion on null
 // TODO: Long term: Split code in a better way between NetworkIO and java type. Some argument passing may fix all.
-public class NetworkIO implements IDependency, ReqKind {
+public class NetworkIO implements Dependency.Item, ReqKind {
     private final Requirement me;
     private final int size;
     private final From1<Typed<AnInt>, Var> readNoArgs;

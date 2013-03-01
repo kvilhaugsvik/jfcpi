@@ -17,7 +17,7 @@ package org.freeciv.packetgen.dependency;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class SimpleDependencyMaker implements IDependency.Maker {
+public abstract class SimpleDependencyMaker implements Dependency.Maker {
     private final List<Requirement> params;
     private final Requirement iCanProduce;
 

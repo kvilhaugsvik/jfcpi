@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import com.kvilhaugsvik.javaGenerator.*;
 
@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-public class SpecialClass extends ClassWriter implements IDependency {
+public class SpecialClass extends ClassWriter implements Dependency.Item {
     private final Requirement iProvide;
     private final Set<Requirement> iRequire;
 

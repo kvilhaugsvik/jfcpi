@@ -23,7 +23,7 @@ import org.freeciv.packet.fieldtype.FieldType;
 import org.freeciv.packet.fieldtype.FieldTypeException;
 import org.freeciv.packet.fieldtype.Key;
 import org.freeciv.packetgen.UndefinedException;
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.ReqKind;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.Field;
@@ -47,7 +47,7 @@ import java.util.logging.Level;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
-public class Packet extends ClassWriter implements IDependency, ReqKind {
+public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private static final TargetClass validation = TargetClass.fromClass(Validation.class);
 
     private final int number;

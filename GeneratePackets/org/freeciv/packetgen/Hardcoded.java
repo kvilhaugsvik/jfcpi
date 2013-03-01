@@ -16,7 +16,7 @@ package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packet.fieldtype.ElementsLimit;
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.dependency.SimpleDependencyMaker;
 import org.freeciv.packetgen.enteties.*;
@@ -60,7 +60,7 @@ public class Hardcoded {
         }
     }
 
-    private static final Collection<IDependency> hardCodedElements = Arrays.<IDependency>asList(
+    private static final Collection<Dependency.Item> hardCodedElements = Arrays.<Dependency.Item>asList(
             new FieldTypeBasic("uint32", "int", TargetClass.fromClass(Long.class),
                     new From1<Block, Var>() {
                         @Override
@@ -190,11 +190,11 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in types
              ************************************************************************************************/
-            (IDependency)(new SimpleTypeAlias("int", Integer.class, null)),
-            (IDependency)(new SimpleTypeAlias("bool", Boolean.class, null)),
-            (IDependency)(new SimpleTypeAlias("float", Float.class, null)),
-            (IDependency)(new SimpleTypeAlias("double", Double.class, null)),
-            (IDependency)(new SimpleTypeAlias("string", String.class, null)),
+            (Dependency.Item)(new SimpleTypeAlias("int", Integer.class, null)),
+            (Dependency.Item)(new SimpleTypeAlias("bool", Boolean.class, null)),
+            (Dependency.Item)(new SimpleTypeAlias("float", Float.class, null)),
+            (Dependency.Item)(new SimpleTypeAlias("double", Double.class, null)),
+            (Dependency.Item)(new SimpleTypeAlias("string", String.class, null)),
             deltaBasic,
 
             /************************************************************************************************
@@ -203,20 +203,20 @@ public class Hardcoded {
             Constant.isInt("STRING_ENDER", IntExpression.integer("0"))
     );
 
-    private static final Set<IDependency.Maker> hardCodedMakers;
+    private static final Set<Dependency.Maker> hardCodedMakers;
     static {
         final Requirement require_universals_n =
                 new Requirement("uint8(enum universals_n)", FieldTypeBasic.FieldTypeAlias.class);
         final Requirement require_universal = new Requirement("struct universal", DataType.class);
 
-        HashSet<IDependency.Maker> makers = new HashSet<IDependency.Maker>();
+        HashSet<Dependency.Maker> makers = new HashSet<Dependency.Maker>();
 
         makers.add(new SimpleDependencyMaker(
                 new Requirement("worklist(struct worklist)", FieldTypeBasic.class),
                 require_universals_n, require_universal
         ) {
             @Override
-            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 final TargetClass universals_n = ((ClassWriter) wasRequired[0]).getAddress();
                 final TargetClass universal = ((ClassWriter) wasRequired[1]).getAddress();
 
@@ -275,7 +275,7 @@ public class Hardcoded {
                 require_universals_n, requirementReq, require_universal
         ) {
             @Override
-            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 final TargetClass universals_n = ((ClassWriter) wasRequired[0]).getAddress();
                 final TargetClass requirementDataType = ((ClassWriter) wasRequired[1]).getAddress();
                 final TargetClass universal = ((ClassWriter) wasRequired[2]).getAddress();
@@ -343,13 +343,13 @@ public class Hardcoded {
                 willNeed));
     }
 
-    public static Collection<IDependency> values() {
-        HashSet<IDependency> out = new HashSet<IDependency>(hardCodedElements);
+    public static Collection<Dependency.Item> values() {
+        HashSet<Dependency.Item> out = new HashSet<Dependency.Item>(hardCodedElements);
         out.add(new BitVector());
         return out;
     }
 
-    public static Collection<IDependency.Maker> makers() {
+    public static Collection<Dependency.Maker> makers() {
         return hardCodedMakers;
     }
 

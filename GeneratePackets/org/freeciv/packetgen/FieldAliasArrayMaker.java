@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Required;
 import org.freeciv.packetgen.dependency.RequiredMulti;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FieldAliasArrayMaker implements IDependency.Maker {
+public class FieldAliasArrayMaker implements Dependency.Maker {
     private static final Pattern arrayRequest = Pattern.compile("(\\w+)_(\\d+)");
 
     @Override
@@ -63,7 +63,7 @@ public class FieldAliasArrayMaker implements IDependency.Maker {
     }
 
     @Override
-    public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+    public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         if ("1".equals(splitRequest(toProduce).group(2)) && eatsArrays(wasRequired[0]))
             return ((FieldTypeBasic.FieldTypeAlias)wasRequired[0]).aliasUnseenToCode(toProduce.getName());
 
@@ -71,7 +71,7 @@ public class FieldAliasArrayMaker implements IDependency.Maker {
                 .createFieldType(toProduce.getName());
     }
 
-    private static boolean eatsArrays(IDependency iDependency) {
-        return ((FieldTypeBasic.FieldTypeAlias)iDependency).getBasicType().isArrayEater();
+    private static boolean eatsArrays(Dependency.Item dependencyItem) {
+        return ((FieldTypeBasic.FieldTypeAlias) dependencyItem).getBasicType().isArrayEater();
     }
 }

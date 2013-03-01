@@ -48,10 +48,10 @@ public class PacketsStore {
 
     public PacketsStore(int bytesInPacketNumber, String logger, boolean enableDelta) {
         requirements = new DependencyStore();
-        for (IDependency primitive : Hardcoded.values()) {
+        for (Dependency.Item primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
         }
-        for (IDependency.Maker maker : Hardcoded.makers()) {
+        for (Dependency.Maker maker : Hardcoded.makers()) {
             requirements.addMaker(maker);
         }
 
@@ -82,7 +82,7 @@ public class PacketsStore {
         Requirement basic = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
         requirements.addMaker(new SimpleDependencyMaker(new Requirement(alias, FieldTypeAlias.class), basic) {
             @Override
-            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 return ((FieldTypeBasic)wasRequired[0]).createFieldType(alias);
             }
         });
@@ -94,7 +94,7 @@ public class PacketsStore {
         requirements.addMaker(new SimpleDependencyMaker(new Requirement(alias, FieldTypeAlias.class),
                 new Requirement(aliased, FieldTypeAlias.class)) {
             @Override
-            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 return ((FieldTypeAlias) wasRequired[0]).getBasicType().createFieldType(alias);
             }
         });
@@ -116,7 +116,7 @@ public class PacketsStore {
 
         requirements.addMaker(new SimpleDependencyMaker(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
             @Override
-            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 assert wasRequired.length == fields.size() : "Wrong number of arguments";
                 List<Field> fieldList = new LinkedList<Field>();
                 for (int i = 0; i < fields.size(); i++) {
@@ -204,14 +204,14 @@ public class PacketsStore {
     }
 
     public Collection<ClassWriter> getJavaCode() {
-        Collection<IDependency> inn = requirements.getResolved();
+        Collection<Dependency.Item> inn = requirements.getResolved();
         HashSet<ClassWriter> out = new HashSet<ClassWriter>();
 
         TreeMap<Integer, TargetClass> resolvedPackets = new TreeMap<Integer, TargetClass>();
         TreeSet<Constant> sortedConstants =
                 new TreeSet<Constant>(new TotalOrderNoCircles(inn));
 
-        for (IDependency dep : inn)
+        for (Dependency.Item dep : inn)
             if (dep instanceof ClassWriter) {
                 out.add((ClassWriter) dep);
                 if (dep instanceof Packet) {
@@ -256,9 +256,9 @@ public class PacketsStore {
         return out;
     }
 
-    public void addDependency(IDependency fulfillment) {
+    public void addDependency(Dependency.Item fulfillment) {
         if (fulfillment instanceof Enum)
-            for (IDependency constant : ((Enum)fulfillment).getEnumConstants())
+            for (Dependency.Item constant : ((Enum)fulfillment).getEnumConstants())
                 requirements.addPossibleRequirement(constant);
         requirements.addPossibleRequirement(fulfillment);
     }

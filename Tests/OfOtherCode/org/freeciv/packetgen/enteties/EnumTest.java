@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
@@ -209,7 +209,7 @@ public class EnumTest {
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2));
 
-        for (IDependency constant: hasValues.getEnumConstants())
+        for (Dependency.Item constant: hasValues.getEnumConstants())
             constants.put(((Constant)constant).getName(), (Constant)constant);
 
         assertTrue("ONE is missing", constants.containsKey("ONE"));

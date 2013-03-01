@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Required;
 import org.freeciv.packetgen.dependency.RequiredMulti;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-class BasicFieldTypeAsFieldTypeAlias implements IDependency.Maker {
+class BasicFieldTypeAsFieldTypeAlias implements Dependency.Maker {
     Pattern splitter = Pattern.compile("(\\w+)\\(([\\w ]+)\\)");
 
     @Override
@@ -38,7 +38,7 @@ class BasicFieldTypeAsFieldTypeAlias implements IDependency.Maker {
     }
 
     @Override
-    public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+    public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         return ((FieldTypeBasic)wasRequired[0])
                 .createFieldType("UNALIASED_" + toProduce.getName().replaceAll("[\\(|\\s|\\)]", "_"),
                         toProduce.getName());

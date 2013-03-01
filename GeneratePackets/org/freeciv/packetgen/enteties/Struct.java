@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.WeakVarDec;
@@ -28,7 +28,7 @@ import java.util.*;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
-public class Struct extends ClassWriter implements IDependency {
+public class Struct extends ClassWriter implements Dependency.Item {
     private final Set<Requirement> iRequire;
     private final Requirement iProvide;
 

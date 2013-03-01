@@ -19,7 +19,7 @@ package org.freeciv.packetgen;
 
 import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
@@ -484,7 +484,7 @@ public class GenerateTest {
 
     private void writeConstantClass(String targetFolder) throws IOException {
         Set<Constant> constants = new HashSet<Constant>();
-        for (IDependency stringEnd : Hardcoded.values())
+        for (Dependency.Item stringEnd : Hardcoded.values())
             if (stringEnd instanceof Constant && "STRING_ENDER".equals(((Constant) stringEnd).getName()))
                 constants.add((Constant)stringEnd);
 
@@ -526,16 +526,16 @@ public class GenerateTest {
 
     public static class Parts {
         final HashMap<String, FieldTypeBasic> primitiveTypes = new HashMap<String, FieldTypeBasic>();
-        final HashMap<String, IDependency.Maker> generators = new HashMap<String, IDependency.Maker>();
+        final HashMap<String, Dependency.Maker> generators = new HashMap<String, Dependency.Maker>();
         final HashMap<String, NetworkIO> network = new HashMap<String, NetworkIO>();
 
         public Parts() {
-            for (IDependency mayBeNeeded : Hardcoded.values()) {
+            for (Dependency.Item mayBeNeeded : Hardcoded.values()) {
                 if (mayBeNeeded instanceof FieldTypeBasic)
                     primitiveTypes.put(((FieldTypeBasic) mayBeNeeded).getFieldTypeBasic(), (FieldTypeBasic)mayBeNeeded);
-                else if (mayBeNeeded instanceof IDependency.Maker)
+                else if (mayBeNeeded instanceof Dependency.Maker)
                     generators.put(mayBeNeeded.getIFulfillReq().getName(),
-                            (IDependency.Maker)mayBeNeeded);
+                            (Dependency.Maker)mayBeNeeded);
                 else if (mayBeNeeded instanceof NetworkIO)
                     network.put(mayBeNeeded.getIFulfillReq().getName(), (NetworkIO)mayBeNeeded);
             }

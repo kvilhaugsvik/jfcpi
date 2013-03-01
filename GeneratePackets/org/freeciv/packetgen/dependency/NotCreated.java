@@ -22,7 +22,7 @@ import java.util.*;
  * Since the attempted creation is over simply finding the requirement later won't help.
  * The creation process may or may not be repeatable and may or may not fail if the requirements are found.
  */
-public class NotCreated implements IDependency {
+public class NotCreated implements Dependency.Item {
     private final Requirement wouldHaveProvided;
     private final Collection<Requirement> wasMissingAtCreation;
 

@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SimpleTypeAlias implements IDependency, IDependency.Maker {
+public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
     private final Pattern fieldTypeBasicForMe;
@@ -61,7 +61,7 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
     }
 
     @Override
-    public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+    public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         final NetworkIO io = (NetworkIO)wasRequired[0];
         return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), typeInJava,
                 new From1<Block, Var>() {

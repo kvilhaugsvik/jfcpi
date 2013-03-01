@@ -86,7 +86,7 @@ public class DependencyStoreTest {
         DependencyStore store = depRoofOnTwoWallsOnTwoFloorsEachOneOverlapping();
         HashSet<Requirement> seen = new HashSet<Requirement>();
 
-        for (IDependency item: store.getResolved()) {
+        for (Dependency.Item item: store.getResolved()) {
             if (!item.getReqs().isEmpty()) {
                 Collection<Requirement> found = new HashSet<Requirement>(item.getReqs());
                 found.removeAll(seen);
@@ -96,7 +96,7 @@ public class DependencyStoreTest {
         }
     }
 
-    IDependency impossible = new IDependency() {
+    Dependency.Item impossible = new Dependency.Item() {
         @Override public Collection<Requirement> getReqs() {
             return Collections.<Requirement>emptySet();
         }
@@ -217,9 +217,9 @@ public class DependencyStoreTest {
     @Test public void makerWorksNoDependencies() {
         final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
         final Requirement req = new Requirement("Value", Constant.class);
-        IDependency.Maker valueGen = new SimpleDependencyMaker(req) {
+        Dependency.Maker valueGen = new SimpleDependencyMaker(req) {
             @Override
-            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 return made;
             }
         };
@@ -229,7 +229,7 @@ public class DependencyStoreTest {
         OnlyRequire lookedFor = new OnlyRequire("ValueUser", req);
         store.addWanted(lookedFor);
 
-        List<IDependency> result = store.getResolved();
+        List<Dependency.Item> result = store.getResolved();
 
         assertTrue("Demanded item should be in output", result.contains(lookedFor));
         assertTrue("Dependency of demanded item should be in output", result.contains(made));
@@ -244,10 +244,10 @@ public class DependencyStoreTest {
     private static final OnlyRequire three = new OnlyRequire("three");
 
     private static DependencyStore makerThreeDependencies() {
-        IDependency.Maker valueGen = new SimpleDependencyMaker(req,
+        Dependency.Maker valueGen = new SimpleDependencyMaker(req,
                 one.getIFulfillReq(), two.getIFulfillReq(), three.getIFulfillReq()) {
             @Override
-            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 if (one.equals(wasRequired[0]) && two.equals(wasRequired[1]) && three.equals(wasRequired[2]))
                     return made;
                 throw new UndefinedException("Parameters missing or in wrong order");
@@ -281,7 +281,7 @@ public class DependencyStoreTest {
         store.addPossibleRequirement(two);
         store.addPossibleRequirement(three);
 
-        List<IDependency> result = store.getResolved();
+        List<Dependency.Item> result = store.getResolved();
         assertTrue("Demanded item should be in output", result.contains(lookedFor));
         assertTrue("Dependency of demanded item should be in output", result.contains(made));
     }
@@ -314,7 +314,7 @@ public class DependencyStoreTest {
         final OnlyRequire rawMaterial2 = new OnlyRequire("two");
         final OnlyRequire rawMaterial3 = new OnlyRequire("three");
 
-        IDependency.Maker valueGen = new IDependency.Maker() {
+        Dependency.Maker valueGen = new Dependency.Maker() {
             @Override
             public List<Requirement> neededInput(Requirement toProduce) {
                 if (produced1.getIFulfillReq().canFulfill(toProduce))
@@ -329,7 +329,7 @@ public class DependencyStoreTest {
             }
 
             @Override
-            public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 if (produced1.getIFulfillReq().equals(toProduce)) {
                     if (rawMaterial1.equals(wasRequired[0]) && rawMaterial2.equals(wasRequired[1]))
                         return produced1;
@@ -356,7 +356,7 @@ public class DependencyStoreTest {
                 produced2, store.getPotentialProvider(produced2.getIFulfillReq()));
     }
 
-    public static class OnlyRequire implements IDependency {
+    public static class OnlyRequire implements Dependency.Item {
         private final HashSet<Requirement> want;
         private final Requirement has;
 

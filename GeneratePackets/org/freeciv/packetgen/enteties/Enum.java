@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
-public class Enum extends ClassWriter implements IDependency, IDependency.Maker {
+public class Enum extends ClassWriter implements Dependency.Item, Dependency.Maker {
     private final boolean bitwise;
     private final Collection<Requirement> iRequire;
     private final Pattern fieldTypeBasicForMe;
@@ -180,8 +180,8 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
         return (EnumElementFC)enums.getElement(named);
     }
 
-    public Collection<IDependency> getEnumConstants() {
-        Collection<IDependency> out = new LinkedList<IDependency>();
+    public Collection<Dependency.Item> getEnumConstants() {
+        Collection<Dependency.Item> out = new LinkedList<Dependency.Item>();
         for (String valueName : enums.getElementNames()) {
             out.add(Constant.isInt(valueName, IntExpression.readFromOther(this,
                                                                         this.getPackage() + "." + this
@@ -207,7 +207,7 @@ public class Enum extends ClassWriter implements IDependency, IDependency.Maker 
     }
 
     @Override
-    public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+    public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         final NetworkIO io = (NetworkIO)wasRequired[0];
         final String named = this.getName();
         HashSet<Requirement> req = new HashSet<Requirement>();

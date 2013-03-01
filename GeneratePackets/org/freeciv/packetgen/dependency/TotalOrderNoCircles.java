@@ -17,40 +17,40 @@ package org.freeciv.packetgen.dependency;
 import java.util.*;
 
 /**
- * Impose a total order on some objects of the type IDependency that contains everything required by all of its
+ * Impose a total order on some objects of the type Dependency.Item that contains everything required by all of its
  * elements and that has no circular requirements.
  *
  * First the number of requirements are compared. Since all requirements of requirements are counted as a
  * requirement anything that require another element will be larger than it as it require the element and the
  * element's dependencies. This way the partial order from required to requires is preserved. The next level is to
- * compare the requirement provided by the IDependency.
+ * compare the requirement provided by the Dependency.Item.
  *
  */
-public class TotalOrderNoCircles implements Comparator<IDependency> {
+public class TotalOrderNoCircles implements Comparator<Dependency.Item> {
     private final HashMap<Requirement, Collection<Requirement>> seed;
     private final HashMap<Requirement, Set<Requirement>> found;
     private final boolean strict;
 
     /**
-     * Construct a comparator for some objects of the type IDependency
+     * Construct a comparator for some objects of the type Dependency.Item
      * @param othersCanBeFoundIn should contain the elements each element in it requires without circles
      * @param beStrict look for circular references and missing requirements
      */
-    public TotalOrderNoCircles(Iterable<IDependency> othersCanBeFoundIn, boolean beStrict) {
+    public TotalOrderNoCircles(Iterable<Dependency.Item> othersCanBeFoundIn, boolean beStrict) {
         this.strict = beStrict;
         this.found = new HashMap<Requirement, Set<Requirement>>();
 
         this.seed = new HashMap<Requirement, Collection<Requirement>>();
-        for (IDependency dep : othersCanBeFoundIn) {
+        for (Dependency.Item dep : othersCanBeFoundIn) {
             seed.put(dep.getIFulfillReq(), dep.getReqs());
         }
     }
 
     /**
-     * Construct a comparator for objects of the type IDependency in othersCanBeFoundIn
+     * Construct a comparator for objects of the type Dependency.Item in othersCanBeFoundIn
      * @param othersCanBeFoundIn where to look for requirements.
      */
-    public TotalOrderNoCircles(Iterable<IDependency> othersCanBeFoundIn) {
+    public TotalOrderNoCircles(Iterable<Dependency.Item> othersCanBeFoundIn) {
         this(othersCanBeFoundIn, true);
     }
 
@@ -73,7 +73,7 @@ public class TotalOrderNoCircles implements Comparator<IDependency> {
     }
 
     @Override
-    public int compare(IDependency left, IDependency right) {
+    public int compare(Dependency.Item left, Dependency.Item right) {
         findTransitiveRequirements(left.getIFulfillReq());
         findTransitiveRequirements(right.getIFulfillReq());
 

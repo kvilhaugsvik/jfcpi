@@ -21,32 +21,32 @@ import java.util.*;
 public final class DependencyStore {
     private static final String nullNotAllowed = "null is not an allowed argument here";
 
-    private final DepStore<IDependency> resolved = DepStore.forIDependency();
-    private final DepStore<IDependency> existing = DepStore.forIDependency();
-    private final DepStore<IDependency> dependenciesFulfilled = DepStore.forIDependency();
+    private final DepStore<Dependency.Item> resolved = DepStore.forIDependency();
+    private final DepStore<Dependency.Item> existing = DepStore.forIDependency();
+    private final DepStore<Dependency.Item> dependenciesFulfilled = DepStore.forIDependency();
     private final HashSet<Requirement> dependenciesUnfulfilled = new HashSet<Requirement>();
     private final HashSet<Requirement> wantsOut = new HashSet<Requirement>();
     private final HashMap<Requirement, Collection<Requirement>> blameDeeperWhenNoItem = new HashMap<Requirement, Collection<Requirement>>();
-    private final DepStore<IDependency.Maker> makers = DepStore.forMaker();
+    private final DepStore<Dependency.Maker> makers = DepStore.forMaker();
 
     /**
      * Make the dependency store aware of the fulfillment of a possible requirement.
      * Any existing fulfillment will be overwritten. A Maker will be added as a Maker as well
      * @param item The dependency to add.
      */
-    public void addPossibleRequirement(IDependency item) {
+    public void addPossibleRequirement(Dependency.Item item) {
         if (null == item) throw new NullPointerException(nullNotAllowed);
         if (ReqKind.FailHard.class.equals(item.getIFulfillReq().getKind()))
             throw new AssertionError("Tried to fulfill a " + ReqKind.FailHard.class +
                                              " that by definition can't be fulfilled");
-        if (item instanceof IDependency.Maker)
-            addMaker((IDependency.Maker)item);
+        if (item instanceof Dependency.Maker)
+            addMaker((Dependency.Maker)item);
 
         existing.add(item);
         dependenciesUnfulfilled.clear();
     }
 
-    public void addWanted(IDependency item) {
+    public void addWanted(Dependency.Item item) {
         addPossibleRequirement(item);
         demand(item.getIFulfillReq());
     }
@@ -55,7 +55,7 @@ public final class DependencyStore {
         wantsOut.add(requirement);
     }
 
-    public void addMaker(IDependency.Maker maker) {
+    public void addMaker(Dependency.Maker maker) {
         if  (null == maker) throw new NullPointerException(nullNotAllowed);
         makers.add(maker);
     }
@@ -99,9 +99,9 @@ public final class DependencyStore {
      * Get the wanted items that has their dependencies in order and their dependencies
      * @return the items sorted so no item comes before its requirements
      */
-    public List<IDependency> getResolved() {
+    public List<Dependency.Item> getResolved() {
         resolve();
-        return new LinkedList<IDependency>(resolved.values());
+        return new LinkedList<Dependency.Item>(resolved.values());
     }
 
     /**
@@ -124,8 +124,8 @@ public final class DependencyStore {
     }
 
     private boolean creationWorked(Requirement item) {
-        IDependency.Maker maker = makers.getFulfillmentOf(item);
-        LinkedList<IDependency> args = new LinkedList<IDependency>();
+        Dependency.Maker maker = makers.getFulfillmentOf(item);
+        LinkedList<Dependency.Item> args = new LinkedList<Dependency.Item>();
         boolean parameterMissing = false;
         for (Requirement req : maker.neededInput(item))
             if (isAwareOfPotentialProvider(req)) {
@@ -138,25 +138,25 @@ public final class DependencyStore {
             return false;
 
         try {
-            existing.add(maker.produce(item, args.toArray(new IDependency[args.size()])));
+            existing.add(maker.produce(item, args.toArray(new Dependency.Item[args.size()])));
             return true;
         } catch (UndefinedException e) {
             return false;
         }
     }
 
-    public IDependency getPotentialProvider(Requirement item) {
+    public Dependency.Item getPotentialProvider(Requirement item) {
         if (!existing.hasFulfillmentOf(item) && makers.hasFulfillmentOf(item))
             creationWorked(item);
         return existing.getFulfillmentOf(item);
     }
 
-    private boolean declareFulfilled(IDependency item) {
+    private boolean declareFulfilled(Dependency.Item item) {
         dependenciesFulfilled.add(item);
         return true;
     }
 
-    public boolean dependenciesFound(IDependency item) {
+    public boolean dependenciesFound(Dependency.Item item) {
         assert (null != item) : nullNotAllowed;
         if (dependenciesFulfilled.hasFulfillmentOf(item.getIFulfillReq())) {
             return true;
@@ -181,7 +181,7 @@ public final class DependencyStore {
         }
     }
 
-    private void addWillCrashUnlessAlreadyChecked(IDependency item) {
+    private void addWillCrashUnlessAlreadyChecked(Dependency.Item item) {
         assert (null != item) : nullNotAllowed;
         assert (dependenciesFulfilled.hasFulfillmentOf(item.getIFulfillReq())) : "Missing dependency";
         if (!resolved.hasFulfillmentOf(item.getIFulfillReq())) {
@@ -192,7 +192,7 @@ public final class DependencyStore {
         }
     }
 
-    private void addToResolvedIfPossible(IDependency item) {
+    private void addToResolvedIfPossible(Dependency.Item item) {
         assert (null != item) : nullNotAllowed;
         if (dependenciesFound(item)) {
             addWillCrashUnlessAlreadyChecked(item);
@@ -215,18 +215,18 @@ public final class DependencyStore {
         private final FulfillGetter fulfillGetter;
 
         public static DepStore forIDependency() {
-            return new DepStore(new FulfillGetter<IDependency>() {
+            return new DepStore(new FulfillGetter<Dependency.Item>() {
                 @Override
-                public Required getIFulfill(IDependency dep) {
+                public Required getIFulfill(Dependency.Item dep) {
                     return dep.getIFulfillReq();
                 }
             });
         }
 
         public static DepStore forMaker() {
-            return new DepStore(new FulfillGetter<IDependency.Maker>() {
+            return new DepStore(new FulfillGetter<Dependency.Maker>() {
                 @Override
-                public Required getIFulfill(IDependency.Maker make) {
+                public Required getIFulfill(Dependency.Maker make) {
                     return make.getICanProduceReq();
                 }
             });

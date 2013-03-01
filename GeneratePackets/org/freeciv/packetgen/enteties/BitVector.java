@@ -3,7 +3,7 @@ package org.freeciv.packetgen.enteties;
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.UndefinedException;
-import org.freeciv.packetgen.dependency.IDependency;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Required;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.DataType;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
-public class BitVector extends ClassWriter implements IDependency, IDependency.Maker {
+public class BitVector extends ClassWriter implements Dependency.Item, Dependency.Maker {
     private static final Var<TargetArray> pFromByte = Var.param(byteArray, "from");
     private static final Var<TargetArray> pFromBits = Var.param(boolArray, "from");
     private static final Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
@@ -130,7 +130,7 @@ public class BitVector extends ClassWriter implements IDependency, IDependency.M
     }
 
     @Override
-    public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
+    public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         final TargetClass me = super.getAddress().scopeKnown();
 
         final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue;

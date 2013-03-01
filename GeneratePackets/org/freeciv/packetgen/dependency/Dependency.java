@@ -18,13 +18,15 @@ import org.freeciv.packetgen.UndefinedException;
 
 import java.util.*;
 
-public interface IDependency {
-    public Collection<Requirement> getReqs();
-    public Requirement getIFulfillReq();
+public interface Dependency {
+    public static interface Item {
+        public Collection<Requirement> getReqs();
+        public Requirement getIFulfillReq();
+    }
 
     public static interface Maker {
         public List<Requirement> neededInput(Requirement toProduce);
         public Required getICanProduceReq();
-        public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException;
+        public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException;
     }
 }
