@@ -64,8 +64,8 @@ public class Struct extends ClassWriter implements Dependency.Item {
 
         HashSet<Requirement> neededByFields = new HashSet<Requirement>();
         for (WeakVarDec field : fields) {
-            if (null != field.getTypeRequirement())
-                neededByFields.add(field.getTypeRequirement());
+            assert (null != field.getTypeRequirement()) : "Type can't be null";
+            neededByFields.add(field.getTypeRequirement());
             for (WeakVarDec.ArrayDeclaration dec : field.getDeclarations())
                 neededByFields.addAll(dec.maxSize.getReqs());
         }

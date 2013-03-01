@@ -337,7 +337,7 @@ public class Hardcoded {
         toStorage.addDependency(new Struct("universal",
                 Arrays.asList(
                         new WeakVarDec(new Requirement("enum universals_n", DataType.class), "org.freeciv.types", "universals_n", "kind", 0),
-                        new WeakVarDec(TargetPackage.TOP_LEVEL_AS_STRING, "int", "value", 0))));
+                        new WeakVarDec(new Requirement("int", DataType.class), TargetPackage.TOP_LEVEL_AS_STRING, "int", "value", 0))));
     }
 
     public static Collection<Dependency.Item> values() {

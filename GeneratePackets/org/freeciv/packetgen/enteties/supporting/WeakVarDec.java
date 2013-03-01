@@ -26,11 +26,10 @@ public class WeakVarDec {
     protected final ArrayDeclaration[] declarations;
     protected final int eatenDeclartions; // TODO: This information don't belong here. Query the storage in users
 
-    public WeakVarDec(String packageOfType, String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
-        this(null, packageOfType, kind, name, eatenDeclartions, declarations);
-    }
-
     public WeakVarDec(Requirement reqKind, String packageOfType, String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
+        if (null == reqKind)
+            throw new IllegalArgumentException("Must have a type");
+
         this.reqKind = reqKind;
         this.type = kind;
         this.packageOfType = packageOfType;

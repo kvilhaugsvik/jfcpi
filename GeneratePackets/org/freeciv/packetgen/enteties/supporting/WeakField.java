@@ -14,13 +14,16 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.enteties.FieldTypeBasic;
+
 import java.util.List;
 
 public class WeakField extends WeakVarDec {
     private final List<WeakFlag> flags;
 
     public WeakField(String name, String kind, List<WeakFlag> flags, ArrayDeclaration... declarations) {
-        super("org.freeciv.packet.fieldtype", kind, name, 0, declarations);
+        super(new Requirement(kind, FieldTypeBasic.FieldTypeAlias.class), "org.freeciv.packet.fieldtype", kind, name, 0, declarations);
         this.flags = flags;
     }
 
