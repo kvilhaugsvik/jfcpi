@@ -256,11 +256,16 @@ public class PacketsStore {
         return out;
     }
 
-    public void addDependency(Dependency.Item fulfillment) {
+    public void addDependency(Dependency fulfillment) {
         if (fulfillment instanceof Enum)
             for (Dependency.Item constant : ((Enum)fulfillment).getEnumConstants())
                 requirements.addPossibleRequirement(constant);
-        requirements.addPossibleRequirement(fulfillment);
+        if (fulfillment instanceof Dependency.Item)
+            requirements.addPossibleRequirement((Dependency.Item) fulfillment);
+        else if (fulfillment instanceof Dependency.Maker)
+            requirements.addMaker((Dependency.Maker) fulfillment);
+        else
+            throw new IllegalArgumentException("Not a maker. Not an item. What is it?");
     }
 
     public void requestConstant(String constant) {

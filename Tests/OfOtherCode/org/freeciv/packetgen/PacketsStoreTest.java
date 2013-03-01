@@ -15,6 +15,7 @@
 package org.freeciv.packetgen;
 
 import org.freeciv.Util;
+import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
@@ -234,6 +235,13 @@ public class PacketsStoreTest {
 
         assertTrue("Packet not created", storage.hasPacket("PACKET_HELLO"));
         assertEquals("Should have one field", 1, storage.getPacket("PACKET_HELLO").getFields().size());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addDependencyUnknownKind() {
+        PacketsStore storage = defaultStorage();
+        storage.addDependency(new Dependency() {
+        });
     }
 
     private static ClassWriter getVersionData(PacketsStore storage) {
