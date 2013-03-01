@@ -217,7 +217,7 @@ public class DependencyStoreTest {
     @Test public void makerWorksNoDependencies() {
         final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
         final Requirement req = new Requirement("Value", Constant.class);
-        IDependency.Maker valueGen = new IDependency.Maker.Simple(req) {
+        IDependency.Maker valueGen = new SimpleDependencyMaker(req) {
             @Override
             public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
                 return made;
@@ -244,7 +244,7 @@ public class DependencyStoreTest {
     private static final OnlyRequire three = new OnlyRequire("three");
 
     private static DependencyStore makerThreeDependencies() {
-        IDependency.Maker valueGen = new IDependency.Maker.Simple(req,
+        IDependency.Maker valueGen = new SimpleDependencyMaker(req,
                 one.getIFulfillReq(), two.getIFulfillReq(), three.getIFulfillReq()) {
             @Override
             public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {

@@ -26,25 +26,5 @@ public interface IDependency {
         public List<Requirement> neededInput(Requirement toProduce);
         public Required getICanProduceReq();
         public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException;
-
-        public static abstract class Simple implements Maker {
-            private final List<Requirement> params;
-            private final Requirement iCanProduce;
-
-            public Simple(Requirement iCanProduce, Requirement... neededArguments) {
-                this.iCanProduce = iCanProduce;
-                this.params = Arrays.asList(neededArguments);
-            }
-
-            @Override
-            public List<Requirement> neededInput(Requirement toProduce) {
-                return params;
-            }
-
-            @Override
-            public Required getICanProduceReq() {
-                return iCanProduce;
-            }
-        }
     }
 }

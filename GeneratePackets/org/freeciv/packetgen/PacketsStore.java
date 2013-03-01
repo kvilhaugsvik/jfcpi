@@ -80,7 +80,7 @@ public class PacketsStore {
 
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
         Requirement basic = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
-        requirements.addMaker(new IDependency.Maker.Simple(new Requirement(alias, FieldTypeAlias.class), basic) {
+        requirements.addMaker(new SimpleDependencyMaker(new Requirement(alias, FieldTypeAlias.class), basic) {
             @Override
             public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
                 return ((FieldTypeBasic)wasRequired[0]).createFieldType(alias);
@@ -91,7 +91,7 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(final String alias, String aliased) throws UndefinedException {
-        requirements.addMaker(new IDependency.Maker.Simple(new Requirement(alias, FieldTypeAlias.class),
+        requirements.addMaker(new SimpleDependencyMaker(new Requirement(alias, FieldTypeAlias.class),
                 new Requirement(aliased, FieldTypeAlias.class)) {
             @Override
             public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
@@ -114,7 +114,7 @@ public class PacketsStore {
         final List<Annotate> packetFlags = extractFlags(flags);
         List<Requirement> allNeeded = extractFieldRequirements(fields);
 
-        requirements.addMaker(new IDependency.Maker.Simple(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
+        requirements.addMaker(new SimpleDependencyMaker(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
             @Override
             public IDependency produce(Requirement toProduce, IDependency... wasRequired) throws UndefinedException {
                 assert wasRequired.length == fields.size() : "Wrong number of arguments";

@@ -18,6 +18,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.dependency.IDependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.dependency.SimpleDependencyMaker;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.supporting.*;
 import com.kvilhaugsvik.javaGenerator.*;
@@ -210,7 +211,7 @@ public class Hardcoded {
 
         HashSet<IDependency.Maker> makers = new HashSet<IDependency.Maker>();
 
-        makers.add(new IDependency.Maker.Simple(
+        makers.add(new SimpleDependencyMaker(
                 new Requirement("worklist(struct worklist)", FieldTypeBasic.class),
                 require_universals_n, require_universal
         ) {
@@ -269,7 +270,7 @@ public class Hardcoded {
         });
 
         final Requirement requirementReq = new Requirement("struct requirement", DataType.class);
-        makers.add(new IDependency.Maker.Simple(
+        makers.add(new SimpleDependencyMaker(
                 new Requirement("requirement(struct requirement)", FieldTypeBasic.class),
                 require_universals_n, requirementReq, require_universal
         ) {
