@@ -16,15 +16,22 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.javaGenerator.TargetArray;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
+import org.freeciv.packetgen.dependency.Requirement;
 
 public class WeakVarDec {
     protected final String name;
+    protected final Requirement reqKind;
     protected final String packageOfType; // TODO: This information don't belong here. Query the storage in users
     protected final String type;
     protected final ArrayDeclaration[] declarations;
     protected final int eatenDeclartions; // TODO: This information don't belong here. Query the storage in users
 
     public WeakVarDec(String packageOfType, String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
+        this(null, packageOfType, kind, name, eatenDeclartions, declarations);
+    }
+
+    public WeakVarDec(Requirement reqKind, String packageOfType, String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
+        this.reqKind = reqKind;
         this.type = kind;
         this.packageOfType = packageOfType;
         this.declarations = declarations;

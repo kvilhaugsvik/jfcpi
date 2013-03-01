@@ -189,7 +189,11 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in types
              ************************************************************************************************/
-            (IDependency)(new SimpleTypeAlias("int", Integer.class, Collections.<Requirement>emptySet())),
+            (IDependency)(new SimpleTypeAlias("int", Integer.class, null)),
+            (IDependency)(new SimpleTypeAlias("bool", Boolean.class, null)),
+            (IDependency)(new SimpleTypeAlias("float", Float.class, null)),
+            (IDependency)(new SimpleTypeAlias("double", Double.class, null)),
+            (IDependency)(new SimpleTypeAlias("string", String.class, null)),
             deltaBasic,
 
             /************************************************************************************************

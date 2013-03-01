@@ -235,9 +235,10 @@ object ParseCCode extends ExtractableParser {
     (cType ~ identifierRegEx ~ rep("[" ~> intExpr <~ "]") <~ ";") ^^ {
       case cTypeDecs ~ name ~ arrayDecs =>
         val typeNotArray = cTypeDecsToJava(ArrayOf(cTypeDecs, arrayDecs.size))
-        val reqs = new java.util.HashSet(typeNotArray._3)
+        val reqs = new java.util.HashSet[Requirement]()
+        reqs.add(typeNotArray._3)
         arrayDecs.foreach(req => reqs.addAll(req.getReqs))
-        new WeakVarDec(typeNotArray._1, typeNotArray._2, name, typeNotArray._4, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*) ->
+        new WeakVarDec(typeNotArray._3, typeNotArray._1, typeNotArray._2, name, typeNotArray._4, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*) ->
           reqs
   }
 

@@ -36,19 +36,19 @@ public class SimpleTypeAlias implements IDependency, IDependency.Maker {
     private final Pattern fieldTypeBasicForMe;
     private final TargetClass typeInJava;
 
-    public SimpleTypeAlias(String name, TargetClass jType, Collection<Requirement> reqs) {
+    public SimpleTypeAlias(String name, TargetClass jType, Requirement req) {
         this.iProvide = new Requirement(name, DataType.class);
         this.typeInJava = jType;
-        this.willRequire = reqs;
+        this.willRequire = null == req ? Collections.<Requirement>emptySet() : Arrays.asList(req);
         fieldTypeBasicForMe = Pattern.compile("(\\w+)\\((" + getIFulfillReq().getName() + ")\\)");
     }
 
-    public SimpleTypeAlias(String name, Class jType, Collection<Requirement> reqs) {
-        this(name, TargetClass.fromClass(jType), reqs);
+    public SimpleTypeAlias(String name, Class jType, Requirement req) {
+        this(name, TargetClass.fromClass(jType), req);
     }
 
-    public SimpleTypeAlias(String name, String jTypePackage, String jType, Collection<Requirement> reqs) {
-        this(name, TargetClass.fromName(jTypePackage, jType), reqs);
+    public SimpleTypeAlias(String name, String jTypePackage, String jType, Requirement req) {
+        this(name, TargetClass.fromName(jTypePackage, jType), req);
     }
 
     public TargetClass getJavaType() {

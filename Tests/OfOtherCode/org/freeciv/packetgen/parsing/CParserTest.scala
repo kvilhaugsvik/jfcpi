@@ -868,7 +868,8 @@ public enum test implements FCEnum {
   @Test def structOneFieldPrimitiveBoolean {
     val parser = ParseCCode
     val result = parsesCorrectly("""struct justOne {bool value;};""", parser, parser.structConverted)
-    assertTrue("The primitive bool should not depend on anything", result.get.getReqs.isEmpty)
+    assertTrue("The primitive bool should be needed here",
+      result.get.getReqs.contains(new Requirement("bool", classOf[DataType])))
   }
 
   @Test def structOneFieldEnum {
@@ -881,7 +882,10 @@ public enum test implements FCEnum {
   @Test def structTwoFieldsPrimitive {
     val parser = ParseCCode
     val result = parsesCorrectly("""struct two {bool value1; int value2;};""", parser, parser.structConverted)
-    assertTrue("The primitives bool and int should not depend on anything", result.get.getReqs.isEmpty)
+    assertTrue("The primitive bool should be needed here",
+      result.get.getReqs.contains(new Requirement("bool", classOf[DataType])))
+    assertTrue("The primitive int should be needed here",
+      result.get.getReqs.contains(new Requirement("int", classOf[DataType])))
   }
 
   @Test def structTwoFieldsEnum {
