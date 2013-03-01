@@ -853,13 +853,13 @@ public enum test implements FCEnum {
   @Test def pointToIntIsIntVarArgs = {
     val result = parsesCorrectly("typedef int *more_complicated;", ParseCCode, ParseCCode.exprConverted).get
 
-    assertEquals("java.lang.Integer...", result.asInstanceOf[SimpleTypeAlias].getJavaType.getFullAddress)
+    assertEquals("java.lang.Integer...", result.asInstanceOf[SimpleTypeAlias].getAddress.getFullAddress)
   }
 
   @Test def pointToCharIsString = {
     val result = parsesCorrectly("typedef char *more_complicated;", ParseCCode, ParseCCode.exprConverted).get
 
-    assertEquals("java.lang.String", result.asInstanceOf[SimpleTypeAlias].getJavaType.getFullAddress)
+    assertEquals("java.lang.String", result.asInstanceOf[SimpleTypeAlias].getAddress.getFullAddress)
   }
 
   /*--------------------------------------------------------------------------------------------------------------------

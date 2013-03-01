@@ -51,7 +51,7 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker {
         this(name, TargetClass.fromName(jTypePackage, jType), req);
     }
 
-    public TargetClass getJavaType() {
+    public TargetClass getAddress() {
         return typeInJava;
     }
 
