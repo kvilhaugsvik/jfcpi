@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
-public class Enum extends ClassWriter implements Dependency.Item, Dependency.Maker {
+public class Enum extends ClassWriter implements Dependency.Item, Dependency.Maker, DataType {
     private final boolean bitwise;
     private final Collection<Requirement> iRequire;
     private final Pattern fieldTypeBasicForMe;

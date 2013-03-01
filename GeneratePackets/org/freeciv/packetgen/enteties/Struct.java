@@ -28,7 +28,7 @@ import java.util.*;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
-public class Struct extends ClassWriter implements Dependency.Item {
+public class Struct extends ClassWriter implements Dependency.Item, DataType {
     private final Set<Requirement> iRequire;
     private final Requirement iProvide;
 

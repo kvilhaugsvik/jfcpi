@@ -14,10 +14,12 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import com.kvilhaugsvik.javaGenerator.TargetClass;
 import org.freeciv.packetgen.dependency.ReqKind;
 
 /**
  * As generated data types like enums, bit vectors etc are generated from different classes use this
  */
 public interface DataType extends ReqKind {
+    public TargetClass getAddress();
 }

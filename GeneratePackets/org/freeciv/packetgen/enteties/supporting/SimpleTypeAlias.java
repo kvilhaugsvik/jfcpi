@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker {
+public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataType {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
     private final Pattern fieldTypeBasicForMe;

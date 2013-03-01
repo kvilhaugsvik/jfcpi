@@ -28,7 +28,7 @@ import java.util.List;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
-public class BitVector extends ClassWriter implements Dependency.Item, Dependency.Maker {
+public class BitVector extends ClassWriter implements Dependency.Item, Dependency.Maker, DataType {
     private static final Var<TargetArray> pFromByte = Var.param(byteArray, "from");
     private static final Var<TargetArray> pFromBits = Var.param(boolArray, "from");
     private static final Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
