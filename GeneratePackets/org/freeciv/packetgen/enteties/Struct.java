@@ -32,7 +32,7 @@ public class Struct extends ClassWriter implements Dependency.Item {
     private final Set<Requirement> iRequire;
     private final Requirement iProvide;
 
-    public Struct(String name, List<WeakVarDec> fields, Set<Requirement> willNeed) {
+    public Struct(String name, List<WeakVarDec> fields) {
         super(ClassKind.CLASS,
                 TargetPackage.from(FCEnum.class.getPackage()),
                 Imports.are(), "Freeciv C code", Collections.<Annotate>emptyList(), name,
@@ -62,7 +62,15 @@ public class Struct extends ClassWriter implements Dependency.Item {
                 TargetClass.newKnown(String.class), "toString",
                 new Block(RETURN(varsToString))));
 
-        iRequire = willNeed;
+        HashSet<Requirement> neededByFields = new HashSet<Requirement>();
+        for (WeakVarDec field : fields) {
+            if (null != field.getTypeRequirement())
+                neededByFields.add(field.getTypeRequirement());
+            for (WeakVarDec.ArrayDeclaration dec : field.getDeclarations())
+                neededByFields.addAll(dec.maxSize.getReqs());
+        }
+
+        this.iRequire = Collections.unmodifiableSet(neededByFields);
         iProvide = new Requirement("struct" + " " + name, DataType.class);
     }
 

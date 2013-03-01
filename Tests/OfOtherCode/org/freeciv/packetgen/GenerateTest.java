@@ -361,7 +361,7 @@ public class GenerateTest {
         LinkedList<WeakVarDec> fields = new LinkedList<WeakVarDec>();
         fields.add(new WeakVarDec(TargetPackage.TOP_LEVEL_AS_STRING, "int", "aNumber", 0));
         fields.add(new WeakVarDec(TargetPackage.TOP_LEVEL_AS_STRING, "int", "theArray", 0, new WeakVarDec.ArrayDeclaration(IntExpression.integer("5"))));
-        Struct result = new Struct("StructArrayField", fields, Collections.<Requirement>emptySet());
+        Struct result = new Struct("StructArrayField", fields);
 
         writeJavaFile(result, targetFolder);
     }

@@ -231,25 +231,21 @@ object ParseCCode extends ExtractableParser {
 
   def bitVectorDefConverted = bitVectorDef ^^ {vec => new BitVector(vec._1, vec._2)}
 
-  def varDec: Parser[(WeakVarDec, java.util.Set[Requirement])] =
+  def varDec: Parser[WeakVarDec] =
     (cType ~ identifierRegEx ~ rep("[" ~> intExpr <~ "]") <~ ";") ^^ {
       case cTypeDecs ~ name ~ arrayDecs =>
         val typeNotArray = cTypeDecsToJava(ArrayOf(cTypeDecs, arrayDecs.size))
-        val reqs = new java.util.HashSet[Requirement]()
-        reqs.add(typeNotArray._3)
-        arrayDecs.foreach(req => reqs.addAll(req.getReqs))
-        new WeakVarDec(typeNotArray._3, typeNotArray._1, typeNotArray._2, name, typeNotArray._4, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*) ->
-          reqs
+        new WeakVarDec(typeNotArray._3, typeNotArray._1, typeNotArray._2, name, typeNotArray._4, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*)
   }
 
-  def struct: Parser[(String, List[(WeakVarDec, java.util.Set[Requirement])])] = {
+  def struct: Parser[(String, List[WeakVarDec])] = {
     val me = (startOfStruct ~> identifierRegEx ~ ("{" ~> rep1(varDec)) <~ "}" ~ ";") ^^ {id => id._1 -> id._2}
 
-    new Parser[(String, List[(WeakVarDec, java.util.Set[Requirement])])] {
-      def apply(in: ParseCCode.this.type#Input): ParseResult[(String, List[(WeakVarDec, java.util.Set[Requirement])])] = {
+    new Parser[(String, List[WeakVarDec])] {
+      def apply(in: ParseCCode.this.type#Input): ParseResult[(String, List[WeakVarDec])] = {
         val oldIgnoreCommentsFlag = ignoreCommentsFlag
         ignoreCommentsFlag = true
-        val result: ParseResult[(String, List[(WeakVarDec, java.util.Set[Requirement])])] = me(in)
+        val result: ParseResult[(String, List[WeakVarDec])] = me(in)
         ignoreCommentsFlag = oldIgnoreCommentsFlag
         return result
       }
@@ -257,12 +253,7 @@ object ParseCCode extends ExtractableParser {
   }
 
   def structConverted = struct ^^ {
-    val willRequire = new java.util.HashSet[Requirement]()
-    struct => new Struct(struct._1, struct._2.map(entry => {
-      willRequire.addAll(entry._2)
-      entry._1
-    }).asJava,
-      willRequire)
+    struct => new Struct(struct._1, struct._2.asJava)
   }
 
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)

@@ -59,6 +59,10 @@ public class WeakVarDec {
         return declarations;
     }
 
+    public Requirement getTypeRequirement() {
+        return reqKind;
+    }
+
     public static class ArrayDeclaration {
         public final IntExpression maxSize;
 
