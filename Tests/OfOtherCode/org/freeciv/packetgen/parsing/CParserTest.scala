@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.parsing
 
-import org.freeciv.packetgen.dependency.Requirement
+import org.freeciv.packetgen.dependency.{Dependency, Requirement}
 import org.freeciv.packetgen.enteties.{Constant, Enum}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.freeciv.Util
@@ -961,7 +961,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsAsMap = enums.map(_.getIFulfillReq.getName)
+    val enumsAsMap = enums.map(_.asInstanceOf[Dependency.Item].getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("enum test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("enum test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("enum test3"))
@@ -973,7 +973,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsAsMap = enums.map(_.getIFulfillReq.getName)
+    val enumsAsMap = enums.map(_.asInstanceOf[Dependency.Item].getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("enum test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("enum test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("enum test3"))
@@ -1020,7 +1020,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsAsMap = enums.map(_.getIFulfillReq.getName)
+    val enumsAsMap = enums.map(_.asInstanceOf[Dependency.Item].getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsAsMap.contains("enum test1"))
     assertTrue("C style enum test2 not found", enumsAsMap.contains("enum test2"))
     assertTrue("C style enum test3 not found", enumsAsMap.contains("enum test3"))
@@ -1061,7 +1061,7 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsNames = enums.map(_.getIFulfillReq.getName)
+    val enumsNames = enums.map(_.asInstanceOf[Dependency.Item].getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsNames.contains("enum test1"))
     assertTrue("C style enum test2 not found", enumsNames.contains("enum test2"))
     assertTrue("C style enum test3 not found", enumsNames.contains("enum test3"))
@@ -1079,7 +1079,7 @@ enum test3 {
     assertNotNull("CONS not found", found)
     assertFalse("CONS not found", found.isEmpty)
 
-    val foundNames = found.map(_.getIFulfillReq.getName)
+    val foundNames = found.map(_.asInstanceOf[Dependency.Item].getIFulfillReq.getName)
     assertTrue("CONS not found but found something else", foundNames.contains("CONS"))
   }
 }

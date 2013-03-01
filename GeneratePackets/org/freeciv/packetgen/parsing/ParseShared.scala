@@ -241,7 +241,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
 abstract class ExtractableParser extends ParseShared {
   def startsOfExtractable : List[String]
-  def exprConverted: Parser[Dependency.Item]
+  def exprConverted: Parser[Dependency]
 }
 
 abstract class ExtractorShared(protected val parser : ExtractableParser) {
