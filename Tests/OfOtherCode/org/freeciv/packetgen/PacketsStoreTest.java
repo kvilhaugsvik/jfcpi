@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.javaGenerator.TargetClass;
 import org.freeciv.Util;
 import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
@@ -51,7 +52,7 @@ public class PacketsStoreTest {
     @Test public void registerTypePreCondKnownLater() throws UndefinedException {
         PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("ALIAS", "sint16", "fbbf");
-        storage.addDependency(new SimpleTypeAlias("fbbf", "org.freeciv.types", "BitString", null));
+        storage.addDependency(new SimpleTypeAlias("fbbf", TargetClass.fromName("org.freeciv.types", "BitString"), null, 0));
 
         assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
     }

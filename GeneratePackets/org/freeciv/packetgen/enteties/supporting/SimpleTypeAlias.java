@@ -36,19 +36,19 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
     private final Pattern fieldTypeBasicForMe;
     private final TargetClass typeInJava;
 
-    public SimpleTypeAlias(String name, TargetClass jType, Requirement req) {
-        this.iProvide = new Requirement(name, DataType.class);
+    public SimpleTypeAlias(String name, TargetClass jType, Requirement req, int arrayDimensions) {
+        this.iProvide = new Requirement(name + (0 == arrayDimensions ? "" : "_" + arrayDimensions), DataType.class);
         this.typeInJava = jType;
         this.willRequire = null == req ? Collections.<Requirement>emptySet() : Arrays.asList(req);
         fieldTypeBasicForMe = Pattern.compile("(\\w+)\\((" + getIFulfillReq().getName() + ")\\)");
     }
 
-    public SimpleTypeAlias(String name, Class jType, Requirement req) {
-        this(name, TargetClass.fromClass(jType), req);
+    public SimpleTypeAlias(String name, Class jType, Requirement req, int arrayDimensions) {
+        this(name, TargetClass.fromClass(jType), req, arrayDimensions);
     }
 
-    public SimpleTypeAlias(String name, String jTypePackage, String jType, Requirement req) {
-        this(name, TargetClass.fromName(jTypePackage, jType), req);
+    public SimpleTypeAlias(String name, String jTypePackage, String jType, Requirement req, int arrayDimensions) {
+        this(name, TargetClass.fromName(jTypePackage, jType), req, arrayDimensions);
     }
 
     public TargetClass getAddress() {

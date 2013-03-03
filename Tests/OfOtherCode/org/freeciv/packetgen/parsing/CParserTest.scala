@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.parsing
 
 import org.freeciv.packetgen.dependency.{Dependency, Requirement}
-import org.freeciv.packetgen.enteties.{Constant, Enum}
+import org.freeciv.packetgen.enteties.{Struct, Constant, Enum}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.freeciv.Util
 import org.junit.Test
@@ -514,7 +514,7 @@ class CParserSemanticTest {
     val parser = ParseCCode
     val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
     assertTrue("C enum based on external constant should depend on it",
-      result.get.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
+      result.get.asInstanceOf[Dependency.Item].getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
   }
 
   @Test def cEnumElementParanoidValueGeneratorSimple {
@@ -522,7 +522,7 @@ class CParserSemanticTest {
     val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
 
     assertTrue("C enum based on external constant should depend on it",
-      result.get.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
+      result.get.asInstanceOf[Dependency.Item].getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
 
     assertEquals("Should get value of constant",
       Util.VERSION_DATA_CLASS + ".START_VALUE",
@@ -538,7 +538,7 @@ class CParserSemanticTest {
     val result = parsesCorrectly(cEnumStartValueIsAnExpressionInvolvingExternal, parser, parser.exprConverted)
 
     assertTrue("C enum based on external constant should depend on it",
-      result.get.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
+      result.get.asInstanceOf[Dependency.Item].getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
 
     assertEquals("Should contain calculation",
       Util.VERSION_DATA_CLASS + ".START_VALUE * 16",
@@ -553,7 +553,7 @@ class CParserSemanticTest {
     val parser = ParseCCode
     val result = parsesCorrectly(cEnumHavingExternalStartValueRefersBack, parser, parser.exprConverted)
     assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
-      result.get.getReqs.isEmpty)
+      result.get.asInstanceOf[Dependency.Item].getReqs.isEmpty)
 
     assertEquals("Wrong value",
       "1",
@@ -573,7 +573,7 @@ enum implicitFirst {
 }
     """, parser, parser.exprConverted)
     assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
-      result.get.getReqs.isEmpty)
+      result.get.asInstanceOf[Dependency.Item].getReqs.isEmpty)
 
     assertEquals("Wrong value",
       "0",
@@ -822,32 +822,32 @@ public enum test implements FCEnum {
     val parser = ParseCCode
     val result = parsesCorrectly("BV_DEFINE(bv_test, 8);", parser, parser.exprConverted).get
 
-    assertTrue("No need for any constant", result.getReqs.isEmpty)
+    assertTrue("No need for any constant", result.asInstanceOf[Dependency.Item].getReqs.isEmpty)
     assertEquals("Should provide it self",
       new Requirement("bv_test", classOf[DataType]),
-      result.getIFulfillReq)
+      result.asInstanceOf[Dependency.Item].getIFulfillReq)
   }
 
   @Test def bvConstant = {
     val parser = ParseCCode
     val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", parser, parser.exprConverted).get
 
-    assertTrue("Should need CONSTANT", result.getReqs.contains(
+    assertTrue("Should need CONSTANT", result.asInstanceOf[Dependency.Item].getReqs.contains(
       new Requirement("CONSTANT", classOf[Constant[_]])))
     assertEquals("Should provide it self",
       new Requirement("bv_test", classOf[DataType]),
-      result.getIFulfillReq)
+      result.asInstanceOf[Dependency.Item].getIFulfillReq)
   }
 
   @Test def bvConstantAddInteger = {
     val parser = ParseCCode
     val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", parser, parser.exprConverted).get
 
-    assertTrue("Should need CONSTANT", result.getReqs.contains(
+    assertTrue("Should need CONSTANT", result.asInstanceOf[Dependency.Item].getReqs.contains(
       new Requirement("CONSTANT", classOf[Constant[_]])))
     assertEquals("Should provide it self",
       new Requirement("bv_test", classOf[DataType]),
-      result.getIFulfillReq)
+      result.asInstanceOf[Dependency.Item].getIFulfillReq)
   }
 
   @Test def pointToIntIsIntVarArgs = {
@@ -865,60 +865,83 @@ public enum test implements FCEnum {
   /*--------------------------------------------------------------------------------------------------------------------
   Test semantics of structs
   --------------------------------------------------------------------------------------------------------------------*/
+  def structFromText(text: String, askFor: Requirement, makerArgs: Dependency.Item*) : Struct = {
+    val parsed = parsesCorrectly(text, ParseCCode, ParseCCode.structConverted)
+    return parsed.get.asInstanceOf[Dependency.Maker].produce(askFor, makerArgs: _*).asInstanceOf[Struct]
+  }
+
   @Test def structOneFieldPrimitiveBoolean {
-    val parser = ParseCCode
-    val result = parsesCorrectly("""struct justOne {bool value;};""", parser, parser.structConverted)
+    val result = structFromText("""struct justOne {bool value;};""",
+      new Requirement("struct justOne", classOf[DataType]),
+      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], null, 0))
+
     assertTrue("The primitive bool should be needed here",
-      result.get.getReqs.contains(new Requirement("bool", classOf[DataType])))
+      result.getReqs.contains(new Requirement("bool", classOf[DataType])))
   }
 
   @Test def structOneFieldEnum {
-    val parser = ParseCCode
-    val result = parsesCorrectly("""struct justOne {enum test value;};""", parser, parser.structConverted)
+    val result = structFromText("""struct justOne {enum test value;};""",
+      new Requirement("struct justOne", classOf[DataType]),
+      new SimpleTypeAlias("enum test", "org.freeciv.types", "test", new Requirement("enum test", classOf[DataType]), 0))
+
     assertTrue("The enum test should be needed here",
-      result.get.getReqs.contains(new Requirement("enum test", classOf[DataType])))
+      result.getReqs.contains(new Requirement("enum test", classOf[DataType])))
   }
 
   @Test def structTwoFieldsPrimitive {
-    val parser = ParseCCode
-    val result = parsesCorrectly("""struct two {bool value1; int value2;};""", parser, parser.structConverted)
+    val result = structFromText("""struct two {bool value1; int value2;};""",
+      new Requirement("struct two", classOf[DataType]),
+      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], null, 0),
+      new SimpleTypeAlias("int", classOf[java.lang.Integer], null, 0))
+
     assertTrue("The primitive bool should be needed here",
-      result.get.getReqs.contains(new Requirement("bool", classOf[DataType])))
+      result.getReqs.contains(new Requirement("bool", classOf[DataType])))
     assertTrue("The primitive int should be needed here",
-      result.get.getReqs.contains(new Requirement("int", classOf[DataType])))
+      result.getReqs.contains(new Requirement("int", classOf[DataType])))
   }
 
   @Test def structTwoFieldsEnum {
-    val parser = ParseCCode
-    val result = parsesCorrectly("""
+    val result = structFromText("""
 struct two {
   enum test value1;
   enum bitwise value2;
 };
-    """, parser, parser.structConverted)
+    """,
+      new Requirement("struct two", classOf[DataType]),
+      new SimpleTypeAlias("enum test", "org.freeciv.types", "test", new Requirement("enum test", classOf[DataType]), 0),
+      new SimpleTypeAlias("enum bitwise", "org.freeciv.types", "bitwise", new Requirement("enum bitwise", classOf[DataType]), 0)
+    )
+
     assertTrue("The enum test should be needed here",
-      result.get.getReqs.contains(new Requirement("enum test", classOf[DataType])))
+      result.getReqs.contains(new Requirement("enum test", classOf[DataType])))
     assertTrue("The enum bitwise should be needed here",
-      result.get.getReqs.contains(new Requirement("enum bitwise", classOf[DataType])))
+      result.getReqs.contains(new Requirement("enum bitwise", classOf[DataType])))
   }
 
   @Test def structArraySizeIsConstant {
-    val parser = ParseCCode
-    val result = parsesCorrectly("""struct two {bool value1; int value2[STANT];};""", parser, parser.structConverted)
+    val result = structFromText("""struct two {bool value1; int value2[STANT];};""",
+      new Requirement("struct two", classOf[DataType]),
+      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], null, 0),
+      new SimpleTypeAlias("int", classOf[java.lang.Integer], null, 0))
+
     assertTrue("The constant STANT should be needed here",
-      result.get.getReqs.contains(new Requirement("STANT", classOf[Constant[_]])))
+      result.getReqs.contains(new Requirement("STANT", classOf[Constant[_]])))
   }
 
   @Test def oneDimensionalArrayOfCharIsString = {
-    val result = parsesCorrectly("struct hasStr {char stringArray[5];};", ParseCCode, ParseCCode.exprConverted).get
+    val result = parsesCorrectly("struct hasStr {char stringArray[5];};", ParseCCode, ParseCCode.structConverted).get
+      .asInstanceOf[Dependency.Maker]
 
-    assertEquals("String", result.asInstanceOf[org.freeciv.packetgen.enteties.Struct].getField("stringArray").getType)
+    assertTrue(result.neededInput(new Requirement("struct hasStr", classOf[DataType]))
+      .contains(new Requirement("string_1", classOf[DataType])))
   }
 
   @Test def twoDimensionalArrayOfCharIsArrayOfString = {
-    val result = parsesCorrectly("struct hasStr {char stringArray[5][2];};", ParseCCode, ParseCCode.exprConverted).get
+    val result = parsesCorrectly("struct hasStr {char stringArray[5][2];};", ParseCCode, ParseCCode.structConverted).get
+      .asInstanceOf[Dependency.Maker]
 
-    assertEquals("String[]", result.asInstanceOf[org.freeciv.packetgen.enteties.Struct].getField("stringArray").getType)
+    assertTrue(result.neededInput(new Requirement("struct hasStr", classOf[DataType]))
+      .contains(new Requirement("string_2", classOf[DataType])))
   }
 }
 

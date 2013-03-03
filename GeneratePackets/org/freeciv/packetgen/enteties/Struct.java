@@ -32,7 +32,7 @@ public class Struct extends ClassWriter implements Dependency.Item, DataType {
     private final Set<Requirement> iRequire;
     private final Requirement iProvide;
 
-    public Struct(String name, List<WeakVarDec> fields) {
+    public Struct(String name, List<WeakVarDec> fields, List<TargetClass> partTypes) {
         super(ClassKind.CLASS,
                 TargetPackage.from(FCEnum.class.getPackage()),
                 Imports.are(), "Freeciv C code", Collections.<Annotate>emptyList(), name,
@@ -40,8 +40,10 @@ public class Struct extends ClassWriter implements Dependency.Item, DataType {
 
         addConstructorFields();
 
-        for (WeakVarDec field: fields) {
-            final TargetClass type = field.getJavaType().scopeKnown();
+        for (int i = 0; i < fields.size(); i++) {
+            final WeakVarDec field = fields.get(i);
+            final TargetClass type = partTypes.get(i);
+
             addObjectConstant(type, field.getName());
             addMethod(Method.newPublicReadObjectState(Comment.no(),
                     type, "get" + field.getName(),

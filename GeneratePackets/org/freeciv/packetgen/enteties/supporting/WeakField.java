@@ -23,7 +23,7 @@ public class WeakField extends WeakVarDec {
     private final List<WeakFlag> flags;
 
     public WeakField(String name, String kind, List<WeakFlag> flags, ArrayDeclaration... declarations) {
-        super(new Requirement(kind, FieldTypeBasic.FieldTypeAlias.class), "org.freeciv.packet.fieldtype", kind, name, 0, declarations);
+        super(new Requirement(kind, FieldTypeBasic.FieldTypeAlias.class), name, declarations);
         this.flags = flags;
     }
 

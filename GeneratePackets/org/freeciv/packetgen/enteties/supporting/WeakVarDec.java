@@ -21,33 +21,21 @@ import org.freeciv.packetgen.dependency.Requirement;
 public class WeakVarDec {
     protected final String name;
     protected final Requirement reqKind;
-    protected final String packageOfType; // TODO: This information don't belong here. Query the storage in users
     protected final String type;
     protected final ArrayDeclaration[] declarations;
-    protected final int eatenDeclartions; // TODO: This information don't belong here. Query the storage in users
 
-    public WeakVarDec(Requirement reqKind, String packageOfType, String kind, String name, int eatenDeclartions, ArrayDeclaration... declarations) {
+    public WeakVarDec(Requirement reqKind, String name, ArrayDeclaration... declarations) {
         if (null == reqKind)
             throw new IllegalArgumentException("Must have a type");
 
         this.reqKind = reqKind;
-        this.type = kind;
-        this.packageOfType = packageOfType;
+        this.type = reqKind.getName();
         this.declarations = declarations;
-        this.eatenDeclartions = eatenDeclartions;
         this.name = name;
     }
 
     public String getType() {
         return type;
-    }
-
-    public TargetClass getJavaType() { // TODO: This method don't belong here. Query the storage in users
-        int arrayLevels = declarations.length - eatenDeclartions;
-        if (0 == arrayLevels)
-            return TargetClass.fromName(packageOfType, type);
-        else
-            return TargetArray.from(packageOfType, type, arrayLevels);
     }
 
     public String getName() {

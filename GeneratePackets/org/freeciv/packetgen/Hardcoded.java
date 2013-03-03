@@ -190,11 +190,11 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in types
              ************************************************************************************************/
-            (Dependency.Item)(new SimpleTypeAlias("int", Integer.class, null)),
-            (Dependency.Item)(new SimpleTypeAlias("bool", Boolean.class, null)),
-            (Dependency.Item)(new SimpleTypeAlias("float", Float.class, null)),
-            (Dependency.Item)(new SimpleTypeAlias("double", Double.class, null)),
-            (Dependency.Item)(new SimpleTypeAlias("string", String.class, null)),
+            (Dependency.Item)(new SimpleTypeAlias("int", Integer.class, null, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("bool", Boolean.class, null, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("float", Float.class, null, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("double", Double.class, null, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("string", String.class, null, 1)),
             deltaBasic,
 
             /************************************************************************************************
@@ -334,10 +334,10 @@ public class Hardcoded {
     public static void applyManualChanges(PacketsStore toStorage) {
         // TODO: autoconvert the enums
         // TODO: when given the location of the tables convert table items as well
-        toStorage.addDependency(new Struct("universal",
+        toStorage.addDependency(new StructMaker("universal",
                 Arrays.asList(
-                        new WeakVarDec(new Requirement("enum universals_n", DataType.class), "org.freeciv.types", "universals_n", "kind", 0),
-                        new WeakVarDec(new Requirement("int", DataType.class), TargetPackage.TOP_LEVEL_AS_STRING, "int", "value", 0))));
+                        new WeakVarDec(new Requirement("enum universals_n", DataType.class), "kind"),
+                        new WeakVarDec(new Requirement("int", DataType.class), "value"))));
     }
 
     public static Collection<Dependency.Item> values() {

@@ -25,7 +25,7 @@ import java.util.{HashSet, HashMap}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.freeciv.packetgen.UndefinedException
 import java.util.AbstractMap.SimpleImmutableEntry
-import org.freeciv.packetgen.enteties.supporting.{WeakVarDec, SimpleTypeAlias, IntExpression}
+import org.freeciv.packetgen.enteties.supporting.{StructMaker, WeakVarDec, SimpleTypeAlias, IntExpression}
 import org.freeciv.packetgen.enteties.supporting.WeakVarDec.ArrayDeclaration
 
 object ParseCCode extends ExtractableParser {
@@ -223,7 +223,7 @@ object ParseCCode extends ExtractableParser {
   def typedefConverted = typedef ^^ {
     case types ~ name => {
       val translatedTypes = cTypeDecsToJava(types)
-      new SimpleTypeAlias(name, translatedTypes._1, translatedTypes._2, translatedTypes._3)
+      new SimpleTypeAlias(name, translatedTypes._1, translatedTypes._2, translatedTypes._3, 0)
     }
   }
 
@@ -235,7 +235,7 @@ object ParseCCode extends ExtractableParser {
     (cType ~ identifierRegEx ~ rep("[" ~> intExpr <~ "]") <~ ";") ^^ {
       case cTypeDecs ~ name ~ arrayDecs =>
         val typeNotArray = cTypeDecsToJava(ArrayOf(cTypeDecs, arrayDecs.size))
-        new WeakVarDec(typeNotArray._3, typeNotArray._1, typeNotArray._2, name, typeNotArray._4, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*)
+        new WeakVarDec(typeNotArray._3, name, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*)
   }
 
   def struct: Parser[(String, List[WeakVarDec])] = {
@@ -253,7 +253,7 @@ object ParseCCode extends ExtractableParser {
   }
 
   def structConverted = struct ^^ {
-    struct => new Struct(struct._1, struct._2.asJava)
+    struct => new StructMaker(struct._1, struct._2.asJava)
   }
 
   def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
