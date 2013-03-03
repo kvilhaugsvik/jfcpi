@@ -43,8 +43,8 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
         fieldTypeBasicForMe = Pattern.compile("(\\w+)\\((" + getIFulfillReq().getName() + ")\\)");
     }
 
-    public SimpleTypeAlias(String name, Class jType, Requirement req, int arrayDimensions) {
-        this(name, TargetClass.fromClass(jType), req, arrayDimensions);
+    public SimpleTypeAlias(String name, Class jType, int arrayDimensions) {
+        this(name, TargetClass.fromClass(jType), null, arrayDimensions);
     }
 
     public SimpleTypeAlias(String name, String jTypePackage, String jType, Requirement req, int arrayDimensions) {

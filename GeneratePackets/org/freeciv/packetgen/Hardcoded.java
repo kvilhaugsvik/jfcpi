@@ -190,11 +190,11 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in types
              ************************************************************************************************/
-            (Dependency.Item)(new SimpleTypeAlias("int", Integer.class, null, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("bool", Boolean.class, null, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("float", Float.class, null, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("double", Double.class, null, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("string", String.class, null, 1)),
+            (Dependency.Item)(new SimpleTypeAlias("int", Integer.class, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("bool", Boolean.class, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("float", Float.class, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("double", Double.class, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("string", String.class, 1)),
             deltaBasic,
 
             /************************************************************************************************
