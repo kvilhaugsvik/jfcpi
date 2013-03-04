@@ -110,7 +110,28 @@ public final class DependencyStore {
      * @return true if a potential provider for a requirement is known EVEN IF IT WON'T RESOLVE
      */
     public boolean isAwareOfPotentialProvider(Requirement item) {
-        return existing.hasFulfillmentOf(item) || (makers.hasFulfillmentOf(item) && creationWorked(item));
+        return existing.hasFulfillmentOf(item) ||
+                wasAbleToCreateShallowly(item) ||
+                wasAbleToCreateDeeply(item);
+    }
+
+    private boolean wasAbleToCreateShallowly(Requirement item) {
+        return (makers.hasFulfillmentOf(item) && creationWorked(item));
+    }
+
+    private boolean wasAbleToCreateDeeply(Requirement item) {
+        final Collection<Requirement> blamed = blameDeeperWhenNoItem.get(item);
+
+        // Give up if no pre requirements are known
+        if (blamed == null)
+            return false;
+
+        // Give up if a single pre requirement can't be provided
+        for (Requirement req : blamed)
+            if (!isAwareOfPotentialProvider(req))
+                return false;
+
+        return wasAbleToCreateShallowly(item);
     }
 
     /**
@@ -138,7 +159,7 @@ public final class DependencyStore {
             return false;
 
         try {
-            existing.add(maker.produce(item, args.toArray(new Dependency.Item[args.size()])));
+            addPossibleRequirement(maker.produce(item, args.toArray(new Dependency.Item[args.size()])));
             return true;
         } catch (UndefinedException e) {
             return false;
