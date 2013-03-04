@@ -79,25 +79,29 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
-        Requirement basic = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
-        requirements.addMaker(new SimpleDependencyMaker(new Requirement(alias, FieldTypeAlias.class), basic) {
+        Requirement to = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
+        final Requirement from = new Requirement(alias, FieldTypeAlias.class);
+        requirements.addMaker(new SimpleDependencyMaker(from, to) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 return ((FieldTypeBasic)wasRequired[0]).createFieldType(alias);
             }
         });
-        requirements.blameMissingOn(basic,
+        requirements.blameMissingOn(from, to);
+        requirements.blameMissingOn(to,
                 new Requirement(ptype, DataType.class), new Requirement(iotype, NetworkIO.class));
     }
 
     public void registerTypeAlias(final String alias, String aliased) throws UndefinedException {
-        requirements.addMaker(new SimpleDependencyMaker(new Requirement(alias, FieldTypeAlias.class),
-                new Requirement(aliased, FieldTypeAlias.class)) {
+        final Requirement from = new Requirement(alias, FieldTypeAlias.class);
+        final Requirement to = new Requirement(aliased, FieldTypeAlias.class);
+        requirements.addMaker(new SimpleDependencyMaker(from, to) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 return ((FieldTypeAlias) wasRequired[0]).getBasicType().createFieldType(alias);
             }
         });
+        requirements.blameMissingOn(from, to);
     }
 
     public boolean doesFieldTypeAliasResolve(String name) {
