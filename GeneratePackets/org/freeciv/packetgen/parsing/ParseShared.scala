@@ -171,7 +171,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
       case Pointer(targetType) => {
         val targetJ = cTypeDecsToJava(targetType)
-        (targetJ._1, targetJ._2 + "...", targetJ._3, 0)
+        (targetJ._1, targetJ._2 + "...", needAsJava(targetJ._3.getName + "*"), 0)
       }
 
       // TODO: Handle more of Array here
