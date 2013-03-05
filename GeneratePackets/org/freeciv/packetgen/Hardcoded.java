@@ -42,11 +42,11 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 public class Hardcoded {
     // TODO: Make parameters in stead
     public static final Var<TargetClass> pLimits = Var.param(ElementsLimit.class, "limits");
-    private static final Var pValue = Var.param(String.class, "value"); // can't know type
+    public static final Var pValue = Var.param(String.class, "value"); // can't know type
     public static final Var fMaxSize = Var.field(Collections.<Annotate>emptyList(),
             Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
             TargetClass.fromClass(ElementsLimit.class), "maxArraySize", null);
-    private static final Value<AValue> noLimit = TargetClass.fromClass(ElementsLimit.class).callV("noLimit");
+    public static final Value<AValue> noLimit = TargetClass.fromClass(ElementsLimit.class).callV("noLimit");
 
     public static final BitVector deltaBasic;
     public static final FieldTypeBasic.FieldTypeAlias deltaField;
