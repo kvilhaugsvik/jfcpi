@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 class BasicFieldTypeAsFieldTypeAlias implements Dependency.Maker {
-    Pattern splitter = Pattern.compile("(\\w+)\\(([\\w ]+)\\)");
+    Pattern splitter = Pattern.compile("((\\{)?\\w+(;\\w+)*(\\})?)\\(([\\w ]+)\\)");
 
     @Override
     public Required getICanProduceReq() {
@@ -40,7 +40,7 @@ class BasicFieldTypeAsFieldTypeAlias implements Dependency.Maker {
     @Override
     public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         return ((FieldTypeBasic)wasRequired[0])
-                .createFieldType("UNALIASED_" + toProduce.getName().replaceAll("[\\(|\\s|\\)]", "_"),
+                .createFieldType("UNALIASED_" + toProduce.getName().replaceAll("[\\(|\\)|\\s|;|\\{|\\}]", "_"),
                         toProduce.getName());
     }
 }
