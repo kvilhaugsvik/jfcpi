@@ -144,33 +144,6 @@ public class Hardcoded {
             TerminatedArray.maxSizedTerminated("building_list", "int",
                     new Requirement("B_LAST", Constant.class)),
             TerminatedArray.xBytes("memory", "unsigned char"),
-            new FieldTypeBasic("bool8", "bool", TargetClass.fromClass(Boolean.class),
-                    new From1<Block, Var>() {
-                        @Override
-                        public Block x(Var arg1) {
-                            return new Block(arg1.assign(pValue.ref()));
-                        }
-                    },
-                    new From2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var to, Var from) {
-                            return new Block(to.assign(from.ref().<ABool>call("readBoolean")));
-                        }
-                    },
-                    new From2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var value, Var to) {
-                            return new Block(to.ref().<Returnable>call("writeBoolean", value.ref()));
-                        }
-                    },
-                    new From1<Typed<AnInt>, Var>() {
-                        @Override
-                        public Typed<AnInt> x(Var arg1) {
-                            return literal(1);
-                        }
-                    },
-                               TO_STRING_OBJECT,
-                               false, Collections.<Requirement>emptySet()),
 
             /************************************************************************************************
              * Built in field type aliases
@@ -186,6 +159,8 @@ public class Hardcoded {
             NetworkIO.witIntAsIntermediate("uint16", 2, "readChar", false, "writeChar"),
             NetworkIO.witIntAsIntermediate("sint16", 2, "readShort", false, "writeShort"),
             NetworkIO.witIntAsIntermediate("sint32", 4, "readInt", true, "writeInt"),
+
+            NetworkIO.witIntAsIntermediate("bool8", 1, "readBoolean", true, "writeBoolean"),
 
             /************************************************************************************************
              * Built in types
