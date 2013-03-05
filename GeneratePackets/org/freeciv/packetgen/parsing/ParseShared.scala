@@ -124,8 +124,8 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     def normalizedIntSize(normalizedInt: List[String]) = normalizedInt match {
       case "char" :: Nil => 8
       case "short" :: "int" :: Nil => 16
-      case "int" :: Nil => 16 // at least 16 bits. Assume 32 bits
-      case "long" :: "int" :: Nil => 31 // at least 32 bits
+      case "int" :: Nil => 16 // at least 16 bits. Assume 32 bits?
+      case "long" :: "int" :: Nil => 32 // at least 32 bits
       case "long" :: "long" :: "int" :: Nil => 64 // at least 64 bits
       case _ => throw new Exception("Could not normalize. Is " +
         normalizedInt.reduce(_ + " " + _) + " a valid C integer?");
