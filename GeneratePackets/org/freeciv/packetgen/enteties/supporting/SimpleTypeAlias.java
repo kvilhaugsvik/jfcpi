@@ -47,10 +47,6 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
         this(name, TargetClass.fromClass(jType), null, arrayDimensions);
     }
 
-    public SimpleTypeAlias(String name, String jTypePackage, String jType, Requirement req, int arrayDimensions) {
-        this(name, TargetClass.fromName(jTypePackage, jType), req, arrayDimensions);
-    }
-
     public TargetClass getAddress() {
         return typeInJava;
     }
@@ -106,5 +102,42 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
     @Override
     public Requirement getIFulfillReq() {
         return iProvide;
+    }
+
+    public static class Incomplete implements Dependency.Maker {
+        private final Requirement to;
+        private final String from;
+        private final Requirement creates;
+
+        public Incomplete(String from, Requirement to) {
+            this.to = to;
+            this.from = from;
+            this.creates = new Requirement(from, DataType.class);
+        }
+
+        @Override
+        public Required getICanProduceReq() {
+            return creates;
+        }
+
+        @Override
+        public List<Requirement> neededInput(Requirement toProduce) {
+            if (!creates.equals(toProduce))
+                throw new IllegalArgumentException("Can't create " + toProduce +
+                        " (can create " + creates + ")");
+
+            return Arrays.asList(to);
+        }
+
+        @Override
+        public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
+            if (!creates.equals(toProduce))
+                throw new IllegalArgumentException("Can't create " + toProduce +
+                        " (can create " + creates + ")");
+
+            final TargetClass target = ((DataType) wasRequired[0]).getAddress();
+            // TODO: extract target's array dimensions in stead of assuming 0
+            return new SimpleTypeAlias(from, target, wasRequired[0].getIFulfillReq(), 0);
+        }
     }
 }

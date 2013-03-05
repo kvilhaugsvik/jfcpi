@@ -851,13 +851,29 @@ public enum test implements FCEnum {
   }
 
   @Test def pointToIntIsIntVarArgs = {
-    val result = parsesCorrectly("typedef int *more_complicated;", ParseCCode, ParseCCode.exprConverted).get
+    val toCreate: Requirement = new Requirement("more_complicated", classOf[DataType])
+    val maker = parsesCorrectly("typedef int *more_complicated;", ParseCCode, ParseCCode.exprConverted)
+      .get.asInstanceOf[Dependency.Maker]
+
+    val wants: java.util.List[Requirement] = maker.neededInput(toCreate)
+    assertTrue("Where is pointer to int in " + wants, wants.contains(new Requirement("int*", classOf[DataType])))
+
+    val result = maker.produce(toCreate,
+      new SimpleTypeAlias("int*", TargetClass.fromName("java.lang", "Integer..."), null, 0))
 
     assertEquals("java.lang.Integer...", result.asInstanceOf[SimpleTypeAlias].getAddress.getFullAddress)
   }
 
   @Test def pointToCharIsString = {
-    val result = parsesCorrectly("typedef char *more_complicated;", ParseCCode, ParseCCode.exprConverted).get
+    val toCreate: Requirement = new Requirement("more_complicated", classOf[DataType])
+    val maker = parsesCorrectly("typedef char *more_complicated;", ParseCCode, ParseCCode.exprConverted)
+      .get.asInstanceOf[Dependency.Maker]
+
+    val wants: java.util.List[Requirement] = maker.neededInput(toCreate)
+    assertTrue("Where is string in " + wants, wants.contains(new Requirement("string", classOf[DataType])))
+
+    val result = maker.produce(toCreate,
+      new SimpleTypeAlias("string", classOf[java.lang.String], 1))
 
     assertEquals("java.lang.String", result.asInstanceOf[SimpleTypeAlias].getAddress.getFullAddress)
   }
@@ -882,7 +898,7 @@ public enum test implements FCEnum {
   @Test def structOneFieldEnum {
     val result = structFromText("""struct justOne {enum test value;};""",
       new Requirement("struct justOne", classOf[DataType]),
-      new SimpleTypeAlias("enum test", "org.freeciv.types", "test", new Requirement("enum test", classOf[DataType]), 0))
+      new SimpleTypeAlias("enum test", TargetClass.fromName("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0))
 
     assertTrue("The enum test should be needed here",
       result.getReqs.contains(new Requirement("enum test", classOf[DataType])))
@@ -908,8 +924,8 @@ struct two {
 };
     """,
       new Requirement("struct two", classOf[DataType]),
-      new SimpleTypeAlias("enum test", "org.freeciv.types", "test", new Requirement("enum test", classOf[DataType]), 0),
-      new SimpleTypeAlias("enum bitwise", "org.freeciv.types", "bitwise", new Requirement("enum bitwise", classOf[DataType]), 0)
+      new SimpleTypeAlias("enum test", TargetClass.fromName("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0),
+      new SimpleTypeAlias("enum bitwise", TargetClass.fromName("org.freeciv.types", "bitwise"), new Requirement("enum bitwise", classOf[DataType]), 0)
     )
 
     assertTrue("The enum test should be needed here",
@@ -1084,7 +1100,8 @@ enum test3 {
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
-    val enumsNames = enums.map(_.asInstanceOf[Dependency.Item].getIFulfillReq.getName)
+    val enumsNames = enums.filter(_.isInstanceOf[Dependency.Item])
+      .map(_.asInstanceOf[Dependency.Item].getIFulfillReq.getName)
     assertTrue("Specenum test1 not found", enumsNames.contains("enum test1"))
     assertTrue("C style enum test2 not found", enumsNames.contains("enum test2"))
     assertTrue("C style enum test3 not found", enumsNames.contains("enum test3"))
