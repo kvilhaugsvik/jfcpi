@@ -198,6 +198,8 @@ public class Hardcoded {
             (Dependency.Item)(new SimpleTypeAlias("string", String.class, 1)),
             deltaBasic,
 
+            (Dependency.Item)(new SimpleTypeAlias("universals_u", Integer.class, 0)), // 4 currently untranslated bytes
+
             /************************************************************************************************
              * Built in constants
              ************************************************************************************************/
@@ -338,7 +340,7 @@ public class Hardcoded {
         toStorage.addDependency(new StructMaker("universal",
                 Arrays.asList(
                         new WeakVarDec(new Requirement("enum universals_n", DataType.class), "kind"),
-                        new WeakVarDec(new Requirement("int", DataType.class), "value"))));
+                        new WeakVarDec(new Requirement("universals_u", DataType.class), "value"))));
     }
 
     public static Collection<Dependency.Item> values() {
