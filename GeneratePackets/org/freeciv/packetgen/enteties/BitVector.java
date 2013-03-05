@@ -164,7 +164,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
         final NetworkIO transferSizeSerialize;
         switch (transferArraySizeKind) {
             case SERIALIZED:
-                transferSizeSerialize = NetworkIO.witIntAsIntermediate("uint16", 2, "readUnsignedShort", false, "writeShort");
+                transferSizeSerialize = NetworkIO.simple("uint16", 2, "readUnsignedShort", int.class, "writeShort");
                 break;
             default:
                 transferSizeSerialize = null;

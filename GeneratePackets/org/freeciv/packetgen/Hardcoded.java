@@ -153,14 +153,14 @@ public class Hardcoded {
             /************************************************************************************************
              * Read from and write to the network
              ************************************************************************************************/
-            NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
+            NetworkIO.simple("uint8", 1, "readUnsignedByte", null, "writeByte"),
             // to.writeByte wraps around so -128 shares encoding with 128
-            NetworkIO.witIntAsIntermediate("sint8", 1, "readByte", false, "writeByte"),
-            NetworkIO.witIntAsIntermediate("uint16", 2, "readChar", false, "writeChar"),
-            NetworkIO.witIntAsIntermediate("sint16", 2, "readShort", false, "writeShort"),
-            NetworkIO.witIntAsIntermediate("sint32", 4, "readInt", true, "writeInt"),
+            NetworkIO.simple("sint8", 1, "readByte", int.class, "writeByte"),
+            NetworkIO.simple("uint16", 2, "readChar", int.class, "writeChar"),
+            NetworkIO.simple("sint16", 2, "readShort", int.class, "writeShort"),
+            NetworkIO.simple("sint32", 4, "readInt", null, "writeInt"),
 
-            NetworkIO.witIntAsIntermediate("bool8", 1, "readBoolean", true, "writeBoolean"),
+            NetworkIO.simple("bool8", 1, "readBoolean", null, "writeBoolean"),
 
             /************************************************************************************************
              * Built in types
@@ -233,7 +233,7 @@ public class Hardcoded {
                         Arrays.asList(require_universals_n,
                                 new Requirement("struct universal", DataType.class)),
                         null,
-                        NetworkIO.witIntAsIntermediate("uint8", 1, "readUnsignedByte", true, "writeByte"),
+                        NetworkIO.simple("uint8", 1, "readUnsignedByte", null, "writeByte"),
                         new From1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var val) {

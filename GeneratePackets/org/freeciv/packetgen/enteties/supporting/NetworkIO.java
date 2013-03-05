@@ -73,22 +73,23 @@ public class NetworkIO implements Dependency.Item, ReqKind {
     /**
      * A network reader that uses int as intermediate representation
      * @param type the IOType it should match
-     * @param size expression returning the since on the wire in bytes
-     * @param readFunction code to read an integer from a DataInput named "from"
-     * @param noCastNeeded does readFunction return an int?
-     * @param write code to write an integer provided in braces right after to a DataOutput named "to"
+     * @param size the since on the wire in bytes
+     * @param readFunction DataInput's read method for this
+     * @param castReadTo cast data to this after it is read or null if no casting is needed
+     * @param write DataInput's write method for this
      */
-    public static NetworkIO witIntAsIntermediate(String type,
-                                                 int size,
-                                                 final String readFunction, final boolean noCastNeeded,
-                                                 String write) {
+    public static NetworkIO simple(String type,
+                                   int size,
+                                   final String readFunction,
+                                   final Class<?> castReadTo,
+                                   String write) {
         return new NetworkIO(type, size, write, NetworkIO.class,
                 new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var from) {
                         Typed<AnInt> out = from.ref().<Returnable>call(readFunction);
-                        if (!noCastNeeded)
-                            out = BuiltIn.<AnInt>cast(int.class, out);
+                        if (null != castReadTo)
+                            out = BuiltIn.<AnInt>cast(castReadTo, out);
                         return out;
                     }
                 });
