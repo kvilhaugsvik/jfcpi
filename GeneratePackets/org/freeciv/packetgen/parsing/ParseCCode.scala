@@ -223,7 +223,7 @@ object ParseCCode extends ExtractableParser {
   def typedefConverted = typedef ^^ {
     case types ~ name => {
       val translatedTypes = cTypeDecsToJava(types)
-      new SimpleTypeAlias.Incomplete(name, translatedTypes._3)
+      new SimpleTypeAlias.Incomplete(name, translatedTypes)
     }
   }
 
@@ -235,7 +235,7 @@ object ParseCCode extends ExtractableParser {
     (cType ~ identifierRegEx ~ rep("[" ~> intExpr <~ "]") <~ ";") ^^ {
       case cTypeDecs ~ name ~ arrayDecs =>
         val typeNotArray = cTypeDecsToJava(ArrayOf(cTypeDecs, arrayDecs.size))
-        new WeakVarDec(typeNotArray._3, name, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*)
+        new WeakVarDec(typeNotArray, name, arrayDecs.map(new WeakVarDec.ArrayDeclaration(_)):_*)
   }
 
   def struct: Parser[(String, List[WeakVarDec])] = {
