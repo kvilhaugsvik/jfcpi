@@ -171,6 +171,8 @@ public class Hardcoded {
             (Dependency.Item)(new SimpleTypeAlias("float", Float.class, 0)),
             (Dependency.Item)(new SimpleTypeAlias("double", Double.class, 0)),
             (Dependency.Item)(new SimpleTypeAlias("string", String.class, 1)),
+
+            new BitVector(), // bit string
             deltaBasic,
 
             (Dependency.Item)(new SimpleTypeAlias("universals_u", Integer.class, 0)), // 4 currently untranslated bytes
@@ -319,9 +321,7 @@ public class Hardcoded {
     }
 
     public static Collection<Dependency.Item> values() {
-        HashSet<Dependency.Item> out = new HashSet<Dependency.Item>(hardCodedElements);
-        out.add(new BitVector());
-        return out;
+        return Collections.unmodifiableCollection(hardCodedElements);
     }
 
     public static Collection<Dependency.Maker> makers() {
