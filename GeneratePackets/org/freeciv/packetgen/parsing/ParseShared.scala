@@ -137,9 +137,9 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
       case Intish(anInteger) => anInteger match { // signed is default for int. The compiler choose for char.
         case "unsigned" :: tail =>
-          needAsJava("int")
+          needAsJava("uint" + normalizedIntSize(tail))
         case signed =>
-          needAsJava("int")
+          needAsJava("int" + normalizedIntSize(signed))
       }
 
       case Simple("bool") => needAsJava("bool")

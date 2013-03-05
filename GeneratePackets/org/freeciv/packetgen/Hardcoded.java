@@ -191,6 +191,7 @@ public class Hardcoded {
              * Built in types
              ************************************************************************************************/
             (Dependency.Item)(new SimpleTypeAlias("int", Integer.class, 0)),
+            (Dependency.Item)(new SimpleTypeAlias("int16", Integer.class, 0)),
             (Dependency.Item)(new SimpleTypeAlias("bool", Boolean.class, 0)),
             (Dependency.Item)(new SimpleTypeAlias("float", Float.class, 0)),
             (Dependency.Item)(new SimpleTypeAlias("double", Double.class, 0)),

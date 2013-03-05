@@ -856,7 +856,7 @@ public enum test implements FCEnum {
       .get.asInstanceOf[Dependency.Maker]
 
     val wants: java.util.List[Requirement] = maker.neededInput(toCreate)
-    assertTrue("Where is pointer to int in " + wants, wants.contains(new Requirement("int*", classOf[DataType])))
+    assertTrue("Where is pointer to int in " + wants, wants.contains(new Requirement("int16*", classOf[DataType])))
 
     val result = maker.produce(toCreate,
       new SimpleTypeAlias("int*", TargetClass.fromName("java.lang", "Integer..."), null, 0))
@@ -913,7 +913,7 @@ public enum test implements FCEnum {
     assertTrue("The primitive bool should be needed here",
       result.getReqs.contains(new Requirement("bool", classOf[DataType])))
     assertTrue("The primitive int should be needed here",
-      result.getReqs.contains(new Requirement("int", classOf[DataType])))
+      result.getReqs.contains(new Requirement("int16", classOf[DataType])))
   }
 
   @Test def structTwoFieldsEnum {
