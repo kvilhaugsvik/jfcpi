@@ -20,10 +20,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.UndefinedException;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Required;
-import org.freeciv.packetgen.dependency.RequiredMulti;
-import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.WeakVarDec;
 import com.kvilhaugsvik.javaGenerator.*;
@@ -42,6 +39,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
     private final Set<Requirement> iRequire;
     private final Requirement iProvide;
     private final String cName;
+    private final String ioName;
     private final RequiredMulti basicFTForMe;
     private final Pattern basicFTForMePattern;
     private final List<String> fieldNames;
@@ -97,12 +95,14 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
         }
 
         this.iRequire = Collections.unmodifiableSet(neededByFields);
+        this.ioName = name;
         this.cName = "struct" + " " + name;
         this.iProvide = new Requirement(cName, DataType.class);
         /*
          * TODO: Consider if creating a new implementation of Required in stead of using RequiredMulti is saner
          */
-        this.basicFTForMePattern = Pattern.compile("(\\{(\\{)*\\w+(\\})*(;(\\{)*\\w+(\\})*)*\\})\\(" + cName + "\\)");
+        this.basicFTForMePattern = Pattern.compile("(" + name + "|" + "(\\{(\\{*\\w+\\}*)(;\\{*\\w+\\}*)*\\})" + ")" +
+                "\\(" + cName + "\\)");
         this.basicFTForMe = new RequiredMulti(FieldTypeBasic.class, basicFTForMePattern);
         this.fieldTypes = fieldTypes;
         this.fieldNames = Collections.unmodifiableList(parts);
@@ -125,7 +125,13 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
     @Override
     public List<Requirement> neededInput(Requirement toProduce) {
-        final ArrayList<String> subIOs = splitIOPart(extractIOPart(toProduce));
+        final String ioPart = extractIOPart(toProduce);
+
+        if (ioName.equals(ioPart))
+            return Arrays.asList(new Requirement(FieldTypeBasic.class.getSimpleName() + ":" + toProduce.getName(),
+                    Wrapper.Wrapped.class));
+
+        final ArrayList<String> subIOs = splitIOPart(ioPart);
 
         if (subIOs.size() != fieldNames.size())
             throw new IllegalArgumentException("Wrong number of network io in " + toProduce);
@@ -183,6 +189,9 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
     @Override
     public Dependency.Item produce(Requirement toProduce, final Dependency.Item... wasRequired) throws UndefinedException {
+        if (ioName.equals(extractIOPart(toProduce)))
+            return ((FieldTypeBasic)((Wrapper.Wrapped)wasRequired[0]).getWrapped()).aliasUnseenToCode(toProduce.getName());
+
         final TargetClass me = getAddress();
         final String ios = extractIOPart(toProduce);
         final HashSet<Requirement> resultMustRequire = requireMeAndTypeOfFields(wasRequired);
