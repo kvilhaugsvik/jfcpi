@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 class BasicFieldTypeAsFieldTypeAlias implements Dependency.Maker {
-    Pattern splitter = Pattern.compile("((\\{)?\\w+(;\\w+)*(\\})?)\\(([\\w ]+)\\)");
+    Pattern splitter = Pattern.compile("((\\{)*\\w+(;(\\{)*\\w+(\\})*)*(\\})*)\\(([\\w ]+)\\)");
 
     @Override
     public Required getICanProduceReq() {

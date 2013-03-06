@@ -99,7 +99,10 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
         this.iRequire = Collections.unmodifiableSet(neededByFields);
         this.cName = "struct" + " " + name;
         this.iProvide = new Requirement(cName, DataType.class);
-        this.basicFTForMePattern = Pattern.compile("(\\{\\w+(;\\w+)*\\})\\(" + cName + "\\)");
+        /*
+         * TODO: Consider if creating a new implementation of Required in stead of using RequiredMulti is saner
+         */
+        this.basicFTForMePattern = Pattern.compile("(\\{(\\{)*\\w+(\\})*(;(\\{)*\\w+(\\})*)*\\})\\(" + cName + "\\)");
         this.basicFTForMe = new RequiredMulti(FieldTypeBasic.class, basicFTForMePattern);
         this.fieldTypes = fieldTypes;
         this.fieldNames = Collections.unmodifiableList(parts);
@@ -122,20 +125,48 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
     @Override
     public List<Requirement> neededInput(Requirement toProduce) {
-        final String ioPart = extractIOPart(toProduce);
-        final String[] readWrite = ioPart.substring(1, ioPart.length() - 1).split(";");
+        final ArrayList<String> subIOs = splitIOPart(extractIOPart(toProduce));
 
-        if (readWrite.length != fieldNames.size())
+        if (subIOs.size() != fieldNames.size())
             throw new IllegalArgumentException("Wrong number of network io in " + toProduce);
 
-        return requireFieldsAsFieldTypes(readWrite);
+        return requireFieldsAsFieldTypes(subIOs);
     }
 
-    private List<Requirement> requireFieldsAsFieldTypes(String[] readWrite) {
+    private ArrayList<String> splitIOPart(String ioPart) {
+        final ArrayList<String> subIOs = new ArrayList<String>();
+
+        StringBuilder subIO = new StringBuilder();
+        int subGroups = 0;
+        for (int i = 1; i < ioPart.length() - 1; i++) {
+            char ch = ioPart.charAt(i);
+            switch (ch) {
+                case ';':
+                    if (0 == subGroups) {
+                        subIOs.add(subIO.toString());
+                        subIO = new StringBuilder();
+                        continue;
+                    } else {
+                        break;
+                    }
+                case '{':
+                    subGroups++;
+                    break;
+                case '}':
+                    subGroups--;
+                    break;
+            }
+            subIO.append(ch);
+        }
+        subIOs.add(subIO.toString());
+        return subIOs;
+    }
+
+    private List<Requirement> requireFieldsAsFieldTypes(List<String> readWrite) {
         final List<Requirement> requirements = new LinkedList<Requirement>();
 
-        for (int i = 0; i < readWrite.length; i++)
-            requirements.add(new Requirement(readWrite[i] + "(" + fieldTypes.get(i).getName() + ")",
+        for (int i = 0; i < readWrite.size(); i++)
+            requirements.add(new Requirement(readWrite.get(i) + "(" + fieldTypes.get(i).getName() + ")",
                     FieldTypeBasic.FieldTypeAlias.class));
 
         return requirements;
