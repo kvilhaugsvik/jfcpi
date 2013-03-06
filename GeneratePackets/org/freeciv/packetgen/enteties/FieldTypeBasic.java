@@ -81,6 +81,31 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         requirement = needs;
     }
 
+    private FieldTypeBasic(String called, FieldTypeBasic original) {
+        this.pFromStream = original.pFromStream;
+        this.pTo = original.pTo;
+        this.fValue = original.fValue;
+
+        this.fieldTypeBasic = called;
+        this.publicType = original.publicType;
+        this.javaType = original.javaType;
+
+        this.decode = original.decode;
+        this.encode = original.encode;
+        this.encodedSize = original.encodedSize;
+        this.arrayEater = original.arrayEater;
+        this.value2String = original.value2String;
+        this.constructorBody = original.constructorBody;
+
+        requirement = original.requirement;
+    }
+
+    public FieldTypeBasic aliasUnseenToCode(String alias) {
+        FieldTypeBasic invisibleAlias = new FieldTypeBasic(alias, this);
+
+        return invisibleAlias;
+    }
+
     public String getFieldTypeBasic() {
         return fieldTypeBasic;
     }
