@@ -19,12 +19,12 @@ import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.dependency.SimpleDependencyMaker;
+import org.freeciv.packetgen.dependency.Wrapper;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.supporting.*;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.Statement;
-import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
@@ -249,64 +249,8 @@ public class Hardcoded {
             }
         });
 
-        final Requirement requirementReq = new Requirement("struct requirement", DataType.class);
-        makers.add(new SimpleDependencyMaker(
-                new Requirement("requirement(struct requirement)", FieldTypeBasic.class),
-                require_universals_n, requirementReq, require_universal
-        ) {
-            @Override
-            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                final TargetClass universals_n = ((ClassWriter) wasRequired[0]).getAddress();
-                final TargetClass requirementDataType = ((ClassWriter) wasRequired[1]).getAddress();
-                final TargetClass universal = ((ClassWriter) wasRequired[2]).getAddress();
-
-                return new FieldTypeBasic("requirement", "struct requirement", requirementDataType,
-                        new From1<Block, Var>() {
-                            @Override
-                            public Block x(Var arg1) {
-                                return new Block(arg1.assign(pValue.ref()));
-                            }
-                        },
-                        new From2<Block, Var, Var>() {
-                            @Override
-                            public Block x(Var to, Var from) {
-                                return new Block(to.assign(requirementDataType.newInstance(
-                                        universal.newInstance(
-                                                universals_n.newInstance(from.ref(), noLimit).callV("getValue"),
-                                                from.ref().<AValue>call("readInt")),
-                                        new MethodCall<AValue>("req_range.valueOf",
-                                                from.ref().<AValue>call("readUnsignedByte")),
-                                        from.ref().<AValue>call("readBoolean"),
-                                        from.ref().<AValue>call("readBoolean"))));
-                            }
-                        },
-                        new From2<Block, Var, Var>() {
-                            @Override
-                            public Block x(Var val, Var to) {
-                                return Block.fromStrings(
-                                        "to.writeByte(this.value.getsource().getkind().getNumber())",
-                                        "to.writeInt(this.value.getsource().getvalue())",
-                                        "to.writeByte(this.value.getrange().getNumber())",
-                                        "to.writeBoolean(this.value.getsurvives())",
-                                        "to.writeBoolean(this.value.getnegated())");
-                            }
-                        },
-                        new From1<Typed<AnInt>, Var>() {
-                            @Override
-                            public Typed<AnInt> x(Var arg1) {
-                                return literal(8);
-                            }
-                        },
-                        TO_STRING_OBJECT,
-                        false,
-                        Arrays.asList(
-                                new Requirement("struct requirement", DataType.class),
-                                new Requirement("enum req_range", DataType.class),
-                                require_universals_n,
-                                new Requirement("struct universal", DataType.class))
-                );
-            }
-        });
+        makers.add(new Wrapper("requirement(struct requirement)", FieldTypeBasic.class,
+                new Requirement("{{uint8;sint32};uint8;bool8;bool8}(struct requirement)", FieldTypeBasic.class)));
 
         hardCodedMakers = Collections.unmodifiableSet(makers);
     }
