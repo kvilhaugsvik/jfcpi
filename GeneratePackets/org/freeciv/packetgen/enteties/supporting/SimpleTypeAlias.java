@@ -70,7 +70,7 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        return new Block(to.assign(io.getRead().x(from)));
+                        return new Block(to.assign(io.getRead(from)));
                     }
                 },
                 new From2<Block, Var, Var>() {

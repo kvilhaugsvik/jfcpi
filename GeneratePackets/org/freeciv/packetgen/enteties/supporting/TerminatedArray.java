@@ -184,7 +184,7 @@ public class TerminatedArray extends FieldTypeBasic {
 
                 Block out = new Block();
 
-                writeLimitsReading(out, maxArraySizeKind, fullArraySizeLocation, transferArraySizeKind, null == transferSizeSerialize ? null : transferSizeSerialize.getRead().x(from), elementTypeCanLimitVerify);
+                writeLimitsReading(out, maxArraySizeKind, fullArraySizeLocation, transferArraySizeKind, null == transferSizeSerialize ? null : transferSizeSerialize.getRead(from), elementTypeCanLimitVerify);
 
                 out.addStatement(buf);
                 out.addStatement(IF(isSame(literal(0), buf.ref().callV("length")),

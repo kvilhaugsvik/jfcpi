@@ -223,7 +223,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        return new Block(to.assign(new MethodCall<AValue>(named + ".valueOf", io.getRead().x(from))));
+                        return new Block(to.assign(new MethodCall<AValue>(named + ".valueOf", io.getRead(from))));
                     }
                 },
                 new From2<Block, Var, Var>() {

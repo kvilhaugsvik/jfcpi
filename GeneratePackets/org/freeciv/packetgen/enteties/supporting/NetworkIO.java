@@ -50,8 +50,8 @@ public class NetworkIO implements Dependency.Item, ReqKind {
         };
     }
 
-    public final From1<Typed<AnInt>, Var> getRead() {
-        return readNoArgs;
+    public final Typed<AnInt> getRead(Var from) {
+        return readNoArgs.x(from);
     }
 
     public String getWrite() {
