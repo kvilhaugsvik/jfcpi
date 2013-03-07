@@ -121,7 +121,10 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
 
     @Override
     public List<Requirement> neededInput(Requirement toProduce) {
-        return Collections.<Requirement>emptyList();
+        if (TerminatedArray.TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
+            return Arrays.asList(new Requirement("uint16", NetworkIO.class));
+        else
+            return Collections.<Requirement>emptyList();
     }
 
     @Override
@@ -164,7 +167,8 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
         final NetworkIO transferSizeSerialize;
         switch (transferArraySizeKind) {
             case SERIALIZED:
-                transferSizeSerialize = NetworkIO.simple("uint16", 2, "readUnsignedShort", int.class, "writeShort");
+                assert 1 == wasRequired.length : "Needed argument missing";
+                transferSizeSerialize = (NetworkIO)wasRequired[0];
                 break;
             default:
                 transferSizeSerialize = null;

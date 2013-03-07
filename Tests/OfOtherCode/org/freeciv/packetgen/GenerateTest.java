@@ -420,8 +420,10 @@ public class GenerateTest {
 
     private FieldTypeBasic.FieldTypeAlias writeBitStringFieldType(String targetFolder, BitVector type) throws UndefinedException, IOException {
         FieldTypeBasic.FieldTypeAlias fieldAlias =
-                ((FieldTypeBasic) type.produce(new Requirement("bit_string" + "(" + "BIT" + ")", FieldTypeBasic.class)))
-                        .createFieldType("BITSTRING");
+                ((FieldTypeBasic) type.produce(
+                        new Requirement("bit_string" + "(" + "BIT" + ")", FieldTypeBasic.class),
+                        NetworkIO.simple("uint16", 2, "readChar", int.class, "writeChar"))
+                ).createFieldType("BITSTRING");
         writeJavaFile(fieldAlias, targetFolder);
         return fieldAlias;
     }
