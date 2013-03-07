@@ -483,7 +483,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         maker.alwaysWhen(
                 new Util.OneCondition<DefaultStyleScopeInfo>() {
                     @Override public boolean isTrueFor(DefaultStyleScopeInfo info) {
-                        return 100 <= info.getLineLength() && info.getLineBreakTry() < 10;
+                        return info.approachingTheEdge() && info.getLineBreakTry() < 10;
                     }
                 },
                 DependsOn.ignore_tokens,
@@ -530,7 +530,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         }
 
         public boolean approachingTheEdge() {
-            return 100 < getLineLength() + getRLen() + 1 || toFar.contains(getNowAt() + 1);
+            return 100 < getLineLength() + getRLen() + 1; //|| toFar.contains(getNowAt() + 1);
         }
 
         @Override
