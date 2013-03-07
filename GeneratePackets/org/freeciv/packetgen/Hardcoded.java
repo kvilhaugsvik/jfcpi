@@ -185,19 +185,19 @@ public class Hardcoded {
 
     private static final Set<Dependency.Maker> hardCodedMakers;
     static {
-        final Requirement require_universals_n =
-                new Requirement("uint8(enum universals_n)", FieldTypeBasic.FieldTypeAlias.class);
+        final Requirement require_universal_field =
+                new Requirement("{uint8;uint8}(struct universal)", FieldTypeBasic.FieldTypeAlias.class);
         final Requirement require_universal = new Requirement("struct universal", DataType.class);
 
         HashSet<Dependency.Maker> makers = new HashSet<Dependency.Maker>();
 
         makers.add(new SimpleDependencyMaker(
                 new Requirement("worklist(struct worklist)", FieldTypeBasic.class),
-                require_universals_n, require_universal
+                require_universal_field, require_universal
         ) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                final TargetClass universals_n = ((ClassWriter) wasRequired[0]).getAddress();
+                final TargetClass universalF = ((ClassWriter) wasRequired[0]).getAddress();
                 final TargetClass universal = ((ClassWriter) wasRequired[1]).getAddress();
 
                 TargetArray universalArray = TargetArray.from(universal.scopeKnown(), 1);
@@ -217,23 +217,18 @@ public class Hardcoded {
                         new From2<Block, Var, Var>() {
                             @Override
                             public Block x(Var to, Var elem) {
-                                return new Block(
-                                        universals_n.newInstance(elem.ref().callV("getkind"), noLimit).call("encodeTo", to.ref()),
-                                        to.ref().<Returnable>call("writeByte", elem.ref().callV("getvalue"))
-                                );
+                                return new Block(universalF.newInstance(elem.ref(), noLimit).call("encodeTo", to.ref()));
                             }
                         },
                         new From1<Typed<? extends AValue>, Var>() {
                             @Override
                             public Typed<AValue> x(Var from) {
-                                return universal.newInstance(
-                                        universals_n.newInstance(from.ref(), noLimit).callV("getValue"),
-                                        from.ref().<AValue>call("readUnsignedByte"));
+                                return universalF.newInstance(from.ref(), noLimit).callV("getValue");
                             }
                         },
                         TO_STRING_ARRAY,
-                        Arrays.asList(require_universals_n,
-                                new Requirement("struct universal", DataType.class)),
+                        Arrays.asList(require_universal_field,
+                                require_universal),
                         null,
                         NetworkIO.simple("uint8", 1, "readUnsignedByte", null, "writeByte"),
                         new From1<Typed<AnInt>, Var>() {
