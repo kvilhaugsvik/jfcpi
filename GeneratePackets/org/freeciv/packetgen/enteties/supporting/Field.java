@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packet.fieldtype.*;
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldTypeBasic;
@@ -167,7 +168,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
                 args.add(getSuperLimit(pos + 1));
             return new MethodCall("ElementsLimit.limit", args.toArray(new Typed[0]));
         } else {
-            return new MethodCall("ElementsLimit.noLimit");
+            return Hardcoded.noLimit;
         }
     }
 

@@ -443,7 +443,7 @@ public class TerminatedArray extends FieldTypeBasic {
     private static Typed<? extends AValue> getNext(boolean arrayEater) {
         return arrayEater ?
                 Hardcoded.pLimits.ref().<TargetClass>call("next") :
-                new MethodCall<AValue>("ElementsLimit.noLimit");
+                Hardcoded.noLimit;
     }
 
     public enum MaxArraySize {
