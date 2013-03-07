@@ -193,7 +193,7 @@ public class Hardcoded {
 
         makers.add(new SimpleDependencyMaker(
                 new Requirement("worklist(struct worklist)", FieldTypeBasic.class),
-                require_universal_field, require_universal
+                require_universal_field, require_universal, new Requirement("uint8", NetworkIO.class)
         ) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
@@ -230,7 +230,7 @@ public class Hardcoded {
                         Arrays.asList(require_universal_field,
                                 require_universal),
                         null,
-                        NetworkIO.simple("uint8", 1, "readUnsignedByte", null, "writeByte"),
+                        (NetworkIO)wasRequired[2],
                         new From1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var val) {
