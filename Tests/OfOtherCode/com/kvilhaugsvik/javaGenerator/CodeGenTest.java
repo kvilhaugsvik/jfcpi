@@ -832,4 +832,15 @@ public class CodeGenTest {
         assertEquals("Hint not ended", "The hint", atoms.get(3).getHintsEnd().get(0));
         assertTrue("Wrong place for hint", atoms.get(3).getHintsBegin().isEmpty());
     }
+
+    @Test public void longComment() {
+        String[] asText = new String[25];
+        Arrays.fill(asText, "deliver");
+        assertEquals("/*\n" +
+                " * deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver\n" +
+                " * deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver\n" +
+                " * deliver\n" +
+                " */",
+                Comment.c(asText).toString());
+    }
 }
