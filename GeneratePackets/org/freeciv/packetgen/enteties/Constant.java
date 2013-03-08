@@ -35,8 +35,8 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements Dependen
     private static final Pattern FIND_CONSTANTS_CLASS = Pattern.compile(constantPrefix);
 
     private Constant(TargetClass type, String name, Typed<Kind> expression, Collection<? extends Requirement> needed) {
-        super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
-                type, name, expression);
+        super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO, type, name, expression,
+                TargetClass.fromName("org.freeciv", "VersionData"));
         reqs.addAll(needed);
     }
 

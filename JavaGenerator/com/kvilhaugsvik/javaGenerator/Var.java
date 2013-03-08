@@ -18,7 +18,6 @@ import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 
@@ -37,7 +36,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     private final Reference reference;
 
     protected Var(List<Annotate> annotations, Visibility visibility, Scope scope, Modifiable modifiable,
-                TargetClass type, String name, Typed<Kind> value) {
+                TargetClass type, String name, Typed<Kind> value, TargetClass locatedOn) {
         this.annotations = annotations;
         this.visibility = visibility;
         this.scope = scope;
@@ -46,7 +45,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         this.name = name;
         this.value = value;
 
-        this.reference = Reference.refOn(this);
+        this.reference = Reference.refOn(locatedOn, this);
     }
 
     public Visibility getVisibility() {
@@ -116,11 +115,11 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     }
 
     public static <Kind extends AValue> Var<Kind> local(TargetClass type, String name, Typed<Kind> value) {
-        return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value);
+        return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value, TargetClass.SELF_TYPED);
     }
 
     public static <Kind extends AValue> Var<Kind> param(TargetClass kind, String name) {
-        return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, kind, name, null);
+        return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, kind, name, null, TargetClass.SELF_TYPED);
     }
 
     public static <Kind extends AValue> Var<Kind> param(Class kind, String name) {
@@ -130,7 +129,14 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations,
                                                         Visibility visibility, Scope scope, Modifiable modifiable,
                                                         TargetClass type, String name, Typed<Kind> value) {
-        return new Var<Kind>(annotations, visibility, scope, modifiable, type, name, value);
+        return Var.<Kind>field(annotations, visibility, scope, modifiable, type, name, value, TargetClass.SELF_TYPED);
+    }
+
+    public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations,
+                                                        Visibility visibility, Scope scope, Modifiable modifiable,
+                                                        TargetClass type, String name, Typed<Kind> value,
+                                                        TargetClass locatedOn) {
+        return new Var<Kind>(annotations, visibility, scope, modifiable, type, name, value, locatedOn);
     }
 
     public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations,

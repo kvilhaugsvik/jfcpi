@@ -35,11 +35,11 @@ public class Reference<Contains extends AValue> extends Address implements Value
         this.valueHelper = new ValueHelper(type, this);
     }
 
-    public static Reference refOn(Var of) {
+    public static Reference refOn(TargetClass locatedOn, Var of) {
         IR.CodeAtom name = new IR.CodeAtom(of.getName());
         switch (of.getScope()) {
             case CLASS:
-                return new Reference(of.getTType(), TargetClass.SELF_TYPED, name);
+                return new Reference(of.getTType(), locatedOn, name);
             case OBJECT:
                 return new Reference(of.getTType(), THIS, name);
             case CODE_BLOCK:
