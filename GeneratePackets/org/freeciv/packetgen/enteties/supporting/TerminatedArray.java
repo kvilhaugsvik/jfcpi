@@ -27,7 +27,7 @@ public class TerminatedArray extends FieldTypeBasic {
     public static final From1<Typed<AnInt>, Var> arrayLen = new From1<Typed<AnInt>, Var>() {
         @Override
         public Typed<AnInt> x(Var value) {
-            return value.read("length");
+            return value.ref().callV("length");
         }
     };
     public static final From2<Block, Var, Var> elemIsByteArray = new From2<Block, Var, Var>() {
@@ -144,7 +144,7 @@ public class TerminatedArray extends FieldTypeBasic {
     }
 
     public static Typed<ABool> addTerminatorUnlessFull(Typed<AnInt> size) {
-        return isSmallerThan(size, fMaxSize.read("full_array_size"));
+        return isSmallerThan(size, fMaxSize.ref().callV("full_array_size"));
     }
 
     private static From2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
@@ -173,7 +173,7 @@ public class TerminatedArray extends FieldTypeBasic {
             @Override
             public Block x(Var to, Var from) {
                 Var buf = Var.local(buffertype, "buffer",
-                        buffertype.newInstance(numberOfValueElementToNumberOfBufferElements.x(fMaxSize.read("elements_to_transfer"))));
+                        buffertype.newInstance(numberOfValueElementToNumberOfBufferElements.x(fMaxSize.ref().callV("elements_to_transfer"))));
                 Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
                 Var pos = Var.local(int.class, "pos", literal(0));
 
@@ -196,7 +196,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         WHILE(noTerminatorFound,
                                 new Block(arraySetElement(buf, pos.ref(), current.ref()),
                                         inc(pos),
-                                        IF(isSmallerThan(pos.ref(), buf.<AnInt>read("length")),
+                                        IF(isSmallerThan(pos.ref(), buf.ref().callV("length")),
                                                 new Block(current.assign(readElementFrom.x(from))),
                                                 new Block(BuiltIn.<NoValue>toCode("break"))))));
                 out.addStatement(to.assign(convertBufferArrayToValue.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
@@ -215,7 +215,7 @@ public class TerminatedArray extends FieldTypeBasic {
             case NO_LIMIT:
                 break;
             case CONSTRUCTOR_PARAM:
-                limits.add(pLimits.read("full_array_size"));
+                limits.add(pLimits.ref().callV("full_array_size"));
                 break;
             case LIMITED_BY_TYPE:
                 limits.add(fullArraySizeLocation);
@@ -227,7 +227,7 @@ public class TerminatedArray extends FieldTypeBasic {
             case MAX_ARRAY_SIZE:
                 break;
             case CONSTRUCTOR_PARAM:
-                limits.add(Hardcoded.pLimits.read("elements_to_transfer"));
+                limits.add(Hardcoded.pLimits.ref().callV("elements_to_transfer"));
                 break;
             case SERIALIZED:
                 limits.add(serialLimit);
@@ -281,7 +281,7 @@ public class TerminatedArray extends FieldTypeBasic {
         sizeIsInsideTheLimit(verifyInsideLimits,
                 maxArraySizeKind, transferArraySizeKind,
                 numberOfElements.x(fValue),
-                Hardcoded.pLimits.<AnInt>read("elements_to_transfer"),
+                Hardcoded.pLimits.ref().<AnInt>callV("elements_to_transfer"),
                 !unterminatable);
         if (elementTypeCanLimitVerify) {
             TargetClass elemtype = ((TargetArray)(fValue.getTType())).getOf();
@@ -386,13 +386,13 @@ public class TerminatedArray extends FieldTypeBasic {
                         RETURN(outVar.ref())));
 
         Var<AValue> pBuf = Var.param(TargetArray.from(kind.getAddress(), 1), "buf");
-        Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.<AnInt>read("length")));
+        Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.ref().<AnInt>callV("length")));
         Var<AnInt> count = Var.<AnInt>local(int.class, "i", literal(0));
         final Method.Helper buffer2value = Method.newHelper(Comment.no(), type, "buffer2value",
                 Arrays.<Var<?>>asList(pBuf),
                 new Block(
                         oVal,
-                        FOR(count, isSmallerThan(count.ref(), pBuf.read("length")), inc(count), new Block(
+                        FOR(count, isSmallerThan(count.ref(), pBuf.ref().callV("length")), inc(count), new Block(
                                 arraySetElement(oVal, count.ref(), pBuf.ref().callV("[]", count.ref()).<AValue>call("getValue"))
                         )),
                         RETURN(oVal.ref())

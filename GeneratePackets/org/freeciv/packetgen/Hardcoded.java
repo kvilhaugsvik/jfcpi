@@ -234,7 +234,7 @@ public class Hardcoded {
                         new From1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var val) {
-                                return multiply(literal(2), val.read("length"));
+                                return multiply(literal(2), val.ref().callV("length"));
                             }
                         },
                         TerminatedArray.sameNumberOfBufferElementsAndValueElements,

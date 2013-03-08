@@ -84,7 +84,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
             List<? extends Var<? extends AValue>> pList = Arrays.asList(pFromBits);
             Block constructorBody = new Block(new MethodCall<Returnable>("super", pFromBits.ref()));
             if (!knowsSize)
-                constructorBody.addStatement(getField("size").assign(pFromBits.read("length")));
+                constructorBody.addStatement(getField("size").assign(pFromBits.ref().callV("length")));
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
         }
         {
@@ -150,7 +150,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
                     convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
                         @Override
                         public Typed<AValue> x(Typed<AValue> bv) {
-                            return me.newInstance(bv, Hardcoded.fMaxSize.read("full_array_size"));
+                            return me.newInstance(bv, Hardcoded.fMaxSize.ref().callV("full_array_size"));
                         }
                     };
                 break;
@@ -158,7 +158,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
                 convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
                     @Override
                     public Typed<AValue> x(Typed<AValue> bv) {
-                        return me.newInstance(bv, Hardcoded.fMaxSize.read("elements_to_transfer"));
+                        return me.newInstance(bv, Hardcoded.fMaxSize.ref().callV("elements_to_transfer"));
                     }
                 };
                 break;
@@ -186,7 +186,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
                 new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var val) {
-                        return val.read("size");
+                        return val.ref().callV("size");
                     }
                 },
                 new From1<Typed<AValue>, Var>() {
@@ -212,7 +212,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
                         new From1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var arg1) {
-                                return neededBytes(arg1.read("size"));
+                                return neededBytes(arg1.ref().callV("size"));
                             }
                         },
                 new From1<Typed<AnInt>, Typed<AnInt>>() {
