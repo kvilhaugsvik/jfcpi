@@ -98,51 +98,6 @@ public class Hardcoded {
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
-            new TerminatedArray("string", "char", TargetClass.fromClass(String.class),
-                    new Requirement("STRING_ENDER", Constant.class),
-                    TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
-                    TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
-                    TerminatedArray.byteArray,
-                    new From1<Typed<AnInt>, Var>() {
-                        @Override
-                        public Typed<AnInt> x(Var value) {
-                            return value.ref().callV("getBytes").callV("length");
-                        }
-                    },
-                    new From1<Typed<AValue>, Var>() {
-                        @Override
-                        public Typed<AValue> x(Var everything) {
-                            return everything.ref().<Returnable>call("getBytes");
-                        }
-                    },
-                    new From1<Typed<AValue>, Typed<AValue>>() {
-                        @Override
-                        public Typed<AValue> x(Typed<AValue> bytes) {
-                            return (TargetClass.fromClass(String.class)).newInstance(bytes);
-                        }
-                    },
-                    TerminatedArray.elemIsByteArray,
-                    TerminatedArray.readByte,
-                    TO_STRING_OBJECT,
-                    Arrays.asList(new Requirement("STRING_ENDER", Constant.class)),
-                    null,
-                    null,
-                    new From1<Typed<AnInt>, Var>() {
-                        @Override
-                        public Typed<AnInt> x(Var value) {
-                            return value.ref().callV("getBytes").callV("length");
-                        }
-                    },
-                    TerminatedArray.sameNumberOfBufferElementsAndValueElements,
-                    Collections.<Method.Helper>emptyList(),
-                    false
-            ),
-            TerminatedArray.maxSizedTerminated("tech_list", "int",
-                    new Requirement("A_LAST", Constant.class)),
-            TerminatedArray.maxSizedTerminated("unit_list", "int",
-                    new Requirement("U_LAST", Constant.class)),
-            TerminatedArray.maxSizedTerminated("building_list", "int",
-                    new Requirement("B_LAST", Constant.class)),
             TerminatedArray.xBytes("memory", "unsigned char"),
 
             /************************************************************************************************
@@ -183,14 +138,86 @@ public class Hardcoded {
             Constant.isInt("STRING_ENDER", IntExpression.integer("0"))
     );
 
+    public static final SimpleDependencyMaker stringBasicFieldType =
+            new SimpleDependencyMaker(new Requirement("string(char)", FieldTypeBasic.class),
+                    new Requirement("STRING_ENDER", Constant.class)) {
+                @Override
+                public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
+                    return new TerminatedArray("string", "char", TargetClass.fromClass(String.class),
+                            (Constant<?>)wasRequired[0],
+                            TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
+                            TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
+                            TerminatedArray.byteArray,
+                            new From1<Typed<AnInt>, Var>() {
+                                @Override
+                                public Typed<AnInt> x(Var value) {
+                                    return value.ref().callV("getBytes").callV("length");
+                                }
+                            },
+                            new From1<Typed<AValue>, Var>() {
+                                @Override
+                                public Typed<AValue> x(Var everything) {
+                                    return everything.ref().<Returnable>call("getBytes");
+                                }
+                            },
+                            new From1<Typed<AValue>, Typed<AValue>>() {
+                                @Override
+                                public Typed<AValue> x(Typed<AValue> bytes) {
+                                    return (TargetClass.fromClass(String.class)).newInstance(bytes);
+                                }
+                            },
+                            TerminatedArray.elemIsByteArray,
+                            TerminatedArray.readByte,
+                            TO_STRING_OBJECT,
+                            Arrays.asList(wasRequired[0].getIFulfillReq()),
+                            null,
+                            null,
+                            new From1<Typed<AnInt>, Var>() {
+                                @Override
+                                public Typed<AnInt> x(Var value) {
+                                    return value.ref().callV("getBytes").callV("length");
+                                }
+                            },
+                            TerminatedArray.sameNumberOfBufferElementsAndValueElements,
+                            Collections.<Method.Helper>emptyList(),
+                            false
+                    );
+                }
+            };
+
     private static final Set<Dependency.Maker> hardCodedMakers;
     static {
+        HashSet<Dependency.Maker> makers = new HashSet<Dependency.Maker>();
+
+        makers.add(stringBasicFieldType);
+
+        makers.add(new SimpleDependencyMaker(new Requirement("tech_list(int)", FieldTypeBasic.class),
+                new Requirement("A_LAST", Constant.class)){
+            @Override
+            public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
+                return TerminatedArray.maxSizedTerminated("tech_list", "int", (Constant<?>)wasRequired[0]);
+            }
+        });
+
+        makers.add(new SimpleDependencyMaker(new Requirement("unit_list(int)", FieldTypeBasic.class),
+                new Requirement("U_LAST", Constant.class)){
+            @Override
+            public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
+                return TerminatedArray.maxSizedTerminated("unit_list", "int", (Constant<?>)wasRequired[0]);
+            }
+        });
+
+        makers.add(new SimpleDependencyMaker(new Requirement("building_list(int)", FieldTypeBasic.class),
+                new Requirement("B_LAST", Constant.class)){
+            @Override
+            public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
+                return TerminatedArray.maxSizedTerminated("building_list", "int", (Constant<?>)wasRequired[0]);
+            }
+        });
+
         final Requirement require_universal_field =
                 new Requirement("{uint8;uint8}(struct universal)", FieldTypeBasic.FieldTypeAlias.class);
         final Requirement require_universal = new Requirement("struct universal", DataType.class);
-
-        HashSet<Dependency.Maker> makers = new HashSet<Dependency.Maker>();
-
         makers.add(new SimpleDependencyMaker(
                 new Requirement("worklist(struct worklist)", FieldTypeBasic.class),
                 require_universal_field, require_universal, new Requirement("uint8", NetworkIO.class)

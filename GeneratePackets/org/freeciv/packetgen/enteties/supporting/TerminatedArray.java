@@ -74,7 +74,7 @@ public class TerminatedArray extends FieldTypeBasic {
     private final Method validateInsideLimits;
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
-                           final Requirement terminator,
+                           final Constant<?> terminator,
                            final MaxArraySize maxArraySizeKind,
                            final TransferArraySize transferArraySizeKind,
                            final TargetArray buffertype,
@@ -121,7 +121,7 @@ public class TerminatedArray extends FieldTypeBasic {
                 || TransferArraySize.CONSTRUCTOR_PARAM.equals(transferArraySizeKind);
     }
 
-    private static boolean notTerminatable(Requirement terminator) {
+    private static boolean notTerminatable(Constant<?> terminator) {
         return null == terminator;
     }
 
@@ -147,7 +147,7 @@ public class TerminatedArray extends FieldTypeBasic {
         return isSmallerThan(size, fMaxSize.ref().callV("full_array_size"));
     }
 
-    private static From2<Block, Var, Var> createEncode(final Requirement terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
+    private static From2<Block, Var, Var> createEncode(final Constant<?> terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
@@ -162,13 +162,13 @@ public class TerminatedArray extends FieldTypeBasic {
                 }
                 if (terminatorShouldBeAdded)
                     out.addStatement(IF(addTerminatorUnlessFull(numberOfElements.x(val)),
-                            new Block(to.ref().<Returnable>call("writeByte", BuiltIn.<AValue>toCode(Constant.referToInJavaCode(terminator))))));
+                            new Block(to.ref().<Returnable>call("writeByte", terminator.ref()))));
                 return out;
             }
         };
     }
 
-    private static From2<Block, Var, Var> createDecode(final Requirement terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify) {
+    private static From2<Block, Var, Var> createDecode(final Constant<?> terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify) {
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var to, Var from) {
@@ -179,8 +179,7 @@ public class TerminatedArray extends FieldTypeBasic {
 
                 Typed<ABool> noTerminatorFound = (notTerminatable(terminator) ?
                         TRUE :
-                        isNotSame(cast(byte.class,
-                                BuiltIn.<AnInt>toCode(Constant.referToInJavaCode(terminator))), current.ref()));
+                        isNotSame(cast(byte.class, terminator.ref()), current.ref()));
 
                 Block out = new Block();
 
@@ -351,7 +350,7 @@ public class TerminatedArray extends FieldTypeBasic {
         );
     }
 
-    public static TerminatedArray maxSizedTerminated(String dataIOType, String publicType, final Requirement terminator) {
+    public static TerminatedArray maxSizedTerminated(String dataIOType, String publicType, final Constant<?> terminator) {
         return new TerminatedArray(dataIOType, publicType, byteArray, terminator,
                         MaxArraySize.CONSTRUCTOR_PARAM,
                         TransferArraySize.CONSTRUCTOR_PARAM,
@@ -359,7 +358,7 @@ public class TerminatedArray extends FieldTypeBasic {
                         arrayLen,
                 fullIsByteArray, valueIsBufferArray, elemIsByteArray, readByte,
                         TO_STRING_ARRAY,
-                        Arrays.asList(terminator),
+                        Arrays.asList(terminator.getIFulfillReq()),
                         null,
                         null,
                         arrayLen,

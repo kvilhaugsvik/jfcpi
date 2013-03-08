@@ -181,7 +181,7 @@ public class GenerateTest {
         FieldTypeBasic.FieldTypeAlias uint32 = createFieldTypeUINT32(items);
         FieldTypeBasic.FieldTypeAlias uint32s = createUINT32_1d(uint32);
         FieldTypeBasic.FieldTypeAlias uint32s2D = createUINT32_2D(uint32s);
-        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING(items);
+        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING();
         FieldTypeBasic.FieldTypeAlias bool = createFieldTypeBool(items);
         FieldTypeBasic.FieldTypeAlias connection = createFieldTypeConnection(items);
 
@@ -240,13 +240,16 @@ public class GenerateTest {
     }
 
     private FieldTypeBasic.FieldTypeAlias writeFieldTypeString(String targetFolder, Parts items) throws UndefinedException, IOException {
-        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING(items);
+        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING();
         writeJavaFile(string, targetFolder);
         return string;
     }
 
-    private FieldTypeBasic.FieldTypeAlias createFieldTypeSTRING(Parts items) throws UndefinedException {
-        return getPrimitiveFieldType(items, "string", "char", "STRING");
+    private FieldTypeBasic.FieldTypeAlias createFieldTypeSTRING() throws UndefinedException {
+        return ((FieldTypeBasic)Hardcoded.stringBasicFieldType
+                .produce(new Requirement("string(char)", FieldTypeBasic.class),
+                        Constant.isInt("STRING_ENDER", IntExpression.integer("0")))
+        ).createFieldType("STRING");
     }
 
     @Test
@@ -466,7 +469,7 @@ public class GenerateTest {
         Parts items = new Parts();
         FieldTypeBasic.FieldTypeAlias uint8 = createFieldTypeUINT8(items);
         FieldTypeBasic.FieldTypeAlias uint32 = createFieldTypeUINT32(items);
-        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING(items);
+        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING();
 
         writeDeltaVectorTestPeerPacket(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, uint8, uint32, string);
     }
