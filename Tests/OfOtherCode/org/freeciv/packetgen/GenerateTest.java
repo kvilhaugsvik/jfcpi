@@ -496,7 +496,7 @@ public class GenerateTest {
     private void writeConstantClass(String targetFolder) throws IOException {
         Set<Constant> constants = new HashSet<Constant>();
         for (Dependency.Item stringEnd : Hardcoded.values())
-            if (stringEnd instanceof Constant && "STRING_ENDER".equals(((Constant) stringEnd).getName()))
+            if (stringEnd instanceof Constant)
                 constants.add((Constant)stringEnd);
 
         TreeMap<Integer, TargetClass> packets = new TreeMap<Integer, TargetClass>();

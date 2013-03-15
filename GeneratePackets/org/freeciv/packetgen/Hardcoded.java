@@ -135,7 +135,8 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in constants
              ************************************************************************************************/
-            Constant.isInt("STRING_ENDER", IntExpression.integer("0"))
+            Constant.isInt("STRING_ENDER", IntExpression.integer("0")),
+            Constant.isInt("DIFF_ARRAY_ENDER", IntExpression.integer("255"))
     );
 
     public static final SimpleDependencyMaker stringBasicFieldType =
