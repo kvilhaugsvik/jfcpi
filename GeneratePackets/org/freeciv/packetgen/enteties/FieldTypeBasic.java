@@ -37,7 +37,6 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class FieldTypeBasic implements Dependency.Item, ReqKind {
     private final String fieldTypeBasic;
-    private final String publicType;
     private final TargetClass javaType;
     private final Block constructorBody;
     private final Block decode;
@@ -66,7 +65,6 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
                 javaType, "value", null);
 
         this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
-        this.publicType = publicType;
         this.javaType = javaType;
         this.decode = decode.x(fValue, pFromStream);
         this.encode = encode.x(fValue, pTo);
@@ -87,7 +85,6 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         this.fValue = original.fValue;
 
         this.fieldTypeBasic = called;
-        this.publicType = original.publicType;
         this.javaType = original.javaType;
 
         this.decode = original.decode;
@@ -108,10 +105,6 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
 
     public String getFieldTypeBasic() {
         return fieldTypeBasic;
-    }
-
-    public String getPublicType() {
-        return publicType;
     }
 
     @Override
