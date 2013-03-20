@@ -109,7 +109,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public String getJType() {
-        return type.getJavaType();
+        return type.getUnderType().getName();
     }
 
     public void setDelta(int deltaNumber) {

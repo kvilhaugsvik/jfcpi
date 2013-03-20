@@ -180,10 +180,6 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
             return basicType;
         }
 
-        public String getJavaType() {
-            return javaType.getName();
-        }
-
         public TargetClass getUnderType() {
             return javaType;
         }
