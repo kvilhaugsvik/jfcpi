@@ -190,7 +190,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
     @Override
     public Dependency.Item produce(Requirement toProduce, final Dependency.Item... wasRequired) throws UndefinedException {
         if (ioName.equals(extractIOPart(toProduce)))
-            return ((FieldTypeBasic)((Wrapper.Wrapped)wasRequired[0]).getWrapped()).aliasUnseenToCode(toProduce.getName());
+            return ((FieldTypeBasic)((Wrapper.Wrapped)wasRequired[0]).getWrapped()).copyUnderNewName(toProduce.getName());
 
         final TargetClass me = getAddress();
         final String ios = extractIOPart(toProduce);

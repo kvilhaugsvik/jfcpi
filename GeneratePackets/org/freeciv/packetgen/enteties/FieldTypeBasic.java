@@ -97,7 +97,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         requirement = original.requirement;
     }
 
-    public FieldTypeBasic aliasUnseenToCode(String alias) {
+    public FieldTypeBasic copyUnderNewName(String alias) {
         FieldTypeBasic invisibleAlias = new FieldTypeBasic(alias, this);
 
         return invisibleAlias;
