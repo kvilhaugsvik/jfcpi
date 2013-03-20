@@ -543,7 +543,7 @@ public class GenerateTest {
         public Parts() {
             for (Dependency.Item mayBeNeeded : Hardcoded.values()) {
                 if (mayBeNeeded instanceof FieldTypeBasic)
-                    primitiveTypes.put(((FieldTypeBasic) mayBeNeeded).getFieldTypeBasic(), (FieldTypeBasic)mayBeNeeded);
+                    primitiveTypes.put(((FieldTypeBasic) mayBeNeeded).getIFulfillReq().getName(), (FieldTypeBasic)mayBeNeeded);
                 else if (mayBeNeeded instanceof Dependency.Maker)
                     generators.put(mayBeNeeded.getIFulfillReq().getName(),
                             (Dependency.Maker)mayBeNeeded);

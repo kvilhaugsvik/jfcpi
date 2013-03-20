@@ -36,7 +36,7 @@ import java.util.*;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class FieldTypeBasic implements Dependency.Item, ReqKind {
-    private final String fieldTypeBasic;
+    private final Requirement iAmRequiredAs;
     private final TargetClass javaType;
     private final Block constructorBody;
     private final Block decode;
@@ -64,7 +64,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         fValue = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                 javaType, "value", null);
 
-        this.fieldTypeBasic = dataIOType + "(" + publicType + ")";
+        this.iAmRequiredAs = new Requirement(dataIOType + "(" + publicType + ")", FieldTypeBasic.class);
         this.javaType = javaType;
         this.decode = decode.x(fValue, pFromStream);
         this.encode = encode.x(fValue, pTo);
@@ -84,7 +84,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         this.pTo = original.pTo;
         this.fValue = original.fValue;
 
-        this.fieldTypeBasic = called;
+        this.iAmRequiredAs = new Requirement(called, FieldTypeBasic.class);
         this.javaType = original.javaType;
 
         this.decode = original.decode;
@@ -103,10 +103,6 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         return invisibleAlias;
     }
 
-    public String getFieldTypeBasic() {
-        return fieldTypeBasic;
-    }
-
     @Override
     public Collection<Requirement> getReqs() {
         return Collections.<Requirement>emptySet();
@@ -114,7 +110,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
 
     @Override
     public Requirement getIFulfillReq() {
-        return new Requirement(fieldTypeBasic, FieldTypeBasic.class);
+        return iAmRequiredAs;
     }
 
     public FieldTypeAlias createFieldType(String name) {
