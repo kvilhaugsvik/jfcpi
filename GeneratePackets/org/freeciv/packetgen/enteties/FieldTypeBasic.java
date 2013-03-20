@@ -130,7 +130,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
     }
 
     public class FieldTypeAlias extends ClassWriter implements Dependency.Item, ReqKind {
-        private final String requiredAs;
+        private final Requirement iAmRequiredAs;
 
         protected FieldTypeAlias(String name) {
             this(name, name);
@@ -144,7 +144,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
                             Import.allIn(FCEnum.class.getPackage())),
                     "Freeciv's protocol definition", Collections.<Annotate>emptyList(), name,
                                           DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getName() + ">")));
-            this.requiredAs = requiredAs;
+            this.iAmRequiredAs = new Requirement(requiredAs, FieldTypeBasic.FieldTypeAlias.class);
 
             addObjectConstant(javaType, "value");
 
@@ -215,7 +215,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
 
         @Override
         public Requirement getIFulfillReq() {
-            return new Requirement(requiredAs, FieldTypeBasic.FieldTypeAlias.class);
+            return iAmRequiredAs;
         }
     }
 }
