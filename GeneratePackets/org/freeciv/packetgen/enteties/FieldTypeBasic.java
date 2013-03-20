@@ -147,6 +147,21 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         return new FieldTypeAlias(name, reqName);
     }
 
+    /**
+     * Use this to provide another type and replace mentions of the other type with this in the generated code
+     * @param alias Name of the field type alias to replace
+     * @return A Field type alias that is a copy of this except that it will fulfill the requirement alias
+     */
+    public FieldTypeAlias aliasUnseenToCode(String alias, FieldTypeAlias to) {
+        FieldTypeAlias invisibleAlias = to.invisibleAliasCreation(alias);
+
+        // See if a sub class has messed this up
+        assert alias.equals(invisibleAlias.getIFulfillReq().getName()) : "Not a proper alias";
+        assert invisibleAlias.toString().equals(to.toString()) : "Different code generated";
+
+        return invisibleAlias;
+    }
+
     public boolean isArrayEater() {
         return arrayEater;
     }
@@ -195,13 +210,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
          * @return A Field type alias that is a copy of this except that it will fulfill the requirement alias
          */
         public FieldTypeAlias aliasUnseenToCode(String alias) {
-            FieldTypeAlias invisibleAlias = invisibleAliasCreation(alias);
-
-            // See if a sub class has messed this up
-            assert alias.equals(invisibleAlias.getIFulfillReq().getName()) : "Not a proper alias";
-            assert invisibleAlias.toString().equals(this.toString()) : "Different code generated";
-
-            return invisibleAlias;
+            return getBasicType().aliasUnseenToCode(alias, this);
         }
 
         /**
