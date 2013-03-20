@@ -103,16 +103,6 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         return invisibleAlias;
     }
 
-    @Override
-    public Collection<Requirement> getReqs() {
-        return Collections.<Requirement>emptySet();
-    }
-
-    @Override
-    public Requirement getIFulfillReq() {
-        return iAmRequiredAs;
-    }
-
     public FieldTypeAlias createFieldType(String name) {
         return createFieldType(name, name);
     }
@@ -127,6 +117,16 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
 
     public TargetClass getUnderType() {
         return javaType;
+    }
+
+    @Override
+    public Collection<Requirement> getReqs() {
+        return Collections.<Requirement>emptySet();
+    }
+
+    @Override
+    public Requirement getIFulfillReq() {
+        return iAmRequiredAs;
     }
 
     public class FieldTypeAlias extends ClassWriter implements Dependency.Item, ReqKind {
