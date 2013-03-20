@@ -175,7 +175,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
                     TargetClass.fromClass(boolean.class), "equals", Arrays.asList(paramOther),
                     Collections.<TargetClass>emptyList(),
                     new Block(IF(
-                            BuiltIn.<ABool>toCode("other instanceof " + name),
+                            BuiltIn.isInstanceOf(paramOther.ref(), getAddress()),
                             new Block(RETURN(BuiltIn.<ABool>toCode("this.value.equals(((" + name + ")other).getValue())"))),
                             new Block(RETURN(FALSE))))));
         }
