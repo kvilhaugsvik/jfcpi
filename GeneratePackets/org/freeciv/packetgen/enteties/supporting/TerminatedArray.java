@@ -370,12 +370,12 @@ public class TerminatedArray extends FieldTypeBasic {
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
                                              final FieldTypeAlias kind) {
-        final TargetArray type = TargetArray.from(kind.getUnderType(), 1);
+        final TargetArray type = TargetArray.from(kind.getBasicType().getUnderType(), 1);
         final boolean arrayEater = kind.getBasicType().isArrayEater();
 
         Var<AValue> helperParamValue = Var.param(type, "values");
         Var<AValue> helperParamLimits = Var.param(ElementsLimit.class, "limits");
-        Var<AValue> elem = Var.<AValue>param(kind.getUnderType(), "elem");
+        Var<AValue> elem = Var.<AValue>param(kind.getBasicType().getUnderType(), "elem");
         Var<AnInt> outVar = Var.<AnInt>local(int.class, "totalSize", literal(0));
         final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.fromClass(int.class), "lengthInBytes",
                 Arrays.<Var<?>>asList(helperParamValue, helperParamLimits),

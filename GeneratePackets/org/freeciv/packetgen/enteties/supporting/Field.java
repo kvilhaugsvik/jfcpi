@@ -101,7 +101,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public TargetClass getUnderType() {
-        return type.getUnderType();
+        return type.getBasicType().getUnderType();
     }
 
     public String getFType() {
@@ -109,7 +109,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public String getJType() {
-        return type.getUnderType().getName();
+        return type.getBasicType().getUnderType().getName();
     }
 
     public void setDelta(int deltaNumber) {

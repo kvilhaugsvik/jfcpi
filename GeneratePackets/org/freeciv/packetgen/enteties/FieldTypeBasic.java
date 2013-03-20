@@ -125,6 +125,10 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         return arrayEater;
     }
 
+    public TargetClass getUnderType() {
+        return javaType;
+    }
+
     public class FieldTypeAlias extends ClassWriter implements Dependency.Item, ReqKind {
         private final String requiredAs;
 
@@ -178,10 +182,6 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
 
         public FieldTypeBasic getBasicType() {
             return basicType;
-        }
-
-        public TargetClass getUnderType() {
-            return javaType;
         }
 
         /**
