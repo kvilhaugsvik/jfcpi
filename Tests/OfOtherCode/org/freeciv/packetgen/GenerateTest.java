@@ -21,6 +21,7 @@ import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
+import org.freeciv.packetgen.dependency.TotalOrderNoCircles;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
@@ -494,7 +495,7 @@ public class GenerateTest {
     }
 
     private void writeConstantClass(String targetFolder) throws IOException {
-        Set<Constant> constants = new HashSet<Constant>();
+        Set<Constant> constants = new TreeSet<Constant>(new TotalOrderNoCircles(Hardcoded.values()));
         for (Dependency.Item stringEnd : Hardcoded.values())
             if (stringEnd instanceof Constant)
                 constants.add((Constant)stringEnd);
