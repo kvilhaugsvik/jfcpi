@@ -98,6 +98,41 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         requirement = original.requirement;
     }
 
+    private void assemble(FieldTypeAlias me) {
+        me.addObjectConstant(javaType, "value");
+
+        List<TargetClass> tIOExcept = Arrays.asList(TargetClass.newKnown(IOException.class));
+        Var<TargetClass> pValue = Var.param(javaType, "value");
+
+        me.addMethod(Method.newPublicConstructor(Comment.no(),
+                new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
+                constructorBody));
+        me.addMethod(Method.newPublicConstructorWithException(Comment.no(),
+                new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits))), tIOExcept,
+                decode));
+        me.addMethod(Method.newPublicDynamicMethod(Comment.no(),
+                TargetClass.newKnown(void.class), "encodeTo", Arrays.asList(pTo),
+                tIOExcept, encode));
+        me.addMethod(Method.newPublicReadObjectState(Comment.no(),
+                TargetClass.fromClass(int.class), "encodedLength",
+                encodedSize));
+        me.addMethod(Method.newPublicReadObjectState(Comment.no(),
+                javaType, "getValue",
+                new Block(RETURN(me.getField("value").ref()))));
+        me.addMethod(Method.newPublicReadObjectState(Comment.no(),
+                TargetClass.newKnown(String.class), "toString",
+                new Block(RETURN(value2String.x(me.getField("value"))))));
+        Var<TargetClass> paramOther = Var.param(TargetClass.fromClass(Object.class), "other");
+        me.addMethod(Method.custom(Comment.no(),
+                Visibility.PUBLIC, Scope.OBJECT,
+                TargetClass.fromClass(boolean.class), "equals", Arrays.asList(paramOther),
+                Collections.<TargetClass>emptyList(),
+                new Block(IF(
+                        BuiltIn.isInstanceOf(paramOther.ref(), me.getAddress()),
+                        new Block(RETURN(me.getField("value").ref().callV("equals", BuiltIn.cast(me.getAddress().scopeKnown(), paramOther.ref()).callV("getValue")))),
+                        new Block(RETURN(FALSE))))));
+    }
+
     public FieldTypeBasic copyUnderNewName(String alias) {
         FieldTypeBasic invisibleAlias = new FieldTypeBasic(alias, this);
 
@@ -147,38 +182,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
                                           DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getName() + ">")));
             this.iAmRequiredAs = new Requirement(requiredAs, FieldTypeBasic.FieldTypeAlias.class);
 
-            addObjectConstant(javaType, "value");
-
-            List<TargetClass> tIOExcept = Arrays.asList(TargetClass.newKnown(IOException.class));
-            Var<TargetClass> pValue = Var.param(javaType, "value");
-
-            addMethod(Method.newPublicConstructor(Comment.no(),
-                    new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
-                    constructorBody));
-            addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                    new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits))), tIOExcept,
-                    decode));
-            addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                    TargetClass.newKnown(void.class), "encodeTo", Arrays.asList(pTo),
-                    tIOExcept, encode));
-            addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    TargetClass.fromClass(int.class), "encodedLength",
-                    encodedSize));
-            addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    javaType, "getValue",
-                    new Block(RETURN(getField("value").ref()))));
-            addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    TargetClass.newKnown(String.class), "toString",
-                    new Block(RETURN(value2String.x(getField("value"))))));
-            Var<TargetClass> paramOther = Var.param(TargetClass.fromClass(Object.class), "other");
-            addMethod(Method.custom(Comment.no(),
-                    Visibility.PUBLIC, Scope.OBJECT,
-                    TargetClass.fromClass(boolean.class), "equals", Arrays.asList(paramOther),
-                    Collections.<TargetClass>emptyList(),
-                    new Block(IF(
-                            BuiltIn.isInstanceOf(paramOther.ref(), getAddress()),
-                            new Block(RETURN(getField("value").ref().callV("equals", BuiltIn.cast(getAddress().scopeKnown(), paramOther.ref()).callV("getValue")))),
-                            new Block(RETURN(FALSE))))));
+            assemble(this);
         }
 
         public FieldTypeBasic getBasicType() {
