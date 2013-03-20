@@ -75,6 +75,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
 
         // TODO: remove when fixed
         this.javaType.register(new TargetMethod(javaType, "toString", TargetClass.fromClass(String.class), TargetMethod.Called.DYNAMIC));
+        this.javaType.register(new TargetMethod(javaType, "equals", TargetClass.fromClass(Boolean.class), TargetMethod.Called.DYNAMIC));
 
         requirement = needs;
     }
@@ -176,7 +177,7 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
                     Collections.<TargetClass>emptyList(),
                     new Block(IF(
                             BuiltIn.isInstanceOf(paramOther.ref(), getAddress()),
-                            new Block(RETURN(BuiltIn.<ABool>toCode("this.value.equals(((" + name + ") other).getValue())"))),
+                            new Block(RETURN(getField("value").ref().callV("equals", BuiltIn.cast(getAddress().scopeKnown(), paramOther.ref()).callV("getValue")))),
                             new Block(RETURN(FALSE))))));
         }
 
