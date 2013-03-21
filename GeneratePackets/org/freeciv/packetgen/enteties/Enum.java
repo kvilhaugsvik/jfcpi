@@ -232,9 +232,10 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                         return new Block(to.ref().<Returnable>call(io.getWrite(), val.ref().<AValue>call("getNumber")));
                     }
                 },
-                                  io.getSize(),
+                io.getSize(),
                 BuiltIn.TO_STRING_OBJECT,
-                                  false, req);
+                false,
+                req);
     }
 
     @Override

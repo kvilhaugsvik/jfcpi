@@ -73,6 +73,7 @@ public class FieldTypeTest {
                     }
                 },
                 TO_STRING_OBJECT,
-                false, Collections.<Requirement>emptySet());
+                false,
+                Collections.<Requirement>emptySet());
     }
 }

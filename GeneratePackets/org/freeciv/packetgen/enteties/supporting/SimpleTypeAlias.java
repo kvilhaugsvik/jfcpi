@@ -79,9 +79,10 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
                         return new Block(to.ref().<Returnable>call(io.getWrite(), val.ref()));
                     }
                 },
-                                  io.getSize(),
+                io.getSize(),
                 BuiltIn.TO_STRING_OBJECT,
-                                  false, willRequire);
+                false,
+                willRequire);
     }
 
     @Override
