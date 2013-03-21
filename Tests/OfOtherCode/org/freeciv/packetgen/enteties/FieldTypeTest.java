@@ -74,6 +74,9 @@ public class FieldTypeTest {
                 },
                 TO_STRING_OBJECT,
                 false,
-                Collections.<Requirement>emptySet());
+                Collections.<Requirement>emptySet(),
+                Collections.<Var<com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue>>emptyList(),
+                Collections.<com.kvilhaugsvik.javaGenerator.Method>emptyList()
+        );
     }
 }

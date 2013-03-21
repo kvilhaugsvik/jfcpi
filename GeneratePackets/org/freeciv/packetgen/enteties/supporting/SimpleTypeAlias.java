@@ -82,7 +82,10 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
                 io.getSize(),
                 BuiltIn.TO_STRING_OBJECT,
                 false,
-                willRequire);
+                willRequire,
+                Collections.<Var<AValue>>emptyList(),
+                Collections.<com.kvilhaugsvik.javaGenerator.Method>emptyList()
+        );
     }
 
     @Override

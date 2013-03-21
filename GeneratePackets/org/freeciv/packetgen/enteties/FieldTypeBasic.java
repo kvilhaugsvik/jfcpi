@@ -44,6 +44,8 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
     private final Block encodedSize;
     private final From1<Typed<AString>, Var> value2String;
     private final boolean arrayEater;
+    private final List<? extends Var<? extends AValue>> fieldsToAdd;
+    private final List<? extends Method> methodsToAdd;
 
     protected final Var<TargetClass> fValue;
     private final Var<TargetClass> pTo;
@@ -58,7 +60,10 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
                           From2<Block, Var, Var> encode,
                           From1<Typed<AnInt>, Var> encodedSize,
                           From1<Typed<AString>, Var> toString,
-                          boolean arrayEater, Collection<Requirement> needs) {
+                          boolean arrayEater,
+                          Collection<Requirement> needs,
+                          List<? extends Var<? extends AValue>> fieldsToAdd,
+                          List<? extends Method> methodsToAdd) {
         pFromStream = Var.param(TargetClass.newKnown(DataInput.class), "from");
         pTo = Var.param(TargetClass.newKnown(DataOutput.class), "to");
         fValue = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
@@ -72,6 +77,8 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         this.arrayEater = arrayEater;
         this.value2String = toString;
         this.constructorBody = constructorBody.x(fValue);
+        this.fieldsToAdd = fieldsToAdd;
+        this.methodsToAdd = methodsToAdd;
 
         // TODO: remove when fixed
         this.javaType.register(new TargetMethod(javaType, "toString", TargetClass.fromClass(String.class), TargetMethod.Called.DYNAMIC));
@@ -94,6 +101,8 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
         this.arrayEater = original.arrayEater;
         this.value2String = original.value2String;
         this.constructorBody = original.constructorBody;
+        this.fieldsToAdd = original.fieldsToAdd;
+        this.methodsToAdd = original.methodsToAdd;
 
         requirement = original.requirement;
     }
@@ -131,6 +140,12 @@ public class FieldTypeBasic implements Dependency.Item, ReqKind {
                         BuiltIn.isInstanceOf(paramOther.ref(), me.getAddress()),
                         new Block(RETURN(me.getField("value").ref().callV("equals", BuiltIn.cast(me.getAddress().scopeKnown(), paramOther.ref()).callV("getValue")))),
                         new Block(RETURN(FALSE))))));
+
+        for (Var<? extends AValue> toAdd : fieldsToAdd)
+            me.addField(toAdd);
+
+        for (Method toAdd : methodsToAdd)
+            me.addMethod(toAdd);
     }
 
     public FieldTypeBasic copyUnderNewName(String alias) {

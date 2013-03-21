@@ -245,7 +245,9 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
                 },
                 TO_STRING_OBJECT,
                 false,
-                resultMustRequire
+                resultMustRequire,
+                Collections.<Var<AValue>>emptyList(),
+                Collections.<Method>emptyList()
         );
     }
 

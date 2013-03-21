@@ -95,7 +95,10 @@ public class Hardcoded {
                     },
                     TO_STRING_OBJECT,
                     false,
-                    Collections.<Requirement>emptySet()),
+                    Collections.<Requirement>emptySet(),
+                    Collections.<Var<AValue>>emptyList(),
+                    Collections.<Method>emptyList()
+            ),
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
@@ -324,6 +327,9 @@ public class Hardcoded {
                 },
                 TO_STRING_OBJECT,
                 false,
-                Collections.<Requirement>emptySet());
+                Collections.<Requirement>emptySet(),
+                Collections.<Var<AValue>>emptyList(),
+                Collections.<Method>emptyList()
+        );
     }
 }

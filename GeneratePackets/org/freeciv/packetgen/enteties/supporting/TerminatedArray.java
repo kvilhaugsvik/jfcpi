@@ -99,7 +99,12 @@ public class TerminatedArray extends FieldTypeBasic {
                 createEnocedSize(transferArraySizeKind, numberOfElements, null != terminator, transferSizeSerialize, valueGetByteLen),
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
-                uses
+                uses,
+                Arrays.asList(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.newKnown(ElementsLimit.class), "maxArraySize", null)),
+                addValidate(helperMethods, maxArraySizeKind, transferArraySizeKind, numberOfElements,
+                        Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+                                javaType, "value", null),
+                        notTerminatable(terminator), elementTypeCanLimitVerify, buffertype)
         );
 
         this.unterminatable = notTerminatable(terminator);
@@ -110,10 +115,29 @@ public class TerminatedArray extends FieldTypeBasic {
         this.buffertype = buffertype;
 
         this.validateInsideLimits = eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind) ?
-                getValidateInsideLimits() :
+                getValidateInsideLimits(maxArraySizeKind, transferArraySizeKind, numberOfElements, fValue, unterminatable, elementTypeCanLimitVerify, buffertype) :
                 null;
 
         helpers = new ArrayList<Method.Helper>(helperMethods);
+    }
+
+    private static List<? extends Method> addValidate(List<? extends Method> helperMethods,
+                                                      MaxArraySize maxArraySizeKind,
+                                                      TransferArraySize transferArraySizeKind,
+                                                      From1<Typed<AnInt>, Var> numberOfElements,
+                                                      Var<?> fValue,
+                                                      boolean unterminatable,
+                                                      boolean elementTypeCanLimitVerify,
+                                                      TargetArray buffertype) {
+        if (eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind)) {
+            List<Method> e = new ArrayList<Method>();
+            final Method insideLimits = getValidateInsideLimits(maxArraySizeKind, transferArraySizeKind, numberOfElements, fValue, unterminatable, elementTypeCanLimitVerify, buffertype);
+            e.addAll(helperMethods);
+            e.add(insideLimits);
+            return e;
+        } else {
+            return helperMethods;
+        }
     }
 
     private static boolean eatsArrayLimitInformation(MaxArraySize maxArraySizeKind, TransferArraySize transferArraySizeKind) {
@@ -275,7 +299,7 @@ public class TerminatedArray extends FieldTypeBasic {
         return MaxArraySize.NO_LIMIT.equals(maxArraySizeKind);
     }
 
-    private Method getValidateInsideLimits() {
+    private static Method getValidateInsideLimits(MaxArraySize maxArraySizeKind, TransferArraySize transferArraySizeKind, From1<Typed<AnInt>, Var> numberOfElements, Var<?> fValue, boolean unterminatable, boolean elementTypeCanLimitVerify, TargetArray buffertype) {
         Block verifyInsideLimits = new Block();
         sizeIsInsideTheLimit(verifyInsideLimits,
                 maxArraySizeKind, transferArraySizeKind,
@@ -295,38 +319,6 @@ public class TerminatedArray extends FieldTypeBasic {
                 Arrays.asList(Hardcoded.pLimits),
                 Collections.<TargetClass>emptyList(),
                 verifyInsideLimits);
-    }
-
-    @Override
-    public FieldTypeAlias createFieldType(String name, String reqName) {
-        return new FieldTypeAliasToTerminatedArray(name, reqName);
-    }
-
-    private class FieldTypeAliasToTerminatedArray extends FieldTypeAlias {
-        private FieldTypeAliasToTerminatedArray(String name) {
-            this(name, name);
-        }
-
-        private FieldTypeAliasToTerminatedArray(String name, String alias) {
-            super(name, alias);
-
-            addObjectConstant(TargetClass.newKnown(ElementsLimit.class), "maxArraySize");
-
-            if (!helpers.isEmpty()) {
-                for (Method helper : helpers) {
-                    addMethod(helper);
-                }
-            }
-
-            if (eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind)) {
-                addMethod(validateInsideLimits);
-            }
-        }
-
-        @Override
-        protected FieldTypeAlias invisibleAliasCreation(String alias) {
-            return new FieldTypeAliasToTerminatedArray(getName(), alias);
-        }
     }
 
     public static TerminatedArray xBytes(String dataIOType, String publicType) {

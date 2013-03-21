@@ -235,7 +235,10 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 io.getSize(),
                 BuiltIn.TO_STRING_OBJECT,
                 false,
-                req);
+                req,
+                Collections.<Var<AValue>>emptyList(),
+                Collections.<Method>emptyList()
+        );
     }
 
     @Override
