@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.FieldType;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class WeakField extends WeakVarDec {
     private final List<WeakFlag> flags;
 
     public WeakField(String name, String kind, List<WeakFlag> flags, ArrayDeclaration... declarations) {
-        super(new Requirement(kind, FieldTypeBasic.FieldTypeAlias.class), name, declarations);
+        super(new Requirement(kind, FieldType.class), name, declarations);
         this.flags = flags;
     }
 

@@ -203,7 +203,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
 
     @Override
     public Required getICanProduceReq() {
-        return new RequiredMulti(FieldTypeBasic.class, fieldTypeBasicForMe);
+        return new RequiredMulti(FieldType.class, fieldTypeBasicForMe);
     }
 
     @Override
@@ -213,7 +213,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement("enum " + named, DataType.class));
         final TargetClass parent = getAddress().scopeKnown();
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), "enum " + named, parent,
+        return new FieldType(io.getIFulfillReq().getName(), "enum " + named, parent,
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
@@ -244,7 +244,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
     @Override
     public List<Requirement> neededInput(Requirement toProduce) {
         Matcher search = fieldTypeBasicForMe.matcher(toProduce.getName());
-        if (search.matches() && toProduce.getKind().equals(FieldTypeBasic.class))
+        if (search.matches() && toProduce.getKind().equals(FieldType.class))
             return Arrays.asList(new Requirement(search.group(1), NetworkIO.class));
         else
             throw new IllegalArgumentException("The requirement " + toProduce +

@@ -101,7 +101,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
         this.iProvide = new Requirement(reqName, DataType.class);
         this.dataIOType = knowsSize ? "bitvector" : "bit_string";
         this.bvFieldType = new Requirement(dataIOType +
-                "(" + iProvide.getName() + ")", FieldTypeBasic.class);
+                "(" + iProvide.getName() + ")", FieldType.class);
     }
 
     @Override

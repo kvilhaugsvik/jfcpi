@@ -19,7 +19,6 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.NoDelta;
 import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.fieldtype.FieldType;
 import org.freeciv.packet.fieldtype.FieldTypeException;
 import org.freeciv.packet.fieldtype.Key;
 import org.freeciv.packetgen.UndefinedException;
@@ -83,7 +82,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, boolean deltaIsOn, Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
-                Imports.are(Import.allIn(FieldType.class.getPackage()),
+                Imports.are(Import.allIn(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
                         Import.allIn(FCEnum.class.getPackage()),
                         Import.classIn(org.freeciv.Util.class),
                         Import.classIn(DataInput.class),
@@ -116,7 +115,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         int deltaFields = 0;
         if (delta) {
-            requirements.add(new Requirement("BV_DELTA_FIELDS", FieldTypeBasic.FieldTypeAlias.class));
+            requirements.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
 
             addObjectConstant(TargetClass.fromName("org.freeciv.packet.fieldtype", "BV_DELTA_FIELDS"), "delta");
 

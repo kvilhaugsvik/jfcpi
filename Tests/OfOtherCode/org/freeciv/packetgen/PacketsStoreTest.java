@@ -19,7 +19,7 @@ import org.freeciv.Util;
 import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
-import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.supporting.*;
 import com.kvilhaugsvik.javaGenerator.ClassWriter;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
@@ -46,7 +46,7 @@ public class PacketsStoreTest {
         PacketsStore storage = defaultStorage();
         storage.registerTypeAlias("ALIAS", "uint32", "int");
 
-        assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
+        assertTrue(storage.doesFieldTypeResolve("ALIAS"));
     }
 
     @Test public void registerTypePreCondKnownLater() throws UndefinedException {
@@ -54,7 +54,7 @@ public class PacketsStoreTest {
         storage.registerTypeAlias("ALIAS", "sint16", "fbbf");
         storage.addDependency(new SimpleTypeAlias("fbbf", TargetClass.fromName("org.freeciv.types", "BitString"), null, 0));
 
-        assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
+        assertTrue(storage.doesFieldTypeResolve("ALIAS"));
     }
 
     @Test public void registerTypeAlias() throws UndefinedException {
@@ -62,7 +62,7 @@ public class PacketsStoreTest {
         storage.registerTypeAlias("ALIASED", "uint32", "int");
         storage.registerTypeAlias("ALIAS", "ALIASED");
 
-        assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
+        assertTrue(storage.doesFieldTypeResolve("ALIAS"));
     }
 
     @Test public void registerTypeAliasToTypeRegisteredLater() throws UndefinedException {
@@ -70,7 +70,7 @@ public class PacketsStoreTest {
         storage.registerTypeAlias("ALIAS", "ALIASED");
         storage.registerTypeAlias("ALIASED", "uint32", "int");
 
-        assertTrue(storage.doesFieldTypeAliasResolve("ALIAS"));
+        assertTrue(storage.doesFieldTypeResolve("ALIAS"));
     }
 
     private static void registerPacketToPullInnFieldtype(PacketsStore storage, String fieldTypeName, int time)
@@ -96,7 +96,7 @@ public class PacketsStoreTest {
 
         registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
 
-        assertLooksForButNoCodeYet(storage, new Requirement("UINT32", FieldTypeBasic.FieldTypeAlias.class),
+        assertLooksForButNoCodeYet(storage, new Requirement("UINT32", FieldType.class),
                 "THISSHOULDNOTEXIST");
     }
 
@@ -106,7 +106,7 @@ public class PacketsStoreTest {
 
         registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
 
-        assertLooksForButNoCodeYet(storage, new Requirement("notexisting128(void)", FieldTypeBasic.FieldTypeAlias.class),
+        assertLooksForButNoCodeYet(storage, new Requirement("notexisting128(void)", FieldType.class),
                 "THISSHOULDNOTEXIST");
     }
 
@@ -179,7 +179,7 @@ public class PacketsStoreTest {
         fields.add(field1);
         storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields);
 
-        assertTrue(storage.doesFieldTypeAliasResolve("STRING"));
+        assertTrue(storage.doesFieldTypeResolve("STRING"));
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
 
@@ -224,7 +224,7 @@ public class PacketsStoreTest {
 
         assertNull(storage.getPacket(25));
         assertNull(storage.getPacket("PACKET_HELLO"));
-        assertLooksForButNoCodeYet(storage, new Requirement("STRING", FieldTypeBasic.FieldTypeAlias.class), "STRING");
+        assertLooksForButNoCodeYet(storage, new Requirement("STRING", FieldType.class), "STRING");
     }
 
     @Test public void registerPacketBeforeItsFieldType() throws PacketCollisionException, UndefinedException {

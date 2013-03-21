@@ -18,7 +18,7 @@ import org.freeciv.packet.fieldtype.*;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
@@ -38,16 +38,16 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     private final static int DELTA_NUMBER_NOT_SET = -1;
 
     private final String onPacket;
-    private final FieldTypeBasic.FieldTypeAlias type;
+    private final FieldType type;
     private final ArrayDeclaration[] declarations;
 
     private int deltaFieldNumber = DELTA_NUMBER_NOT_SET;
 
-    public Field(String fieldName, FieldTypeBasic.FieldTypeAlias typeAlias, String onPacket, List<WeakFlag> flags,
+    public Field(String fieldName, FieldType typeAlias, String onPacket, List<WeakFlag> flags,
                  WeakField.ArrayDeclaration... declarations) {
         super(fieldFlagsToAnnotations(flags), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, typeAlias.getAddress().scopeKnown(), fieldName, null, TargetClass.SELF_TYPED);
 
-        if (typeAlias.getBasicType().isArrayEater() && (0 == declarations.length))
+        if (typeAlias.isArrayEater() && (0 == declarations.length))
             throw new IllegalArgumentException("Array eaters needs array declarations");
 
         this.type = typeAlias;
@@ -101,7 +101,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public TargetClass getUnderType() {
-        return type.getBasicType().getUnderType();
+        return type.getUnderType();
     }
 
     public String getFType() {
@@ -109,7 +109,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public String getJType() {
-        return type.getBasicType().getUnderType().getName();
+        return type.getUnderType().getName();
     }
 
     public void setDelta(int deltaNumber) {
@@ -151,7 +151,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public void appendArrayEaterValidationTo(Block body) throws UndefinedException {
-        if (type.getBasicType().isArrayEater()) {
+        if (type.isArrayEater()) {
             body.addStatement(ref().<Returnable>call("verifyInsideLimits", getSuperLimit(0)));
         }
     }
@@ -195,7 +195,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
     public Collection<Requirement> getReqs() {
         HashSet<Requirement> reqs = new HashSet<Requirement>();
-        reqs.add(new Requirement(getFType(), FieldTypeBasic.FieldTypeAlias.class));
+        reqs.add(new Requirement(getFType(), org.freeciv.packetgen.enteties.FieldType.class));
 
         for (ArrayDeclaration declaration : declarations) {
             reqs.addAll(declaration.getReqs());

@@ -49,7 +49,7 @@ class PacketsDefParseTest {
 
     parser.parsePacketsDef("type BOOL               = bool8(bool)")
 
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesTypeDefAlias() {
@@ -58,7 +58,7 @@ class PacketsDefParseTest {
     parser.parsePacketsDef("type BOOL               = bool8(bool)")
     parser.parsePacketsDef("type BOOL2              = BOOL")
 
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL2"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL2"))
   }
 
   @Test def parsesTypeDefTwoLines() {
@@ -67,7 +67,7 @@ class PacketsDefParseTest {
     parser.parsePacketsDef("""type BOOL = bool8(bool)
                               type BOOL2 = BOOL""")
 
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL2"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL2"))
   }
 
   @Test def parsesTypeDefAsStream() {
@@ -76,28 +76,28 @@ class PacketsDefParseTest {
     val stream = new CharArrayReader("type BOOL = bool8(bool)\ntype BOOL2 = BOOL".toCharArray)
     parser.parsePacketsDef(stream)
 
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL2"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL2"))
   }
 
   @Test def parsesCommentCStyleBefore() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("/*comment*/ type BOOL               = bool8(bool)").successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleAfter() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("type BOOL               = bool8(bool) /*comment*/").successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleBeforeAndAfter() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("/*comment*/ type BOOL               = bool8(bool) /*comment*/").successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleOnTwoLines() {
@@ -106,7 +106,7 @@ class PacketsDefParseTest {
     assertTrue(parser.parsePacketsDef("""/* comment
     on two lines */
     type BOOL               = bool8(bool)""").successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleExtraStarsOnBothSidesOfTextNoSpace() {
@@ -115,7 +115,7 @@ class PacketsDefParseTest {
     assertTrue("Couldn't parse", parser.parsePacketsDef("""/***Text***/
 
     type BOOL               = bool8(bool)""").successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleExtraStarsOnBothSidesOfTextSpace() {
@@ -124,7 +124,7 @@ class PacketsDefParseTest {
     assertTrue("Couldn't parse", parser.parsePacketsDef("""/*** Text ***/
 
     type BOOL               = bool8(bool)""").successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleExtraStarsOnLeftSideOfTextNoSpace() {
@@ -133,7 +133,7 @@ class PacketsDefParseTest {
     assertTrue("Couldn't parse", parser.parsePacketsDef("""/***Text*/
 
     type BOOL               = bool8(bool)""").successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleExtraStarsOnLeftSideOfTextSpace() {
@@ -142,7 +142,7 @@ class PacketsDefParseTest {
     assertTrue("Couldn't parse", parser.parsePacketsDef("""/*** Text */
 
     type BOOL               = bool8(bool)""").successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleExtraStarsOnRightSideOfTextNoSpace() {
@@ -151,7 +151,7 @@ class PacketsDefParseTest {
     assertTrue("Couldn't parse", parser.parsePacketsDef("""/*Text***/
 
     type BOOL               = bool8(bool)""").successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleExtraStarsOnRightSideOfTextSpace() {
@@ -160,7 +160,7 @@ class PacketsDefParseTest {
     assertTrue("Couldn't parse", parser.parsePacketsDef("""/* Text ***/
 
     type BOOL               = bool8(bool)""").successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleExtraStarsOnRightSideOfTextSpaceEvenNumber() {
@@ -171,7 +171,7 @@ class PacketsDefParseTest {
     type BOOL               = bool8(bool)
     /* Will this take away bool? */
     """).successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleExtraStarsAmongText() {
@@ -183,7 +183,7 @@ class PacketsDefParseTest {
       */
 
     type BOOL               = bool8(bool)""").successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleTwoExtraStarsInARowAmongText() {
@@ -195,7 +195,7 @@ class PacketsDefParseTest {
       */
 
     type BOOL               = bool8(bool)""").successful)
-    assertTrue("Didn't store type", storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue("Didn't store type", storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleBeginEnd() {
@@ -214,7 +214,7 @@ class PacketsDefParseTest {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("/*type BOOL               = bool8(bool)*/").successful)
-    assertFalse(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertFalse(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCStyleAmongFieldsInPacket() {
@@ -273,7 +273,7 @@ class PacketsDefParseTest {
       type BOOL               = bool8(bool)
       """).successful)
 
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCxxStyleAfter() {
@@ -283,35 +283,35 @@ class PacketsDefParseTest {
       // comment
       """).successful)
 
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCxxStyleAfterOnSameLine() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("type BOOL               = bool8(bool) // comment\n").successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCxxStyleAfterOnSameLineNoSpace() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("type BOOL               = bool8(bool)// comment\n").successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCxxStyleCommentsOut() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("//type BOOL               = bool8(bool)\n").successful)
-    assertFalse(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertFalse(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentCxxStyleOnLastLine() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("// comment").successful)
-    assertFalse(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertFalse(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentPythonStyleBefore() {
@@ -320,7 +320,7 @@ class PacketsDefParseTest {
     assertTrue(parser.parsePacketsDef("""# comment
       type BOOL               = bool8(bool)
       """).successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentPythonStyleAfter() {
@@ -329,35 +329,35 @@ class PacketsDefParseTest {
     assertTrue(parser.parsePacketsDef("""type BOOL               = bool8(bool)
       # comment
       """).successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentPythonStyleAfterOnSameLine() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("type BOOL               = bool8(bool) # comment\n").successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentPythonStyleAfterOnSameLineNoSpace() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("type BOOL               = bool8(bool)# comment\n").successful)
-    assertTrue(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertTrue(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentPythonStyleCommentsOut() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("#type BOOL               = bool8(bool)\n").successful)
-    assertFalse(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertFalse(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentPythonStyleOnLastLine() {
     val (storage, parser) = storePars
 
     assertTrue(parser.parsePacketsDef("# comment").successful)
-    assertFalse(storage.doesFieldTypeAliasResolve("BOOL"))
+    assertFalse(storage.doesFieldTypeResolve("BOOL"))
   }
 
   @Test def parsesCommentPythonStyleAmongFieldsInPacket() {

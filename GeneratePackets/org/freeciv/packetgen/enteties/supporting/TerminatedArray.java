@@ -5,7 +5,7 @@ import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
-import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
@@ -21,7 +21,7 @@ import static org.freeciv.packetgen.Hardcoded.*;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 // Perhaps also have the generalized version output an Array of the referenced objects in stead of their number.
-public class TerminatedArray extends FieldTypeBasic {
+public class TerminatedArray extends FieldType {
     public static final TargetArray byteArray = TargetArray.from(byte[].class);
 
     public static final From1<Typed<AnInt>, Var> arrayLen = new From1<Typed<AnInt>, Var>() {
@@ -361,13 +361,13 @@ public class TerminatedArray extends FieldTypeBasic {
     }
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
-                                             final FieldTypeAlias kind) {
-        final TargetArray type = TargetArray.from(kind.getBasicType().getUnderType(), 1);
-        final boolean arrayEater = kind.getBasicType().isArrayEater();
+                                             final FieldType kind) {
+        final TargetArray type = TargetArray.from(kind.getUnderType(), 1);
+        final boolean arrayEater = kind.isArrayEater();
 
         Var<AValue> helperParamValue = Var.param(type, "values");
         Var<AValue> helperParamLimits = Var.param(ElementsLimit.class, "limits");
-        Var<AValue> elem = Var.<AValue>param(kind.getBasicType().getUnderType(), "elem");
+        Var<AValue> elem = Var.<AValue>param(kind.getUnderType(), "elem");
         Var<AnInt> outVar = Var.<AnInt>local(int.class, "totalSize", literal(0));
         final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.fromClass(int.class), "lengthInBytes",
                 Arrays.<Var<?>>asList(helperParamValue, helperParamLimits),

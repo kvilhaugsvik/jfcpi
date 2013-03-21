@@ -103,7 +103,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
          */
         this.basicFTForMePattern = Pattern.compile("(" + name + "|" + "(\\{(\\{*\\w+\\}*)(;\\{*\\w+\\}*)*\\})" + ")" +
                 "\\(" + cName + "\\)");
-        this.basicFTForMe = new RequiredMulti(FieldTypeBasic.class, basicFTForMePattern);
+        this.basicFTForMe = new RequiredMulti(FieldType.class, basicFTForMePattern);
         this.fieldTypes = fieldTypes;
         this.fieldNames = Collections.unmodifiableList(parts);
     }
@@ -128,7 +128,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
         final String ioPart = extractIOPart(toProduce);
 
         if (ioName.equals(ioPart))
-            return Arrays.asList(new Requirement(FieldTypeBasic.class.getSimpleName() + ":" + toProduce.getName(),
+            return Arrays.asList(new Requirement(FieldType.class.getSimpleName() + ":" + toProduce.getName(),
                     Wrapper.Wrapped.class));
 
         final ArrayList<String> subIOs = splitIOPart(ioPart);
@@ -173,7 +173,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
         for (int i = 0; i < readWrite.size(); i++)
             requirements.add(new Requirement(readWrite.get(i) + "(" + fieldTypes.get(i).getName() + ")",
-                    FieldTypeBasic.FieldTypeAlias.class));
+                    FieldType.class));
 
         return requirements;
     }
@@ -190,7 +190,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
     @Override
     public Dependency.Item produce(Requirement toProduce, final Dependency.Item... wasRequired) throws UndefinedException {
         if (ioName.equals(extractIOPart(toProduce)))
-            return ((FieldTypeBasic)((Wrapper.Wrapped)wasRequired[0]).getWrapped()).copyUnderNewName(toProduce.getName());
+            return ((FieldType)((Wrapper.Wrapped)wasRequired[0]).getWrapped()).createFieldType(toProduce.getName());
 
         final TargetClass me = getAddress();
         final String ios = extractIOPart(toProduce);
@@ -198,9 +198,9 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
         final List<TargetClass> fieldTypeClasses = new ArrayList<TargetClass>();
         for (Dependency.Item field : wasRequired)
-            fieldTypeClasses.add(((FieldTypeBasic.FieldTypeAlias)field).getAddress());
+            fieldTypeClasses.add(((FieldType)field).getAddress());
 
-        return new FieldTypeBasic(ios, cName, me,
+        return new FieldType(ios, cName, me,
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {

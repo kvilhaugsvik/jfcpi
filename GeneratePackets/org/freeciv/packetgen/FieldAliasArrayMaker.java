@@ -18,7 +18,7 @@ import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Required;
 import org.freeciv.packetgen.dependency.RequiredMulti;
 import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
 
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
 
     @Override
     public Required getICanProduceReq() {
-        return new RequiredMulti(FieldTypeBasic.FieldTypeAlias.class, arrayRequest);
+        return new RequiredMulti(FieldType.class, arrayRequest);
     }
 
     @Override
@@ -48,11 +48,11 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
     }
 
     private static Requirement theDimensionBelow(String underlying, int dimensions) {
-        return new Requirement(underlying + "_" + (dimensions - 1), FieldTypeBasic.FieldTypeAlias.class);
+        return new Requirement(underlying + "_" + (dimensions - 1), FieldType.class);
     }
 
     private static Requirement theUnderlying(String underlying) {
-        return new Requirement(underlying, FieldTypeBasic.FieldTypeAlias.class);
+        return new Requirement(underlying, FieldType.class);
     }
 
     private static Matcher splitRequest(Requirement toProduce) {
@@ -65,13 +65,13 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
     @Override
     public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         if ("1".equals(splitRequest(toProduce).group(2)) && eatsArrays(wasRequired[0]))
-            return ((FieldTypeBasic.FieldTypeAlias)wasRequired[0]).aliasUnseenToCode(toProduce.getName());
+            return ((FieldType)wasRequired[0]).aliasUnseenToCode(toProduce.getName());
 
-        return TerminatedArray.fieldArray("n", "a", (FieldTypeBasic.FieldTypeAlias) wasRequired[0])
+        return TerminatedArray.fieldArray("n", "a", (FieldType) wasRequired[0])
                 .createFieldType(toProduce.getName());
     }
 
     private static boolean eatsArrays(Dependency.Item dependencyItem) {
-        return ((FieldTypeBasic.FieldTypeAlias) dependencyItem).getBasicType().isArrayEater();
+        return ((FieldType) dependencyItem).isArrayEater();
     }
 }

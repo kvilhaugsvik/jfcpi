@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class PacketTest {
-    private static final FieldTypeBasic.FieldTypeAlias floatalias = Hardcoded.getFloat("5").createFieldType("AFloat");
+    private static final FieldType floatalias = Hardcoded.getFloat("5").createFieldType("AFloat");
 
     @Test
     public void deltaHeader_shouldExist() throws UndefinedException {

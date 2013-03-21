@@ -49,11 +49,11 @@ public class Hardcoded {
     public static final Value<AValue> noLimit = TargetClass.fromClass(ElementsLimit.class).callV("noLimit");
 
     public static final BitVector deltaBasic;
-    public static final FieldTypeBasic.FieldTypeAlias deltaField;
+    public static final FieldType deltaField;
     static {
         deltaBasic = new BitVector("bv_delta_fields");
         try {
-            deltaField = ((FieldTypeBasic) deltaBasic.produce(new Requirement("bit_string(bv_delta_fields)", FieldTypeBasic.class)))
+            deltaField = ((FieldType) deltaBasic.produce(new Requirement("bit_string(bv_delta_fields)", FieldType.class)))
                     .createFieldType("BV_DELTA_FIELDS");
         } catch (UndefinedException e) {
             throw new RuntimeException(e);
@@ -61,7 +61,7 @@ public class Hardcoded {
     }
 
     private static final Collection<Dependency.Item> hardCodedElements = Arrays.<Dependency.Item>asList(
-            new FieldTypeBasic("uint32", "int", TargetClass.fromClass(Long.class),
+            new FieldType("uint32", "int", TargetClass.fromClass(Long.class),
                     new From1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -144,7 +144,7 @@ public class Hardcoded {
     );
 
     public static final SimpleDependencyMaker stringBasicFieldType =
-            new SimpleDependencyMaker(new Requirement("string(char)", FieldTypeBasic.class),
+            new SimpleDependencyMaker(new Requirement("string(char)", FieldType.class),
                     new Requirement("STRING_ENDER", Constant.class)) {
                 @Override
                 public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
@@ -196,7 +196,7 @@ public class Hardcoded {
 
         makers.add(stringBasicFieldType);
 
-        makers.add(new SimpleDependencyMaker(new Requirement("tech_list(int)", FieldTypeBasic.class),
+        makers.add(new SimpleDependencyMaker(new Requirement("tech_list(int)", FieldType.class),
                 new Requirement("A_LAST", Constant.class)){
             @Override
             public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
@@ -204,7 +204,7 @@ public class Hardcoded {
             }
         });
 
-        makers.add(new SimpleDependencyMaker(new Requirement("unit_list(int)", FieldTypeBasic.class),
+        makers.add(new SimpleDependencyMaker(new Requirement("unit_list(int)", FieldType.class),
                 new Requirement("U_LAST", Constant.class)){
             @Override
             public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
@@ -212,7 +212,7 @@ public class Hardcoded {
             }
         });
 
-        makers.add(new SimpleDependencyMaker(new Requirement("building_list(int)", FieldTypeBasic.class),
+        makers.add(new SimpleDependencyMaker(new Requirement("building_list(int)", FieldType.class),
                 new Requirement("B_LAST", Constant.class)){
             @Override
             public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
@@ -221,10 +221,10 @@ public class Hardcoded {
         });
 
         final Requirement require_universal_field =
-                new Requirement("{uint8;uint8}(struct universal)", FieldTypeBasic.FieldTypeAlias.class);
+                new Requirement("{uint8;uint8}(struct universal)", FieldType.class);
         final Requirement require_universal = new Requirement("struct universal", DataType.class);
         makers.add(new SimpleDependencyMaker(
-                new Requirement("worklist(struct worklist)", FieldTypeBasic.class),
+                new Requirement("worklist(struct worklist)", FieldType.class),
                 require_universal_field, require_universal, new Requirement("uint8", NetworkIO.class)
         ) {
             @Override
@@ -276,8 +276,8 @@ public class Hardcoded {
             }
         });
 
-        makers.add(new Wrapper("requirement(struct requirement)", FieldTypeBasic.class,
-                new Requirement("{{uint8;sint32};uint8;bool8;bool8}(struct requirement)", FieldTypeBasic.class)));
+        makers.add(new Wrapper("requirement(struct requirement)", FieldType.class,
+                new Requirement("{{uint8;sint32};uint8;bool8;bool8}(struct requirement)", FieldType.class)));
 
         hardCodedMakers = Collections.unmodifiableSet(makers);
     }
@@ -299,8 +299,8 @@ public class Hardcoded {
         return hardCodedMakers;
     }
 
-    public static FieldTypeBasic getFloat(final String times) {
-        return new FieldTypeBasic("float" + times, "float", TargetClass.fromClass(Float.class),
+    public static FieldType getFloat(final String times) {
+        return new FieldType("float" + times, "float", TargetClass.fromClass(Float.class),
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {

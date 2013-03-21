@@ -16,7 +16,7 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.*;
-import org.freeciv.packetgen.enteties.FieldTypeBasic;
+import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
 import com.kvilhaugsvik.javaGenerator.Var;
 import com.kvilhaugsvik.javaGenerator.Block;
@@ -53,13 +53,13 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
 
     @Override
     public Required getICanProduceReq() {
-        return new RequiredMulti(FieldTypeBasic.class, fieldTypeBasicForMe);
+        return new RequiredMulti(FieldType.class, fieldTypeBasicForMe);
     }
 
     @Override
     public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         final NetworkIO io = (NetworkIO)wasRequired[0];
-        return new FieldTypeBasic(io.getIFulfillReq().getName(), iProvide.getName(), typeInJava,
+        return new FieldType(io.getIFulfillReq().getName(), iProvide.getName(), typeInJava,
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
@@ -91,7 +91,7 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
     @Override
     public List<Requirement> neededInput(Requirement toProduce) {
         Matcher search = fieldTypeBasicForMe.matcher(toProduce.getName());
-        if (search.matches() && toProduce.getKind().equals(FieldTypeBasic.class))
+        if (search.matches() && toProduce.getKind().equals(FieldType.class))
             return Arrays.asList(new Requirement(search.group(1), NetworkIO.class));
         else
             throw new IllegalArgumentException("The requirement " + toProduce +

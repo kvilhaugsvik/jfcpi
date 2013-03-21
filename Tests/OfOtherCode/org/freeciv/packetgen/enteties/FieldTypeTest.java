@@ -36,8 +36,8 @@ import static org.junit.Assert.*;
 public class FieldTypeTest {
     @Test
     public void fieldTypeAliasAlias() {
-        FieldTypeBasic.FieldTypeAlias base = simpleBasicFT().createFieldType("base");
-        FieldTypeBasic.FieldTypeAlias alias = base.aliasUnseenToCode("alias");
+        FieldType base = simpleBasicFT().createFieldType("base");
+        FieldType alias = base.aliasUnseenToCode("alias");
 
         assertFalse("Requirement fulfillment names should differ",
                 base.getIFulfillReq().getName().equals(alias.getIFulfillReq().getName()));
@@ -46,8 +46,8 @@ public class FieldTypeTest {
         assertEquals("Different code generated for base and alias", base.toString(), alias.toString());
     }
 
-    private static FieldTypeBasic simpleBasicFT() {
-        return new FieldTypeBasic("net", "c", TargetClass.fromClass(Integer.class),
+    private static FieldType simpleBasicFT() {
+        return new FieldType("net", "c", TargetClass.fromClass(Integer.class),
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {

@@ -63,13 +63,13 @@ public class GenerateTest {
         writeConstantClass(targetFolder);
 
         Parts items = new Parts();
-        FieldTypeBasic.FieldTypeAlias uint8 = writeFieldTypeUINT8(targetFolder, items);
-        FieldTypeBasic.FieldTypeAlias uint32 = writeFieldTypeUINT32(targetFolder, items);
-        FieldTypeBasic.FieldTypeAlias uint32s = writeTerminatedArrayFieldArray(targetFolder, uint32);
-        FieldTypeBasic.FieldTypeAlias uint32s2D = writeTerminatedArrayFieldArray2D(targetFolder, uint32s);
-        FieldTypeBasic.FieldTypeAlias string = writeFieldTypeString(targetFolder, items);
-        FieldTypeBasic.FieldTypeAlias bool = writeFieldTypeBool(targetFolder, items);
-        FieldTypeBasic.FieldTypeAlias connection = writeFieldTypeConnection(targetFolder, items);
+        FieldType uint8 = writeFieldTypeUINT8(targetFolder, items);
+        FieldType uint32 = writeFieldTypeUINT32(targetFolder, items);
+        FieldType uint32s = writeTerminatedArrayFieldArray(targetFolder, uint32);
+        FieldType uint32s2D = writeTerminatedArrayFieldArray2D(targetFolder, uint32s);
+        FieldType string = writeFieldTypeString(targetFolder, items);
+        FieldType bool = writeFieldTypeBool(targetFolder, items);
+        FieldType connection = writeFieldTypeConnection(targetFolder, items);
 
         writeDeltaVectorTestPeerPacket(targetFolder, uint8, uint32, string);
 
@@ -77,20 +77,20 @@ public class GenerateTest {
     }
 
     public void remaining(String targetFolder,
-                          FieldTypeBasic.FieldTypeAlias uint8,
-                          FieldTypeBasic.FieldTypeAlias uint32,
-                          FieldTypeBasic.FieldTypeAlias uint32s,
-                          FieldTypeBasic.FieldTypeAlias uint32s2d,
-                          FieldTypeBasic.FieldTypeAlias string,
-                          FieldTypeBasic.FieldTypeAlias bool,
-                          FieldTypeBasic.FieldTypeAlias connection) throws IOException, UndefinedException {
-        FieldTypeBasic.FieldTypeAlias uint8s = TerminatedArray.fieldArray("n", "a", uint8).createFieldType("UINT8S");
+                          FieldType uint8,
+                          FieldType uint32,
+                          FieldType uint32s,
+                          FieldType uint32s2d,
+                          FieldType string,
+                          FieldType bool,
+                          FieldType connection) throws IOException, UndefinedException {
+        FieldType uint8s = TerminatedArray.fieldArray("n", "a", uint8).createFieldType("UINT8S");
         writeJavaFile(uint8s, targetFolder);
 
-        FieldTypeBasic.FieldTypeAlias uint8s2D = TerminatedArray.fieldArray("n", "a", uint8s).createFieldType("UINT8S2D");
+        FieldType uint8s2D = TerminatedArray.fieldArray("n", "a", uint8s).createFieldType("UINT8S2D");
         writeJavaFile(uint8s2D, targetFolder);
 
-        FieldTypeBasic.FieldTypeAlias strings = TerminatedArray.fieldArray("n", "a", string).createFieldType("STRINGS");
+        FieldType strings = TerminatedArray.fieldArray("n", "a", string).createFieldType("STRINGS");
         writeJavaFile(strings, targetFolder);
 
         writePacket(new Packet("SERVER_JOIN_REQ",
@@ -178,13 +178,13 @@ public class GenerateTest {
     @Test
     public void generateRemaining() throws IOException, UndefinedException {
         Parts items = new Parts();
-        FieldTypeBasic.FieldTypeAlias uint8 = createFieldTypeUINT8(items);
-        FieldTypeBasic.FieldTypeAlias uint32 = createFieldTypeUINT32(items);
-        FieldTypeBasic.FieldTypeAlias uint32s = createUINT32_1d(uint32);
-        FieldTypeBasic.FieldTypeAlias uint32s2D = createUINT32_2D(uint32s);
-        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING();
-        FieldTypeBasic.FieldTypeAlias bool = createFieldTypeBool(items);
-        FieldTypeBasic.FieldTypeAlias connection = createFieldTypeConnection(items);
+        FieldType uint8 = createFieldTypeUINT8(items);
+        FieldType uint32 = createFieldTypeUINT32(items);
+        FieldType uint32s = createUINT32_1d(uint32);
+        FieldType uint32s2D = createUINT32_2D(uint32s);
+        FieldType string = createFieldTypeSTRING();
+        FieldType bool = createFieldTypeBool(items);
+        FieldType connection = createFieldTypeConnection(items);
 
         remaining(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER,
                 uint8, uint32, uint32s, uint32s2D, string, bool, connection);
@@ -210,13 +210,13 @@ public class GenerateTest {
         writeFieldTypeUINT8(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, new Parts());
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeFieldTypeUINT8(String targetFolder, Parts items) throws UndefinedException, IOException {
-        FieldTypeBasic.FieldTypeAlias uint8 = createFieldTypeUINT8(items);
+    private FieldType writeFieldTypeUINT8(String targetFolder, Parts items) throws UndefinedException, IOException {
+        FieldType uint8 = createFieldTypeUINT8(items);
         writeJavaFile(uint8, targetFolder);
         return uint8;
     }
 
-    private FieldTypeBasic.FieldTypeAlias createFieldTypeUINT8(Parts items) throws UndefinedException {
+    private FieldType createFieldTypeUINT8(Parts items) throws UndefinedException {
         return getPrimitiveFieldType(items, "uint8", "int", "UINT8");
     }
 
@@ -225,13 +225,13 @@ public class GenerateTest {
         writeFieldTypeUINT32(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, new Parts());
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeFieldTypeUINT32(String targetFolder, Parts items) throws UndefinedException, IOException {
-        FieldTypeBasic.FieldTypeAlias uint32 = createFieldTypeUINT32(items);
+    private FieldType writeFieldTypeUINT32(String targetFolder, Parts items) throws UndefinedException, IOException {
+        FieldType uint32 = createFieldTypeUINT32(items);
         writeJavaFile(uint32, targetFolder);
         return uint32;
     }
 
-    private FieldTypeBasic.FieldTypeAlias createFieldTypeUINT32(Parts items) throws UndefinedException {
+    private FieldType createFieldTypeUINT32(Parts items) throws UndefinedException {
         return getPrimitiveFieldType(items, "uint32", "int", "UINT32");
     }
 
@@ -240,15 +240,15 @@ public class GenerateTest {
         writeFieldTypeString(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, new Parts());
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeFieldTypeString(String targetFolder, Parts items) throws UndefinedException, IOException {
-        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING();
+    private FieldType writeFieldTypeString(String targetFolder, Parts items) throws UndefinedException, IOException {
+        FieldType string = createFieldTypeSTRING();
         writeJavaFile(string, targetFolder);
         return string;
     }
 
-    private FieldTypeBasic.FieldTypeAlias createFieldTypeSTRING() throws UndefinedException {
-        return ((FieldTypeBasic)Hardcoded.stringBasicFieldType
-                .produce(new Requirement("string(char)", FieldTypeBasic.class),
+    private FieldType createFieldTypeSTRING() throws UndefinedException {
+        return ((FieldType)Hardcoded.stringBasicFieldType
+                .produce(new Requirement("string(char)", FieldType.class),
                         Constant.isInt("STRING_ENDER", IntExpression.integer("0")))
         ).createFieldType("STRING");
     }
@@ -258,13 +258,13 @@ public class GenerateTest {
         writeFieldTypeBool(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, new Parts());
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeFieldTypeBool(String targetFolder, Parts items) throws UndefinedException, IOException {
-        FieldTypeBasic.FieldTypeAlias bool = createFieldTypeBool(items);
+    private FieldType writeFieldTypeBool(String targetFolder, Parts items) throws UndefinedException, IOException {
+        FieldType bool = createFieldTypeBool(items);
         writeJavaFile(bool, targetFolder);
         return bool;
     }
 
-    private FieldTypeBasic.FieldTypeAlias createFieldTypeBool(Parts items) throws UndefinedException {
+    private FieldType createFieldTypeBool(Parts items) throws UndefinedException {
         return getPrimitiveFieldType(items, "bool8", "bool", "BOOL");
     }
 
@@ -273,13 +273,13 @@ public class GenerateTest {
         writeFieldTypeConnection(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, new Parts());
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeFieldTypeConnection(String targetFolder, Parts items) throws UndefinedException, IOException {
-        FieldTypeBasic.FieldTypeAlias connection = createFieldTypeConnection(items);
+    private FieldType writeFieldTypeConnection(String targetFolder, Parts items) throws UndefinedException, IOException {
+        FieldType connection = createFieldTypeConnection(items);
         writeJavaFile(connection, targetFolder);
         return connection;
     }
 
-    private FieldTypeBasic.FieldTypeAlias createFieldTypeConnection(Parts items) throws UndefinedException {
+    private FieldType createFieldTypeConnection(Parts items) throws UndefinedException {
         return getPrimitiveFieldType(items, "sint16", "int", "CONNECTION");
     }
 
@@ -380,13 +380,13 @@ public class GenerateTest {
         writeTerminatedArrayFieldArray(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, createFieldTypeUINT32(new Parts()));
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeTerminatedArrayFieldArray(String targetFolder, FieldTypeBasic.FieldTypeAlias uint32) throws IOException, UndefinedException {
-        FieldTypeBasic.FieldTypeAlias array = createUINT32_1d(uint32);
+    private FieldType writeTerminatedArrayFieldArray(String targetFolder, FieldType uint32) throws IOException, UndefinedException {
+        FieldType array = createUINT32_1d(uint32);
         writeJavaFile(array, targetFolder);
         return array;
     }
 
-    private FieldTypeBasic.FieldTypeAlias createUINT32_1d(FieldTypeBasic.FieldTypeAlias uint32) throws UndefinedException {
+    private FieldType createUINT32_1d(FieldType uint32) throws UndefinedException {
         return TerminatedArray.fieldArray("x", "y", uint32).createFieldType("UINT32S");
     }
 
@@ -394,13 +394,13 @@ public class GenerateTest {
         writeTerminatedArrayFieldArray(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, createFieldTypeUINT32(new Parts()));
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeTerminatedArrayFieldArray2D(String targetFolder, FieldTypeBasic.FieldTypeAlias uint32_1d) throws IOException, UndefinedException {
-        FieldTypeBasic.FieldTypeAlias array = createUINT32_2D(uint32_1d);
+    private FieldType writeTerminatedArrayFieldArray2D(String targetFolder, FieldType uint32_1d) throws IOException, UndefinedException {
+        FieldType array = createUINT32_2D(uint32_1d);
         writeJavaFile(array, targetFolder);
         return array;
     }
 
-    private FieldTypeBasic.FieldTypeAlias createUINT32_2D(FieldTypeBasic.FieldTypeAlias uint32_1d) throws UndefinedException {
+    private FieldType createUINT32_2D(FieldType uint32_1d) throws UndefinedException {
         return TerminatedArray.fieldArray("x", "y", uint32_1d).createFieldType("UINT32S_2D");
     }
 
@@ -411,7 +411,7 @@ public class GenerateTest {
     private void writeBitStringTestPeers(String targetFolder) throws IOException, UndefinedException {
         BitVector type = writeBitStringType(targetFolder);
 
-        FieldTypeBasic.FieldTypeAlias fieldAlias = writeBitStringFieldType(targetFolder, type);
+        FieldType fieldAlias = writeBitStringFieldType(targetFolder, type);
 
         writeBitStringUsingPacket(targetFolder, fieldAlias);
     }
@@ -422,17 +422,17 @@ public class GenerateTest {
         return type;
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeBitStringFieldType(String targetFolder, BitVector type) throws UndefinedException, IOException {
-        FieldTypeBasic.FieldTypeAlias fieldAlias =
-                ((FieldTypeBasic) type.produce(
-                        new Requirement("bit_string" + "(" + "BIT" + ")", FieldTypeBasic.class),
+    private FieldType writeBitStringFieldType(String targetFolder, BitVector type) throws UndefinedException, IOException {
+        FieldType fieldAlias =
+                ((FieldType) type.produce(
+                        new Requirement("bit_string" + "(" + "BIT" + ")", FieldType.class),
                         NetworkIO.simple("uint16", 2, "readChar", int.class, "writeChar"))
                 ).createFieldType("BITSTRING");
         writeJavaFile(fieldAlias, targetFolder);
         return fieldAlias;
     }
 
-    private void writeBitStringUsingPacket(String targetFolder, FieldTypeBasic.FieldTypeAlias fieldAlias) throws UndefinedException, IOException {
+    private void writeBitStringUsingPacket(String targetFolder, FieldType fieldAlias) throws UndefinedException, IOException {
         Packet packet = new Packet("TestBitString", 931,
                 TargetClass.newKnown(Header_2_2.class),
                 GeneratorDefaults.LOG_TO,
@@ -449,7 +449,7 @@ public class GenerateTest {
     private void writeGenBVTestPeers(String targetFolder) throws IOException, UndefinedException {
         BitVector type = writeGenBVType(targetFolder);
 
-        FieldTypeBasic.FieldTypeAlias fieldAlias = writeGenBVFieldType(targetFolder, type);
+        FieldType fieldAlias = writeGenBVFieldType(targetFolder, type);
     }
 
     private BitVector writeGenBVType(String targetFolder) throws IOException {
@@ -458,9 +458,9 @@ public class GenerateTest {
         return type;
     }
 
-    private FieldTypeBasic.FieldTypeAlias writeGenBVFieldType(String targetFolder, BitVector type) throws UndefinedException, IOException {
-        FieldTypeBasic.FieldTypeAlias fieldAlias =
-                ((FieldTypeBasic) type.produce(new Requirement("bit_string" + "(" + "BIT" + ")", FieldTypeBasic.class)))
+    private FieldType writeGenBVFieldType(String targetFolder, BitVector type) throws UndefinedException, IOException {
+        FieldType fieldAlias =
+                ((FieldType) type.produce(new Requirement("bit_string" + "(" + "BIT" + ")", FieldType.class)))
                         .createFieldType("BV_GENERAL");
         writeJavaFile(fieldAlias, targetFolder);
         return fieldAlias;
@@ -468,14 +468,14 @@ public class GenerateTest {
 
     @Test public void writeDeltaVectorTestPeer() throws IOException, UndefinedException {
         Parts items = new Parts();
-        FieldTypeBasic.FieldTypeAlias uint8 = createFieldTypeUINT8(items);
-        FieldTypeBasic.FieldTypeAlias uint32 = createFieldTypeUINT32(items);
-        FieldTypeBasic.FieldTypeAlias string = createFieldTypeSTRING();
+        FieldType uint8 = createFieldTypeUINT8(items);
+        FieldType uint32 = createFieldTypeUINT32(items);
+        FieldType string = createFieldTypeSTRING();
 
         writeDeltaVectorTestPeerPacket(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, uint8, uint32, string);
     }
 
-    private void writeDeltaVectorTestPeerPacket(String targetFolder, FieldTypeBasic.FieldTypeAlias uint8, FieldTypeBasic.FieldTypeAlias uint32, FieldTypeBasic.FieldTypeAlias string) throws UndefinedException, IOException {
+    private void writeDeltaVectorTestPeerPacket(String targetFolder, FieldType uint8, FieldType uint32, FieldType string) throws UndefinedException, IOException {
         writeJavaFile(Hardcoded.deltaBasic, targetFolder);
         writeJavaFile(Hardcoded.deltaField, targetFolder);
         writePacket(new Packet("DeltaVectorTest",
@@ -510,13 +510,13 @@ public class GenerateTest {
         writeJavaFile(PacketsStore.generateVersionData(packets, constants), targetFolder);
     }
 
-    private static FieldTypeBasic.FieldTypeAlias getPrimitiveFieldType(Parts items,
+    private static FieldType getPrimitiveFieldType(Parts items,
                 String netType, String pType, String alias) throws UndefinedException {
         if (items.primitiveTypes.containsKey(netType + "(" + pType + ")"))
             return items.primitiveTypes.get(netType + "(" + pType + ")").createFieldType(alias);
         else
-            return ((FieldTypeBasic)items.generators.get(pType)
-                    .produce(new Requirement(netType + "(" + pType + ")", FieldTypeBasic.class),
+            return ((FieldType)items.generators.get(pType)
+                    .produce(new Requirement(netType + "(" + pType + ")", FieldType.class),
                             items.network.get(netType)))
                     .createFieldType(alias);
     }
@@ -537,14 +537,14 @@ public class GenerateTest {
     }
 
     public static class Parts {
-        final HashMap<String, FieldTypeBasic> primitiveTypes = new HashMap<String, FieldTypeBasic>();
+        final HashMap<String, FieldType> primitiveTypes = new HashMap<String, FieldType>();
         final HashMap<String, Dependency.Maker> generators = new HashMap<String, Dependency.Maker>();
         final HashMap<String, NetworkIO> network = new HashMap<String, NetworkIO>();
 
         public Parts() {
             for (Dependency.Item mayBeNeeded : Hardcoded.values()) {
-                if (mayBeNeeded instanceof FieldTypeBasic)
-                    primitiveTypes.put(((FieldTypeBasic) mayBeNeeded).getIFulfillReq().getName(), (FieldTypeBasic)mayBeNeeded);
+                if (mayBeNeeded instanceof FieldType)
+                    primitiveTypes.put(((FieldType) mayBeNeeded).getIFulfillReq().getName(), (FieldType)mayBeNeeded);
                 else if (mayBeNeeded instanceof Dependency.Maker)
                     generators.put(mayBeNeeded.getIFulfillReq().getName(),
                             (Dependency.Maker)mayBeNeeded);

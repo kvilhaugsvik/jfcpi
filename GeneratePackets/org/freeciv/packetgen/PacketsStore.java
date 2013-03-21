@@ -17,7 +17,6 @@ package org.freeciv.packetgen;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.Util;
 import org.freeciv.packet.*;
-import org.freeciv.packetgen.enteties.FieldTypeBasic.FieldTypeAlias;
 import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
@@ -56,7 +55,6 @@ public class PacketsStore {
         }
 
         requirements.addMaker(new FieldAliasArrayMaker());
-        requirements.addMaker(new BasicFieldTypeAsFieldTypeAlias());
 
         this.logger = logger;
         this.enableDelta = enableDelta;
@@ -79,12 +77,12 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
-        Requirement to = new Requirement(iotype + "(" + ptype + ")", FieldTypeBasic.class);
-        final Requirement from = new Requirement(alias, FieldTypeAlias.class);
+        Requirement to = new Requirement(iotype + "(" + ptype + ")", FieldType.class);
+        final Requirement from = new Requirement(alias, FieldType.class);
         requirements.addMaker(new SimpleDependencyMaker(from, to) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                return ((FieldTypeBasic)wasRequired[0]).createFieldType(alias);
+                return ((FieldType)wasRequired[0]).createFieldType(alias);
             }
         });
         requirements.blameMissingOn(from, to);
@@ -93,19 +91,19 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(final String alias, String aliased) throws UndefinedException {
-        final Requirement from = new Requirement(alias, FieldTypeAlias.class);
-        final Requirement to = new Requirement(aliased, FieldTypeAlias.class);
+        final Requirement from = new Requirement(alias, FieldType.class);
+        final Requirement to = new Requirement(aliased, FieldType.class);
         requirements.addMaker(new SimpleDependencyMaker(from, to) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                return ((FieldTypeAlias) wasRequired[0]).getBasicType().createFieldType(alias);
+                return ((FieldType) wasRequired[0]).createFieldType(alias);
             }
         });
         requirements.blameMissingOn(from, to);
     }
 
-    public boolean doesFieldTypeAliasResolve(String name) {
-        return requirements.isAwareOfProvider(new Requirement(name, FieldTypeBasic.FieldTypeAlias.class));
+    public boolean doesFieldTypeResolve(String name) {
+        return requirements.isAwareOfProvider(new Requirement(name, FieldType.class));
     }
 
     public void registerPacket(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields)
@@ -126,7 +124,7 @@ public class PacketsStore {
                 for (int i = 0; i < fields.size(); i++) {
                     WeakField fieldType = fields.get(i);
                     fieldList.add(new Field(fieldType.getName(),
-                            (FieldTypeAlias)wasRequired[i],
+                            (FieldType)wasRequired[i],
                             name,
                             fieldType.getFlags(),
                             fieldType.getDeclarations()));
@@ -186,7 +184,7 @@ public class PacketsStore {
             if (0 < fieldType.getDeclarations().length)
                 type = type + "_" + fieldType.getDeclarations().length;
 
-            allNeeded.add(new Requirement(type, FieldTypeAlias.class));
+            allNeeded.add(new Requirement(type, FieldType.class));
         }
         return allNeeded;
     }
