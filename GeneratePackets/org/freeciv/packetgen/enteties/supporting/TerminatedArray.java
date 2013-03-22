@@ -64,15 +64,6 @@ public class TerminatedArray extends FieldType {
                                 };
     public static final String SELF_VALIDATOR_NAME = "verifyInsideLimits";
 
-    private final boolean unterminatable;
-    private final TransferArraySize transferArraySizeKind;
-    private final MaxArraySize maxArraySizeKind;
-    private final From1<Typed<AnInt>, Var> numberOfElements;
-    private final boolean elementTypeCanLimitVerify;
-    private final TargetArray buffertype;
-    private final List<Method.Helper> helpers;
-    private final Method validateInsideLimits;
-
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
                            final Constant<?> terminator,
                            final MaxArraySize maxArraySizeKind,
@@ -106,19 +97,6 @@ public class TerminatedArray extends FieldType {
                                 javaType, "value", null),
                         notTerminatable(terminator), elementTypeCanLimitVerify, buffertype)
         );
-
-        this.unterminatable = notTerminatable(terminator);
-        this.maxArraySizeKind = maxArraySizeKind;
-        this.transferArraySizeKind = transferArraySizeKind;
-        this.numberOfElements = numberOfElements;
-        this.elementTypeCanLimitVerify = elementTypeCanLimitVerify;
-        this.buffertype = buffertype;
-
-        this.validateInsideLimits = eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind) ?
-                getValidateInsideLimits(maxArraySizeKind, transferArraySizeKind, numberOfElements, fValue, unterminatable, elementTypeCanLimitVerify, buffertype) :
-                null;
-
-        helpers = new ArrayList<Method.Helper>(helperMethods);
     }
 
     private static List<? extends Method> addValidate(List<? extends Method> helperMethods,
@@ -261,11 +239,6 @@ public class TerminatedArray extends FieldType {
         if (elementTypeCanLimitVerify)
             limits.add(pLimits.ref().<AValue>call("next"));
         to.addStatement(fMaxSize.assign(new MethodCall("ElementsLimit.limit", limits.toArray(new Typed[0]))));
-    }
-
-    private static boolean shouldValidateLimits(TransferArraySize transferArraySizeKind, MaxArraySize maxArraySizeKind) {
-        return !(TransferArraySize.MAX_ARRAY_SIZE.equals(transferArraySizeKind)
-                || noUpperLimitOnTheNumberOfElements(maxArraySizeKind));
     }
 
     private static From1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation, final MethodCall<Returnable> validateLimitsCall, final boolean elementTypeCanLimitVerify) {
