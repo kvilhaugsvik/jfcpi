@@ -86,8 +86,8 @@ public class TerminatedArray extends FieldType {
         super(dataIOType, publicType, javaType,
                 createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
                 createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements, elementTypeCanLimitVerify),
-                createEncode(terminator, transferArraySizeKind, numberOfElements, null != terminator, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType),
-                createEnocedSize(transferArraySizeKind, numberOfElements, null != terminator, transferSizeSerialize, valueGetByteLen),
+                createEncode(terminator, transferArraySizeKind, numberOfElements, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType),
+                createEnocedSize(transferArraySizeKind, numberOfElements, !notTerminatable(terminator), transferSizeSerialize, valueGetByteLen),
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
                 uses,
@@ -149,7 +149,7 @@ public class TerminatedArray extends FieldType {
         return isSmallerThan(size, fMaxSize.ref().callV("full_array_size"));
     }
 
-    private static From2<Block, Var, Var> createEncode(final Constant<?> terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
+    private static From2<Block, Var, Var> createEncode(final Constant<?> terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
@@ -162,7 +162,7 @@ public class TerminatedArray extends FieldType {
                 } else {
                     out.addStatement(to.ref().<Returnable>call("write", convertAllElementsToByteArray.x(val)));
                 }
-                if (terminatorShouldBeAdded)
+                if (!notTerminatable(terminator))
                     out.addStatement(IF(addTerminatorUnlessFull(numberOfElements.x(val)),
                             new Block(to.ref().<Returnable>call("writeByte", terminator.ref()))));
                 return out;
