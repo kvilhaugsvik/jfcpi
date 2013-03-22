@@ -164,7 +164,7 @@ public class TerminatedArray extends FieldType {
                 }
                 if (!notTerminatable(terminator))
                     out.addStatement(IF(addTerminatorUnlessFull(numberOfElements.x(val)),
-                            new Block(to.ref().<Returnable>call("writeByte", terminator.ref()))));
+                            writeElementTo.x(to, terminator)));
                 return out;
             }
         };
