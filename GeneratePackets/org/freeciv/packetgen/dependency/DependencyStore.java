@@ -151,6 +151,7 @@ public final class DependencyStore {
         for (Requirement req : maker.neededInput(item))
             if (isAwareOfPotentialProvider(req)) {
                 args.add(getPotentialProvider(req));
+                assert null != args.peekLast() : "Item claimed to be there don't exist";
             } else {
                 dependenciesUnfulfilled.add(req);
                 parameterMissing = true;
