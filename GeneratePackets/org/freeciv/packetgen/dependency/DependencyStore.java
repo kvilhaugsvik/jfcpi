@@ -222,14 +222,26 @@ public final class DependencyStore {
     }
 
     private void resolve() {
-        for (Requirement toAdd : wantsOut) {
-            if (isAwareOfPotentialProvider(toAdd))
-                addToResolvedIfPossible(getPotentialProvider(toAdd));
-            else
-                dependenciesUnfulfilled.add(toAdd);
+        int oldResolved = -1;
+        while (moreIsAskedFor() && newItemsWereAdded(oldResolved)) {
+            oldResolved = resolved.values().size();
+            for (Requirement toAdd : wantsOut) {
+                if (isAwareOfPotentialProvider(toAdd))
+                    addToResolvedIfPossible(getPotentialProvider(toAdd));
+                else
+                    dependenciesUnfulfilled.add(toAdd);
+            }
+            for (Dependency.Item item : resolved.values())
+                wantsOut.remove(item.getIFulfillReq());
         }
-        for (Dependency.Item item : resolved.values())
-            wantsOut.remove(item.getIFulfillReq());
+    }
+
+    private boolean moreIsAskedFor() {
+        return wantsOut.size() != 0;
+    }
+
+    private boolean newItemsWereAdded(int oldResolved) {
+        return oldResolved != resolved.values().size();
     }
 
     private static class DepStore<Of> {
