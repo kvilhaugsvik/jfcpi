@@ -179,9 +179,14 @@ public class TerminatedArray extends FieldType {
                 Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
                 Var pos = Var.local(int.class, "pos", literal(0));
 
-                Typed<ABool> noTerminatorFound = (notTerminatable(terminator) ?
-                        TRUE :
-                        isNotSame(cast(byte.class, terminator.ref()), current.ref()));
+                Typed<ABool> noTerminatorFound;
+                if (!notTerminatable(terminator))
+                    if ("byte".equals(current.getTType().getName()))
+                        noTerminatorFound = isNotSame(cast(byte.class, terminator.ref()), current.ref());
+                    else
+                        throw new IllegalArgumentException("Don't know how to compare terminator to current value");
+                else
+                    noTerminatorFound = TRUE;
 
                 Block out = new Block();
 
