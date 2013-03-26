@@ -228,7 +228,8 @@ public final class DependencyStore {
             else
                 dependenciesUnfulfilled.add(toAdd);
         }
-        wantsOut.removeAll(resolved.values());
+        for (Dependency.Item item : resolved.values())
+            wantsOut.remove(item.getIFulfillReq());
     }
 
     private static class DepStore<Of> {
