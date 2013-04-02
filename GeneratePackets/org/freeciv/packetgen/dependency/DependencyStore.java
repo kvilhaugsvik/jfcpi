@@ -71,28 +71,69 @@ public final class DependencyStore {
         blameDeeperWhenNoItem.put(missing, new HashSet(Arrays.asList(blamed)));
     }
 
+    @Deprecated
     public Set<Requirement> getMissingRequirements() {
-        resolve();
-        purgeBlameDeeper();
+        HashSet<Requirement> knownOrAssumedGuilty = new HashSet<Requirement>();
 
-        HashSet<Requirement> knownOrAssumedGuilty = new HashSet<Requirement>(dependenciesUnfulfilled);
-        for (Requirement blameHint : blameDeeperWhenNoItem.keySet())
-            if (dependenciesUnfulfilled.contains(blameHint))
-                knownOrAssumedGuilty.addAll(blameDeeperWhenNoItem.get(blameHint));
+        for (Requirement req : getMissing()) {
+            knownOrAssumedGuilty.add(req);
+            knownOrAssumedGuilty.addAll(explainMissing(req).toRequirements());
+        }
+
         return knownOrAssumedGuilty;
     }
 
-    private void purgeBlameDeeper() {
-        for (Requirement purgeKey : new HashSet<Requirement>(blameDeeperWhenNoItem.keySet()))
-            if (existing.hasFulfillmentOf(purgeKey)) {
-                blameDeeperWhenNoItem.remove(purgeKey);
-            } else {
-                for (Requirement suspect : new HashSet<Requirement>(blameDeeperWhenNoItem.get(purgeKey)))
-                    if (isAwareOfProvider(suspect))
-                        blameDeeperWhenNoItem.get(blameDeeperWhenNoItem.get(purgeKey).remove(suspect));
-                if (blameDeeperWhenNoItem.get(purgeKey).isEmpty())
-                    blameDeeperWhenNoItem.remove(purgeKey);
-            }
+    /**
+     * Wanted items that don't exist or can't be resolved
+     * @return the requirements of items asked for but not resolved
+     */
+    public Set<Requirement> getMissing() {
+        resolve();
+        return Collections.unmodifiableSet(wantsOut);
+    }
+
+    /**
+     * Explain why a required item is missing
+     * @param missing the requirement of the missing item
+     * @return the reason the item is missing
+     */
+    public MissingItemExplained explainMissing(Requirement missing) {
+        if (notAProblem(missing))
+            throw new IllegalArgumentException("Asked to explain why a non problem is a problem");
+
+        HashSet<MissingItemExplained.Blame> subExplains = new HashSet<MissingItemExplained.Blame>();
+
+        if (existing.hasFulfillmentOf(missing)) {
+            for (Requirement req : existing.getFulfillmentOf(missing).getReqs())
+                if (!notAProblem(req))
+                    subExplains.add(new MissingItemExplained.Blame(
+                            explainMissing(req),
+                            MissingItemExplained.Relation.DEPEND_ON));
+        } else if (makers.hasFulfillmentOf(missing)) {
+            for (Requirement req : makers.getFulfillmentOf(missing).neededInput(missing))
+                if (!notAProblem(req))
+                    subExplains.add(new MissingItemExplained.Blame(
+                            explainMissing(req),
+                            MissingItemExplained.Relation.MADE_FROM));
+        } else if (blameDeeperWhenNoItem.containsKey(missing)) {
+            for (Requirement req : blameDeeperWhenNoItem.get(missing))
+                if (!(notAProblem(req) || existing.hasFulfillmentOf(req)))
+                    subExplains.add(new MissingItemExplained.Blame(
+                            explainMissing(req),
+                            MissingItemExplained.Relation.BLAMED_ON));
+        } // don't know who or what to blame
+
+        return new MissingItemExplained(missing, getHowItIsAProblem(missing), subExplains);
+    }
+
+    private MissingItemExplained.Status getHowItIsAProblem(Requirement missing) {
+        return existing.hasFulfillmentOf(missing) ?
+                MissingItemExplained.Status.EXIST_BUT :
+                MissingItemExplained.Status.IS_MISSING;
+    }
+
+    private boolean notAProblem(Requirement missing) {
+        return resolved.hasFulfillmentOf(missing) || dependenciesFulfilled.hasFulfillmentOf(missing);
     }
 
     /**
