@@ -64,13 +64,13 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
   def writeToDir(path: File) {
     val statusPrinter = new ChangingConsoleLine("Writing the file ", System.out)
 
-    val notFound = storage.getUnsolvedRequirements
+    val notFound = storage.explainMissing()
     if (!notFound.isEmpty) {
       if (devMode) {
         println("Some packets were not generated. These were missing or had missing dependencies:")
         notFound.foreach(println(_))
       } else {
-        throw new UndefinedException("Missing dependencies: " + notFound)
+        throw new UndefinedException("Missing dependencies:\n" + notFound.map(_.toString).reduce(_ + "\n" + _))
       }
     }
 

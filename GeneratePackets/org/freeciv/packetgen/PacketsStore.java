@@ -253,8 +253,18 @@ public class PacketsStore {
         return packets.toArray(new Typed[packets.size()]);
     }
 
+    @Deprecated
     public Collection<Requirement> getUnsolvedRequirements() {
         TreeSet<Requirement> out = new TreeSet<Requirement>(requirements.getMissingRequirements());
+        return out;
+    }
+
+    public Collection<MissingItemExplained> explainMissing() {
+        TreeSet<MissingItemExplained> out = new TreeSet<MissingItemExplained>();
+
+        for (Requirement req : requirements.getMissing())
+            out.add(requirements.explainMissing(req));
+
         return out;
     }
 
