@@ -126,10 +126,8 @@ public final class DependencyStore {
         if (blamed == null)
             return false;
 
-        // Give up if a single pre requirement can't be provided
         for (Requirement req : blamed)
-            if (!isAwareOfPotentialProvider(req))
-                return false;
+            isAwareOfPotentialProvider(req);
 
         return wasAbleToCreateShallowly(item);
     }
