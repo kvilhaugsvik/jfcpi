@@ -55,6 +55,8 @@ public class PacketsStore {
         }
 
         requirements.addMaker(new FieldAliasArrayMaker());
+        requirements.addMaker(new DiffArrayElementDataType());
+        requirements.addMaker(new DiffArrayElementFieldType());
 
         this.logger = logger;
         this.enableDelta = enableDelta;
@@ -182,11 +184,19 @@ public class PacketsStore {
             String type = fieldType.getType();
 
             if (0 < fieldType.getDeclarations().length)
-                type = type + "_" + fieldType.getDeclarations().length;
+                type = type + "_" + (enableDelta && hasFlag("diff", fieldType.getFlags()) ? "DIFF" : "") + fieldType.getDeclarations().length;
 
             allNeeded.add(new Requirement(type, FieldType.class));
         }
         return allNeeded;
+    }
+
+    private static boolean hasFlag(String name, List<WeakFlag> flags) {
+        for (WeakFlag flag : flags)
+            if (name.equals(flag.getName()))
+                return true;
+
+        return false;
     }
 
     public boolean hasPacket(String name) {
