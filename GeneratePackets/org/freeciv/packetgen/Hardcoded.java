@@ -109,6 +109,9 @@ public class Hardcoded {
              ************************************************************************************************/
             deltaField,
 
+            // Workaround: the field data in PACKET_PLAYER_ATTRIBUTE_CHUNK claims to use array diff. Don't believe it.
+            TerminatedArray.xBytes("memory", "unsigned char").createFieldType("MEMORY_DIFF"),
+
             /************************************************************************************************
              * Read from and write to the network
              ************************************************************************************************/
