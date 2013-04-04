@@ -17,6 +17,7 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.dependency.Dependency;
@@ -72,6 +73,7 @@ public class GenerateTest {
         FieldType connection = writeFieldTypeConnection(targetFolder, items);
 
         writeDeltaVectorTestPeerPacket(targetFolder, uint8, uint32, string);
+        writeTerminatedArrayFieldArrayDiffElement(targetFolder, uint8, uint32);
 
         remaining(targetFolder, uint8, uint32, uint32s, uint32s2D, string, bool, connection);
     }
@@ -402,6 +404,39 @@ public class GenerateTest {
 
     private FieldType createUINT32_2D(FieldType uint32_1d) throws UndefinedException {
         return TerminatedArray.fieldArray("x", "y", uint32_1d).createFieldType("UINT32S_2D");
+    }
+
+    @Test public void writeTerminatedArrayFieldArrayDiffElement() throws IOException, UndefinedException {
+        final Parts items = new Parts();
+        writeTerminatedArrayFieldArrayDiffElement(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER,
+                createFieldTypeUINT8(items), createFieldTypeUINT32(items));
+    }
+
+    private void writeTerminatedArrayFieldArrayDiffElement(String targetFolder, FieldType uint8, FieldType uint32) throws IOException, UndefinedException {
+        final Constant<AnInt> diff_array_ender = Constant.isInt("DIFF_ARRAY_ENDER", IntExpression.integer("255"));
+
+        Dependency.Item diffElementType = createUINT32DiffElementData(uint32);
+        writeJavaFile((ClassWriter) diffElementType, targetFolder);
+
+        Dependency.Item diffElementField = createUINT32DiffElementField(uint8, diffElementType, uint32, diff_array_ender);
+        writeJavaFile((ClassWriter) diffElementField, targetFolder);
+
+        Dependency.Item diffArray = createUINT32DiffArray((FieldType)diffElementField, diff_array_ender);
+        writeJavaFile((ClassWriter) diffArray, targetFolder);
+    }
+
+    private Dependency.Item createUINT32DiffElementData(FieldType uint32) throws UndefinedException {
+        return (new DiffArrayElementDataType())
+                .produce(new Requirement("UINT32_diff", FieldType.class), uint32);
+    }
+
+    private Dependency.Item createUINT32DiffElementField(FieldType uint8, Dependency.Item diffElementType, FieldType uint32, Constant<AnInt> diff_array_ender) throws UndefinedException {
+        return (new DiffArrayElementFieldType())
+                .produce(new Requirement("UINT32_DIFF", FieldType.class), uint8, uint32, diffElementType, diff_array_ender);
+    }
+
+    private Dependency.Item createUINT32DiffArray(FieldType diffElementField, Constant<AnInt> diff_array_ender) {
+        return TerminatedArray.fieldArray("n", "a", diffElementField, diff_array_ender).createFieldType("UINT32_DIFF_ARRAY");
     }
 
     @Test public void writeBitStringTestPeers() throws IOException, UndefinedException {

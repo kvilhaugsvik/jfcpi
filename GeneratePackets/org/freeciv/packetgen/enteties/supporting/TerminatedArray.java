@@ -1,5 +1,6 @@
 package org.freeciv.packetgen.enteties.supporting;
 
+import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
@@ -131,15 +132,20 @@ public class TerminatedArray extends FieldType {
         return new From1<Typed<AnInt>, Var>() {
             @Override
             public Typed<AnInt> x(Var value) {
+                // TODO: Should be parameter
+                final boolean alwaysIncludeStopValue = value.getTType().getName().endsWith("_diff[]");
+
                 Typed<AnInt> length = valueGetByteLen.x(value);
                 if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     length = sum(transferSizeSerialize.getSize().x(value), length);
-                if (terminatorShouldBeAdded)
-                    length = BuiltIn.<AnInt>sum(
-                            length,
+                if (terminatorShouldBeAdded) {
+                    final Typed<AnInt> terminatorExtra = alwaysIncludeStopValue ?
+                            literal(1) :
                             R_IF(addTerminatorUnlessFull(numberOfElements.x(value)),
                                     literal(1),
-                                    literal(0)));
+                                    literal(0));
+                    length = BuiltIn.<AnInt>sum(length, terminatorExtra);
+                }
                 return length;
             }
         };
@@ -153,6 +159,9 @@ public class TerminatedArray extends FieldType {
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
+                // TODO: Should be parameter
+                final boolean alwaysIncludeStopValue = val.getTType().getName().endsWith("_diff[]");
+
                 Block out = new Block();
                 if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     out.addStatement(to.ref().<Returnable>call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
@@ -163,14 +172,20 @@ public class TerminatedArray extends FieldType {
                     out.addStatement(to.ref().<Returnable>call("write", convertAllElementsToByteArray.x(val)));
                 }
                 if (!notTerminatable(terminator))
-                    out.addStatement(IF(addTerminatorUnlessFull(numberOfElements.x(val)),
-                            writeElementTo.x(to, terminator)));
+                    if (alwaysIncludeStopValue)
+                        out.addStatement(IF(TRUE, writeElementTo.x(to, terminator)));
+                    else
+                        out.addStatement(IF(addTerminatorUnlessFull(numberOfElements.x(val)),
+                                writeElementTo.x(to, terminator)));
                 return out;
             }
         };
     }
 
     private static From2<Block, Var, Var> createDecode(final Constant<?> terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify) {
+        // TODO: Should be parameter
+        final boolean alwaysIncludeStopValue = buffertype.getOf().getName().endsWith("_DIFF");
+
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var to, Var from) {
@@ -183,10 +198,18 @@ public class TerminatedArray extends FieldType {
                 if (!notTerminatable(terminator))
                     if ("byte".equals(current.getTType().getName()))
                         noTerminatorFound = isNotSame(cast(byte.class, terminator.ref()), current.ref());
+                    else if (current.getTType().getName().endsWith("_DIFF"))
+                        noTerminatorFound = isNotSame(terminator.ref(),
+                                current.ref().callV("getValue").callV("getindex").callV("intValue"));
                     else
                         throw new IllegalArgumentException("Don't know how to compare terminator to current value");
                 else
                     noTerminatorFound = TRUE;
+
+                final Block limitReached = new Block();
+                if (alwaysIncludeStopValue)
+                    limitReached.addStatement(readElementFrom.x(from));
+                limitReached.addStatement(BuiltIn.<NoValue>toCode("break"));
 
                 Block out = new Block();
 
@@ -204,7 +227,7 @@ public class TerminatedArray extends FieldType {
                                         inc(pos),
                                         IF(isSmallerThan(pos.ref(), buf.ref().callV("length")),
                                                 new Block(current.assign(readElementFrom.x(from))),
-                                                new Block(BuiltIn.<NoValue>toCode("break"))))));
+                                                limitReached))));
                 out.addStatement(to.assign(convertBufferArrayToValue.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
                         buf.ref(), pos.ref()))));
 
@@ -340,6 +363,11 @@ public class TerminatedArray extends FieldType {
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
                                              final FieldType kind) {
+        return fieldArray(dataIOType, publicType, kind, null);
+    }
+
+    public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
+                                             final FieldType kind, final Constant<?> stopElem) {
         final TargetArray type = TargetArray.from(kind.getUnderType(), 1);
         final boolean arrayEater = kind.isArrayEater();
 
@@ -367,7 +395,7 @@ public class TerminatedArray extends FieldType {
                         RETURN(oVal.ref())
                 ));
 
-        return new TerminatedArray(dataIOType, publicType, type, null,
+        return new TerminatedArray(dataIOType, publicType, type, stopElem,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
                 TargetArray.from(kind.getAddress(), 1),
@@ -382,8 +410,11 @@ public class TerminatedArray extends FieldType {
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var elem) {
+                        final Typed<AValue> from = "int".equals(elem.getTType().getName()) ?
+                                kind.getUnderType().newInstance(elem.ref(), NULL) :
+                                elem.ref();
                         return new Block(kind.getAddress()
-                                .newInstance(elem.ref(), fMaxSize.ref().<Returnable>call("next"))
+                                .newInstance(from, fMaxSize.ref().<Returnable>call("next"))
                                 .call("encodeTo", to.ref()));
                     }
                 },
