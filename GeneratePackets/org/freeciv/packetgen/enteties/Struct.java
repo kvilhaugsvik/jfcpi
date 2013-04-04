@@ -51,6 +51,11 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
     }
 
     public Struct(String name, List<WeakVarDec> fields, List<TargetClass> partTypes, List<Requirement> fieldTypes) {
+        this(name, fields, partTypes, fieldTypes, true);
+    }
+
+    public Struct(String name, List<WeakVarDec> fields, List<TargetClass> partTypes, List<Requirement> fieldTypes,
+                  boolean requiredAsAStruct) {
         super(ClassKind.CLASS,
                 TargetPackage.from(FCEnum.class.getPackage()),
                 Imports.are(), "Freeciv C code", Collections.<Annotate>emptyList(), name,
@@ -96,7 +101,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
         this.iRequire = Collections.unmodifiableSet(neededByFields);
         this.ioName = name;
-        this.cName = "struct" + " " + name;
+        this.cName = (requiredAsAStruct ? "struct" + " " : "") + name;
         this.iProvide = new Requirement(cName, DataType.class);
         /*
          * TODO: Consider if creating a new implementation of Required in stead of using RequiredMulti is saner
