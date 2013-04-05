@@ -33,6 +33,7 @@ public class PacketsStore {
     private final TargetClass packetHeaderType;
     private final String logger;
     private final boolean enableDelta;
+    private final boolean enableDeltaBoolFolding;
 
     private final DependencyStore requirements;
 
@@ -42,10 +43,10 @@ public class PacketsStore {
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
     @Deprecated public PacketsStore(int bytesInPacketNumber) {
-        this(bytesInPacketNumber, GeneratorDefaults.LOG_TO, false);
+        this(bytesInPacketNumber, GeneratorDefaults.LOG_TO, false, false);
     }
 
-    public PacketsStore(int bytesInPacketNumber, String logger, boolean enableDelta) {
+    public PacketsStore(int bytesInPacketNumber, String logger, boolean enableDelta, boolean enableDeltaBoolFolding) {
         requirements = new DependencyStore();
         for (Dependency.Item primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
@@ -60,6 +61,7 @@ public class PacketsStore {
 
         this.logger = logger;
         this.enableDelta = enableDelta;
+        this.enableDeltaBoolFolding = enableDeltaBoolFolding;
 
         switch (bytesInPacketNumber) {
             case 1:
@@ -76,6 +78,7 @@ public class PacketsStore {
                 packetHeaderType.scopeUnknown().callV("class")));
 
         requirements.addWanted(Constant.isBool("enableDelta", BuiltIn.literal(enableDelta)));
+        requirements.addWanted(Constant.isBool("enableDeltaBoolFolding", BuiltIn.literal(this.enableDeltaBoolFolding)));
     }
 
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
@@ -132,7 +135,7 @@ public class PacketsStore {
                             fieldType.getDeclarations()));
                 }
 
-                return new Packet(name, number, packetHeaderType, logger, packetFlags, enableDelta, fieldList.toArray(new Field[0]));
+                return new Packet(name, number, packetHeaderType, logger, packetFlags, enableDelta, enableDeltaBoolFolding, fieldList.toArray(new Field[0]));
             }
         });
 
