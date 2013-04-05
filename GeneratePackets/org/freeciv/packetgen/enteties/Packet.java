@@ -21,6 +21,7 @@ import org.freeciv.packet.NoDelta;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.fieldtype.FieldTypeException;
 import org.freeciv.packet.fieldtype.Key;
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.UndefinedException;
 import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.ReqKind;
@@ -81,6 +82,12 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, boolean deltaIsOn, Field... fields) throws UndefinedException {
+        this(name, number, headerKind, logger, packetFlags, deltaIsOn, false, fields);
+    }
+
+    public Packet(String name, int number, TargetClass headerKind, String logger,
+                  List<Annotate> packetFlags, boolean deltaIsOn, final boolean enableDeltaBoolFolding,
+                  Field... fields) throws UndefinedException {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
                 Imports.are(Import.allIn(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
                         Import.allIn(FCEnum.class.getPackage()),
@@ -138,8 +145,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             addJavaGetter(field);
         }
 
-        addEncoder(fields);
-        addCalcBodyLen(fields);
+        addEncoder(fields, enableDeltaBoolFolding);
+        addCalcBodyLen(fields, enableDeltaBoolFolding);
         addGetDeltaKey(number, fields);
 
         addToString(name, fields);
@@ -154,7 +161,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         addConstructorFromFields(fields, headerKind, addExceptionLocation, deltaFields);
         addConstructorFromJavaTypes(fields, headerKind, addExceptionLocation, deltaFields);
-        addConstructorFromDataInput(name, fields, headerKind, addExceptionLocation, deltaFields);
+        addConstructorFromDataInput(name, fields, headerKind, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
     }
 
     private static boolean hasAtLeastOneDeltaField(Field[] fields) {
@@ -299,7 +306,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
     }
 
-    private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields) throws UndefinedException {
+    private void addConstructorFromDataInput(String name, Field[] fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding) throws UndefinedException {
         Var<TargetClass> argHeader = Var.param(TargetClass.newKnown(PacketHeader.class), "header");
         final Var<TargetClass> streamName = Var.param(TargetClass.newKnown(DataInput.class), "from");
         final Var<TargetClass> old =
@@ -345,9 +352,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(streamName.ref(),
                     field.getSuperLimit(0))));
             final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
-            constructorBodyStream.addStatement(ifDeltaElse(field, readLabeled, delta ?
-                    field.assign(chosenOld.ref().callV(getterNameJavaish(field))) :
-                    literal("Never run")));
+            constructorBodyStream.addStatement(isBoolFolded(enableDeltaBoolFolding, field) ?
+                    field.assign(field.getTType().newInstance(deltaHas(field), Hardcoded.noLimit)) :
+                    ifDeltaElse(field, readLabeled, delta ?
+                            field.assign(chosenOld.ref().callV(getterNameJavaish(field))) :
+                            literal("Never run")));
         }
 
         constructorBodyStream.groupBoundary();
@@ -399,6 +408,10 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 constructorBodyStream));
     }
 
+    private boolean isBoolFolded(boolean boolFoldEnabled, Field field) {
+        return boolFoldEnabled && field.isDelta() && "Boolean".equals(field.getUnderType().getName());
+    }
+
     private Typed<?> ifDeltaElse(Field field, Typed<?> defaultAction, Typed<?> deltaDisabledAction) {
         return deltaApplies(field) ?
                 (null == deltaDisabledAction ?
@@ -418,7 +431,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return (delta && field.isDelta());
     }
 
-    private void addEncoder(Field[] fields) {
+    private void addEncoder(Field[] fields, boolean enableDeltaBoolFolding) {
         Var<TargetClass> pTo = Var.<TargetClass>param(TargetClass.newKnown(DataOutput.class), "to");
         Block body = new Block();
         body.addStatement(getField("header").ref().<Returnable>call("encodeTo", pTo.ref()));
@@ -426,21 +439,31 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             if (delta)
                 body.addStatement(getField("delta").ref().call("encodeTo", pTo.ref()));
             for (Field field : fields)
-                body.addStatement(ifDeltaElse(field, field.ref().<Returnable>call("encodeTo", pTo.ref()), null));
+                if (!isBoolFolded(enableDeltaBoolFolding, field))
+                    body.addStatement(ifDeltaElse(field, field.ref().<Returnable>call("encodeTo", pTo.ref()), null));
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.fromClass(void.class), "encodeTo", Arrays.asList(pTo),
                 Arrays.asList(TargetClass.newKnown(IOException.class)), body));
     }
 
-    private void addCalcBodyLen(Field[] fields) {
+    private void addCalcBodyLen(Field[] fields, boolean enableDeltaBoolFolding) {
         Block encodeFieldsLen = new Block();
         if (0 < fields.length) {
-            Typed<? extends AValue> summing = calcBodyLen(fields[0]);
-            if (delta)
-                summing = sum(getField("delta").ref().callV("encodedLength"), summing);
+            final Typed<? extends AValue> elem1 = calcBodyLen(fields[0]);
+            Typed<? extends AValue> summing;
+            if (delta) {
+                final Value deltaSize = getField("delta").ref().callV("encodedLength");
+                if (isBoolFolded(enableDeltaBoolFolding, fields[0]))
+                    summing = deltaSize;
+                else
+                    summing = sum(deltaSize, elem1);
+            } else {
+                summing = elem1;
+            }
             for (int i = 1; i < fields.length; i++)
-                summing = sum(summing, calcBodyLen(fields[i]));
+                if (!isBoolFolded(enableDeltaBoolFolding, fields[i]))
+                    summing = sum(summing, calcBodyLen(fields[i]));
             encodeFieldsLen.addStatement(RETURN(summing));
         } else {
             encodeFieldsLen.addStatement(RETURN(literal(0)));
