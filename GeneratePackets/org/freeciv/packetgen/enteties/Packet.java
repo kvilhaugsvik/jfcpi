@@ -369,9 +369,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                                 argHeader.ref().<AnInt>call("getPacketKind"))),
                         literal("header"))))));
 
-        constructorBodyStream.addStatement(ASSERT(isInstanceOf(argHeader.ref(), headerKind),
-                literal("Packet not generated for this kind of header")));
-
         constructorBodyStream.addStatement(IF(isNotSame(sum(argHeader.ref().<AnInt>call("getHeaderSize"),
                 calcBodyLenCall), argHeader.ref().<AnInt>call("getTotalSize")),
                 new Block(THROW(addExceptionLocation.callV(
