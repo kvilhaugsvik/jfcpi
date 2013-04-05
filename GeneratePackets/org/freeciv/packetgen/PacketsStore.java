@@ -172,6 +172,10 @@ public class PacketsStore {
                 packetFlags.add(new Annotate(IsGameInfo.class.getSimpleName()));
             else if ("force".equals(flag.getName()))
                 packetFlags.add(new Annotate(Force.class.getSimpleName()));
+            else if ("post-send".equals(flag.getName()))
+                packetFlags.add(new Annotate(PostSend.class.getSimpleName()));
+            else if ("post-recv".equals(flag.getName()))
+                packetFlags.add(new Annotate(PostRecv.class.getSimpleName()));
             else if ("cancel".equals(flag.getName()))
                 canceled.add(flag.getArguments()[0]);
 
