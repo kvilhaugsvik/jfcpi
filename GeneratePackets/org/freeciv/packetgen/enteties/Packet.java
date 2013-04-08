@@ -243,7 +243,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             params.add(asParam);
             constructorBody.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
-            field.appendValidationTo(constructorBody);
+            field.validateLimitInsideInt(constructorBody);
             constructorBody.addStatement(field.ref().assign(asParam.ref()));
             Block validate = new Block();
             field.appendArrayEaterValidationTo(validate);
@@ -295,7 +295,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 constructorBodyJ.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
                 Block readAndValidate = new Block();
-                field.appendValidationTo(readAndValidate);
+                field.validateLimitInsideInt(readAndValidate);
                 readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(
                         asParam.ref(), field.getSuperLimit(0))));
                 final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
@@ -348,7 +348,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 }
             }
             Block readAndValidate = new Block();
-            field.appendValidationTo(readAndValidate);
+            field.validateLimitInsideInt(readAndValidate);
             readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(streamName.ref(),
                     field.getSuperLimit(0))));
             final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);

@@ -170,7 +170,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         }
     }
 
-    public void appendValidationTo(Block to) throws UndefinedException {
+    public void validateLimitInsideInt(Block to) throws UndefinedException {
         LinkedList<Typed<ABool>> transferTypeCheck = new LinkedList<Typed<ABool>>();
         for (ArrayDeclaration dec : declarations) {
             if (dec.hasTransfer()) {
