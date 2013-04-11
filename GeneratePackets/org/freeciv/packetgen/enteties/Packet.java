@@ -78,11 +78,14 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags, boolean deltaIsOn, final boolean enableDeltaBoolFolding,
                   Field... fields) throws UndefinedException {
-        this(name, number, headerKind, logger, packetFlags, deltaIsOn, enableDeltaBoolFolding, Arrays.asList(fields));
+        this(name, number, headerKind, logger, packetFlags,
+                deltaIsOn, enableDeltaBoolFolding, deltaIsOn ? Hardcoded.deltaField : null,
+                Arrays.asList(fields));
     }
 
     public Packet(String name, int number, TargetClass headerKind, String logger,
-                  List<Annotate> packetFlags, boolean deltaIsOn, final boolean enableDeltaBoolFolding,
+                  List<Annotate> packetFlags,
+                  boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,
                   List<Field> fields) throws UndefinedException {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
                 Imports.are(Import.allIn(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
@@ -118,9 +121,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         int deltaFields = 0;
         if (delta) {
-            requirements.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
+            requirements.add(bv_delta_fields.getIFulfillReq());
 
-            addObjectConstant(TargetClass.fromName("org.freeciv.packet.fieldtype", "BV_DELTA_FIELDS"), "delta");
+            addObjectConstant(bv_delta_fields.getAddress(), "delta");
 
             addMethod(Method.custom(Comment.no(), Visibility.PROTECTED, Scope.OBJECT,
                     TargetClass.fromClass(boolean[].class), "getDeltaVector",
@@ -151,13 +154,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         if (deltaIsOn) {
             if (0 < fields.size())
-                addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields);
+                addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields, bv_delta_fields);
             addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().newInstance());
         }
 
-        addConstructorFromFields(fields, headerKind, addExceptionLocation, deltaFields);
-        addConstructorFromJavaTypes(fields, headerKind, addExceptionLocation, deltaFields);
-        addConstructorFromDataInput(name, fields, headerKind, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
+        addConstructorFromFields(fields, headerKind, addExceptionLocation, deltaFields, bv_delta_fields);
+        addConstructorFromJavaTypes(fields, headerKind, addExceptionLocation, deltaFields, bv_delta_fields);
+        addConstructorFromDataInput(name, fields, headerKind, addExceptionLocation, deltaFields, enableDeltaBoolFolding, bv_delta_fields);
     }
 
     private static boolean hasAtLeastOneDeltaField(List<Field> fields) {
@@ -201,11 +204,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addConstructorZero(List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation,
-                                    int deltaFields) throws UndefinedException {
+                                    int deltaFields, FieldType bv_delta_fields) throws UndefinedException {
         Block body = new Block();
 
         if (delta)
-            addDeltaField(addExceptionLocation, deltaFields, body);
+            addDeltaField(addExceptionLocation, deltaFields, body, bv_delta_fields);
 
         Var<AValue> zeroes = Var.local(TargetClass.fromClass(DataInputStream.class).scopeUnknown(), "zeroStream",
                 TargetClass.fromClass(DataInputStream.class).scopeUnknown()
@@ -224,11 +227,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 Collections.<Var<?>>emptyList(), Collections.<TargetClass>emptyList(), body));
     }
 
-    private void addConstructorFromFields(List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields) throws UndefinedException {
+    private void addConstructorFromFields(List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields) throws UndefinedException {
         Block constructorBody = new Block();
 
         if (delta)
-            addDeltaField(addExceptionLocation, deltaFields, constructorBody);
+            addDeltaField(addExceptionLocation, deltaFields, constructorBody, bv_delta_fields);
 
 
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
@@ -266,23 +269,23 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         getField("number").ref()))), addExceptionLocation);
     }
 
-    private void addDeltaField(TargetMethod addExceptionLocation, int deltaFields, Block body) {
+    private void addDeltaField(TargetMethod addExceptionLocation, int deltaFields, Block body, FieldType bv_delta_fields) {
         body.addStatement(labelExceptionsWithPacketAndField(
                 getField("delta"),
-                new Block(getField("delta").assign(getField("delta").getTType().scopeKnown().newInstance(
-                        TargetClass.fromName("org.freeciv.types", "bv_delta_fields").scopeUnknown()
+                new Block(getField("delta").assign(bv_delta_fields.getAddress().scopeKnown().newInstance(
+                        bv_delta_fields.getUnderType().scopeUnknown()
                                 .newInstance(TRUE, literal(deltaFields)),
                         new MethodCall("ElementsLimit.limit", literal(deltaFields))))),
                 addExceptionLocation));
     }
 
-    private void addConstructorFromJavaTypes(List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields) throws UndefinedException {
+    private void addConstructorFromJavaTypes(List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields) throws UndefinedException {
         if (0 < fields.size()) {
             LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
             Block constructorBodyJ = new Block();
 
             if (delta)
-                addDeltaField(addExceptionLocation, deltaFields, constructorBodyJ);
+                addDeltaField(addExceptionLocation, deltaFields, constructorBodyJ, bv_delta_fields);
 
             for (Field field : fields) {
                 Var<AValue> asParam = Var.param(field.getUnderType().scopeKnown(),
@@ -302,7 +305,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
     }
 
-    private void addConstructorFromDataInput(String name, List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding) throws UndefinedException {
+    private void addConstructorFromDataInput(String name, List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding, FieldType bv_delta_fields) throws UndefinedException {
         Var<TargetClass> argHeader = Var.param(TargetClass.newKnown(PacketHeader.class), "header");
         final Var<TargetClass> streamName = Var.param(TargetClass.newKnown(DataInput.class), "from");
         final Var<TargetClass> old =

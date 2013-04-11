@@ -119,12 +119,15 @@ public class PacketsStore {
         reserveNameAndNumber(name, number, me);
 
         final List<Annotate> packetFlags = extractFlags(flags);
+
         List<Requirement> allNeeded = extractFieldRequirements(fields);
+        if (enableDelta)
+            allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
 
         requirements.addMaker(new SimpleDependencyMaker(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                assert wasRequired.length == fields.size() : "Wrong number of arguments";
+                assert wasRequired.length == fields.size() + (enableDelta ? 1 : 0) : "Wrong number of arguments";
                 List<Field> fieldList = new LinkedList<Field>();
                 for (int i = 0; i < fields.size(); i++) {
                     WeakField fieldType = fields.get(i);
@@ -135,7 +138,9 @@ public class PacketsStore {
                             fieldType.getDeclarations()));
                 }
 
-                return new Packet(name, number, packetHeaderType, logger, packetFlags, enableDelta, enableDeltaBoolFolding, fieldList);
+                return new Packet(name, number, packetHeaderType, logger, packetFlags,
+                        enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
+                        fieldList);
             }
         });
 
