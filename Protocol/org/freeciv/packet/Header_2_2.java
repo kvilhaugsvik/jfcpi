@@ -31,6 +31,11 @@ public class Header_2_2 extends PacketHeader {
         this(sizeAndKind[0], sizeAndKind[1]);
     }
 
+    @Override
+    public int getHeaderSize() {
+        return HEADER_SIZE;
+    }
+
     @Override public void encodeTo(DataOutput to) throws IOException {
         to.writeShort(super.totalSize);
         to.writeShort(super.packetKind);

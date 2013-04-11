@@ -49,12 +49,10 @@ public abstract class PacketHeader {
     }
 
     /**
-     * Get the predicted size of the body without the header
-     * @return the size of the body
+     * Get the predicted size of the header without the body
+     * @return the size of the header
      */
-    public int getHeaderSize() {
-        return totalSize - bodySize;
-    }
+    public abstract int getHeaderSize();
 
     /**
      * Get the predicted size of the body without the header
