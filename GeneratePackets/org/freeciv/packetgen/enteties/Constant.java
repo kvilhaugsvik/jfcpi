@@ -40,14 +40,6 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements Dependen
         reqs.addAll(needed);
     }
 
-    public String getType() {
-        return super.getType();
-    }
-
-    public String getName() {
-        return super.getName();
-    }
-
     public String getExpression() {
         return Util.joinStringArray(
                 ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(new CodeAtoms(super.getValue())).toArray(),

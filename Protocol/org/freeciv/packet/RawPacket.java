@@ -51,12 +51,4 @@ public class RawPacket implements Packet {
                 "\n\theader = " + header +
                 Util.joinStringArray(content, ", ", "\n\tbody (raw data) = (", ")");
     }
-
-    public int getNumber() {
-        return header.getPacketKind();
-    }
-
-    public int getEncodedSize() {
-        return header.getTotalSize();
-    }
 }

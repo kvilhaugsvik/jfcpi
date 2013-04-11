@@ -1,6 +1,5 @@
 package org.freeciv.packetgen.enteties.supporting;
 
-import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
@@ -294,10 +293,6 @@ public class TerminatedArray extends FieldType {
                 isNotSame(limit, actualNumberOfElements);
         out.addStatement(IF(check,
                 new Block(THROW(IllegalNumberOfElementsException.class, literal("Wrong number of elements")))));
-    }
-
-    private static boolean noUpperLimitOnTheNumberOfElements(MaxArraySize maxArraySizeKind) {
-        return MaxArraySize.NO_LIMIT.equals(maxArraySizeKind);
     }
 
     private static Method getValidateInsideLimits(MaxArraySize maxArraySizeKind, TransferArraySize transferArraySizeKind, From1<Typed<AnInt>, Var> numberOfElements, Var<?> fValue, boolean unterminatable, boolean elementTypeCanLimitVerify, TargetArray buffertype) {

@@ -20,10 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 class FilterAnd extends FilterMany {
-    FilterAnd(Filter... any) {
-        this(Arrays.asList(any));
-    }
-
     FilterAnd(List<Filter> any) {
         super(any);
     }

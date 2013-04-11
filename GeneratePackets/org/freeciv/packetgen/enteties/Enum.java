@@ -157,13 +157,6 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                         RETURN(BuiltIn.<AValue>toCode("INVALID")))));
     }
 
-    public void addEnumerated(Comment comment,
-                              String enumName,
-                              int number,
-                              String toStringName) {
-        addEnumerated(EnumElementKnowsNumber.newEnumValue(comment, enumName, number, toStringName));
-    }
-
     public boolean isBitwise() {
         return bitwise;
     }

@@ -45,15 +45,6 @@ public class NotCreated implements Dependency.Item {
         }
     }
 
-    /**
-     * A representation of an item that couldn't be created since hard dependencies was missing.
-     * @param wouldHaveProvided What the item would have provided
-     * @param wasMissingAtCreation Items missing at creation time causing the creation to fail.
-     */
-    public NotCreated(Requirement wouldHaveProvided, Collection<Requirement> wasMissingAtCreation) {
-        this(wouldHaveProvided, wasMissingAtCreation, Collections.<Requirement>emptySet());
-    }
-
     @Override public Collection<Requirement> getReqs() {
         return totalRequirements;
     }
