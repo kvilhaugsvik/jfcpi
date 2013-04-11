@@ -152,10 +152,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         TargetMethod addExceptionLocation = addExceptionLocationAdder();
 
-        if (deltaIsOn) {
-            if (0 < fields.size())
+        if (delta) {
+            if (0 < fields.size()) {
                 addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields, bv_delta_fields);
-            addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().newInstance());
+                addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().newInstance());
+            }
         }
 
         addConstructorFromFields(fields, headerKind, addExceptionLocation, deltaFields, bv_delta_fields);
