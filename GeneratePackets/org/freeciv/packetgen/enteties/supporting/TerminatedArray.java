@@ -81,13 +81,14 @@ public class TerminatedArray extends FieldType {
                            final From1<Typed<AnInt>, Var> valueGetByteLen,
                            final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
                            final List<Method.Helper> helperMethods,
-                           boolean elementTypeCanLimitVerify
+                           boolean elementTypeCanLimitVerify,
+                           boolean alwaysIncludeStopValue
     ) {
         super(dataIOType, publicType, javaType,
                 createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
-                createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements, elementTypeCanLimitVerify),
-                createEncode(terminator, transferArraySizeKind, numberOfElements, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType),
-                createEnocedSize(transferArraySizeKind, numberOfElements, !notTerminatable(terminator), transferSizeSerialize, valueGetByteLen),
+                createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements, elementTypeCanLimitVerify, alwaysIncludeStopValue),
+                createEncode(terminator, transferArraySizeKind, numberOfElements, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType, alwaysIncludeStopValue),
+                createEnocedSize(transferArraySizeKind, numberOfElements, !notTerminatable(terminator), transferSizeSerialize, valueGetByteLen, alwaysIncludeStopValue),
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
                 uses,
@@ -127,13 +128,10 @@ public class TerminatedArray extends FieldType {
         return null == terminator;
     }
 
-    private static From1<Typed<AnInt>, Var> createEnocedSize(final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Var> valueGetByteLen) {
+    private static From1<Typed<AnInt>, Var> createEnocedSize(final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Var> valueGetByteLen, final boolean alwaysIncludeStopValue) {
         return new From1<Typed<AnInt>, Var>() {
             @Override
             public Typed<AnInt> x(Var value) {
-                // TODO: Should be parameter
-                final boolean alwaysIncludeStopValue = value.getTType().getName().endsWith("_diff[]");
-
                 Typed<AnInt> length = valueGetByteLen.x(value);
                 if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     length = sum(transferSizeSerialize.getSize().x(value), length);
@@ -154,13 +152,10 @@ public class TerminatedArray extends FieldType {
         return isSmallerThan(size, fMaxSize.ref().callV("full_array_size"));
     }
 
-    private static From2<Block, Var, Var> createEncode(final Constant<?> terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType) {
+    private static From2<Block, Var, Var> createEncode(final Constant<?> terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType, final boolean alwaysIncludeStopValue) {
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
-                // TODO: Should be parameter
-                final boolean alwaysIncludeStopValue = val.getTType().getName().endsWith("_diff[]");
-
                 Block out = new Block();
                 if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     out.addStatement(to.ref().<Returnable>call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
@@ -181,10 +176,7 @@ public class TerminatedArray extends FieldType {
         };
     }
 
-    private static From2<Block, Var, Var> createDecode(final Constant<?> terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify) {
-        // TODO: Should be parameter
-        final boolean alwaysIncludeStopValue = buffertype.getOf().getName().endsWith("_DIFF");
-
+    private static From2<Block, Var, Var> createDecode(final Constant<?> terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify, final boolean alwaysIncludeStopValue) {
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var to, Var from) {
@@ -334,6 +326,7 @@ public class TerminatedArray extends FieldType {
                         arrayLen,
                         sameNumberOfBufferElementsAndValueElements,
                         Collections.<Method.Helper>emptyList(),
+                false,
                 false
         );
     }
@@ -352,6 +345,7 @@ public class TerminatedArray extends FieldType {
                         arrayLen,
                         sameNumberOfBufferElementsAndValueElements,
                         Collections.<Method.Helper>emptyList(),
+                false,
                 false
         );
     }
@@ -431,7 +425,8 @@ public class TerminatedArray extends FieldType {
                 },
                 sameNumberOfBufferElementsAndValueElements,
                 Arrays.<Method.Helper>asList(lenInBytesHelper, buffer2value),
-                arrayEater
+                arrayEater,
+                TargetArray.from(kind.getAddress(), 1).getOf().getName().endsWith("_DIFF")
         );
     }
 
