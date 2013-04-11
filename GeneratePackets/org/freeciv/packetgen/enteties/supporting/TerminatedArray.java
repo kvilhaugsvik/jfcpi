@@ -56,12 +56,12 @@ public class TerminatedArray extends FieldType {
         }
     };
     public static final From1<Typed<AnInt>, Typed<AnInt>> sameNumberOfBufferElementsAndValueElements =
-                                new From1<Typed<AnInt>, Typed<AnInt>>() {
-                                    @Override
-                                    public Typed<AnInt> x(Typed<AnInt> maxElements) {
-                                        return maxElements;
-                                    }
-                                };
+            new From1<Typed<AnInt>, Typed<AnInt>>() {
+                @Override
+                public Typed<AnInt> x(Typed<AnInt> maxElements) {
+                    return maxElements;
+                }
+            };
     public static final String SELF_VALIDATOR_NAME = "verifyInsideLimits";
 
     public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
@@ -311,21 +311,21 @@ public class TerminatedArray extends FieldType {
 
     public static TerminatedArray xBytes(String dataIOType, String publicType) {
         return new TerminatedArray(dataIOType, publicType, byteArray, null,
-                        MaxArraySize.CONSTRUCTOR_PARAM,
-                        TransferArraySize.CONSTRUCTOR_PARAM,
-                        byteArray,
-                        arrayLen,
+                MaxArraySize.CONSTRUCTOR_PARAM,
+                TransferArraySize.CONSTRUCTOR_PARAM,
+                byteArray,
+                arrayLen,
                 fullIsByteArray,
                 valueIsBufferArray,
-                        elemIsByteArray,
-                        readByte,
-                        TO_STRING_ARRAY,
-                        Collections.<Requirement>emptySet(),
-                        null,
-                        null,
-                        arrayLen,
-                        sameNumberOfBufferElementsAndValueElements,
-                        Collections.<Method.Helper>emptyList(),
+                elemIsByteArray,
+                readByte,
+                TO_STRING_ARRAY,
+                Collections.<Requirement>emptySet(),
+                null,
+                null,
+                arrayLen,
+                sameNumberOfBufferElementsAndValueElements,
+                Collections.<Method.Helper>emptyList(),
                 false,
                 false
         );
@@ -333,18 +333,18 @@ public class TerminatedArray extends FieldType {
 
     public static TerminatedArray maxSizedTerminated(String dataIOType, String publicType, final Constant<?> terminator) {
         return new TerminatedArray(dataIOType, publicType, byteArray, terminator,
-                        MaxArraySize.CONSTRUCTOR_PARAM,
-                        TransferArraySize.CONSTRUCTOR_PARAM,
-                        byteArray,
-                        arrayLen,
+                MaxArraySize.CONSTRUCTOR_PARAM,
+                TransferArraySize.CONSTRUCTOR_PARAM,
+                byteArray,
+                arrayLen,
                 fullIsByteArray, valueIsBufferArray, elemIsByteArray, readByte,
-                        TO_STRING_ARRAY,
-                        Arrays.asList(terminator.getIFulfillReq()),
-                        null,
-                        null,
-                        arrayLen,
-                        sameNumberOfBufferElementsAndValueElements,
-                        Collections.<Method.Helper>emptyList(),
+                TO_STRING_ARRAY,
+                Arrays.asList(terminator.getIFulfillReq()),
+                null,
+                null,
+                arrayLen,
+                sameNumberOfBufferElementsAndValueElements,
+                Collections.<Method.Helper>emptyList(),
                 false,
                 false
         );
