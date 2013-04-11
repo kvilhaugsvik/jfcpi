@@ -20,12 +20,14 @@ import org.freeciv.connection.FreecivConnection;
 import org.freeciv.connection.ReflexReaction;
 import org.freeciv.packet.PACKET_CONN_PONG;
 import org.freeciv.packet.PACKET_SERVER_JOIN_REQ;
+import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -37,7 +39,7 @@ public class SignInAndWait {
     private static final String PORT = "port";
     private static final String USER_NAME = "user-name";
 
-    public static void main(String[] cmd) throws InvocationTargetException {
+    public static void main(String[] cmd) throws InvocationTargetException, NoSuchMethodException {
         ArgumentSettings settings = new ArgumentSettings(
                 new LinkedList<Setting<?>>(){{
                     add(new Setting.StringSetting(ADDRESS, "127.0.0.1", "connect to the Freeciv server on this address"));
@@ -53,12 +55,15 @@ public class SignInAndWait {
         int portNumber = settings.<Integer>getSetting(PORT);
         String userName = settings.getSetting(USER_NAME);
 
+        final Constructor<? extends PacketHeader> headerConstructor =
+                org.freeciv.packet.Header_2_2.class.getConstructor(int.class, int.class);
+
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction() {
             @Override
             public void apply(RawPacket incoming, FreecivConnection connection) {
                 try {
-                    connection.toSend(new PACKET_CONN_PONG());
+                    connection.toSend(new PACKET_CONN_PONG(headerConstructor));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }
@@ -78,7 +83,8 @@ public class SignInAndWait {
                     con.getVersionLabel(),
                     con.getVersionMajor(),
                     con.getVersionMinor(),
-                    con.getVersionPatch()));
+                    con.getVersionPatch(),
+                    headerConstructor));
 
             while(con.isOpen() || con.packetReady()) {
                 try {

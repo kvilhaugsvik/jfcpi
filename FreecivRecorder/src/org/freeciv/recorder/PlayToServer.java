@@ -24,6 +24,7 @@ import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -48,17 +49,20 @@ public class PlayToServer {
     private final SinkForward toServer;
     private final boolean ignoreDynamic;
 
-    public PlayToServer(InputStream source, Socket server, boolean ignoreDynamic) throws IOException {
+    public PlayToServer(InputStream source, Socket server, boolean ignoreDynamic) throws IOException, NoSuchMethodException {
         final PacketsMapping versionKnowledge = new PacketsMapping();
         final Class<? extends PacketHeader> packetHeaderClass = versionKnowledge.getPacketHeaderClass();
         this.source = new TraceFormat2Read(source, new OverImpl(), packetHeaderClass);
+
+        final Constructor<? extends PacketHeader> headerConstructor =
+                org.freeciv.packet.Header_2_2.class.getConstructor(int.class, int.class);
 
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction() {
             @Override
             public void apply(RawPacket incoming, FreecivConnection connection) {
                 try {
-                    connection.toSend(new PACKET_CONN_PONG());
+                    connection.toSend(new PACKET_CONN_PONG(headerConstructor));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }
@@ -127,6 +131,11 @@ public class PlayToServer {
         try {
             me = new PlayToServer(traceInn, server, settings.<Boolean>getSetting(IGNORE_TIME));
         } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+            return;
+        } catch (NoSuchMethodException e) {
+            System.err.println("Internal program error: Headers no properly ported");
             e.printStackTrace();
             System.exit(1);
             return;

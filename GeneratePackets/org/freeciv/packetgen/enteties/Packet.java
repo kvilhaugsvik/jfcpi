@@ -42,6 +42,7 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -222,7 +223,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                             .newInstance(zeroes.ref(), field.getSuperLimit(0)))),
                     addExceptionLocation));
 
-        body.addStatement(generateHeader(headerKind, addExceptionLocation));
+        Var header = getField("header");
+        body.addStatement(labelExceptionsWithPacketAndField(header, new Block(
+                header.assign(headerKind.newInstance(
+                        sum(new MethodCall<AnInt>("calcBodyLen"), headerKind.read("HEADER_SIZE")),
+                        getField("number").ref()))), addExceptionLocation));
 
         addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE,
                 Collections.<Var<?>>emptyList(), Collections.<TargetClass>emptyList(), body));
@@ -250,7 +255,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             if (0 < validate.numberOfStatements())
                 constructorBody.addStatement(labelExceptionsWithPacketAndField(field, validate, addExceptionLocation));
         }
-        constructorBody.addStatement(generateHeader(headerKind, addExceptionLocation));
+
+        final Var<AValue> pHeaderKind = Var.param(TargetClass.fromClass(Constructor.class), "headerKind");
+        constructorBody.addStatement(generateHeader(pHeaderKind.ref(), addExceptionLocation));
+
+        params.add(pHeaderKind);
         addMethod(Method.newPublicConstructor(Comment.no(), params, constructorBody));
     }
 
@@ -262,12 +271,15 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 new Block(THROW(addExceptionLocation.<AValue>call(e.ref(), literal(field.getName())))));
     }
 
-    private Typed<NoValue> generateHeader(TargetClass headerKind, TargetMethod addExceptionLocation) {
+    private Typed<NoValue> generateHeader(Value<? extends AValue> headerKind, TargetMethod addExceptionLocation) {
         Var header = getField("header");
-        return labelExceptionsWithPacketAndField(header, new Block(
-                header.assign(headerKind.newInstance(
-                        sum(new MethodCall<AnInt>("calcBodyLen"), headerKind.read("HEADER_SIZE")),
-                        getField("number").ref()))), addExceptionLocation);
+        return labelExceptionsWithPacketAndField(header, new Block(header.assign(BuiltIn.cast(
+                PacketHeader.class,
+                headerKind.callV("newInstance",
+                        sum(new MethodCall<AnInt>("calcBodyLen"),
+                                headerKind.callV("getDeclaringClass").callV("getField", literal("HEADER_SIZE"))
+                                        .callV("getInt", NULL)),
+                        getField("number").ref())))), addExceptionLocation);
     }
 
     private void addDeltaField(TargetMethod addExceptionLocation, int deltaFields, Block body, FieldType bv_delta_fields) {
@@ -301,7 +313,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
                 constructorBodyJ.addStatement(readLabeled);
             }
-            constructorBodyJ.addStatement(generateHeader(headerKind, addExceptionLocation));
+
+            final Var<AValue> pHeaderKind = Var.param(TargetClass.fromClass(Constructor.class), "headerKind");
+            constructorBodyJ.addStatement(generateHeader(pHeaderKind.ref(), addExceptionLocation));
+
+            params.add(pHeaderKind);
             addMethod(Method.newPublicConstructor(Comment.no(), params, constructorBodyJ));
         }
     }
