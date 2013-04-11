@@ -135,7 +135,7 @@ public class PacketsStore {
                             fieldType.getDeclarations()));
                 }
 
-                return new Packet(name, number, packetHeaderType, logger, packetFlags, enableDelta, enableDeltaBoolFolding, fieldList.toArray(new Field[0]));
+                return new Packet(name, number, packetHeaderType, logger, packetFlags, enableDelta, enableDeltaBoolFolding, fieldList);
             }
         });
 

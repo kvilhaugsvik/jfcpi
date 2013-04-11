@@ -77,7 +77,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         return toDeclarations.toArray(new ArrayDeclaration[0]);
     }
 
-    public void introduceNeighbours(Field[] neighbours) {
+    public void introduceNeighbours(List<Field> neighbours) {
         HashMap<String, ArrayDeclaration> unsolvedReferences = new HashMap<String, ArrayDeclaration>();
         for (ArrayDeclaration dec : declarations) {
             if (dec.hasTransfer()) {
@@ -87,8 +87,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         if (unsolvedReferences.isEmpty())
             return;
 
-        Field[] others = neighbours;
-        for (Field other : others) {
+        for (Field other : neighbours) {
             if (unsolvedReferences.containsKey(other.getFieldName())) { // the value of the field is used
                 ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getFieldName());
                 toIntroduce.setJavaTypeOfTransfer(other);
