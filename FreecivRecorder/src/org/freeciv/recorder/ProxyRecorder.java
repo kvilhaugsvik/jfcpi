@@ -248,7 +248,7 @@ public class ProxyRecorder extends Thread {
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(8, new ReflexReaction() {
             @Override
-            public void apply(RawPacket incoming, FreecivConnection connection) {
+            public void apply(Packet incoming, FreecivConnection connection) {
                 timeToExit = true;
             }
         });

@@ -14,8 +14,8 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.RawPacket;
+import org.freeciv.packet.Packet;
 
 public interface ReflexReaction {
-    public void apply(RawPacket incoming, FreecivConnection connection);
+    public void apply(Packet incoming, FreecivConnection connection);
 }

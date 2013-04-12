@@ -16,8 +16,8 @@ package org.freeciv.recorder;
 
 import org.freeciv.connection.*;
 import org.freeciv.packet.PACKET_CONN_PONG;
+import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.RawPacket;
 import org.freeciv.recorder.traceFormat2.RecordTF2;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
@@ -60,7 +60,7 @@ public class PlayToServer {
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction() {
             @Override
-            public void apply(RawPacket incoming, FreecivConnection connection) {
+            public void apply(Packet incoming, FreecivConnection connection) {
                 try {
                     connection.toSend(new PACKET_CONN_PONG(headerConstructor));
                 } catch (IOException e) {
@@ -70,7 +70,7 @@ public class PlayToServer {
         });
         reflexes.put(8, new ReflexReaction() {
             @Override
-            public void apply(RawPacket incoming, FreecivConnection connection) {
+            public void apply(Packet incoming, FreecivConnection connection) {
                 connection.setOver();
             }
         });

@@ -18,10 +18,7 @@ import org.freeciv.connection.Interpreted;
 import org.freeciv.connection.NotReadyYetException;
 import org.freeciv.connection.FreecivConnection;
 import org.freeciv.connection.ReflexReaction;
-import org.freeciv.packet.PACKET_CONN_PONG;
-import org.freeciv.packet.PACKET_SERVER_JOIN_REQ;
-import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.RawPacket;
+import org.freeciv.packet.*;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -61,7 +58,7 @@ public class SignInAndWait {
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction() {
             @Override
-            public void apply(RawPacket incoming, FreecivConnection connection) {
+            public void apply(Packet incoming, FreecivConnection connection) {
                 try {
                     connection.toSend(new PACKET_CONN_PONG(headerConstructor));
                 } catch (IOException e) {
@@ -71,7 +68,7 @@ public class SignInAndWait {
         });
         reflexes.put(8, new ReflexReaction() {
             @Override
-            public void apply(RawPacket incoming, FreecivConnection connection) {
+            public void apply(Packet incoming, FreecivConnection connection) {
                 connection.setOver();
             }
         });
