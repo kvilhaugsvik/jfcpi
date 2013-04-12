@@ -14,9 +14,7 @@
 
 package org.freeciv.test;
 
-import org.freeciv.packet.Header_2_2;
-import org.freeciv.packet.TestArrayTransfer;
-import org.freeciv.packet.TestBitString;
+import org.freeciv.packet.*;
 import org.junit.Test;
 
 import java.io.*;
@@ -29,7 +27,7 @@ public class IsolatedBugCausers {
         DataInput inputStream = new DataInputStream(new ByteArrayInputStream(
                 new byte[]{0} // 0 is the size. The array isn't there as it ends in 0.
         ));
-        TestArrayTransfer fromData = new TestArrayTransfer(inputStream, new Header_2_2(5, 927));
+        TestArrayTransfer fromData = new TestArrayTransfer(inputStream, new Header_2_2(5, 927), new java.util.HashMap<DeltaKey, Packet>());
 
         assertEquals("Wrong size", 0, fromData.getToTransferValue().intValue());
         assertArrayEquals("Wrong data", new Long[0], fromData.getTheArrayValue());
@@ -39,6 +37,6 @@ public class IsolatedBugCausers {
         DataInput inputStream = new DataInputStream(new ByteArrayInputStream(
                 new byte[]{0, 8, -1} // size is 8 bits. Data is 11111111
         ));
-        TestBitString fromData = new TestBitString(inputStream, new Header_2_2(7, 931));
+        TestBitString fromData = new TestBitString(inputStream, new Header_2_2(7, 931), new java.util.HashMap<DeltaKey, Packet>());
     }
 }
