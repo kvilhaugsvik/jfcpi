@@ -14,7 +14,7 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.RawPacket;
+import org.freeciv.packet.Packet;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class ReflexPacketKind {
         this.quickRespond = new HashMap<Integer, ReflexReaction>(reflexes);
     }
 
-    public void handle(RawPacket incoming) {
+    public void handle(Packet incoming) {
         if (quickRespond.containsKey(incoming.getHeader().getPacketKind()))
             quickRespond.get(incoming.getHeader().getPacketKind()).apply(incoming, owner);
     }

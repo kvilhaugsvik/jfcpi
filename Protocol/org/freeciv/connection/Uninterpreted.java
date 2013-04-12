@@ -20,6 +20,7 @@ import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -28,18 +29,29 @@ public class Uninterpreted implements FreecivConnection {
     private final OutputStream out;
 
     private final OverImpl overImpl = new OverImpl();
+    private final ReflexPacketKind postSend;
 
     private boolean stillOpen;
 
     public Uninterpreted(
             final Socket connection,
             final Class<? extends PacketHeader> packetHeaderClass,
-            final Map<Integer, ReflexReaction> reflexes
+            final Map<Integer, ReflexReaction> postReceive
+    ) throws IOException {
+        this(connection, packetHeaderClass, postReceive, Collections.<Integer, ReflexReaction>emptyMap());
+    }
+
+    public Uninterpreted(
+            final Socket connection,
+            final Class<? extends PacketHeader> packetHeaderClass,
+            final Map<Integer, ReflexReaction> postReceive,
+            final Map<Integer, ReflexReaction> postSend
     ) throws IOException {
         this.stillOpen = true;
         this.out = connection.getOutputStream();
         this.in = new BackgroundReader(connection.getInputStream(), this,
-                new ReflexPacketKind(reflexes, this), packetHeaderClass);
+                new ReflexPacketKind(postReceive, this), packetHeaderClass);
+        this.postSend = new ReflexPacketKind(postSend, this);
 
         this.in.start();
     }
@@ -82,6 +94,7 @@ public class Uninterpreted implements FreecivConnection {
 
         try {
             out.write(packetSerialized.toByteArray());
+            this.postSend.handle(toSend);
         } catch (IOException e) {
             close();
             throw new IOException("Can't send", e);
