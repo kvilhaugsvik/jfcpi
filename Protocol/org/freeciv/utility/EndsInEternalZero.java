@@ -17,9 +17,25 @@ package org.freeciv.utility;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class EndlessZeroInputStream extends InputStream {
+public class EndsInEternalZero extends InputStream {
+    private final byte[] beginning;
+    private int pos = -1;
+
+    public EndsInEternalZero() {
+        this(new byte[0]);
+    }
+
+    public EndsInEternalZero(byte[] beginning) {
+        this.beginning = beginning;
+    }
+
     @Override
     public int read() throws IOException {
-        return 0;
+        pos++;
+
+        if (pos < beginning.length)
+            return beginning[pos];
+        else
+            return 0;
     }
 }

@@ -35,7 +35,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.*;
-import org.freeciv.utility.EndlessZeroInputStream;
+import org.freeciv.utility.EndsInEternalZero;
 import org.freeciv.utility.Validation;
 
 import java.io.DataInput;
@@ -214,7 +214,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         Var<AValue> zeroes = Var.local(TargetClass.fromClass(DataInputStream.class).scopeUnknown(), "zeroStream",
                 TargetClass.fromClass(DataInputStream.class).scopeUnknown()
-                        .newInstance(TargetClass.fromClass(EndlessZeroInputStream.class).scopeUnknown().newInstance()));
+                        .newInstance(TargetClass.fromClass(EndsInEternalZero.class).scopeUnknown().newInstance()));
         body.addStatement(zeroes);
 
         for (Field field : fields)
