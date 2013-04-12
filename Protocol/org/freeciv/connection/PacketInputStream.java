@@ -14,6 +14,7 @@
 
 package org.freeciv.connection;
 
+import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
@@ -26,10 +27,14 @@ public class PacketInputStream extends FilterInputStream {
     private final HeaderRead headerRead;
 
     public PacketInputStream(InputStream in, Over state, final Class<? extends PacketHeader> packetHeaderClass) {
+        this(in, state, new HeaderRead(packetHeaderClass));
+    }
+
+    public PacketInputStream(InputStream in, Over state, final HeaderRead packetHeaderClass) {
         super(in);
 
         this.state = state;
-        this.headerRead = new HeaderRead(packetHeaderClass);
+        this.headerRead = packetHeaderClass;
     }
 
     public RawPacket readPacket() throws IOException, InvocationTargetException {
@@ -84,11 +89,15 @@ public class PacketInputStream extends FilterInputStream {
                     "Read " + alreadyRead + " of " + wanted + " bytes");
     }
 
-    private static class HeaderRead {
-        public final Constructor<? extends PacketHeader> headerReader;
-        public final int headerSize;
+    public static class HeaderRead implements PacketChangeHeader {
+        public Constructor<? extends PacketHeader> headerReader;
+        public int headerSize;
 
         public HeaderRead(final Class<? extends PacketHeader> packetHeaderClass) {
+            setHeaderTypeTo(packetHeaderClass);
+        }
+
+        public void setHeaderTypeTo(Class<? extends PacketHeader> packetHeaderClass) {
             try {
                 this.headerReader = packetHeaderClass.getConstructor(DataInput.class);
                 this.headerSize = packetHeaderClass.getField("HEADER_SIZE").getInt(null);
@@ -99,6 +108,10 @@ public class PacketInputStream extends FilterInputStream {
             } catch (IllegalAccessException e) {
                 throw new IllegalArgumentException("Could not access header size in header interpreter", e);
             }
+        }
+
+        public boolean sameType(Packet packet) {
+            return headerReader.getDeclaringClass().isInstance(packet.getHeader());
         }
     }
 }

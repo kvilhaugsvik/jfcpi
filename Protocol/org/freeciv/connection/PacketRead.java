@@ -15,10 +15,11 @@
 package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
+import org.freeciv.packet.PacketHeader;
 
 import java.io.IOException;
 
-public interface PacketRead {
+public interface PacketRead extends PacketChangeHeader {
     /**
      * Return true if a packet is ready to be read
      * @return true if a packet is ready to be read

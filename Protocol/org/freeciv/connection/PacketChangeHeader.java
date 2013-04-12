@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Sveinung Kvilhaugsvik.
+ * Copyright (c) 2013. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,16 +14,11 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 
-import java.io.IOException;
-
-public interface PacketWrite extends PacketChangeHeader {
+public interface PacketChangeHeader {
     /**
-     * Send a packet via this connection
-     * @param toSend the packet to send
-     * @throws java.io.IOException if there is a problem sending the packet
+     * Change the packet header type
      */
-    void toSend(Packet toSend) throws IOException;
+    void setHeaderTypeTo(Class<? extends PacketHeader> newKind);
 }

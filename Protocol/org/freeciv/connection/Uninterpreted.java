@@ -20,9 +20,7 @@ import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class Uninterpreted implements FreecivConnection {
     private final BackgroundReader in;
@@ -30,6 +28,7 @@ public class Uninterpreted implements FreecivConnection {
 
     private final OverImpl overImpl = new OverImpl();
     private final ReflexPacketKind postSend;
+    private final PacketInputStream.HeaderRead currentHeader;
 
     private boolean stillOpen;
 
@@ -48,9 +47,10 @@ public class Uninterpreted implements FreecivConnection {
             final Map<Integer, ReflexReaction> postSend
     ) throws IOException {
         this.stillOpen = true;
+        this.currentHeader = new PacketInputStream.HeaderRead(packetHeaderClass);
         this.out = connection.getOutputStream();
         this.in = new BackgroundReader(connection.getInputStream(), this,
-                new ReflexPacketKind(postReceive, this), packetHeaderClass);
+                new ReflexPacketKind(postReceive, this), currentHeader);
         this.postSend = new ReflexPacketKind(postSend, this);
 
         this.in.start();
@@ -85,6 +85,8 @@ public class Uninterpreted implements FreecivConnection {
     public void toSend(Packet toSend) throws IOException {
         if (!isOpen()) {
             throw new IOException("Is closed. Can't send.");
+        } else if (!currentHeader.sameType(toSend)) {
+            throw new IllegalArgumentException("Unexpected header kind");
         }
 
         ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getHeader().getTotalSize());
@@ -99,6 +101,11 @@ public class Uninterpreted implements FreecivConnection {
             close();
             throw new IOException("Can't send", e);
         }
+    }
+
+    @Override
+    public void setHeaderTypeTo(Class<? extends PacketHeader> newKind) {
+        currentHeader.setHeaderTypeTo(newKind);
     }
 
     public void setOver() {
@@ -117,9 +124,9 @@ public class Uninterpreted implements FreecivConnection {
         private final ReflexPacketKind quickRespond;
 
         public BackgroundReader(InputStream in, Uninterpreted parent, ReflexPacketKind quickRespond,
-                                final Class<? extends PacketHeader> packetHeaderClass)
+                                final PacketInputStream.HeaderRead currentHeader)
                 throws IOException {
-            this.in = new PacketInputStream(in, parent, packetHeaderClass);
+            this.in = new PacketInputStream(in, parent, currentHeader);
             this.parent = parent;
             this.quickRespond = quickRespond;
             this.buffered = new LinkedList<RawPacket>();

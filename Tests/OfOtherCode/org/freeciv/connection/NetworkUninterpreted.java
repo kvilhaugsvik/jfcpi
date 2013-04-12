@@ -14,6 +14,7 @@
 
 package org.freeciv.connection;
 
+import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packet.Packet;
 import org.junit.Test;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.*;
 
 import static org.junit.Assert.*;
@@ -33,13 +35,51 @@ public class NetworkUninterpreted {
         Uninterpreted self = new Uninterpreted(other, Header_2_2.class,
                 Collections.<Integer, ReflexReaction>emptyMap());
 
-        helperWaitSomeSecondsForAPacket(self, 4);
-
-        assertTrue("There should be a packet here", self.packetReady());
-        Packet packet = self.getPacket();
+        Packet packet = assertPacketIsThere(self);
 
         assertEquals("Wrong kind", 0, packet.getHeader().getPacketKind());
         assertEquals("Wrong size", 4, packet.getHeader().getHeaderSize());
+    }
+
+    @Test
+    public void headerTypeIsChangedAfterReceiving() throws IOException, InterruptedException, ExecutionException, TimeoutException, NotReadyYetException {
+        Socket other = helperDataSender(new byte[]{
+                0, 3, 1,
+                0, 3, 5,
+                0, 7, 0, 10, 0, 0, 0,
+                0, 4, 0, 0
+        });
+
+        HashMap<Integer, ReflexReaction> postReceive = new HashMap<Integer, ReflexReaction>();
+        postReceive.put(5, new ReflexReaction() {
+            @Override
+            public void apply(Packet incoming, FreecivConnection connection) {
+                connection.setHeaderTypeTo(org.freeciv.packet.Header_2_2.class);
+            }
+        });
+
+        Uninterpreted self = new Uninterpreted(other, Header_2_1.class, postReceive,
+                Collections.<Integer, ReflexReaction>emptyMap());
+
+        Packet packetBeforeChange = assertPacketIsThere(self);
+
+        assertEquals("Wrong kind", 1, packetBeforeChange.getHeader().getPacketKind());
+        assertEquals("Wrong size", 3, packetBeforeChange.getHeader().getHeaderSize());
+
+        Packet packetChangeAfter = assertPacketIsThere(self);
+
+        assertEquals("Wrong kind", 5, packetChangeAfter.getHeader().getPacketKind());
+        assertEquals("Wrong size", 3, packetChangeAfter.getHeader().getHeaderSize());
+
+        Packet packetAfterBodyAsWell = assertPacketIsThere(self);
+
+        assertEquals("Wrong kind", 10, packetAfterBodyAsWell.getHeader().getPacketKind());
+        assertEquals("Wrong size", 4, packetAfterBodyAsWell.getHeader().getHeaderSize());
+
+        Packet packetAfterHeaderOnly = assertPacketIsThere(self);
+
+        assertEquals("Wrong kind", 0, packetAfterHeaderOnly.getHeader().getPacketKind());
+        assertEquals("Wrong size", 4, packetAfterHeaderOnly.getHeader().getHeaderSize());
     }
 
     /*********************************************************************************************************************
@@ -105,5 +145,12 @@ public class NetworkUninterpreted {
                 Thread.yield();
             }
         }
+    }
+
+    private static Packet assertPacketIsThere(Uninterpreted self) throws ExecutionException, TimeoutException, InterruptedException, NotReadyYetException {
+        helperWaitSomeSecondsForAPacket(self, 4);
+
+        assertTrue("There should be a packet here", self.packetReady());
+        return self.getPacket();
     }
 }

@@ -75,6 +75,11 @@ public class Interpreted implements FreecivConnection {
         return toProcess.isOpen();
     }
 
+    @Override
+    public void setHeaderTypeTo(Class<? extends PacketHeader> newKind) {
+        toProcess.setHeaderTypeTo(newKind);
+    }
+
     public boolean packetReady() {
         return toProcess.packetReady();
     }
