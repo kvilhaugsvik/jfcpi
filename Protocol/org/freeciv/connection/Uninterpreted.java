@@ -19,6 +19,7 @@ import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.util.*;
 
@@ -98,6 +99,16 @@ public class Uninterpreted implements FreecivConnection {
     @Override
     public void setHeaderTypeTo(Class<? extends PacketHeader> newKind) {
         currentHeader.setHeaderTypeTo(newKind);
+    }
+
+    @Override
+    public Constructor<? extends PacketHeader> getStream2Header() {
+        return currentHeader.getStream2Header();
+    }
+
+    @Override
+    public Constructor<? extends PacketHeader> getFields2Header() {
+        return currentHeader.getFields2Header();
     }
 
     public void setOver() {

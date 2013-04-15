@@ -17,6 +17,7 @@ package org.freeciv.connection;
 import org.freeciv.packet.*;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,6 +80,16 @@ public class Interpreted implements FreecivConnection {
     @Override
     public void setHeaderTypeTo(Class<? extends PacketHeader> newKind) {
         toProcess.setHeaderTypeTo(newKind);
+    }
+
+    @Override
+    public Constructor<? extends PacketHeader> getStream2Header() {
+        return toProcess.getStream2Header();
+    }
+
+    @Override
+    public Constructor<? extends PacketHeader> getFields2Header() {
+        return toProcess.getFields2Header();
     }
 
     public boolean packetReady() {

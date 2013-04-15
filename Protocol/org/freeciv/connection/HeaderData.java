@@ -43,11 +43,13 @@ public class HeaderData implements PacketChangeHeader {
         }
     }
 
-    public Constructor<? extends PacketHeader> getStreamConstructor() {
+    @Override
+    public Constructor<? extends PacketHeader> getStream2Header() {
         return constructFromStream;
     }
 
-    public Constructor<? extends PacketHeader> getFieldsConstructor() {
+    @Override
+    public Constructor<? extends PacketHeader> getFields2Header() {
         return constructFromPNumAndSize;
     }
 

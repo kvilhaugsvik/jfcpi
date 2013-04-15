@@ -44,7 +44,7 @@ public class PacketInputStream extends FilterInputStream {
         final byte[] headerStart = readXBytesFrom(headerData.getHeaderSize(), from, state, true);
         PacketHeader head;
         try {
-            head = headerData.getStreamConstructor().newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
+            head = headerData.getStream2Header().newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
         } catch (InstantiationException e) {
             throw badHeader(e);
         } catch (IllegalAccessException e) {
