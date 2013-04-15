@@ -15,7 +15,7 @@ LOG_TO ?= "Logger.GLOBAL_LOGGER_NAME"
 
 # What it should be generated from
 # take instructions from trunk.xml
-VERSIONCONFIGURATION ?= trunk.xml
+VERSIONCONFIGURATION ?= GeneratePackets/config/trunk.xml
 # assume to be placed in a folder in the top level directory of Freeciv's source code unless told otherwise
 FREECIV_SOURCE_PATH ?= ..
 
