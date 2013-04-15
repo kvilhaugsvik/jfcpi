@@ -30,14 +30,14 @@ public class Interpreted implements FreecivConnection {
     private final PacketsMapping interpreter;
     private final HashMap<DeltaKey, Packet> oldRead;
 
-    public Interpreted(Socket connection, Map<Integer, ReflexReaction> reflexes) throws IOException {
-        this(connection, reflexes, new PacketsMapping());
+    public Interpreted(Socket connection, Map<Integer, ReflexReaction> postReceiveReflexes, Map<Integer, ReflexReaction> postSendReflexes) throws IOException {
+        this(connection, new PacketsMapping(), postReceiveReflexes, postSendReflexes);
     }
 
-    private Interpreted(Socket connection, Map<Integer, ReflexReaction> reflexes, PacketsMapping interpreter)
+    private Interpreted(Socket connection, PacketsMapping interpreter, Map<Integer, ReflexReaction> postReceiveReflexes, Map<Integer, ReflexReaction> postSendReflexes)
             throws IOException {
-        this(new Uninterpreted(connection, interpreter.getPacketHeaderClass(),
-                reflexes, Collections.<Integer, ReflexReaction>emptyMap()), interpreter);
+        this(new Uninterpreted(connection, interpreter.getPacketHeaderClass(), postReceiveReflexes, postSendReflexes),
+                interpreter);
     }
 
     public Interpreted(Uninterpreted connection, PacketsMapping interpreter) throws IOException {

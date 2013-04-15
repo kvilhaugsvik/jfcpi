@@ -186,8 +186,8 @@ public class ProxyRecorder extends Thread {
         this.trace = trace;
 
         if (settings.<Boolean>getSetting(UNDERSTAND)) {
-            this.clientCon = new Interpreted(client, Collections.<Integer, ReflexReaction>emptyMap());
-            this.serverCon = new Interpreted(server, getServerConnectionReflexes());
+            this.clientCon = new Interpreted(client, Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap());
+            this.serverCon = new Interpreted(server, getServerConnectionReflexes(), Collections.<Integer, ReflexReaction>emptyMap());
         } else {
             PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
             this.clientCon = new Uninterpreted(client, versionKnowledge.getPacketHeaderClass(),

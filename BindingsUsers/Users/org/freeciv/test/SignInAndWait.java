@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -73,7 +74,7 @@ public class SignInAndWait {
             }
         });
         try {
-            Interpreted con = new Interpreted(new Socket(address, portNumber), reflexes);
+            Interpreted con = new Interpreted(new Socket(address, portNumber), reflexes, Collections.<Integer, ReflexReaction>emptyMap());
 
             con.toSend(new PACKET_SERVER_JOIN_REQ(userName,
                     con.getCapStringMandatory(),
