@@ -21,12 +21,12 @@ import org.junit.Test
 import org.junit.Assert._
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
-import org.freeciv.packetgen.PacketsStore
+import org.freeciv.packetgen.{GeneratorDefaults, PacketHeaderKinds, PacketsStore}
 import org.freeciv.packetgen.enteties.supporting.{WeakFlag, WeakField, Field}
 
 class PacketsDefParseTest {
   @inline def storePars = {
-    val storage = new PacketsStore(2)
+    val storage = new PacketsStore(PacketHeaderKinds.FC_2_4_99_2011_11_02, GeneratorDefaults.LOG_TO, false, false)
     val parser = new ParsePacketsDef(storage)
     (storage, parser)
   }

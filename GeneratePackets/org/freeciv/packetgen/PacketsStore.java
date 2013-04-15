@@ -42,10 +42,6 @@ public class PacketsStore {
     private final HashMap<String, Requirement> packets = new HashMap<String, Requirement>();
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
-    @Deprecated public PacketsStore(int bytesInPacketNumber) {
-        this(bytesInPacketNumber == 2 ? PacketHeaderKinds.FC_2_4_99_2011_11_02 : PacketHeaderKinds.FC_2_4, GeneratorDefaults.LOG_TO, false, false);
-    }
-
     public PacketsStore(PacketHeaderKinds bytesInPacketNumber, String logger, boolean enableDelta, boolean enableDeltaBoolFolding) {
         requirements = new DependencyStore();
         for (Dependency.Item primitive : Hardcoded.values()) {

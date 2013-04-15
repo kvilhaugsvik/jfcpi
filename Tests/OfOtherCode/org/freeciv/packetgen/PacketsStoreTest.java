@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 
 public class PacketsStoreTest {
     private static PacketsStore defaultStorage() {
-        return new PacketsStore(2);
+        return new PacketsStore(PacketHeaderKinds.FC_2_4_99_2011_11_02, GeneratorDefaults.LOG_TO, false, false);
     }
 
     private static void assertLooksForButNoCodeYet(PacketsStore storage, Requirement looksFor, String noCodeNamed) {
