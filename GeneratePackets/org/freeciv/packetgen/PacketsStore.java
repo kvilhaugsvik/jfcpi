@@ -16,6 +16,7 @@ package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.Util;
+import org.freeciv.connection.ReflexRuleTime;
 import org.freeciv.packet.*;
 import org.freeciv.packetgen.dependency.*;
 import org.freeciv.packetgen.enteties.*;
@@ -59,16 +60,23 @@ public class PacketsStore {
         this.enableDelta = enableDelta;
         this.enableDeltaBoolFolding = enableDeltaBoolFolding;
 
+        final TargetClass rule = TargetClass.fromClass(org.freeciv.connection.ReflexRule.class).scopeUnknown();
+        final Typed[] protoRules;
         switch (bytesInPacketNumber) {
             case FC_2_4:
                 packetHeaderType = TargetClass.newKnown(Header_2_1.class);
+                protoRules = new Typed[0];
                 break;
             case FC_2_4_99_2011_11_02:
                 packetHeaderType = TargetClass.newKnown(Header_2_2.class);
+                protoRules = new Typed[0];
                 break;
             default: throw new IllegalArgumentException("No other sizes than one or two bytes are supported" +
                                                                 "for packet kind field in packet header");
         }
+
+        requirements.addWanted(Constant.isOther(TargetArray.from(rule, 1).scopeUnknown(), Util.RULES_NAME,
+                new ArrayLiteral(protoRules)));
 
         requirements.addWanted(Constant.isClass(Util.HEADER_NAME,
                 packetHeaderType.scopeUnknown().callV("class")));

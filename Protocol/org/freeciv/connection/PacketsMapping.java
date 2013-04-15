@@ -20,6 +20,7 @@ import org.freeciv.packet.*;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -27,6 +28,8 @@ import java.util.NoSuchElementException;
 public class PacketsMapping {
     private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
     private final Class<? extends PacketHeader> packetNumberBytes;
+    private final Map<Integer, ReflexReaction> protoRulesPostReceive;
+    private final Map<Integer, ReflexReaction> protoRulesPostSend;
     private final boolean isDeltaEnabled;
     private final String capStringMandatory;
     private final String capStringOptional;
@@ -61,6 +64,23 @@ public class PacketsMapping {
                                                   "(No constructor from DataInput, PacketHeader, Map found)");
                 }
             }
+
+            HashMap<Integer, ReflexReaction> neededPostSend = new HashMap<Integer, ReflexReaction>();
+            HashMap<Integer, ReflexReaction> neededPostReceive = new HashMap<Integer, ReflexReaction>();
+            for (ReflexRule rule : (ReflexRule[])constants.getField(Util.RULES_NAME).get(null)) {
+                switch (rule.getWhen()) {
+                    case POST_SEND:
+                        neededPostSend.put(rule.getNumber(), rule.getAction());
+                        break;
+                    case POST_RECEIVE:
+                        neededPostReceive.put(rule.getNumber(), rule.getAction());
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Don't know how to execute a rule " + rule.getWhen());
+                }
+            }
+            this.protoRulesPostSend = Collections.unmodifiableMap(neededPostSend);
+            this.protoRulesPostReceive = Collections.unmodifiableMap(neededPostReceive);
         } catch (ClassNotFoundException e) {
             throw new IOException("Version information missing", e);
         } catch (NoSuchFieldException e) {
@@ -96,6 +116,14 @@ public class PacketsMapping {
 
     public Class<? extends PacketHeader> getPacketHeaderClass() {
         return packetNumberBytes;
+    }
+
+    public Map<Integer, ReflexReaction> getRequiredPostReceiveRules() {
+        return protoRulesPostReceive;
+    }
+
+    public Map<Integer, ReflexReaction> getRequiredPostSendRules() {
+        return protoRulesPostSend;
     }
 
     public String getCapStringMandatory() {

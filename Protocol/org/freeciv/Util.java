@@ -21,6 +21,7 @@ public class Util {
     /* Constants */
     public static final String VERSION_DATA_CLASS = "org.freeciv.VersionData";
     public static final String HEADER_NAME = "startHeaderKind";
+    public static final String RULES_NAME = "protocolRules";
     public static final String PACKET_MAP_NAME = "understandsPackets";
 
     /* Utility methods */
