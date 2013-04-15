@@ -27,6 +27,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -74,7 +75,8 @@ public class PlayToServer {
                 connection.setOver();
             }
         });
-        final FreecivConnection conn = new Uninterpreted(server, packetHeaderClass, reflexes);
+        final FreecivConnection conn = new Uninterpreted(server, packetHeaderClass,
+                reflexes, Collections.<Integer, ReflexReaction>emptyMap());
         this.toServer = new SinkForward(conn, new FilterNot(new FilterOr(
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));

@@ -35,14 +35,6 @@ public class Uninterpreted implements FreecivConnection {
     public Uninterpreted(
             final Socket connection,
             final Class<? extends PacketHeader> packetHeaderClass,
-            final Map<Integer, ReflexReaction> postReceive
-    ) throws IOException {
-        this(connection, packetHeaderClass, postReceive, Collections.<Integer, ReflexReaction>emptyMap());
-    }
-
-    public Uninterpreted(
-            final Socket connection,
-            final Class<? extends PacketHeader> packetHeaderClass,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend
     ) throws IOException {

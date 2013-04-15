@@ -16,7 +16,6 @@ package org.freeciv.recorder;
 
 import org.freeciv.connection.*;
 import org.freeciv.packet.Packet;
-import org.freeciv.packet.RawPacket;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -192,9 +191,9 @@ public class ProxyRecorder extends Thread {
         } else {
             PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
             this.clientCon = new Uninterpreted(client, versionKnowledge.getPacketHeaderClass(),
-                    Collections.<Integer, ReflexReaction>emptyMap());
+                    Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap());
             this.serverCon = new Uninterpreted(server, versionKnowledge.getPacketHeaderClass(),
-                    getServerConnectionReflexes());
+                    getServerConnectionReflexes(), Collections.<Integer, ReflexReaction>emptyMap());
         }
 
         Filter forwardFilters = new FilterAllAccepted(); // Forward everything

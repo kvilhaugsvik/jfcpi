@@ -33,7 +33,7 @@ public class NetworkUninterpreted {
     public void pureHeader() throws IOException, ExecutionException, TimeoutException, InterruptedException, NotReadyYetException {
         Socket other = helperDataSender(new byte[]{0, 4, 0, 0});
         Uninterpreted self = new Uninterpreted(other, Header_2_2.class,
-                Collections.<Integer, ReflexReaction>emptyMap());
+                Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap());
 
         Packet packet = assertPacketIsThere(self);
 
