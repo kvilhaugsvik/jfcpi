@@ -23,17 +23,17 @@ import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
                       requested: List[(String, String)], logger: String,
-                      devMode: Boolean, bytesInPacketNumber: Int, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) {
+                      devMode: Boolean, packetHeader: PacketHeaderKinds, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) {
 
   def this(packetsDefPathString: String, versionPath: String, cPathsString: List[String],
            requested: List[(String, String)], logger: String,
-           devMode: Boolean, bytesInPacketNumber: Int, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) = {
+           devMode: Boolean, packetHeader: PacketHeaderKinds, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) = {
     this(new File(packetsDefPathString), new File(versionPath), cPathsString.map(new File(_)),
       requested, logger,
-      devMode, bytesInPacketNumber, enableDelta, enableDeltaBoolFolding)
+      devMode, packetHeader, enableDelta, enableDeltaBoolFolding)
   }
 
-  private val storage = new PacketsStore(bytesInPacketNumber, logger, enableDelta, enableDeltaBoolFolding)
+  private val storage = new PacketsStore(packetHeader, logger, enableDelta, enableDeltaBoolFolding)
   private val Parser = new ParsePacketsDef(storage)
 
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
@@ -114,7 +114,7 @@ object GeneratePackets {
 
     val versionConfiguration = readVersionParameters(new File(settings.getSetting[String](VERSION_INFORMATION)))
 
-    val bytesInPacketNumber = versionConfiguration.attribute("packetNumberSize").get.text.toInt
+    val packetHeader = PacketHeaderKinds.valueOf(versionConfiguration.attribute("packetHeaderKind").get.text)
 
     val enableDelta = versionConfiguration.attribute("enableDelta").get.text.toBoolean
     val enableDeltaBoolFolding = versionConfiguration.attribute("enableDeltaBoolFolding").get.text.toBoolean
@@ -131,7 +131,7 @@ object GeneratePackets {
       requested,
       settings.getSetting[String](PACKETS_SHOULD_LOG_TO),
       settings.getSetting[Boolean](IGNORE_PROBLEMS),
-      bytesInPacketNumber,
+      packetHeader,
       enableDelta,
       enableDeltaBoolFolding)
 

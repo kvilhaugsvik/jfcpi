@@ -43,10 +43,10 @@ public class PacketsStore {
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
     @Deprecated public PacketsStore(int bytesInPacketNumber) {
-        this(bytesInPacketNumber, GeneratorDefaults.LOG_TO, false, false);
+        this(bytesInPacketNumber == 2 ? PacketHeaderKinds.FC_2_4_99_2011_11_02 : PacketHeaderKinds.FC_2_4, GeneratorDefaults.LOG_TO, false, false);
     }
 
-    public PacketsStore(int bytesInPacketNumber, String logger, boolean enableDelta, boolean enableDeltaBoolFolding) {
+    public PacketsStore(PacketHeaderKinds bytesInPacketNumber, String logger, boolean enableDelta, boolean enableDeltaBoolFolding) {
         requirements = new DependencyStore();
         for (Dependency.Item primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
@@ -64,10 +64,10 @@ public class PacketsStore {
         this.enableDeltaBoolFolding = enableDeltaBoolFolding;
 
         switch (bytesInPacketNumber) {
-            case 1:
+            case FC_2_4:
                 packetHeaderType = TargetClass.newKnown(Header_2_1.class);
                 break;
-            case 2:
+            case FC_2_4_99_2011_11_02:
                 packetHeaderType = TargetClass.newKnown(Header_2_2.class);
                 break;
             default: throw new IllegalArgumentException("No other sizes than one or two bytes are supported" +
