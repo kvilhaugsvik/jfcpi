@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-//TODO: Implement delta protocol
 //TODO: Implement compression in protocol
 public class Interpreted implements FreecivConnection {
     private final Uninterpreted toProcess;
