@@ -204,7 +204,7 @@ public class GeneratedPacketTest {
                 new byte[]{/*0, 65, 00, 4, */70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
                         105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,
                         48, 50, 32, 0, 45, 100, 101, 118, 0, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 99}));
-        SERVER_JOIN_REQ2ByteKind packet = new SERVER_JOIN_REQ2ByteKind(inputStream, new Header_2_2(65, 4), new HashMap<DeltaKey, Packet>());
+        SERVER_JOIN_REQ packet = new SERVER_JOIN_REQ(inputStream, new Header_2_2(65, 4), new HashMap<DeltaKey, Packet>());
 
         ByteArrayOutputStream serialized = new ByteArrayOutputStream();
         packet.encodeTo(new DataOutputStream(serialized));

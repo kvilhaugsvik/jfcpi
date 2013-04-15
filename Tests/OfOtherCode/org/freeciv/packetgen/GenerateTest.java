@@ -124,19 +124,6 @@ public class GenerateTest {
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false), targetFolder);
         writePacket(new Packet("CONN_PONG", 89, TargetClass.newKnown(Header_2_1.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false), targetFolder);
-        writePacket(new Packet("SERVER_JOIN_REQ2ByteKind",
-                4,
-                TargetClass.newKnown(Header_2_2.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false,
-                new Field("username", string, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("capability", string, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("version_label", string, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("major_version", uint32, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList()),
-                new Field("minor_version", uint32, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList()),
-                new Field("patch_version", uint32, "SERVER_JOIN_REQ2ByteKind", Collections.<WeakFlag>emptyList())), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
                 TargetClass.newKnown(Header_2_2.class),
