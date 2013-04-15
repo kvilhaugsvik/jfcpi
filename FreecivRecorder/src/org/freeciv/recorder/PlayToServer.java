@@ -55,15 +55,12 @@ public class PlayToServer {
         final Class<? extends PacketHeader> packetHeaderClass = versionKnowledge.getPacketHeaderClass();
         this.source = new TraceFormat2Read(source, new OverImpl(), packetHeaderClass);
 
-        final Constructor<? extends PacketHeader> headerConstructor =
-                org.freeciv.packet.Header_2_2.class.getConstructor(int.class, int.class);
-
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction() {
             @Override
             public void apply(Packet incoming, FreecivConnection connection) {
                 try {
-                    connection.toSend(new PACKET_CONN_PONG(headerConstructor));
+                    connection.toSend(new PACKET_CONN_PONG(connection.getFields2Header()));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }

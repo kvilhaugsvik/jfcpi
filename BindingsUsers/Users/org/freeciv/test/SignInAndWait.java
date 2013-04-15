@@ -14,10 +14,7 @@
 
 package org.freeciv.test;
 
-import org.freeciv.connection.Interpreted;
-import org.freeciv.connection.NotReadyYetException;
-import org.freeciv.connection.FreecivConnection;
-import org.freeciv.connection.ReflexReaction;
+import org.freeciv.connection.*;
 import org.freeciv.packet.*;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
@@ -53,15 +50,12 @@ public class SignInAndWait {
         int portNumber = settings.<Integer>getSetting(PORT);
         String userName = settings.getSetting(USER_NAME);
 
-        final Constructor<? extends PacketHeader> headerConstructor =
-                org.freeciv.packet.Header_2_2.class.getConstructor(int.class, int.class);
-
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction() {
             @Override
             public void apply(Packet incoming, FreecivConnection connection) {
                 try {
-                    connection.toSend(new PACKET_CONN_PONG(headerConstructor));
+                    connection.toSend(new PACKET_CONN_PONG(connection.getFields2Header()));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }
@@ -82,7 +76,7 @@ public class SignInAndWait {
                     con.getVersionMajor(),
                     con.getVersionMinor(),
                     con.getVersionPatch(),
-                    headerConstructor));
+                    con.getFields2Header()));
 
             while(con.isOpen() || con.packetReady()) {
                 try {
