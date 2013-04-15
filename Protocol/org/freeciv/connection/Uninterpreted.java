@@ -28,7 +28,7 @@ public class Uninterpreted implements FreecivConnection {
 
     private final OverImpl overImpl = new OverImpl();
     private final ReflexPacketKind postSend;
-    private final PacketInputStream.HeaderRead currentHeader;
+    private final HeaderData currentHeader;
 
     private boolean stillOpen;
 
@@ -47,7 +47,7 @@ public class Uninterpreted implements FreecivConnection {
             final Map<Integer, ReflexReaction> postSend
     ) throws IOException {
         this.stillOpen = true;
-        this.currentHeader = new PacketInputStream.HeaderRead(packetHeaderClass);
+        this.currentHeader = new HeaderData(packetHeaderClass);
         this.out = connection.getOutputStream();
         this.in = new BackgroundReader(connection.getInputStream(), this,
                 new ReflexPacketKind(postReceive, this), currentHeader);
@@ -124,7 +124,7 @@ public class Uninterpreted implements FreecivConnection {
         private final ReflexPacketKind quickRespond;
 
         public BackgroundReader(InputStream in, Uninterpreted parent, ReflexPacketKind quickRespond,
-                                final PacketInputStream.HeaderRead currentHeader)
+                                final HeaderData currentHeader)
                 throws IOException {
             this.in = new PacketInputStream(in, parent, currentHeader);
             this.parent = parent;

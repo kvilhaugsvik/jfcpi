@@ -14,39 +14,37 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class PacketInputStream extends FilterInputStream {
     private final Over state;
-    private final HeaderRead headerRead;
+    private final HeaderData headerData;
 
     public PacketInputStream(InputStream in, Over state, final Class<? extends PacketHeader> packetHeaderClass) {
-        this(in, state, new HeaderRead(packetHeaderClass));
+        this(in, state, new HeaderData(packetHeaderClass));
     }
 
-    public PacketInputStream(InputStream in, Over state, final HeaderRead packetHeaderClass) {
+    public PacketInputStream(InputStream in, Over state, final HeaderData packetHeaderClass) {
         super(in);
 
         this.state = state;
-        this.headerRead = packetHeaderClass;
+        this.headerData = packetHeaderClass;
     }
 
     public RawPacket readPacket() throws IOException, InvocationTargetException {
-        return readPacket(in, state, headerRead);
+        return readPacket(in, state, headerData);
     }
 
-    private static RawPacket readPacket(InputStream from, Over state, HeaderRead headerRead)
+    private static RawPacket readPacket(InputStream from, Over state, HeaderData headerData)
             throws IOException, InvocationTargetException {
-        final byte[] headerStart = readXBytesFrom(headerRead.headerSize, from, state, true);
+        final byte[] headerStart = readXBytesFrom(headerData.getHeaderSize(), from, state, true);
         PacketHeader head;
         try {
-            head = headerRead.headerReader.newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
+            head = headerData.getStreamConstructor().newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
         } catch (InstantiationException e) {
             throw badHeader(e);
         } catch (IllegalAccessException e) {
@@ -89,29 +87,4 @@ public class PacketInputStream extends FilterInputStream {
                     "Read " + alreadyRead + " of " + wanted + " bytes");
     }
 
-    public static class HeaderRead implements PacketChangeHeader {
-        public Constructor<? extends PacketHeader> headerReader;
-        public int headerSize;
-
-        public HeaderRead(final Class<? extends PacketHeader> packetHeaderClass) {
-            setHeaderTypeTo(packetHeaderClass);
-        }
-
-        public void setHeaderTypeTo(Class<? extends PacketHeader> packetHeaderClass) {
-            try {
-                this.headerReader = packetHeaderClass.getConstructor(DataInput.class);
-                this.headerSize = packetHeaderClass.getField("HEADER_SIZE").getInt(null);
-            } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException("Could not find constructor for header interpreter", e);
-            } catch (NoSuchFieldException e) {
-                throw new IllegalArgumentException("Could not find header size in header interpreter", e);
-            } catch (IllegalAccessException e) {
-                throw new IllegalArgumentException("Could not access header size in header interpreter", e);
-            }
-        }
-
-        public boolean sameType(Packet packet) {
-            return headerReader.getDeclaringClass().isInstance(packet.getHeader());
-        }
-    }
 }
