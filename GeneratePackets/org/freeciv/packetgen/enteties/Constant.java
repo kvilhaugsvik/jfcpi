@@ -89,4 +89,8 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements Dependen
     public static Constant<ALong> isLong(String name, Typed<ALong> expression) {
         return new Constant<ALong>(TargetClass.fromClass(long.class), name, expression, Collections.<Requirement>emptySet());
     }
+
+    public static <T extends AValue> Constant<T> isOther(TargetClass kind, String name, Typed<T> expression) {
+        return new Constant<T>(kind, name, expression, Collections.<Requirement>emptySet());
+    }
 }
