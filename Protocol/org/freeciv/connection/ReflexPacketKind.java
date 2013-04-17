@@ -32,4 +32,12 @@ public class ReflexPacketKind {
         if (quickRespond.containsKey(incoming.getHeader().getPacketKind()))
             quickRespond.get(incoming.getHeader().getPacketKind()).apply(incoming, owner);
     }
+
+    public static Map<Integer, ReflexReaction> layer(
+            Map<Integer, ReflexReaction> base,
+            Map<Integer, ReflexReaction> over) {
+        HashMap<Integer, ReflexReaction> out = new HashMap<Integer, ReflexReaction>(base);
+        out.putAll(over);
+        return out;
+    }
 }
