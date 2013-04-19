@@ -19,17 +19,22 @@ import org.freeciv.packet.PacketHeader;
 
 import java.io.DataInput;
 import java.lang.reflect.Constructor;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class HeaderData implements PacketChangeHeader {
+    private final ReentrantReadWriteLock lock;
+
     private Constructor<? extends PacketHeader> constructFromStream;
     private Constructor<? extends PacketHeader> constructFromPNumAndSize;
     private int headerSize;
 
     public HeaderData(final Class<? extends PacketHeader> packetHeaderClass) {
+        this.lock = new ReentrantReadWriteLock();
         setHeaderTypeTo(packetHeaderClass);
     }
 
     public void setHeaderTypeTo(Class<? extends PacketHeader> packetHeaderClass) {
+        this.lock.writeLock().lock();
         try {
             this.constructFromStream = packetHeaderClass.getConstructor(DataInput.class);
             this.constructFromPNumAndSize = packetHeaderClass.getConstructor(int.class, int.class);
@@ -40,24 +45,46 @@ public class HeaderData implements PacketChangeHeader {
             throw new IllegalArgumentException("Could not find header size in header interpreter", e);
         } catch (IllegalAccessException e) {
             throw new IllegalArgumentException("Could not access header size in header interpreter", e);
+        } finally {
+            this.lock.writeLock().unlock();
         }
     }
 
     @Override
     public Constructor<? extends PacketHeader> getStream2Header() {
-        return constructFromStream;
+        this.lock.readLock().lock();
+        try {
+            return constructFromStream;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     @Override
     public Constructor<? extends PacketHeader> getFields2Header() {
-        return constructFromPNumAndSize;
+        this.lock.readLock().lock();
+        try {
+            return constructFromPNumAndSize;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     public int getHeaderSize() {
-        return headerSize;
+        this.lock.readLock().lock();
+        try {
+            return headerSize;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     public boolean sameType(Packet packet) {
-        return constructFromStream.getDeclaringClass().isInstance(packet.getHeader());
+        this.lock.readLock().lock();
+        try {
+            return constructFromStream.getDeclaringClass().isInstance(packet.getHeader());
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 }
