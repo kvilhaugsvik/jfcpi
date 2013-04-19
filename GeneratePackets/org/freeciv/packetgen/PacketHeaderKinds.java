@@ -16,6 +16,7 @@ package org.freeciv.packetgen;
 
 public enum PacketHeaderKinds {
     FC_2_4,
+    FC_trunk,
 
     /* Never used in a release */
     FC_2_4_99_2011_11_02

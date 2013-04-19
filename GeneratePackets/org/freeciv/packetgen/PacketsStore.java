@@ -71,6 +71,17 @@ public class PacketsStore {
                 packetHeaderType = TargetClass.newKnown(Header_2_2.class);
                 protoRules = new Typed[0];
                 break;
+            case FC_trunk:
+                packetHeaderType = TargetClass.newKnown(Header_2_1.class);
+                TargetClass place = TargetClass.fromClass(ReflexRuleTime.class).scopeUnknown();
+                TargetClass change = TargetClass.fromClass(org.freeciv.connection.ReflexActionChangeHeaderKind.class).scopeUnknown();
+                protoRules = new Typed[]{
+                        rule.newInstance(place.callV("POST_RECEIVE"), BuiltIn.literal(5),
+                                change.newInstance(TargetClass.newKnown(Header_2_2.class).callV("class"))),
+                        rule.newInstance(place.callV("POST_SEND"), BuiltIn.literal(5),
+                                change.newInstance(TargetClass.newKnown(Header_2_2.class).callV("class")))
+                };
+                break;
             default: throw new IllegalArgumentException("No other sizes than one or two bytes are supported" +
                                                                 "for packet kind field in packet header");
         }
