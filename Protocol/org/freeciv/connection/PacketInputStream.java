@@ -41,45 +41,40 @@ public class PacketInputStream extends FilterInputStream {
 
     private static RawPacket readPacket(InputStream from, Over state, HeaderData headerData)
             throws IOException, InvocationTargetException {
-        final byte[] headerStart = readXBytesFrom(headerData.getHeaderSize(), from, state, true);
-        PacketHeader head;
-        try {
-            head = headerData.getStream2Header().newInstance(new DataInputStream(new ByteArrayInputStream(headerStart)));
-        } catch (InstantiationException e) {
-            throw badHeader(e);
-        } catch (IllegalAccessException e) {
-            throw badHeader(e);
-        }
+        final byte[] start = readXBytesFrom(2, new byte[0], from, state);
+        final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
 
-        byte[] body = readXBytesFrom(head.getBodySize(), from, state, false);
-        return new RawPacket(body, head);
+        byte[] packet = readXBytesFrom(size - 2, start, from, state);
+
+        return new RawPacket(packet, headerData);
     }
 
-    private static IllegalStateException badHeader(Exception e) {
-        return new IllegalStateException("Wrong data for reading headers", e);
-    }
-
-    private static byte[] readXBytesFrom(int wanted, InputStream from, Over state, boolean clean)
+    private static byte[] readXBytesFrom(int wanted, byte[] start, InputStream from, Over state)
             throws IOException {
-        byte[] out = new byte[wanted];
+        assert 0 <= wanted : "Can't read a negative number of bytes";
+
+        byte[] out = new byte[wanted + start.length];
+        System.arraycopy(start, 0, out, 0, start.length);
+
         int alreadyRead = 0;
         while(alreadyRead < wanted) {
             final int bytesRead;
             try {
-                bytesRead = from.read(out, alreadyRead, wanted - alreadyRead);
+                bytesRead = from.read(out, alreadyRead + start.length, wanted - alreadyRead);
             } catch (EOFException e) {
-                throw done(wanted, clean, alreadyRead);
+                throw done(wanted, start, alreadyRead);
             }
             if (0 <= bytesRead)
                 alreadyRead += bytesRead;
             else if (state.isOver())
-                throw done(wanted, clean, alreadyRead);
+                throw done(wanted, start, alreadyRead);
             Thread.yield();
         }
         return out;
     }
 
-    private static IOException done(int wanted, boolean clean, int alreadyRead) throws DoneReading, EOFException {
+    private static IOException done(int wanted, byte[] start, int alreadyRead) throws DoneReading, EOFException {
+        final boolean clean = 0 == start.length;
         if (clean && 0 == alreadyRead)
             return new DoneReading("Nothing to read and nothing is waiting");
         else

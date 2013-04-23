@@ -15,8 +15,12 @@
 package org.freeciv.packet;
 
 import org.freeciv.Util;
+import org.freeciv.connection.HeaderData;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 public class RawPacket implements Packet {
     private final PacketHeader header;
@@ -28,9 +32,20 @@ public class RawPacket implements Packet {
         in.readFully(content);
     }
 
-    public RawPacket(byte[] in, PacketHeader header) throws IOException {
-        this.header = header;
-        content = in;
+    public RawPacket(byte[] packet, HeaderData stream2Header) throws InvocationTargetException {
+        try {
+            this.header = stream2Header.getStream2Header()
+                    .newInstance(new DataInputStream(new ByteArrayInputStream(packet)));
+        } catch (InstantiationException e) {
+            throw badHeader(e);
+        } catch (IllegalAccessException e) {
+            throw badHeader(e);
+        }
+        this.content = Arrays.copyOfRange(packet, header.getHeaderSize(), packet.length);
+    }
+
+    private static IllegalStateException badHeader(Exception e) {
+        return new IllegalStateException("Wrong data for reading headers", e);
     }
 
     public PacketHeader getHeader() {
