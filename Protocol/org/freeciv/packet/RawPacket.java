@@ -26,12 +26,6 @@ public class RawPacket implements Packet {
     private final PacketHeader header;
     private final byte[] content;
 
-    public RawPacket(DataInput in, PacketHeader header) throws IOException {
-        this.header = header;
-        content = new byte[header.getBodySize()];
-        in.readFully(content);
-    }
-
     public RawPacket(byte[] packet, HeaderData stream2Header) throws InvocationTargetException {
         try {
             this.header = stream2Header.getStream2Header()
