@@ -200,13 +200,13 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
                 TerminatedArray.readByte,
                 BuiltIn.TO_STRING_OBJECT,
                 Arrays.asList(iProvide),
-                me.<AnInt>read("size"),
+                me.<AnInt>callV("size"),
                 transferSizeSerialize,
                 knowsSize ?
                         new From1<Typed<AnInt>, Var>() {
                             @Override
                             public Typed<AnInt> x(Var val) {
-                                return neededBytes(me.<AnInt>read("size"));
+                                return neededBytes(me.<AnInt>callV("size"));
                             }
                         } :
                         new From1<Typed<AnInt>, Var>() {

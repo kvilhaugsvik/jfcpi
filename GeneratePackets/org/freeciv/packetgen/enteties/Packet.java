@@ -226,7 +226,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         Var header = getField("header");
         body.addStatement(labelExceptionsWithPacketAndField(header, new Block(
                 header.assign(headerKind.newInstance(
-                        sum(new MethodCall<AnInt>("calcBodyLen"), headerKind.read("HEADER_SIZE")),
+                        sum(new MethodCall<AnInt>("calcBodyLen"), headerKind.callV("HEADER_SIZE")),
                         getField("number").ref()))), addExceptionLocation));
 
         addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE,

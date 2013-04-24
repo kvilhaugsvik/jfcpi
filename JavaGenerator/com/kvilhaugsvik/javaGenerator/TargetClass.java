@@ -115,10 +115,6 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         this.represents = rep;
     }
 
-    public <Kind extends AValue> Value<Kind> read(final String field) {
-        return callV(field);
-    }
-
     public void register(TargetMethod has) {
         // TODO: Fix underlying issue. For now work around by sparing dynamic non void methods from over writing
         if (methods.containsKey(has.getName())
