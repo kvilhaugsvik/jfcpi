@@ -46,6 +46,7 @@ public interface HasAtoms {
     public static final CodeAtom MUL = new CodeAtom("*");
     public static final CodeAtom DIV = new CodeAtom("/");
     public static final CodeAtom REM = new CodeAtom("%");
+    public static final CodeAtom DEC = new CodeAtom("--");
     public static final CodeAtom INC = new CodeAtom("++");
     public static final CodeAtom INC_USING = new CodeAtom("+=");
     public static final CodeAtom newInst = new CodeAtom("new");
