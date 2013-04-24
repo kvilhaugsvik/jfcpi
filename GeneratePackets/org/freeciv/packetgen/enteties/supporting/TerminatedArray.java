@@ -200,7 +200,7 @@ public class TerminatedArray extends FieldType {
                 final Block limitReached = new Block();
                 if (alwaysIncludeStopValue)
                     limitReached.addStatement(readElementFrom.x(from));
-                limitReached.addStatement(BuiltIn.<NoValue>toCode("break"));
+                limitReached.addStatement(BuiltIn.BREAK());
 
                 Block out = new Block();
 
@@ -209,7 +209,7 @@ public class TerminatedArray extends FieldType {
                 out.addStatement(buf);
                 out.addStatement(IF(isSame(literal(0), buf.ref().callV("length")),
                         new Block(to.assign(convertBufferArrayToValue.x(buf.ref())),
-                                BuiltIn.toCode("return"))));
+                                BuiltIn.RETURN())));
                 out.addStatement(current);
                 out.addStatement(pos);
                 out.addStatement(
