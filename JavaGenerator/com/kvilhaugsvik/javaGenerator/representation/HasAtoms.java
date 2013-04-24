@@ -54,6 +54,7 @@ public interface HasAtoms {
     public static final CodeAtom IF = new CodeAtom("if");
     public static final CodeAtom ELSE = new CodeAtom("else");
     public static final CodeAtom RET = new CodeAtom("return");
+    public static final CodeAtom BRE = new CodeAtom("break");
     public static final CodeAtom RIF_THEN = new CodeAtom("?");
     public static final CodeAtom ELSE2 = new CodeAtom(":");
     public static final CodeAtom ASSRT = new IR.CodeAtom("assert");

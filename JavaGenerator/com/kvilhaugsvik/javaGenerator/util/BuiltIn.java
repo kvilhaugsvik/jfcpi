@@ -70,6 +70,24 @@ public class BuiltIn {
             };
     }
 
+    public static Typed<NoValue> RETURN() {
+            return new Formatted.Type<NoValue>() {
+                @Override
+                public void writeAtoms(CodeAtoms to) {
+                    to.add(RET);
+                }
+            };
+    }
+
+    public static Typed<NoValue> BREAK() {
+            return new Formatted.Type<NoValue>() {
+                @Override
+                public void writeAtoms(CodeAtoms to) {
+                    to.add(BRE);
+                }
+            };
+    }
+
     private static final From2or3<Typed<NoValue>, Typed<ABool>, Block, Block> ifImpl = new If();
     public static Typed<NoValue> IF (Typed<ABool> cond, Block then) {
         return ifImpl.x(cond, then);
