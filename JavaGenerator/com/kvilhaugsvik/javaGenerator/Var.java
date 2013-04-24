@@ -15,6 +15,7 @@
 package com.kvilhaugsvik.javaGenerator;
 
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
+import com.kvilhaugsvik.javaGenerator.formating.TokensToStringStyle;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
@@ -77,8 +78,8 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     }
 
     @Override
-    public String getJavaCodeIndented(String start) {
-        return new Statement(this).getJavaCodeIndented(start);
+    public String getJavaCodeIndented(String start, TokensToStringStyle style) {
+        return new Statement(this).getJavaCodeIndented(start, style);
     }
 
     @Override

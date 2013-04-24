@@ -15,6 +15,7 @@
 package com.kvilhaugsvik.javaGenerator.util;
 
 import com.kvilhaugsvik.javaGenerator.ClassWriter;
+import com.kvilhaugsvik.javaGenerator.formating.TokensToStringStyle;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
@@ -23,8 +24,8 @@ import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import java.util.List;
 
 public abstract class Formatted implements HasAtoms {
-    public String getJavaCodeIndented(String start) {
-        List<String> lines = ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(new CodeAtoms(this));
+    public String getJavaCodeIndented(String start, TokensToStringStyle style) {
+        List<String> lines = style.asFormattedLines(new CodeAtoms(this));
         if (0 == lines.size())
             return "";
         StringBuilder out = new StringBuilder(start);
@@ -40,8 +41,12 @@ public abstract class Formatted implements HasAtoms {
         return out.toString();
     }
 
+    public String toString(TokensToStringStyle style) {
+        return getJavaCodeIndented("", style);
+    }
+
     public String toString() {
-        return getJavaCodeIndented("");
+        return toString(ClassWriter.DEFAULT_STYLE_INDENT);
     }
 
     public static abstract class Type<Return extends Returnable> extends Formatted implements Typed<Return> {}
