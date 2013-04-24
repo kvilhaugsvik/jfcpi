@@ -39,7 +39,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     boolean shallow = true;
     Class represents = null;
 
-    public TargetClass(String inPackage, String className) {
+    protected TargetClass(String inPackage, String className) {
         super(TargetPackage.from(inPackage), addressString2Components(className));
         final CodeAtom name = super.components[super.components.length - 1];
         final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
