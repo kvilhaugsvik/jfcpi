@@ -44,6 +44,9 @@ public class PacketInputStream extends FilterInputStream {
         final byte[] start = readXBytesFrom(2, new byte[0], from, state);
         final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
 
+        // released after reflexes are done
+        state.networkAndReflexesLock();
+
         byte[] packet = readXBytesFrom(size - 2, start, from, state);
 
         return new RawPacket(packet, headerData);

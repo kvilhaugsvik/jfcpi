@@ -76,6 +76,21 @@ public class Interpreted implements FreecivConnection {
         return toProcess.isOver();
     }
 
+    @Override
+    public void networkAndReflexesLock() {
+        toProcess.networkAndReflexesLock();
+    }
+
+    @Override
+    public void networkAndReflexesUnlock() {
+        toProcess.networkAndReflexesUnlock();
+    }
+
+    @Override
+    public boolean networkAndReflexesHeldByCurrentThread() {
+        return toProcess.networkAndReflexesHeldByCurrentThread();
+    }
+
     public boolean isOpen() {
         return toProcess.isOpen();
     }

@@ -22,6 +22,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Uninterpreted implements FreecivConnection {
     private final BackgroundReader in;
@@ -87,12 +88,15 @@ public class Uninterpreted implements FreecivConnection {
 
         toSend.encodeTo(packet);
 
+        networkAndReflexesLock();
         try {
             out.write(packetSerialized.toByteArray());
             this.postSend.handle(toSend);
         } catch (IOException e) {
             close();
             throw new IOException("Can't send", e);
+        } finally {
+            networkAndReflexesUnlock();
         }
     }
 
@@ -119,6 +123,21 @@ public class Uninterpreted implements FreecivConnection {
         return overImpl.isOver();
     }
 
+    @Override
+    public void networkAndReflexesLock() {
+        overImpl.networkAndReflexesLock();
+    }
+
+    @Override
+    public void networkAndReflexesUnlock() {
+        overImpl.networkAndReflexesUnlock();
+    }
+
+    @Override
+    public boolean networkAndReflexesHeldByCurrentThread() {
+        return overImpl.networkAndReflexesHeldByCurrentThread();
+    }
+
     private static class BackgroundReader extends Thread {
         private final PacketInputStream in;
         private final LinkedList<RawPacket> buffered;
@@ -141,9 +160,15 @@ public class Uninterpreted implements FreecivConnection {
         public void run() {
             try {
                 while(true) {
-                    RawPacket incoming = in.readPacket();
+                    RawPacket incoming;
+                    try { // Locked after some data is read
+                        incoming = in.readPacket();
 
-                    quickRespond.handle(incoming);
+                        quickRespond.handle(incoming);
+                    } finally {
+                        if (parent.networkAndReflexesHeldByCurrentThread())
+                            parent.networkAndReflexesUnlock();
+                    }
 
                     synchronized (buffered) {
                         buffered.add(incoming);

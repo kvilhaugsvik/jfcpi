@@ -14,10 +14,14 @@
 
 package org.freeciv.connection;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public class OverImpl implements Over {
+    private final ReentrantLock reflexLock;
     boolean over = false;
 
     public OverImpl() {
+        this.reflexLock = new ReentrantLock();
     }
 
     public void setOver() {
@@ -26,5 +30,20 @@ public class OverImpl implements Over {
 
     public boolean isOver() {
         return over;
+    }
+
+    @Override
+    public void networkAndReflexesLock() {
+        reflexLock.lock();
+    }
+
+    @Override
+    public void networkAndReflexesUnlock() {
+        reflexLock.unlock();
+    }
+
+    @Override
+    public boolean networkAndReflexesHeldByCurrentThread() {
+        return reflexLock.isHeldByCurrentThread();
     }
 }
