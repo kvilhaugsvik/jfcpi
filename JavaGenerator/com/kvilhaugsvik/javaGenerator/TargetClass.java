@@ -73,13 +73,9 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     public TargetClass(TargetPackage where, CodeAtom name) {
-        this(where, name, new HashMap<String, TargetMethod>());
-    }
-
-    private TargetClass(TargetPackage where, CodeAtom name, HashMap<String, TargetMethod> methods) {
         super(where, name);
         this.name = name;
-        this.methods = methods;
+        this.methods = new HashMap<String, TargetMethod>();
 
         registerBuiltIn();
     }
