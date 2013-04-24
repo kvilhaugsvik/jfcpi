@@ -187,7 +187,7 @@ public class CodeGenTest {
                 "more comment"), Visibility.PUBLIC, Scope.CLASS,
                 TargetClass.fromClass(int.class), "testMethod",  Arrays.asList(Var.param(String.class, "a")),
                 Arrays.asList(TargetClass.fromClass(Throwable.class)),
-                new Block(RETURN(literal(5))))).toString();
+                new Block(RETURN(literal(5))))).getJavaCodeIndented("\t", longCommentStyle);
 
         assertEquals("Generated source not as expected",
                 "\t" + "/*" + "\n" +
@@ -196,7 +196,7 @@ public class CodeGenTest {
                         "\t" + " */" + "\n" +
                         "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
                         "\t" + "\t" + "return 5;\n" +
-                        "\t" + "}" + "\n",
+                        "\t" + "}",
                 result);
     }
 
@@ -843,6 +843,85 @@ public class CodeGenTest {
                 " * deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver deliver\n" +
                 " * deliver\n" +
                 " */",
-                Comment.c(asText).toString());
+                Comment.c(asText).toString(longCommentStyle));
+    }
+
+    final static TokensToStringStyle longCommentStyle;
+    static {
+        CodeStyleBuilder<ScopeStack.ScopeInfo> builder =
+            new CodeStyleBuilder<ScopeStack.ScopeInfo>(CodeStyleBuilder.<ScopeStack.ScopeInfo>INSERT_SPACE(),
+                    ScopeStack.ScopeInfo.class);
+
+        builder.whenFirst(
+                new Util.OneCondition<ScopeStack.ScopeInfo>() {
+                    @Override
+                    public boolean isTrueFor(ScopeStack.ScopeInfo argument) {
+                        return 100 < argument.getLineLength() + argument.getRLen() + 1;
+                    }
+                },
+                CodeStyleBuilder.DependsOn.ignore_tokens,
+                builder.BREAK_COMMENT_LINE
+        );
+        builder.whenFirst(
+                builder.condLeftIs(HasAtoms.CCommentStart),
+                CodeStyleBuilder.DependsOn.token_left,
+                builder.BREAK_COMMENT_LINE
+        );
+        builder.whenFirst(
+                builder.condRightIs(HasAtoms.CCommentEnd),
+                CodeStyleBuilder.DependsOn.token_right,
+                builder.BREAK_LINE,
+                builder.INSERT_SPACE
+        );
+        builder.whenFirst(
+                builder.condAtTheBeginning(),
+                CodeStyleBuilder.DependsOn.ignore_tokens,
+                builder.DO_NOTHING
+        );
+        builder.whenFirst(
+                builder.condAtTheEnd(),
+                CodeStyleBuilder.DependsOn.ignore_tokens,
+                builder.DO_NOTHING
+        );
+        builder.whenFirst(
+                builder.condLeftIs(HasAtoms.CCommentEnd),
+                CodeStyleBuilder.DependsOn.token_left,
+                builder.BREAK_LINE
+        );
+        builder.whenFirst(
+                builder.condLeftIs(HasAtoms.LSC),
+                CodeStyleBuilder.DependsOn.token_left,
+                builder.SCOPE_ENTER,
+                builder.BREAK_LINE,
+                builder.INDENT
+        );
+        builder.whenFirst(
+                builder.condRightIs(HasAtoms.RSC),
+                CodeStyleBuilder.DependsOn.token_right,
+                builder.SCOPE_EXIT,
+                builder.BREAK_LINE
+        );
+        builder.whenFirst(
+                builder.condLeftIs(HasAtoms.LPR),
+                CodeStyleBuilder.DependsOn.token_left,
+                builder.DO_NOTHING
+        );
+        builder.whenFirst(
+                builder.condRightIs(HasAtoms.RPR),
+                CodeStyleBuilder.DependsOn.token_right,
+                builder.DO_NOTHING
+        );
+        builder.whenFirst(
+                builder.condRightIs(HasAtoms.LPR),
+                CodeStyleBuilder.DependsOn.token_right,
+                builder.DO_NOTHING
+        );
+        builder.whenFirst(
+                builder.condRightIs(HasAtoms.EOL),
+                CodeStyleBuilder.DependsOn.token_right,
+                builder.DO_NOTHING
+        );
+
+        longCommentStyle = builder.getStyle();
     }
 }
