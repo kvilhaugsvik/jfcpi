@@ -328,7 +328,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 out = new Typed[3];
                 out[2] = valid ? BuiltIn.TRUE : BuiltIn.FALSE;
             }
-            out[0] = BuiltIn.<AnInt>toCode(valueGen.toString());
+            out[0] = valueGen;
             out[1] = BuiltIn.<AString>toCode(toStringName);
             return out;
         }

@@ -68,7 +68,7 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements Dependen
 
     public static Constant<AnInt> isInt(String name, IntExpression expression) {
         return new Constant<AnInt>(TargetClass.fromClass(int.class), name,
-                BuiltIn.<AnInt>toCode(expression.toString()), expression.getReqs());
+                expression, expression.getReqs());
     }
 
     public static Constant<AString> isString(String name, Typed<AString> expression) {

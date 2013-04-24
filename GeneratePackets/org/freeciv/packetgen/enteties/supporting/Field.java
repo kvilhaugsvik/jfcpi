@@ -158,7 +158,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     public Typed getSuperLimit(int pos) throws UndefinedException {
         if (pos < declarations.length) {
             LinkedList<Typed<AnInt>> args = new LinkedList<Typed<AnInt>>();
-            args.add(BuiltIn.<AnInt>toCode(declarations[pos].getMaxSize().toString()));
+            args.add(declarations[pos].getMaxSize());
             if (declarations[pos].hasTransfer())
                 args.add(declarations[pos].getTransferValue());
             if (pos + 1 < declarations.length)
@@ -177,7 +177,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
                     case 0:
                         break;
                     case 1:
-                        transferTypeCheck.add(isSmallerThan(BuiltIn.<AnInt>toCode(dec.getMaxSize().toString()),
+                        transferTypeCheck.add(isSmallerThan(dec.getMaxSize(),
                                 BuiltIn.<AnInt>toCode("Integer.MAX_VALUE")));
                         break;
                     case -1:

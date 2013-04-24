@@ -66,7 +66,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
         this.transferArraySizeKind = transferArraySizeKind;
 
         if (knowsSize)
-            addClassConstant(Visibility.PUBLIC, int.class, "size", BuiltIn.<AnInt>toCode(knownSize.toString()));
+            addClassConstant(Visibility.PUBLIC, int.class, "size", knownSize);
         else
             addPublicObjectConstant(int.class, "size");
 
