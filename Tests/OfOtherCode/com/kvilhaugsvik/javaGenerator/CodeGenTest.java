@@ -57,7 +57,7 @@ public class CodeGenTest {
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
-                        "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
+                        "\t" + "public static int testMethod(java.lang.String a) throws java.lang.Throwable {" + "\n" +
                         "\t" + "\t" + "return 5;\n" +
                         "\t" + "}" + "\n",
                 result);
@@ -94,7 +94,7 @@ public class CodeGenTest {
                 new Block(RETURN(literal(5)))));
 
         assertEquals("Generated source not as expected",
-                        "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
+                        "\t" + "public static int testMethod(java.lang.String a) throws java.lang.Throwable {" + "\n" +
                         "\t" + "\t" + "return 5;\n" +
                         "\t" + "}" + "\n",
                 result);
@@ -107,7 +107,7 @@ public class CodeGenTest {
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
-                        "\t" + "public static int testMethod() throws Throwable {" + "\n" +
+                        "\t" + "public static int testMethod() throws java.lang.Throwable {" + "\n" +
                         "\t" + "\t" + "return 5;\n" +
                         "\t" + "}" + "\n",
                 result);
@@ -194,7 +194,7 @@ public class CodeGenTest {
                         "\t" + " * comment comment comment comment comment comment comment comment comment comment comment comment" + "\n" +
                         "\t" + " * more comment" + "\n" +
                         "\t" + " */" + "\n" +
-                        "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
+                        "\t" + "public static int testMethod(java.lang.String a) throws java.lang.Throwable {" + "\n" +
                         "\t" + "\t" + "return 5;\n" +
                         "\t" + "}",
                 result);
@@ -211,7 +211,7 @@ public class CodeGenTest {
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
-                        "\t" + "public static int testMethod(String a) throws Throwable {" + "\n" +
+                        "\t" + "public static int testMethod(java.lang.String a) throws java.lang.Throwable {" + "\n" +
                         "\t" + "\t" + "int a = 5;" + "\n" +
                         "\n" +
                         "\t" + "\t" + "return a;" + "\n" +
@@ -279,7 +279,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public class NameOfClass implements Packet {" + "}" + "\n",
+                        "public class NameOfClass implements org.freeciv.packet.Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -292,7 +292,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public class NameOfClass implements Packet {" + "}" + "\n",
+                        "public class NameOfClass implements org.freeciv.packet.Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -305,7 +305,7 @@ public class CodeGenTest {
                         "import javax.annotation.Generated;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public class NameOfClass implements Packet {" + "}" + "\n",
+                        "public class NameOfClass implements org.freeciv.packet.Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -317,7 +317,7 @@ public class CodeGenTest {
                         "\n" +
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
-                        "public class NameOfClass implements Packet {" + "}" + "\n",
+                        "public class NameOfClass implements org.freeciv.packet.Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -353,7 +353,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public enum NameOfClass implements Packet {" + "}" + "\n",
+                        "public enum NameOfClass implements org.freeciv.packet.Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -369,7 +369,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public enum NameOfClass implements Packet {" + "\n" +
+                        "public enum NameOfClass implements org.freeciv.packet.Packet {" + "\n" +
                         "\t" + "ONE(1, \"one\");" + "\n" +
                         "}" + "\n",
                 toWrite.toString());
@@ -389,7 +389,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public enum NameOfClass implements Packet {" + "\n" +
+                        "public enum NameOfClass implements org.freeciv.packet.Packet {" + "\n" +
                         "\t" + "ONE(1)," + "\n" +
                         "\t" + "TWO(2)," + "\n" +
                         "\t" + "THREE(3);" + "\n" +
@@ -413,7 +413,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public enum NameOfClass implements Packet {" + "\n" +
+                        "public enum NameOfClass implements org.freeciv.packet.Packet {" + "\n" +
                         "\t" + "ONE(1)," + "\n" +
                         "\t" + "TWO(2)," + "\n" +
                         "\t" + "THREE(3)," + "\n" +
@@ -437,7 +437,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public enum NameOfClass implements Packet {" + "\n" +
+                        "public enum NameOfClass implements org.freeciv.packet.Packet {" + "\n" +
                         "\t" + "ONE(1)," + "\n" +
                         "\t" + "/* Not a prime number */ TWO(2)," + "\n" +
                         "\t" + "THREE(3);" + "\n" +
@@ -459,7 +459,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public enum NameOfClass implements Packet {" + "\n" +
+                        "public enum NameOfClass implements org.freeciv.packet.Packet {" + "\n" +
                         "\t" + "ONE(1, \"one\")," + "\n" +
                         "\t" + "2nd(2, \"2nd\")," + "\n" +
                         "\t" + "TWO(2, \"two\");" + "\n" +
@@ -491,7 +491,7 @@ public class CodeGenTest {
                         "import org.freeciv.packet.Packet;" + "\n" +
                         "\n" +
                         "@Generated(comments = \"Auto generated from nothing\"" + generatorname + "\n" +
-                        "public class NameOfClass implements Packet {" + "}" + "\n",
+                        "public class NameOfClass implements org.freeciv.packet.Packet {" + "}" + "\n",
                 toWrite.toString());
     }
 
@@ -523,7 +523,7 @@ public class CodeGenTest {
                 Block.fromStrings("this.unit_id = new UNIT(unit_id)")).toString();
 
         assertEquals("Generated source not as expected",
-                "\t" + "public " + HasAtoms.SELF.get() + "(Integer unit_id) {" + "\n" +
+                "\t" + "public " + HasAtoms.SELF.get() + "(java.lang.Integer unit_id) {" + "\n" +
                         "\t" + "\t" + "this.unit_id = new UNIT(unit_id);" + "\n" +
                         "\t" + "}" + "\n",
                 result);
@@ -537,7 +537,7 @@ public class CodeGenTest {
         Block body = new Block(
                 BuiltIn.<AValue>toCode("this.unit_id = new UNIT(from)"),
                 IF(BuiltIn.<ABool>toCode("getNumber() != packet"),
-                        Block.fromStrings("throw new IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet)")));
+                        Block.fromStrings("throw new java.io.IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet)")));
         body.groupBoundary();
         body.addStatement(IF(BuiltIn.<ABool>toCode("getEncodedSize() != headerLen"),
                 new Block(THROW((TargetClass.newKnown(IOException.class))
@@ -562,16 +562,16 @@ public class CodeGenTest {
                         "\t" + " * @param from data stream that is at the start of the package body" + "\n" +
                         "\t" + " * @param headerLen length from header package" + "\n" +
                         "\t" + " * @param packet the number of the packet specified in the header" + "\n" +
-                        "\t" + " * @throws IOException if the DataInput has a problem" + "\n" +
+                        "\t" + " * @throws java.io.IOException if the DataInput has a problem" + "\n" +
                         "\t" + " */" + "\n" +
-                        "\t" + "public " + HasAtoms.SELF.get() + "(DataInput from, int headerLen, int packet) throws IOException {\n" +
+                        "\t" + "public " + HasAtoms.SELF.get() + "(java.io.DataInput from, int headerLen, int packet) throws java.io.IOException {\n" +
                         "\t" + "\t" + "this.unit_id = new UNIT(from);\n" +
                         "\t" + "\t" + "if (getNumber() != packet) {\n" +
-                        "\t" + "\t" + "\t" + "throw new IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet);\n" +
+                        "\t" + "\t" + "\t" + "throw new java.io.IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet);\n" +
                         "\t" + "\t" + "}" + "\n" +
                         "\n" +
                         "\t" + "\t" + "if (getEncodedSize() != headerLen) {\n" +
-                        "\t" + "\t" + "\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen " /*"\n" +
+                        "\t" + "\t" + "\t" + "throw new java.io.IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen " /*"\n" +
                         "\t" + "\t" + "\t" + "\t" + "\t"*/ + "+ \" Packet: \" + getEncodedSize());\n" +
                         "\t" + "\t" + "}" + "\n" +
                         "\t" + "}" + "\n",
@@ -584,7 +584,7 @@ public class CodeGenTest {
                 new Block(RETURN(BuiltIn.<AString>toCode("value.toString()")))).toString();
 
         assertEquals("Generated source not as expected",
-                "\tpublic String toString() {\n" +
+                "\tpublic java.lang.String toString() {\n" +
                         "\t\treturn value.toString();\n" +
                         "\t}\n",
                 result);
@@ -918,6 +918,16 @@ public class CodeGenTest {
         );
         builder.whenFirst(
                 builder.condRightIs(HasAtoms.EOL),
+                CodeStyleBuilder.DependsOn.token_right,
+                builder.DO_NOTHING
+        );
+        builder.whenFirst(
+                builder.condLeftIs(HasAtoms.HAS),
+                CodeStyleBuilder.DependsOn.token_left,
+                builder.DO_NOTHING
+        );
+        builder.whenFirst(
+                builder.condRightIs(HasAtoms.HAS),
                 CodeStyleBuilder.DependsOn.token_right,
                 builder.DO_NOTHING
         );

@@ -199,7 +199,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     public void writeAtoms(CodeAtoms to) {
         if (!SELF_TYPED.equals(this))
             to.hintStart(TargetClass.class.getName());
-        if (isInScope || SELF_TYPED.equals(this))
+        if (SELF_TYPED.equals(this))
             shared.name.writeAtoms(to);
         else
             super.writeAtoms(to);
