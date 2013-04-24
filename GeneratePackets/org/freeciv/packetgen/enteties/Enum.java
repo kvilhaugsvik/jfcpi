@@ -176,10 +176,8 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
     public Collection<Dependency.Item> getEnumConstants() {
         Collection<Dependency.Item> out = new LinkedList<Dependency.Item>();
         for (String valueName : enums.getElementNames()) {
-            out.add(Constant.isInt(valueName, IntExpression.readFromOther(this,
-                                                                        this.getPackage() + "." + this
-                                                                                .getName() + "." + valueName + "" +
-                                                                                ".getNumber()")));
+            out.add(Constant.isInt(valueName,
+                    IntExpression.readFromOther(this, BuiltIn.<AnInt>toCode(getAddress().toString() + "." + valueName + ".getNumber()"))));
         }
         return out;
     }

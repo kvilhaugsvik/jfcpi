@@ -19,6 +19,8 @@ import org.junit.Test
 import org.freeciv.Util
 import util.parsing.input.CharArrayReader
 import org.freeciv.packetgen.enteties.supporting.IntExpression
+import com.kvilhaugsvik.javaGenerator.representation.{CodeAtoms, HasAtoms}
+import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom
 
 class ParseSharedTest {
   def parserShared = new ParseShared {
@@ -47,7 +49,8 @@ class ParseSharedTest {
 
   @Test def unaryAdd = assertIntExpressionBecomes("4", "+4")
 
-  @Test def unaryMinus = assertIntExpressionBecomes("-4", "-4")
+  // Code style problem workaround
+  @Test def unaryMinus = assertIntExpressionBecomes("- 4", "-4")
 
   @Test def prefixPlusPlus = assertIntExpressionBecomes("++" + Util.VERSION_DATA_CLASS + ".A", "++A")
 
@@ -85,9 +88,11 @@ class ParseSharedTest {
 
   @Test def parenTimesPlus = assertIntExpressionBecomes("1 * (2 + 3)", "1 * (2 + 3)")
 
-  @Test def uminusBinMinus = assertIntExpressionBecomes("(-2) - 3", "-2 - 3")
+   // Code style problem workaround
+  @Test def uminusBinMinus = assertIntExpressionBecomes("(- 2) - 3", "-2 - 3")
 
-  @Test def binMinusUminus = assertIntExpressionBecomes("2 - (-3)", "2 - -3")
+  // Code style problem workaround
+  @Test def binMinusUminus = assertIntExpressionBecomes("2 -(- 3)", "2 - -3")
 
   @Test def uminusParenBinMinus = assertIntExpressionBecomes("-(2 - 3)", "-(2 - 3)")
 
@@ -113,16 +118,17 @@ class ParseSharedTest {
   // Mapping
   @Test def mapParsedNumbersToTheirNames {
     val input: String = "1 + -2 * 3++"
-    val result: String = "ONE + ((-TWO) * (THREE++))"
-    val transformer: (IntExpression) => String = leaf => {
+    // Code style problem workaround
+    val result: String = "ONE + ((- TWO) * (THREE++))"
+    val transformer: (IntExpression) => HasAtoms = leaf => {
       if ("1".equals(leaf.toString))
-        "ONE"
+        new CodeAtom("ONE")
       else if ("2".equals(leaf.toString))
-        "TWO"
+        new CodeAtom("TWO")
       else if ("3".equals(leaf.toString))
-        "THREE"
+        new CodeAtom("THREE")
       else
-        "UNKNOWN"
+        new CodeAtom("UNKNOWN")
     }
 
     assertEquals("Failed to map the values of an IntExpression",

@@ -27,6 +27,7 @@ import org.freeciv.packetgen.UndefinedException
 import java.util.AbstractMap.SimpleImmutableEntry
 import org.freeciv.packetgen.enteties.supporting.{StructMaker, WeakVarDec, SimpleTypeAlias, IntExpression}
 import org.freeciv.packetgen.enteties.supporting.WeakVarDec.ArrayDeclaration
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn
 
 object ParseCCode extends ExtractableParser {
   private final val DEFINE: String = "#define"
@@ -178,10 +179,10 @@ object ParseCCode extends ExtractableParser {
             else {
               globalNumberExpression = registeredValue.get.valueMap(value => {
                 if (isAnInterpretedConstantOnThis(value)) {
-                  value.toStringNotJava + ".getNumber()"
+                  BuiltIn.toCode(value.nameOfConstant() + ".getNumber()")
                 } else {
                   iRequire.addAll(value.getReqs)
-                  value.toString
+                  value
                 }
               })
             }
@@ -189,7 +190,7 @@ object ParseCCode extends ExtractableParser {
           val number = globalNumberExpression
           globalNumberExpression = IntExpression.binary("+",
             IntExpression.integer("1"),
-            IntExpression.handled(name + ".getNumber()"))
+            IntExpression.handled(BuiltIn.toCode(name + ".getNumber()")))
           val enumVal = EnumElementFC.newEnumValue(name, number)
           alreadyReadExpression.put(name, enumVal)
           enumVal
