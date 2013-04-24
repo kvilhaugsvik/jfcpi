@@ -86,7 +86,7 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceDimensionsInTargetClass() {
-        TargetArray array = TargetArray.from(TargetClass.fromClass(int[][].class), 1);
+        TargetArray array = TargetArray.from(TargetClass.from(int[][].class), 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -101,7 +101,7 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceNoArrayFromTargetClass() {
-        TargetArray array = TargetArray.from(TargetClass.fromClass(int.class), 0);
+        TargetArray array = TargetArray.from(TargetClass.from(int.class), 0);
     }
 
     @Test public void targetArrayReadEnd() {
@@ -280,12 +280,12 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void callValuedReturnsVoid() {
-        TargetClass o = TargetClass.fromClass(Object.class);
+        TargetClass o = TargetClass.from(Object.class);
         o.callV("notify");
     }
 
     @Test public void callValuedReturns() {
-        TargetClass o = TargetClass.fromClass(Pattern.class);
+        TargetClass o = TargetClass.from(Pattern.class);
         Value<AValue> theCall = o.callV("compile", BuiltIn.literal("a*"));
 
         assertNotNull(theCall);
@@ -306,7 +306,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetMethod_readField_madeInTargetClass() throws NoSuchFieldException {
-        Value<AValue> theCall = TargetClass.fromClass(Pattern.class).callV("LITERAL");
+        Value<AValue> theCall = TargetClass.from(Pattern.class).callV("LITERAL");
 
         assertEquals("java.util.regex.Pattern.LITERAL", IR.joinSqueeze(new CodeAtoms(theCall).toArray()));
     }
@@ -340,7 +340,7 @@ public class TypedCodeTest {
             public boolean isTrueFor(CodeAtom atom) {
                 return HasAtoms.SELF.equals(atom);
             }
-        }, TargetClass.fromName("myPackage", "MyClass").scopeUnknown());
+        }, TargetClass.from("myPackage", "MyClass").scopeUnknown());
         Address bigAddress = Var.field(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
                 int.class, "myField", null).ref();
         bigAddress.writeAtoms(atoms);
@@ -386,22 +386,22 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClassCacheStringAndClass() {
-        TargetClass fromString = TargetClass.fromName("java.lang", "String");
-        TargetClass fromClass = TargetClass.fromClass(String.class);
+        TargetClass fromString = TargetClass.from("java.lang", "String");
+        TargetClass fromClass = TargetClass.from(String.class);
 
         assertEquals("The representations are different", fromClass, fromString);
     }
 
     public static void justExist() {}
     @Test public void targetClassFromClassAddsInfoToCached() {
-        TargetClass fromString = TargetClass.fromName("com.kvilhaugsvik.javaGenerator", "TypedCodeTest");
+        TargetClass fromString = TargetClass.from("com.kvilhaugsvik.javaGenerator", "TypedCodeTest");
         try {
             fromString.call("justExist");
             fail("Test makes bad assumption");
         } catch (IllegalArgumentException e) {
         }
 
-        TargetClass fromClass = TargetClass.fromClass(this.getClass());
+        TargetClass fromClass = TargetClass.from(this.getClass());
         assertNotNull(fromClass.call("justExist"));
     }
 
@@ -412,7 +412,7 @@ public class TypedCodeTest {
             fail("Test makes bad assumption");
         } catch (IllegalArgumentException e) {}
         aClass.scopeUnknown().register(new TargetMethod(aClass, "notThereYet",
-                TargetClass.fromClass(int.class), TargetMethod.Called.STATIC));
+                TargetClass.from(int.class), TargetMethod.Called.STATIC));
 
         assertNotNull("Method registered in unknown scope not there in known scope.", aClass.call("notThereYet"));
     }
@@ -428,67 +428,67 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClass_inheritance_fromParent() {
-        TargetClass child = TargetClass.fromName("testPack", "Child");
-        TargetClass parent = TargetClass.fromName("testPack", "Parent");
-        parent.register(new TargetMethod(parent, "methodNotOnChild", TargetClass.fromClass(int.class), TargetMethod.Called.STATIC));
+        TargetClass child = TargetClass.from("testPack", "Child");
+        TargetClass parent = TargetClass.from("testPack", "Parent");
+        parent.register(new TargetMethod(parent, "methodNotOnChild", TargetClass.from(int.class), TargetMethod.Called.STATIC));
         child.setParent(parent);
 
         assertNotNull(child.callV("methodNotOnChild"));
     }
 
     @Test public void targetClass_inheritance_fromGrandParent() {
-        TargetClass child = TargetClass.fromName("testPack", "Child");
-        TargetClass parent = TargetClass.fromName("testPack", "Parent");
+        TargetClass child = TargetClass.from("testPack", "Child");
+        TargetClass parent = TargetClass.from("testPack", "Parent");
         child.setParent(parent);
-        TargetClass grandParent = TargetClass.fromName("testPack", "GrandParent");
+        TargetClass grandParent = TargetClass.from("testPack", "GrandParent");
         parent.setParent(grandParent);
 
-        grandParent.register(new TargetMethod(grandParent, "methodNotOnChildOrParent", TargetClass.fromClass(int.class), TargetMethod.Called.STATIC));
+        grandParent.register(new TargetMethod(grandParent, "methodNotOnChildOrParent", TargetClass.from(int.class), TargetMethod.Called.STATIC));
 
         assertNotNull(child.callV("methodNotOnChildOrParent"));
     }
 
     @Test(expected = IllegalStateException.class)
     public void targetClass_inheritance_hasParentAlready() {
-        TargetClass child = TargetClass.fromName("testPack", "Child");
-        TargetClass parent = TargetClass.fromName("testPack", "Parent");
+        TargetClass child = TargetClass.from("testPack", "Child");
+        TargetClass parent = TargetClass.from("testPack", "Parent");
         child.setParent(parent);
-        TargetClass triesToBeParent = TargetClass.fromName("testPack", "StepParent");
+        TargetClass triesToBeParent = TargetClass.from("testPack", "StepParent");
         child.setParent(triesToBeParent);
     }
 
     @Test public void targetClass_inheritance_fromClassFindsParent() {
-        TargetClass child = TargetClass.fromClass(String.class);
+        TargetClass child = TargetClass.from(String.class);
         Var myString = Var.param(child, "myString");
 
         assertNotNull("Failed to inherit dynamic method wait from Class Object", myString.ref().<Returnable>call("wait"));
     }
 
     @Test public void targetClass_inheritance_Cache_FromStringWillNotDenyParentInfo() {
-        TargetClass child = TargetClass.fromName("com.kvilhaugsvik.javaGenerator.testData",
+        TargetClass child = TargetClass.from("com.kvilhaugsvik.javaGenerator.testData",
                 "TheChildReferredToUseOnlyOnce");
-        TargetClass parent = TargetClass.fromName("com.kvilhaugsvik.javaGenerator.testData",
+        TargetClass parent = TargetClass.from("com.kvilhaugsvik.javaGenerator.testData",
                 "TheParentReferredToUseOnlyOnce");
         child.setParent(parent);
-        TargetClass childIsClass = TargetClass.fromClass(TheChildReferredToUseOnlyOnce.class);
+        TargetClass childIsClass = TargetClass.from(TheChildReferredToUseOnlyOnce.class);
 
         assertNotNull(childIsClass.callV("methodNotOnChild"));
     }
 
     @Test public void targetClass_fromString_varArg() {
-        assertEquals("java.lang.Integer...", TargetClass.fromName("java.lang", "Integer...").getFullAddress());
+        assertEquals("java.lang.Integer...", TargetClass.from("java.lang", "Integer...").getFullAddress());
     }
 
     @Test public void scopeData_class_notInScope() {
-        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.one", "User"));
-        CodeAtoms used = new CodeAtoms(TargetClass.fromName("org.other", "Used"));
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.from("org.one", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.from("org.other", "Used"));
 
         assertFalse("Not imported. In other package. Shouldn't be in scope", scopeData.isInScope(used.toArray()));
     }
 
     @Test public void scopeData_class_inScope_sinceInSamePackage() {
-        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.here", "User"));
-        CodeAtoms used = new CodeAtoms(TargetClass.fromName("org.here", "Used"));
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.from("org.here", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.from("org.here", "Used"));
 
         assertTrue("Should be in scope since in same package", scopeData.isInScope(used.toArray()));
     }
@@ -499,27 +499,27 @@ public class TypedCodeTest {
 
     private void scopeData_class_inScope_sinceImported(Import<?> theImport, String wasImported) {
         Imports.ScopeDataForJavaFile scopeData = Imports.are(theImport)
-                .getScopeData(TargetClass.fromName("org.here", "User"));
-        CodeAtoms used = new CodeAtoms(TargetClass.fromName("org.there", "Used"));
+                .getScopeData(TargetClass.from("org.here", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.from("org.there", "Used"));
 
         assertTrue("Should be in scope since " + wasImported + " was imported", scopeData.isInScope(used.toArray()));
     }
 
     @Test public void scopeData_class_inScope_sinceClassImported() {
-        scopeData_class_inScope_sinceImported(Import.classIn(TargetClass.fromName("org.there", "Used")), "the class");
+        scopeData_class_inScope_sinceImported(Import.classIn(TargetClass.from("org.there", "Used")), "the class");
     }
 
     @Test public void scopeData_class_inScope_sinceInJavaLang() {
-        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.here", "User"));
-        CodeAtoms used = new CodeAtoms(TargetClass.fromClass(String.class).scopeUnknown());
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.from("org.here", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.from(String.class).scopeUnknown());
 
         assertTrue("String is in scope since its in java.lang", scopeData.isInScope(used.toArray()));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void scopeData_invalidEnd() {
-        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.one", "User"));
-        CodeAtoms used = new CodeAtoms(TargetClass.fromName("org.other", "Used"));
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.from("org.one", "User"));
+        CodeAtoms used = new CodeAtoms(TargetClass.from("org.other", "Used"));
         used.add(new CodeAtom("Failer"));
 
         assertFalse(scopeData.isInScope(used.toArray()));
@@ -527,9 +527,9 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void scopeData_invalidStart() {
-        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.fromName("org.one", "User"));
+        Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.from("org.one", "User"));
         CodeAtoms used = new CodeAtoms(new CodeAtom("Failer"));
-        TargetClass.fromName("org.other", "Used").writeAtoms(used);
+        TargetClass.from("org.other", "Used").writeAtoms(used);
 
         assertFalse(scopeData.isInScope(used.toArray()));
     }

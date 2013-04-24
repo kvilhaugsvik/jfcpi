@@ -858,7 +858,7 @@ public enum test implements org.freeciv.types.FCEnum {
     assertTrue("Where is pointer to int in " + wants, wants.contains(new Requirement("int16*", classOf[DataType])))
 
     val result = maker.produce(toCreate,
-      new SimpleTypeAlias("int*", TargetClass.fromName("java.lang", "Integer..."), null, 0))
+      new SimpleTypeAlias("int*", TargetClass.from("java.lang", "Integer..."), null, 0))
 
     assertEquals("java.lang.Integer...", result.asInstanceOf[SimpleTypeAlias].getAddress.getFullAddress)
   }
@@ -897,7 +897,7 @@ public enum test implements org.freeciv.types.FCEnum {
   @Test def structOneFieldEnum {
     val result = structFromText("""struct justOne {enum test value;};""",
       new Requirement("struct justOne", classOf[DataType]),
-      new SimpleTypeAlias("enum test", TargetClass.fromName("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0))
+      new SimpleTypeAlias("enum test", TargetClass.from("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0))
 
     assertTrue("The enum test should be needed here",
       result.getReqs.contains(new Requirement("enum test", classOf[DataType])))
@@ -923,8 +923,8 @@ struct two {
 };
     """,
       new Requirement("struct two", classOf[DataType]),
-      new SimpleTypeAlias("enum test", TargetClass.fromName("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0),
-      new SimpleTypeAlias("enum bitwise", TargetClass.fromName("org.freeciv.types", "bitwise"), new Requirement("enum bitwise", classOf[DataType]), 0)
+      new SimpleTypeAlias("enum test", TargetClass.from("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0),
+      new SimpleTypeAlias("enum bitwise", TargetClass.from("org.freeciv.types", "bitwise"), new Requirement("enum bitwise", classOf[DataType]), 0)
     )
 
     assertTrue("The enum test should be needed here",

@@ -39,16 +39,16 @@ public class TargetMethod extends Address<TargetClass> {
     }
 
     public TargetMethod(Method has) {
-        this(TargetClass.fromClass(has.getDeclaringClass()),
+        this(TargetClass.from(has.getDeclaringClass()),
                 has.getName(),
-                TargetClass.fromClass(has.getReturnType()),
+                TargetClass.from(has.getReturnType()),
                 Modifier.isStatic(has.getModifiers()) ? Called.STATIC : Called.DYNAMIC);
     }
 
     public TargetMethod(Field has) {
-        this(TargetClass.fromClass(has.getDeclaringClass()).scopeUnknown(),
+        this(TargetClass.from(has.getDeclaringClass()).scopeUnknown(),
                 has.getName(),
-                TargetClass.fromClass(has.getType()).scopeUnknown(),
+                TargetClass.from(has.getType()).scopeUnknown(),
                 Modifier.isStatic(has.getModifiers()) ? Called.STATIC_FIELD : Called.DYNAMIC_FIELD);
     }
 

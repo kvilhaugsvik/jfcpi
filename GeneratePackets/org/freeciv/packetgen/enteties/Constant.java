@@ -21,7 +21,6 @@ import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
-import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 
@@ -36,7 +35,7 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements Dependen
 
     private Constant(TargetClass type, String name, Typed<Kind> expression, Collection<? extends Requirement> needed) {
         super(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO, type, name, expression,
-                TargetClass.fromName("org.freeciv", "VersionData"));
+                TargetClass.from("org.freeciv", "VersionData"));
         reqs.addAll(needed);
     }
 
@@ -57,27 +56,27 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements Dependen
     }
 
     public static Constant<AnInt> isInt(String name, IntExpression expression) {
-        return new Constant<AnInt>(TargetClass.fromClass(int.class), name,
+        return new Constant<AnInt>(TargetClass.from(int.class), name,
                 expression, expression.getReqs());
     }
 
     public static Constant<AString> isString(String name, Typed<AString> expression) {
-        return new Constant<AString>(TargetClass.fromClass(String.class), name,
+        return new Constant<AString>(TargetClass.from(String.class), name,
                 expression, Collections.<Requirement>emptySet());
     }
 
     public static Constant<AValue> isClass(String name, Typed<AValue> expression) {
-        return new Constant<AValue>(TargetClass.fromClass(Class.class), name,
+        return new Constant<AValue>(TargetClass.from(Class.class), name,
                 expression, Collections.<Requirement>emptySet());
     }
 
     public static Constant<ABool> isBool(String name, Typed<ABool> expression) {
-        return new Constant<ABool>(TargetClass.fromClass(boolean.class), name,
+        return new Constant<ABool>(TargetClass.from(boolean.class), name,
                 expression, Collections.<Requirement>emptySet());
     }
 
     public static Constant<ALong> isLong(String name, Typed<ALong> expression) {
-        return new Constant<ALong>(TargetClass.fromClass(long.class), name, expression, Collections.<Requirement>emptySet());
+        return new Constant<ALong>(TargetClass.from(long.class), name, expression, Collections.<Requirement>emptySet());
     }
 
     public static <T extends AValue> Constant<T> isOther(TargetClass kind, String name, Typed<T> expression) {

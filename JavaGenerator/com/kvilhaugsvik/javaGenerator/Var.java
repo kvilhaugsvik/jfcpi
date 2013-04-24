@@ -112,7 +112,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
 
 
     public static <Kind extends AValue> Var<Kind> local(Class type, String name, Typed<Kind> value) {
-        return Var.<Kind>local(TargetClass.fromClass(type), name, value);
+        return Var.<Kind>local(TargetClass.from(type), name, value);
     }
 
     public static <Kind extends AValue> Var<Kind> local(TargetClass type, String name, Typed<Kind> value) {
@@ -124,7 +124,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     }
 
     public static <Kind extends AValue> Var<Kind> param(Class kind, String name) {
-        return Var.<Kind>param(TargetClass.fromClass(kind), name);
+        return Var.<Kind>param(TargetClass.from(kind), name);
     }
 
     public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations,
@@ -143,7 +143,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     public static <Kind extends AValue> Var<Kind> field(List<Annotate> annotations,
                                                         Visibility visibility, Scope scope, Modifiable modifiable,
                                                         Class type, String name, Typed<Kind> value) {
-        return Var.<Kind>field(annotations, visibility, scope, modifiable, TargetClass.fromClass(type), name, value);
+        return Var.<Kind>field(annotations, visibility, scope, modifiable, TargetClass.from(type), name, value);
     }
 
     public boolean isAnnotatedUsing(String name) {

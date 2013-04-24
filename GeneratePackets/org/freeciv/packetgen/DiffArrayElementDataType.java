@@ -60,7 +60,7 @@ public class DiffArrayElementDataType implements Dependency.Maker {
                         new WeakVarDec(new Requirement("int", DataType.class), "index"),
                         new WeakVarDec(require, "newValue")),
                 Arrays.asList(
-                        TargetClass.fromClass(Integer.class),
+                        TargetClass.from(Integer.class),
                         fieldTypeAlias.getUnderType()),
                 Arrays.asList(
                         new Requirement("int", DataType.class),

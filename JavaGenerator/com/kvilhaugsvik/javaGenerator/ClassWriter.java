@@ -35,7 +35,7 @@ import java.util.*;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class ClassWriter extends Formatted implements HasAtoms {
-    public static final TargetClass DEFAULT_PARENT = TargetClass.fromClass(Object.class);
+    public static final TargetClass DEFAULT_PARENT = TargetClass.from(Object.class);
 
     private final TargetClass myAddress;
     private final Imports.ScopeDataForJavaFile scopeData;
@@ -95,7 +95,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     public void addClassConstant(Visibility visibility, Class type, String name, Typed<? extends AValue> value) {
-        addClassConstant(visibility, TargetClass.fromClass(type), name, value);
+        addClassConstant(visibility, TargetClass.from(type), name, value);
     }
 
     public void addObjectConstant(TargetClass type, String name) {
@@ -103,7 +103,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     public void addObjectConstant(Class type, String name) {
-        addObjectConstant(TargetClass.fromClass(type), name);
+        addObjectConstant(TargetClass.from(type), name);
     }
 
     public void addPublicObjectConstant(TargetClass type, String name) {
@@ -111,7 +111,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     public void addPublicObjectConstant(Class type, String name) {
-        addPublicObjectConstant(TargetClass.fromClass(type), name);
+        addPublicObjectConstant(TargetClass.from(type), name);
     }
 
     public void addObjectConstantAndGetter(Var field) {

@@ -92,8 +92,8 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.methodsToAdd = methodsToAdd;
 
         // TODO: remove when fixed
-        this.javaType.register(new TargetMethod(javaType, "toString", TargetClass.fromClass(String.class), TargetMethod.Called.DYNAMIC));
-        this.javaType.register(new TargetMethod(javaType, "equals", TargetClass.fromClass(Boolean.class), TargetMethod.Called.DYNAMIC));
+        this.javaType.register(new TargetMethod(javaType, "toString", TargetClass.from(String.class), TargetMethod.Called.DYNAMIC));
+        this.javaType.register(new TargetMethod(javaType, "equals", TargetClass.from(Boolean.class), TargetMethod.Called.DYNAMIC));
 
         requirement = needs;
 
@@ -148,7 +148,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 TargetClass.newKnown(void.class), "encodeTo", Arrays.asList(pTo),
                 tIOExcept, encode));
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
-                TargetClass.fromClass(int.class), "encodedLength",
+                TargetClass.from(int.class), "encodedLength",
                 encodedSize));
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
                 javaType, "getValue",
@@ -156,10 +156,10 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.newKnown(String.class), "toString",
                 new Block(RETURN(value2String.x(this.getField("value"))))));
-        Var<TargetClass> paramOther = Var.param(TargetClass.fromClass(Object.class), "other");
+        Var<TargetClass> paramOther = Var.param(TargetClass.from(Object.class), "other");
         this.addMethod(Method.custom(Comment.no(),
                 Visibility.PUBLIC, Scope.OBJECT,
-                TargetClass.fromClass(boolean.class), "equals", Arrays.asList(paramOther),
+                TargetClass.from(boolean.class), "equals", Arrays.asList(paramOther),
                 Collections.<TargetClass>emptyList(),
                 new Block(IF(
                         BuiltIn.isInstanceOf(paramOther.ref(), this.getAddress()),

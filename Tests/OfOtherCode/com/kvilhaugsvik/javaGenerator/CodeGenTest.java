@@ -51,8 +51,8 @@ public class CodeGenTest {
 
     @Test public void testMethodEverything() {
         String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromClass(int.class), "testMethod", Arrays.asList(Var.param(String.class, "a")),
-                Arrays.asList(TargetClass.fromClass(Throwable.class)),
+                TargetClass.from(int.class), "testMethod", Arrays.asList(Var.param(String.class, "a")),
+                Arrays.asList(TargetClass.from(Throwable.class)),
                 new Block(RETURN(literal(5)))));
 
         assertEquals("Generated source not as expected",
@@ -89,8 +89,8 @@ public class CodeGenTest {
 
     @Test public void testMethodNoComment() {
         String result = toStringAsIfInAClass(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromClass(int.class), "testMethod", Arrays.asList(Var.param(String.class, "a")),
-                Arrays.asList(TargetClass.fromClass(Throwable.class)),
+                TargetClass.from(int.class), "testMethod", Arrays.asList(Var.param(String.class, "a")),
+                Arrays.asList(TargetClass.from(Throwable.class)),
                 new Block(RETURN(literal(5)))));
 
         assertEquals("Generated source not as expected",
@@ -102,7 +102,7 @@ public class CodeGenTest {
 
     @Test public void testMethodNoParams() {
         String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromClass(int.class), "testMethod", Collections.<Var<AValue>>emptyList(),
+                TargetClass.from(int.class), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Arrays.<TargetClass>asList(TargetClass.newKnown(Throwable.class)), new Block(RETURN(literal(5)))));
 
         assertEquals("Generated source not as expected",
@@ -115,7 +115,7 @@ public class CodeGenTest {
 
     @Test public void testMethodManyLevelsOfIndention() {
         String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromClass(int.class), "testMethod", Collections.<Var<AValue>>emptyList(),
+                TargetClass.from(int.class), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(),
                 new Block(WHILE(TRUE,
                         new Block(WHILE(TRUE,
@@ -149,7 +149,7 @@ public class CodeGenTest {
             }
         };
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromClass(int.class), "testMethod", Collections.<Var<AValue>>emptyList(),
+                TargetClass.from(int.class), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(), closesScopeNotOpened)).toString();
     }
 
@@ -177,7 +177,7 @@ public class CodeGenTest {
             }
         };
         String result = (Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromClass(int.class), "testMethod", Collections.<Var<AValue>>emptyList(),
+                TargetClass.from(int.class), "testMethod", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(), forgetsToCloseScope)).toString();
     }
 
@@ -185,8 +185,8 @@ public class CodeGenTest {
         String result = (Method.custom(Comment.c("comment comment comment comment comment comment " +
                 "comment comment comment comment comment comment " +
                 "more comment"), Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromClass(int.class), "testMethod",  Arrays.asList(Var.param(String.class, "a")),
-                Arrays.asList(TargetClass.fromClass(Throwable.class)),
+                TargetClass.from(int.class), "testMethod",  Arrays.asList(Var.param(String.class, "a")),
+                Arrays.asList(TargetClass.from(Throwable.class)),
                 new Block(RETURN(literal(5))))).getJavaCodeIndented("\t", longCommentStyle);
 
         assertEquals("Generated source not as expected",
@@ -206,8 +206,8 @@ public class CodeGenTest {
         isSeparated.groupBoundary();
         isSeparated.addStatement(BuiltIn.<AValue>toCode("return a"));
         String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
-                TargetClass.fromClass(int.class), "testMethod", Arrays.asList(Var.param(String.class, "a")),
-                Arrays.asList(TargetClass.fromClass(Throwable.class)), isSeparated));
+                TargetClass.from(int.class), "testMethod", Arrays.asList(Var.param(String.class, "a")),
+                Arrays.asList(TargetClass.from(Throwable.class)), isSeparated));
 
         assertEquals("Generated source not as expected",
                 "\t" + "/* comment */" + "\n" +
@@ -221,7 +221,7 @@ public class CodeGenTest {
 
     @Test public void testMethodClassStateReader() {
         Method toTest = Method.newReadClassState(Comment.no(),
-                TargetClass.fromClass(boolean.class), "isTrue",
+                TargetClass.from(boolean.class), "isTrue",
                 Block.fromStrings("return true"));
         assertEquals("Generated Class state reader source code not as espected",
                 "\t" + "public static boolean isTrue() {" + "\n" +
@@ -580,7 +580,7 @@ public class CodeGenTest {
 
     @Test public void testPublicReadObjectState() {
         String result = Method.newPublicReadObjectState(Comment.no(),
-                TargetClass.fromClass(String.class), "toString",
+                TargetClass.from(String.class), "toString",
                 new Block(RETURN(BuiltIn.<AString>toCode("value.toString()")))).toString();
 
         assertEquals("Generated source not as expected",

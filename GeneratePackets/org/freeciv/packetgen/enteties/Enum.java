@@ -106,7 +106,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         addObjectConstant(boolean.class, "valid");
         if (nameOverride)
             addField(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.YES,
-                    TargetClass.fromClass(String.class), "toStringName", null));
+                    TargetClass.from(String.class), "toStringName", null));
         else
             addObjectConstant(String.class, "toStringName");
 
@@ -127,16 +127,16 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                         fieldToStringName.assign(paramToStrName.ref()),
                         fieldValid.assign(paramValid.ref()))));
 
-        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(int.class), "getNumber",
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.from(int.class), "getNumber",
                 new Block(BuiltIn.RETURN(fieldNumber.ref()))));
-        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(boolean.class), "isValid",
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.from(boolean.class), "isValid",
                 new Block(BuiltIn.RETURN(fieldValid.ref()))));
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.newKnown(String.class), "toString",
                 new Block(BuiltIn.RETURN(fieldToStringName.ref()))));
         if (nameOverride) {
             Var<AString> paramName = Var.param(String.class, "name");
             addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                    TargetClass.fromClass(void.class), "setName", Arrays.asList(paramName),
+                    TargetClass.from(void.class), "setName", Arrays.asList(paramName),
                     Collections.<TargetClass>emptyList(),
                     new Block(fieldToStringName.assign(paramName.ref()))));
         }
@@ -144,7 +144,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         addMethod(Method.newReadClassState(Comment.doc("Is the enum bitwise?",
                 "An enum is bitwise if it's number increase by two's exponent.",
                 Comment.docReturns("true if the enum is bitwise")),
-                TargetClass.fromClass(boolean.class), "isBitWise", new Block(RETURN(BuiltIn.<ABool>toCode(bitwise + "")))));
+                TargetClass.from(boolean.class), "isBitWise", new Block(RETURN(BuiltIn.<ABool>toCode(bitwise + "")))));
 
         Var element = Var.local(this.getAddress().scopeKnown(), "element", null);
         addMethod(Method.custom(Comment.no(),

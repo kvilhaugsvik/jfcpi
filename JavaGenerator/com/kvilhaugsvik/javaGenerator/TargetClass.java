@@ -21,7 +21,6 @@ import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.AddressScopeHelper;
-import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
@@ -63,7 +62,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
         if (null != wrapped.getSuperclass())
             if (null == target.shared.parent)
-                target.setParent(TargetClass.fromClass(wrapped.getSuperclass()));
+                target.setParent(TargetClass.from(wrapped.getSuperclass()));
             else if (null == target.shared.parent.shared.represents)
                 target.shared.parent.setRepresents(wrapped.getSuperclass());
 
@@ -97,7 +96,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     private void registerBuiltIn() {
-        register(new TargetMethod(this, "class", TargetClass.fromClass(Class.class), TargetMethod.Called.STATIC_FIELD));
+        register(new TargetMethod(this, "class", TargetClass.from(Class.class), TargetMethod.Called.STATIC_FIELD));
     }
 
     public TargetPackage getPackage() {
@@ -236,7 +235,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         return inScope ? found.scopeKnown() : found.scopeUnknown();
     }
 
-    public static TargetClass fromName(String inPackage, String className) {
+    public static TargetClass from(String inPackage, String className) {
         boolean inScope = "java.lang".equals(inPackage);
         try {
             return getExisting((TargetPackage.TOP_LEVEL_AS_STRING.equals(inPackage) ? "" : inPackage + ".") + className,
@@ -246,7 +245,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         }
     }
 
-    public static TargetClass fromClass(Class cl) {
+    public static TargetClass from(Class cl) {
         String name = cl.getCanonicalName();
         boolean inScope = Package.getPackage("java.lang").equals(cl.getPackage());
 
@@ -263,10 +262,10 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     public static TargetClass newKnown(Class cl) {
-        return fromClass(cl).scopeKnown();
+        return from(cl).scopeKnown();
     }
 
     public static TargetClass newKnown(String inPackage, String className) {
-        return fromName(inPackage, className).scopeKnown();
+        return from(inPackage, className).scopeKnown();
     }
 }

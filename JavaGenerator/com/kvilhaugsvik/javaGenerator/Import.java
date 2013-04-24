@@ -69,7 +69,7 @@ public class Import<Of extends Address> extends Formatted implements HasAtoms, C
     }
 
     public static Import<TargetClass> classIn(Class target) {
-        return classIn(TargetClass.fromClass(target));
+        return classIn(TargetClass.from(target));
     }
 
     public static Import<TargetClass> classIn(TargetClass target) {

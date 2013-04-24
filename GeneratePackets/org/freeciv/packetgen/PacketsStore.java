@@ -60,7 +60,7 @@ public class PacketsStore {
         this.enableDelta = enableDelta;
         this.enableDeltaBoolFolding = enableDeltaBoolFolding;
 
-        final TargetClass rule = TargetClass.fromClass(org.freeciv.connection.ReflexRule.class).scopeUnknown();
+        final TargetClass rule = TargetClass.from(org.freeciv.connection.ReflexRule.class).scopeUnknown();
         final Typed[] protoRules;
         switch (bytesInPacketNumber) {
             case FC_2_4:
@@ -73,8 +73,8 @@ public class PacketsStore {
                 break;
             case FC_trunk:
                 packetHeaderType = TargetClass.newKnown(Header_2_1.class);
-                TargetClass place = TargetClass.fromClass(ReflexRuleTime.class).scopeUnknown();
-                TargetClass change = TargetClass.fromClass(org.freeciv.connection.ReflexActionChangeHeaderKind.class).scopeUnknown();
+                TargetClass place = TargetClass.from(ReflexRuleTime.class).scopeUnknown();
+                TargetClass change = TargetClass.from(org.freeciv.connection.ReflexActionChangeHeaderKind.class).scopeUnknown();
                 protoRules = new Typed[]{
                         rule.newInstance(place.callV("POST_RECEIVE"), BuiltIn.literal(5),
                                 change.newInstance(TargetClass.newKnown(Header_2_2.class).callV("class"))),

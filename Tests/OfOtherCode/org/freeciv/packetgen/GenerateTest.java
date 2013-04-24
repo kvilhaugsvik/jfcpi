@@ -355,10 +355,10 @@ public class GenerateTest {
         LinkedList<TargetClass> types = new LinkedList<TargetClass>();
 
         fields.add(new WeakVarDec(new Requirement("int", DataType.class), "aNumber"));
-        types.add(TargetClass.fromClass(int.class));
+        types.add(TargetClass.from(int.class));
 
         fields.add(new WeakVarDec(new Requirement("int", DataType.class), "theArray", new WeakVarDec.ArrayDeclaration(IntExpression.integer("5"))));
-        types.add(TargetClass.fromClass(int[].class));
+        types.add(TargetClass.from(int[].class));
 
         Struct result = new Struct("StructArrayField", fields, types);
 
@@ -525,11 +525,11 @@ public class GenerateTest {
                 constants.add((Constant)stringEnd);
 
         TreeMap<Integer, TargetClass> packets = new TreeMap<Integer, TargetClass>();
-        packets.put(926, TargetClass.fromName("org.freeciv.packet", "TestArray"));
-        packets.put(927, TargetClass.fromName("org.freeciv.packet", "TestArrayTransfer"));
-        packets.put(928, TargetClass.fromName("org.freeciv.packet", "TestArrayDouble"));
-        packets.put(929, TargetClass.fromName("org.freeciv.packet", "TestArrayDoubleTransfer"));
-        packets.put(930, TargetClass.fromName("org.freeciv.packet", "StringArray"));
+        packets.put(926, TargetClass.from("org.freeciv.packet", "TestArray"));
+        packets.put(927, TargetClass.from("org.freeciv.packet", "TestArrayTransfer"));
+        packets.put(928, TargetClass.from("org.freeciv.packet", "TestArrayDouble"));
+        packets.put(929, TargetClass.from("org.freeciv.packet", "TestArrayDoubleTransfer"));
+        packets.put(930, TargetClass.from("org.freeciv.packet", "StringArray"));
 
         writeJavaFile(PacketsStore.generateVersionData(packets, constants), targetFolder);
     }

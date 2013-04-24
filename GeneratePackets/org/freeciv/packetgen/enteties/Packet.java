@@ -49,7 +49,7 @@ import java.util.logging.Level;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
-    private static final TargetClass validation = TargetClass.fromClass(Validation.class);
+    private static final TargetClass validation = TargetClass.from(Validation.class);
 
     private final int number;
     private final List<Field> fields;
@@ -62,13 +62,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
     static { // TODO: Make target class support generics and remove this work arround
         try {
-            TargetClass.fromName("java.util", "Map<DeltaKey, Packet>")
+            TargetClass.from("java.util", "Map<DeltaKey, Packet>")
                     .register(new TargetMethod(Map.class.getMethod("get", Object.class)));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Is this Java? Map is supposed to have get(Object)...", e);
         }
         try {
-            TargetClass.fromName("java.util", "Map<DeltaKey, Packet>")
+            TargetClass.from("java.util", "Map<DeltaKey, Packet>")
                     .register(new TargetMethod(Map.class.getMethod("put", Object.class, Object.class)));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Is this Java? Map is supposed to have put...", e);
@@ -118,7 +118,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         addClassConstant(Visibility.PUBLIC, int.class, "number", literal(number));
 
         addObjectConstantAndGetter(Var.field(Collections.<Annotate>emptyList(),
-                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.fromClass(PacketHeader.class), "header", null));
+                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.from(PacketHeader.class), "header", null));
 
         int deltaFields = 0;
         if (delta) {
@@ -127,7 +127,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             addObjectConstant(bv_delta_fields.getAddress(), "delta");
 
             addMethod(Method.custom(Comment.no(), Visibility.PROTECTED, Scope.OBJECT,
-                    TargetClass.fromClass(boolean[].class), "getDeltaVector",
+                    TargetClass.from(boolean[].class), "getDeltaVector",
                     Collections.<Var<? extends AValue>>emptyList(),
                     Collections.<TargetClass>emptyList(),
                     new Block(RETURN(getField("delta").ref().callV("getValue").callV("getBits")))));
@@ -196,7 +196,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         fte.ref().<Returnable>call("setInPacket", literal(getName())),
                         fte.ref().<Returnable>call("setField", pName.ref()),
                         new MethodCall<NoValue>("Logger.getLogger(" + logger + ").log",
-                                TargetClass.fromClass(Level.class).callV("WARNING"),
+                                TargetClass.from(Level.class).callV("WARNING"),
                                 sum(literal("Misinterpretation. "), fte.ref().callV("getMessage")),
                                 fte.ref()),
                         RETURN(fte.ref())));
@@ -212,9 +212,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         if (delta)
             addDeltaField(addExceptionLocation, deltaFields, body, bv_delta_fields);
 
-        Var<AValue> zeroes = Var.local(TargetClass.fromClass(DataInputStream.class).scopeUnknown(), "zeroStream",
-                TargetClass.fromClass(DataInputStream.class).scopeUnknown()
-                        .newInstance(TargetClass.fromClass(EndsInEternalZero.class).scopeUnknown().newInstance()));
+        Var<AValue> zeroes = Var.local(TargetClass.from(DataInputStream.class).scopeUnknown(), "zeroStream",
+                TargetClass.from(DataInputStream.class).scopeUnknown()
+                        .newInstance(TargetClass.from(EndsInEternalZero.class).scopeUnknown().newInstance()));
         body.addStatement(zeroes);
 
         for (Field field : fields)
@@ -256,7 +256,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 constructorBody.addStatement(labelExceptionsWithPacketAndField(field, validate, addExceptionLocation));
         }
 
-        final Var<AValue> pHeaderKind = Var.param(TargetClass.fromClass(Constructor.class), "headerKind");
+        final Var<AValue> pHeaderKind = Var.param(TargetClass.from(Constructor.class), "headerKind");
         constructorBody.addStatement(generateHeader(pHeaderKind.ref(), addExceptionLocation));
 
         params.add(pHeaderKind);
@@ -314,7 +314,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 constructorBodyJ.addStatement(readLabeled);
             }
 
-            final Var<AValue> pHeaderKind = Var.param(TargetClass.fromClass(Constructor.class), "headerKind");
+            final Var<AValue> pHeaderKind = Var.param(TargetClass.from(Constructor.class), "headerKind");
             constructorBodyJ.addStatement(generateHeader(pHeaderKind.ref(), addExceptionLocation));
 
             params.add(pHeaderKind);
@@ -326,7 +326,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         Var<TargetClass> argHeader = Var.param(TargetClass.newKnown(PacketHeader.class), "header");
         final Var<TargetClass> streamName = Var.param(TargetClass.newKnown(DataInput.class), "from");
         final Var<TargetClass> old =
-                Var.param(TargetClass.fromName("java.util", "Map<DeltaKey, Packet>").scopeUnknown(), "old");
+                Var.param(TargetClass.from("java.util", "Map<DeltaKey, Packet>").scopeUnknown(), "old");
         MethodCall<AnInt> calcBodyLenCall = new MethodCall<AnInt>("calcBodyLen");
 
         Block constructorBodyStream = new Block();
@@ -379,7 +379,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         constructorBodyStream.addStatement(IF(isNotSame(getField("number").ref(), argHeader.ref().<AnInt>call("getPacketKind")),
                 new Block(THROW(addExceptionLocation.callV(
-                        TargetClass.fromClass(FieldTypeException.class).newInstance(sum(
+                        TargetClass.from(FieldTypeException.class).newInstance(sum(
                                 literal("Wrong packet number. "),
                                 literal("Packet is " + name + " (" + number + ") but header is for packet number "),
                                 argHeader.ref().<AnInt>call("getPacketKind"))),
@@ -388,7 +388,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         constructorBodyStream.addStatement(IF(isNotSame(sum(argHeader.ref().<AnInt>call("getHeaderSize"),
                 calcBodyLenCall), argHeader.ref().<AnInt>call("getTotalSize")),
                 new Block(THROW(addExceptionLocation.callV(
-                        TargetClass.fromClass(FieldTypeException.class).newInstance(sum(
+                        TargetClass.from(FieldTypeException.class).newInstance(sum(
                                 literal("interpreted packet size ("),
                                 GROUP(sum(argHeader.ref().<AnInt>call("getHeaderSize"), calcBodyLenCall)),
                                 literal(") don't match header packet size ("),
@@ -447,7 +447,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                     body.addStatement(ifDeltaElse(field, field.ref().<Returnable>call("encodeTo", pTo.ref()), null));
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                TargetClass.fromClass(void.class), "encodeTo", Arrays.asList(pTo),
+                TargetClass.from(void.class), "encodeTo", Arrays.asList(pTo),
                 Arrays.asList(TargetClass.newKnown(IOException.class)), body));
     }
 
@@ -474,7 +474,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
-                TargetClass.fromClass(int.class), "calcBodyLen", Collections.<Var<AValue>>emptyList(),
+                TargetClass.from(int.class), "calcBodyLen", Collections.<Var<AValue>>emptyList(),
                 Collections.<TargetClass>emptyList(),
                 encodeFieldsLen));
     }
@@ -498,7 +498,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                     literal("\\n\\t" + field.getFieldName() + " = "),
                     field.ref())));
         body.addStatement(RETURN(buildOutput.ref()));
-        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.fromClass(String.class), "toString", body));
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.from(String.class), "toString", body));
     }
 
     private void addGetDeltaKey(int number, List<Field> fields) {
@@ -511,8 +511,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         "A DeltaKey used in a HashMap makes it easy to find the previous packet of " +
                                 "the same packet kind where all key fields are the same.",
                         Comment.docReturns("a delta key matching the packet.")),
-                TargetClass.fromClass(DeltaKey.class), "getKey",
-                new Block(RETURN(TargetClass.fromClass(DeltaKey.class)
+                TargetClass.from(DeltaKey.class), "getKey",
+                new Block(RETURN(TargetClass.from(DeltaKey.class)
                         .newInstance(params.toArray(new Typed[params.size()]))))));
     }
 

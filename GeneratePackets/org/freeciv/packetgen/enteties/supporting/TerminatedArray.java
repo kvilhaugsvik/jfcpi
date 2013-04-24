@@ -364,7 +364,7 @@ public class TerminatedArray extends FieldType {
         Var<AValue> helperParamLimits = Var.param(ElementsLimit.class, "limits");
         Var<AValue> elem = Var.<AValue>param(kind.getUnderType(), "elem");
         Var<AnInt> outVar = Var.<AnInt>local(int.class, "totalSize", literal(0));
-        final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.fromClass(int.class), "lengthInBytes",
+        final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.from(int.class), "lengthInBytes",
                 Arrays.<Var<?>>asList(helperParamValue, helperParamLimits),
                 new Block(outVar,
                         FOR(elem, helperParamValue.ref(),

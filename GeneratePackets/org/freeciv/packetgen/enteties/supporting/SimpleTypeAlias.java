@@ -44,7 +44,7 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
     }
 
     public SimpleTypeAlias(String name, Class jType, int arrayDimensions) {
-        this(name, TargetClass.fromClass(jType), null, arrayDimensions);
+        this(name, TargetClass.from(jType), null, arrayDimensions);
     }
 
     public TargetClass getAddress() {

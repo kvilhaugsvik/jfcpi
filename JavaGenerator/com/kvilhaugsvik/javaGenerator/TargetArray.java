@@ -33,7 +33,7 @@ public class TargetArray extends TargetClass {
         if (!wrapped.isArray())
             throw new IllegalArgumentException("Not an array");
 
-        this.of = newKnown(wrapped.getComponentType());
+        this.of = TargetClass.newKnown(wrapped.getComponentType());
 
         lookForDimensions(wrapped.getComponentType().getName());
 
@@ -76,7 +76,7 @@ public class TargetArray extends TargetClass {
 
     private void registerBuiltIn() {
         register(new TargetMethod(this, "[]", of, TargetMethod.Called.DYNAMIC_ARRAY_GET));
-        register(new TargetMethod(this, "length", TargetClass.fromClass(int.class), TargetMethod.Called.DYNAMIC_FIELD));
+        register(new TargetMethod(this, "length", TargetClass.from(int.class), TargetMethod.Called.DYNAMIC_FIELD));
     }
 
     private static final Pattern chechName = Pattern.compile("\\[");

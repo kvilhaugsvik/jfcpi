@@ -47,7 +47,7 @@ public class FieldTypeTest {
     }
 
     private static FieldType simpleBasicFT() {
-        return new FieldType("net", "c", TargetClass.fromClass(Integer.class),
+        return new FieldType("net", "c", TargetClass.from(Integer.class),
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {

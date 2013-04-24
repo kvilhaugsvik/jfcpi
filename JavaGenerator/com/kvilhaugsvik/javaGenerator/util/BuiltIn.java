@@ -32,7 +32,7 @@ public class BuiltIn {
     public static final TargetArray boolArray = TargetArray.from(boolean[].class);
 
     public static Typed<NoValue> THROW(final Class error, Typed<? extends AValue>... parms) {
-        return THROW((TargetClass.fromClass(error)).newInstance(parms));
+        return THROW((TargetClass.from(error)).newInstance(parms));
     }
 
     public static Typed<NoValue> THROW(final Typed<? extends AValue> error) {
@@ -332,7 +332,7 @@ public class BuiltIn {
     }
 
     public static <Ret extends AValue> Value<Ret> cast(final Class newType, final Typed<? extends AValue> val) {
-        return cast(TargetClass.fromClass(newType), val);
+        return cast(TargetClass.from(newType), val);
     }
 
     public static <Ret extends AValue> Value<Ret> cast(final TargetClass newType, final Typed<? extends AValue> val) {

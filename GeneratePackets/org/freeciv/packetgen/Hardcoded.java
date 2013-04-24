@@ -45,8 +45,8 @@ public class Hardcoded {
     public static final Var pValue = Var.param(String.class, "value"); // can't know type
     public static final Var fMaxSize = Var.field(Collections.<Annotate>emptyList(),
             Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-            TargetClass.fromClass(ElementsLimit.class), "maxArraySize", null);
-    public static final Value<AValue> noLimit = TargetClass.fromClass(ElementsLimit.class).callV("noLimit");
+            TargetClass.from(ElementsLimit.class), "maxArraySize", null);
+    public static final Value<AValue> noLimit = TargetClass.from(ElementsLimit.class).callV("noLimit");
 
     public static final BitVector deltaBasic;
     public static final FieldType deltaField;
@@ -61,7 +61,7 @@ public class Hardcoded {
     }
 
     private static final Collection<Dependency.Item> hardCodedElements = Arrays.<Dependency.Item>asList(
-            new FieldType("uint32", "int", TargetClass.fromClass(Long.class),
+            new FieldType("uint32", "int", TargetClass.from(Long.class),
                     new From1<Block, Var>() {
                         @Override
                         public Block x(Var arg1) {
@@ -151,7 +151,7 @@ public class Hardcoded {
                     new Requirement("STRING_ENDER", Constant.class)) {
                 @Override
                 public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
-                    return new TerminatedArray("string", "char", TargetClass.fromClass(String.class),
+                    return new TerminatedArray("string", "char", TargetClass.from(String.class),
                             (Constant<?>)wasRequired[0],
                             TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
                             TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
@@ -171,7 +171,7 @@ public class Hardcoded {
                             new From1<Typed<AValue>, Typed<AValue>>() {
                                 @Override
                                 public Typed<AValue> x(Typed<AValue> bytes) {
-                                    return (TargetClass.fromClass(String.class)).newInstance(bytes);
+                                    return (TargetClass.from(String.class)).newInstance(bytes);
                                 }
                             },
                             TerminatedArray.elemIsByteArray,
@@ -305,7 +305,7 @@ public class Hardcoded {
     }
 
     public static FieldType getFloat(final String times) {
-        return new FieldType("float" + times, "float", TargetClass.fromClass(Float.class),
+        return new FieldType("float" + times, "float", TargetClass.from(Float.class),
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
