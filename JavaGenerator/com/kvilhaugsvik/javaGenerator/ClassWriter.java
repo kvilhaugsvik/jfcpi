@@ -138,6 +138,9 @@ public class ClassWriter extends Formatted implements HasAtoms {
     protected void addEnumerated(EnumElement element) {
         assert kind.equals(ClassKind.ENUM);
 
+        myAddress.register(new TargetMethod(myAddress, element.getEnumValueName(), myAddress,
+                TargetMethod.Called.STATIC_FIELD));
+
         enums.add(element);
     }
 
