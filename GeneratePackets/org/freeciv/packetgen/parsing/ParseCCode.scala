@@ -23,10 +23,9 @@ import org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.{newEnumValue,
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
-import org.freeciv.packetgen.UndefinedException
+import org.freeciv.packetgen.{GeneratorDefaults, UndefinedException}
 import java.util.AbstractMap.SimpleImmutableEntry
 import org.freeciv.packetgen.enteties.supporting.{StructMaker, WeakVarDec, SimpleTypeAlias, IntExpression}
-import org.freeciv.packetgen.enteties.supporting.WeakVarDec.ArrayDeclaration
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn
 
 object ParseCCode extends ExtractableParser {
@@ -170,7 +169,7 @@ object ParseCCode extends ExtractableParser {
         val alreadyReadExpression = new HashMap[String, EnumElementFC]()
 
         @inline def isAnInterpretedConstantOnThis(value: IntExpression): Boolean =
-          alreadyReadExpression.containsKey(value.toStringNotJava)
+          value.mayBeConstant && alreadyReadExpression.containsKey(value.nameOfConstant())
 
         def countParanoid(name: String, registeredValue: Option[IntExpression]): EnumElementFC = {
           if (!registeredValue.isEmpty) { // Value is specified

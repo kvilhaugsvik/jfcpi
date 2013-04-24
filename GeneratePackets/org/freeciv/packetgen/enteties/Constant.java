@@ -56,16 +56,6 @@ public class Constant<Kind extends AValue> extends Var<Kind> implements Dependen
         return new Requirement(super.getName(), Constant.class);
     }
 
-    public static String referToInJavaCode(Requirement req) {
-        assert (Constant.class.equals(req.getKind()));
-
-        return constantPrefix + req.getName();
-    }
-
-    public static String stripJavaCodeFromReference(String constantName) {
-        return FIND_CONSTANTS_CLASS.matcher(constantName).replaceAll("");
-    }
-
     public static Constant<AnInt> isInt(String name, IntExpression expression) {
         return new Constant<AnInt>(TargetClass.fromClass(int.class), name,
                 expression, expression.getReqs());

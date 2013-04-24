@@ -7,6 +7,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
+import org.freeciv.Util;
 import org.freeciv.packetgen.dependency.Dependency;
 import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
@@ -97,11 +98,6 @@ public class IntExpression extends Formatted implements Typed<AnInt> {
         return null == rhs && null == lhs && 1 == reqs.size();
     }
 
-    @Deprecated
-    public String toStringNotJava() {
-        return Constant.stripJavaCodeFromReference(toString());
-    }
-
     private boolean noPostfix() {
         return null == rhs;
     }
@@ -154,9 +150,10 @@ public class IntExpression extends Formatted implements Typed<AnInt> {
         return new IntExpression(readStatement, null, null, other.getIFulfillReq());
     }
 
+    // TODO: Should be maker
     public static IntExpression variable(String name) {
         Requirement valueDefinition = new Requirement(name, Constant.class);
-        return new IntExpression(BuiltIn.toCode(Constant.referToInJavaCode(valueDefinition)), null, null, valueDefinition);
+        return new IntExpression(BuiltIn.<AnInt>toCode(Util.VERSION_DATA_CLASS + "." + name), null, null, valueDefinition);
     }
 
     public Collection<Requirement> getReqs() {
