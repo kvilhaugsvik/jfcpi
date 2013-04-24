@@ -18,6 +18,7 @@ import org.junit.Assert._
 import org.junit.Test
 import org.freeciv.Util
 import util.parsing.input.CharArrayReader
+import org.freeciv.packetgen.enteties.supporting.IntExpression
 
 class ParseSharedTest {
   def parserShared = new ParseShared {
@@ -110,9 +111,10 @@ class ParseSharedTest {
 
   // TODO: Should probably be tested another place
   // Mapping
-  @Test def mapParsedNumbersToTheirNames = assertEquals("Failed to map the values of an IntExpression",
-    "ONE + ((-TWO) * (THREE++))",
-    CParserTest.parsesCorrectly("1 + -2 * 3++", parserShared, parserShared.intExpr).get.valueMap(leaf => {
+  @Test def mapParsedNumbersToTheirNames {
+    val input: String = "1 + -2 * 3++"
+    val result: String = "ONE + ((-TWO) * (THREE++))"
+    val transformer: (IntExpression) => String = leaf => {
       if ("1".equals(leaf.toString))
         "ONE"
       else if ("2".equals(leaf.toString))
@@ -121,7 +123,12 @@ class ParseSharedTest {
         "THREE"
       else
         "UNKNOWN"
-    }).toString)
+    }
+
+    assertEquals("Failed to map the values of an IntExpression",
+      result,
+      CParserTest.parsesCorrectly(input, parserShared, parserShared.intExpr).get.valueMap(transformer).toString)
+  }
 
   /*--------------------------------------------------------------------------------------------------------------------
   Normalization of C int type declarations
