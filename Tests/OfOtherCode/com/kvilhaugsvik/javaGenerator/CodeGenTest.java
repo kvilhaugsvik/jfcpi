@@ -47,7 +47,7 @@ import static org.junit.Assert.assertTrue;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class CodeGenTest {
-    private static final String generatorname = ",\n\tvalue = \"com.kvilhaugsvik.javaGenerator.ClassWriter\")";
+    private static final String generatorname = ", value = \"com.kvilhaugsvik.javaGenerator.ClassWriter\")";
 
     @Test public void testMethodEverything() {
         String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,
@@ -571,8 +571,8 @@ public class CodeGenTest {
                         "\t" + "\t" + "}" + "\n" +
                         "\n" +
                         "\t" + "\t" + "if (getEncodedSize() != headerLen) {\n" +
-                        "\t" + "\t" + "\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen\n" +
-                        "\t" + "\t" + "\t" + "\t" + "\t" + "+ \" Packet: \" + getEncodedSize());\n" +
+                        "\t" + "\t" + "\t" + "throw new IOException(\"Package size in header and Java packet not the same. Header: \" + headerLen " /*"\n" +
+                        "\t" + "\t" + "\t" + "\t" + "\t"*/ + "+ \" Packet: \" + getEncodedSize());\n" +
                         "\t" + "\t" + "}" + "\n" +
                         "\t" + "}" + "\n",
                 result);

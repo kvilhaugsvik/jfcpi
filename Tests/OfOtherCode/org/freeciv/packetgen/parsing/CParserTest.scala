@@ -707,8 +707,7 @@ enum implicitFirst {
 
 import javax.annotation.Generated;
 
-@Generated(comments = "Auto generated from Freeciv C code",
-""" + "\t" + """value = "com.kvilhaugsvik.javaGenerator.ClassWriter")
+@Generated(comments = "Auto generated from Freeciv C code", value = "com.kvilhaugsvik.javaGenerator.ClassWriter")
 public enum test implements FCEnum {
 	ONE(0, "ONE"),
 	TWO(1, "TWO"),

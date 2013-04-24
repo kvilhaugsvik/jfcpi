@@ -518,7 +518,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         }
 
         public boolean approachingTheEdge() {
-            return 100 < getLineLength() + getRLen() + 1; //|| toFar.contains(getNowAt() + 1);
+            return 1000 < getLineLength() + getRLen() + 1; //|| toFar.contains(getNowAt() + 1);
         }
 
         @Override
