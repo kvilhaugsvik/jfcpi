@@ -27,11 +27,15 @@ public class BitVector {
 
     public BitVector(final int sizeInBits, final byte[] src) {
         this(sizeInBits);
+
+        if (src.length < bytesNeededToHoldBits(vec.length))
+            throw new IllegalArgumentException("Not enough data to get " + sizeInBits + " bits");
+
         for (int pos = 0; pos < sizeInBits; pos++)
             vec[pos] = 0 != (src[isInByteNumber(pos)] & (1 << isBitNumberInAByte(pos)));
     }
 
-    protected BitVector(final int size, final boolean setAllTo) {
+    public BitVector(final int size, final boolean setAllTo) {
         this(size);
         for (int toSet = 0; toSet < size; toSet++) {
             vec[toSet] = setAllTo;
@@ -46,7 +50,7 @@ public class BitVector {
         return pos % 8;
     }
 
-    private int isInByteNumber(final int pos) {
+    private static int isInByteNumber(final int pos) {
         return pos / 8;
     }
 
@@ -60,7 +64,7 @@ public class BitVector {
     }
 
     public byte[] getAsByteArray() {
-        byte[] out = new byte[1 + isInByteNumber((vec.length - 1))];
+        byte[] out = new byte[bytesNeededToHoldBits(vec.length)];
         Arrays.fill(out, (byte)0);
         for (int bit = 0; bit < vec.length; bit++) {
             if (vec[bit])
@@ -76,5 +80,9 @@ public class BitVector {
     @Override
     public String toString() {
         return joinStringArray(vec, ", ");
+    }
+
+    private static int bytesNeededToHoldBits(int numberOfBits) {
+        return 1 + isInByteNumber(numberOfBits - 1);
     }
 }
