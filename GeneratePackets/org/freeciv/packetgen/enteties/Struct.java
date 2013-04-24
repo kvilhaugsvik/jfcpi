@@ -84,7 +84,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
         }
         varsToString = sum(varsToString, literal(")"));
         addMethod(Method.newPublicReadObjectState(Comment.no(),
-                TargetClass.newKnown(String.class), "toString",
+                TargetClass.from(String.class), "toString",
                 new Block(RETURN(varsToString))));
 
         LinkedList<String> parts = new LinkedList<String>();

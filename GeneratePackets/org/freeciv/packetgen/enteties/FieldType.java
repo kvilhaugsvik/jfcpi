@@ -73,10 +73,10 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                         Import.allIn(FCEnum.class.getPackage())),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
                 getUnaliasedName((dataIOType + "(" + publicType + ")")),
-                DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getName() + ">")));
+                DEFAULT_PARENT, Arrays.asList(TargetClass.from("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getName() + ">")));
 
-        pFromStream = Var.param(TargetClass.newKnown(DataInput.class), "from");
-        pTo = Var.param(TargetClass.newKnown(DataOutput.class), "to");
+        pFromStream = Var.param(TargetClass.from(DataInput.class), "from");
+        pTo = Var.param(TargetClass.from(DataOutput.class), "to");
         fValue = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                 javaType, "value", null);
 
@@ -109,7 +109,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                         Import.allIn(FCEnum.class.getPackage())),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
                 fixClassNameIfBasic(visible ? name : original.getName()),
-                DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown("org.freeciv.packet.fieldtype", "FieldType<" + original.javaType.getName() + ">")));
+                DEFAULT_PARENT, Arrays.asList(TargetClass.from("org.freeciv.packet.fieldtype", "FieldType<" + original.javaType.getName() + ">")));
 
         this.pFromStream = original.pFromStream;
         this.pTo = original.pTo;
@@ -135,7 +135,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     private void assemble() {
         this.addObjectConstant(javaType, "value");
 
-        List<TargetClass> tIOExcept = Arrays.asList(TargetClass.newKnown(IOException.class));
+        List<TargetClass> tIOExcept = Arrays.asList(TargetClass.from(IOException.class));
         Var<TargetClass> pValue = Var.param(javaType, "value");
 
         this.addMethod(Method.newPublicConstructor(Comment.no(),
@@ -145,7 +145,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits))), tIOExcept,
                 decode));
         this.addMethod(Method.newPublicDynamicMethod(Comment.no(),
-                TargetClass.newKnown(void.class), "encodeTo", Arrays.asList(pTo),
+                TargetClass.from(void.class), "encodeTo", Arrays.asList(pTo),
                 tIOExcept, encode));
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.from(int.class), "encodedLength",
@@ -154,7 +154,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 javaType, "getValue",
                 new Block(RETURN(this.getField("value").ref()))));
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
-                TargetClass.newKnown(String.class), "toString",
+                TargetClass.from(String.class), "toString",
                 new Block(RETURN(value2String.x(this.getField("value"))))));
         Var<TargetClass> paramOther = Var.param(TargetClass.from(Object.class), "other");
         this.addMethod(Method.custom(Comment.no(),
@@ -163,7 +163,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 Collections.<TargetClass>emptyList(),
                 new Block(IF(
                         BuiltIn.isInstanceOf(paramOther.ref(), this.getAddress()),
-                        new Block(RETURN(this.getField("value").ref().callV("equals", BuiltIn.cast(this.getAddress().scopeKnown(), paramOther.ref()).callV("getValue")))),
+                        new Block(RETURN(this.getField("value").ref().callV("equals", BuiltIn.cast(this.getAddress(), paramOther.ref()).callV("getValue")))),
                         new Block(RETURN(FALSE))))));
 
         for (Var<? extends AValue> toAdd : fieldsToAdd)

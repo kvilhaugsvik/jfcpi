@@ -63,7 +63,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                    String cntCode, String cntString, Collection<Requirement> reqs,
                 List<EnumElementFC> values) {
         super(ClassKind.ENUM, TargetPackage.from(FCEnum.class.getPackage()), Imports.are(), "Freeciv C code", Collections.<Annotate>emptyList(), enumName,
-                DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(FCEnum.class)));
+                DEFAULT_PARENT, Arrays.asList(TargetClass.from(FCEnum.class)));
 
         this.bitwise = bitwise;
         this.iRequire = reqs;
@@ -131,7 +131,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 new Block(BuiltIn.RETURN(fieldNumber.ref()))));
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.from(boolean.class), "isValid",
                 new Block(BuiltIn.RETURN(fieldValid.ref()))));
-        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.newKnown(String.class), "toString",
+        addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.from(String.class), "toString",
                 new Block(BuiltIn.RETURN(fieldToStringName.ref()))));
         if (nameOverride) {
             Var<AString> paramName = Var.param(String.class, "name");
@@ -146,10 +146,10 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 Comment.docReturns("true if the enum is bitwise")),
                 TargetClass.from(boolean.class), "isBitWise", new Block(RETURN(BuiltIn.<ABool>toCode(bitwise + "")))));
 
-        Var element = Var.local(this.getAddress().scopeKnown(), "element", null);
+        Var element = Var.local(this.getAddress(), "element", null);
         addMethod(Method.custom(Comment.no(),
                 Visibility.PUBLIC, Scope.CLASS,
-                this.getAddress().scopeKnown(), "valueOf", Arrays.asList(paramNumber),
+                this.getAddress(), "valueOf", Arrays.asList(paramNumber),
                 Collections.<TargetClass>emptyList(),
                 new Block(
                         FOR(element, new MethodCall<AValue>("values", new Typed[0]),
@@ -203,7 +203,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         final String named = this.getName();
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement("enum " + named, DataType.class));
-        final TargetClass parent = getAddress().scopeKnown();
+        final TargetClass parent = getAddress();
         return new FieldType(io.getIFulfillReq().getName(), "enum " + named, parent,
                 new From1<Block, Var>() {
                     @Override

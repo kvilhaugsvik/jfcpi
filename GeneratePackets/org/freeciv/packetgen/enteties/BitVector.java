@@ -59,7 +59,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
     private BitVector(String name, IntExpression knownSize, TerminatedArray.MaxArraySize maxArraySizeKind, TerminatedArray.TransferArraySize transferArraySizeKind, String reqName) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), Imports.are(),
                 "Freeciv C code", Collections.<Annotate>emptyList(), name,
-                TargetClass.newKnown(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
+                TargetClass.from(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
         this.knowsSize = null != knownSize;
 
         this.maxArraySizeKind = maxArraySizeKind;
@@ -134,7 +134,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
 
     @Override
     public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-        final TargetClass me = super.getAddress().scopeKnown();
+        final TargetClass me = super.getAddress();
 
         final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue;
         switch (transferArraySizeKind) {

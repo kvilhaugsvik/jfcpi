@@ -28,12 +28,12 @@ public class TargetArray extends TargetClass {
     private final int dimensions;
 
     private TargetArray(Class wrapped) {
-        super(wrapped, true);
+        super(wrapped);
 
         if (!wrapped.isArray())
             throw new IllegalArgumentException("Not an array");
 
-        this.of = TargetClass.newKnown(wrapped.getComponentType());
+        this.of = TargetClass.from(wrapped.getComponentType());
 
         lookForDimensions(wrapped.getComponentType().getName());
 
@@ -43,7 +43,7 @@ public class TargetArray extends TargetClass {
     }
 
     private TargetArray(TargetClass wrapped, int levels) {
-        super(wrapped.getPackage().getFullAddress(), wrapped.getName() + Strings.repeat("[]", levels), true);
+        super(wrapped.getPackage().getFullAddress(), wrapped.getName() + Strings.repeat("[]", levels));
         this.of = wrapped;
 
         if (null != wrapped.getRepresents())
@@ -61,8 +61,8 @@ public class TargetArray extends TargetClass {
     }
 
     private TargetArray(String inPacket, String inClass, int levels) {
-        super(inPacket, inClass + Strings.repeat("[]", levels), true);
-        this.of = TargetClass.newKnown(inPacket, inClass);
+        super(inPacket, inClass + Strings.repeat("[]", levels));
+        this.of = TargetClass.from(inPacket, inClass);
 
         if (levels < 1)
             throw new IllegalArgumentException("Not an array");

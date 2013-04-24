@@ -46,9 +46,9 @@ public class TargetMethod extends Address<TargetClass> {
     }
 
     public TargetMethod(Field has) {
-        this(TargetClass.from(has.getDeclaringClass()).scopeUnknown(),
+        this(TargetClass.from(has.getDeclaringClass()),
                 has.getName(),
-                TargetClass.from(has.getType()).scopeUnknown(),
+                TargetClass.from(has.getType()),
                 Modifier.isStatic(has.getModifiers()) ? Called.STATIC_FIELD : Called.DYNAMIC_FIELD);
     }
 

@@ -60,7 +60,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
         if (null == where)
             throw new IllegalArgumentException("null given as package. (Did you mean TargetPackage.TOP_LEVEL?)");
 
-        this.myAddress = new TargetClass(where, new ClassWriter.Atom(name), false);
+        this.myAddress = new TargetClass(where, new ClassWriter.Atom(name));
         myAddress.setParent(parent);
 
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
@@ -117,7 +117,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     public void addObjectConstantAndGetter(Var field) {
         addField(field);
         addMethod(Method.newPublicReadObjectState(Comment.no(),
-                field.getTType().scopeKnown(),
+                field.getTType(),
                 getterNameJavaish(field),
                 new Block(RETURN(field.ref()))));
     }

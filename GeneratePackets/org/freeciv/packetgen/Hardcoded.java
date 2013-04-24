@@ -236,7 +236,7 @@ public class Hardcoded {
                 final TargetClass universalF = ((ClassWriter) wasRequired[0]).getAddress();
                 final TargetClass universal = ((ClassWriter) wasRequired[1]).getAddress();
 
-                TargetArray universalArray = TargetArray.from(universal.scopeKnown(), 1);
+                TargetArray universalArray = TargetArray.from(universal, 1);
                 return new TerminatedArray("worklist", "struct worklist", universalArray,
                         null,
                         TerminatedArray.MaxArraySize.NO_LIMIT,

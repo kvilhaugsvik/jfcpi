@@ -86,7 +86,8 @@ public class TypedCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void targetArrayNewInstanceDimensionsInTargetClass() {
-        TargetArray array = TargetArray.from(TargetClass.from(int[][].class), 1);
+        // TODO: Bug: TargetClass.fromClass may load old working TargetArray
+        TargetArray array = TargetArray.from(TargetClass.from(char[][].class), 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -312,7 +313,7 @@ public class TypedCodeTest {
     }
 
     @Test public void addressInTopLevelPackage_NoArtifactsAdded() {
-        Address inTop = new TargetClass(TargetPackage.TOP_LEVEL, new CodeAtom("WhoNeedPackets"), false);
+        Address inTop = new TargetClass(TargetPackage.TOP_LEVEL, new CodeAtom("WhoNeedPackets"));
         CodeAtoms atoms = new CodeAtoms(inTop);
         assertEquals("WhoNeedPackets", atoms.get(0).getAtom().get());
         assertEquals(1, atoms.toArray().length);
@@ -324,7 +325,7 @@ public class TypedCodeTest {
     }
 
     @Test public void address_getFirstComponent_onAbstract_correctComponent() {
-        CodeAtom firstComponent = new TargetClass(TargetPackage.TOP_LEVEL, new CodeAtom("WhoNeedPackets"), false).getFirstComponent();
+        CodeAtom firstComponent = new TargetClass(TargetPackage.TOP_LEVEL, new CodeAtom("WhoNeedPackets")).getFirstComponent();
         assertEquals("WhoNeedPackets", firstComponent.get());
     }
 
@@ -340,7 +341,7 @@ public class TypedCodeTest {
             public boolean isTrueFor(CodeAtom atom) {
                 return HasAtoms.SELF.equals(atom);
             }
-        }, TargetClass.from("myPackage", "MyClass").scopeUnknown());
+        }, TargetClass.from("myPackage", "MyClass"));
         Address bigAddress = Var.field(Collections.<Annotate>emptyList(), Visibility.PUBLIC, Scope.CLASS, Modifiable.NO,
                 int.class, "myField", null).ref();
         bigAddress.writeAtoms(atoms);
@@ -403,28 +404,6 @@ public class TypedCodeTest {
 
         TargetClass fromClass = TargetClass.from(this.getClass());
         assertNotNull(fromClass.call("justExist"));
-    }
-
-    @Test public void targetClassMethodRegisteredOnOneScopeIsThereInTheOther() {
-        TargetClass aClass = new TargetClass(TargetPackage.TOP_LEVEL_AS_STRING, "RandomName5792452", true);
-        try {
-            aClass.call("notThereYet");
-            fail("Test makes bad assumption");
-        } catch (IllegalArgumentException e) {}
-        aClass.scopeUnknown().register(new TargetMethod(aClass, "notThereYet",
-                TargetClass.from(int.class), TargetMethod.Called.STATIC));
-
-        assertNotNull("Method registered in unknown scope not there in known scope.", aClass.call("notThereYet"));
-    }
-
-    @Test public void targetClassScopeChangeOnlyMakesTwoCopiesStartInScope() {
-        TargetClass aClass = new TargetClass(TargetPackage.TOP_LEVEL_AS_STRING, "Thing", true);
-        assertEquals("The original wasn't kept. A new one was created.", aClass, aClass.scopeUnknown().scopeKnown());
-    }
-
-    @Test public void targetClassScopeChangeOnlyMakesTwoCopiesStartNotInScope() {
-        TargetClass aClass = new TargetClass(TargetPackage.TOP_LEVEL_AS_STRING, "Thing", false);
-        assertEquals("The original isn't kept. A new one was created.", aClass, aClass.scopeKnown().scopeUnknown());
     }
 
     @Test public void targetClass_inheritance_fromParent() {
@@ -511,7 +490,7 @@ public class TypedCodeTest {
 
     @Test public void scopeData_class_inScope_sinceInJavaLang() {
         Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.from("org.here", "User"));
-        CodeAtoms used = new CodeAtoms(TargetClass.from(String.class).scopeUnknown());
+        CodeAtoms used = new CodeAtoms(TargetClass.from(String.class));
 
         assertTrue("String is in scope since its in java.lang", scopeData.isInScope(used.toArray()));
     }

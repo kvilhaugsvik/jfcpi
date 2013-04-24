@@ -20,7 +20,6 @@ import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
-import com.kvilhaugsvik.javaGenerator.util.AddressScopeHelper;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
@@ -33,22 +32,26 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     public static final TargetClass SELF_TYPED = new TargetClass();
     public static final TargetClass TYPE_NOT_KNOWN = new TargetClass();
 
-    private final boolean isInScope;
-    private final Common shared;
+    private final CodeAtom name;
+    private final HashMap<String, TargetMethod> methods;
 
-    public TargetClass(String inPackage, String className, boolean isInScope) {
+    TargetClass parent = null;
+    boolean shallow = true;
+    Class represents = null;
+
+    public TargetClass(String inPackage, String className) {
         super(TargetPackage.from(inPackage), addressString2Components(className));
         final CodeAtom name = super.components[super.components.length - 1];
         final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
-        this.isInScope = isInScope;
 
-        this.shared = new Common(name, where, methods, this);
+        this.name = name;
+        this.methods = methods;
 
         registerBuiltIn();
     }
 
-    protected TargetClass(Class wrapped, boolean isInScope) {
-        this(TargetPackage.from(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()), isInScope);
+    protected TargetClass(Class wrapped) {
+        this(TargetPackage.from(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()));
 
         setRepresents(wrapped);
     }
@@ -61,36 +64,30 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
             target.register(new TargetMethod(has));
 
         if (null != wrapped.getSuperclass())
-            if (null == target.shared.parent)
+            if (null == target.parent)
                 target.setParent(TargetClass.from(wrapped.getSuperclass()));
-            else if (null == target.shared.parent.shared.represents)
-                target.shared.parent.setRepresents(wrapped.getSuperclass());
+            else if (null == target.parent.represents)
+                target.parent.setRepresents(wrapped.getSuperclass());
 
-        target.shared.shallow = false;
+        target.shallow = false;
     }
 
-    public TargetClass(TargetPackage where, CodeAtom name, boolean isInScope) {
-        this(where, name, isInScope, new HashMap<String, TargetMethod>());
+    public TargetClass(TargetPackage where, CodeAtom name) {
+        this(where, name, new HashMap<String, TargetMethod>());
     }
 
-    private TargetClass(TargetPackage where, CodeAtom name, boolean isInScope, HashMap<String, TargetMethod> methods) {
+    private TargetClass(TargetPackage where, CodeAtom name, HashMap<String, TargetMethod> methods) {
         super(where, name);
-        this.isInScope = isInScope;
-        this.shared = new Common(name, where, methods, this);
+        this.name = name;
+        this.methods = methods;
 
         registerBuiltIn();
     }
 
-    private TargetClass(Common common, boolean isInScope) {
-        super(common.where, common.name);
-        this.isInScope = isInScope;
-        this.shared = common;
-    }
-
     private TargetClass() {
         super(TargetPackage.TOP_LEVEL);
-        this.isInScope = true;
-        this.shared = new Common(HasAtoms.SELF, TargetPackage.TOP_LEVEL, new HashMap<String, TargetMethod>(), this);
+        this.name = HasAtoms.SELF;
+        this.methods = new HashMap<String, TargetMethod>();
 
         registerBuiltIn();
     }
@@ -100,34 +97,26 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     public TargetPackage getPackage() {
-        return shared.where;
+        return where;
     }
 
     public CodeAtom getCName() {
-        return shared.name;
+        return name;
     }
 
     public String getName() {
-        return shared.name.get();
+        return name.get();
     }
 
     protected Class<?> getRepresents() {
-        return this.shared.represents;
+        return this.represents;
     }
 
     protected void setRepresents(Class<?> rep) {
-        /*if (null != this.shared.represents) // TODO: track down double writes and uncomment
+        /*if (null != this.represents) // TODO: track down double writes and uncomment
             throw new IllegalStateException("Class already set");*/
 
-        this.shared.represents = rep;
-    }
-
-    public TargetClass scopeKnown() {
-        return shared.variants.scopeKnown();
-    }
-
-    public TargetClass scopeUnknown() {
-        return shared.variants.scopeUnknown();
+        this.represents = rep;
     }
 
     public <Kind extends AValue> Value<Kind> read(final String field) {
@@ -136,49 +125,49 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     public void register(TargetMethod has) {
         // TODO: Fix underlying issue. For now work around by sparing dynamic non void methods from over writing
-        if (shared.methods.containsKey(has.getName())
-                && shared.methods.get(has.getName()).isDynamic()
-                && shared.methods.get(has.getName()).returnsAValue())
+        if (methods.containsKey(has.getName())
+                && methods.get(has.getName()).isDynamic()
+                && methods.get(has.getName()).returnsAValue())
             return;
 
-        shared.methods.put(has.getName(), has);
+        methods.put(has.getName(), has);
     }
 
     public void setParent(TargetClass parent) {
-        if (!(null == shared.parent || shared.parent.equals(parent)))
+        if (!(null == this.parent || this.parent.equals(parent)))
             throw new IllegalStateException("Parent already set");
-        shared.parent = parent;
+        this.parent = parent;
     }
 
     public <Ret extends Returnable> Typed<Ret> call(String method, Typed<? extends AValue>... parameters) {
         methodExists(method);
-        if (shared.methods.containsKey(method))
-            return shared.methods.get(method).<Ret>call(parameters);
+        if (methods.containsKey(method))
+            return methods.get(method).<Ret>call(parameters);
         else
-            return shared.parent.<Ret>call(method, parameters);
+            return parent.<Ret>call(method, parameters);
     }
 
     private void methodExists(String method) {
         if (!hasMethod(method))
-            throw new IllegalArgumentException("No method named " + method + " on " + shared.name.get());
+            throw new IllegalArgumentException("No method named " + method + " on " + name.get());
     }
 
     private void initIfPossibleAndNotDone() {
-        if (shared.shallow && null != shared.represents)
-            convertMethods(this, shared.represents);
+        if (shallow && null != represents)
+            convertMethods(this, represents);
     }
 
     private boolean hasMethod(String method) {
         initIfPossibleAndNotDone();
-        return shared.methods.containsKey(method) || (null != shared.parent && shared.parent.hasMethod(method));
+        return methods.containsKey(method) || (null != parent && parent.hasMethod(method));
     }
 
     public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... parameters) {
         methodExists(method); // exception if method don't exist here or on parent
-        if (shared.methods.containsKey(method)) // method exists here
-            return shared.methods.get(method).<Ret>callV(parameters);
+        if (methods.containsKey(method)) // method exists here
+            return methods.get(method).<Ret>callV(parameters);
         else // method exists at parent
-            return shared.parent.<Ret>callV(method, parameters);
+            return parent.<Ret>callV(method, parameters);
     }
 
     public Value<AValue> newInstance(Typed<? extends AValue>... parameterList) {
@@ -199,73 +188,37 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         if (!SELF_TYPED.equals(this))
             to.hintStart(TargetClass.class.getName());
         if (SELF_TYPED.equals(this))
-            shared.name.writeAtoms(to);
+            name.writeAtoms(to);
         else
             super.writeAtoms(to);
         if (!SELF_TYPED.equals(this))
             to.hintEnd(TargetClass.class.getName());
     }
 
-    private static class Common {
-        final AddressScopeHelper<TargetClass> variants;
-
-        final CodeAtom name;
-        final TargetPackage where;
-        final HashMap<String, TargetMethod> methods;
-
-
-        TargetClass parent;
-        boolean shallow = true;
-        Class represents = null;
-
-        private Common(CodeAtom name, TargetPackage where, HashMap<String, TargetMethod> methods, TargetClass existing) {
-            this.name = name;
-            this.where = where;
-            this.methods = methods;
-
-            TargetClass inScope = existing.isInScope ? existing : new TargetClass(this, true);
-            TargetClass notInScope = existing.isInScope ? new TargetClass(this, false) : existing;
-            this.variants = new AddressScopeHelper<TargetClass>(inScope, notInScope);
-        }
-    }
-
-    private static TargetClass getExisting(String name, boolean inScope) {
-        final TargetClass found = getExisting(name, TargetClass.class);
-
-        return inScope ? found.scopeKnown() : found.scopeUnknown();
+    private static TargetClass getExisting(String name) {
+        return getExisting(name, TargetClass.class);
     }
 
     public static TargetClass from(String inPackage, String className) {
-        boolean inScope = "java.lang".equals(inPackage);
         try {
-            return getExisting((TargetPackage.TOP_LEVEL_AS_STRING.equals(inPackage) ? "" : inPackage + ".") + className,
-                    inScope);
+            return getExisting((TargetPackage.TOP_LEVEL_AS_STRING.equals(inPackage) ? "" : inPackage + ".") + className);
         } catch (NoSuchElementException e) {
-            return new TargetClass(inPackage, className, inScope);
+            return new TargetClass(inPackage, className);
         }
     }
 
     public static TargetClass from(Class cl) {
         String name = cl.getCanonicalName();
-        boolean inScope = Package.getPackage("java.lang").equals(cl.getPackage());
 
         try {
-            TargetClass targetClass = getExisting(name, inScope);
+            TargetClass targetClass = getExisting(name);
 
-            if (null == targetClass.shared.represents)
+            if (null == targetClass.represents)
                 targetClass.setRepresents(cl);
 
             return targetClass;
         } catch (NoSuchElementException e) {
-            return new TargetClass(cl, inScope);
+            return new TargetClass(cl);
         }
-    }
-
-    public static TargetClass newKnown(Class cl) {
-        return from(cl).scopeKnown();
-    }
-
-    public static TargetClass newKnown(String inPackage, String className) {
-        return from(inPackage, className).scopeKnown();
     }
 }

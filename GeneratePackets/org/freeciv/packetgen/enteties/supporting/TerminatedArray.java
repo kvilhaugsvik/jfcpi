@@ -92,7 +92,7 @@ public class TerminatedArray extends FieldType {
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
                 uses,
-                Arrays.asList(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.newKnown(ElementsLimit.class), "maxArraySize", null)),
+                Arrays.asList(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.from(ElementsLimit.class), "maxArraySize", null)),
                 addValidate(helperMethods, maxArraySizeKind, transferArraySizeKind, numberOfElements,
                         Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                                 javaType, "value", null),
@@ -303,7 +303,7 @@ public class TerminatedArray extends FieldType {
             )));
         }
         return Method.newPublicDynamicMethod(Comment.no(),
-                TargetClass.newKnown(void.class), SELF_VALIDATOR_NAME,
+                TargetClass.from(void.class), SELF_VALIDATOR_NAME,
                 Arrays.asList(Hardcoded.pLimits),
                 Collections.<TargetClass>emptyList(),
                 verifyInsideLimits);

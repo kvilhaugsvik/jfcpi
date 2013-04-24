@@ -45,7 +45,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
     public Field(String fieldName, FieldType typeAlias, String onPacket, List<WeakFlag> flags,
                  WeakField.ArrayDeclaration... declarations) {
-        super(fieldFlagsToAnnotations(flags), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, typeAlias.getAddress().scopeKnown(), fieldName, null, TargetClass.SELF_TYPED);
+        super(fieldFlagsToAnnotations(flags), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, typeAlias.getAddress(), fieldName, null, TargetClass.SELF_TYPED);
 
         if (typeAlias.isArrayEater() && (0 == declarations.length))
             throw new IllegalArgumentException("Array eaters needs array declarations");

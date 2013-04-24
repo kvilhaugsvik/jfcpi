@@ -73,7 +73,7 @@ public class StructMaker implements Dependency.Maker {
 
         LinkedList<TargetClass> fieldKinds = new LinkedList<TargetClass>();
         for (Item item : wasRequired)
-            fieldKinds.add(((DataType)item).getAddress().scopeKnown());
+            fieldKinds.add(((DataType) item).getAddress());
 
         return new Struct(name, fields, fieldKinds, elementTypes);
     }

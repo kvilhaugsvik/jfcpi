@@ -97,7 +97,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         Import.classIn(java.util.logging.Logger.class),
                         Import.classIn(IOException.class)),
                 "Freeciv's protocol definition", packetFlags, name,
-                      DEFAULT_PARENT, Arrays.asList(TargetClass.newKnown(org.freeciv.packet.Packet.class)));
+                      DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.Packet.class)));
 
         this.number = number;
         this.fields = fields;
@@ -181,7 +181,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
     private TargetMethod addExceptionLocationAdder() {
         Var<AValue> e = Var.param(Throwable.class, "e");
-        TargetClass ft = TargetClass.newKnown(FieldTypeException.class);
+        TargetClass ft = TargetClass.from(FieldTypeException.class);
         Var<AValue> fte = Var.local(ft, "fte",
                 R_IF(isInstanceOf(e.ref(), ft), cast(ft, e.ref()),
                         ft.newInstance(sum(literal("threw "), e.ref().callV("getClass").callV("getName")), e.ref())));
@@ -212,14 +212,14 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         if (delta)
             addDeltaField(addExceptionLocation, deltaFields, body, bv_delta_fields);
 
-        Var<AValue> zeroes = Var.local(TargetClass.from(DataInputStream.class).scopeUnknown(), "zeroStream",
-                TargetClass.from(DataInputStream.class).scopeUnknown()
-                        .newInstance(TargetClass.from(EndsInEternalZero.class).scopeUnknown().newInstance()));
+        Var<AValue> zeroes = Var.local(TargetClass.from(DataInputStream.class), "zeroStream",
+                TargetClass.from(DataInputStream.class)
+                        .newInstance(TargetClass.from(EndsInEternalZero.class).newInstance()));
         body.addStatement(zeroes);
 
         for (Field field : fields)
             body.addStatement(labelExceptionsWithPacketAndField(field,
-                    new Block(field.ref().assign(field.getTType().scopeKnown()
+                    new Block(field.ref().assign(field.getTType()
                             .newInstance(zeroes.ref(), field.getSuperLimit(0)))),
                     addExceptionLocation));
 
@@ -243,7 +243,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         for (Field field : fields) {
             final Var<AValue> asParam = Var.param(
-                    field.getTType().scopeKnown(),
+                    field.getTType(),
                     field.getFieldName());
             params.add(asParam);
             constructorBody.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
@@ -285,8 +285,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private void addDeltaField(TargetMethod addExceptionLocation, int deltaFields, Block body, FieldType bv_delta_fields) {
         body.addStatement(labelExceptionsWithPacketAndField(
                 getField("delta"),
-                new Block(getField("delta").assign(bv_delta_fields.getAddress().scopeKnown().newInstance(
-                        bv_delta_fields.getUnderType().scopeUnknown()
+                new Block(getField("delta").assign(bv_delta_fields.getAddress().newInstance(
+                        bv_delta_fields.getUnderType()
                                 .newInstance(TRUE, literal(deltaFields)),
                         new MethodCall("ElementsLimit.limit", literal(deltaFields))))),
                 addExceptionLocation));
@@ -301,14 +301,14 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 addDeltaField(addExceptionLocation, deltaFields, constructorBodyJ, bv_delta_fields);
 
             for (Field field : fields) {
-                Var<AValue> asParam = Var.param(field.getUnderType().scopeKnown(),
+                Var<AValue> asParam = Var.param(field.getUnderType(),
                         field.getFieldName());
                 params.add(asParam);
                 constructorBodyJ.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
                 Block readAndValidate = new Block();
                 field.validateLimitInsideInt(readAndValidate);
-                readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(
+                readAndValidate.addStatement(field.assign(field.getTType().newInstance(
                         asParam.ref(), field.getSuperLimit(0))));
                 final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
                 constructorBodyJ.addStatement(readLabeled);
@@ -323,10 +323,10 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addConstructorFromDataInput(String name, List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding, FieldType bv_delta_fields) throws UndefinedException {
-        Var<TargetClass> argHeader = Var.param(TargetClass.newKnown(PacketHeader.class), "header");
-        final Var<TargetClass> streamName = Var.param(TargetClass.newKnown(DataInput.class), "from");
+        Var<TargetClass> argHeader = Var.param(TargetClass.from(PacketHeader.class), "header");
+        final Var<TargetClass> streamName = Var.param(TargetClass.from(DataInput.class), "from");
         final Var<TargetClass> old =
-                Var.param(TargetClass.from("java.util", "Map<DeltaKey, Packet>").scopeUnknown(), "old");
+                Var.param(TargetClass.from("java.util", "Map<DeltaKey, Packet>"), "old");
         MethodCall<AnInt> calcBodyLenCall = new MethodCall<AnInt>("calcBodyLen");
 
         Block constructorBodyStream = new Block();
@@ -338,7 +338,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         constructorBodyStream.addStatement(getField("header").assign(argHeader.ref()));
         if (delta) {
             Block operation = new Block();
-            operation.addStatement(getField("delta").assign(getField("delta").getTType().scopeKnown().newInstance(
+            operation.addStatement(getField("delta").assign(getField("delta").getTType().newInstance(
                     streamName.ref(),
                     new MethodCall("ElementsLimit.limit", literal(deltaFields)))));
             constructorBodyStream.addStatement(labelExceptionsWithPacketAndField(
@@ -350,10 +350,10 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         boolean oldNeeded = true;
         final Var<? extends AValue> chosenOld;
         if (delta)
-            chosenOld = Var.local(getAddress().scopeKnown(), "chosenOld", R_IF(
-                    isSame(NULL, old.ref().callV("get", getAddress().scopeKnown().callV("getKey", Reference.THIS))),
+            chosenOld = Var.local(getAddress(), "chosenOld", R_IF(
+                    isSame(NULL, old.ref().callV("get", getAddress().callV("getKey", Reference.THIS))),
                     getField("zero").ref(),
-                    cast(getAddress(), old.ref().callV("get", getAddress().scopeKnown().callV("getKey", Reference.THIS)))));
+                    cast(getAddress(), old.ref().callV("get", getAddress().callV("getKey", Reference.THIS)))));
         else
             chosenOld = null;
         for (Field field : fields) {
@@ -365,7 +365,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             }
             Block readAndValidate = new Block();
             field.validateLimitInsideInt(readAndValidate);
-            readAndValidate.addStatement(field.assign(field.getTType().scopeKnown().newInstance(streamName.ref(),
+            readAndValidate.addStatement(field.assign(field.getTType().newInstance(streamName.ref(),
                     field.getSuperLimit(0))));
             final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
             constructorBodyStream.addStatement(isBoolFolded(enableDeltaBoolFolding, field) ?
@@ -398,7 +398,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         if (delta)
             constructorBodyStream.addStatement(old.ref().callV("put",
-                    getAddress().scopeKnown().callV("getKey", Reference.THIS),
+                    getAddress().callV("getKey", Reference.THIS),
                     Reference.THIS));
 
         addMethod(Method.newPublicConstructorWithException(Comment.doc(
@@ -406,9 +406,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 Comment.param(streamName, "data stream that is at the start of the package body"),
                 Comment.param(argHeader, "header data. Must contain size and number"),
                 Comment.param(old, "where the Delta protocol should look for older packets"),
-                Comment.docThrows(TargetClass.newKnown(FieldTypeException.class), "if there is a problem")),
+                Comment.docThrows(TargetClass.from(FieldTypeException.class), "if there is a problem")),
                 Arrays.asList(streamName, argHeader, old),
-                Arrays.asList(TargetClass.newKnown(FieldTypeException.class)),
+                Arrays.asList(TargetClass.from(FieldTypeException.class)),
                 constructorBodyStream));
     }
 
@@ -436,7 +436,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addEncoder(List<Field> fields, boolean enableDeltaBoolFolding) {
-        Var<TargetClass> pTo = Var.<TargetClass>param(TargetClass.newKnown(DataOutput.class), "to");
+        Var<TargetClass> pTo = Var.<TargetClass>param(TargetClass.from(DataOutput.class), "to");
         Block body = new Block();
         body.addStatement(getField("header").ref().<Returnable>call("encodeTo", pTo.ref()));
         if (0 < fields.size()) {
@@ -448,7 +448,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
         addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.from(void.class), "encodeTo", Arrays.asList(pTo),
-                Arrays.asList(TargetClass.newKnown(IOException.class)), body));
+                Arrays.asList(TargetClass.from(IOException.class)), body));
     }
 
     private void addCalcBodyLen(List<Field> fields, boolean enableDeltaBoolFolding) {
@@ -530,7 +530,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         body = new Block(RETURN(field.ref().<Returnable>call("getValue")));
 
         addMethod(Method.newPublicReadObjectState(Comment.no(),
-                field.getUnderType().scopeKnown(),
+                field.getUnderType(),
                 getterNameJavaish(field) + "Value",
                 body));
     }

@@ -60,37 +60,37 @@ public class PacketsStore {
         this.enableDelta = enableDelta;
         this.enableDeltaBoolFolding = enableDeltaBoolFolding;
 
-        final TargetClass rule = TargetClass.from(org.freeciv.connection.ReflexRule.class).scopeUnknown();
+        final TargetClass rule = TargetClass.from(org.freeciv.connection.ReflexRule.class);
         final Typed[] protoRules;
         switch (bytesInPacketNumber) {
             case FC_2_4:
-                packetHeaderType = TargetClass.newKnown(Header_2_1.class);
+                packetHeaderType = TargetClass.from(Header_2_1.class);
                 protoRules = new Typed[0];
                 break;
             case FC_2_4_99_2011_11_02:
-                packetHeaderType = TargetClass.newKnown(Header_2_2.class);
+                packetHeaderType = TargetClass.from(Header_2_2.class);
                 protoRules = new Typed[0];
                 break;
             case FC_trunk:
-                packetHeaderType = TargetClass.newKnown(Header_2_1.class);
-                TargetClass place = TargetClass.from(ReflexRuleTime.class).scopeUnknown();
-                TargetClass change = TargetClass.from(org.freeciv.connection.ReflexActionChangeHeaderKind.class).scopeUnknown();
+                packetHeaderType = TargetClass.from(Header_2_1.class);
+                TargetClass place = TargetClass.from(ReflexRuleTime.class);
+                TargetClass change = TargetClass.from(org.freeciv.connection.ReflexActionChangeHeaderKind.class);
                 protoRules = new Typed[]{
                         rule.newInstance(place.callV("POST_RECEIVE"), BuiltIn.literal(5),
-                                change.newInstance(TargetClass.newKnown(Header_2_2.class).callV("class"))),
+                                change.newInstance(TargetClass.from(Header_2_2.class).callV("class"))),
                         rule.newInstance(place.callV("POST_SEND"), BuiltIn.literal(5),
-                                change.newInstance(TargetClass.newKnown(Header_2_2.class).callV("class")))
+                                change.newInstance(TargetClass.from(Header_2_2.class).callV("class")))
                 };
                 break;
             default: throw new IllegalArgumentException("No other sizes than one or two bytes are supported" +
                                                                 "for packet kind field in packet header");
         }
 
-        requirements.addWanted(Constant.isOther(TargetArray.from(rule, 1).scopeUnknown(), Util.RULES_NAME,
+        requirements.addWanted(Constant.isOther(TargetArray.from(rule, 1), Util.RULES_NAME,
                 new ArrayLiteral(protoRules)));
 
         requirements.addWanted(Constant.isClass(Util.HEADER_NAME,
-                packetHeaderType.scopeUnknown().callV("class")));
+                packetHeaderType.callV("class")));
 
         requirements.addWanted(Constant.isBool("enableDelta", BuiltIn.literal(enableDelta)));
         requirements.addWanted(Constant.isBool("enableDeltaBoolFolding", BuiltIn.literal(this.enableDeltaBoolFolding)));
