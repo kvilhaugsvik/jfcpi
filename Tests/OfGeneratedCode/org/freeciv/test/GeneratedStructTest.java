@@ -23,7 +23,7 @@ public class GeneratedStructTest {
     @Test
     public void structWhereFieldIsArray() {
         StructArrayField a = new StructArrayField(5, new int[]{7, 8, 9});
-        assertEquals("Wrong number in a field", 5, a.getaNumber());
-        assertArrayEquals("Wrong array in a field", new int[]{7, 8, 9}, a.gettheArray());
+        assertEquals("Wrong number in a field", 5, a.getANumber());
+        assertArrayEquals("Wrong array in a field", new int[]{7, 8, 9}, a.getTheArray());
     }
 }

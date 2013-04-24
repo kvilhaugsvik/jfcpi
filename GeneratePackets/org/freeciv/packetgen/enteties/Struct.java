@@ -69,7 +69,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
             addObjectConstant(type, field.getName());
             addMethod(Method.newPublicReadObjectState(Comment.no(),
-                    type, "get" + field.getName(),
+                    type, getterNameJavaish(getField(field.getName())),
                     new Block(RETURN(getField(field.getName()).ref()))));
         }
 
@@ -89,7 +89,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
         LinkedList<String> parts = new LinkedList<String>();
         for (WeakVarDec field : fields)
-            parts.add("get" + field.getName());
+            parts.add(getterNameJavaish(getField(field.getName())));
 
         HashSet<Requirement> neededByFields = new HashSet<Requirement>();
         for (WeakVarDec field : fields) {

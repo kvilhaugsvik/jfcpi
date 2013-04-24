@@ -109,19 +109,19 @@ public class DiffArrayElementFieldType implements Dependency.Maker {
                     @Override
                     public Block x(Var val, Var to) {
                         return new Block(
-                                ftIndex.getAddress().newInstance(val.ref().callV("getindex"), Hardcoded.noLimit).call("encodeTo", to.ref()),
-                                IF(isNotSame(val.ref().callV("getindex").callV("intValue"), stopValue.ref()),
-                                        new Block(ftValue.getAddress().newInstance(val.ref().callV("getnewValue"), Hardcoded.noLimit).call("encodeTo", to.ref()))));
+                                ftIndex.getAddress().newInstance(val.ref().callV("getIndex"), Hardcoded.noLimit).call("encodeTo", to.ref()),
+                                IF(isNotSame(val.ref().callV("getIndex").callV("intValue"), stopValue.ref()),
+                                        new Block(ftValue.getAddress().newInstance(val.ref().callV("getNewValue"), Hardcoded.noLimit).call("encodeTo", to.ref()))));
                     }
                 },
                 new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var val) {
                         return BuiltIn.sum(
-                                ftIndex.getAddress().newInstance(val.ref().callV("getindex"), Hardcoded.noLimit).callV("encodedLength"),
-                                BuiltIn.R_IF(isSame(val.ref().callV("getindex").callV("intValue"), stopValue.ref()),
+                                ftIndex.getAddress().newInstance(val.ref().callV("getIndex"), Hardcoded.noLimit).callV("encodedLength"),
+                                BuiltIn.R_IF(isSame(val.ref().callV("getIndex").callV("intValue"), stopValue.ref()),
                                         literal(0),
-                                        ftValue.getAddress().newInstance(val.ref().callV("getnewValue"), Hardcoded.noLimit).<AnInt>callV("encodedLength")));
+                                        ftValue.getAddress().newInstance(val.ref().callV("getNewValue"), Hardcoded.noLimit).<AnInt>callV("encodedLength")));
                     }
                 },
                 TO_STRING_OBJECT,

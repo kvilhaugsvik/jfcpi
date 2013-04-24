@@ -191,7 +191,7 @@ public class TerminatedArray extends FieldType {
                         noTerminatorFound = isNotSame(cast(byte.class, terminator.ref()), current.ref());
                     else if (current.getTType().getName().endsWith("_DIFF"))
                         noTerminatorFound = isNotSame(terminator.ref(),
-                                current.ref().callV("getValue").callV("getindex").callV("intValue"));
+                                current.ref().callV("getValue").callV("getIndex").callV("intValue"));
                     else
                         throw new IllegalArgumentException("Don't know how to compare terminator to current value");
                 else
