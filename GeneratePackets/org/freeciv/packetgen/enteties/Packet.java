@@ -531,7 +531,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         addMethod(Method.newPublicReadObjectState(Comment.no(),
                 field.getUnderType().scopeKnown(),
-                "get" + field.getFieldName().substring(0, 1).toUpperCase() + field.getFieldName().substring(1) + "Value",
+                getterNameJavaish(field) + "Value",
                 body));
     }
 
