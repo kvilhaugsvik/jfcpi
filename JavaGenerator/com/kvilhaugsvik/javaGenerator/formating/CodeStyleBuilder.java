@@ -160,6 +160,13 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
             context.getRunningFormatting().insertSpace();
         }
     };
+    public Triggered<ScopeInfoKind> BREAK_COMMENT_LINE = new Triggered<ScopeInfoKind>() {
+        @Override
+        public void run(ScopeInfoKind context) {
+            context.getRunningFormatting().breakLine();
+            context.getRunningFormatting().insertStar();
+        }
+    };
     public Triggered<ScopeInfoKind> BREAK_LINE_BLOCK = new Triggered<ScopeInfoKind>() {
         @Override
         public void run(ScopeInfoKind context) {

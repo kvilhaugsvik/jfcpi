@@ -320,13 +320,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 maker.condRightIs(Annotate.Atom.class),
                 maker.condLeftIs(Comment.Word.class),
                 DependsOn.token_both,
-                maker.BREAK_LINE,
-                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
-                    @Override
-                    public void run(DefaultStyleScopeInfo context) {
-                        context.getRunningFormatting().insertStar();
-                    }
-                });
+                maker.BREAK_COMMENT_LINE);
         maker.whenFirst(maker.condRightIs(Annotate.Atom.class), maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL),
                 DependsOn.token_right, maker.BREAK_LINE);
         maker.whenFirst(maker.condRightIs(Visibility.Atom.class), maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL),
@@ -384,13 +378,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                     }
                 },
                 DependsOn.token_left,
-                maker.BREAK_LINE,
-                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
-                    @Override
-                    public void run(DefaultStyleScopeInfo context) {
-                        context.getRunningFormatting().insertStar();
-                    }
-                });
+                maker.BREAK_COMMENT_LINE);
         maker.whenFirst(maker.condRightIs(HasAtoms.CCommentEnd),
                 new Util.OneCondition<DefaultStyleScopeInfo>() {
                     @Override
@@ -416,13 +404,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                     }
                 },
                 DependsOn.token_right,
-                maker.BREAK_LINE,
-                new CodeStyleBuilder.Triggered<DefaultStyleScopeInfo>() {
-                    @Override
-                    public void run(DefaultStyleScopeInfo context) {
-                        context.getRunningFormatting().insertStar();
-                    }
-                });
+                maker.BREAK_COMMENT_LINE);
         maker.whenFirst(new Util.OneCondition<DefaultStyleScopeInfo>() {
             @Override
             public boolean isTrueFor(DefaultStyleScopeInfo argument) {
