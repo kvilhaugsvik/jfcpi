@@ -294,11 +294,11 @@ public class GenerateTest {
     }
 
     public static void writeEnumSimple(String targetFolder) throws IOException {
-        Enum test = Enum.fromArray("test", false,
+        Enum test = Enum.specEnum("test", false, false, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
                 newEnumValue("three", 3),
-                newInvalidEnum(-3));
+                newInvalidEnum(-3)));
 
                 writeJavaFile(test, targetFolder);
     }
@@ -309,10 +309,10 @@ public class GenerateTest {
     }
 
     public static void writeEnumDefaultInvalid(String targetFolder) throws IOException {
-        Enum testDefaultInvalid = Enum.fromArray("testDefaultInvalid", false,
+        Enum testDefaultInvalid = Enum.specEnum("testDefaultInvalid", false, false, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
-                newEnumValue("three", 3));
+                newEnumValue("three", 3)));
 
         writeJavaFile(testDefaultInvalid, targetFolder);
     }
@@ -323,11 +323,11 @@ public class GenerateTest {
     }
 
     public static void writeEnumNamedCount(String targetFolder) throws IOException {
-        Enum testCount = Enum.fromArray("testCount", "COUNT", "\"numbers listed\"",
+        Enum testCount = Enum.specEnum("testCount", false, "COUNT", "\"numbers listed\"", Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("zero", 0),
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
-                newEnumValue("three", 3));
+                newEnumValue("three", 3)));
 
         writeJavaFile(testCount, targetFolder);
     }
@@ -338,10 +338,10 @@ public class GenerateTest {
     }
 
     public static void writeEnumBitwise(String targetFolder) throws IOException {
-        Enum bitwise = Enum.fromArray("bitwise", true,
+        Enum bitwise = Enum.specEnum("bitwise", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("one", 1),
                 newEnumValue("two", 2),
-                newEnumValue("four", 4));
+                newEnumValue("four", 4)));
 
         writeJavaFile(bitwise, targetFolder);
     }
@@ -352,7 +352,7 @@ public class GenerateTest {
     }
 
     public static void writeEnumWithSettableName(String targetFolder) throws IOException {
-        Enum result = new Enum("UserMod", true, false, Arrays.asList(
+        Enum result = Enum.specEnum("UserMod", true, false, Arrays.asList(
                 Enum.EnumElementFC.newEnumValue("user1", IntExpression.integer("1")),
                 Enum.EnumElementFC.newEnumValue("user2", IntExpression.integer("2")),
                 Enum.EnumElementFC.newEnumValue("user3", IntExpression.integer("3")),

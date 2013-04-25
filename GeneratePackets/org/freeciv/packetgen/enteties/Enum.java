@@ -43,22 +43,6 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
     private final EnumElementFC invalidDefault;
     private final EnumElementFC countElement;
 
-    public Enum(String enumName, boolean nameOverride, boolean bitwise, List<EnumElementFC> values) {
-        this(enumName, nameOverride, bitwise, null, null, Collections.<Requirement>emptySet(), values);
-    }
-
-    public Enum(String enumName, boolean nameOverride, String cntCode, List<EnumElementFC> values) {
-        this(enumName, nameOverride, cntCode, null, values);
-    }
-
-    public Enum(String enumName, boolean nameOverride, String cntCode, String cntString, List<EnumElementFC> values) {
-        this(enumName, nameOverride, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
-    }
-
-    public Enum(String enumName, Collection<Requirement> reqs, List<EnumElementFC> values) {
-        this(enumName, false, false, null, null, reqs, values);
-    }
-
     protected Enum(String enumName, boolean nameOverride, boolean bitwise,
                    String cntCode, String cntString, Collection<Requirement> reqs,
                 List<EnumElementFC> values) {
@@ -157,6 +141,22 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                         RETURN(BuiltIn.<AValue>toCode("INVALID")))));
     }
 
+    public static Enum specEnum(String enumName, boolean nameOverride, boolean bitwise, List<EnumElementFC> values) {
+        return new Enum(enumName, nameOverride, bitwise, null, null, Collections.<Requirement>emptySet(), values);
+    }
+
+    public static Enum specEnum(String enumName, boolean nameOverride, String cntCode, List<EnumElementFC> values) {
+        return specEnum(enumName, nameOverride, cntCode, null, values);
+    }
+
+    public static Enum specEnum(String enumName, boolean nameOverride, String cntCode, String cntString, List<EnumElementFC> values) {
+        return new Enum(enumName, nameOverride, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
+    }
+
+    public static Enum cEnum(String enumName, Collection<Requirement> reqs, List<EnumElementFC> values) {
+        return new Enum(enumName, false, false, null, null, reqs, values);
+    }
+
     public boolean isBitwise() {
         return bitwise;
     }
@@ -240,25 +240,6 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         else
             throw new IllegalArgumentException("The requirement " + toProduce +
                     " isn't a basic field type using the enum " + getName());
-    }
-
-    @Deprecated
-    public static Enum fromArray(String enumName, boolean bitwise, EnumElementFC... values) {
-        return new Enum(enumName, false, bitwise, Arrays.asList(values));
-    }
-
-    @Deprecated
-    public static Enum fromArray(String enumName, String cntCode, EnumElementFC... values) {
-        return new Enum(enumName, false, cntCode, Arrays.asList(values));
-    }
-
-    @Deprecated
-    public static Enum fromArray(String enumName, String cntCode, String cntString, EnumElementFC... values) {
-        return new Enum(enumName, false, cntCode, cntString, Arrays.asList(values));
-    }
-
-    public static Enum fromArray(String enumName, Collection<Requirement> reqs, EnumElementFC... values) {
-        return new Enum(enumName, reqs, Arrays.asList(values));
     }
 
     public static class EnumElementKnowsNumber extends EnumElementFC {

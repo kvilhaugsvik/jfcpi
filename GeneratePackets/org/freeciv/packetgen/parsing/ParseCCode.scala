@@ -143,13 +143,13 @@ object ParseCCode extends ExtractableParser {
       val sortedEnumValues: List[EnumElementFC] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
       if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
-          new Enum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
+          Enum.specEnum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             enumerations.get("COUNT" + NAME).get, sortedEnumValues.asJava)
         else
-          new Enum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
+          Enum.specEnum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             sortedEnumValues.asJava)
       else
-        new Enum(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)
+        Enum.specEnum(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)
   }
 
   def enumValue = intExpr
@@ -198,7 +198,7 @@ object ParseCCode extends ExtractableParser {
         elements.map(elem => countParanoid(elem._1, elem._2))
       }
 
-      new Enum(asStructures._1.asInstanceOf[String],
+      Enum.cEnum(asStructures._1.asInstanceOf[String],
         iRequire,
         countedCEnumElements(asStructures._2).asJava)
     }

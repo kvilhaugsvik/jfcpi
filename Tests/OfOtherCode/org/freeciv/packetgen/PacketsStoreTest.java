@@ -112,7 +112,7 @@ public class PacketsStoreTest {
 
     @Test public void registerTypeRequired() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
-        storage.addDependency(Enum.fromArray("unit_activity", false));
+        storage.addDependency(Enum.specEnum("unit_activity", false, false, Collections.<Enum.EnumElementFC>emptyList()));
         storage.registerTypeAlias("ACTIVITY", "uint8", "enum unit_activity");
 
         registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
