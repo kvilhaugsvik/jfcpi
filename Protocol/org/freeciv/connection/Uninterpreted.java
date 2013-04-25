@@ -80,7 +80,8 @@ public class Uninterpreted implements FreecivConnection {
         if (!isOpen()) {
             throw new IOException("Is closed. Can't send.");
         } else if (!currentHeader.sameType(toSend)) {
-            throw new IllegalArgumentException("Unexpected header kind");
+            throw new IllegalArgumentException("Unexpected header kind " +
+                    toSend.getHeader().getClass().getCanonicalName());
         }
 
         ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getHeader().getTotalSize());
