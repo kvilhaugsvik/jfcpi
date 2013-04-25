@@ -45,11 +45,6 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
     private final List<String> fieldNames;
     private final List<Requirement> fieldTypes;
 
-    @Deprecated
-    public Struct(String name, List<WeakVarDec> fields, List<TargetClass> partTypes) {
-        this(name, fields, partTypes, null);
-    }
-
     public Struct(String name, List<WeakVarDec> fields, List<TargetClass> partTypes, List<Requirement> fieldTypes) {
         this(name, fields, partTypes, fieldTypes, true);
     }

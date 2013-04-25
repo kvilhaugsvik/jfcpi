@@ -376,7 +376,7 @@ public class GenerateTest {
         fields.add(new WeakVarDec(new Requirement("int", DataType.class), "theArray", new WeakVarDec.ArrayDeclaration(IntExpression.integer("5"))));
         types.add(TargetClass.from(int[].class));
 
-        Struct result = new Struct("StructArrayField", fields, types);
+        Struct result = new Struct("StructArrayField", fields, types, null);
 
         writeJavaFile(result, targetFolder);
     }
