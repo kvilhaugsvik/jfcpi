@@ -98,70 +98,86 @@ public class GenerateTest {
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
                 TargetClass.from(Header_2_1.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false,
-                new Field("username", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("capability", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("version_label", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("major_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList()),
-                new Field("minor_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList()),
-                new Field("patch_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList())), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Arrays.asList(
+                        new Field("username", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                        new Field("capability", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                        new Field("version_label", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                        new Field("major_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList()),
+                        new Field("minor_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList()),
+                        new Field("patch_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList()))),
+                targetFolder);
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
                 TargetClass.from(Header_2_1.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false,
-                new Field("you_can_join", bool, "you_can_join", Collections.<WeakFlag>emptyList()),
-                new Field("message", string, "you_can_join", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("capability", string, "you_can_join", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("challenge_file", string, "you_can_join", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                new Field("conn_id", connection, "you_can_join", Collections.<WeakFlag>emptyList())), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Arrays.asList(
+                        new Field("you_can_join", bool, "you_can_join", Collections.<WeakFlag>emptyList()),
+                        new Field("message", string, "you_can_join", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                        new Field("capability", string, "you_can_join", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                        new Field("challenge_file", string, "you_can_join", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
+                        new Field("conn_id", connection, "you_can_join", Collections.<WeakFlag>emptyList()))),
+                targetFolder);
         writePacket(new Packet("CONN_PING", 88, TargetClass.from(Header_2_1.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Field>emptyList()), targetFolder);
         writePacket(new Packet("CONN_PONG", 89, TargetClass.from(Header_2_1.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Field>emptyList()), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
                 TargetClass.from(Header_2_2.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false,
-                new Field("theArray", uint32s, "TestArray", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("2"), null))), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Arrays.asList(
+                        new Field("theArray", uint32s, "TestArray", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("2"), null)))),
+                targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
                 TargetClass.from(Header_2_2.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false,
-                new Field("toTransfer", uint8, "TestArrayTransfer", Collections.<WeakFlag>emptyList()),
-                new Field("theArray", uint32s, "TestArrayTransfer", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Arrays.asList(
+                        new Field("toTransfer", uint8, "TestArrayTransfer", Collections.<WeakFlag>emptyList()),
+                        new Field("theArray", uint32s, "TestArrayTransfer", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer")))),
+                targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
                 TargetClass.from(Header_2_2.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false,
-                new Field("theArray", uint32s2d, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
-                        new WeakField.ArrayDeclaration(IntExpression.integer("3"), null))), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Arrays.asList(
+                        new Field("theArray", uint32s2d, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("3"), null)))),
+                targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
                 TargetClass.from(Header_2_2.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false,
-                new Field("toTransfer", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
-                new Field("toTransfer2", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
-                new Field("theArray", uint32s2d, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"),
-                        new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Arrays.asList(
+                        new Field("toTransfer", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
+                        new Field("toTransfer2", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
+                        new Field("theArray", uint32s2d, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2")))),
+                targetFolder);
         writePacket(new Packet("StringArray",
                 930,
                 TargetClass.from(Header_2_2.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false,
-                new Field("notAnArray", string, "StringArray", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
-                new Field("theArray", strings, "StringArray", Collections.<WeakFlag>emptyList(),
-                          new WeakField.ArrayDeclaration(IntExpression.integer("3"), null),
-                        new WeakField.ArrayDeclaration(IntExpression.integer("10"), null))), targetFolder);
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Arrays.asList(
+                        new Field("notAnArray", string, "StringArray", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
+                        new Field("theArray", strings, "StringArray", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("3"), null),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("10"), null)))),
+                targetFolder);
     }
 
     @Test
@@ -461,8 +477,9 @@ public class GenerateTest {
                 Collections.<Annotate>emptyList(),
                 false,
                 false,
-                new Field("theBitStingField", fieldAlias, "TestBitString", Collections.<WeakFlag>emptyList(),
-                        new WeakField.ArrayDeclaration(IntExpression.integer("9"), null)));
+                null,
+                Arrays.asList(new Field("theBitStingField", fieldAlias, "TestBitString", Collections.<WeakFlag>emptyList(),
+                        new WeakField.ArrayDeclaration(IntExpression.integer("9"), null))));
         writeJavaFile(packet, targetFolder);
     }
 
@@ -505,11 +522,12 @@ public class GenerateTest {
         writePacket(new Packet("DeltaVectorTest",
                 933,
                 TargetClass.from(Header_2_2.class),
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), true, false,
-                new Field("id", uint8, "DeltaTest", Arrays.asList(new WeakFlag("key"))),
-                new Field("field1", string, "DeltaTest", Collections.<WeakFlag>emptyList(),
-                        new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
-                new Field("field2", uint32, "DeltaTest", Collections.<WeakFlag>emptyList())),
+                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
+                Arrays.asList(
+                        new Field("id", uint8, "DeltaTest", Arrays.asList(new WeakFlag("key"))),
+                        new Field("field1", string, "DeltaTest", Collections.<WeakFlag>emptyList(),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
+                        new Field("field2", uint32, "DeltaTest", Collections.<WeakFlag>emptyList()))),
                 targetFolder);
     }
 

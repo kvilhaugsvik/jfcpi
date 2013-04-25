@@ -34,39 +34,39 @@ public class PacketTest {
     @Test
     public void deltaHeader_shouldExist() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
-                Collections.<Annotate>emptyList(), true, false,
-                new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList()));
+                Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
+                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())));
         assertNotNull("Should have a delta field", packet.getField("delta"));
     }
 
     @Test
     public void deltaHeader_shouldNotExist_noFields() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
-                Collections.<Annotate>emptyList(), true, false);
+                Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField, Collections.<Field>emptyList());
         assertNull("Shouldn't have delta when there are no other fields", packet.getField("delta"));
     }
 
     @Test
     public void deltaHeader_shouldNotExist_onlyAKeyField() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
-                Collections.<Annotate>emptyList(), true, false,
-                new Field("aField", floatalias, "Test", Arrays.asList(new WeakFlag("key"))));
+                Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
+                Arrays.asList(new Field("aField", floatalias, "Test", Arrays.asList(new WeakFlag("key")))));
         assertNull("Shouldn't have delta when there only are key fields", packet.getField("delta"));
     }
 
     @Test
     public void deltaHeader_shouldNotExist_annotationNoDelta() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
-                Arrays.asList(new Annotate("NoDelta")), true, false,
-                new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList()));
+                Arrays.asList(new Annotate("NoDelta")), true, false, Hardcoded.deltaField,
+                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())));
         assertNull("Shouldn't have delta when packet has the flag no-delta", packet.getField("delta"));
     }
 
     @Test
     public void deltaHeader_shouldNotExist_deltaOf() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
-                Collections.<Annotate>emptyList(), false, false,
-                new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList()));
+                Collections.<Annotate>emptyList(), false, false, null,
+                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())));
         assertNull("Shouldn't have delta when delta is off", packet.getField("delta"));
     }
 }
