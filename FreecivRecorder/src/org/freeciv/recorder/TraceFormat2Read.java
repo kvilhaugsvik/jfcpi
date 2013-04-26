@@ -23,7 +23,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
+import java.util.Map;
 
 public class TraceFormat2Read {
     private final PacketInputStream inAsPacket;
@@ -31,9 +31,11 @@ public class TraceFormat2Read {
 
     private final HeaderTF2 header;
 
-    public TraceFormat2Read(InputStream in, Over state, Class<? extends PacketHeader> packetHeaderClass) throws IOException {
-        this.inAsPacket = new PacketInputStream(in, state, new HeaderData(packetHeaderClass),
-                new ReflexPacketKind(Collections.<Integer, ReflexReaction>emptyMap(), null));
+    public TraceFormat2Read(InputStream in, Over state, Class<? extends PacketHeader> packetHeaderClass,
+                            Map<Integer, ReflexReaction> postReadReflexes) throws IOException {
+        final HeaderData headerData = new HeaderData(packetHeaderClass);
+        this.inAsPacket = new PacketInputStream(in, state, headerData,
+                new ReflexPacketKind(postReadReflexes, headerData));
         this.inAsData = new DataInputStream(in);
 
         try {

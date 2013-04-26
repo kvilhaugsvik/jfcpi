@@ -24,7 +24,6 @@ import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.Collections;
@@ -52,17 +51,20 @@ public class PlayToServer {
 
     public PlayToServer(InputStream source, Socket server, boolean ignoreDynamic) throws IOException, NoSuchMethodException {
         final PacketsMapping versionKnowledge = new PacketsMapping();
-        final Class<? extends PacketHeader> packetHeaderClass = versionKnowledge.getPacketHeaderClass();
-        this.source = new TraceFormat2Read(source, new OverImpl(), packetHeaderClass);
+
+        this.source = new TraceFormat2Read(source, new OverImpl(),
+                versionKnowledge.getPacketHeaderClass(),
+                versionKnowledge.getRequiredPostReceiveRules());
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
 
-        final FreecivConnection conn = new Uninterpreted(server, packetHeaderClass,
+        final FreecivConnection conn = new Uninterpreted(server, versionKnowledge.getPacketHeaderClass(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
                 versionKnowledge.getRequiredPostSendRules());
         this.toServer = new SinkForward(conn, new FilterNot(new FilterOr(
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));
+
         this.ignoreDynamic = ignoreDynamic;
     }
 
