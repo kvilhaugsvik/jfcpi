@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Sveinung Kvilhaugsvik
+ * Copyright (c) 2013. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,8 +14,8 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Packet;
-
-public interface ReflexReaction<Target extends ConnectionRelated> {
-    public void apply(Packet incoming, Target connection);
+/**
+ * A sub set of the features a Freeciv connection offers
+ */
+public interface ConnectionRelated {
 }

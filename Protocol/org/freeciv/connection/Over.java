@@ -14,7 +14,7 @@
 
 package org.freeciv.connection;
 
-public interface Over {
+public interface Over extends ConnectionRelated {
     /**
      * Close this connection as soon as its data has been read
      */

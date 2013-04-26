@@ -68,9 +68,9 @@ public class PlayToServer {
 
     private static HashMap<Integer, ReflexReaction> createStandardReflexes() {
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
-        reflexes.put(88, new ReflexReaction() {
+        reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
-            public void apply(Packet incoming, FreecivConnection connection) {
+            public void apply(Packet incoming, PacketWrite connection) {
                 try {
                     connection.toSend(new PACKET_CONN_PONG(connection.getFields2Header()));
                 } catch (IOException e) {
@@ -78,9 +78,9 @@ public class PlayToServer {
                 }
             }
         });
-        reflexes.put(8, new ReflexReaction() {
+        reflexes.put(8, new ReflexReaction<Over>() {
             @Override
-            public void apply(Packet incoming, FreecivConnection connection) {
+            public void apply(Packet incoming, Over connection) {
                 connection.setOver();
             }
         });

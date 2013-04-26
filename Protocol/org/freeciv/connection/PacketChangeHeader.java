@@ -18,7 +18,7 @@ import org.freeciv.packet.PacketHeader;
 
 import java.lang.reflect.Constructor;
 
-public interface PacketChangeHeader {
+public interface PacketChangeHeader extends ConnectionRelated {
     /**
      * Change the packet header type
      */
