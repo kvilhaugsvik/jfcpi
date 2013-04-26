@@ -14,9 +14,7 @@
 
 package org.freeciv.recorder;
 
-import org.freeciv.connection.HeaderData;
-import org.freeciv.connection.Over;
-import org.freeciv.connection.PacketInputStream;
+import org.freeciv.connection.*;
 import org.freeciv.packet.PacketHeader;
 import org.freeciv.recorder.traceFormat2.HeaderTF2;
 import org.freeciv.recorder.traceFormat2.RecordTF2;
@@ -25,6 +23,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 
 public class TraceFormat2Read {
     private final PacketInputStream inAsPacket;
@@ -33,7 +32,8 @@ public class TraceFormat2Read {
     private final HeaderTF2 header;
 
     public TraceFormat2Read(InputStream in, Over state, Class<? extends PacketHeader> packetHeaderClass) throws IOException {
-        this.inAsPacket = new PacketInputStream(in, state, new HeaderData(packetHeaderClass));
+        this.inAsPacket = new PacketInputStream(in, state, new HeaderData(packetHeaderClass),
+                new ReflexPacketKind(Collections.<Integer, ReflexReaction>emptyMap(), null));
         this.inAsData = new DataInputStream(in);
 
         try {

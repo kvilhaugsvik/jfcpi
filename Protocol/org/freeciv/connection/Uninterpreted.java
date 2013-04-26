@@ -22,7 +22,6 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Uninterpreted implements FreecivConnection {
     private final BackgroundReader in;
@@ -144,14 +143,11 @@ public class Uninterpreted implements FreecivConnection {
         private final LinkedList<RawPacket> buffered;
         private final Uninterpreted parent;
 
-        private final ReflexPacketKind quickRespond;
-
         public BackgroundReader(InputStream in, Uninterpreted parent, ReflexPacketKind quickRespond,
                                 final HeaderData currentHeader)
                 throws IOException {
-            this.in = new PacketInputStream(in, parent, currentHeader);
+            this.in = new PacketInputStream(in, parent, currentHeader, quickRespond);
             this.parent = parent;
-            this.quickRespond = quickRespond;
             this.buffered = new LinkedList<RawPacket>();
 
             this.setDaemon(true);
@@ -161,15 +157,7 @@ public class Uninterpreted implements FreecivConnection {
         public void run() {
             try {
                 while(true) {
-                    RawPacket incoming;
-                    try { // Locked after some data is read
-                        incoming = in.readPacket();
-
-                        quickRespond.handle(incoming);
-                    } finally {
-                        if (parent.networkAndReflexesHeldByCurrentThread())
-                            parent.networkAndReflexesUnlock();
-                    }
+                    RawPacket incoming = in.readPacket();
 
                     synchronized (buffered) {
                         buffered.add(incoming);

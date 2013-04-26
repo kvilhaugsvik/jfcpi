@@ -23,24 +23,32 @@ import java.lang.reflect.InvocationTargetException;
 public class PacketInputStream extends FilterInputStream {
     private final Over state;
     private final HeaderData headerData;
+    private final ReflexPacketKind quickRespond;
 
-    public PacketInputStream(InputStream in, Over state, final HeaderData packetHeaderClass) {
+    public PacketInputStream(InputStream in, Over state, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond) {
         super(in);
 
         this.state = state;
         this.headerData = packetHeaderClass;
+        this.quickRespond = quickRespond;
     }
 
     public RawPacket readPacket() throws IOException, InvocationTargetException {
         final byte[] start = readXBytesFrom(2, new byte[0], in, state);
         final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
 
-        // released after reflexes are done
         state.networkAndReflexesLock();
+        try {
+            byte[] packet = readXBytesFrom(size - 2, start, in, state);
 
-        byte[] packet = readXBytesFrom(size - 2, start, in, state);
+            final RawPacket rawPacket = new RawPacket(packet, headerData);
 
-        return new RawPacket(packet, headerData);
+            quickRespond.handle(rawPacket);
+
+            return rawPacket;
+        } finally {
+            state.networkAndReflexesUnlock();
+        }
     }
 
     private static byte[] readXBytesFrom(int wanted, byte[] start, InputStream from, Over state)
