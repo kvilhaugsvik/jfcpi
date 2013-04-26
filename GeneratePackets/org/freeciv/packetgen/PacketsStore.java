@@ -18,7 +18,7 @@ import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.Util;
 import org.freeciv.connection.ReflexRuleTime;
 import org.freeciv.packet.*;
-import org.freeciv.packetgen.dependency.*;
+import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.Packet;

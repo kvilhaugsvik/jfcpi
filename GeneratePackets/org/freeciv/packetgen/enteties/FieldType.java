@@ -15,9 +15,9 @@
 package org.freeciv.packetgen.enteties;
 
 import org.freeciv.packetgen.Hardcoded;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.ReqKind;
-import org.freeciv.packetgen.dependency.Requirement;
+import com.kvilhaugsvik.dependency.Dependency;
+import com.kvilhaugsvik.dependency.ReqKind;
+import com.kvilhaugsvik.dependency.Requirement;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.Import;

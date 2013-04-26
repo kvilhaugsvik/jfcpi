@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.parsing
 
-import org.freeciv.packetgen.dependency.{Dependency, Requirement}
+import com.kvilhaugsvik.dependency.{Dependency, Requirement}
 import org.freeciv.packetgen.enteties.{Struct, Constant, Enum}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.freeciv.Util
@@ -24,9 +24,9 @@ import scala.inline
 import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader
 import java.util.Collection
-import org.freeciv.packetgen.UndefinedException
 import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, DataType}
 import com.kvilhaugsvik.javaGenerator.TargetClass
+import com.kvilhaugsvik.dependency.UndefinedException
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------

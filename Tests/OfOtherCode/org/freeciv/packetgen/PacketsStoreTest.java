@@ -14,10 +14,11 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
 import org.freeciv.Util;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Requirement;
+import com.kvilhaugsvik.dependency.Dependency;
+import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.supporting.*;

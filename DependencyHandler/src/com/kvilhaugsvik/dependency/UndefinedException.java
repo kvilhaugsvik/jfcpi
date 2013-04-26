@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package com.kvilhaugsvik.dependency;
 
 public class UndefinedException extends Exception {
     public UndefinedException(String errorMessage) {

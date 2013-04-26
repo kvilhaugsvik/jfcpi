@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.dependency;
+package com.kvilhaugsvik.dependency;
 
 public interface ReqKind {
     public static interface FailHard extends ReqKind {} // a Requirement that already has failed to be met

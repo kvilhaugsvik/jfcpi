@@ -15,10 +15,10 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.javaGenerator.TargetClass;
-import org.freeciv.packetgen.UndefinedException;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Required;
-import org.freeciv.packetgen.dependency.Requirement;
+import com.kvilhaugsvik.dependency.UndefinedException;
+import com.kvilhaugsvik.dependency.Dependency;
+import com.kvilhaugsvik.dependency.Required;
+import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Struct;
 
 import java.util.Collections;

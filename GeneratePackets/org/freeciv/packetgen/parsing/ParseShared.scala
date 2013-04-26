@@ -16,7 +16,7 @@ package org.freeciv.packetgen.parsing
 
 import util.parsing.combinator._
 import org.freeciv.packetgen.enteties.supporting.{DataType, IntExpression}
-import org.freeciv.packetgen.dependency.{Dependency, Requirement}
+import com.kvilhaugsvik.dependency.{Dependency, Requirement}
 import util.parsing.input.CharArrayReader
 
 abstract class ParseShared extends RegexParsers with PackratParsers {

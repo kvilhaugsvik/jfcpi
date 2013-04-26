@@ -16,8 +16,8 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packet.fieldtype.*;
 import org.freeciv.packetgen.Hardcoded;
-import org.freeciv.packetgen.UndefinedException;
-import org.freeciv.packetgen.dependency.Requirement;
+import com.kvilhaugsvik.dependency.UndefinedException;
+import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;

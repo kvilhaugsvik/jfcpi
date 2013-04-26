@@ -14,11 +14,8 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.dependency.*;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Required;
-import org.freeciv.packetgen.dependency.RequiredMulti;
-import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.Struct;
 import org.freeciv.packetgen.enteties.supporting.DataType;

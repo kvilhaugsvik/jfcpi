@@ -14,10 +14,7 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Required;
-import org.freeciv.packetgen.dependency.RequiredMulti;
-import org.freeciv.packetgen.dependency.Requirement;
+import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.supporting.TerminatedArray;

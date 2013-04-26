@@ -20,6 +20,7 @@ import java.io._
 import collection.JavaConversions._
 import xml.XML
 import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
+import com.kvilhaugsvik.dependency.UndefinedException
 
 class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
                       requested: List[(String, String)], logger: String,

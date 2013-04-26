@@ -17,12 +17,13 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.dependency.TotalOrderNoCircles;
+import com.kvilhaugsvik.dependency.Dependency;
+import com.kvilhaugsvik.dependency.Requirement;
+import com.kvilhaugsvik.dependency.TotalOrderNoCircles;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;

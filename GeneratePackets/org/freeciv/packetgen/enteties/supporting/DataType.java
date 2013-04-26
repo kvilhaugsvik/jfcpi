@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.javaGenerator.TargetClass;
-import org.freeciv.packetgen.dependency.ReqKind;
+import com.kvilhaugsvik.dependency.ReqKind;
 
 /**
  * As generated data types like enums, bit vectors etc are generated from different classes use this

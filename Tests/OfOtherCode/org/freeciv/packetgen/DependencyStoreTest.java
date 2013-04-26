@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen;
 
-import org.freeciv.packetgen.dependency.*;
+import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.enteties.Constant;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;

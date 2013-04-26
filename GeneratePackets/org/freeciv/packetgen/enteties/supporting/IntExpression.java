@@ -8,8 +8,8 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import org.freeciv.Util;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Requirement;
+import com.kvilhaugsvik.dependency.Dependency;
+import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import scala.Function1;
 

@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.parsing
 
 import collection.mutable.ListBuffer
-import org.freeciv.packetgen.dependency.{Dependency, Requirement}
+import com.kvilhaugsvik.dependency.{Dependency, Requirement}
 import com.kvilhaugsvik.javaGenerator.ClassWriter
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import org.freeciv.packetgen.enteties.{Struct, Enum, Constant, BitVector}
@@ -23,10 +23,11 @@ import org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.{newEnumValue,
 import util.parsing.input.CharArrayReader
 import java.util.{HashSet, HashMap}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
-import org.freeciv.packetgen.{GeneratorDefaults, UndefinedException}
+import org.freeciv.packetgen.{GeneratorDefaults}
 import java.util.AbstractMap.SimpleImmutableEntry
 import org.freeciv.packetgen.enteties.supporting.{StructMaker, WeakVarDec, SimpleTypeAlias, IntExpression}
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn
+import com.kvilhaugsvik.dependency.UndefinedException
 
 object ParseCCode extends ExtractableParser {
   private final val DEFINE: String = "#define"

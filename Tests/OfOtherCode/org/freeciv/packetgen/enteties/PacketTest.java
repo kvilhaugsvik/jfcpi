@@ -18,7 +18,7 @@ import com.kvilhaugsvik.javaGenerator.Annotate;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packetgen.Hardcoded;
-import org.freeciv.packetgen.UndefinedException;
+import com.kvilhaugsvik.dependency.UndefinedException;
 import org.freeciv.packetgen.enteties.supporting.*;
 import org.junit.Test;
 

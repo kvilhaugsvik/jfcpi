@@ -14,24 +14,19 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.dependency.*;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Required;
-import org.freeciv.packetgen.dependency.RequiredMulti;
-import org.freeciv.packetgen.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.Struct;
 import org.freeciv.packetgen.enteties.supporting.DataType;
-import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
 import org.freeciv.utility.Validation;
 
 import java.util.Arrays;

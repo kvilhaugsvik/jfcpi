@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen.dependency;
+package com.kvilhaugsvik.dependency;
 
 public interface Required {
     public Class<? extends ReqKind> getKind();

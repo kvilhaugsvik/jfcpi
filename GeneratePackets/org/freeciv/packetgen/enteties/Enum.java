@@ -14,8 +14,8 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.packetgen.UndefinedException;
-import org.freeciv.packetgen.dependency.*;
+import com.kvilhaugsvik.dependency.UndefinedException;
+import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;

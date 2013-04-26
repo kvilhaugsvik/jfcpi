@@ -14,12 +14,9 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.dependency.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packet.fieldtype.ElementsLimit;
-import org.freeciv.packetgen.dependency.Dependency;
-import org.freeciv.packetgen.dependency.Requirement;
-import org.freeciv.packetgen.dependency.SimpleDependencyMaker;
-import org.freeciv.packetgen.dependency.Wrapper;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.supporting.*;
 import com.kvilhaugsvik.javaGenerator.*;

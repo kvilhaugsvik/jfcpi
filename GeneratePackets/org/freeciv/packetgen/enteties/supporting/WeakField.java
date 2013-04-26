@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
-import org.freeciv.packetgen.dependency.Requirement;
+import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldType;
 
 import java.util.List;

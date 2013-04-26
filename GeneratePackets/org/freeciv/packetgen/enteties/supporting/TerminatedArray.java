@@ -3,7 +3,7 @@ package org.freeciv.packetgen.enteties.supporting;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
-import org.freeciv.packetgen.dependency.Requirement;
+import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.*;
