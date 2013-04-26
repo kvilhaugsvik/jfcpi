@@ -17,7 +17,6 @@ package org.freeciv.packetgen.parsing
 import com.kvilhaugsvik.dependency.{Dependency, Requirement}
 import org.freeciv.packetgen.enteties.{Struct, Constant, Enum}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
-import org.freeciv.Util
 import org.junit.Test
 import org.junit.Assert._
 import scala.inline
@@ -27,6 +26,7 @@ import java.util.Collection
 import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, DataType}
 import com.kvilhaugsvik.javaGenerator.TargetClass
 import com.kvilhaugsvik.dependency.UndefinedException
+import org.freeciv.utility.Util
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------

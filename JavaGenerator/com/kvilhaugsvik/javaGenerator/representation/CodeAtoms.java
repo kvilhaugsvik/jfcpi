@@ -14,7 +14,7 @@
 
 package com.kvilhaugsvik.javaGenerator.representation;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 
 import java.util.*;

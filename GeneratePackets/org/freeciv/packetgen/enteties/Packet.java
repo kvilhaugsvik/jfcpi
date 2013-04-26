@@ -36,6 +36,7 @@ import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.*;
 import org.freeciv.utility.EndsInEternalZero;
+import org.freeciv.utility.Util;
 import org.freeciv.utility.Validation;
 
 import java.io.DataInput;
@@ -82,7 +83,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
                 Imports.are(Import.allIn(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
                         Import.allIn(FCEnum.class.getPackage()),
-                        Import.classIn(org.freeciv.Util.class),
+                        Import.classIn(Util.class),
                         Import.classIn(DataInput.class),
                         Import.classIn(DataOutput.class),
                         Import.classIn(java.util.logging.Logger.class),

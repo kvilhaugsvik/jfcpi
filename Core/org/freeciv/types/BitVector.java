@@ -14,7 +14,7 @@
 
 package org.freeciv.types;
 
-import static org.freeciv.Util.*;
+import static org.freeciv.utility.Util.*;
 
 import java.util.Arrays;
 

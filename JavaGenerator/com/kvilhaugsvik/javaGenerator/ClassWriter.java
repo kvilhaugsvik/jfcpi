@@ -14,7 +14,7 @@
 
 package com.kvilhaugsvik.javaGenerator;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import com.kvilhaugsvik.javaGenerator.expression.EnumElement;
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;

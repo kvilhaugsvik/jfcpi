@@ -14,7 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import com.kvilhaugsvik.dependency.ReqKind;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import com.kvilhaugsvik.dependency.Dependency;

@@ -15,7 +15,7 @@
 package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import org.freeciv.connection.ReflexRuleTime;
 import org.freeciv.packet.*;
 import com.kvilhaugsvik.dependency.*;

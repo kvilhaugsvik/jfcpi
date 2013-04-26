@@ -7,7 +7,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Constant;

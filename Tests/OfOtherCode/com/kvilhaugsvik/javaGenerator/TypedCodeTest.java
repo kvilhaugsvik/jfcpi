@@ -14,7 +14,7 @@
 
 package com.kvilhaugsvik.javaGenerator;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.expression.Reference;

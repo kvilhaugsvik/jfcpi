@@ -14,11 +14,10 @@
 
 package org.freeciv.packet;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import org.freeciv.connection.HeaderData;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 

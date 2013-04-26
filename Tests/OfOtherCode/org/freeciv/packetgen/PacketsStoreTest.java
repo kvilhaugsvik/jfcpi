@@ -16,7 +16,7 @@ package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.Enum;

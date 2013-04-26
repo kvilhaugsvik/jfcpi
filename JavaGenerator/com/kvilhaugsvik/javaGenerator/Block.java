@@ -14,7 +14,7 @@
 
 package com.kvilhaugsvik.javaGenerator;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;

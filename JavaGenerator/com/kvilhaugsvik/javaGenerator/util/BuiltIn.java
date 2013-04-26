@@ -199,7 +199,7 @@ public class BuiltIn {
     public static final From1<Typed<AString>, Var> TO_STRING_ARRAY = new From1<Typed<AString>, Var>() {
         @Override
         public Typed<AString> x(Var arg1) {
-            return new MethodCall<AString>("org.freeciv.Util.joinStringArray",
+            return new MethodCall<AString>("org.freeciv.utility.Util.joinStringArray",
                     arg1.ref(), literal(" "));
         }
     };

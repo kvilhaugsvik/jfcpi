@@ -14,7 +14,7 @@
 
 package org.freeciv.types;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

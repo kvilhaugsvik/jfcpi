@@ -16,11 +16,11 @@ package org.freeciv.packetgen.parsing
 
 import org.junit.Assert._
 import org.junit.Test
-import org.freeciv.Util
 import util.parsing.input.CharArrayReader
 import org.freeciv.packetgen.enteties.supporting.IntExpression
 import com.kvilhaugsvik.javaGenerator.representation.{CodeAtoms, HasAtoms}
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom
+import org.freeciv.utility.Util
 
 class ParseSharedTest {
   def parserShared = new ParseShared {

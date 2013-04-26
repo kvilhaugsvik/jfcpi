@@ -14,7 +14,7 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import org.freeciv.packet.*;
 
 import java.io.*;

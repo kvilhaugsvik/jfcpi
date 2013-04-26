@@ -14,7 +14,7 @@
 
 package com.kvilhaugsvik.javaGenerator.formating;
 
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import com.kvilhaugsvik.javaGenerator.formating.ScopeStack.ScopeInfo;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR;

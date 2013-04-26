@@ -19,7 +19,7 @@ package com.kvilhaugsvik.javaGenerator;
 
 import com.kvilhaugsvik.javaGenerator.formating.CodeStyleBuilder;
 import com.kvilhaugsvik.javaGenerator.formating.ScopeStack;
-import org.freeciv.Util;
+import org.freeciv.utility.Util;
 import org.freeciv.connection.Interpreted;
 import org.freeciv.packet.fieldtype.FieldType;
 import com.kvilhaugsvik.javaGenerator.expression.EnumElement;
