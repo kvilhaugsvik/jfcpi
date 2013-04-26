@@ -14,6 +14,7 @@
 
 package org.freeciv.recorder;
 
+import org.freeciv.connection.HeaderData;
 import org.freeciv.connection.Over;
 import org.freeciv.connection.PacketInputStream;
 import org.freeciv.packet.PacketHeader;
@@ -32,7 +33,7 @@ public class TraceFormat2Read {
     private final HeaderTF2 header;
 
     public TraceFormat2Read(InputStream in, Over state, Class<? extends PacketHeader> packetHeaderClass) throws IOException {
-        this.inAsPacket = new PacketInputStream(in, state, packetHeaderClass);
+        this.inAsPacket = new PacketInputStream(in, state, new HeaderData(packetHeaderClass));
         this.inAsData = new DataInputStream(in);
 
         try {

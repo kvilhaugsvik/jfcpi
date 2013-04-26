@@ -24,10 +24,6 @@ public class PacketInputStream extends FilterInputStream {
     private final Over state;
     private final HeaderData headerData;
 
-    public PacketInputStream(InputStream in, Over state, final Class<? extends PacketHeader> packetHeaderClass) {
-        this(in, state, new HeaderData(packetHeaderClass));
-    }
-
     public PacketInputStream(InputStream in, Over state, final HeaderData packetHeaderClass) {
         super(in);
 
