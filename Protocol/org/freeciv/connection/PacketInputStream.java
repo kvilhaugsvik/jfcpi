@@ -36,18 +36,13 @@ public class PacketInputStream extends FilterInputStream {
     }
 
     public RawPacket readPacket() throws IOException, InvocationTargetException {
-        return readPacket(in, state, headerData);
-    }
-
-    private static RawPacket readPacket(InputStream from, Over state, HeaderData headerData)
-            throws IOException, InvocationTargetException {
-        final byte[] start = readXBytesFrom(2, new byte[0], from, state);
+        final byte[] start = readXBytesFrom(2, new byte[0], in, state);
         final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
 
         // released after reflexes are done
         state.networkAndReflexesLock();
 
-        byte[] packet = readXBytesFrom(size - 2, start, from, state);
+        byte[] packet = readXBytesFrom(size - 2, start, in, state);
 
         return new RawPacket(packet, headerData);
     }
