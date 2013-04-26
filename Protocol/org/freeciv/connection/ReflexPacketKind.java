@@ -19,11 +19,11 @@ import org.freeciv.packet.Packet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ReflexPacketKind {
+public class ReflexPacketKind<WorksOn extends ConnectionRelated> {
     private final HashMap<Integer, ReflexReaction> quickRespond;
-    private final FreecivConnection owner;
+    private final WorksOn owner;
 
-    public ReflexPacketKind(Map<Integer, ReflexReaction> reflexes, FreecivConnection owner) {
+    public ReflexPacketKind(Map<Integer, ReflexReaction<WorksOn>> reflexes, WorksOn owner) {
         this.owner = owner;
         this.quickRespond = new HashMap<Integer, ReflexReaction>(reflexes);
     }
