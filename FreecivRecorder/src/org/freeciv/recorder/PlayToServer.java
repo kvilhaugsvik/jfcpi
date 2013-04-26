@@ -55,6 +55,18 @@ public class PlayToServer {
         final Class<? extends PacketHeader> packetHeaderClass = versionKnowledge.getPacketHeaderClass();
         this.source = new TraceFormat2Read(source, new OverImpl(), packetHeaderClass);
 
+        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
+
+        final FreecivConnection conn = new Uninterpreted(server, packetHeaderClass,
+                ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
+                versionKnowledge.getRequiredPostSendRules());
+        this.toServer = new SinkForward(conn, new FilterNot(new FilterOr(
+                new FilterNot(new FilterPacketFromClientToServer()),
+                ProxyRecorder.CONNECTION_PACKETS)));
+        this.ignoreDynamic = ignoreDynamic;
+    }
+
+    private static HashMap<Integer, ReflexReaction> createStandardReflexes() {
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction() {
             @Override
@@ -72,13 +84,8 @@ public class PlayToServer {
                 connection.setOver();
             }
         });
-        final FreecivConnection conn = new Uninterpreted(server, packetHeaderClass,
-                ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
-                versionKnowledge.getRequiredPostSendRules());
-        this.toServer = new SinkForward(conn, new FilterNot(new FilterOr(
-                new FilterNot(new FilterPacketFromClientToServer()),
-                ProxyRecorder.CONNECTION_PACKETS)));
-        this.ignoreDynamic = ignoreDynamic;
+
+        return reflexes;
     }
 
     public void run() throws IOException, InvocationTargetException {
