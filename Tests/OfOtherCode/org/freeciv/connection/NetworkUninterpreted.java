@@ -51,12 +51,7 @@ public class NetworkUninterpreted {
         });
 
         HashMap<Integer, ReflexReaction> postReceive = new HashMap<Integer, ReflexReaction>();
-        postReceive.put(5, new ReflexReaction() {
-            @Override
-            public void apply(Packet incoming, FreecivConnection connection) {
-                connection.setHeaderTypeTo(org.freeciv.packet.Header_2_2.class);
-            }
-        });
+        postReceive.put(5, new ReflexActionChangeHeaderKind(Header_2_2.class));
 
         Uninterpreted self = new Uninterpreted(other, Header_2_1.class, postReceive,
                 Collections.<Integer, ReflexReaction>emptyMap());
