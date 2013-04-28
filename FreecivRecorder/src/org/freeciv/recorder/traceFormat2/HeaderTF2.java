@@ -96,7 +96,7 @@ public class HeaderTF2 {
 
         // the time the record began
         if (includesTime())
-            to.writeLong(System.currentTimeMillis());
+            to.writeLong(recordStartedAt);
     }
 
     public boolean includesTime() {
