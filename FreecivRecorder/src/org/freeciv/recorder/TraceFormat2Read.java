@@ -58,7 +58,7 @@ public class TraceFormat2Read {
     }
 
     public RecordTF2 readRecord() throws IOException, InvocationTargetException {
-        return new RecordTF2(inAsData, inAsPacket, header);
+        return new RecordTF2(header, inAsData, inAsPacket);
     }
 
 }

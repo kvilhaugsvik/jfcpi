@@ -25,13 +25,20 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 public class RecordTF2 {
-    private final HeaderTF2 traceHeader;
+    /*********************
+     * Stored in the trace
+     *********************/
     public final UnderstoodBitVector<RecordFlag> flags;
-    public final boolean ignoreMe;
     public final long when;
     public final Packet packet;
 
-    public RecordTF2(boolean client2server, long when, Packet packet, HeaderTF2 traceHeader, boolean traceHeaderSizeSkip, boolean recordHeaderSizeSkip) {
+    /************************
+     * Not stored in the trace
+     *************************/
+    public final boolean ignoreMe;
+    private final HeaderTF2 traceHeader;
+
+    public RecordTF2(HeaderTF2 traceHeader, boolean client2server, long when, Packet packet, boolean traceHeaderSizeSkip, boolean recordHeaderSizeSkip) {
         this.traceHeader = traceHeader;
         this.flags = recordFlags(client2server, traceHeaderSizeSkip, recordHeaderSizeSkip);
         this.ignoreMe = false;
@@ -50,7 +57,7 @@ public class RecordTF2 {
         return flags;
     }
 
-    public RecordTF2(DataInputStream inAsData, PacketInputStream inAsPacket, HeaderTF2 traceHeader) throws IOException, InvocationTargetException {
+    public RecordTF2(HeaderTF2 traceHeader, DataInputStream inAsData, PacketInputStream inAsPacket) throws IOException, InvocationTargetException {
         this.flags = new RecordFlagVector(new byte[]{inAsData.readByte()});
 
         this.traceHeader = traceHeader;

@@ -22,12 +22,18 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class HeaderTF2 {
+    /*********************
+     * Stored in the trace
+     *********************/
     public final int formatVersion;
     public final int traceHeaderSize;
     public final int recordHeaderSize;
     public final UnderstoodBitVector<TraceFlag> flags;
     public final long recordStartedAt;
 
+     /************************
+     * Not stored in the trace
+     *************************/
     final boolean unexpectedTraceHeaderSize;
     final boolean unexpectedRecordHeaderSize;
 
