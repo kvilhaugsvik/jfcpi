@@ -21,3 +21,4 @@ JavaGenerator
 
 Generally
  * Make the code more consistent by finishing or removing incomplete abstractions
+ * Fix misleading names
