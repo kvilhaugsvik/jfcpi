@@ -1,0 +1,23 @@
+Record a game
+ * Start the Freeciv server. You can do this using the command
+     FREECIV_COMPRESSION_LEVEL=0 ./fcser -p 55555
+   in the folder where you have compiled Freeciv.
+ * Load a saved game the record should be on top of. It may be right after game start or later.
+   Setting gameseed and mapseed in stead of using a saved game won't work at the moment.
+ * Start the recorder. The line below use the default trace name and will overwrite previous traces.
+     ./proxyRecorder
+   in this folder should do it.
+ * Connect a client to the port the proxy is listening to.
+     ./fcgui -a
+   in the folder where you have compiled Freeciv.
+
+Play it back:
+ * Start the Freeciv server:
+     FREECIV_COMPRESSION_LEVEL=0 ./fcser
+   in the folder where you have compiled Freeciv
+ * Start the play back
+     ./playRecord 
+   in this folder should start playing a record that has the default file name.
+ * Connect to the server using a different login name than when you played. In the connection dialog click observe.
+     ./fcgui
+   in the folder where you have compiled Freeciv
