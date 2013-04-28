@@ -221,7 +221,7 @@ public class ProxyRecorder extends Thread {
             out.add(new FilterNot(new FilterPacketFromClientToServer()));
 
         if (settings.<Boolean>getSetting(TRACE_EXCLUDE_S2C))
-            out.add(new FilterPacketFromClientToServer());
+            out.add(new FilterOr(new FilterPacketFromClientToServer(), new FilterPacketKind(Arrays.asList(5))));
 
         return new FilterAnd(out);
     }
