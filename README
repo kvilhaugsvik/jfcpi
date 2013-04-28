@@ -8,6 +8,10 @@ become a better player. Showing off your skills may be fun. Demonstrating a stra
 by watching may also be interesting. It may also have potential as a real paranoid debugging tool. As you are reading
 this I assume you already have your own motivation for recording a game.
 
+========================================================================================================================
+Quick start
+========================================================================================================================
+
 Record a game
  * Start the Freeciv server. You can do this using the command
      FREECIV_COMPRESSION_LEVEL=0 ./fcser -p 55555
@@ -37,3 +41,63 @@ Play it back:
  * Connect to the server using a different login name than when you played. In the connection dialog click observe.
      ./fcgui
    in the folder where you have compiled Freeciv
+
+
+========================================================================================================================
+Details
+========================================================================================================================
+The way proxyRecorder works is that it pretends to be the Freeciv server when it talk to the client and pretend to be
+the Freeciv client when talking to the server. Before forwarding what is said to who it really was meant for it can
+record it to a file. This kind of file is called a trace. The trace can later be played by a player that pretends to be
+a Freeciv client and play back what was recorded. As some things aren't sent between the client and the server you have
+to make sure that the server is in the same state it was when the trace was recorded to play it back.
+
+
+--- proxyRecorder ---
+The quick start showed the trace-exclude-from-server option of proxyRecorder. There are more options. To change an
+option write --optionName=newValue (note: no space) where optionName is the option and newValue is the new value.
+
+You can change where proxyRecorder will expect to find the Freeciv client or the Freeciv server.
+ --proxy-port - the port where the recorder will let Freeciv clients connect. The default is a port the Freeciv client
+                will try without having to be told to try it.
+ --real-server-port - connect to the real Freeciv server on this port. The default is 55555. Pass the option -p 55555
+                      to the real Freeciv server when you start it to make it listen to this port.
+ --real-server-address - the machine the real Freeciv server is on. The default is the machine you now use.
+
+Normally the trace for the first connection is then FreecivCon0.fct, the second FreecivCon1.fct, etc.
+ --trace-name-start - The start of the file name of the traces. The default is FreecivCon.
+ --trace-name-end - The end of the file name of the traces. The default is .fct.
+
+Time can be included in the trace. This makes it possible to record when something happen. It also makes it possible to
+record games that has a time out. Note that the time takes a lot of extra space.
+ --record-time - is set to true by default. To turn it off use the option --record-time=false
+
+Not everything is needed to play back a trace. playRecord only use packets sent from the client that aren't connection
+packets. These take a lot less space than a full trace.
+ --trace-exclude-connection - don't record connection packets in the trace. This is on by default.
+ --trace-exclude-from-server - don't record packets sent by the server in the trace. This is off by default.
+ --trace-exclude-from-client - don't record packets sent by the client in the trace. The client send few packets
+                               compared to the server so this won't save much space. It will also make the record
+                               unusable in playRecord. Its value in other areas, like AI training data, also decreases.
+                               This is off by default.
+
+This file may be out of date.
+ --help - will show the options, their default values and a short description and then exit
+
+Developers may find the following options interesting
+ --verbose - be verbose on the console
+ --understand - interpret the packets before processing them. Warn if not understood. Can be used with trace-to-console
+                to get a text trace on the console.
+ --debug - print debug information to the console
+ --trace-to-console - print all packets going to the trace to the console
+
+--- playRecord ---
+The options of playRecord are
+ --file - the file containing the trace to play back. Defaults to FreecivCon0.fct
+
+ --address - where the Freeciv server is. Defaults to your computer
+ --port - the port to connect to to find the Freeciv sever
+
+ --ignore-time - ignore time data in the trace. Wait a bit between each action in stead.
+
+ --help - will show the options, their default values and a short description and then exit
