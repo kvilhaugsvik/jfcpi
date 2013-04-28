@@ -37,7 +37,7 @@ class SinkWriteTrace extends Sink {
         this.traceFile = new DataOutputStream(traceFile);
 
         try {
-            header = new HeaderTF2(System.currentTimeMillis(), isDynamic);
+            header = new HeaderTF2(began, isDynamic);
             header.write(this.traceFile);
         } catch (IOException e) {
             throw new IOException(id + ": Unable to write trace headers", e);
