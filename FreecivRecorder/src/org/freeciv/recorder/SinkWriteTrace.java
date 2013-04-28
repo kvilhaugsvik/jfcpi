@@ -24,20 +24,17 @@ import java.io.OutputStream;
 
 class SinkWriteTrace extends Sink {
     private final HeaderTF2 header;
-    private final long began;
     private final int id;
     private final DataOutputStream traceFile;
 
     public SinkWriteTrace(Filter filter, OutputStream traceFile, boolean isDynamic, int id) throws IOException {
         super(filter);
 
-        this.began = System.currentTimeMillis();
-
         this.id = id;
         this.traceFile = new DataOutputStream(traceFile);
 
         try {
-            header = new HeaderTF2(began, isDynamic);
+            header = new HeaderTF2(System.currentTimeMillis(), isDynamic);
             header.write(this.traceFile);
         } catch (IOException e) {
             throw new IOException(id + ": Unable to write trace headers", e);
@@ -47,7 +44,7 @@ class SinkWriteTrace extends Sink {
     public void write(boolean clientToServer, Packet packet) throws IOException {
         try {
             final RecordTF2 record =
-                    new RecordTF2(header, clientToServer, System.currentTimeMillis() - began, packet, false, false);
+                    new RecordTF2(header, clientToServer, System.currentTimeMillis() - header.getOriginalStartTime(), packet, false, false);
             synchronized (this) {
                 record.write(traceFile);
             }
