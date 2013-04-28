@@ -49,15 +49,16 @@ public class PlayToServer {
 
     public PlayToServer(InputStream source, Socket server, boolean ignoreDynamic) throws IOException, NoSuchMethodException {
         final PacketsMapping versionKnowledge = new PacketsMapping();
+        final HeaderData sharedHeaderData = versionKnowledge.getNewPacketHeaderData();
 
         this.source = new TraceFormat2Read(source, new OverImpl(),
-                versionKnowledge.getNewPacketHeaderData(),
+                sharedHeaderData,
                 versionKnowledge.getRequiredPostReceiveRules());
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
 
         final FreecivConnection conn = new Uninterpreted(server,
-                versionKnowledge.getNewPacketHeaderData(),
+                sharedHeaderData,
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
                 versionKnowledge.getRequiredPostSendRules());
         this.toServer = new SinkForward(conn, new FilterNot(new FilterOr(
