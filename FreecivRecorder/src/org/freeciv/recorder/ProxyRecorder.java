@@ -56,7 +56,7 @@ public class ProxyRecorder extends Thread {
         add(new Setting.StringSetting(TRACE_NAME_START, DEFAULT_TRACE_PREFIX, "prefix of the trace file names"));
         add(new Setting.StringSetting(TRACE_NAME_END, DEFAULT_TRACE_SUFFIX, "suffix of the trace file names"));
         add(new Setting.BoolSetting(TRACE_DYNAMIC, true, "should time be recorded in the trace"));
-        add(new Setting.BoolSetting(TRACE_EXCLUDE_CONNECTION, false,
+        add(new Setting.BoolSetting(TRACE_EXCLUDE_CONNECTION, true,
                 "don't record connection packets in the trace"));
         add(new Setting.BoolSetting(TRACE_EXCLUDE_C2S, false,
                 "don't record packets sent by the client in the trace"));
