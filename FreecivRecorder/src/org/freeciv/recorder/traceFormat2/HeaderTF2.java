@@ -25,11 +25,11 @@ public class HeaderTF2 {
     /*********************
      * Stored in the trace
      *********************/
-    public final int formatVersion;
-    public final int traceHeaderSize;
-    public final int recordHeaderSize;
-    public final UnderstoodBitVector<TraceFlag> flags;
-    public final long recordStartedAt;
+    private final int formatVersion;
+    private final int traceHeaderSize;
+    private final int recordHeaderSize;
+    private final UnderstoodBitVector<TraceFlag> flags;
+    private final long recordStartedAt;
 
      /************************
      * Not stored in the trace
@@ -101,6 +101,30 @@ public class HeaderTF2 {
 
     public boolean includesTime() {
         return flags.get(TraceFlag.INCLUDES_TIME);
+    }
+
+    public int getFormatVersion() {
+        return formatVersion;
+    }
+
+    public int getTraceHeaderSize() {
+        return traceHeaderSize;
+    }
+
+    public int getRecordHeaderSize() {
+        return recordHeaderSize;
+    }
+
+    public long getOriginalStartTime() {
+        return recordStartedAt;
+    }
+
+    public boolean isTraceHeaderSizeUnexpected() {
+        return unexpectedTraceHeaderSize;
+    }
+
+    public boolean isRecordHeaderSizeUnexpected() {
+        return unexpectedRecordHeaderSize;
     }
 
     public static int calculateFileHeaderSize(boolean dynamic) {

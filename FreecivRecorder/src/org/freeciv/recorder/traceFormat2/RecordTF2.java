@@ -28,14 +28,14 @@ public class RecordTF2 {
     /*********************
      * Stored in the trace
      *********************/
-    public final UnderstoodBitVector<RecordFlag> flags;
-    public final long when;
-    public final Packet packet;
+    private final UnderstoodBitVector<RecordFlag> flags;
+    private final long when;
+    private final Packet packet;
 
     /************************
      * Not stored in the trace
      *************************/
-    public final boolean ignoreMe;
+    private final boolean ignoreMe;
     private final HeaderTF2 traceHeader;
 
     public RecordTF2(HeaderTF2 traceHeader, boolean client2server, long when, Packet packet, boolean traceHeaderSizeSkip, boolean recordHeaderSizeSkip) {
@@ -64,11 +64,11 @@ public class RecordTF2 {
 
         this.when = traceHeader.includesTime() ? inAsData.readLong() : -1;
 
-        this.ignoreMe = ((skipIfUnknownTraceHeader() && traceHeader.unexpectedTraceHeaderSize) ||
-                (skipIfUnknownRecordHeader() && traceHeader.unexpectedRecordHeaderSize));
+        this.ignoreMe = ((skipIfUnknownTraceHeader() && traceHeader.isTraceHeaderSizeUnexpected()) ||
+                (skipIfUnknownRecordHeader() && traceHeader.isRecordHeaderSizeUnexpected()));
 
-        if (traceHeader.unexpectedRecordHeaderSize)
-            TF2.headerSkip(inAsData, traceHeader.recordHeaderSize - calculateRecordHeaderSize(traceHeader.includesTime()));
+        if (traceHeader.isRecordHeaderSizeUnexpected())
+            TF2.headerSkip(inAsData, traceHeader.getRecordHeaderSize() - calculateRecordHeaderSize(traceHeader.includesTime()));
 
         this.packet = inAsPacket.readPacket();
     }
@@ -92,6 +92,18 @@ public class RecordTF2 {
 
     public boolean skipIfUnknownRecordHeader() {
         return flags.get(RecordFlag.RECORD_HEADER_SIZE_SKIP);
+    }
+
+    public long getTimestamp() {
+        return when;
+    }
+
+    public Packet getPacket() {
+        return packet;
+    }
+
+    public boolean shouldBeIgnored() {
+        return ignoreMe;
     }
 
     public static int calculateRecordHeaderSize(boolean dynamic) {

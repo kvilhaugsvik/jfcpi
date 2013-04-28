@@ -97,16 +97,16 @@ public class PlayToServer {
         long sendNextAt = beganPlaying;
 
         while (true) {
-            if (rec.ignoreMe || !rec.isClientToServer()) {
+            if (rec.shouldBeIgnored() || !rec.isClientToServer()) {
                 rec = source.readRecord();
                 continue;
             }
 
-            sendNextAt = source.isDynamic() && !ignoreDynamic ? beganPlaying + rec.when : sendNextAt + 1000;
+            sendNextAt = source.isDynamic() && !ignoreDynamic ? beganPlaying + rec.getTimestamp() : sendNextAt + 1000;
             while (System.currentTimeMillis() < sendNextAt) // TODO: Evaluate if more precision is needed
                 Thread.yield();
 
-            toServer.filteredWrite(rec.isClientToServer(), rec.packet);
+            toServer.filteredWrite(rec.isClientToServer(), rec.getPacket());
 
             rec = source.readRecord();
         }

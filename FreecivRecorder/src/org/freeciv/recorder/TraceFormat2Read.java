@@ -50,11 +50,11 @@ public class TraceFormat2Read {
     }
 
     public int getVersion() {
-        return header.formatVersion;
+        return header.getFormatVersion();
     }
 
     public long getOriginalStartTime() {
-        return header.recordStartedAt;
+        return header.getOriginalStartTime();
     }
 
     public RecordTF2 readRecord() throws IOException, InvocationTargetException {
