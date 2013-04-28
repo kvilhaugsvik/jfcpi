@@ -114,8 +114,8 @@ public class PacketsMapping {
         return packetMakers.containsKey(kind);
     }
 
-    public Class<? extends PacketHeader> getPacketHeaderClass() {
-        return packetNumberBytes;
+    public HeaderData getNewPacketHeaderData() {
+        return new HeaderData(packetNumberBytes);
     }
 
     public Map<Integer, ReflexReaction> getRequiredPostReceiveRules() {

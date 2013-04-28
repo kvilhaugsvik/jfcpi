@@ -35,12 +35,12 @@ public class Uninterpreted implements FreecivConnection {
 
     public Uninterpreted(
             final Socket connection,
-            final Class<? extends PacketHeader> packetHeaderClass,
+            final HeaderData headerData,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend
     ) throws IOException {
         this.stillOpen = true;
-        this.currentHeader = new HeaderData(packetHeaderClass);
+        this.currentHeader = headerData;
         this.out = connection.getOutputStream();
         this.in = new BackgroundReader(connection.getInputStream(), this,
                 new ReflexPacketKind(postReceive, this), currentHeader);

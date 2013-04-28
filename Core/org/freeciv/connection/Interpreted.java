@@ -19,7 +19,6 @@ import org.freeciv.packet.*;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ public class Interpreted implements FreecivConnection {
     private Interpreted(Socket connection, PacketsMapping interpreter, Map<Integer, ReflexReaction> postReceiveReflexes, Map<Integer, ReflexReaction> postSendReflexes)
             throws IOException {
         this(
-                new Uninterpreted(connection, interpreter.getPacketHeaderClass(),
+                new Uninterpreted(connection, interpreter.getNewPacketHeaderData(),
                         ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), postReceiveReflexes),
                         ReflexPacketKind.layer(interpreter.getRequiredPostSendRules(), postSendReflexes)),
                 interpreter);

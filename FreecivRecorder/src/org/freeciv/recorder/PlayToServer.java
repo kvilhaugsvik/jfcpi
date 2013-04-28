@@ -17,7 +17,6 @@ package org.freeciv.recorder;
 import org.freeciv.connection.*;
 import org.freeciv.packet.PACKET_CONN_PONG;
 import org.freeciv.packet.Packet;
-import org.freeciv.packet.PacketHeader;
 import org.freeciv.recorder.traceFormat2.RecordTF2;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
@@ -26,7 +25,6 @@ import org.freeciv.utility.UI;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -53,12 +51,13 @@ public class PlayToServer {
         final PacketsMapping versionKnowledge = new PacketsMapping();
 
         this.source = new TraceFormat2Read(source, new OverImpl(),
-                versionKnowledge.getPacketHeaderClass(),
+                versionKnowledge.getNewPacketHeaderData(),
                 versionKnowledge.getRequiredPostReceiveRules());
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
 
-        final FreecivConnection conn = new Uninterpreted(server, versionKnowledge.getPacketHeaderClass(),
+        final FreecivConnection conn = new Uninterpreted(server,
+                versionKnowledge.getNewPacketHeaderData(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
                 versionKnowledge.getRequiredPostSendRules());
         this.toServer = new SinkForward(conn, new FilterNot(new FilterOr(

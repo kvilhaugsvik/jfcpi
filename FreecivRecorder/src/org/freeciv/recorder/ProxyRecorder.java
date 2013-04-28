@@ -190,9 +190,9 @@ public class ProxyRecorder extends Thread {
             this.serverCon = new Interpreted(server, getServerConnectionReflexes(), Collections.<Integer, ReflexReaction>emptyMap());
         } else {
             PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
-            this.clientCon = new Uninterpreted(client, versionKnowledge.getPacketHeaderClass(),
+            this.clientCon = new Uninterpreted(client, versionKnowledge.getNewPacketHeaderData(),
                     versionKnowledge.getRequiredPostReceiveRules(), versionKnowledge.getRequiredPostSendRules());
-            this.serverCon = new Uninterpreted(server, versionKnowledge.getPacketHeaderClass(),
+            this.serverCon = new Uninterpreted(server, versionKnowledge.getNewPacketHeaderData(),
                     ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
                     versionKnowledge.getRequiredPostSendRules());
         }
