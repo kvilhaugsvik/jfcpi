@@ -46,7 +46,7 @@ class SinkWriteTrace extends Sink {
 
     public void write(boolean clientToServer, Packet packet) throws IOException {
         try {
-            new RecordTF2(clientToServer, System.currentTimeMillis(), packet, header, false, false).write(traceFile, System.currentTimeMillis() - began);
+            new RecordTF2(clientToServer, System.currentTimeMillis() - began, packet, header, false, false).write(traceFile);
         } catch (IOException e) {
             throw new IOException(id + ": Failed to write a packet to trace", e);
         }

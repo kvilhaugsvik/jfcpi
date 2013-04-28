@@ -66,11 +66,11 @@ public class RecordTF2 {
         this.packet = inAsPacket.readPacket();
     }
 
-    public void write(DataOutputStream to, long time) throws IOException {
+    public void write(DataOutputStream to) throws IOException {
         to.write(flags.getAsByteArray());
 
         if (traceHeader.includesTime())
-            to.writeLong(time);
+            to.writeLong(this.when);
 
         packet.encodeTo(to);
     }
