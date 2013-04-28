@@ -18,7 +18,8 @@ Record a game
    Setting gameseed and mapseed in stead of using a saved game won't work at the moment.
  * Start the recorder. The line below use the default trace name and will overwrite previous traces.
      ./proxyRecorder
-   in this folder should do it.
+   in this folder should do it. As the play back don't use server packets you can reduce the size of the trace using
+     ./proxyRecorder --trace-exclude-from-server
  * Connect a client to the port the proxy is listening to.
      ./fcgui -a
    in the folder where you have compiled Freeciv.
