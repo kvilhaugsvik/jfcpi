@@ -1,0 +1,23 @@
+FreecivRecorder
+ * Exit cleanly when the trace has been played back
+ * Forward client disconnections to the server
+ * Merge all connections in one file
+ * Make more of the filtering accessible from the command line
+
+Core
+ * Support compression properly
+ * look at the challenge protocol
+   - see if it is responsible for seed setting not working
+
+GeneratePackets
+ * Handle all of array diff so the field is stored as a normal array
+ * Continue making code generation more typed
+ * Support capabilities so 2.4 can be understood
+
+JavaGenerator
+ * TargetClass should not be AValue
+ * Support rewrite formatting
+ * Support formatting -5 as -5 without turning 2 - 5 in to 2 -5
+
+Generally
+ * Make the code more consistent by finishing or removing incomplete abstractions
