@@ -1,0 +1,30 @@
+At the moment there are no proper installation support. Running it from this directory should work.
+
+What you'll need
+ * Java 7 (Java 6 hasn't been tested for a while)
+ * JUnit 4.10 (other versions not tested)
+ * GNU Make 3.81 (other versions are probably OK)
+ * The Freeciv trunk source code (SVN revision 22783 is known to work)
+ * Scala 2.9 (2.10 is not tested yet)
+
+Building
+The Makefile in this folder don't have a ./configure script. It therefore may need to be told where it can find its
+dependencies. If you are running Debian Wheezy and installed all the dependencies from the official Debian repository
+and have placed this folder in Freeciv trunk the defaults should be OK. If not you must override the default values from
+the command line. You override them by setting them before the command. The information that is needed is:
+ * JAVA - the java application launcher
+ * JAVAC - the java compiler
+ * JAR - the jar utility
+ * SCALA - the scala application launcher
+ * SCALAC - the scala compiler
+ * SCALALIB - the scala library
+ * JUNIT - the JUnit library
+To compile using a JUnit located in ~/lib to run the tests and a jar from ~/bin/jar use the command
+  JUNIT=~/lib/junit.jar JAR=~/bin/jar make all
+
+Freeciv has its own documentation on how to build it and what you need. You won't have to install it to test recording.
+It is worth having a look at. If all of Freeciv's build dependencies are there entering its folder and running
+,/autogen.sh && make
+should work.
+
+When this is done see README for instructions on how to record and play back a Freeciv game.
