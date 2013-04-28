@@ -1,3 +1,5 @@
+For information on how to build everything see INSTALL
+
 Record a game
  * Start the Freeciv server. You can do this using the command
      FREECIV_COMPRESSION_LEVEL=0 ./fcser -p 55555
