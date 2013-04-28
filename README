@@ -1,5 +1,13 @@
 For information on how to build everything see INSTALL
 
+At the moment the main thing this system does is to record and play back a Freeciv game. This README will therefore
+focus on recording.
+
+Recording a game can be done for many reasons. Being able to observe a game you played after it is over may help you
+become a better player. Showing off your skills may be fun. Demonstrating a strategy for beginners and AI's that learn
+by watching may also be interesting. It may also have potential as a real paranoid debugging tool. As you are reading
+this I assume you already have your own motivation for recording a game.
+
 Record a game
  * Start the Freeciv server. You can do this using the command
      FREECIV_COMPRESSION_LEVEL=0 ./fcser -p 55555
