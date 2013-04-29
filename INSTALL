@@ -7,6 +7,22 @@ What you'll need
  * The Freeciv trunk source code (SVN revision 22783 is known to work)
  * Scala 2.9 (2.10 is not tested yet)
 
+Where you can find it
+ * Most GNU/Linux distributions will have the OpenJDK Java implementation in their package repositories. Users of
+   Windows and OS X can find Java at http://java.oracle.com. Remember that you need a JDK and not just a JRE. No browser
+   plug in is required.
+ * Most GNU/Linux distributions will have JUnit in their package repositories. Windows and OS X users can find it at
+   http://JUnit.org
+ * GNU Make is needed to build Freeciv as well. GNU/Linux users will find it in the package repository of their
+   distribution. Apple distributes it as a part of Command Line Tools for OS X. Windows users can get it from
+   http://cygwin.com
+ * The trunk version of Freeciv can be found at svn://svn.gna.org/svn/freeciv/trunk and downloaded using your favorite
+   version control system. To download it using Bazaar make sure that bzr-svn is installed and run
+     bzr branch svn://svn.gna.org/svn/freeciv/trunk
+   The Freeciv web page has instructions for downloading the trunk version using Git or SVN at
+   http://freeciv.wikia.com/wiki/Freeciv_source_code_repository
+ * Scala is in the package repositories of some GNU/Linux distributions. It can also be found at http://scala-lang.org
+
 Building
 The Makefile in this folder don't have a ./configure script. It therefore may need to be told where it can find its
 dependencies. If you are running Debian Wheezy and installed all the dependencies from the official Debian repository
