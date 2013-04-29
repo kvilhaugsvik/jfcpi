@@ -29,20 +29,6 @@ public class Interpreted implements FreecivConnection {
     private final PacketsMapping interpreter;
     private final HashMap<DeltaKey, Packet> oldRead;
 
-    public Interpreted(Socket connection, Map<Integer, ReflexReaction> postReceiveReflexes, Map<Integer, ReflexReaction> postSendReflexes) throws IOException {
-        this(connection, new PacketsMapping(), postReceiveReflexes, postSendReflexes);
-    }
-
-    private Interpreted(Socket connection, PacketsMapping interpreter, Map<Integer, ReflexReaction> postReceiveReflexes, Map<Integer, ReflexReaction> postSendReflexes)
-            throws IOException {
-        this(
-                new Uninterpreted(connection.getInputStream(), connection.getOutputStream(),
-                        interpreter.getNewPacketHeaderData(),
-                        ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), postReceiveReflexes),
-                        ReflexPacketKind.layer(interpreter.getRequiredPostSendRules(), postSendReflexes)),
-                interpreter);
-    }
-
     public Interpreted(Uninterpreted connection, PacketsMapping interpreter) throws IOException {
         this.interpreter = interpreter;
         this.toProcess = connection;

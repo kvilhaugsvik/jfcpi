@@ -21,7 +21,6 @@ import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.Collections;
@@ -68,7 +67,14 @@ public class SignInAndWait {
             }
         });
         try {
-            Interpreted con = new Interpreted(new Socket(address, portNumber), reflexes, Collections.<Integer, ReflexReaction>emptyMap());
+            final PacketsMapping interpreter = new PacketsMapping();
+            final Socket connection = new Socket(address, portNumber);
+            final Interpreted con = new Interpreted(
+                    new Uninterpreted(connection.getInputStream(), connection.getOutputStream(),
+                            interpreter.getNewPacketHeaderData(),
+                            ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
+                            interpreter.getRequiredPostSendRules()),
+                    interpreter);
 
             con.toSend(new PACKET_SERVER_JOIN_REQ(userName,
                     con.getCapStringMandatory(),
