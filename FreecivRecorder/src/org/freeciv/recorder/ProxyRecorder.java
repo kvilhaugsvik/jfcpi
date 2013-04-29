@@ -185,18 +185,21 @@ public class ProxyRecorder extends Thread {
         this.proxyNumber = proxyNumber;
         this.trace = trace;
 
+        final PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
+        final Uninterpreted clientConTmp = new Uninterpreted(client.getInputStream(), client.getOutputStream(),
+                versionKnowledge.getNewPacketHeaderData(),
+                versionKnowledge.getRequiredPostReceiveRules(), versionKnowledge.getRequiredPostSendRules());
+        final Uninterpreted serverConTmp = new Uninterpreted(server.getInputStream(), server.getOutputStream(),
+                versionKnowledge.getNewPacketHeaderData(),
+                ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
+                versionKnowledge.getRequiredPostSendRules());
+
         if (settings.<Boolean>getSetting(UNDERSTAND)) {
-            this.clientCon = new Interpreted(client, Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap());
-            this.serverCon = new Interpreted(server, getServerConnectionReflexes(), Collections.<Integer, ReflexReaction>emptyMap());
+            this.clientCon = new Interpreted(clientConTmp, versionKnowledge);
+            this.serverCon = new Interpreted(serverConTmp, versionKnowledge);
         } else {
-            PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
-            this.clientCon = new Uninterpreted(client.getInputStream(), client.getOutputStream(),
-                    versionKnowledge.getNewPacketHeaderData(),
-                    versionKnowledge.getRequiredPostReceiveRules(), versionKnowledge.getRequiredPostSendRules());
-            this.serverCon = new Uninterpreted(server.getInputStream(), server.getOutputStream(),
-                    versionKnowledge.getNewPacketHeaderData(),
-                    ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
-                    versionKnowledge.getRequiredPostSendRules());
+            this.clientCon = clientConTmp;
+            this.serverCon = serverConTmp;
         }
 
         Filter forwardFilters = new FilterAllAccepted(); // Forward everything
