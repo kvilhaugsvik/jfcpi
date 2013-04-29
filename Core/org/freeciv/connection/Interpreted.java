@@ -36,7 +36,8 @@ public class Interpreted implements FreecivConnection {
     private Interpreted(Socket connection, PacketsMapping interpreter, Map<Integer, ReflexReaction> postReceiveReflexes, Map<Integer, ReflexReaction> postSendReflexes)
             throws IOException {
         this(
-                new Uninterpreted(connection, interpreter.getNewPacketHeaderData(),
+                new Uninterpreted(connection.getInputStream(), connection.getOutputStream(),
+                        interpreter.getNewPacketHeaderData(),
                         ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), postReceiveReflexes),
                         ReflexPacketKind.layer(interpreter.getRequiredPostSendRules(), postSendReflexes)),
                 interpreter);
