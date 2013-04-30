@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PlayToServer {
     private static final String TRACE_FILE = "file";
@@ -60,7 +61,7 @@ public class PlayToServer {
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));
 
-        this.source = new TraceFormat2Read(source, conn,
+        this.source = new TraceFormat2Read(source, conn, new ReentrantLock(),
                 versionKnowledge.getNewPacketHeaderData(),
                 versionKnowledge.getRequiredPostReceiveRules());
 

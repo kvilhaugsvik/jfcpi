@@ -20,14 +20,16 @@ import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Uninterpreted implements FreecivConnection {
     private final BackgroundReader in;
     private final OutputStream out;
 
     private final OverImpl overImpl = new OverImpl();
+    private final Lock completeReflexesInOneStep;
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
 
@@ -43,8 +45,9 @@ public class Uninterpreted implements FreecivConnection {
         this.stillOpen = true;
         this.currentHeader = headerData;
         this.out = out;
+        this.completeReflexesInOneStep = new ReentrantLock();
         this.in = new BackgroundReader(inn, this,
-                new ReflexPacketKind(postReceive, this), currentHeader);
+                completeReflexesInOneStep, new ReflexPacketKind(postReceive, this), currentHeader);
         this.postSend = new ReflexPacketKind(postSend, this);
 
         this.in.start();
@@ -89,7 +92,7 @@ public class Uninterpreted implements FreecivConnection {
 
         toSend.encodeTo(packet);
 
-        networkAndReflexesLock();
+        completeReflexesInOneStep.lock();
         try {
             out.write(packetSerialized.toByteArray());
             this.postSend.handle(toSend);
@@ -97,7 +100,7 @@ public class Uninterpreted implements FreecivConnection {
             close();
             throw new IOException("Can't send", e);
         } finally {
-            networkAndReflexesUnlock();
+            completeReflexesInOneStep.unlock();
         }
     }
 
@@ -124,25 +127,15 @@ public class Uninterpreted implements FreecivConnection {
         return overImpl.isOver();
     }
 
-    @Override
-    public void networkAndReflexesLock() {
-        overImpl.networkAndReflexesLock();
-    }
-
-    @Override
-    public void networkAndReflexesUnlock() {
-        overImpl.networkAndReflexesUnlock();
-    }
-
     private static class BackgroundReader extends Thread {
         private final PacketInputStream in;
         private final LinkedList<RawPacket> buffered;
         private final Uninterpreted parent;
 
-        public BackgroundReader(InputStream in, Uninterpreted parent, ReflexPacketKind quickRespond,
+        public BackgroundReader(InputStream in, Uninterpreted parent, Lock completeReflexesInOneStep, ReflexPacketKind quickRespond,
                                 final HeaderData currentHeader)
                 throws IOException {
-            this.in = new PacketInputStream(in, parent, currentHeader, quickRespond);
+            this.in = new PacketInputStream(in, parent, completeReflexesInOneStep, currentHeader, quickRespond);
             this.parent = parent;
             this.buffered = new LinkedList<RawPacket>();
 

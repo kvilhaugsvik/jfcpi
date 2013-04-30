@@ -14,21 +14,23 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.locks.Lock;
 
 public class PacketInputStream extends FilterInputStream {
     private final Over state;
     private final HeaderData headerData;
     private final ReflexPacketKind quickRespond;
+    private Lock completeReflexesInOneStep;
 
-    public PacketInputStream(InputStream in, Over state, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond) {
+    public PacketInputStream(InputStream in, Over state, Lock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond) {
         super(in);
 
         this.state = state;
+        this.completeReflexesInOneStep = completeReflexesInOneStep;
         this.headerData = packetHeaderClass;
         this.quickRespond = quickRespond;
     }
@@ -37,7 +39,7 @@ public class PacketInputStream extends FilterInputStream {
         final byte[] start = readXBytesFrom(2, new byte[0], in, state);
         final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
 
-        state.networkAndReflexesLock();
+        completeReflexesInOneStep.lock();
         try {
             byte[] packet = readXBytesFrom(size - 2, start, in, state);
 
@@ -47,7 +49,7 @@ public class PacketInputStream extends FilterInputStream {
 
             return rawPacket;
         } finally {
-            state.networkAndReflexesUnlock();
+            completeReflexesInOneStep.unlock();
         }
     }
 

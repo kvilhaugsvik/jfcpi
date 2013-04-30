@@ -25,14 +25,4 @@ public interface Over extends ConnectionRelated {
      * @return true if the connection is closed or soon will be
      */
     boolean isOver();
-
-    /**
-     * Stop other threads from reading or writing until the already started packet is done AND its reflexes are done
-     */
-    public void networkAndReflexesLock();
-
-    /**
-     * Let other threads read / write again as the reflexes now are done
-     */
-    public void networkAndReflexesUnlock();
 }

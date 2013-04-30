@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 public class TraceFormat2Read {
     private final PacketInputStream inAsPacket;
@@ -30,9 +31,9 @@ public class TraceFormat2Read {
 
     private final HeaderTF2 header;
 
-    public TraceFormat2Read(InputStream in, Over state, HeaderData headerData,
+    public TraceFormat2Read(InputStream in, Over state, Lock completeReflexesInOneStep, HeaderData headerData,
                             Map<Integer, ReflexReaction> postReadReflexes) throws IOException {
-        this.inAsPacket = new PacketInputStream(in, state, headerData,
+        this.inAsPacket = new PacketInputStream(in, state, completeReflexesInOneStep, headerData,
                 new ReflexPacketKind(postReadReflexes, headerData));
         this.inAsData = new DataInputStream(in);
 
