@@ -14,6 +14,7 @@
 
 package org.freeciv.recorder;
 
+import org.freeciv.connection.OverImpl;
 import org.freeciv.packet.Packet;
 import org.freeciv.recorder.traceFormat2.HeaderTF2;
 import org.freeciv.recorder.traceFormat2.RecordTF2;
@@ -26,11 +27,13 @@ class SinkWriteTrace extends Sink {
     private final HeaderTF2 header;
     private final int id;
     private final DataOutputStream traceFile;
+    private final OverImpl over;
 
     public SinkWriteTrace(Filter filter, OutputStream traceFile, boolean isDynamic, int id) throws IOException {
         super(filter);
 
         this.id = id;
+        this.over = new OverImpl();
         this.traceFile = new DataOutputStream(traceFile);
 
         try {
@@ -41,16 +44,33 @@ class SinkWriteTrace extends Sink {
         }
     }
 
-    public void write(boolean clientToServer, Packet packet) throws IOException {
+    public synchronized void write(boolean clientToServer, Packet packet) throws IOException {
         try {
             final RecordTF2 record =
                     new RecordTF2(header, clientToServer, System.currentTimeMillis() - header.getOriginalStartTime(), packet, false, false);
-            synchronized (this) {
-                record.write(traceFile);
-            }
+            record.write(traceFile);
         } catch (IOException e) {
             throw new IOException(id + ": Failed to write a packet to trace", e);
         }
     }
 
+    @Override
+    public void setOver() {
+        over.setOver();
+        whenOver();
+    }
+
+    private synchronized void whenOver() {
+        try {
+            traceFile.close();
+        } catch (IOException e) {
+            System.err.println("Some data may not have been written to the trace for connection " + id);
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean isOver() {
+        return over.isOver();
+    }
 }

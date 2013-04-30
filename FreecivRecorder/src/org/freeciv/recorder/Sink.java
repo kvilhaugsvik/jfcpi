@@ -14,11 +14,12 @@
 
 package org.freeciv.recorder;
 
+import org.freeciv.connection.Over;
 import org.freeciv.packet.Packet;
 
 import java.io.IOException;
 
-abstract class Sink {
+abstract class Sink implements Over {
     private final Filter filter;
 
     Sink(Filter filter) {

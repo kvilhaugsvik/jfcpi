@@ -14,19 +14,32 @@
 
 package org.freeciv.recorder;
 
+import org.freeciv.connection.OverImpl;
 import org.freeciv.packet.Packet;
 
 import java.util.List;
 
 class SinkInformUser extends Sink {
     private final int proxyNumber;
+    private final OverImpl over;
 
     SinkInformUser(Filter filter, int proxyNumber) {
         super(filter);
         this.proxyNumber = proxyNumber;
+        this.over = new OverImpl();
     }
 
     public void write(boolean clientToServer, Packet packet) {
         System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + packet);
+    }
+
+    @Override
+    public void setOver() {
+        over.setOver();
+    }
+
+    @Override
+    public boolean isOver() {
+        return over.isOver();
     }
 }

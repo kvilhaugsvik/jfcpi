@@ -34,4 +34,14 @@ class SinkForward extends Sink {
             throw new IOException("Couldn't forward packet to " + (clientToServer ? "server" : "client"), e);
         }
     }
+
+    @Override
+    public void setOver() {
+        writeTo.setOver();
+    }
+
+    @Override
+    public boolean isOver() {
+        return writeTo.isOver();
+    }
 }
