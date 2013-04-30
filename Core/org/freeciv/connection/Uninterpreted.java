@@ -28,12 +28,10 @@ public class Uninterpreted implements FreecivConnection {
     private final BackgroundReader in;
     private final OutputStream out;
 
-    private final OverImpl overImpl = new OverImpl();
+    private final OverImpl overImpl;
     private final Lock completeReflexesInOneStep;
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
-
-    private boolean stillOpen;
 
     public Uninterpreted(
             final InputStream inn,
@@ -42,9 +40,19 @@ public class Uninterpreted implements FreecivConnection {
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend
     ) throws IOException {
-        this.stillOpen = true;
         this.currentHeader = headerData;
         this.out = out;
+        this.overImpl = new OverImpl() {
+            @Override
+            protected void whenOverImpl() {
+                try {
+                    out.close(); // Since out is from a Socket this closes it as well
+                } catch (IOException e) {
+                    System.err.println("Problems while closing network connection. Packets may not have been sent");
+                    e.printStackTrace();
+                }
+            }
+        };
         this.completeReflexesInOneStep = new ReentrantLock();
         this.in = new BackgroundReader(inn, this,
                 completeReflexesInOneStep, new ReflexPacketKind(postReceive, this), currentHeader);
@@ -64,19 +72,9 @@ public class Uninterpreted implements FreecivConnection {
         return in.getPacket();
     }
 
-    public boolean isOpen() {
-        return stillOpen;
-    }
-
     public void close() {
         setOver();
-        stillOpen = false;
-        try {
-            out.close(); // Since out is from a Socket this closes it as well
-        } catch (IOException e) {
-            System.err.println("Problems while closing network connection. Packets may not have been sent");
-            e.printStackTrace();
-        }
+        whenOver();
     }
 
     public void toSend(Packet toSend) throws IOException {
@@ -119,12 +117,24 @@ public class Uninterpreted implements FreecivConnection {
         return currentHeader.getFields2Header();
     }
 
+    @Override
     public void setOver() {
         overImpl.setOver();
     }
 
+    @Override
+    public void whenOver() {
+        overImpl.whenOver();
+    }
+
+    @Override
     public boolean isOver() {
         return overImpl.isOver();
+    }
+
+    @Override
+    public boolean isOpen() {
+        return overImpl.isOpen();
     }
 
     private static class BackgroundReader extends Thread {

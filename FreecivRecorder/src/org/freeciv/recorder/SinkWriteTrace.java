@@ -33,8 +33,15 @@ class SinkWriteTrace extends Sink {
         super(filter);
 
         this.id = id;
-        this.over = new OverImpl();
         this.traceFile = new DataOutputStream(traceFile);
+
+        final SinkWriteTrace me = this;
+        this.over = new OverImpl() {
+            @Override
+            protected void whenOverImpl() {
+                me.whenOverImpl();
+            }
+        };
 
         try {
             header = new HeaderTF2(System.currentTimeMillis(), isDynamic);
@@ -57,10 +64,17 @@ class SinkWriteTrace extends Sink {
     @Override
     public void setOver() {
         over.setOver();
+
+        // TODO: Remove when no longer needed
         whenOver();
     }
 
-    private synchronized void whenOver() {
+    @Override
+    public void whenOver() {
+        over.whenOver();
+    }
+
+    private synchronized void whenOverImpl() {
         try {
             traceFile.close();
         } catch (IOException e) {
@@ -72,5 +86,10 @@ class SinkWriteTrace extends Sink {
     @Override
     public boolean isOver() {
         return over.isOver();
+    }
+
+    @Override
+    public boolean isOpen() {
+        return over.isOpen();
     }
 }

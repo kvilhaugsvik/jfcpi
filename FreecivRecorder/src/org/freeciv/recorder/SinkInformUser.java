@@ -26,7 +26,12 @@ class SinkInformUser extends Sink {
     SinkInformUser(Filter filter, int proxyNumber) {
         super(filter);
         this.proxyNumber = proxyNumber;
-        this.over = new OverImpl();
+        this.over = new OverImpl() {
+            @Override
+            protected void whenOverImpl() {
+                // no need to close System.out
+            }
+        };
     }
 
     public void write(boolean clientToServer, Packet packet) {
@@ -39,7 +44,17 @@ class SinkInformUser extends Sink {
     }
 
     @Override
+    public void whenOver() {
+        over.whenOver();
+    }
+
+    @Override
     public boolean isOver() {
         return over.isOver();
+    }
+
+    @Override
+    public boolean isOpen() {
+        return over.isOpen();
     }
 }

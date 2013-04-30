@@ -14,14 +14,34 @@
 
 package org.freeciv.connection;
 
-public class OverImpl implements Over {
+public abstract class OverImpl implements Over {
     boolean over = false;
+    private boolean open = true;
 
+    @Override
     public void setOver() {
         over = true;
     }
 
+    @Override
+    public void whenOver() {
+        if (!isOver())
+            throw new IllegalStateException("Tried to run whenOver() before it is over");
+
+        open = false;
+
+        whenOverImpl();
+    }
+
+    protected abstract void whenOverImpl();
+
+    @Override
     public boolean isOver() {
         return over;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return open;
     }
 }

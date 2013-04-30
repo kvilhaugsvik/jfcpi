@@ -58,10 +58,16 @@ public class Interpreted implements FreecivConnection {
     }
 
     @Override
+    public void whenOver() {
+        toProcess.whenOver();
+    }
+
+    @Override
     public boolean isOver() {
         return toProcess.isOver();
     }
 
+    @Override
     public boolean isOpen() {
         return toProcess.isOpen();
     }

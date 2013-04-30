@@ -33,10 +33,4 @@ public interface PacketRead extends PacketChangeHeader, Over {
      * @throws org.freeciv.connection.NotReadyYetException if no packet is ready
      */
     Packet getPacket() throws IOException, NotReadyYetException;
-
-    /**
-     * Is the underlying connection open
-     * @return true if the underlying connection is open
-     */
-    boolean isOpen();
 }

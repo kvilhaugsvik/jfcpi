@@ -21,8 +21,19 @@ public interface Over extends ConnectionRelated {
     void setOver();
 
     /**
+     * Run this when all is over to close stuff etc
+     */
+    void whenOver();
+
+    /**
      * Will this connection be closed (unless it already is) as soon as its empty?
      * @return true if the connection is closed or soon will be
      */
     boolean isOver();
+
+    /**
+     * Is the underlying connection open?
+     * @return true if the underlying connection is open
+     */
+    boolean isOpen();
 }

@@ -41,7 +41,17 @@ class SinkForward extends Sink {
     }
 
     @Override
+    public void whenOver() {
+        writeTo.whenOver();
+    }
+
+    @Override
     public boolean isOver() {
         return writeTo.isOver();
+    }
+
+    @Override
+    public boolean isOpen() {
+        return writeTo.isOpen();
     }
 }
