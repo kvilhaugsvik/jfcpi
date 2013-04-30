@@ -46,9 +46,15 @@ public class Uninterpreted implements FreecivConnection {
             @Override
             protected void whenOverImpl() {
                 try {
-                    out.close(); // Since out is from a Socket this closes it as well
+                    out.close();
                 } catch (IOException e) {
-                    System.err.println("Problems while closing network connection. Packets may not have been sent");
+                    System.err.println("Problems while closing the connection's output. Packets may not have been sent");
+                    e.printStackTrace();
+                }
+                try {
+                    inn.close();
+                } catch (IOException e) {
+                    System.err.println("Problems while closing the connection's input");
                     e.printStackTrace();
                 }
             }
