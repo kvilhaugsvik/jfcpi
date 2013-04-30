@@ -14,5 +14,5 @@
 
 package org.freeciv.connection;
 
-public interface FreecivConnection extends Over, PacketRead, PacketWrite {
+public interface FreecivConnection extends PacketRead, PacketWrite {
 }

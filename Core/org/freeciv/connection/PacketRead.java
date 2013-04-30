@@ -19,7 +19,7 @@ import org.freeciv.packet.PacketHeader;
 
 import java.io.IOException;
 
-public interface PacketRead extends PacketChangeHeader {
+public interface PacketRead extends PacketChangeHeader, Over {
     /**
      * Return true if a packet is ready to be read
      * @return true if a packet is ready to be read

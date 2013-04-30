@@ -19,7 +19,7 @@ import org.freeciv.packet.PacketHeader;
 
 import java.io.IOException;
 
-public interface PacketWrite extends PacketChangeHeader {
+public interface PacketWrite extends PacketChangeHeader, Over {
     /**
      * Send a packet via this connection
      * @param toSend the packet to send
