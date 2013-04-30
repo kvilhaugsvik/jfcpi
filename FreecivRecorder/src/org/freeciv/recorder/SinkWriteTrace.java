@@ -64,9 +64,6 @@ class SinkWriteTrace extends Sink {
     @Override
     public void setOver() {
         over.setOver();
-
-        // TODO: Remove when no longer needed
-        whenOver();
     }
 
     @Override
