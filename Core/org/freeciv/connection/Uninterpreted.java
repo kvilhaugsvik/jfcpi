@@ -72,11 +72,6 @@ public class Uninterpreted implements FreecivConnection {
         return in.getPacket();
     }
 
-    public void close() {
-        setOver();
-        whenOver();
-    }
-
     public void toSend(Packet toSend) throws IOException {
         if (!isOpen()) {
             throw new IOException("Is closed. Can't send.");
@@ -95,7 +90,8 @@ public class Uninterpreted implements FreecivConnection {
             out.write(packetSerialized.toByteArray());
             this.postSend.handle(toSend);
         } catch (IOException e) {
-            close();
+            setOver();
+            whenOver();
             throw new IOException("Can't send", e);
         } finally {
             completeReflexesInOneStep.unlock();
@@ -167,9 +163,9 @@ public class Uninterpreted implements FreecivConnection {
             } catch (Exception e) {
                 System.err.println("Problem in the thread that reads from the network");
                 e.printStackTrace();
-                parent.setOver();
             } finally {
-                parent.close();
+                parent.setOver();
+                parent.whenOver();
             }
         }
 
