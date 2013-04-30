@@ -41,9 +41,4 @@ public class OverImpl implements Over {
     public void networkAndReflexesUnlock() {
         reflexLock.unlock();
     }
-
-    @Override
-    public boolean networkAndReflexesHeldByCurrentThread() {
-        return reflexLock.isHeldByCurrentThread();
-    }
 }

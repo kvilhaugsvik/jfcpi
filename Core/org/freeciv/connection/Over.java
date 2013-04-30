@@ -35,9 +35,4 @@ public interface Over extends ConnectionRelated {
      * Let other threads read / write again as the reflexes now are done
      */
     public void networkAndReflexesUnlock();
-
-    /**
-     * Did the current thread lock it?
-     */
-    public boolean networkAndReflexesHeldByCurrentThread();
 }

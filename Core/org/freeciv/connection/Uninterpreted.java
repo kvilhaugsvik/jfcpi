@@ -134,11 +134,6 @@ public class Uninterpreted implements FreecivConnection {
         overImpl.networkAndReflexesUnlock();
     }
 
-    @Override
-    public boolean networkAndReflexesHeldByCurrentThread() {
-        return overImpl.networkAndReflexesHeldByCurrentThread();
-    }
-
     private static class BackgroundReader extends Thread {
         private final PacketInputStream in;
         private final LinkedList<RawPacket> buffered;
