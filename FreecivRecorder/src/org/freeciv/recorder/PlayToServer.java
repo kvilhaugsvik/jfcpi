@@ -15,8 +15,7 @@
 package org.freeciv.recorder;
 
 import org.freeciv.connection.*;
-import org.freeciv.packet.PACKET_CONN_PONG;
-import org.freeciv.packet.Packet;
+import org.freeciv.packet.*;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -60,8 +59,42 @@ public class PlayToServer {
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));
 
+        final Sink reaction = new SinkProcess(new FilterPacketKind(Arrays.asList(5, 160)), versionKnowledge) {
+            String challengeFileName = null;
+
+            @Override
+            public void write(boolean clientToServer, Packet packet) throws IOException {
+                final Packet interpreted = interpret(clientToServer, packet);
+
+                switch (packet.getHeader().getPacketKind()) {
+                    case 5:
+                        challengeFileName = System.getProperty("user.home") + "/.freeciv/" +
+                                ((PACKET_SERVER_JOIN_REPLY)interpreted).getChallenge_fileValue();
+                        break;
+                    case 160:
+                        if (null == challengeFileName)
+                            throw new IllegalStateException("Don't know the file name yet");
+
+                        String challengeString = "[challenge]\ntoken=\"" +
+                                ((PACKET_SINGLE_WANT_HACK_REQ)interpreted).getTokenValue() + "\"\n";
+
+                        FileOutputStream challengeWrite = new FileOutputStream(challengeFileName);
+                        try {
+                            challengeWrite.write(challengeString.getBytes());
+                        } finally {
+                            challengeWrite.close();
+                        }
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Should have been filtered");
+                }
+            }
+        };
+
         final HashMap<Source, List<Sink>> sourcesToSinks = new HashMap<Source, List<Sink>>();
-        sourcesToSinks.put(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true), Arrays.asList(toServer));
+        sourcesToSinks.put(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true),
+                Arrays.asList(reaction, toServer));
+        sourcesToSinks.put(new SourceConn(conn, false), Arrays.asList(reaction));
         this.plumbing = new Plumbing(sourcesToSinks, timeToExit);
     }
 

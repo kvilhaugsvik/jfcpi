@@ -6,8 +6,6 @@ FreecivRecorder
 
 Core
  * Support compression properly
- * look at the challenge protocol
-   - see if it is responsible for seed setting not working
 
 GeneratePackets
  * Handle all of array diff so the field is stored as a normal array
