@@ -14,6 +14,7 @@
 
 package org.freeciv.recorder.traceFormat2;
 
+import org.freeciv.connection.DoneReading;
 import org.freeciv.connection.PacketInputStream;
 import org.freeciv.packet.Packet;
 import org.freeciv.types.FCEnum;
@@ -21,6 +22,7 @@ import org.freeciv.types.UnderstoodBitVector;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
@@ -58,7 +60,11 @@ public class RecordTF2 {
     }
 
     public RecordTF2(HeaderTF2 traceHeader, DataInputStream inAsData, PacketInputStream inAsPacket) throws IOException, InvocationTargetException {
-        this.flags = new RecordFlagVector(new byte[]{inAsData.readByte()});
+        try {
+            this.flags = new RecordFlagVector(new byte[]{inAsData.readByte()});
+        } catch (EOFException e) {
+            throw new DoneReading("Out of data before the first byte of the record was read");
+        }
 
         this.traceHeader = traceHeader;
 
