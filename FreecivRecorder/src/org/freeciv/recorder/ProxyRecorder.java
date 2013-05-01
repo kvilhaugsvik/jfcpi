@@ -74,7 +74,7 @@ public class ProxyRecorder extends Thread {
 
     private final HashMap<Source, List<Sink>> sourcesToSinks;
 
-    private static boolean timeToExit = false;
+    private static boolean[] timeToExit = {false};
 
     private boolean started = false;
     private boolean finished = false;
@@ -104,7 +104,7 @@ public class ProxyRecorder extends Thread {
         }
 
         ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
-        while (!timeToExit) {
+        while (!timeToExit[0]) {
             final Socket client;
             try {
                 client = serverProxy.accept();
@@ -256,7 +256,7 @@ public class ProxyRecorder extends Thread {
         reflexes.put(8, new ReflexReaction<ConnectionRelated>() {
             @Override
             public void apply(Packet incoming, ConnectionRelated connection) {
-                timeToExit = true;
+                timeToExit[0] = true;
             }
         });
         return reflexes;
@@ -332,7 +332,7 @@ public class ProxyRecorder extends Thread {
     }
 
     private void checkIfGlobalOver() {
-        if (timeToExit) {
+        if (timeToExit[0]) {
             setAllSinksAndSourcesToOver();
         }
     }
