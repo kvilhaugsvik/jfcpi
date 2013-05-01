@@ -72,8 +72,6 @@ public class ProxyRecorder extends Thread {
         add(new Setting.BoolSetting(TO_TRACE, false, "print all packets going to the trace to the terminal"));
     }};
 
-    private final int proxyNumber;
-
     private final HashMap<Source, List<Sink>> sourcesToSinks;
 
     private static boolean timeToExit = false;
@@ -178,7 +176,6 @@ public class ProxyRecorder extends Thread {
 
     public ProxyRecorder(Socket client, Socket server, OutputStream trace, int proxyNumber, ArgumentSettings settings)
             throws IOException, InterruptedException {
-        this.proxyNumber = proxyNumber;
 
         final PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
 
@@ -282,7 +279,6 @@ public class ProxyRecorder extends Thread {
         cleanUp();
 
         finished = true;
-        System.out.println(proxyNumber + " is finished");
     }
 
     // TODO: What about sinks?

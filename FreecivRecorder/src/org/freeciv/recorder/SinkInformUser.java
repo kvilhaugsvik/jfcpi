@@ -23,13 +23,15 @@ class SinkInformUser extends Sink {
     private final int proxyNumber;
     private final OverImpl over;
 
-    SinkInformUser(Filter filter, int proxyNumber) {
+    SinkInformUser(final Filter filter, final int proxyNumber) {
         super(filter);
         this.proxyNumber = proxyNumber;
         this.over = new OverImpl() {
             @Override
             protected void whenOverImpl() {
                 // no need to close System.out
+                // but "close" the user
+                System.out.println(proxyNumber + " is finished");
             }
         };
     }
