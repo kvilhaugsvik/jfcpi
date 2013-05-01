@@ -181,23 +181,16 @@ public class ProxyRecorder extends Thread {
         this.proxyNumber = proxyNumber;
 
         final PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
-        final Uninterpreted clientConTmp = new Uninterpreted(client.getInputStream(), client.getOutputStream(),
-                versionKnowledge.getNewPacketHeaderData(),
-                versionKnowledge.getRequiredPostReceiveRules(), versionKnowledge.getRequiredPostSendRules());
-        final Uninterpreted serverConTmp = new Uninterpreted(server.getInputStream(), server.getOutputStream(),
-                versionKnowledge.getNewPacketHeaderData(),
-                ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
+
+        final FreecivConnection clientCon = socket2Connection(client, versionKnowledge,
+                settings.<Boolean>getSetting(UNDERSTAND),
+                versionKnowledge.getRequiredPostReceiveRules(),
                 versionKnowledge.getRequiredPostSendRules());
 
-        final FreecivConnection clientCon;
-        final FreecivConnection serverCon;
-        if (settings.<Boolean>getSetting(UNDERSTAND)) {
-            clientCon = new Interpreted(clientConTmp, versionKnowledge);
-            serverCon = new Interpreted(serverConTmp, versionKnowledge);
-        } else {
-            clientCon = clientConTmp;
-            serverCon = serverConTmp;
-        }
+        final FreecivConnection serverCon = socket2Connection(server, versionKnowledge,
+                settings.<Boolean>getSetting(UNDERSTAND),
+                ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
+                versionKnowledge.getRequiredPostSendRules());
 
         Source clientSource = new SourceConn(clientCon, true);
         Source serverSource = new SourceConn(serverCon, false);
@@ -214,6 +207,18 @@ public class ProxyRecorder extends Thread {
         this.sourcesToSinks = new HashMap<Source, List<Sink>>();
         sourcesToSinks.put(clientSource, Arrays.asList(cons, traceSink, sinkServer));
         sourcesToSinks.put(serverSource, Arrays.asList(cons, traceSink, sinkClient));
+    }
+
+    private static FreecivConnection socket2Connection(Socket connectedSocket, PacketsMapping versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
+        final Uninterpreted tmp = new Uninterpreted(
+                connectedSocket.getInputStream(), connectedSocket.getOutputStream(),
+                versionKnowledge.getNewPacketHeaderData(),
+                postReceive, postSend);
+
+        if (understand)
+            return new Interpreted(tmp, versionKnowledge);
+        else
+            return tmp;
     }
 
     static private Filter buildTraceFilters(ArgumentSettings settings) {
