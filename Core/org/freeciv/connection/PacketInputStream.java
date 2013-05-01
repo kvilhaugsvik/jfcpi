@@ -18,6 +18,7 @@ import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.SocketException;
 import java.util.concurrent.locks.Lock;
 
 public class PacketInputStream extends FilterInputStream {
@@ -66,6 +67,8 @@ public class PacketInputStream extends FilterInputStream {
             try {
                 bytesRead = from.read(out, alreadyRead + start.length, wanted - alreadyRead);
             } catch (EOFException e) {
+                throw done(wanted, start, alreadyRead);
+            } catch (SocketException e) {
                 throw done(wanted, start, alreadyRead);
             }
             if (0 <= bytesRead)
