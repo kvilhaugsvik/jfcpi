@@ -36,7 +36,7 @@ class SinkInformUser extends Sink {
         };
     }
 
-    public void write(boolean clientToServer, Packet packet) {
+    public synchronized void write(boolean clientToServer, Packet packet) {
         System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + packet);
     }
 
