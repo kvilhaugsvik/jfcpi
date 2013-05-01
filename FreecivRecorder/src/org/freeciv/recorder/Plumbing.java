@@ -92,10 +92,14 @@ public class Plumbing extends Thread {
 
         for (Source source : sourcesToSinks.keySet()) {
             for (Sink sink : sourcesToSinks.get(source))
-                if (sink.isOpen())
-                    sink.whenOver();
-            source.whenOver();
+                cleanUnclosed(sink);
+            cleanUnclosed(source);
         }
+    }
+
+    private void cleanUnclosed(Over over) {
+        if (over.isOpen())
+            over.whenOver();
     }
 
     private void proxyPacket(Source readFrom, List<Sink> sinks) {
