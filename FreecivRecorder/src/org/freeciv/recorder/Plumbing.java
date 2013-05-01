@@ -30,12 +30,13 @@ public class Plumbing extends Thread {
     boolean started = false;
     boolean finished = false;
 
-    public Plumbing(HashMap<Source, List<Sink>> sourcesToSinks, boolean[] timeToExit) {
+    public Plumbing(Source source, List<Sink> sinks, boolean[] timeToExit) {
         if (1 != timeToExit.length)
             throw new IllegalArgumentException("Need to be signalled in a boolean array of size 1");
 
         this.timeToExit = timeToExit;
-        this.sourcesToSinks = sourcesToSinks;
+        this.sourcesToSinks = new HashMap<Source, List<Sink>>();
+        this.sourcesToSinks.put(source, sinks);
     }
 
     public static FreecivConnection socket2Connection(Socket connectedSocket, PacketsMapping versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {

@@ -109,14 +109,9 @@ public class PlayToServer {
             }
         };
 
-        final HashMap<Source, List<Sink>> csPipe = new HashMap<Source, List<Sink>>();
-        csPipe.put(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true),
-                Arrays.asList(reaction, toServer));
-        this.csPlumbing = new Plumbing(csPipe, timeToExit);
-
-        final HashMap<Source, List<Sink>> scPipe = new HashMap<Source, List<Sink>>();
-        scPipe.put(new SourceConn(conn, false), Arrays.asList(reaction));
-        this.scPlumbing = new Plumbing(scPipe, timeToExit);
+        this.csPlumbing = new Plumbing(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true),
+                Arrays.asList(reaction, toServer), timeToExit);
+        this.scPlumbing = new Plumbing(new SourceConn(conn, false), Arrays.asList(reaction), timeToExit);
     }
 
     private static HashMap<Integer, ReflexReaction> createStandardReflexes() {

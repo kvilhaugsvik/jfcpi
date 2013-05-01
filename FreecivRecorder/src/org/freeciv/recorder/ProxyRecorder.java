@@ -198,13 +198,8 @@ public class ProxyRecorder {
         final Sink sinkServer = new SinkForward(serverCon, forwardFilters);
         final Sink sinkClient = new SinkForward(clientCon, forwardFilters);
 
-        final HashMap<Source, List<Sink>> csSourcesToSinks = new HashMap<Source, List<Sink>>();
-        csSourcesToSinks.put(clientSource, Arrays.asList(cons, traceSink, sinkServer));
-        this.csPlumbing = new Plumbing(csSourcesToSinks, timeToExit);
-
-        final HashMap<Source, List<Sink>> scSourcesToSinks = new HashMap<Source, List<Sink>>();
-        scSourcesToSinks.put(serverSource, Arrays.asList(cons, traceSink, sinkClient));
-        this.scPlumbing = new Plumbing(scSourcesToSinks, timeToExit);
+        this.csPlumbing = new Plumbing(clientSource, Arrays.asList(cons, traceSink, sinkServer), timeToExit);
+        this.scPlumbing = new Plumbing(serverSource, Arrays.asList(cons, traceSink, sinkClient), timeToExit);
     }
 
     static private Filter buildTraceFilters(ArgumentSettings settings) {
