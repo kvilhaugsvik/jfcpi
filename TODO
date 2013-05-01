@@ -1,5 +1,4 @@
 FreecivRecorder
- * Exit cleanly when the trace has been played back
  * Forward client disconnections to the server
  * Merge all connections in one file
  * Make more of the filtering accessible from the command line

@@ -17,7 +17,6 @@ package org.freeciv.recorder;
 import org.freeciv.connection.*;
 import org.freeciv.packet.PACKET_CONN_PONG;
 import org.freeciv.packet.Packet;
-import org.freeciv.recorder.traceFormat2.RecordTF2;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -25,9 +24,10 @@ import org.freeciv.utility.UI;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.List;
 
 public class PlayToServer {
     private static final String TRACE_FILE = "file";
@@ -44,9 +44,8 @@ public class PlayToServer {
         add(UI.HELP_SETTING);
     }};
 
-    private final TraceFormat2Read source;
-    private final SinkForward toServer;
-    private final boolean ignoreDynamic;
+    private static boolean[] timeToExit = {false};
+    private final Plumbing plumbing;
 
     public PlayToServer(InputStream source, Socket server, boolean ignoreDynamic) throws IOException, NoSuchMethodException {
         final PacketsMapping versionKnowledge = new PacketsMapping();
@@ -57,15 +56,13 @@ public class PlayToServer {
                 versionKnowledge.getNewPacketHeaderData(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
                 versionKnowledge.getRequiredPostSendRules());
-        this.toServer = new SinkForward(conn, new FilterNot(new FilterOr(
+        Sink toServer = new SinkForward(conn, new FilterNot(new FilterOr(
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));
 
-        this.source = new TraceFormat2Read(source, conn, new ReentrantLock(),
-                versionKnowledge.getNewPacketHeaderData(),
-                versionKnowledge.getRequiredPostReceiveRules());
-
-        this.ignoreDynamic = ignoreDynamic;
+        final HashMap<Source, List<Sink>> sourcesToSinks = new HashMap<Source, List<Sink>>();
+        sourcesToSinks.put(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true), Arrays.asList(toServer));
+        this.plumbing = new Plumbing(sourcesToSinks, timeToExit);
     }
 
     private static HashMap<Integer, ReflexReaction> createStandardReflexes() {
@@ -91,25 +88,7 @@ public class PlayToServer {
     }
 
     public void run() throws IOException, InvocationTargetException {
-        final long beganPlaying = System.currentTimeMillis();
-
-        RecordTF2 rec = source.readRecord();
-        long sendNextAt = beganPlaying;
-
-        while (true) {
-            if (rec.shouldBeIgnored() || !rec.isClientToServer()) {
-                rec = source.readRecord();
-                continue;
-            }
-
-            sendNextAt = source.isDynamic() && !ignoreDynamic ? beganPlaying + rec.getTimestamp() : sendNextAt + 1000;
-            while (System.currentTimeMillis() < sendNextAt) // TODO: Evaluate if more precision is needed
-                Thread.yield();
-
-            toServer.filteredWrite(rec.isClientToServer(), rec.getPacket());
-
-            rec = source.readRecord();
-        }
+        this.plumbing.run();
     }
 
     public static void main(String[] args) throws InvocationTargetException, IOException, InterruptedException {
