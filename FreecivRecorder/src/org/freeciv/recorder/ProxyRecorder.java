@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Sveinung Kvilhaugsvik
+ * Copyright (c) 2012, 2013. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.*;
 
-public class ProxyRecorder extends Thread {
+public class ProxyRecorder {
     private static final String PROXY_PORT = "proxy-port";
     private static final String REAL_SERVER_PORT = "real-server-port";
     private static final String REAL_SERVER_ADDRESS = "real-server-address";
@@ -72,12 +72,8 @@ public class ProxyRecorder extends Thread {
         add(new Setting.BoolSetting(TO_TRACE, false, "print all packets going to the trace to the terminal"));
     }};
 
-    private final HashMap<Source, List<Sink>> sourcesToSinks;
-
     private static boolean[] timeToExit = {false};
-
-    private boolean started = false;
-    private boolean finished = false;
+    private final Plumbing plumbing;
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(SETTINGS, args);
@@ -143,7 +139,7 @@ public class ProxyRecorder extends Thread {
             try {
                 final ProxyRecorder proxy = new ProxyRecorder(client, server, traceOut, connections.size(), settings);
                 connections.add(proxy);
-                proxy.start();
+                proxy.plumbing.start();
             } catch (IOException e) {
                 System.err.println("Incoming connection: Failed starting");
                 e.printStackTrace();
@@ -158,7 +154,7 @@ public class ProxyRecorder extends Thread {
 
         // wait for all the connections
         for (ProxyRecorder connection : connections)
-            while (!connection.isFinished()) {
+            while (!connection.plumbing.isFinished()) {
                 Thread.yield();
             }
 
@@ -179,12 +175,12 @@ public class ProxyRecorder extends Thread {
 
         final PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
 
-        final FreecivConnection clientCon = socket2Connection(client, versionKnowledge,
+        final FreecivConnection clientCon = Plumbing.socket2Connection(client, versionKnowledge,
                 settings.<Boolean>getSetting(UNDERSTAND),
                 versionKnowledge.getRequiredPostReceiveRules(),
                 versionKnowledge.getRequiredPostSendRules());
 
-        final FreecivConnection serverCon = socket2Connection(server, versionKnowledge,
+        final FreecivConnection serverCon = Plumbing.socket2Connection(server, versionKnowledge,
                 settings.<Boolean>getSetting(UNDERSTAND),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
                 versionKnowledge.getRequiredPostSendRules());
@@ -201,21 +197,10 @@ public class ProxyRecorder extends Thread {
         final Sink sinkServer = new SinkForward(serverCon, forwardFilters);
         final Sink sinkClient = new SinkForward(clientCon, forwardFilters);
 
-        this.sourcesToSinks = new HashMap<Source, List<Sink>>();
+        final HashMap<Source, List<Sink>> sourcesToSinks = new HashMap<Source, List<Sink>>();
         sourcesToSinks.put(clientSource, Arrays.asList(cons, traceSink, sinkServer));
         sourcesToSinks.put(serverSource, Arrays.asList(cons, traceSink, sinkClient));
-    }
-
-    private static FreecivConnection socket2Connection(Socket connectedSocket, PacketsMapping versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
-        final Uninterpreted tmp = new Uninterpreted(
-                connectedSocket.getInputStream(), connectedSocket.getOutputStream(),
-                versionKnowledge.getNewPacketHeaderData(),
-                postReceive, postSend);
-
-        if (understand)
-            return new Interpreted(tmp, versionKnowledge);
-        else
-            return tmp;
+        this.plumbing = new Plumbing(sourcesToSinks, timeToExit);
     }
 
     static private Filter buildTraceFilters(ArgumentSettings settings) {
@@ -260,84 +245,5 @@ public class ProxyRecorder extends Thread {
             }
         });
         return reflexes;
-    }
-
-    @Override
-    public void run() {
-        if (!started)
-            started = true;
-        else
-            throw new IllegalStateException("Already started");
-
-        while (allSourcesAreOpen()) {
-            for (Source source : sourcesToSinks.keySet())
-                proxyPacket(source, sourcesToSinks.get(source));
-
-            checkIfGlobalOver();
-        }
-
-        cleanUp();
-
-        finished = true;
-    }
-
-    // TODO: What about sinks?
-    private boolean allSourcesAreOpen() {
-        for (Source source : sourcesToSinks.keySet())
-            if (!source.isOpen())
-                return false;
-
-        return true;
-    }
-
-    private void setAllSinksAndSourcesToOver() {
-        for (Source source : sourcesToSinks.keySet()) {
-            for (Sink sink : sourcesToSinks.get(source))
-                sink.setOver();
-            source.setOver();
-        }
-    }
-
-    private void cleanUp() {
-        setAllSinksAndSourcesToOver();
-
-        for (Source source : sourcesToSinks.keySet()) {
-            for (Sink sink : sourcesToSinks.get(source))
-                if (sink.isOpen())
-                    sink.whenOver();
-            source.whenOver();
-        }
-    }
-
-    private void proxyPacket(Source readFrom, List<Sink> sinks) {
-        try {
-            Packet packet;
-
-            try {
-                packet = readFrom.getPacket();
-            } catch (IOException e) {
-                throw new IOException("Couldn't read packet from " + (readFrom.isFromClient() ? "client" : "server"), e);
-            }
-
-            for (Sink sink : sinks)
-                sink.filteredWrite(readFrom.isFromClient(), packet);
-
-        } catch (NotReadyYetException e) {
-            Thread.yield();
-        } catch (IOException e) {
-            System.err.println("Finishing...");
-            e.printStackTrace();
-            setAllSinksAndSourcesToOver();
-        }
-    }
-
-    private void checkIfGlobalOver() {
-        if (timeToExit[0]) {
-            setAllSinksAndSourcesToOver();
-        }
-    }
-
-    public boolean isFinished() {
-        return finished;
     }
 }
