@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Plumbing extends Thread {
-    final HashMap<Source, List<Sink>> sourcesToSinks;
+    private final Source source;
+    private final List<Sink> sinks;
     final boolean[] timeToExit; // TODO: Consider using a SwitchPoint when breaking Java 6 compatiblity
 
     boolean started = false;
@@ -35,8 +36,8 @@ public class Plumbing extends Thread {
             throw new IllegalArgumentException("Need to be signalled in a boolean array of size 1");
 
         this.timeToExit = timeToExit;
-        this.sourcesToSinks = new HashMap<Source, List<Sink>>();
-        this.sourcesToSinks.put(source, sinks);
+        this.source = source;
+        this.sinks = sinks;
     }
 
     public static FreecivConnection socket2Connection(Socket connectedSocket, PacketsMapping versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
@@ -59,18 +60,15 @@ public class Plumbing extends Thread {
             throw new IllegalStateException("Already started");
 
         while (allSourcesAreOpen()) {
-            for (Source source : sourcesToSinks.keySet())
-                try {
-                    proxyPacket(source, sourcesToSinks.get(source));
-                } catch (DoneReading doneReading) {
-                    // TODO: Should sinks only used by this source also be set to over? Corner case: A shared Socket
-                    source.setOver();
+            try {
+                proxyPacket(source, sinks);
+            } catch (DoneReading doneReading) {
+                // TODO: Should sinks only used by this source also be set to over? Corner case: A shared Socket
+                source.setOver();
 
-                    // TODO: remove if central Over management is added
-                    cleanUnclosed(source);
-
-                    // TODO: should probably remove source from sourcesToSinks
-                }
+                // TODO: remove if central Over management is added
+                cleanUnclosed(source);
+            }
 
             globalOver();
         }
@@ -82,29 +80,24 @@ public class Plumbing extends Thread {
 
     // TODO: What about sinks?
     private boolean allSourcesAreOpen() {
-        for (Source source : sourcesToSinks.keySet())
-            if (!source.isOpen())
-                return false;
+        if (!source.isOpen())
+            return false;
 
         return true;
     }
 
     private void setAllSinksAndSourcesToOver() {
-        for (Source source : sourcesToSinks.keySet()) {
-            for (Sink sink : sourcesToSinks.get(source))
-                sink.setOver();
-            source.setOver();
-        }
+        for (Sink sink : sinks)
+            sink.setOver();
+        source.setOver();
     }
 
     private void cleanUp() {
         setAllSinksAndSourcesToOver();
 
-        for (Source source : sourcesToSinks.keySet()) {
-            for (Sink sink : sourcesToSinks.get(source))
-                cleanUnclosed(sink);
-            cleanUnclosed(source);
-        }
+        for (Sink sink : sinks)
+            cleanUnclosed(sink);
+        cleanUnclosed(source);
     }
 
     private void cleanUnclosed(Over over) {
