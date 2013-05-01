@@ -303,7 +303,8 @@ public class ProxyRecorder extends Thread {
 
         for (Source source : sourcesToSinks.keySet()) {
             for (Sink sink : sourcesToSinks.get(source))
-                sink.whenOver();
+                if (sink.isOpen())
+                    sink.whenOver();
             source.whenOver();
         }
     }
