@@ -73,7 +73,8 @@ public class ProxyRecorder {
     }};
 
     private static boolean[] timeToExit = {false};
-    private final Plumbing plumbing;
+    private final Plumbing csPlumbing;
+    private final Plumbing scPlumbing;
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(SETTINGS, args);
@@ -139,7 +140,7 @@ public class ProxyRecorder {
             try {
                 final ProxyRecorder proxy = new ProxyRecorder(client, server, traceOut, connections.size(), settings);
                 connections.add(proxy);
-                proxy.plumbing.start();
+                proxy.startThreads();
             } catch (IOException e) {
                 System.err.println("Incoming connection: Failed starting");
                 e.printStackTrace();
@@ -154,7 +155,7 @@ public class ProxyRecorder {
 
         // wait for all the connections
         for (ProxyRecorder connection : connections)
-            while (!connection.plumbing.isFinished()) {
+            while (!(connection.csPlumbing.isFinished() && connection.scPlumbing.isFinished())) {
                 Thread.yield();
             }
 
@@ -197,10 +198,13 @@ public class ProxyRecorder {
         final Sink sinkServer = new SinkForward(serverCon, forwardFilters);
         final Sink sinkClient = new SinkForward(clientCon, forwardFilters);
 
-        final HashMap<Source, List<Sink>> sourcesToSinks = new HashMap<Source, List<Sink>>();
-        sourcesToSinks.put(clientSource, Arrays.asList(cons, traceSink, sinkServer));
-        sourcesToSinks.put(serverSource, Arrays.asList(cons, traceSink, sinkClient));
-        this.plumbing = new Plumbing(sourcesToSinks, timeToExit);
+        final HashMap<Source, List<Sink>> csSourcesToSinks = new HashMap<Source, List<Sink>>();
+        csSourcesToSinks.put(clientSource, Arrays.asList(cons, traceSink, sinkServer));
+        this.csPlumbing = new Plumbing(csSourcesToSinks, timeToExit);
+
+        final HashMap<Source, List<Sink>> scSourcesToSinks = new HashMap<Source, List<Sink>>();
+        scSourcesToSinks.put(serverSource, Arrays.asList(cons, traceSink, sinkClient));
+        this.scPlumbing = new Plumbing(scSourcesToSinks, timeToExit);
     }
 
     static private Filter buildTraceFilters(ArgumentSettings settings) {
@@ -245,5 +249,10 @@ public class ProxyRecorder {
             }
         });
         return reflexes;
+    }
+
+    public void startThreads() throws IOException, InvocationTargetException {
+        this.csPlumbing.start();
+        this.scPlumbing.start();
     }
 }
