@@ -19,7 +19,6 @@ import org.freeciv.packet.Packet;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,17 @@ public class Plumbing extends Thread {
 
         while (allSourcesAreOpen()) {
             for (Source source : sourcesToSinks.keySet())
-                proxyPacket(source, sourcesToSinks.get(source));
+                try {
+                    proxyPacket(source, sourcesToSinks.get(source));
+                } catch (DoneReading doneReading) {
+                    // TODO: Should sinks only used by this source also be set to over? Corner case: A shared Socket
+                    source.setOver();
+
+                    // TODO: remove if central Over management is added
+                    cleanUnclosed(source);
+
+                    // TODO: should probably remove source from sourcesToSinks
+                }
 
             globalOver();
         }
@@ -102,12 +111,14 @@ public class Plumbing extends Thread {
             over.whenOver();
     }
 
-    private void proxyPacket(Source readFrom, List<Sink> sinks) {
+    private void proxyPacket(Source readFrom, List<Sink> sinks) throws DoneReading {
         try {
             Packet packet;
 
             try {
                 packet = readFrom.getPacket();
+            } catch (DoneReading e) {
+                throw e;
             } catch (IOException e) {
                 throw new IOException("Couldn't read packet from " + (readFrom.isFromClient() ? "client" : "server"), e);
             }
@@ -117,6 +128,8 @@ public class Plumbing extends Thread {
 
         } catch (NotReadyYetException e) {
             Thread.yield();
+        } catch (DoneReading e) {
+            throw e;
         } catch (IOException e) {
             System.err.println("Finishing...");
             e.printStackTrace();
