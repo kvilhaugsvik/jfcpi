@@ -73,14 +73,8 @@ public class ProxyRecorder extends Thread {
     }};
 
     private final int proxyNumber;
-    private final FreecivConnection clientCon;
-    private final Source clientSource;
-    private final FreecivConnection serverCon;
-    private final Source serverSource;
-    private final OutputStream trace;
 
-    private final List<Sink> c2sSinks;
-    private final List<Sink> s2cSinks;
+    private final HashMap<Source, List<Sink>> sourcesToSinks;
 
     private static boolean timeToExit = false;
 
@@ -185,7 +179,6 @@ public class ProxyRecorder extends Thread {
     public ProxyRecorder(Socket client, Socket server, OutputStream trace, int proxyNumber, ArgumentSettings settings)
             throws IOException, InterruptedException {
         this.proxyNumber = proxyNumber;
-        this.trace = trace;
 
         final PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
         final Uninterpreted clientConTmp = new Uninterpreted(client.getInputStream(), client.getOutputStream(),
@@ -196,29 +189,31 @@ public class ProxyRecorder extends Thread {
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
                 versionKnowledge.getRequiredPostSendRules());
 
+        final FreecivConnection clientCon;
+        final FreecivConnection serverCon;
         if (settings.<Boolean>getSetting(UNDERSTAND)) {
-            this.clientCon = new Interpreted(clientConTmp, versionKnowledge);
-            this.serverCon = new Interpreted(serverConTmp, versionKnowledge);
+            clientCon = new Interpreted(clientConTmp, versionKnowledge);
+            serverCon = new Interpreted(serverConTmp, versionKnowledge);
         } else {
-            this.clientCon = clientConTmp;
-            this.serverCon = serverConTmp;
+            clientCon = clientConTmp;
+            serverCon = serverConTmp;
         }
 
-        clientSource = new SourceConn(clientCon, true);
-        serverSource = new SourceConn(serverCon, false);
+        Source clientSource = new SourceConn(clientCon, true);
+        Source serverSource = new SourceConn(serverCon, false);
 
         Filter forwardFilters = new FilterAllAccepted(); // Forward everything
         Filter diskFilters = buildTraceFilters(settings);
         Filter consoleFilters = buildConsoleFilters(settings, diskFilters);
 
-        final Sink traceSink =
-                new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
+        final Sink traceSink = new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
         final Sink cons = new SinkInformUser(consoleFilters, proxyNumber);
-        final SinkForward sinkServer = new SinkForward(serverCon, forwardFilters);
-        final SinkForward sinkClient = new SinkForward(clientCon, forwardFilters);
+        final Sink sinkServer = new SinkForward(serverCon, forwardFilters);
+        final Sink sinkClient = new SinkForward(clientCon, forwardFilters);
 
-        this.c2sSinks = Arrays.asList(cons, traceSink, sinkServer);
-        this.s2cSinks = Arrays.asList(cons, traceSink, sinkClient);
+        this.sourcesToSinks = new HashMap<Source, List<Sink>>();
+        sourcesToSinks.put(clientSource, Arrays.asList(cons, traceSink, sinkServer));
+        sourcesToSinks.put(serverSource, Arrays.asList(cons, traceSink, sinkClient));
     }
 
     static private Filter buildTraceFilters(ArgumentSettings settings) {
@@ -272,9 +267,10 @@ public class ProxyRecorder extends Thread {
         else
             throw new IllegalStateException("Already started");
 
-        while (clientCon.isOpen() && serverCon.isOpen()) {
-            proxyPacket(clientSource, c2sSinks);
-            proxyPacket(serverSource, s2cSinks);
+        while (allSourcesAreOpen()) {
+            for (Source source : sourcesToSinks.keySet())
+                proxyPacket(source, sourcesToSinks.get(source));
+
             checkIfGlobalOver();
         }
 
@@ -284,14 +280,30 @@ public class ProxyRecorder extends Thread {
         System.out.println(proxyNumber + " is finished");
     }
 
+    // TODO: What about sinks?
+    private boolean allSourcesAreOpen() {
+        for (Source source : sourcesToSinks.keySet())
+            if (!source.isOpen())
+                return false;
+
+        return true;
+    }
+
+    private void setAllSinksAndSourcesToOver() {
+        for (Source source : sourcesToSinks.keySet()) {
+            for (Sink sink : sourcesToSinks.get(source))
+                sink.setOver();
+            source.setOver();
+        }
+    }
+
     private void cleanUp() {
-        clientCon.setOver();
-        serverCon.setOver();
-        try {
-            trace.close();
-        } catch (IOException e) {
-            System.err.println("Some data may not have been written to the trace for connection " + proxyNumber);
-            e.printStackTrace();
+        setAllSinksAndSourcesToOver();
+
+        for (Source source : sourcesToSinks.keySet()) {
+            for (Sink sink : sourcesToSinks.get(source))
+                sink.whenOver();
+            source.whenOver();
         }
     }
 
@@ -313,15 +325,13 @@ public class ProxyRecorder extends Thread {
         } catch (IOException e) {
             System.err.println("Finishing...");
             e.printStackTrace();
-            clientCon.setOver();
-            serverCon.setOver();
+            setAllSinksAndSourcesToOver();
         }
     }
 
     private void checkIfGlobalOver() {
         if (timeToExit) {
-            clientCon.setOver();
-            serverCon.setOver();
+            setAllSinksAndSourcesToOver();
         }
     }
 
