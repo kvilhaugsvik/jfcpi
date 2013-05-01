@@ -74,7 +74,9 @@ public class ProxyRecorder extends Thread {
 
     private final int proxyNumber;
     private final FreecivConnection clientCon;
+    private final Source clientSource;
     private final FreecivConnection serverCon;
+    private final Source serverSource;
     private final OutputStream trace;
 
     private final List<Sink> c2sSinks;
@@ -202,6 +204,9 @@ public class ProxyRecorder extends Thread {
             this.serverCon = serverConTmp;
         }
 
+        clientSource = new SourceConn(clientCon, true);
+        serverSource = new SourceConn(serverCon, false);
+
         Filter forwardFilters = new FilterAllAccepted(); // Forward everything
         Filter diskFilters = buildTraceFilters(settings);
         Filter consoleFilters = buildConsoleFilters(settings, diskFilters);
@@ -268,8 +273,8 @@ public class ProxyRecorder extends Thread {
             throw new IllegalStateException("Already started");
 
         while (clientCon.isOpen() && serverCon.isOpen()) {
-            proxyPacket(clientCon, true, c2sSinks);
-            proxyPacket(serverCon, false, s2cSinks);
+            proxyPacket(clientSource, c2sSinks);
+            proxyPacket(serverSource, s2cSinks);
             checkIfGlobalOver();
         }
 
@@ -290,18 +295,18 @@ public class ProxyRecorder extends Thread {
         }
     }
 
-    private void proxyPacket(PacketRead readFrom, boolean clientToServer, List<Sink> sinks) {
+    private void proxyPacket(Source readFrom, List<Sink> sinks) {
         try {
             Packet packet;
 
             try {
                 packet = readFrom.getPacket();
             } catch (IOException e) {
-                throw new IOException("Couldn't read packet from " + (clientToServer ? "client" : "server"), e);
+                throw new IOException("Couldn't read packet from " + (readFrom.isFromClient() ? "client" : "server"), e);
             }
 
             for (Sink sink : sinks)
-                sink.filteredWrite(clientToServer, packet);
+                sink.filteredWrite(readFrom.isFromClient(), packet);
 
         } catch (NotReadyYetException e) {
             Thread.yield();
