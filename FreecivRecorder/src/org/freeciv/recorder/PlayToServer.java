@@ -27,6 +27,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PlayToServer {
     private static final String TRACE_FILE = "file";
@@ -44,7 +47,8 @@ public class PlayToServer {
     }};
 
     private static boolean[] timeToExit = {false};
-    private final Plumbing plumbing;
+    private final Plumbing csPlumbing;
+    private final Plumbing scPlumbing;
 
     public PlayToServer(InputStream source, Socket server, boolean ignoreDynamic) throws IOException, NoSuchMethodException {
         final PacketsMapping versionKnowledge = new PacketsMapping();
@@ -60,6 +64,9 @@ public class PlayToServer {
                 ProxyRecorder.CONNECTION_PACKETS)));
 
         final Sink reaction = new SinkProcess(new FilterPacketKind(Arrays.asList(5, 160)), versionKnowledge) {
+            final Lock fileNameLock = new ReentrantLock();
+            final Condition newFileName = fileNameLock.newCondition();
+
             String challengeFileName = null;
 
             @Override
@@ -68,21 +75,32 @@ public class PlayToServer {
 
                 switch (packet.getHeader().getPacketKind()) {
                     case 5:
-                        challengeFileName = System.getProperty("user.home") + "/.freeciv/" +
-                                ((PACKET_SERVER_JOIN_REPLY)interpreted).getChallenge_fileValue();
+                        fileNameLock.lock();
+                        try {
+                            challengeFileName = System.getProperty("user.home") + "/.freeciv/" +
+                                    ((PACKET_SERVER_JOIN_REPLY)interpreted).getChallenge_fileValue();
+                            newFileName.signal();
+                        } finally {
+                            fileNameLock.unlock();
+                        }
                         break;
                     case 160:
-                        if (null == challengeFileName)
-                            throw new IllegalStateException("Don't know the file name yet");
-
-                        String challengeString = "[challenge]\ntoken=\"" +
-                                ((PACKET_SINGLE_WANT_HACK_REQ)interpreted).getTokenValue() + "\"\n";
-
-                        FileOutputStream challengeWrite = new FileOutputStream(challengeFileName);
+                        fileNameLock.lock();
                         try {
-                            challengeWrite.write(challengeString.getBytes());
+                            while (null == challengeFileName)
+                                newFileName.awaitUninterruptibly();
+
+                            String challengeString = "[challenge]\ntoken=\"" +
+                                    ((PACKET_SINGLE_WANT_HACK_REQ)interpreted).getTokenValue() + "\"\n";
+
+                            FileOutputStream challengeWrite = new FileOutputStream(challengeFileName);
+                            try {
+                                challengeWrite.write(challengeString.getBytes());
+                            } finally {
+                                challengeWrite.close();
+                            }
                         } finally {
-                            challengeWrite.close();
+                            fileNameLock.unlock();
                         }
                         break;
                     default:
@@ -91,11 +109,14 @@ public class PlayToServer {
             }
         };
 
-        final HashMap<Source, List<Sink>> sourcesToSinks = new HashMap<Source, List<Sink>>();
-        sourcesToSinks.put(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true),
+        final HashMap<Source, List<Sink>> csPipe = new HashMap<Source, List<Sink>>();
+        csPipe.put(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true),
                 Arrays.asList(reaction, toServer));
-        sourcesToSinks.put(new SourceConn(conn, false), Arrays.asList(reaction));
-        this.plumbing = new Plumbing(sourcesToSinks, timeToExit);
+        this.csPlumbing = new Plumbing(csPipe, timeToExit);
+
+        final HashMap<Source, List<Sink>> scPipe = new HashMap<Source, List<Sink>>();
+        scPipe.put(new SourceConn(conn, false), Arrays.asList(reaction));
+        this.scPlumbing = new Plumbing(scPipe, timeToExit);
     }
 
     private static HashMap<Integer, ReflexReaction> createStandardReflexes() {
@@ -120,8 +141,9 @@ public class PlayToServer {
         return reflexes;
     }
 
-    public void run() throws IOException, InvocationTargetException {
-        this.plumbing.run();
+    public void startThreads() throws IOException, InvocationTargetException {
+        this.csPlumbing.start();
+        this.scPlumbing.start();
     }
 
     public static void main(String[] args) throws InvocationTargetException, IOException, InterruptedException {
@@ -161,6 +183,6 @@ public class PlayToServer {
             System.exit(1);
             return;
         }
-        me.run();
+        me.startThreads();
     }
 }
