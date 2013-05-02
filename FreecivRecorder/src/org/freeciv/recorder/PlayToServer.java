@@ -63,9 +63,10 @@ public class PlayToServer {
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));
 
-        final Sink reaction = new SinkProcess(new FilterPacketKind(Arrays.asList(5, 160)), versionKnowledge) {
+        final Sink reaction = new SinkProcess(new FilterPacketKind(Arrays.asList(5, 160, 161)), versionKnowledge) {
             final Lock fileNameLock = new ReentrantLock();
             final Condition newFileName = fileNameLock.newCondition();
+            final Condition wroteTheFile = fileNameLock.newCondition();
 
             String challengeFileName = null;
 
@@ -96,6 +97,7 @@ public class PlayToServer {
                             FileOutputStream challengeWrite = new FileOutputStream(challengeFileName);
                             try {
                                 challengeWrite.write(challengeString.getBytes());
+                                wroteTheFile.signal();
                             } finally {
                                 challengeWrite.close();
                             }
@@ -103,8 +105,21 @@ public class PlayToServer {
                             fileNameLock.unlock();
                         }
                         break;
+                    case 161:
+                        fileNameLock.lock();
+                        try {
+                            File target = new File(challengeFileName);
+                            while (!target.exists())
+                                wroteTheFile.awaitUninterruptibly();
+
+                            target.delete();
+                        } finally {
+                            fileNameLock.unlock();
+                        }
+                        break;
                     default:
-                        throw new IllegalArgumentException("Should have been filtered");
+                        throw new IllegalArgumentException("The packet number " + packet.getHeader().getPacketKind() +
+                                " should have been filtered");
                 }
             }
         };
