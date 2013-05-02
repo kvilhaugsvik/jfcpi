@@ -163,7 +163,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
                 args.add(declarations[pos].getTransferValue());
             if (pos + 1 < declarations.length)
                 args.add(getSuperLimit(pos + 1));
-            return new MethodCall("ElementsLimit.limit", args.toArray(new Typed[0]));
+            return TargetClass.from(ElementsLimit.class).callV("limit", args.toArray(new Typed[0]));
         } else {
             return Hardcoded.noLimit;
         }

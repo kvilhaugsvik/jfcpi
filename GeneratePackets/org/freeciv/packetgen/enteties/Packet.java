@@ -19,6 +19,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.NoDelta;
 import org.freeciv.packet.PacketHeader;
+import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packet.fieldtype.FieldTypeException;
 import org.freeciv.packet.fieldtype.Key;
 import org.freeciv.packetgen.Hardcoded;
@@ -275,7 +276,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 new Block(getField("delta").assign(bv_delta_fields.getAddress().newInstance(
                         bv_delta_fields.getUnderType()
                                 .newInstance(TRUE, literal(deltaFields)),
-                        new MethodCall("ElementsLimit.limit", literal(deltaFields))))),
+                        TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields))))),
                 addExceptionLocation));
     }
 
@@ -327,7 +328,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             Block operation = new Block();
             operation.addStatement(getField("delta").assign(getField("delta").getTType().newInstance(
                     streamName.ref(),
-                    new MethodCall("ElementsLimit.limit", literal(deltaFields)))));
+                    TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)))));
             constructorBodyStream.addStatement(labelExceptionsWithPacketAndField(
                     getField("delta"),
                     operation,

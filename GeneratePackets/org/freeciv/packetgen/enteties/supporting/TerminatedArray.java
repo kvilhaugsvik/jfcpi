@@ -257,7 +257,7 @@ public class TerminatedArray extends FieldType {
         }
         if (elementTypeCanLimitVerify)
             limits.add(pLimits.ref().<AValue>call("next"));
-        to.addStatement(fMaxSize.assign(new MethodCall("ElementsLimit.limit", limits.toArray(new Typed[0]))));
+        to.addStatement(fMaxSize.assign(TargetClass.from(ElementsLimit.class).callV("limit", limits.toArray(new Typed[0]))));
     }
 
     private static From1<Block, Var> createConstructorBody(final TargetClass javaType, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatable, final Typed<AnInt> fullArraySizeLocation, final MethodCall<Returnable> validateLimitsCall, final boolean elementTypeCanLimitVerify) {
