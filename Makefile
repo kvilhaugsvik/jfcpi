@@ -11,7 +11,7 @@ JUNIT ?= /usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar
 DEVMODE ?= false
 
 # where to log errors
-LOG_TO ?= "Logger.GLOBAL_LOGGER_NAME"
+LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
 
 # What it should be generated from
 # take instructions from trunk.xml
