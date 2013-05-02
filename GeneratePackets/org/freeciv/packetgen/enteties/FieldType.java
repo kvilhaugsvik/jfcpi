@@ -70,7 +70,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 Imports.are(Import.allIn(FCEnum.class.getPackage())),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
                 getUnaliasedName((dataIOType + "(" + publicType + ")")),
-                DEFAULT_PARENT, Arrays.asList(TargetClass.from("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getName() + ">")));
+                DEFAULT_PARENT, Arrays.asList(TargetClass.from("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getFullAddress() + ">")));
 
         pFromStream = Var.param(TargetClass.from(DataInput.class), "from");
         pTo = Var.param(TargetClass.from(DataOutput.class), "to");
@@ -103,7 +103,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 Imports.are(Import.allIn(FCEnum.class.getPackage())),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
                 fixClassNameIfBasic(visible ? name : original.getName()),
-                DEFAULT_PARENT, Arrays.asList(TargetClass.from("org.freeciv.packet.fieldtype", "FieldType<" + original.javaType.getName() + ">")));
+                DEFAULT_PARENT, Arrays.asList(TargetClass.from("org.freeciv.packet.fieldtype", "FieldType<" + original.javaType.getFullAddress() + ">")));
 
         this.pFromStream = original.pFromStream;
         this.pTo = original.pTo;
