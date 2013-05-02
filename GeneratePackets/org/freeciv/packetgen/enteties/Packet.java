@@ -84,8 +84,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                   boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,
                   List<Field> fields) throws UndefinedException {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
-                Imports.are(Import.allIn(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
-                        Import.classIn(java.util.logging.Logger.class)),
+                Imports.are(),
                 "Freeciv's protocol definition", packetFlags, name,
                       DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.Packet.class)));
 
