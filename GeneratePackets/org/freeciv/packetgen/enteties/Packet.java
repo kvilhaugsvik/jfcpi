@@ -82,7 +82,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                   List<Field> fields) throws UndefinedException {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
                 Imports.are(Import.allIn(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
-                        Import.allIn(FCEnum.class.getPackage()),
                         Import.classIn(java.util.logging.Logger.class)),
                 "Freeciv's protocol definition", packetFlags, name,
                       DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.Packet.class)));
