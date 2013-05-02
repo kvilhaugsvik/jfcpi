@@ -67,7 +67,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                      List<? extends Var<? extends AValue>> fieldsToAdd,
                      List<? extends Method> methodsToAdd) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
-                Imports.are(Import.allIn(FCEnum.class.getPackage())),
+                Imports.are(),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
                 getUnaliasedName((dataIOType + "(" + publicType + ")")),
                 DEFAULT_PARENT, Arrays.asList(TargetClass.from("org.freeciv.packet.fieldtype", "FieldType<" + javaType.getFullAddress() + ">")));
@@ -100,7 +100,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     /* An field type alias */
     protected FieldType(String name, String requiredAs, FieldType original, boolean visible) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
-                Imports.are(Import.allIn(FCEnum.class.getPackage())),
+                Imports.are(),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
                 fixClassNameIfBasic(visible ? name : original.getName()),
                 DEFAULT_PARENT, Arrays.asList(TargetClass.from("org.freeciv.packet.fieldtype", "FieldType<" + original.javaType.getFullAddress() + ">")));
