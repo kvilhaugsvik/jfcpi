@@ -219,8 +219,8 @@ public class TerminatedArray extends FieldType {
                                         IF(isSmallerThan(pos.ref(), buf.ref().callV("length")),
                                                 new Block(current.assign(readElementFrom.x(from))),
                                                 limitReached))));
-                out.addStatement(to.assign(convertBufferArrayToValue.x(new MethodCall<AValue>("java.util.Arrays.copyOf",
-                        buf.ref(), pos.ref()))));
+                out.addStatement(to.assign(convertBufferArrayToValue.x(TargetClass.from(java.util.Arrays.class)
+                        .callV("copyOf", buf.ref(), pos.ref()))));
 
                 return out;
             }
