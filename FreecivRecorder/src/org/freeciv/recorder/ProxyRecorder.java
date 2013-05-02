@@ -80,7 +80,21 @@ public class ProxyRecorder {
         ArgumentSettings settings = new ArgumentSettings(SETTINGS, args);
 
         UI.printAndExitOnHelp(settings, ProxyRecorder.class);
+        printStarted(settings);
 
+        final ServerSocket serverProxy = startListening(settings);
+        final ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
+
+        fakeServer(settings, serverProxy, connections);
+
+        closeIt(serverProxy);
+
+        letThemFinish(connections);
+
+        System.exit(0);
+    }
+
+    private static void printStarted(ArgumentSettings settings) {
         System.out.println("Listening for Freeciv clients on port " + settings.getSetting(PROXY_PORT));
         System.out.println("Will connect to Freeciv server at " + settings.getSetting(REAL_SERVER_ADDRESS) +
                 ", port " + settings.getSetting(REAL_SERVER_PORT));
@@ -89,18 +103,21 @@ public class ProxyRecorder {
         if (settings.<Boolean>getSetting(VERBOSE))
             for (Setting.Settable option : settings.getAll())
                 System.out.println(option.name() + " = " + option.get() + "\t" + option.describe());
+    }
 
-        final ServerSocket serverProxy;
+    private static ServerSocket startListening(ArgumentSettings settings) {
         try {
-            serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
+            final ServerSocket serverProxy = new ServerSocket(settings.<Integer>getSetting(PROXY_PORT));
             serverProxy.setSoTimeout(2500);
+            return serverProxy;
         } catch (IOException e) {
             System.err.println("Error starting to listen to port " + settings.<Integer>getSetting(PROXY_PORT));
             System.exit(1);
-            return;
+            return null;
         }
+    }
 
-        ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
+    private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections) throws InterruptedException, InvocationTargetException {
         while (!timeToExit[0]) {
             final Socket client;
             try {
@@ -108,8 +125,7 @@ public class ProxyRecorder {
             } catch (SocketTimeoutException e) {
                 continue;
             } catch (IOException e) {
-                System.err.println("Incoming connection: Failed accepting new connection");
-                e.printStackTrace();
+                failedAcceptingConnection(e);
                 continue; // Todo: Should this exit the program?
             }
 
@@ -118,9 +134,7 @@ public class ProxyRecorder {
                 server = new Socket(settings.<String>getSetting(REAL_SERVER_ADDRESS),
                         settings.<Integer>getSetting(REAL_SERVER_PORT));
             } catch (IOException e) {
-                System.err.println("Incoming connection: Failed connecting to server");
-                e.printStackTrace();
-                closeIt(client);
+                failedConnectingToServer(client, e);
                 continue; // Todo: Should this exit the program?
             }
 
@@ -130,10 +144,7 @@ public class ProxyRecorder {
                         new FileOutputStream(settings.<String>getSetting(TRACE_NAME_START) +
                                 connections.size() + settings.<String>getSetting(TRACE_NAME_END)));
             } catch (IOException e) {
-                System.err.println("Incoming connection: Failed opening trace file");
-                e.printStackTrace();
-                closeIt(client);
-                closeIt(server);
+                failedOpeningTraceFile(client, server, e);
                 continue; // Todo: Should this exit the program?
             }
 
@@ -142,24 +153,36 @@ public class ProxyRecorder {
                 connections.add(proxy);
                 proxy.startThreads();
             } catch (IOException e) {
-                System.err.println("Incoming connection: Failed starting");
-                e.printStackTrace();
-                closeIt(traceOut);
-                closeIt(client);
-                closeIt(server);
+                failedStarting(client, server, traceOut, e);
                 continue; // Todo: Should this exit the program?
             }
         }
+    }
 
-        closeIt(serverProxy);
+    private static void failedAcceptingConnection(IOException e) {
+        System.err.println("Incoming connection: Failed accepting new connection");
+        e.printStackTrace();
+    }
 
-        // wait for all the connections
-        for (ProxyRecorder connection : connections)
-            while (!(connection.csPlumbing.isFinished() && connection.scPlumbing.isFinished())) {
-                Thread.yield();
-            }
+    private static void failedConnectingToServer(Socket client, IOException e) {
+        System.err.println("Incoming connection: Failed connecting to server");
+        e.printStackTrace();
+        closeIt(client);
+    }
 
-        System.exit(0);
+    private static void failedOpeningTraceFile(Socket client, Socket server, IOException e) {
+        System.err.println("Incoming connection: Failed opening trace file");
+        e.printStackTrace();
+        closeIt(client);
+        closeIt(server);
+    }
+
+    private static void failedStarting(Socket client, Socket server, OutputStream traceOut, IOException e) {
+        System.err.println("Incoming connection: Failed starting");
+        e.printStackTrace();
+        closeIt(traceOut);
+        closeIt(client);
+        closeIt(server);
     }
 
     private static void closeIt(Closeable toClose) {
@@ -169,6 +192,14 @@ public class ProxyRecorder {
             System.err.println("Problems while closing " + toClose);
             e.printStackTrace();
         }
+    }
+
+    private static void letThemFinish(ArrayList<ProxyRecorder> connections) {
+        // wait for all the connections
+        for (ProxyRecorder connection : connections)
+            while (!(connection.csPlumbing.isFinished() && connection.scPlumbing.isFinished())) {
+                Thread.yield();
+            }
     }
 
     public ProxyRecorder(Socket client, Socket server, OutputStream trace, int proxyNumber, ArgumentSettings settings)
