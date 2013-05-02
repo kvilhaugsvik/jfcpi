@@ -48,7 +48,7 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class CodeGenTest {
     private static final String generatorname = ", value = \"com.kvilhaugsvik.javaGenerator.ClassWriter\")";
-    public static final String GENERATED_ANNOTATION = "@Generated";
+    public static final String GENERATED_ANNOTATION = "@javax.annotation.Generated";
 
     @Test public void testMethodEverything() {
         String result = toStringAsIfInAClass(Method.custom(Comment.c("comment"), Visibility.PUBLIC, Scope.CLASS,

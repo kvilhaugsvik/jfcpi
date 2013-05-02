@@ -49,7 +49,8 @@ public class Annotate extends Formatted implements HasAtoms {
 
     public static class Atom extends CodeAtom {
         public Atom(TargetClass annotation) {
-            this(annotation.getName());
+            // It is not a real atom. TODO: Find a better solution that still permits formatting after an atom.
+            this(annotation.getFullAddress());
         }
 
         public Atom(String atom) {
