@@ -183,10 +183,12 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         fte,
                         fte.ref().<Returnable>call("setInPacket", literal(getName())),
                         fte.ref().<Returnable>call("setField", pName.ref()),
-                        new MethodCall<NoValue>("Logger.getLogger(" + logger + ").log",
-                                TargetClass.from(Level.class).callV("WARNING"),
-                                sum(literal("Misinterpretation. "), fte.ref().callV("getMessage")),
-                                fte.ref()),
+                        TargetClass.from(java.util.logging.Logger.class)
+                                .callV("getLogger", BuiltIn.<AValue>toCode(logger))
+                                .call("log",
+                                        TargetClass.from(Level.class).callV("WARNING"),
+                                        sum(literal("Misinterpretation. "), fte.ref().callV("getMessage")),
+                                        fte.ref()),
                         RETURN(fte.ref())));
         addMethod(addExceptionLocation);
 
