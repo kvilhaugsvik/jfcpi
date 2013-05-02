@@ -384,7 +384,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                                 GROUP(sum(argHeader.ref().<AnInt>call("getHeaderSize"), calcBodyLenCall)),
                                 literal(") don't match header packet size ("),
                                 argHeader.ref().<AnInt>call("getTotalSize"),
-                                literal(") for "), new MethodCall<AString>("this.toString"))),
+                                literal(") for "), getAddress().callV("toString", Reference.THIS))),
                         literal("header"))))));
 
         if (delta)
