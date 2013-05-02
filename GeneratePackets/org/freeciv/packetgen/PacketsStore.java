@@ -185,17 +185,17 @@ public class PacketsStore {
             else if ("cs".equals(flag.getName()))
                 sentBy += 1;
             else if ("no-delta".equals(flag.getName()))
-                packetFlags.add(new Annotate(NoDelta.class.getSimpleName()));
+                packetFlags.add(new Annotate(NoDelta.class));
             else if ("is-info".equals(flag.getName()))
-                packetFlags.add(new Annotate(IsInfo.class.getSimpleName()));
+                packetFlags.add(new Annotate(IsInfo.class));
             else if ("is-game-info".equals(flag.getName()))
-                packetFlags.add(new Annotate(IsGameInfo.class.getSimpleName()));
+                packetFlags.add(new Annotate(IsGameInfo.class));
             else if ("force".equals(flag.getName()))
-                packetFlags.add(new Annotate(Force.class.getSimpleName()));
+                packetFlags.add(new Annotate(Force.class));
             else if ("post-send".equals(flag.getName()))
-                packetFlags.add(new Annotate(PostSend.class.getSimpleName()));
+                packetFlags.add(new Annotate(PostSend.class));
             else if ("post-recv".equals(flag.getName()))
-                packetFlags.add(new Annotate(PostRecv.class.getSimpleName()));
+                packetFlags.add(new Annotate(PostRecv.class));
             else if ("cancel".equals(flag.getName()))
                 canceled.add(flag.getArguments()[0]);
 

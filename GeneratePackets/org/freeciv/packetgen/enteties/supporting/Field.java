@@ -61,9 +61,9 @@ public class Field<Kind extends AValue> extends Var<Kind> {
 
         for (WeakFlag flag : flags)
             if ("key".equals(flag.getName()))
-                annotations.add(new Annotate(Key.class.getSimpleName()));
+                annotations.add(new Annotate(Key.class));
             else if ("diff".equals(flag.getName()))
-                annotations.add(new Annotate(ArrayDiff.class.getSimpleName()));
+                annotations.add(new Annotate(ArrayDiff.class));
 
         return annotations;
     }

@@ -268,7 +268,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 Reference.SetTo.strToVal("value", BuiltIn.literal(ClassWriter.class.getCanonicalName()));
         Reference.SetTo comments =
                 Reference.SetTo.strToVal("comments", BuiltIn.literal("Auto generated from " + from));
-        return new Annotate("Generated", comments, value);
+        return new Annotate(javax.annotation.Generated.class, comments, value);
     }
 
     public static final TokensToStringStyle DEFAULT_STYLE_INDENT;

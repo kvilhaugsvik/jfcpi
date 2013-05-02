@@ -146,9 +146,13 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         return Var.<Kind>field(annotations, visibility, scope, modifiable, TargetClass.from(type), name, value);
     }
 
-    public boolean isAnnotatedUsing(String name) {
+    public boolean isAnnotatedUsing(Class ann) {
+        return isAnnotatedUsing(TargetClass.from(ann));
+    }
+
+    public boolean isAnnotatedUsing(TargetClass name) {
         for (Annotate annotation : annotations)
-            if (annotation.getName().equals(name))
+            if (annotation.sameClass(name))
                 return true;
         return false;
     }

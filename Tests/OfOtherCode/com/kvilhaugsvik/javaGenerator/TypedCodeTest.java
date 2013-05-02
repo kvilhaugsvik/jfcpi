@@ -139,7 +139,7 @@ public class TypedCodeTest {
     }
 
     @Test public void annotatedField_codeGen() {
-        Annotate annotation = new Annotate("IsAField");
+        Annotate annotation = new Annotate(TargetClass.from(TargetPackage.TOP_LEVEL_AS_STRING, "IsAField"));
         Var field = Var.field(Arrays.asList(annotation),
                 Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                 int.class, "number", null);
@@ -153,13 +153,15 @@ public class TypedCodeTest {
     }
 
     @Test public void annotatedField_isAnnotated() {
-        Annotate annotation = new Annotate("IsAField");
+        Annotate annotation = new Annotate(TargetClass.from(TargetPackage.TOP_LEVEL_AS_STRING, "IsAField"));
         Var field = Var.field(Arrays.asList(annotation),
                 Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                 int.class, "number", null);
 
-        assertTrue("Annotation missing", field.isAnnotatedUsing("IsAField"));
-        assertFalse("Wrong annotation", field.isAnnotatedUsing("NotAnnotatedUsing"));
+        assertTrue("Annotation missing",
+                field.isAnnotatedUsing(TargetClass.from(TargetPackage.TOP_LEVEL_AS_STRING, "IsAField")));
+        assertFalse("Wrong annotation",
+                field.isAnnotatedUsing(TargetClass.from(TargetPackage.TOP_LEVEL_AS_STRING, "NotAnnotatedUsing")));
     }
 
     @Test public void breakLineBlock() {

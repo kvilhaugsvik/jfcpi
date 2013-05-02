@@ -25,7 +25,7 @@ import java.util.List;
 
 public class Canceler extends Annotate {
     public Canceler(List<String> canceled) {
-        super(Cancel.class.getSimpleName(), Reference.SetTo.strToVal("value", formatArray(canceled)));
+        super(Cancel.class, Reference.SetTo.strToVal("value", formatArray(canceled)));
     }
 
     public static Typed<AValue> formatArray(List<String> canceled) {

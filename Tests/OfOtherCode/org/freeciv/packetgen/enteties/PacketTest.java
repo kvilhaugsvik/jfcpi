@@ -57,7 +57,7 @@ public class PacketTest {
     @Test
     public void deltaHeader_shouldNotExist_annotationNoDelta() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
-                Arrays.asList(new Annotate("NoDelta")), true, false, Hardcoded.deltaField,
+                Arrays.asList(new Annotate(org.freeciv.packet.NoDelta.class)), true, false, Hardcoded.deltaField,
                 Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())));
         assertNull("Shouldn't have delta when packet has the flag no-delta", packet.getField("delta"));
     }

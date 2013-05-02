@@ -23,7 +23,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 
 public class Sender extends Annotate {
     public Sender(int number) {
-        super(Sent.class.getSimpleName(), Reference.SetTo.strToVal("value", sender(number)));
+        super(Sent.class, Reference.SetTo.strToVal("value", sender(number)));
     }
 
     private static Typed<AValue> sender(int number) {

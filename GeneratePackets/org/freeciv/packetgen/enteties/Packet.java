@@ -52,6 +52,8 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private static final TargetClass validation = TargetClass.from(Validation.class);
+    private static final TargetClass noDeltaFlag = TargetClass.from(NoDelta.class);
+    public static final TargetClass keyFlagg = TargetClass.from(Key.class);
 
     private final int number;
     private final List<Field> fields;
@@ -121,7 +123,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                     new Block(RETURN(getField("delta").ref().callV("getValue").callV("getBits")))));
 
             for (Field field : fields) {
-                if (!field.isAnnotatedUsing(Key.class.getSimpleName())) {
+                if (!field.isAnnotatedUsing(keyFlagg)) {
                     field.setDelta(deltaFields);
                     deltaFields++;
                 }
@@ -155,14 +157,14 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
     private static boolean hasAtLeastOneDeltaField(List<Field> fields) {
         for (Field field : fields)
-            if (!field.isAnnotatedUsing(Key.class.getSimpleName()))
+            if (!field.isAnnotatedUsing(keyFlagg))
                 return true;
         return false;
     }
 
     private static boolean hasDelta(List<Annotate> packetFlags) {
         for (Annotate flag : packetFlags)
-            if (NoDelta.class.getSimpleName().equals(flag.getName()))
+            if (flag.sameClass(noDeltaFlag))
                 return false;
         return true;
     }
@@ -348,7 +350,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             chosenOld = null;
         for (Field field : fields) {
             if (delta && oldNeeded) {
-                if (!field.isAnnotatedUsing(Key.class.getSimpleName())) {
+                if (!field.isAnnotatedUsing(keyFlagg)) {
                     oldNeeded = false;
                     constructorBodyStream.addStatement(chosenOld);
                 }
@@ -509,7 +511,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private static List<Field<?>> getKeyFields(List<Field> fields) {
         List<Field<?>> out = new LinkedList<Field<?>>();
         for (Field field : fields)
-            if (field.isAnnotatedUsing(Key.class.getSimpleName()))
+            if (field.isAnnotatedUsing(keyFlagg))
                 out.add(field);
         return out;
     }

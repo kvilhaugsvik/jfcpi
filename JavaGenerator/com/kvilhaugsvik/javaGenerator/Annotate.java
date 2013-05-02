@@ -21,16 +21,20 @@ import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 
 public class Annotate extends Formatted implements HasAtoms {
-    private final String annotation;
+    private final TargetClass annotation;
     private final Reference.SetTo[] arguments;
 
-    public Annotate(String annotation, Reference.SetTo... arguments) {
+    public Annotate(Class annotation, Reference.SetTo... arguments) {
+        this(TargetClass.from(annotation), arguments);
+    }
+
+    public Annotate(TargetClass annotation, Reference.SetTo... arguments) {
         this.annotation = annotation;
         this.arguments = arguments;
     }
 
-    public String getName() {
-        return annotation;
+    public boolean sameClass(TargetClass other) {
+        return annotation.equals(other);
     }
 
     @Override
@@ -44,6 +48,10 @@ public class Annotate extends Formatted implements HasAtoms {
     }
 
     public static class Atom extends CodeAtom {
+        public Atom(TargetClass annotation) {
+            this(annotation.getName());
+        }
+
         public Atom(String atom) {
             super("@" + atom);
         }
