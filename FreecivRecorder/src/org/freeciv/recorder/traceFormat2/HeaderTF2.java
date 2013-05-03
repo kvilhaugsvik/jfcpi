@@ -20,6 +20,7 @@ import org.freeciv.types.UnderstoodBitVector;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 public class HeaderTF2 {
     /*********************
@@ -125,6 +126,51 @@ public class HeaderTF2 {
 
     public boolean isRecordHeaderSizeUnexpected() {
         return unexpectedRecordHeaderSize;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder out = new StringBuilder();
+
+        out.append("Record format version: ");
+        out.append(formatVersion);
+        out.append("\n");
+
+        out.append("Trace header size: ");
+        out.append(traceHeaderSize);
+        out.append("\n");
+
+        out.append("Record header size: ");
+        out.append(recordHeaderSize);
+        out.append("\n");
+
+        out.append("Flags: ");
+        out.append(flags.toString());
+        out.append("\n");
+
+        if (flags.get(TraceFlag.INCLUDES_TIME)) {
+            out.append("Recording started: ");
+            out.append(new Date(recordStartedAt));
+            out.append(" (");
+            out.append(recordStartedAt);
+            out.append(")\n");
+        }
+
+        if (unexpectedTraceHeaderSize) {
+            out.append("There was also ");
+            out.append((long) (traceHeaderSize - calculateFileHeaderSize(includesTime())));
+            out.append(" unknown bytes.");
+            out.append("\n");
+        }
+
+        if (unexpectedRecordHeaderSize) {
+            out.append("Each record will have ");
+            out.append((long) (recordHeaderSize - RecordTF2.calculateRecordHeaderSize(includesTime())));
+            out.append(" unknown bytes.");
+            out.append("\n");
+        }
+
+        return out.toString();
     }
 
     public static int calculateFileHeaderSize(boolean dynamic) {

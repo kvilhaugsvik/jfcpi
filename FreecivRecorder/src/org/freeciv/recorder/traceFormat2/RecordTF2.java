@@ -25,6 +25,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 
 public class RecordTF2 {
     /*********************
@@ -110,6 +111,28 @@ public class RecordTF2 {
 
     public boolean shouldBeIgnored() {
         return ignoreMe;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder out = new StringBuilder();
+
+        out.append("Flags: ");
+        out.append(flags.toString());
+        out.append("\t");
+
+        if (traceHeader.includesTime()) {
+            out.append("When: ");
+            out.append(new Date(when + traceHeader.getOriginalStartTime()));
+            out.append("\t");
+        }
+
+        out.append("Packet: ");
+        out.append(packet.toString());
+
+        out.append("\n");
+
+        return out.toString();
     }
 
     public static int calculateRecordHeaderSize(boolean dynamic) {
