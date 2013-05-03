@@ -82,16 +82,32 @@ public class ProxyRecorder {
         UI.printAndExitOnHelp(settings, ProxyRecorder.class);
         printStarted(settings);
 
+        final PacketsMapping versionKnowledge = loadProtocol();
+
+        final Filter forwardFilters = new FilterAllAccepted(); // Forward everything to the network
+        final Filter diskFilters = buildTraceFilters(settings);
+        final Filter consoleFilters = buildConsoleFilters(settings, diskFilters);
+
         final ServerSocket serverProxy = startListening(settings);
         final ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
 
-        fakeServer(settings, serverProxy, connections);
+        fakeServer(settings, serverProxy, connections, diskFilters, forwardFilters, consoleFilters, versionKnowledge);
 
         closeIt(serverProxy);
 
         letThemFinish(connections);
 
         System.exit(0);
+    }
+
+    private static PacketsMapping loadProtocol() {
+        try {
+            return new PacketsMapping();
+        } catch (IOException e) {
+            System.err.println("Problem loading protocol data.");
+            System.exit(1);
+            return null;
+        }
     }
 
     private static void printStarted(ArgumentSettings settings) {
@@ -117,7 +133,7 @@ public class ProxyRecorder {
         }
     }
 
-    private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections) throws InterruptedException, InvocationTargetException {
+    private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections, Filter diskFilters, Filter forwardFilters, Filter consoleFilters, PacketsMapping versionKnowledge) throws InterruptedException, InvocationTargetException {
         while (!timeToExit[0]) {
             final Socket client;
             try {
@@ -149,7 +165,10 @@ public class ProxyRecorder {
             }
 
             try {
-                final ProxyRecorder proxy = new ProxyRecorder(client, server, traceOut, connections.size(), settings);
+                final ProxyRecorder proxy = new ProxyRecorder(client, server,
+                        getNewTrace(traceOut, connections.size(), settings, diskFilters),
+                        getConsole(consoleFilters, connections.size()),
+                        forwardFilters, settings, versionKnowledge);
                 connections.add(proxy);
                 proxy.startThreads();
             } catch (IOException e) {
@@ -157,6 +176,14 @@ public class ProxyRecorder {
                 continue; // Todo: Should this exit the program?
             }
         }
+    }
+
+    private static SinkWriteTrace getNewTrace(OutputStream trace, int proxyNumber, ArgumentSettings settings, Filter diskFilters) throws IOException {
+        return new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
+    }
+
+    private static SinkInformUser getConsole(Filter consoleFilters, int proxyNumber) {
+        return new SinkInformUser(consoleFilters, proxyNumber);
     }
 
     private static void failedAcceptingConnection(IOException e) {
@@ -202,11 +229,8 @@ public class ProxyRecorder {
             }
     }
 
-    public ProxyRecorder(Socket client, Socket server, OutputStream trace, int proxyNumber, ArgumentSettings settings)
+    public ProxyRecorder(Socket client, Socket server, Sink traceSink, Sink console, Filter forwardFilters, ArgumentSettings settings, PacketsMapping versionKnowledge)
             throws IOException, InterruptedException {
-
-        final PacketsMapping versionKnowledge = new PacketsMapping(); // keep using PacketsMapping until format is settled
-
         final FreecivConnection clientCon = Plumbing.socket2Connection(client, versionKnowledge,
                 settings.<Boolean>getSetting(UNDERSTAND),
                 versionKnowledge.getRequiredPostReceiveRules(),
@@ -217,20 +241,14 @@ public class ProxyRecorder {
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
                 versionKnowledge.getRequiredPostSendRules());
 
-        Source clientSource = new SourceConn(clientCon, true);
-        Source serverSource = new SourceConn(serverCon, false);
-
-        Filter forwardFilters = new FilterAllAccepted(); // Forward everything
-        Filter diskFilters = buildTraceFilters(settings);
-        Filter consoleFilters = buildConsoleFilters(settings, diskFilters);
-
-        final Sink traceSink = new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
-        final Sink cons = new SinkInformUser(consoleFilters, proxyNumber);
+        final Source serverSource = new SourceConn(serverCon, false);
         final Sink sinkServer = new SinkForward(serverCon, forwardFilters);
+
+        final Source clientSource = new SourceConn(clientCon, true);
         final Sink sinkClient = new SinkForward(clientCon, forwardFilters);
 
-        this.csPlumbing = new Plumbing(clientSource, Arrays.asList(cons, traceSink, sinkServer), timeToExit);
-        this.scPlumbing = new Plumbing(serverSource, Arrays.asList(cons, traceSink, sinkClient), timeToExit);
+        this.csPlumbing = new Plumbing(clientSource, Arrays.asList(console, traceSink, sinkServer), timeToExit);
+        this.scPlumbing = new Plumbing(serverSource, Arrays.asList(console, traceSink, sinkClient), timeToExit);
     }
 
     static private Filter buildTraceFilters(ArgumentSettings settings) {
