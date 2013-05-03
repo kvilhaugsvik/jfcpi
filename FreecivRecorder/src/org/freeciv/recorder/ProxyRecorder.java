@@ -86,12 +86,14 @@ public class ProxyRecorder {
 
         final Filter forwardFilters = new FilterAllAccepted(); // Forward everything to the network
         final Filter diskFilters = buildTraceFilters(settings);
-        final Filter consoleFilters = buildConsoleFilters(settings, diskFilters);
+
+        final SinkInformUser.SharedData console =
+                new SinkInformUser.SharedData(buildConsoleFilters(settings, diskFilters));
 
         final ServerSocket serverProxy = startListening(settings);
         final ArrayList<ProxyRecorder> connections = new ArrayList<ProxyRecorder>();
 
-        fakeServer(settings, serverProxy, connections, diskFilters, forwardFilters, consoleFilters, versionKnowledge);
+        fakeServer(settings, serverProxy, connections, diskFilters, forwardFilters, console, versionKnowledge);
 
         closeIt(serverProxy);
 
@@ -133,7 +135,7 @@ public class ProxyRecorder {
         }
     }
 
-    private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections, Filter diskFilters, Filter forwardFilters, Filter consoleFilters, PacketsMapping versionKnowledge) throws InterruptedException, InvocationTargetException {
+    private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections, Filter diskFilters, Filter forwardFilters, SinkInformUser.SharedData console, PacketsMapping versionKnowledge) throws InterruptedException, InvocationTargetException {
         while (!timeToExit[0]) {
             final Socket client;
             try {
@@ -167,7 +169,7 @@ public class ProxyRecorder {
             try {
                 final ProxyRecorder proxy = new ProxyRecorder(client, server,
                         getNewTrace(traceOut, connections.size(), settings, diskFilters),
-                        getConsole(consoleFilters, connections.size()),
+                        console.forConnection(connections.size()),
                         forwardFilters, settings, versionKnowledge);
                 connections.add(proxy);
                 proxy.startThreads();
@@ -180,10 +182,6 @@ public class ProxyRecorder {
 
     private static SinkWriteTrace getNewTrace(OutputStream trace, int proxyNumber, ArgumentSettings settings, Filter diskFilters) throws IOException {
         return new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
-    }
-
-    private static SinkInformUser getConsole(Filter consoleFilters, int proxyNumber) {
-        return new SinkInformUser(consoleFilters, proxyNumber);
     }
 
     private static void failedAcceptingConnection(IOException e) {

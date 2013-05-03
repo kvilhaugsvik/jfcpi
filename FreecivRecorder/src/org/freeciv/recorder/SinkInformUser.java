@@ -18,14 +18,17 @@ import org.freeciv.connection.OverImpl;
 import org.freeciv.packet.Packet;
 
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 class SinkInformUser extends Sink {
     private final int proxyNumber;
     private final OverImpl over;
+    private final ReentrantLock writeLock;
 
-    SinkInformUser(final Filter filter, final int proxyNumber) {
+    private SinkInformUser(final Filter filter, final int proxyNumber, ReentrantLock writeLock) {
         super(filter);
         this.proxyNumber = proxyNumber;
+        this.writeLock = writeLock;
         this.over = new OverImpl() {
             @Override
             protected void whenOverImpl() {
@@ -36,8 +39,13 @@ class SinkInformUser extends Sink {
         };
     }
 
-    public synchronized void write(boolean clientToServer, Packet packet) {
-        System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + packet);
+    public void write(boolean clientToServer, Packet packet) {
+        writeLock.lock();
+        try {
+            System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + packet);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @Override
@@ -58,5 +66,19 @@ class SinkInformUser extends Sink {
     @Override
     public boolean isOpen() {
         return over.isOpen();
+    }
+
+    public static class SharedData {
+        private final Filter filter;
+        private final ReentrantLock writeLock;
+
+        public SharedData(Filter filter) {
+            this.filter = filter;
+            this.writeLock = new ReentrantLock();
+        }
+
+        public SinkInformUser forConnection(int id) {
+            return new SinkInformUser(filter, id, writeLock);
+        }
     }
 }
