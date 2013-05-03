@@ -15,7 +15,6 @@
 package org.freeciv.recorder;
 
 import org.freeciv.connection.*;
-import org.freeciv.packet.Packet;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -286,7 +285,7 @@ public class ProxyRecorder {
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(8, new ReflexReaction<ConnectionRelated>() {
             @Override
-            public void apply(Packet incoming, ConnectionRelated connection) {
+            public void apply(ConnectionRelated connection) {
                 timeToExit[0] = true;
             }
         });

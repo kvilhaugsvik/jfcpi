@@ -46,7 +46,7 @@ public class PacketInputStream extends FilterInputStream {
 
             final RawPacket rawPacket = new RawPacket(packet, headerData);
 
-            quickRespond.handle(rawPacket);
+            quickRespond.handle(rawPacket.getHeader().getPacketKind());
 
             return rawPacket;
         } finally {

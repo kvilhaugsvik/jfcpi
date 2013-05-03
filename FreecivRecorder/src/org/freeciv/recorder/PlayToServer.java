@@ -26,7 +26,6 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -133,7 +132,7 @@ public class PlayToServer {
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
-            public void apply(Packet incoming, PacketWrite connection) {
+            public void apply(PacketWrite connection) {
                 try {
                     connection.toSend(new PACKET_CONN_PONG(connection.getFields2Header()));
                 } catch (IOException e) {
@@ -143,7 +142,7 @@ public class PlayToServer {
         });
         reflexes.put(8, new ReflexReaction<Over>() {
             @Override
-            public void apply(Packet incoming, Over connection) {
+            public void apply(Over connection) {
                 connection.setOver();
             }
         });

@@ -23,7 +23,6 @@ import org.freeciv.utility.UI;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -52,7 +51,7 @@ public class SignInAndWait {
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
-            public void apply(Packet incoming, PacketWrite connection) {
+            public void apply(PacketWrite connection) {
                 try {
                     connection.toSend(new PACKET_CONN_PONG(connection.getFields2Header()));
                 } catch (IOException e) {
@@ -62,7 +61,7 @@ public class SignInAndWait {
         });
         reflexes.put(8, new ReflexReaction<Over>() {
             @Override
-            public void apply(Packet incoming, Over connection) {
+            public void apply(Over connection) {
                 connection.setOver();
             }
         });

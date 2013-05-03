@@ -14,7 +14,6 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 
 public class ReflexActionChangeHeaderKind implements ReflexReaction<PacketChangeHeader> {
@@ -25,7 +24,7 @@ public class ReflexActionChangeHeaderKind implements ReflexReaction<PacketChange
     }
 
     @Override
-    public void apply(Packet incoming, PacketChangeHeader connection) {
+    public void apply(PacketChangeHeader connection) {
         connection.setHeaderTypeTo(to);
     }
 }

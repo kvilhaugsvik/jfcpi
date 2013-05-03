@@ -94,7 +94,7 @@ public class Uninterpreted implements FreecivConnection {
         completeReflexesInOneStep.lock();
         try {
             out.write(packetSerialized.toByteArray());
-            this.postSend.handle(toSend);
+            this.postSend.handle(toSend.getHeader().getPacketKind());
         } catch (IOException e) {
             setOver();
             whenOver();

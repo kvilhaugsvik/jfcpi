@@ -14,8 +14,8 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Packet;
+import org.freeciv.packet.PacketHeader;
 
 public interface ReflexReaction<Target extends ConnectionRelated> {
-    public void apply(Packet incoming, Target connection);
+    public void apply(Target connection);
 }
