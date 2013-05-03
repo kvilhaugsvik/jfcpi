@@ -19,6 +19,7 @@ import org.freeciv.connection.Over;
 import org.freeciv.connection.PacketsMapping;
 import org.freeciv.packet.Packet;
 import org.freeciv.recorder.traceFormat2.RecordTF2;
+import org.freeciv.recorder.traceFormat2.TraceFormat2Read;
 
 import java.io.IOException;
 import java.io.InputStream;

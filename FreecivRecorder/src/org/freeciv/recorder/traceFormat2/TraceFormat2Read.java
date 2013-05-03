@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.recorder;
+package org.freeciv.recorder.traceFormat2;
 
 import org.freeciv.connection.*;
 import org.freeciv.recorder.traceFormat2.HeaderTF2;
