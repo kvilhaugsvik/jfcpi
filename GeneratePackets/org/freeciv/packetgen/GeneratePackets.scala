@@ -22,17 +22,12 @@ import xml.XML
 import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
 import com.kvilhaugsvik.dependency.UndefinedException
 
-class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
+class GeneratePackets(sourceLocation: String, packetsDefRPath: String, versionRPath: String, cRPaths: List[String],
                       requested: List[(String, String)], logger: String,
                       devMode: Boolean, packetHeader: PacketHeaderKinds, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) {
-
-  def this(packetsDefPathString: String, versionPath: String, cPathsString: List[String],
-           requested: List[(String, String)], logger: String,
-           devMode: Boolean, packetHeader: PacketHeaderKinds, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) = {
-    this(new File(packetsDefPathString), new File(versionPath), cPathsString.map(new File(_)),
-      requested, logger,
-      devMode, packetHeader, enableDelta, enableDeltaBoolFolding)
-  }
+  private val packetsDefPath: File = new File(sourceLocation + packetsDefRPath)
+  private val versionPath: File = new File(sourceLocation + versionRPath)
+  private val cPaths: List[File] = cRPaths.map(cr => new File(sourceLocation + cr))
 
   private val storage = new PacketsStore(packetHeader, logger, enableDelta, enableDeltaBoolFolding)
   private val Parser = new ParsePacketsDef(storage)
@@ -121,12 +116,14 @@ object GeneratePackets {
     val enableDeltaBoolFolding = versionConfiguration.attribute("enableDeltaBoolFolding").get.text.toBoolean
 
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem \ "file").map(settings.getSetting[String](SOURCE_CODE_LOCATION) + "/" + _.text)).toMap
+      elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
 
     val requested: List[(String, String)] =
       ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
 
-    val self = new GeneratePackets(inputSources("packets").head,
+    val self = new GeneratePackets(
+      settings.getSetting[String](SOURCE_CODE_LOCATION) + "/",
+      inputSources("packets").head,
       inputSources("variables").head,
       inputSources("C").toList,
       requested,
