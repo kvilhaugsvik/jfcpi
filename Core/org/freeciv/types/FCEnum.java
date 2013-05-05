@@ -26,5 +26,23 @@ public interface FCEnum {
             }
             throw new IllegalArgumentException(number + " not known");
         }
+
+        public static <Flags extends FCEnum> Flags valueOfUnknownIsMinusOne(int number, Flags[] values) {
+            Flags unknown = null;
+            for (Flags element : values) {
+                if (element.getNumber() == number) {
+                    return element;
+                } else if (element.getNumber() == -1) {
+                    unknown = element;
+                }
+            }
+
+            assert null != unknown : "The unknown element " + number + " revealed a programmer error:\n" +
+                    "valueOfUnknownIsMinusOne should only be used if en enum element has the value -1.\n" +
+                    (values.length == 0 ?
+                            "This don't have a single element" :
+                            "The enum used here was " + values[0].getClass());
+            return unknown;
+        }
     }
 }

@@ -15,7 +15,7 @@
 package org.freeciv.packetgen.parsing
 
 import com.kvilhaugsvik.dependency.{Dependency, Requirement}
-import org.freeciv.packetgen.enteties.{Struct, Constant, Enum}
+import org.freeciv.packetgen.enteties.{SourceFile, Struct, Constant, Enum}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.junit.Test
 import org.junit.Assert._
@@ -992,8 +992,7 @@ enum test3 {
   }
 
   @Test def findsEnumsAllExist {
-    val enums = FromCExtractor
-      .extract(test123NotingElse)
+    val enums = FromCExtractor.extract(new SourceFile("dummy", test123NotingElse))
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -1004,8 +1003,7 @@ enum test3 {
   }
 
   @Test def findsEnumsOneMissingExtract {
-    val enums = FromCExtractor
-      .extract(test123NotingElse)
+    val enums = FromCExtractor.extract(new SourceFile("dummy", test123NotingElse))
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -1052,7 +1050,7 @@ enum test3 {
   }
 
   @Test def findsEnumsOtherCodeAsWell {
-    val enums = FromCExtractor.extract(test123OtherCodeAsWell)
+    val enums = FromCExtractor.extract(new SourceFile("dummy", test123OtherCodeAsWell))
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -1092,8 +1090,7 @@ enum test3 {
   }
 
   @Test def findsEnumsEnumsUsed {
-    val enums = FromCExtractor
-      .extract(test123EnumsUsed)
+    val enums = FromCExtractor.extract(new SourceFile("dummy", test123EnumsUsed))
     assertNotNull("Enums not found", enums)
     assertFalse("Enums not found", enums.isEmpty)
 
@@ -1111,7 +1108,7 @@ enum test3 {
 #define CONS 5
 #define NotLookedFor
 """
-    val found = extractor.extract(input)
+    val found = extractor.extract(new SourceFile("dummy", input))
 
     assertNotNull("CONS not found", found)
     assertFalse("CONS not found", found.isEmpty)

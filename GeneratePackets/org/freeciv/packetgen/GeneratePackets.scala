@@ -21,18 +21,12 @@ import collection.JavaConversions._
 import xml.XML
 import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
 import com.kvilhaugsvik.dependency.UndefinedException
+import org.freeciv.packetgen.enteties.SourceFile
 
-class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File],
+class GeneratePackets(sourceLocation: String, packetsDefRPath: String, versionRPath: String, cRPaths: List[String],
                       requested: List[(String, String)], logger: String,
                       devMode: Boolean, packetHeader: PacketHeaderKinds, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) {
-
-  def this(packetsDefPathString: String, versionPath: String, cPathsString: List[String],
-           requested: List[(String, String)], logger: String,
-           devMode: Boolean, packetHeader: PacketHeaderKinds, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) = {
-    this(new File(packetsDefPathString), new File(versionPath), cPathsString.map(new File(_)),
-      requested, logger,
-      devMode, packetHeader, enableDelta, enableDeltaBoolFolding)
-  }
+  private val packetsDefPath: File = new File(sourceLocation + packetsDefRPath)
 
   private val storage = new PacketsStore(packetHeader, logger, enableDelta, enableDeltaBoolFolding)
   private val Parser = new ParsePacketsDef(storage)
@@ -40,17 +34,30 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
   requested.filter(item => "type".equals(item._1)).foreach(cons => storage.requestType(cons._2))
 
-  GeneratePackets.checkFilesCanRead(packetsDefPath :: versionPath :: cPaths)
+  // checking that all input files are there BEFORE wasting time working on some of it is now done during reading
+  println("Reading the source code")
 
-  println("Reading Freeciv version information")
-  VariableAssignmentsExtractor.extract(GeneratePackets.readFileAsString(versionPath)).foreach(storage.addDependency(_))
+  private val pdSource: SourceFile = GeneratePackets.readFileAsString(sourceLocation, packetsDefRPath)
+  storage.addSource(pdSource)
+
+  private val vpSource: SourceFile = GeneratePackets.readFileAsString(sourceLocation, versionRPath)
+  storage.addSource(vpSource)
+
+  private val cSources: List[SourceFile] = cRPaths.map(cr => {
+    val src = GeneratePackets.readFileAsString(sourceLocation, cr)
+    storage.addSource(src)
+    src
+  })
+
+  println("Extracting from Freeciv version information")
+  VariableAssignmentsExtractor.extract(vpSource).foreach(storage.addDependency(_))
 
   print("Extracting from provided C code")
-  cPaths.map(code => {print("."); FromCExtractor.extract(GeneratePackets.readFileAsString(code))}).flatten
-    .foreach(storage.addDependency(_))
+  cSources.map(cSource => {print("."); FromCExtractor.extract(cSource)}).flatten.foreach(storage.addDependency(_))
   println()
 
   println("Extracting from protocol definition")
+  //TODO: Port packetDef understanding to extract system
   private val packetsDefResult =
     Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath))))
   if (!packetsDefResult.successful) {
@@ -60,9 +67,9 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
   println("Applying manual changes")
   Hardcoded.applyManualChanges(storage);
 
-  def writeToDir(path: String): Unit = writeToDir(new File(path))
+  def writeToDir(path: String, includeOrigSrc: Boolean): Unit = writeToDir(new File(path), includeOrigSrc)
 
-  def writeToDir(path: File) {
+  def writeToDir(path: File, includeOrigSrc: Boolean) {
     val statusPrinter = new ChangingConsoleLine("Writing the file ", System.out)
 
     val notFound = storage.explainMissing()
@@ -88,6 +95,21 @@ class GeneratePackets(packetsDefPath: File, versionPath: File, cPaths: List[File
       classWriter.close()
     })
 
+    if (includeOrigSrc) {
+      val srcLoc = path + "/" + "GPLComply" + "/"
+      storage.getSource.foreach((src) => {
+        val srcCopy = new File(srcLoc + src.getPath)
+
+        statusPrinter.printCurrent(srcCopy.getAbsolutePath)
+
+        srcCopy.getParentFile.mkdirs()
+        srcCopy.createNewFile
+        val writer = new FileWriter(srcCopy)
+        writer.write(src.getContent)
+        writer.close()
+      })
+    }
+
     statusPrinter.finished()
   }
 }
@@ -97,6 +119,7 @@ object GeneratePackets {
   private val VERSION_INFORMATION = "version-information"
   private val PACKETS_SHOULD_LOG_TO = "packets-should-log-to"
   private val IGNORE_PROBLEMS = "ignore-problems"
+  private val GPL_SOURCE = "gpl-source"
 
   def main(args: Array[String]) {
     val settings = new ArgumentSettings(List(
@@ -106,8 +129,11 @@ object GeneratePackets {
         "file containing settings for the version of Freeciv"),
       new Setting.StringSetting(PACKETS_SHOULD_LOG_TO, GeneratorDefaults.LOG_TO,
         "the logger the generated code should use"),
-      new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.DEVMODE.toBoolean,
+      new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.IGNORE_ISSUES,
         "should problems be ignored?"),
+      new Setting.BoolSetting(GPL_SOURCE, GeneratorDefaults.NOT_DISTRIBUTED_WITH_FREECIV,
+        "copy the Freeciv source code used as a source to generate Java code to the generated code's location" +
+          ". This makes it easy to remember including it when the generated Java code is distributed."),
       UI.HELP_SETTING
     ), args: _*)
 
@@ -121,12 +147,14 @@ object GeneratePackets {
     val enableDeltaBoolFolding = versionConfiguration.attribute("enableDeltaBoolFolding").get.text.toBoolean
 
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem \ "file").map(settings.getSetting[String](SOURCE_CODE_LOCATION) + "/" + _.text)).toMap
+      elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
 
     val requested: List[(String, String)] =
       ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
 
-    val self = new GeneratePackets(inputSources("packets").head,
+    val self = new GeneratePackets(
+      settings.getSetting[String](SOURCE_CODE_LOCATION) + "/",
+      inputSources("packets").head,
       inputSources("variables").head,
       inputSources("C").toList,
       requested,
@@ -136,28 +164,31 @@ object GeneratePackets {
       enableDelta,
       enableDeltaBoolFolding)
 
-    self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
+    self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER, settings.getSetting[Boolean](GPL_SOURCE))
   }
 
-  def checkFilesCanRead(files: List[File]) {
-    files.foreach((fileToValidate: File) => {
-      if (!fileToValidate.exists()) {
-        throw new IOException(fileToValidate.getAbsolutePath + " doesn't exist.")
-      } else if (!fileToValidate.canRead) {
-        throw new IOException("Can't read " + fileToValidate.getAbsolutePath)
-      }
-    })
+  def checkFileCanRead(fileToValidate: File) {
+    if (!fileToValidate.exists()) {
+      throw new IOException(fileToValidate.getAbsolutePath + " doesn't exist.")
+    } else if (!fileToValidate.canRead) {
+      throw new IOException("Can't read " + fileToValidate.getAbsolutePath)
+    }
   }
 
-  def readFileAsString(code: File): String = {
+  def readFileAsString(sourceLocation: String, itemRPath: String): SourceFile = {
+    val code: File = new File(sourceLocation + itemRPath)
+
+    GeneratePackets.checkFileCanRead(code)
+
     val codeFile = new FileReader(code)
     val content = StreamReader(codeFile).source.toString
     codeFile.close()
-    return content
+
+    return new SourceFile(itemRPath, content)
   }
 
   def readVersionParameters(listFile: File) = {
-    checkFilesCanRead(listFile :: Nil)
+    checkFileCanRead(listFile)
     XML.loadFile(listFile)
   }
 }

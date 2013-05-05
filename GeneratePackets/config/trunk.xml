@@ -29,9 +29,6 @@
         <file>common/traderoutes.h</file>
         <file>common/unit.h</file>
 
-        <file>server/settings.c</file>
-        <file>server/settings.h</file>
-
         <file>utility/shared.h</file>
     </inputSource>
 

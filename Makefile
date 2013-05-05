@@ -6,9 +6,11 @@ SCALAC ?= scalac
 SCALALIB ?= /usr/share/java/scala-library.jar
 JUNIT ?= /usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar
 
-# Generate code for items that don't depend on them when
-# items are missing in stead of aborting on missing items.
-DEVMODE ?= false
+# Ignore issues that shouldn't be there in a release.
+# All it controls for now is if missing required items in stead of aborting the
+# code generation should be ignored so items that don't depend on them still
+# are generated.
+IGNORE_ISSUES ?= false
 
 # where to log errors
 LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
@@ -23,6 +25,10 @@ FREECIV_SOURCE_PATH ?= ..
 GENERATED_SOURCE_FOLDER ?= BindingsUsers/GeneratedPackets
 GENERATED_TEST_SOURCE_FOLDER ?= Tests/GeneratedTestPeers
 GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
+
+# Copy the Freeciv source code used to generate Java code to GENERATED_SOURCE_FOLDER
+# This makes it easier to follow the GPL when distributing without having to mirror all of some Freeciv SVN snapshot
+NOT_DISTRIBUTED_WITH_FREECIV ?= true
 
 # Generated compiled Java classes
 COMPILED_CORE_FOLDER ?= out/Core
@@ -67,8 +73,9 @@ sourceDefaultsForGenerator:
 	echo "  public static final String GENERATED_TEST_SOURCE_FOLDER = \"${GENERATED_TEST_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final String DEVMODE = \"${DEVMODE}\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final boolean IGNORE_ISSUES = ${IGNORE_ISSUES};" >> ${GENERATORDEFAULTS}
 	echo "  public static final String LOG_TO = \"${LOG_TO}\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final boolean NOT_DISTRIBUTED_WITH_FREECIV = ${NOT_DISTRIBUTED_WITH_FREECIV};" >> ${GENERATORDEFAULTS}
 	echo "}" >>${GENERATORDEFAULTS}
 	touch sourceDefaultsForGenerator
 
@@ -84,7 +91,7 @@ compileCodeGenerator: sourceDefaultsForGenerator compileCore compileUtils compil
 	touch compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
-	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${DEVMODE}
+	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${IGNORE_ISSUES} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv
@@ -223,12 +230,8 @@ runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnecti
 	touch runTests
 
 clean:
-	rm -rf ${COMPILED_CORE_FOLDER} compileCore
 	rm -rf runPacketTest compilePacketTest
 	rm -rf runConnectionTests compileConnectionTests
-	rm -rf ${PACKETGENOUT} compileCodeGenerator
-	rm -rf ${COMPILED_JAVA_GENERATOR_FOLDER} compileJavaGenerator
-	rm -rf ${COMPILED_DEPENDENCY_FOLDER} compileDependency
 	rm -rf compileTestPeerGenerator
 	rm -rf compileTestPeers
 	rm -rf compileTestGeneratedCode
@@ -237,23 +240,26 @@ clean:
 	rm -rf runTestsOfGenerator
 	rm -rf runTests tests
 	rm -rf folderTestOut ${COMPILED_TESTS_FOLDER}
-	rm -rf ${GENERATED_TEST_SOURCE_FOLDER}/* sourceTestPeers
-	rm -rf ${GENERATED_SOURCE_FOLDER}
+	rm -rf ${GENERATED_TEST_SOURCE_FOLDER} sourceTestPeers
 	rm -rf ${COMPILED_BINDINGS_USERS_FOLDER}
 	rm -f ${PROTOCOL_DISTRIBUTION} protojar
 	rm -f all
 	rm -f code
 	rm -rf compileTestSignInToServer testSignInToServer runtestsignintoserver
-	rm -rf ${PROTOCOL_DISTRIBUTION}
-	rm -rf sourceFromFreeciv
 	rm -rf compileFromFreeciv
 	rm -rf compileBindingsUsers
 	rm -rf compileProxyRecorder proxyRecorder runProxyRecorer
-	rm -f scriptRunProxyRecorder scriptTestSignInToServer scriptPacketsExtract
-	rm -f packetsExtract
+	rm -f scriptRunProxyRecorder scriptTestSignInToServer
 	rm -f scriptRunPlayToServer playRecord
-	rm -rf compileUtils compileUtilsTests runUtilsTests
+	rm -rf compileUtilsTests runUtilsTests
 
 distclean: clean
-	rm -rf out ${GENERATED_TEST_SOURCE_FOLDER}
 	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
+	rm -rf ${COMPILED_CORE_FOLDER} compileCore
+	rm -rf ${COMPILED_CORE_FOLDER} compileUtils
+	rm -rf ${COMPILED_JAVA_GENERATOR_FOLDER} compileJavaGenerator
+	rm -rf ${COMPILED_DEPENDENCY_FOLDER} compileDependency
+	rm -rf packetsExtract scriptPacketsExtract
+	rm -rf ${PACKETGENOUT} compileCodeGenerator
+	rm -rf ${GENERATED_SOURCE_FOLDER} sourceFromFreeciv
+	rm -rf out

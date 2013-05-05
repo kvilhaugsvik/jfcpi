@@ -145,7 +145,9 @@ public class RecordTF2 {
     public static enum RecordFlag implements FCEnum {
         CLIENT_TO_SERVER(0),
         TRACE_HEADER_SIZE_SKIP(1), // skip this record if the trace header had unknown fields
-        RECORD_HEADER_SIZE_SKIP(2); // skip this record if the record header has unknown fields
+        RECORD_HEADER_SIZE_SKIP(2), // skip this record if the record header has unknown fields
+
+        UNKNOWN(-1); // a new flag or an error
 
         private final int number;
 
@@ -159,7 +161,7 @@ public class RecordTF2 {
         }
 
         public static RecordFlag valueOf(int number) {
-            return Helper.<RecordFlag>valueOfUnknownIsIllegal(number, RecordFlag.values());
+            return Helper.<RecordFlag>valueOfUnknownIsMinusOne(number, RecordFlag.values());
         }
     }
 
