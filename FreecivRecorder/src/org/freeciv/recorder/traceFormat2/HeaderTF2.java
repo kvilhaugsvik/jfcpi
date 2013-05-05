@@ -181,7 +181,9 @@ public class HeaderTF2 {
     }
 
     public static enum TraceFlag implements FCEnum {
-        INCLUDES_TIME(0);
+        INCLUDES_TIME(0),
+
+        UNKNOWN(-1); // a new flag or an error
 
         private final int number;
 
@@ -195,7 +197,7 @@ public class HeaderTF2 {
         }
 
         public static TraceFlag valueOf(int number) {
-            return Helper.<TraceFlag>valueOfUnknownIsIllegal(number, TraceFlag.values());
+            return Helper.<TraceFlag>valueOfUnknownIsMinusOne(number, TraceFlag.values());
         }
     }
 
