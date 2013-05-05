@@ -60,4 +60,7 @@ public class TraceFormat2Read {
         return new RecordTF2(header, inAsData, inAsPacket);
     }
 
+    public String getHumanReadableHeader() {
+        return header.toString();
+    }
 }
