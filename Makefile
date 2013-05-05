@@ -6,9 +6,11 @@ SCALAC ?= scalac
 SCALALIB ?= /usr/share/java/scala-library.jar
 JUNIT ?= /usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar
 
-# Generate code for items that don't depend on them when
-# items are missing in stead of aborting on missing items.
-DEVMODE ?= false
+# Ignore issues that shouldn't be there in a release.
+# All it controls for now is if missing required items in stead of aborting the
+# code generation should be ignored so items that don't depend on them still
+# are generated.
+IGNORE_ISSUES ?= false
 
 # where to log errors
 LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
@@ -71,7 +73,7 @@ sourceDefaultsForGenerator:
 	echo "  public static final String GENERATED_TEST_SOURCE_FOLDER = \"${GENERATED_TEST_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final String DEVMODE = \"${DEVMODE}\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final boolean IGNORE_ISSUES = ${IGNORE_ISSUES};" >> ${GENERATORDEFAULTS}
 	echo "  public static final String LOG_TO = \"${LOG_TO}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final boolean NOT_DISTRIBUTED_WITH_FREECIV = ${NOT_DISTRIBUTED_WITH_FREECIV};" >> ${GENERATORDEFAULTS}
 	echo "}" >>${GENERATORDEFAULTS}
@@ -89,7 +91,7 @@ compileCodeGenerator: sourceDefaultsForGenerator compileCore compileUtils compil
 	touch compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
-	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${DEVMODE} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
+	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${IGNORE_ISSUES} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv

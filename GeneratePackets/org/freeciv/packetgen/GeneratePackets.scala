@@ -129,7 +129,7 @@ object GeneratePackets {
         "file containing settings for the version of Freeciv"),
       new Setting.StringSetting(PACKETS_SHOULD_LOG_TO, GeneratorDefaults.LOG_TO,
         "the logger the generated code should use"),
-      new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.DEVMODE.toBoolean,
+      new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.IGNORE_ISSUES,
         "should problems be ignored?"),
       new Setting.BoolSetting(GPL_SOURCE, GeneratorDefaults.NOT_DISTRIBUTED_WITH_FREECIV,
         "copy the Freeciv source code used as a source to generate Java code to the generated code's location" +
