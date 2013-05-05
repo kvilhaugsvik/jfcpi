@@ -35,7 +35,8 @@ class GeneratePackets(sourceLocation: String, packetsDefRPath: String, versionRP
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
   requested.filter(item => "type".equals(item._1)).foreach(cons => storage.requestType(cons._2))
 
-  GeneratePackets.checkFilesCanRead(packetsDefPath :: versionPath :: cPaths)
+  // check that all input files are there BEFORE wasting time working on some of it
+  (packetsDefPath :: versionPath :: cPaths).foreach(GeneratePackets.checkFileCanRead)
 
   println("Reading Freeciv version information")
   VariableAssignmentsExtractor.extract(GeneratePackets.readFileAsString(versionPath)).foreach(storage.addDependency(_))
@@ -136,14 +137,12 @@ object GeneratePackets {
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER)
   }
 
-  def checkFilesCanRead(files: List[File]) {
-    files.foreach((fileToValidate: File) => {
-      if (!fileToValidate.exists()) {
-        throw new IOException(fileToValidate.getAbsolutePath + " doesn't exist.")
-      } else if (!fileToValidate.canRead) {
-        throw new IOException("Can't read " + fileToValidate.getAbsolutePath)
-      }
-    })
+  def checkFileCanRead(fileToValidate: File) {
+    if (!fileToValidate.exists()) {
+      throw new IOException(fileToValidate.getAbsolutePath + " doesn't exist.")
+    } else if (!fileToValidate.canRead) {
+      throw new IOException("Can't read " + fileToValidate.getAbsolutePath)
+    }
   }
 
   def readFileAsString(code: File): String = {
@@ -154,7 +153,7 @@ object GeneratePackets {
   }
 
   def readVersionParameters(listFile: File) = {
-    checkFilesCanRead(listFile :: Nil)
+    checkFileCanRead(listFile)
     XML.loadFile(listFile)
   }
 }
