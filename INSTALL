@@ -59,4 +59,5 @@ be hard.
 
 To solve this GeneratePackets can copy the Freeciv sources used to generate the Java code and put them next to the
 generated Java code if the option --gpl-source is set to true. The Freeciv source code generated from will then end up
-next to the generated code. It is possible to turn of to avoid confusion in cases when Freeciv is there anyway.
+next to the generated code. It is possible to turn of to avoid confusion in cases when Freeciv is there anyway. To turn
+it off when using the bundled Makefile set NOT_DISTRIBUTED_WITH_FREECIV to false when running make.

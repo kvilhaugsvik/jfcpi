@@ -28,7 +28,7 @@ GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.jav
 
 # Copy the Freeciv source code used to generate Java code to GENERATED_SOURCE_FOLDER
 # This makes it easier to follow the GPL when distributing without having to mirror all of some Freeciv SVN snapshot
-NOT_DISTRIBUTED_WITH_FREECIV ?= false
+NOT_DISTRIBUTED_WITH_FREECIV ?= true
 
 # Generated compiled Java classes
 COMPILED_CORE_FOLDER ?= out/Core
