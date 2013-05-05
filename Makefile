@@ -230,12 +230,8 @@ runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnecti
 	touch runTests
 
 clean:
-	rm -rf ${COMPILED_CORE_FOLDER} compileCore
 	rm -rf runPacketTest compilePacketTest
 	rm -rf runConnectionTests compileConnectionTests
-	rm -rf ${PACKETGENOUT} compileCodeGenerator
-	rm -rf ${COMPILED_JAVA_GENERATOR_FOLDER} compileJavaGenerator
-	rm -rf ${COMPILED_DEPENDENCY_FOLDER} compileDependency
 	rm -rf compileTestPeerGenerator
 	rm -rf compileTestPeers
 	rm -rf compileTestGeneratedCode
@@ -244,23 +240,26 @@ clean:
 	rm -rf runTestsOfGenerator
 	rm -rf runTests tests
 	rm -rf folderTestOut ${COMPILED_TESTS_FOLDER}
-	rm -rf ${GENERATED_TEST_SOURCE_FOLDER}/* sourceTestPeers
-	rm -rf ${GENERATED_SOURCE_FOLDER}
+	rm -rf ${GENERATED_TEST_SOURCE_FOLDER} sourceTestPeers
 	rm -rf ${COMPILED_BINDINGS_USERS_FOLDER}
 	rm -f ${PROTOCOL_DISTRIBUTION} protojar
 	rm -f all
 	rm -f code
 	rm -rf compileTestSignInToServer testSignInToServer runtestsignintoserver
-	rm -rf ${PROTOCOL_DISTRIBUTION}
-	rm -rf sourceFromFreeciv
 	rm -rf compileFromFreeciv
 	rm -rf compileBindingsUsers
 	rm -rf compileProxyRecorder proxyRecorder runProxyRecorer
-	rm -f scriptRunProxyRecorder scriptTestSignInToServer scriptPacketsExtract
-	rm -f packetsExtract
+	rm -f scriptRunProxyRecorder scriptTestSignInToServer
 	rm -f scriptRunPlayToServer playRecord
-	rm -rf compileUtils compileUtilsTests runUtilsTests
+	rm -rf compileUtilsTests runUtilsTests
 
 distclean: clean
-	rm -rf out ${GENERATED_TEST_SOURCE_FOLDER}
 	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
+	rm -rf ${COMPILED_CORE_FOLDER} compileCore
+	rm -rf ${COMPILED_CORE_FOLDER} compileUtils
+	rm -rf ${COMPILED_JAVA_GENERATOR_FOLDER} compileJavaGenerator
+	rm -rf ${COMPILED_DEPENDENCY_FOLDER} compileDependency
+	rm -rf packetsExtract scriptPacketsExtract
+	rm -rf ${PACKETGENOUT} compileCodeGenerator
+	rm -rf ${GENERATED_SOURCE_FOLDER} sourceFromFreeciv
+	rm -rf out
