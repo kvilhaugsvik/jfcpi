@@ -37,22 +37,26 @@ public class HeaderTF2 {
      *************************/
     final boolean unexpectedTraceHeaderSize;
     final boolean unexpectedRecordHeaderSize;
+    final int compatibleConnection;
 
-    public HeaderTF2(long recordStartedAt, boolean isDynamic) {
-        this.flags = traceFlags(isDynamic);
+    public HeaderTF2(long recordStartedAt, boolean isDynamic, boolean isMultiConn, int compatibleConnection) {
+        this.flags = traceFlags(isDynamic, isMultiConn);
         this.formatVersion = TF2.FORMAT_VERSION;
         this.traceHeaderSize = calculateFileHeaderSize(includesTime());
-        this.recordHeaderSize = RecordTF2.calculateRecordHeaderSize(includesTime());
+        this.recordHeaderSize = RecordTF2.calculateRecordHeaderSize(includesTime(), includesConnectionID());
         this.recordStartedAt = recordStartedAt;
 
+        this.compatibleConnection = compatibleConnection;
         this.unexpectedTraceHeaderSize = false;
         this.unexpectedRecordHeaderSize = false;
     }
 
-    private static UnderstoodBitVector<TraceFlag> traceFlags(boolean isDynamic) {
+    private static UnderstoodBitVector<TraceFlag> traceFlags(boolean isDynamic, boolean isMultiConn) {
         final TraceFlagVector flags = new TraceFlagVector();
         if (isDynamic)
             flags.set(TraceFlag.INCLUDES_TIME);
+        if (isMultiConn)
+            flags.set(TraceFlag.INCLUDES_CONN_ID);
         return flags;
     }
 
@@ -75,11 +79,14 @@ public class HeaderTF2 {
         this.recordStartedAt = dynamic ? inAsData.readLong() : -1;
 
         this.unexpectedTraceHeaderSize = traceHeaderSize != calculateFileHeaderSize(dynamic);
-        this.unexpectedRecordHeaderSize = recordHeaderSize != RecordTF2.calculateRecordHeaderSize(dynamic);
+        this.unexpectedRecordHeaderSize =
+                recordHeaderSize != RecordTF2.calculateRecordHeaderSize(dynamic, includesConnectionID());
 
         // skip unknown parts of the header
         if (unexpectedTraceHeaderSize)
             TF2.headerSkip(inAsData, (long) (traceHeaderSize - calculateFileHeaderSize(dynamic)));
+
+        this.compatibleConnection = -1; // the records not marked for skipping if unknown size has the real number
     }
 
     public void write(DataOutputStream to) throws IOException {
@@ -90,7 +97,7 @@ public class HeaderTF2 {
         to.writeByte(calculateFileHeaderSize(includesTime()));
 
         // record header size. It should be safe to skip unknown fields
-        to.writeByte(RecordTF2.calculateRecordHeaderSize(includesTime()));
+        to.writeByte(RecordTF2.calculateRecordHeaderSize(includesTime(), includesConnectionID()));
 
         // flags
         to.write(this.flags.getAsByteArray());
@@ -102,6 +109,10 @@ public class HeaderTF2 {
 
     public boolean includesTime() {
         return flags.get(TraceFlag.INCLUDES_TIME);
+    }
+
+    public boolean includesConnectionID() {
+        return flags.get(TraceFlag.INCLUDES_CONN_ID);
     }
 
     public int getFormatVersion() {
@@ -165,7 +176,7 @@ public class HeaderTF2 {
 
         if (unexpectedRecordHeaderSize) {
             out.append("Each record will have ");
-            out.append((long) (recordHeaderSize - RecordTF2.calculateRecordHeaderSize(includesTime())));
+            out.append((long) (recordHeaderSize - RecordTF2.calculateRecordHeaderSize(includesTime(), includesConnectionID())));
             out.append(" unknown bytes.");
             out.append("\n");
         }
@@ -182,6 +193,7 @@ public class HeaderTF2 {
 
     public static enum TraceFlag implements FCEnum {
         INCLUDES_TIME(0),
+        INCLUDES_CONN_ID(1), // the records contain a connection ID as more than one connection may be stored here
 
         UNKNOWN(-1); // a new flag or an error
 

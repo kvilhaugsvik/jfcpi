@@ -33,6 +33,7 @@ public class RecordTF2 {
      *********************/
     private final UnderstoodBitVector<RecordFlag> flags;
     private final long when;
+    private final int connID;
     private final Packet packet;
 
     /************************
@@ -41,12 +42,17 @@ public class RecordTF2 {
     private final boolean ignoreMe;
     private final HeaderTF2 traceHeader;
 
-    public RecordTF2(HeaderTF2 traceHeader, boolean client2server, long when, Packet packet, boolean traceHeaderSizeSkip, boolean recordHeaderSizeSkip) {
+    public RecordTF2(HeaderTF2 traceHeader, boolean client2server, long when, Packet packet, boolean traceHeaderSizeSkip, int connID) {
         this.traceHeader = traceHeader;
-        this.flags = recordFlags(client2server, traceHeaderSizeSkip, recordHeaderSizeSkip);
+        this.connID = connID;
+        this.flags = recordFlags(client2server, traceHeaderSizeSkip, skipUnlessYouReadConnectionID(traceHeader, connID));
         this.ignoreMe = false;
         this.when = when;
         this.packet = packet;
+    }
+
+    private static boolean skipUnlessYouReadConnectionID(HeaderTF2 traceHeader, int connID) {
+        return traceHeader.includesConnectionID() && connID != traceHeader.compatibleConnection;
     }
 
     private static UnderstoodBitVector<RecordFlag> recordFlags(boolean client2server, boolean traceHeaderSizeSkip, boolean recordHeaderSizeSkip) {
@@ -71,11 +77,13 @@ public class RecordTF2 {
 
         this.when = traceHeader.includesTime() ? inAsData.readLong() : -1;
 
+        this.connID = traceHeader.includesConnectionID() ? inAsData.readChar() : -1;
+
         this.ignoreMe = ((skipIfUnknownTraceHeader() && traceHeader.isTraceHeaderSizeUnexpected()) ||
                 (skipIfUnknownRecordHeader() && traceHeader.isRecordHeaderSizeUnexpected()));
 
         if (traceHeader.isRecordHeaderSizeUnexpected())
-            TF2.headerSkip(inAsData, traceHeader.getRecordHeaderSize() - calculateRecordHeaderSize(traceHeader.includesTime()));
+            TF2.headerSkip(inAsData, traceHeader.getRecordHeaderSize() - calculateRecordHeaderSize(traceHeader.includesTime(), traceHeader.includesConnectionID()));
 
         this.packet = inAsPacket.readPacket();
     }
@@ -85,6 +93,9 @@ public class RecordTF2 {
 
         if (traceHeader.includesTime())
             to.writeLong(this.when);
+
+        if (traceHeader.includesConnectionID())
+            to.writeChar(connID);
 
         packet.encodeTo(to);
     }
@@ -127,6 +138,12 @@ public class RecordTF2 {
             out.append("\t");
         }
 
+        if (traceHeader.includesConnectionID()) {
+            out.append("Connection id: ");
+            out.append(connID);
+            out.append("\t");
+        }
+
         out.append("Packet: ");
         out.append(packet.toString());
 
@@ -135,10 +152,12 @@ public class RecordTF2 {
         return out.toString();
     }
 
-    public static int calculateRecordHeaderSize(boolean dynamic) {
+    public static int calculateRecordHeaderSize(boolean dynamic, boolean multiConn) {
         int size = 1; // flags. For now only client to server
         if (dynamic)
             size += 8; // the time of the record
+        if (multiConn)
+            size += 2; // the connection ID
         return size;
     }
 
