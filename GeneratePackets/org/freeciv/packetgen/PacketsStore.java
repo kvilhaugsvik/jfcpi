@@ -242,6 +242,16 @@ public class PacketsStore {
         return getPacket(packetsByNumber.get(number));
     }
 
+    public Collection<SourceFile> getSource() {
+        Collection<SourceFile> out = new LinkedList<SourceFile>();
+
+        for (Dependency.Item dep : requirements.getResolved())
+            if (dep instanceof SourceFile)
+                out.add((SourceFile) dep);
+
+        return out;
+    }
+
     public Collection<ClassWriter> getJavaCode() {
         Collection<Dependency.Item> inn = requirements.getResolved();
         HashSet<ClassWriter> out = new HashSet<ClassWriter>();
@@ -315,6 +325,10 @@ public class PacketsStore {
             requirements.addMaker((Dependency.Maker) fulfillment);
         else
             throw new IllegalArgumentException("Not a maker. Not an item. What is it?");
+    }
+
+    public void addSource(SourceFile source) {
+        requirements.addWanted(source);
     }
 
     public void requestConstant(String constant) {

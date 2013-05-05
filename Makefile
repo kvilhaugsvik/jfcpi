@@ -24,6 +24,10 @@ GENERATED_SOURCE_FOLDER ?= BindingsUsers/GeneratedPackets
 GENERATED_TEST_SOURCE_FOLDER ?= Tests/GeneratedTestPeers
 GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
 
+# Copy the Freeciv source code used to generate Java code to GENERATED_SOURCE_FOLDER
+# This makes it easier to follow the GPL when distributing without having to mirror all of some Freeciv SVN snapshot
+NOT_DISTRIBUTED_WITH_FREECIV ?= false
+
 # Generated compiled Java classes
 COMPILED_CORE_FOLDER ?= out/Core
 COMPILED_JAVA_GENERATOR_FOLDER ?= out/JavaGenerator
@@ -69,6 +73,7 @@ sourceDefaultsForGenerator:
 	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String DEVMODE = \"${DEVMODE}\";" >> ${GENERATORDEFAULTS}
 	echo "  public static final String LOG_TO = \"${LOG_TO}\";" >> ${GENERATORDEFAULTS}
+	echo "  public static final boolean NOT_DISTRIBUTED_WITH_FREECIV = ${NOT_DISTRIBUTED_WITH_FREECIV};" >> ${GENERATORDEFAULTS}
 	echo "}" >>${GENERATORDEFAULTS}
 	touch sourceDefaultsForGenerator
 
@@ -84,7 +89,7 @@ compileCodeGenerator: sourceDefaultsForGenerator compileCore compileUtils compil
 	touch compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
-	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${DEVMODE}
+	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${DEVMODE} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv

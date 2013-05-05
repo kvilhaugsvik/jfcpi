@@ -1,5 +1,8 @@
 At the moment there are no proper installation support. Running it from this directory should work.
 
+========================================================================================================================
+Building
+========================================================================================================================
 What you'll need
  * A Java 7 (Java 6 hasn't been tested for a while) JDK. A JRE is not enough.
  * JUnit 4.10 (other versions not tested)
@@ -44,3 +47,16 @@ It is worth having a look at. If all of Freeciv's build dependencies are there e
 should work.
 
 When this is done see README for instructions on how to record and play back a Freeciv game.
+
+========================================================================================================================
+Distributing
+========================================================================================================================
+The GPLv2 section 3 requires that the source code it self or a written offer to give it to anyone accompanies the
+distribution of "object code or executable form". The source code is defined as "the preferred form of the work for
+making modifications to it." The Freeciv C source can therefore be said to be the source code of the generated Java code
+unless the Java code has been manually modified after it was generated. Remembering to include it or an offer for it can
+be hard.
+
+To solve this GeneratePackets can copy the Freeciv sources used to generate the Java code and put them next to the
+generated Java code if the option --gpl-source is set to true. The Freeciv source code generated from will then end up
+next to the generated code. It is possible to turn of to avoid confusion in cases when Freeciv is there anyway.

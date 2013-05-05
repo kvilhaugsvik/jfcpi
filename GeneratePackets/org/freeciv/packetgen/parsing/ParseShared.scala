@@ -18,6 +18,8 @@ import util.parsing.combinator._
 import org.freeciv.packetgen.enteties.supporting.{DataType, IntExpression}
 import com.kvilhaugsvik.dependency.{Dependency, Requirement}
 import util.parsing.input.CharArrayReader
+import org.freeciv.packetgen.enteties.SourceFile
+import java.io.File
 
 abstract class ParseShared extends RegexParsers with PackratParsers {
   def expr: Parser[Any]
@@ -232,9 +234,9 @@ abstract class ExtractorShared(protected val parser : ExtractableParser) {
   def findPossibleStartPositions(lookIn: String): List[Int] =
     lookFor.findAllIn(lookIn).matchData.map(_.start).toList
 
-  def extract(lookIn: String) = {
-    val positions = findPossibleStartPositions(lookIn)
-    val lookInAsReader = new parser.PackratReader(new CharArrayReader(lookIn.toArray))
+  def extract(lookIn: SourceFile) = {
+    val positions = findPossibleStartPositions(lookIn.getContent)
+    val lookInAsReader = new parser.PackratReader(new CharArrayReader(lookIn.getContent.toArray))
 
     positions.map(position => parser.parse(parser.exprConverted, lookInAsReader.drop(position)))
       .filter(!_.isEmpty).map(_.get)
