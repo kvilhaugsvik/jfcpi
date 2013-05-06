@@ -25,9 +25,6 @@ object ParseVariableAssignments extends ExtractableParser {
   protected def areCommentsIgnored(source: CharSequence, offset: Int) = true
   def startsOfExtractable = List(identifier + "\\s*" + "=")
 
-  // TODO: Should concatenation be supported?
-  def strExpr = quotedString.r ^^ {a => toCode[AString](a)}
-
   def value: Parser[Typed[AString]] = strExpr
 
   // TODO: Error if next item isn't EOL to avoid subtle bugs
