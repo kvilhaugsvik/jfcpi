@@ -31,6 +31,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
@@ -145,9 +146,18 @@ public class Hardcoded {
 
     public static final SimpleDependencyMaker stringBasicFieldType =
             new SimpleDependencyMaker(new Requirement("string(char)", FieldType.class),
-                    new Requirement("STRING_ENDER", Constant.class)) {
+                    new Requirement("STRING_ENDER", Constant.class),
+                    new Requirement("FC_DEFAULT_DATA_ENCODING", Constant.class)
+            ) {
                 @Override
                 public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
+                    final Constant encoding = (Constant) wasRequired[1];
+
+                    final TargetClass charsetClass = TargetClass.from(Charset.class);
+                    final Var<AValue> charset = Var.field(Collections.<Annotate>emptyList(),
+                            Visibility.PRIVATE, Scope.CLASS, Modifiable.NO,
+                            charsetClass, "CHARSET", charsetClass.callV("forName", encoding.ref()));
+
                     return new TerminatedArray("string", "char", TargetClass.from(String.class),
                             (Constant<?>)wasRequired[0],
                             TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
@@ -156,38 +166,38 @@ public class Hardcoded {
                             new From1<Typed<AnInt>, Var>() {
                                 @Override
                                 public Typed<AnInt> x(Var value) {
-                                    return value.ref().callV("getBytes").callV("length");
+                                    return value.ref().callV("getBytes", charset.ref()).callV("length");
                                 }
                             },
                             new From1<Typed<AValue>, Var>() {
                                 @Override
                                 public Typed<AValue> x(Var everything) {
-                                    return everything.ref().<Returnable>call("getBytes");
+                                    return everything.ref().<Returnable>call("getBytes", charset.ref());
                                 }
                             },
                             new From1<Typed<AValue>, Typed<AValue>>() {
                                 @Override
                                 public Typed<AValue> x(Typed<AValue> bytes) {
-                                    return (TargetClass.from(String.class)).newInstance(bytes);
+                                    return (TargetClass.from(String.class)).newInstance(bytes, charset.ref());
                                 }
                             },
                             TerminatedArray.elemIsByteArray,
                             TerminatedArray.readByte,
                             TO_STRING_OBJECT,
-                            Arrays.asList(wasRequired[0].getIFulfillReq()),
+                            Arrays.asList(wasRequired[0].getIFulfillReq(), wasRequired[1].getIFulfillReq()),
                             null,
                             null,
                             new From1<Typed<AnInt>, Var>() {
                                 @Override
                                 public Typed<AnInt> x(Var value) {
-                                    return value.ref().callV("getBytes").callV("length");
+                                    return value.ref().callV("getBytes", charset.ref()).callV("length");
                                 }
                             },
                             TerminatedArray.sameNumberOfBufferElementsAndValueElements,
                             Collections.<Method.Helper>emptyList(),
                             false,
                             false,
-                            Collections.<Var<? extends AValue>>emptyList()
+                            Arrays.<Var<? extends AValue>>asList(charset)
                     );
                 }
             };
