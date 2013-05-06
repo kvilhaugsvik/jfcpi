@@ -1,6 +1,7 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packet.fieldtype.ElementsLimit;
+import org.freeciv.packet.fieldtype.FieldTypeException;
 import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.Requirement;
@@ -17,6 +18,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 
 import java.util.*;
 
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.cast;
 import static org.freeciv.packetgen.Hardcoded.*;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
@@ -302,11 +304,24 @@ public class TerminatedArray extends FieldType {
                             .call(SELF_VALIDATOR_NAME, pLimits.ref().<TargetClass>call("next"))
             )));
         }
+
         return Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.from(void.class), SELF_VALIDATOR_NAME,
                 Arrays.asList(Hardcoded.pLimits),
-                Collections.<TargetClass>emptyList(),
-                verifyInsideLimits);
+                Arrays.asList(TargetClass.from(FieldTypeException.class)),
+                new Block(wrapThrowableInFieldTypeException(verifyInsideLimits)));
+    }
+
+    private static Typed<?> wrapThrowableInFieldTypeException(Block verifyInsideLimits) {
+        Var<AValue> e = Var.param(Throwable.class, "e");
+        TargetClass ft = TargetClass.from(FieldTypeException.class);
+        return BuiltIn.tryCatch(
+                verifyInsideLimits,
+                Var.param(Throwable.class, "e"),
+                new Block(
+                        THROW(R_IF(isInstanceOf(e.ref(), ft), cast(ft, e.ref()),
+                                ft.newInstance(sum(literal("threw "), e.ref().callV("getClass").callV("getName")), e.ref())))
+                ));
     }
 
     public static TerminatedArray xBytes(String dataIOType, String publicType) {
