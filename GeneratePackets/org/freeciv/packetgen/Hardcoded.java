@@ -186,7 +186,8 @@ public class Hardcoded {
                             TerminatedArray.sameNumberOfBufferElementsAndValueElements,
                             Collections.<Method.Helper>emptyList(),
                             false,
-                            false
+                            false,
+                            Collections.<Var<? extends AValue>>emptyList()
                     );
                 }
             };
@@ -273,7 +274,8 @@ public class Hardcoded {
                         TerminatedArray.sameNumberOfBufferElementsAndValueElements,
                         Collections.<Method.Helper>emptyList(),
                         false,
-                        false
+                        false,
+                        Collections.<Var<? extends AValue>>emptyList()
                 );
             }
         });

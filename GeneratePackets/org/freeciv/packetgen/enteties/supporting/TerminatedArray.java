@@ -84,7 +84,8 @@ public class TerminatedArray extends FieldType {
                            final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
                            final List<Method.Helper> helperMethods,
                            boolean elementTypeCanLimitVerify,
-                           boolean alwaysIncludeStopValue
+                           boolean alwaysIncludeStopValue,
+                           List<Var<? extends AValue>> extraFields
     ) {
         super(dataIOType, publicType, javaType,
                 createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
@@ -94,12 +95,22 @@ public class TerminatedArray extends FieldType {
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
                 uses,
-                Arrays.asList(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.from(ElementsLimit.class), "maxArraySize", null)),
+                extraFields(extraFields),
                 addValidate(helperMethods, maxArraySizeKind, transferArraySizeKind, numberOfElements,
                         Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                                 javaType, "value", null),
                         notTerminatable(terminator), elementTypeCanLimitVerify, buffertype)
         );
+    }
+
+    private static List<? extends Var<? extends AValue>> extraFields(List<Var<? extends AValue>> extraFields) {
+        LinkedList<Var<? extends AValue>> out = new LinkedList<Var<? extends AValue>>(extraFields);
+
+        out.add(Var.field(Collections.<Annotate>emptyList(),
+                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+                TargetClass.from(ElementsLimit.class), "maxArraySize", null));
+
+        return out;
     }
 
     private static List<? extends Method> addValidate(List<? extends Method> helperMethods,
@@ -342,7 +353,8 @@ public class TerminatedArray extends FieldType {
                 sameNumberOfBufferElementsAndValueElements,
                 Collections.<Method.Helper>emptyList(),
                 false,
-                false
+                false,
+                Collections.<Var<? extends AValue>>emptyList()
         );
     }
 
@@ -361,7 +373,8 @@ public class TerminatedArray extends FieldType {
                 sameNumberOfBufferElementsAndValueElements,
                 Collections.<Method.Helper>emptyList(),
                 false,
-                false
+                false,
+                Collections.<Var<? extends AValue>>emptyList()
         );
     }
 
@@ -441,7 +454,8 @@ public class TerminatedArray extends FieldType {
                 sameNumberOfBufferElementsAndValueElements,
                 Arrays.<Method.Helper>asList(lenInBytesHelper, buffer2value),
                 arrayEater,
-                TargetArray.from(kind.getAddress(), 1).getOf().getName().endsWith("_DIFF")
+                TargetArray.from(kind.getAddress(), 1).getOf().getName().endsWith("_DIFF"),
+                Collections.<Var<? extends AValue>>emptyList()
         );
     }
 
