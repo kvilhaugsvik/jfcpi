@@ -45,7 +45,7 @@ PROTOCOL_DISTRIBUTION = FreecivProto.jar
 all: tests compileTestSignInToServer compileProxyRecorder protojar
 	touch all
 
-code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder scriptRunPlayToServer sourceDefaultsForGenerator sourceTestPeers sourceFromFreeciv
+code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace sourceDefaultsForGenerator sourceTestPeers sourceFromFreeciv
 	touch code
 
 tests: runTests
@@ -167,6 +167,11 @@ compileTestSignInToServer: compileBindingsUsers scriptTestSignInToServer
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
+scriptInspectTrace:
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
+	chmod +x inspectTrace
+	touch scriptInspectTrace
+
 scriptRunProxyRecorder:
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
@@ -177,7 +182,7 @@ scriptRunPlayToServer:
 	chmod +x playRecord
 	touch scriptRunPlayToServer
 
-compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer
+compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
 	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${COMPILED_CORE_FOLDER} `find FreecivRecorder/src -iname "*.java"`
 	touch compileProxyRecorder
@@ -252,6 +257,7 @@ clean:
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
 	rm -f scriptRunPlayToServer playRecord
 	rm -rf compileUtilsTests runUtilsTests
+	rm -rf scriptInspectTrace inspectTrace
 
 distclean: clean
 	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
