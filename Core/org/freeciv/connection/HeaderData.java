@@ -18,7 +18,9 @@ import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class HeaderData implements PacketChangeHeader {
@@ -33,6 +35,19 @@ public class HeaderData implements PacketChangeHeader {
         setHeaderTypeTo(packetHeaderClass);
     }
 
+    public PacketHeader newHeaderFromStream(DataInput stream) {
+        try {
+            return getStream2Header().newInstance(stream);
+        } catch (InstantiationException e) {
+            throw new BadProtocolData("Header from stream issue", e);
+        } catch (IllegalAccessException e) {
+            throw new BadProtocolData("Header from stream issue", e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalArgumentException("Exception thrown while reading header", e);
+        }
+    }
+
+    @Override
     public void setHeaderTypeTo(Class<? extends PacketHeader> packetHeaderClass) {
         this.lock.writeLock().lock();
         try {
