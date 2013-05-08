@@ -49,7 +49,7 @@ public class PlayToServer {
     private final Plumbing csPlumbing;
     private final Plumbing scPlumbing;
 
-    public PlayToServer(InputStream source, Socket server, boolean ignoreDynamic) throws IOException, NoSuchMethodException {
+    public PlayToServer(final InputStream source, Socket server, boolean ignoreDynamic) throws IOException, NoSuchMethodException {
         final PacketsMapping versionKnowledge = new PacketsMapping();
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
@@ -123,7 +123,17 @@ public class PlayToServer {
             }
         };
 
-        this.csPlumbing = new Plumbing(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true, false),
+        this.csPlumbing = new Plumbing(new SourceTF2(source, new OverImpl() {
+            @Override
+            protected void whenDoneImpl() {
+                try {
+                    source.close();
+                } catch (IOException e) {
+                    System.err.println("Problem closing input file after it was read");
+                    e.printStackTrace();
+                }
+            }
+        }, versionKnowledge, ignoreDynamic, true, false),
                 Arrays.asList(reaction, toServer), timeToExit);
         this.scPlumbing = new Plumbing(new SourceConn(conn, false), Arrays.asList(reaction), timeToExit);
     }
