@@ -94,20 +94,20 @@ public class PacketsMapping {
 
     public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException {
         if (!canInterpret(header.getPacketKind()))
-            throw packetReadingError(header.getPacketKind(), new NoSuchElementException("Don't know how to interpret"));
+            throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
         try {
             return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header, old);
         } catch (InstantiationException e) {
-            throw packetReadingError(header.getPacketKind(), e);
+            throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
         } catch (IllegalAccessException e) {
-            throw packetReadingError(header.getPacketKind(), e);
+            throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
         } catch (InvocationTargetException e) {
-            throw packetReadingError(header.getPacketKind(), e);
+            throw new IOException(internalErrorMessage(header.getPacketKind()), e);
         }
     }
 
-    private static IOException packetReadingError(int kind, Exception exception) {
-        return new IOException("Internal error while trying to read packet numbered " + kind + " from network", exception);
+    private static String internalErrorMessage(int packetKind) {
+        return "Internal error while trying to read packet numbered " + packetKind + " from network";
     }
 
     boolean canInterpret(int kind) {
