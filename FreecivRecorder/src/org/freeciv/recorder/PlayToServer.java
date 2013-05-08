@@ -123,7 +123,7 @@ public class PlayToServer {
             }
         };
 
-        this.csPlumbing = new Plumbing(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true),
+        this.csPlumbing = new Plumbing(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true, false),
                 Arrays.asList(reaction, toServer), timeToExit);
         this.scPlumbing = new Plumbing(new SourceConn(conn, false), Arrays.asList(reaction), timeToExit);
     }
