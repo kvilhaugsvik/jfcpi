@@ -217,7 +217,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         Var header = getField("header");
         body.addStatement(labelExceptionsWithPacketAndField(header, new Block(
                 header.assign(headerKind.newInstance(
-                        sum(new MethodCall<AnInt>("calcBodyLen"), headerKind.callV("HEADER_SIZE")),
+                        sum(getAddress().callV("calcBodyLen", Reference.THIS), headerKind.callV("HEADER_SIZE")),
                         getField("number").ref()))), addExceptionLocation));
 
         addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE,
@@ -267,7 +267,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return labelExceptionsWithPacketAndField(header, new Block(header.assign(BuiltIn.cast(
                 PacketHeader.class,
                 headerKind.callV("newInstance",
-                        sum(new MethodCall<AnInt>("calcBodyLen"),
+                        sum(getAddress().callV("calcBodyLen", Reference.THIS),
                                 headerKind.callV("getDeclaringClass").callV("getField", literal("HEADER_SIZE"))
                                         .callV("getInt", NULL)),
                         getField("number").ref())))), addExceptionLocation);
@@ -318,7 +318,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         final Var<TargetClass> streamName = Var.param(TargetClass.from(DataInput.class), "from");
         final Var<TargetClass> old =
                 Var.param(TargetClass.from("java.util", "Map<DeltaKey, Packet>"), "old");
-        MethodCall<AnInt> calcBodyLenCall = new MethodCall<AnInt>("calcBodyLen");
+        Typed<AnInt> calcBodyLenCall = getAddress().<AnInt>callV("calcBodyLen", Reference.THIS);
 
         Block constructorBodyStream = new Block();
         constructorBodyStream.addStatement(validation.call("validateNotNull", argHeader.ref(), literal(argHeader.getName())));
