@@ -14,7 +14,7 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.RawPacket;
+import org.freeciv.packet.Packet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,15 +23,15 @@ import java.util.concurrent.locks.Lock;
 
 public class BackgroundReader extends Thread {
     private final PacketInputStream in;
-    private final LinkedList<RawPacket> buffered;
-    private final Uninterpreted parent;
+    private final LinkedList<Packet> buffered;
+    private final Connection parent;
 
-    public BackgroundReader(InputStream in, Uninterpreted parent, Lock completeReflexesInOneStep, ReflexPacketKind quickRespond,
-                            final HeaderData currentHeader)
+    public BackgroundReader(InputStream in, Connection parent, Lock completeReflexesInOneStep, ReflexPacketKind quickRespond,
+                            final HeaderData currentHeader, PacketsMapping protoCode)
             throws IOException {
-        this.in = new PacketInputStream(in, parent, completeReflexesInOneStep, currentHeader, quickRespond);
+        this.in = new PacketInputStream(in, parent, completeReflexesInOneStep, currentHeader, quickRespond, protoCode);
         this.parent = parent;
-        this.buffered = new LinkedList<RawPacket>();
+        this.buffered = new LinkedList<Packet>();
 
         this.setDaemon(true);
     }
@@ -40,7 +40,7 @@ public class BackgroundReader extends Thread {
     public void run() {
         try {
             while(true) {
-                RawPacket incoming = in.readPacket();
+                Packet incoming = in.readPacket();
 
                 synchronized (buffered) {
                     buffered.add(incoming);
@@ -63,7 +63,7 @@ public class BackgroundReader extends Thread {
         }
     }
 
-    public RawPacket getPacket() {
+    public Packet getPacket() {
         synchronized (buffered) {
             return buffered.removeFirst();
         }

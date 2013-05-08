@@ -32,7 +32,7 @@ public class NetworkUninterpreted {
     @Test
     public void pureHeader() throws IOException, ExecutionException, TimeoutException, InterruptedException, NotReadyYetException {
         Socket other = helperDataSender(new byte[]{0, 4, 0, 0});
-        Uninterpreted self = new Uninterpreted(other.getInputStream(), other.getOutputStream(),
+        Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
                 new HeaderData(Header_2_2.class), Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap());
 
         Packet packet = assertPacketIsThere(self);
@@ -53,7 +53,7 @@ public class NetworkUninterpreted {
         HashMap<Integer, ReflexReaction> postReceive = new HashMap<Integer, ReflexReaction>();
         postReceive.put(5, new ReflexActionChangeHeaderKind(Header_2_2.class));
 
-        Uninterpreted self = new Uninterpreted(other.getInputStream(), other.getOutputStream(),
+        Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
                 new HeaderData(Header_2_1.class), postReceive, Collections.<Integer, ReflexReaction>emptyMap());
 
         Packet packetBeforeChange = assertPacketIsThere(self);
@@ -122,7 +122,7 @@ public class NetworkUninterpreted {
     }
 
     /* Wait for a packet to appear but no longer than x seconds */
-    private static void helperWaitSomeSecondsForAPacket(Uninterpreted on, int seconds)
+    private static void helperWaitSomeSecondsForAPacket(Connection on, int seconds)
             throws ExecutionException, TimeoutException, InterruptedException {
         Executors.newSingleThreadExecutor().submit(new YieldUnlessNewPacket(on)).get(seconds, TimeUnit.SECONDS);
     }
@@ -130,7 +130,7 @@ public class NetworkUninterpreted {
     public static class YieldUnlessNewPacket implements Runnable {
         private final FreecivConnection conn;
 
-        public YieldUnlessNewPacket(Uninterpreted conn) {
+        public YieldUnlessNewPacket(Connection conn) {
             this.conn = conn;
         }
 
@@ -142,7 +142,7 @@ public class NetworkUninterpreted {
         }
     }
 
-    private static Packet assertPacketIsThere(Uninterpreted self) throws ExecutionException, TimeoutException, InterruptedException, NotReadyYetException {
+    private static Packet assertPacketIsThere(Connection self) throws ExecutionException, TimeoutException, InterruptedException, NotReadyYetException {
         helperWaitSomeSecondsForAPacket(self, 4);
 
         assertTrue("There should be a packet here", self.packetReady());

@@ -38,7 +38,7 @@ public class PacketsMapping {
     private final long versionMinor;
     private final long versionPatch;
 
-    public PacketsMapping() throws IOException {
+    public PacketsMapping() {
         try {
             Class constants = Class.forName(Util.VERSION_DATA_CLASS);
             Class[] understoodPackets = (Class[])constants.getField(Util.PACKET_MAP_NAME).get(null);
@@ -57,11 +57,11 @@ public class PacketsMapping {
                     this.packetMakers.put(understood.getField("number").getInt(null),
                                           understood.getConstructor(DataInput.class, PacketHeader.class, Map.class));
                 } catch (NoSuchFieldException e) {
-                    throw new IOException(understood.getSimpleName() + " is not compatible.\n" +
+                    throw new BadProtocolData(understood.getSimpleName() + " is not compatible.\n" +
                             "(The static field number is missing)", e);
                 } catch (NoSuchMethodException e) {
-                    throw new IOException(understood.getSimpleName() + " is not compatible.\n" +
-                                                  "(No constructor from DataInput, PacketHeader, Map found)");
+                    throw new BadProtocolData(understood.getSimpleName() + " is not compatible.\n" +
+                                                  "(No constructor from DataInput, PacketHeader, Map found)", e);
                 }
             }
 
@@ -82,32 +82,32 @@ public class PacketsMapping {
             this.protoRulesPostSend = Collections.unmodifiableMap(neededPostSend);
             this.protoRulesPostReceive = Collections.unmodifiableMap(neededPostReceive);
         } catch (ClassNotFoundException e) {
-            throw new IOException("Version information missing", e);
+            throw new BadProtocolData("Version information missing", e);
         } catch (NoSuchFieldException e) {
-            throw new IOException("Version information not compatible", e);
+            throw new BadProtocolData("Version information not compatible", e);
         } catch (ClassCastException e) {
-            throw new IOException("Version information not compatible", e);
+            throw new BadProtocolData("Version information not compatible", e);
         } catch (IllegalAccessException e) {
-            throw new IOException("Refused to read version information", e);
+            throw new BadProtocolData("Refused to read version information", e);
         }
     }
 
     public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException {
         if (!canInterpret(header.getPacketKind()))
-            throw packetReadingError(header.getPacketKind(), new NoSuchElementException("Don't know how to interpret"));
+            throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
         try {
             return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header, old);
         } catch (InstantiationException e) {
-            throw packetReadingError(header.getPacketKind(), e);
+            throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
         } catch (IllegalAccessException e) {
-            throw packetReadingError(header.getPacketKind(), e);
+            throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
         } catch (InvocationTargetException e) {
-            throw packetReadingError(header.getPacketKind(), e);
+            throw new IOException(internalErrorMessage(header.getPacketKind()), e);
         }
     }
 
-    private static IOException packetReadingError(int kind, Exception exception) {
-        return new IOException("Internal error while trying to read packet numbered " + kind + " from network", exception);
+    private static String internalErrorMessage(int packetKind) {
+        return "Internal error while trying to read packet numbered " + packetKind + " from network";
     }
 
     boolean canInterpret(int kind) {

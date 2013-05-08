@@ -14,11 +14,16 @@
 
 package org.freeciv.connection;
 
+import org.freeciv.packet.DeltaKey;
+import org.freeciv.packet.Packet;
+import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
 public class PacketInputStream extends FilterInputStream {
@@ -26,32 +31,36 @@ public class PacketInputStream extends FilterInputStream {
     private final HeaderData headerData;
     private final ReflexPacketKind quickRespond;
     private Lock completeReflexesInOneStep;
+    private final DataToPackets dataToPackets;
 
-    public PacketInputStream(InputStream in, Over state, Lock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond) {
+    public PacketInputStream(InputStream in, Over state, Lock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode) {
         super(in);
 
         this.state = state;
         this.completeReflexesInOneStep = completeReflexesInOneStep;
         this.headerData = packetHeaderClass;
         this.quickRespond = quickRespond;
+        this.dataToPackets = null == protoCode ? new AlwaysRaw() : new InterpretWhenPossible(protoCode);
     }
 
-    public RawPacket readPacket() throws IOException, InvocationTargetException {
+    public Packet readPacket() throws IOException, InvocationTargetException {
         final byte[] start = readXBytesFrom(2, new byte[0], in, state);
         final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
 
+        final PacketHeader head;
+        final byte[] packet;
         completeReflexesInOneStep.lock();
         try {
-            byte[] packet = readXBytesFrom(size - 2, start, in, state);
+            packet = readXBytesFrom(size - 2, start, in, state);
 
-            final RawPacket rawPacket = new RawPacket(packet, headerData);
+            head = headerData.newHeaderFromStream(new DataInputStream(new ByteArrayInputStream(packet)));
 
-            quickRespond.handle(rawPacket.getHeader().getPacketKind());
-
-            return rawPacket;
+            quickRespond.handle(head.getPacketKind());
         } finally {
             completeReflexesInOneStep.unlock();
         }
+
+        return dataToPackets.convert(head, packet);
     }
 
     private static byte[] readXBytesFrom(int wanted, byte[] start, InputStream from, Over state)
@@ -89,4 +98,39 @@ public class PacketInputStream extends FilterInputStream {
                     "Read " + alreadyRead + " of " + wanted + " bytes");
     }
 
+    private static interface DataToPackets {
+        Packet convert(PacketHeader head, byte[] remaining);
+    }
+
+    private static class AlwaysRaw implements DataToPackets {
+        @Override
+        public Packet convert(PacketHeader head, byte[] packet) {
+            return new RawPacket(packet, head);
+        }
+    }
+
+    private static class InterpretWhenPossible implements DataToPackets {
+        private final PacketsMapping map;
+        private final Map<DeltaKey, Packet> old;
+
+        private InterpretWhenPossible(PacketsMapping map) {
+            this.map = map;
+            this.old = new HashMap<DeltaKey, Packet>();
+        }
+
+        @Override
+        public Packet convert(PacketHeader head, byte[] packet) {
+            try {
+                DataInputStream body = new DataInputStream(new ByteArrayInputStream(packet));
+
+                int toSkip = head.getHeaderSize();
+                while (0 < toSkip)
+                    toSkip = toSkip - body.skipBytes(toSkip);
+
+                return map.interpret(head, body, old);
+            } catch (IOException e) {
+                return new RawPacket(packet, head);
+            }
+        }
+    }
 }

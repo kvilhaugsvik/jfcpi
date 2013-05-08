@@ -30,6 +30,11 @@ public class RawPacket implements Packet {
         this.content = Arrays.copyOfRange(packet, header.getHeaderSize(), packet.length);
     }
 
+    public RawPacket(byte[] packet, PacketHeader header) {
+        this.header = header;
+        this.content = Arrays.copyOfRange(packet, header.getHeaderSize(), packet.length);
+    }
+
     public PacketHeader getHeader() {
         return header;
     }

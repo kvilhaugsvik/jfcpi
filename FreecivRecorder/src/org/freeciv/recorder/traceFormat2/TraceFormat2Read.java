@@ -31,10 +31,11 @@ public class TraceFormat2Read {
 
     private final HeaderTF2 header;
 
-    public TraceFormat2Read(InputStream in, Over state, Lock completeReflexesInOneStep, HeaderData headerData,
+    public TraceFormat2Read(InputStream in, Over state, Lock completeReflexesInOneStep,
+                            PacketsMapping packetsHelpUnderstand, HeaderData headerData,
                             Map<Integer, ReflexReaction> postReadReflexes) throws IOException {
         this.inAsPacket = new PacketInputStream(in, state, completeReflexesInOneStep, headerData,
-                new ReflexPacketKind(postReadReflexes, headerData));
+                new ReflexPacketKind(postReadReflexes, headerData), packetsHelpUnderstand);
         this.inAsData = new DataInputStream(in);
 
         try {
@@ -60,4 +61,7 @@ public class TraceFormat2Read {
         return new RecordTF2(header, inAsData, inAsPacket);
     }
 
+    public String getHumanReadableHeader() {
+        return header.toString();
+    }
 }

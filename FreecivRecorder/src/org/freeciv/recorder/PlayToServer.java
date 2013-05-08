@@ -54,7 +54,7 @@ public class PlayToServer {
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
 
-        final FreecivConnection conn = new Uninterpreted(server.getInputStream(), server.getOutputStream(),
+        final FreecivConnection conn = Connection.uninterpreted(server.getInputStream(), server.getOutputStream(),
                 versionKnowledge.getNewPacketHeaderData(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
                 versionKnowledge.getRequiredPostSendRules());
@@ -123,7 +123,7 @@ public class PlayToServer {
             }
         };
 
-        this.csPlumbing = new Plumbing(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true),
+        this.csPlumbing = new Plumbing(new SourceTF2(source, conn, versionKnowledge, ignoreDynamic, true, false),
                 Arrays.asList(reaction, toServer), timeToExit);
         this.scPlumbing = new Plumbing(new SourceConn(conn, false), Arrays.asList(reaction), timeToExit);
     }

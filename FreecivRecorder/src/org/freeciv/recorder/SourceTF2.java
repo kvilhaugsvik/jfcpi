@@ -37,11 +37,12 @@ public class SourceTF2 implements Source {
     private long sendNextAt;
     private RecordTF2 rec;
 
-    public SourceTF2(InputStream source, Over over, PacketsMapping versionKnowledge, boolean ignoreDynamic, boolean fromClient) throws IOException {
+    public SourceTF2(InputStream source, Over over, PacketsMapping versionKnowledge, boolean ignoreDynamic, boolean fromClient, boolean understand) throws IOException {
         this.over = over;
         this.ignoreDynamic = ignoreDynamic;
         this.fromClient = fromClient;
         this.source = new TraceFormat2Read(source, over, new ReentrantLock(),
+                understand ? versionKnowledge : null,
                 versionKnowledge.getNewPacketHeaderData(),
                 versionKnowledge.getRequiredPostReceiveRules());
 
