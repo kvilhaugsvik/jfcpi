@@ -53,7 +53,7 @@ public class Plumbing extends Thread {
         else
             throw new IllegalStateException("Already started");
 
-        while (allSourcesAreOpen()) {
+        while (canRead()) {
             try {
                 proxyPacket(source, sinks);
             } catch (DoneReading doneReading) {
@@ -72,12 +72,9 @@ public class Plumbing extends Thread {
         finished = true;
     }
 
-    // TODO: What about sinks?
-    private boolean allSourcesAreOpen() {
-        if (!source.isOpen())
-            return false;
-
-        return true;
+    // TODO: What about write?
+    private boolean canRead() {
+        return source.isOpen() || source.packetReady();
     }
 
     private void setAllSinksAndSourcesToOver() {
