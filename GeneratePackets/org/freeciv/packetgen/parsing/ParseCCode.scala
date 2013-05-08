@@ -28,6 +28,8 @@ import java.util.AbstractMap.SimpleImmutableEntry
 import org.freeciv.packetgen.enteties.supporting.{StructMaker, WeakVarDec, SimpleTypeAlias, IntExpression}
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn
 import com.kvilhaugsvik.dependency.UndefinedException
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString
 
 object ParseCCode extends ExtractableParser {
   private final val DEFINE: String = "#define"
@@ -257,9 +259,13 @@ object ParseCCode extends ExtractableParser {
     struct => new StructMaker(struct._1, struct._2.asJava)
   }
 
-  def constantValueDef = defineLine(startOfConstant, identifier.r ~ intExpr)
+  def constantValueDef = defineLine(startOfConstant, identifier.r ~ (intExpr | strExpr))
 
-  def constantValueDefConverted = constantValueDef ^^ {variable => Constant.isInt(variable._1, variable._2)}
+  def constantValueDefConverted = constantValueDef ^^ {
+    case (name: String) ~ (value: IntExpression) => Constant.isInt(name, value)
+    case (name: String) ~ (value: Typed[AString]) => Constant.isString(name, value)
+    case _ => throw new UnsupportedOperationException("Can't handle this kind of constant.")
+  }
 
   def exprConverted = cEnumDefConverted |
     specEnumDefConverted |

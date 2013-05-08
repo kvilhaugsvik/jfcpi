@@ -30,6 +30,7 @@
         <file>common/unit.h</file>
 
         <file>utility/shared.h</file>
+        <file>utility/fciconv.h</file>
     </inputSource>
 
     <requested>

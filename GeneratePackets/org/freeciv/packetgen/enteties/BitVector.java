@@ -223,7 +223,8 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
                 },
                 Collections.<Method.Helper>emptyList(),
                 false,
-                false
+                false,
+                Collections.<Var<? extends AValue>>emptyList()
         );
     }
 }

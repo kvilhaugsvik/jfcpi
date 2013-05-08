@@ -18,7 +18,9 @@
 package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.dependency.UndefinedException;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import com.kvilhaugsvik.dependency.Dependency;
@@ -38,6 +40,9 @@ import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newEnum
 import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newInvalidEnum;
 
 public class GenerateTest {
+    public static final Constant<AString> FC_DEFAULT_DATA_ENCODING =
+            Constant.isString("FC_DEFAULT_DATA_ENCODING", BuiltIn.literal("UTF-8"));
+
     public static void main(String[] args) throws IOException, UndefinedException {
         (new GenerateTest()).generate(args);
     }
@@ -255,7 +260,8 @@ public class GenerateTest {
     private FieldType createFieldTypeSTRING() throws UndefinedException {
         return ((FieldType)Hardcoded.stringBasicFieldType
                 .produce(new Requirement("string(char)", FieldType.class),
-                        Constant.isInt("STRING_ENDER", IntExpression.integer("0")))
+                        Constant.isInt("STRING_ENDER", IntExpression.integer("0")),
+                        FC_DEFAULT_DATA_ENCODING)
         ).createFieldType("STRING");
     }
 
@@ -538,10 +544,15 @@ public class GenerateTest {
     }
 
     private void writeConstantClass(String targetFolder) throws IOException {
-        Set<Constant> constants = new TreeSet<Constant>(new TotalOrderNoCircles(Hardcoded.values()));
+        ArrayList<Dependency.Item> willBeSorted = new ArrayList<Dependency.Item>(Hardcoded.values());
+        willBeSorted.add(FC_DEFAULT_DATA_ENCODING);
+
+        Set<Constant> constants = new TreeSet<Constant>(new TotalOrderNoCircles(willBeSorted));
         for (Dependency.Item stringEnd : Hardcoded.values())
             if (stringEnd instanceof Constant)
                 constants.add((Constant)stringEnd);
+
+        constants.add(FC_DEFAULT_DATA_ENCODING);
 
         TreeMap<Integer, TargetClass> packets = new TreeMap<Integer, TargetClass>();
         packets.put(926, TargetClass.from("org.freeciv.packet", "TestArray"));

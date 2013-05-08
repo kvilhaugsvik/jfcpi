@@ -16,6 +16,8 @@ package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import org.freeciv.connection.BadProtocolData;
+import org.freeciv.connection.HeaderData;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.NoDelta;
 import org.freeciv.packet.PacketHeader;
@@ -40,11 +42,9 @@ import org.freeciv.utility.EndsInEternalZero;
 import org.freeciv.utility.Util;
 import org.freeciv.utility.Validation;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -401,6 +401,40 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 Arrays.asList(streamName, argHeader, old),
                 Arrays.asList(TargetClass.from(FieldTypeException.class)),
                 constructorBodyStream));
+
+
+        final Var<TargetClass> argHeaderData = Var.param(TargetClass.from(HeaderData.class), "headerData");
+        addMethod(Method.newPublicConstructorWithException(Comment.doc(
+                "Construct from a DataInput", "",
+                Comment.param(streamName, "data input that is at the start of the packet"),
+                Comment.param(argHeaderData, "data to read the header"),
+                Comment.param(old, "where the Delta protocol should look for older packets"),
+                Comment.docThrows(TargetClass.from(FieldTypeException.class), "if there is a problem in the fields"),
+                Comment.docThrows(TargetClass.from(BadProtocolData.class),
+                        "when data like this class and its user aren't compatible")),
+                Arrays.asList(streamName, argHeaderData, old),
+                Arrays.asList(TargetClass.from(FieldTypeException.class), TargetClass.from(BadProtocolData.class)),
+                new Block(new MethodCall("this",
+                        streamName.ref(),
+                        argHeaderData.ref().callV("newHeaderFromStream", streamName.ref()),
+                        old.ref()))));
+
+        final Var<AValue> bytes = Var.param(TargetArray.from(byte[].class), "packet");
+        addMethod(Method.newPublicConstructorWithException(Comment.doc(
+                "Construct from a byte array", "",
+                Comment.param(bytes, "the packet as a byte array"),
+                Comment.param(argHeaderData, "data to read the header"),
+                Comment.param(old, "where the Delta protocol should look for older packets"),
+                Comment.docThrows(TargetClass.from(FieldTypeException.class), "if there is a problem in the fields"),
+                Comment.docThrows(TargetClass.from(BadProtocolData.class),
+                        "when data like this class and its user aren't compatible")),
+                Arrays.asList(bytes, argHeaderData, old),
+                Arrays.asList(TargetClass.from(FieldTypeException.class), TargetClass.from(BadProtocolData.class)),
+                new Block(new MethodCall("this",
+                        TargetClass.from(DataInputStream.class)
+                                .newInstance(TargetClass.from(ByteArrayInputStream.class).newInstance(bytes.ref())),
+                        argHeaderData.ref(),
+                        old.ref()))));
     }
 
     private boolean isBoolFolded(boolean boolFoldEnabled, Field field) {

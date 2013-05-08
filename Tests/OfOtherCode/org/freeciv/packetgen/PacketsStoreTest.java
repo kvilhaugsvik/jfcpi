@@ -16,6 +16,8 @@ package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.utility.Util;
 import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.Requirement;
@@ -34,7 +36,12 @@ import static org.junit.Assert.assertEquals;
 
 public class PacketsStoreTest {
     private static PacketsStore defaultStorage() {
-        return new PacketsStore(PacketHeaderKinds.FC_2_4_99_2011_11_02, GeneratorDefaults.LOG_TO, false, false);
+        final PacketsStore packetsStore = new PacketsStore(PacketHeaderKinds.FC_2_4_99_2011_11_02, GeneratorDefaults.LOG_TO, false, false);
+
+        // String needs this
+        packetsStore.addDependency(Constant.isString("FC_DEFAULT_DATA_ENCODING", BuiltIn.literal("UTF-8")));
+
+        return packetsStore;
     }
 
     private static void assertLooksForButNoCodeYet(PacketsStore storage, Requirement looksFor, String noCodeNamed) {

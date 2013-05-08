@@ -20,6 +20,8 @@ import com.kvilhaugsvik.dependency.{Dependency, Requirement}
 import util.parsing.input.CharArrayReader
 import org.freeciv.packetgen.enteties.SourceFile
 import java.io.File
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn
 
 abstract class ParseShared extends RegexParsers with PackratParsers {
   def expr: Parser[Any]
@@ -48,6 +50,9 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   val identifierRegEx = identifier.r
 
   def quotedString = """\"[^"]*?\""""
+
+  // TODO: Should concatenation be supported?
+  def strExpr = quotedString.r ^^ {a => BuiltIn.toCode[AString](a)}
 
   private def binOpLev(operators: Parser[String]): PackratParser[(IntExpression, IntExpression) => IntExpression] =
     operators ^^ {operator => (lhs: IntExpression, rhs: IntExpression) => IntExpression.binary(operator, lhs, rhs)}

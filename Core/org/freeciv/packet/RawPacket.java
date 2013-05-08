@@ -25,20 +25,9 @@ public class RawPacket implements Packet {
     private final PacketHeader header;
     private final byte[] content;
 
-    public RawPacket(byte[] packet, HeaderData stream2Header) throws InvocationTargetException {
-        try {
-            this.header = stream2Header.getStream2Header()
-                    .newInstance(new DataInputStream(new ByteArrayInputStream(packet)));
-        } catch (InstantiationException e) {
-            throw badHeader(e);
-        } catch (IllegalAccessException e) {
-            throw badHeader(e);
-        }
+    public RawPacket(byte[] packet, HeaderData stream2Header) {
+        this.header = stream2Header.newHeaderFromStream(new DataInputStream(new ByteArrayInputStream(packet)));
         this.content = Arrays.copyOfRange(packet, header.getHeaderSize(), packet.length);
-    }
-
-    private static IllegalStateException badHeader(Exception e) {
-        return new IllegalStateException("Wrong data for reading headers", e);
     }
 
     public PacketHeader getHeader() {

@@ -1,6 +1,7 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import org.freeciv.packet.fieldtype.ElementsLimit;
+import org.freeciv.packet.fieldtype.FieldTypeException;
 import org.freeciv.packet.fieldtype.IllegalNumberOfElementsException;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.Requirement;
@@ -17,6 +18,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 
 import java.util.*;
 
+import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.cast;
 import static org.freeciv.packetgen.Hardcoded.*;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
@@ -82,7 +84,8 @@ public class TerminatedArray extends FieldType {
                            final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements,
                            final List<Method.Helper> helperMethods,
                            boolean elementTypeCanLimitVerify,
-                           boolean alwaysIncludeStopValue
+                           boolean alwaysIncludeStopValue,
+                           List<Var<? extends AValue>> extraFields
     ) {
         super(dataIOType, publicType, javaType,
                 createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
@@ -92,12 +95,22 @@ public class TerminatedArray extends FieldType {
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
                 uses,
-                Arrays.asList(Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, TargetClass.from(ElementsLimit.class), "maxArraySize", null)),
+                extraFields(extraFields),
                 addValidate(helperMethods, maxArraySizeKind, transferArraySizeKind, numberOfElements,
                         Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                                 javaType, "value", null),
                         notTerminatable(terminator), elementTypeCanLimitVerify, buffertype)
         );
+    }
+
+    private static List<? extends Var<? extends AValue>> extraFields(List<Var<? extends AValue>> extraFields) {
+        LinkedList<Var<? extends AValue>> out = new LinkedList<Var<? extends AValue>>(extraFields);
+
+        out.add(Var.field(Collections.<Annotate>emptyList(),
+                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
+                TargetClass.from(ElementsLimit.class), "maxArraySize", null));
+
+        return out;
     }
 
     private static List<? extends Method> addValidate(List<? extends Method> helperMethods,
@@ -302,11 +315,24 @@ public class TerminatedArray extends FieldType {
                             .call(SELF_VALIDATOR_NAME, pLimits.ref().<TargetClass>call("next"))
             )));
         }
+
         return Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.from(void.class), SELF_VALIDATOR_NAME,
                 Arrays.asList(Hardcoded.pLimits),
-                Collections.<TargetClass>emptyList(),
-                verifyInsideLimits);
+                Arrays.asList(TargetClass.from(FieldTypeException.class)),
+                new Block(wrapThrowableInFieldTypeException(verifyInsideLimits)));
+    }
+
+    private static Typed<?> wrapThrowableInFieldTypeException(Block verifyInsideLimits) {
+        Var<AValue> e = Var.param(Throwable.class, "e");
+        TargetClass ft = TargetClass.from(FieldTypeException.class);
+        return BuiltIn.tryCatch(
+                verifyInsideLimits,
+                Var.param(Throwable.class, "e"),
+                new Block(
+                        THROW(R_IF(isInstanceOf(e.ref(), ft), cast(ft, e.ref()),
+                                ft.newInstance(sum(literal("threw "), e.ref().callV("getClass").callV("getName")), e.ref())))
+                ));
     }
 
     public static TerminatedArray xBytes(String dataIOType, String publicType) {
@@ -327,7 +353,8 @@ public class TerminatedArray extends FieldType {
                 sameNumberOfBufferElementsAndValueElements,
                 Collections.<Method.Helper>emptyList(),
                 false,
-                false
+                false,
+                Collections.<Var<? extends AValue>>emptyList()
         );
     }
 
@@ -346,7 +373,8 @@ public class TerminatedArray extends FieldType {
                 sameNumberOfBufferElementsAndValueElements,
                 Collections.<Method.Helper>emptyList(),
                 false,
-                false
+                false,
+                Collections.<Var<? extends AValue>>emptyList()
         );
     }
 
@@ -426,7 +454,8 @@ public class TerminatedArray extends FieldType {
                 sameNumberOfBufferElementsAndValueElements,
                 Arrays.<Method.Helper>asList(lenInBytesHelper, buffer2value),
                 arrayEater,
-                TargetArray.from(kind.getAddress(), 1).getOf().getName().endsWith("_DIFF")
+                TargetArray.from(kind.getAddress(), 1).getOf().getName().endsWith("_DIFF"),
+                Collections.<Var<? extends AValue>>emptyList()
         );
     }
 
