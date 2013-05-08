@@ -73,6 +73,11 @@ public class SourceTF2 implements Source {
     }
 
     @Override
+    public boolean packetReady() {
+        return null != rec;
+    }
+
+    @Override
     public Packet getPacket() throws IOException, NotReadyYetException {
         if (null == this.rec)
             readNextRecord();

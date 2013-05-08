@@ -35,6 +35,11 @@ public class SourceConn implements Source {
     }
 
     @Override
+    public boolean packetReady() {
+        return source.packetReady();
+    }
+
+    @Override
     public Packet getPacket() throws IOException, NotReadyYetException {
         return source.getPacket();
     }
