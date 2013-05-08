@@ -80,10 +80,13 @@ public class PacketInputStream extends FilterInputStream {
             } catch (SocketException e) {
                 throw done(wanted, start, alreadyRead);
             }
-            if (0 <= bytesRead)
-                alreadyRead += bytesRead;
-            else if (state.shouldIStopReadingWhenOutOfInput())
-                throw done(wanted, start, alreadyRead);
+
+            if (0 < bytesRead) // If some bytes were read
+                alreadyRead += bytesRead; // take note of it
+            else if (-1 == bytesRead || // If there stream is closed or
+                    state.shouldIStopReadingWhenOutOfInput()) // nothing was read and should stop reading in that case
+                throw done(wanted, start, alreadyRead); // it's done
+
             Thread.yield();
         }
         return out;
