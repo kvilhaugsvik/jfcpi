@@ -104,7 +104,7 @@ public class ProxyRecorder {
     private static PacketsMapping loadProtocol() {
         try {
             return new PacketsMapping();
-        } catch (IOException e) {
+        } catch (BadProtocolData e) {
             System.err.println("Problem loading protocol data.");
             System.exit(1);
             return null;

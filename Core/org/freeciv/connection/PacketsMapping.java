@@ -38,7 +38,7 @@ public class PacketsMapping {
     private final long versionMinor;
     private final long versionPatch;
 
-    public PacketsMapping() throws IOException {
+    public PacketsMapping() {
         try {
             Class constants = Class.forName(Util.VERSION_DATA_CLASS);
             Class[] understoodPackets = (Class[])constants.getField(Util.PACKET_MAP_NAME).get(null);
@@ -57,11 +57,11 @@ public class PacketsMapping {
                     this.packetMakers.put(understood.getField("number").getInt(null),
                                           understood.getConstructor(DataInput.class, PacketHeader.class, Map.class));
                 } catch (NoSuchFieldException e) {
-                    throw new IOException(understood.getSimpleName() + " is not compatible.\n" +
+                    throw new BadProtocolData(understood.getSimpleName() + " is not compatible.\n" +
                             "(The static field number is missing)", e);
                 } catch (NoSuchMethodException e) {
-                    throw new IOException(understood.getSimpleName() + " is not compatible.\n" +
-                                                  "(No constructor from DataInput, PacketHeader, Map found)");
+                    throw new BadProtocolData(understood.getSimpleName() + " is not compatible.\n" +
+                                                  "(No constructor from DataInput, PacketHeader, Map found)", e);
                 }
             }
 
@@ -82,13 +82,13 @@ public class PacketsMapping {
             this.protoRulesPostSend = Collections.unmodifiableMap(neededPostSend);
             this.protoRulesPostReceive = Collections.unmodifiableMap(neededPostReceive);
         } catch (ClassNotFoundException e) {
-            throw new IOException("Version information missing", e);
+            throw new BadProtocolData("Version information missing", e);
         } catch (NoSuchFieldException e) {
-            throw new IOException("Version information not compatible", e);
+            throw new BadProtocolData("Version information not compatible", e);
         } catch (ClassCastException e) {
-            throw new IOException("Version information not compatible", e);
+            throw new BadProtocolData("Version information not compatible", e);
         } catch (IllegalAccessException e) {
-            throw new IOException("Refused to read version information", e);
+            throw new BadProtocolData("Refused to read version information", e);
         }
     }
 
