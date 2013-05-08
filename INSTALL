@@ -5,7 +5,7 @@ Building
 ========================================================================================================================
 What you'll need
  * A Java 7 (Java 6 hasn't been tested for a while) JDK. A JRE is not enough.
- * JUnit 4.10 (other versions not tested)
+ * JUnit 4.10 (other versions not tested) if you plan to run the tests
  * GNU Make 3.81 (other versions are probably OK)
  * The Freeciv trunk source code (SVN revision 22783 is known to work)
  * Scala 2.9 (2.10 is not tested yet)
@@ -40,6 +40,8 @@ the command line. You override them by setting them before the command. The info
  * JUNIT - the JUnit library
 To compile using a JUnit located in ~/lib to run the tests and a jar from ~/bin/jar use the command
   JUNIT=~/lib/junit.jar JAR=~/bin/jar make all
+If you don't care about running the tests or don't have JUnit the target "compileProxyRecorder" can be used like this
+  make compileProxyRecorder
 
 Freeciv has its own documentation on how to build it and what you need. You won't have to install it to test recording.
 It is worth having a look at. If all of Freeciv's build dependencies are there entering its folder and running
