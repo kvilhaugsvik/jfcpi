@@ -56,6 +56,7 @@ public class PrintTrace {
                         }
                     },
                     new ReentrantLock(),
+                    packetsMapping,
                     packetsMapping.getNewPacketHeaderData(),
                     packetsMapping.getRequiredPostSendRules()
             );

@@ -42,6 +42,7 @@ public class SourceTF2 implements Source {
         this.ignoreDynamic = ignoreDynamic;
         this.fromClient = fromClient;
         this.source = new TraceFormat2Read(source, over, new ReentrantLock(),
+                null,
                 versionKnowledge.getNewPacketHeaderData(),
                 versionKnowledge.getRequiredPostReceiveRules());
 
