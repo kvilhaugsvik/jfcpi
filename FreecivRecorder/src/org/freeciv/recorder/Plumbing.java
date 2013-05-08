@@ -19,7 +19,6 @@ import org.freeciv.packet.Packet;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,15 +40,10 @@ public class Plumbing extends Thread {
     }
 
     public static FreecivConnection socket2Connection(Socket connectedSocket, PacketsMapping versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
-        final Uninterpreted tmp = new Uninterpreted(
+        return Connection.interpreted(
                 connectedSocket.getInputStream(), connectedSocket.getOutputStream(),
                 versionKnowledge.getNewPacketHeaderData(),
-                postReceive, postSend);
-
-        if (understand)
-            return new Interpreted(tmp, versionKnowledge);
-        else
-            return tmp;
+                postReceive, postSend, understand ? versionKnowledge : null);
     }
 
     @Override

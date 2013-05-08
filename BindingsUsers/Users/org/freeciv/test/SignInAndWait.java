@@ -68,19 +68,17 @@ public class SignInAndWait {
         try {
             final PacketsMapping interpreter = new PacketsMapping();
             final Socket connection = new Socket(address, portNumber);
-            final Interpreted con = new Interpreted(
-                    new Uninterpreted(connection.getInputStream(), connection.getOutputStream(),
-                            interpreter.getNewPacketHeaderData(),
-                            ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
-                            interpreter.getRequiredPostSendRules()),
-                    interpreter);
+            final Connection con = Connection.interpreted(connection.getInputStream(), connection.getOutputStream(),
+                    interpreter.getNewPacketHeaderData(),
+                    ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
+                    interpreter.getRequiredPostSendRules(), interpreter);
 
             con.toSend(new PACKET_SERVER_JOIN_REQ(userName,
-                    con.getCapStringMandatory(),
-                    con.getVersionLabel(),
-                    con.getVersionMajor(),
-                    con.getVersionMinor(),
-                    con.getVersionPatch(),
+                    interpreter.getCapStringMandatory(),
+                    interpreter.getVersionLabel(),
+                    interpreter.getVersionMajor(),
+                    interpreter.getVersionMinor(),
+                    interpreter.getVersionPatch(),
                     con.getFields2Header()));
 
             while(con.isOpen() || con.packetReady()) {

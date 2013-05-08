@@ -20,7 +20,7 @@ package com.kvilhaugsvik.javaGenerator;
 import com.kvilhaugsvik.javaGenerator.formating.CodeStyleBuilder;
 import com.kvilhaugsvik.javaGenerator.formating.ScopeStack;
 import org.freeciv.utility.Util;
-import org.freeciv.connection.Interpreted;
+import org.freeciv.connection.Connection;
 import org.freeciv.packet.fieldtype.FieldType;
 import com.kvilhaugsvik.javaGenerator.expression.EnumElement;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
@@ -251,8 +251,8 @@ public class CodeGenTest {
 
     @Test public void testPackageImport() {
         assertEquals("Generated source not as expected",
-                "import org.freeciv.connection.Interpreted;",
-                Import.classIn(Interpreted.class).toString());
+                "import org.freeciv.connection.Connection;",
+                Import.classIn(Connection.class).toString());
     }
 
     @Test public void testImportAllInPackageOf() {

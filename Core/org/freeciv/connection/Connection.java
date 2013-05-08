@@ -16,7 +16,6 @@ package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -24,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Uninterpreted implements FreecivConnection {
+public class Connection implements FreecivConnection {
     private final BackgroundReader in;
     private final OutputStream out;
 
@@ -33,12 +32,13 @@ public class Uninterpreted implements FreecivConnection {
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
 
-    public Uninterpreted(
+    private Connection(
             final InputStream inn,
             final OutputStream out,
             final HeaderData headerData,
             final Map<Integer, ReflexReaction> postReceive,
-            final Map<Integer, ReflexReaction> postSend
+            final Map<Integer, ReflexReaction> postSend,
+            PacketsMapping protoCode
     ) throws IOException {
         this.currentHeader = headerData;
         this.out = out;
@@ -61,17 +61,38 @@ public class Uninterpreted implements FreecivConnection {
         };
         this.completeReflexesInOneStep = new ReentrantLock();
         this.in = new BackgroundReader(inn, this,
-                completeReflexesInOneStep, new ReflexPacketKind(postReceive, this), currentHeader);
+                completeReflexesInOneStep, new ReflexPacketKind(postReceive, this), currentHeader, protoCode);
         this.postSend = new ReflexPacketKind(postSend, this);
 
         this.in.start();
+    }
+
+    public static Connection interpreted(
+            final InputStream inn,
+            final OutputStream out,
+            final HeaderData headerData,
+            final Map<Integer, ReflexReaction> postReceive,
+            final Map<Integer, ReflexReaction> postSend,
+            PacketsMapping protoCode
+    ) throws IOException {
+        return new Connection(inn, out, headerData, postReceive, postSend, protoCode);
+    }
+
+    public static Connection uninterpreted(
+            final InputStream inn,
+            final OutputStream out,
+            final HeaderData headerData,
+            final Map<Integer, ReflexReaction> postReceive,
+            final Map<Integer, ReflexReaction> postSend
+    ) throws IOException {
+        return new Connection(inn, out, headerData, postReceive, postSend, null);
     }
 
     public boolean packetReady() {
         return in.hasPacket();
     }
 
-    public RawPacket getPacket() throws NotReadyYetException {
+    public Packet getPacket() throws NotReadyYetException {
         if (!packetReady())
             throw new NotReadyYetException("No packets waiting");
 
