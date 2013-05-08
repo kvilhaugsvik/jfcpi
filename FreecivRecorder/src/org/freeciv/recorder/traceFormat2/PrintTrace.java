@@ -51,7 +51,7 @@ public class PrintTrace {
                     file,
                     new OverImpl() {
                         @Override
-                        protected void whenOverImpl() {
+                        protected void whenDoneImpl() {
                             // clean up by hand
                         }
                     },

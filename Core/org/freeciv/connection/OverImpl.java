@@ -19,24 +19,24 @@ public abstract class OverImpl implements Over {
     private boolean open = true;
 
     @Override
-    public void setOver() {
+    public void setStopReadingWhenOutOfInput() {
         over = true;
     }
 
     @Override
-    public void whenOver() {
-        if (!isOver())
+    public void whenDone() {
+        if (!shouldIStopReadingWhenOutOfInput())
             throw new IllegalStateException("Tried to run whenOver() before it is over");
 
         open = false;
 
-        whenOverImpl();
+        whenDoneImpl();
     }
 
-    protected abstract void whenOverImpl();
+    protected abstract void whenDoneImpl();
 
     @Override
-    public boolean isOver() {
+    public boolean shouldIStopReadingWhenOutOfInput() {
         return over;
     }
 

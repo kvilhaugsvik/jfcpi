@@ -44,7 +44,7 @@ public class Connection implements FreecivConnection {
         this.out = out;
         this.overImpl = new OverImpl() {
             @Override
-            protected void whenOverImpl() {
+            protected void whenDoneImpl() {
                 try {
                     out.close();
                 } catch (IOException e) {
@@ -117,8 +117,8 @@ public class Connection implements FreecivConnection {
             out.write(packetSerialized.toByteArray());
             this.postSend.handle(toSend.getHeader().getPacketKind());
         } catch (IOException e) {
-            setOver();
-            whenOver();
+            setStopReadingWhenOutOfInput();
+            whenDone();
             throw new IOException("Can't send", e);
         } finally {
             completeReflexesInOneStep.unlock();
@@ -141,18 +141,18 @@ public class Connection implements FreecivConnection {
     }
 
     @Override
-    public void setOver() {
-        overImpl.setOver();
+    public void setStopReadingWhenOutOfInput() {
+        overImpl.setStopReadingWhenOutOfInput();
     }
 
     @Override
-    public void whenOver() {
-        overImpl.whenOver();
+    public void whenDone() {
+        overImpl.whenDone();
     }
 
     @Override
-    public boolean isOver() {
-        return overImpl.isOver();
+    public boolean shouldIStopReadingWhenOutOfInput() {
+        return overImpl.shouldIStopReadingWhenOutOfInput();
     }
 
     @Override

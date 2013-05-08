@@ -40,18 +40,18 @@ public class SourceConn implements Source {
     }
 
     @Override
-    public void setOver() {
-        source.setOver();
+    public void setStopReadingWhenOutOfInput() {
+        source.setStopReadingWhenOutOfInput();
     }
 
     @Override
-    public void whenOver() {
-        source.whenOver();
+    public void whenDone() {
+        source.whenDone();
     }
 
     @Override
-    public boolean isOver() {
-        return source.isOver();
+    public boolean shouldIStopReadingWhenOutOfInput() {
+        return source.shouldIStopReadingWhenOutOfInput();
     }
 
     @Override

@@ -16,24 +16,24 @@ package org.freeciv.connection;
 
 public interface Over extends ConnectionRelated {
     /**
-     * Close this connection as soon as its data has been read
+     * Stop reading when no more data is waiting
      */
-    void setOver();
+    void setStopReadingWhenOutOfInput();
 
     /**
      * Run this when all is over to close stuff etc
      */
-    void whenOver();
+    void whenDone();
 
     /**
-     * Will this connection be closed (unless it already is) as soon as its empty?
-     * @return true if the connection is closed or soon will be
+     * Is no more input expected?
+     * @return true if no more input is expected
      */
-    boolean isOver();
+    boolean shouldIStopReadingWhenOutOfInput();
 
     /**
-     * Is the underlying connection open?
-     * @return true if the underlying connection is open
+     * Is the underlying resource open?
+     * @return true if it is
      */
     boolean isOpen();
 }

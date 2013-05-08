@@ -38,7 +38,7 @@ class SinkWriteTrace extends Sink {
         final SinkWriteTrace me = this;
         this.over = new OverImpl() {
             @Override
-            protected void whenOverImpl() {
+            protected void whenDoneImpl() {
                 me.whenOverImpl();
             }
         };
@@ -62,13 +62,13 @@ class SinkWriteTrace extends Sink {
     }
 
     @Override
-    public void setOver() {
-        over.setOver();
+    public void setStopReadingWhenOutOfInput() {
+        over.setStopReadingWhenOutOfInput();
     }
 
     @Override
-    public void whenOver() {
-        over.whenOver();
+    public void whenDone() {
+        over.whenDone();
     }
 
     private synchronized void whenOverImpl() {
@@ -81,8 +81,8 @@ class SinkWriteTrace extends Sink {
     }
 
     @Override
-    public boolean isOver() {
-        return over.isOver();
+    public boolean shouldIStopReadingWhenOutOfInput() {
+        return over.shouldIStopReadingWhenOutOfInput();
     }
 
     @Override

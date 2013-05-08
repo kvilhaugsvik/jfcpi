@@ -62,7 +62,7 @@ public class SignInAndWait {
         reflexes.put(8, new ReflexReaction<Over>() {
             @Override
             public void apply(Over connection) {
-                connection.setOver();
+                connection.setStopReadingWhenOutOfInput();
             }
         });
         try {

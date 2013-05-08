@@ -58,7 +58,7 @@ public class Plumbing extends Thread {
                 proxyPacket(source, sinks);
             } catch (DoneReading doneReading) {
                 // TODO: Should sinks only used by this source also be set to over? Corner case: A shared Socket
-                source.setOver();
+                source.setStopReadingWhenOutOfInput();
 
                 // TODO: remove if central Over management is added
                 cleanUnclosed(source);
@@ -82,8 +82,8 @@ public class Plumbing extends Thread {
 
     private void setAllSinksAndSourcesToOver() {
         for (Sink sink : sinks)
-            sink.setOver();
-        source.setOver();
+            sink.setStopReadingWhenOutOfInput();
+        source.setStopReadingWhenOutOfInput();
     }
 
     private void cleanUp() {
@@ -96,7 +96,7 @@ public class Plumbing extends Thread {
 
     private void cleanUnclosed(Over over) {
         if (over.isOpen())
-            over.whenOver();
+            over.whenDone();
     }
 
     private void proxyPacket(Source readFrom, List<Sink> sinks) throws DoneReading {

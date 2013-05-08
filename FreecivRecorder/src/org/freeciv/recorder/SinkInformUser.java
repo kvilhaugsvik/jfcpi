@@ -17,7 +17,6 @@ package org.freeciv.recorder;
 import org.freeciv.connection.OverImpl;
 import org.freeciv.packet.Packet;
 
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 class SinkInformUser extends Sink {
@@ -31,7 +30,7 @@ class SinkInformUser extends Sink {
         this.writeLock = writeLock;
         this.over = new OverImpl() {
             @Override
-            protected void whenOverImpl() {
+            protected void whenDoneImpl() {
                 // no need to close System.out
                 // but "close" the user
                 System.out.println(proxyNumber + " is finished");
@@ -49,18 +48,18 @@ class SinkInformUser extends Sink {
     }
 
     @Override
-    public void setOver() {
-        over.setOver();
+    public void setStopReadingWhenOutOfInput() {
+        over.setStopReadingWhenOutOfInput();
     }
 
     @Override
-    public void whenOver() {
-        over.whenOver();
+    public void whenDone() {
+        over.whenDone();
     }
 
     @Override
-    public boolean isOver() {
-        return over.isOver();
+    public boolean shouldIStopReadingWhenOutOfInput() {
+        return over.shouldIStopReadingWhenOutOfInput();
     }
 
     @Override

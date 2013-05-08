@@ -52,8 +52,8 @@ public class BackgroundReader extends Thread {
             System.err.println("Problem in the thread that reads from the network");
             e.printStackTrace();
         } finally {
-            parent.setOver();
-            parent.whenOver();
+            parent.setStopReadingWhenOutOfInput();
+            parent.whenDone();
         }
     }
 

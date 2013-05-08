@@ -39,7 +39,7 @@ public abstract class SinkProcess extends Sink {
         this.versionKnowledge = versionKnowledge;
         this.over = new OverImpl() {
             @Override
-            protected void whenOverImpl() {
+            protected void whenDoneImpl() {
                 // use only where no closing is required in the processing
             }
         };
@@ -49,18 +49,18 @@ public abstract class SinkProcess extends Sink {
     public abstract void write(boolean clientToServer, Packet packet) throws IOException;
 
     @Override
-    public void setOver() {
-        over.setOver();
+    public void setStopReadingWhenOutOfInput() {
+        over.setStopReadingWhenOutOfInput();
     }
 
     @Override
-    public void whenOver() {
-        over.whenOver();
+    public void whenDone() {
+        over.whenDone();
     }
 
     @Override
-    public boolean isOver() {
-        return over.isOver();
+    public boolean shouldIStopReadingWhenOutOfInput() {
+        return over.shouldIStopReadingWhenOutOfInput();
     }
 
     @Override

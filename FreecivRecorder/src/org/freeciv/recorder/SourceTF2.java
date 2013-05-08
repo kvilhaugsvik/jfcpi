@@ -87,18 +87,18 @@ public class SourceTF2 implements Source {
     }
 
     @Override
-    public void setOver() {
-        over.setOver();
+    public void setStopReadingWhenOutOfInput() {
+        over.setStopReadingWhenOutOfInput();
     }
 
     @Override
-    public void whenOver() {
-        over.whenOver();
+    public void whenDone() {
+        over.whenDone();
     }
 
     @Override
-    public boolean isOver() {
-        return over.isOver();
+    public boolean shouldIStopReadingWhenOutOfInput() {
+        return over.shouldIStopReadingWhenOutOfInput();
     }
 
     @Override

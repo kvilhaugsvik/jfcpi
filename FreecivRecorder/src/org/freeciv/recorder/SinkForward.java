@@ -36,18 +36,18 @@ class SinkForward extends Sink {
     }
 
     @Override
-    public void setOver() {
-        writeTo.setOver();
+    public void setStopReadingWhenOutOfInput() {
+        writeTo.setStopReadingWhenOutOfInput();
     }
 
     @Override
-    public void whenOver() {
-        writeTo.whenOver();
+    public void whenDone() {
+        writeTo.whenDone();
     }
 
     @Override
-    public boolean isOver() {
-        return writeTo.isOver();
+    public boolean shouldIStopReadingWhenOutOfInput() {
+        return writeTo.shouldIStopReadingWhenOutOfInput();
     }
 
     @Override

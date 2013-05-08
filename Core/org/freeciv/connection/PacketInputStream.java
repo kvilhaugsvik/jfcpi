@@ -82,7 +82,7 @@ public class PacketInputStream extends FilterInputStream {
             }
             if (0 <= bytesRead)
                 alreadyRead += bytesRead;
-            else if (state.isOver())
+            else if (state.shouldIStopReadingWhenOutOfInput())
                 throw done(wanted, start, alreadyRead);
             Thread.yield();
         }
