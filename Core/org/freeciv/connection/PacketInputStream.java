@@ -33,10 +33,6 @@ public class PacketInputStream extends FilterInputStream {
     private Lock completeReflexesInOneStep;
     private final DataToPackets dataToPackets;
 
-    public PacketInputStream(InputStream in, Over state, Lock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond) {
-        this(in, state, completeReflexesInOneStep, packetHeaderClass, quickRespond, null);
-    }
-
     public PacketInputStream(InputStream in, Over state, Lock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode) {
         super(in);
 
