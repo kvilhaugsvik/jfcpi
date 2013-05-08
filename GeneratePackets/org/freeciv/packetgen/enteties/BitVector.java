@@ -75,14 +75,14 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
             List<? extends Var<? extends AValue>> pList = knowsSize ?
                     Arrays.asList(pFromByte) :
                     Arrays.asList(pFromByte, pSize);
-            Block constructorBody = new Block(new MethodCall<Returnable>("super", sizeForNotFromData, pFromByte.ref()));
+            Block constructorBody = new Block(BuiltIn.superConstr(sizeForNotFromData, pFromByte.ref()));
             if (!knowsSize)
                 constructorBody.addStatement(getField("size").assign(pSize.ref()));
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
         }
         {
             List<? extends Var<? extends AValue>> pList = Arrays.asList(pFromBits);
-            Block constructorBody = new Block(new MethodCall<Returnable>("super", pFromBits.ref()));
+            Block constructorBody = new Block(BuiltIn.superConstr(pFromBits.ref()));
             if (!knowsSize)
                 constructorBody.addStatement(getField("size").assign(pFromBits.ref().callV("length")));
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
@@ -91,7 +91,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
             List<? extends Var<? extends AValue>> pList = knowsSize ?
                     Arrays.asList(pFromBit) :
                     Arrays.asList(pFromBit, pSize);
-            Block constructorBody = new Block(new MethodCall<Returnable>("super", sizeForNotFromData, pFromBit.ref()));
+            Block constructorBody = new Block(BuiltIn.superConstr(sizeForNotFromData, pFromBit.ref()));
             if (!knowsSize)
                 constructorBody.addStatement(getField("size").assign(pSize.ref()));
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));

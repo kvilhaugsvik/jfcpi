@@ -104,7 +104,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         Var<ABool> paramValid = Var.param(boolean.class, "valid");
         addMethod(Method.newConstructor(Comment.no(),
                 Visibility.PRIVATE, Arrays.asList(paramNumber, paramToStrName),
-                new Block(new MethodCall<Returnable>("this", paramNumber.ref(), paramToStrName.ref(), TRUE))));
+                new Block(BuiltIn.thisConstr(paramNumber.ref(), paramToStrName.ref(), TRUE))));
         addMethod(Method.newConstructor(Comment.no(),
                 Visibility.PRIVATE, Arrays.asList(paramNumber, paramToStrName, paramValid),
                 new Block(fieldNumber.assign(paramNumber.ref()),

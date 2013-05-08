@@ -414,7 +414,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         "when data like this class and its user aren't compatible")),
                 Arrays.asList(streamName, argHeaderData, old),
                 Arrays.asList(TargetClass.from(FieldTypeException.class), TargetClass.from(BadProtocolData.class)),
-                new Block(new MethodCall("this",
+                new Block(BuiltIn.thisConstr(
                         streamName.ref(),
                         argHeaderData.ref().callV("newHeaderFromStream", streamName.ref()),
                         old.ref()))));
@@ -430,7 +430,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         "when data like this class and its user aren't compatible")),
                 Arrays.asList(bytes, argHeaderData, old),
                 Arrays.asList(TargetClass.from(FieldTypeException.class), TargetClass.from(BadProtocolData.class)),
-                new Block(new MethodCall("this",
+                new Block(BuiltIn.thisConstr(
                         TargetClass.from(DataInputStream.class)
                                 .newInstance(TargetClass.from(ByteArrayInputStream.class).newInstance(bytes.ref())),
                         argHeaderData.ref(),

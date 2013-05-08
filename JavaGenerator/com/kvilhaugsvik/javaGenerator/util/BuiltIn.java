@@ -31,6 +31,14 @@ public class BuiltIn {
     public static final TargetArray byteArray = TargetArray.from(byte[].class);
     public static final TargetArray boolArray = TargetArray.from(boolean[].class);
 
+    public static final Typed<NoValue> superConstr(Typed<? extends AValue>... args) {
+        return new MethodCall<NoValue>("super", args);
+    }
+
+    public static final Typed<NoValue> thisConstr(Typed<? extends AValue>... args) {
+        return new MethodCall<NoValue>("this", args);
+    }
+
     public static Typed<NoValue> THROW(final Class error, Typed<? extends AValue>... parms) {
         return THROW((TargetClass.from(error)).newInstance(parms));
     }
