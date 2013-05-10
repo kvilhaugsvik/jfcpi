@@ -35,10 +35,11 @@ public class PlayToServer {
     private static final String ADDRESS = "address";
     private static final String PORT = "port";
     private static final String IGNORE_TIME = "ignore-time";
+
     public static final LinkedList<Setting<?>> SETTINGS = new LinkedList<Setting<?>>() {{
         add(new Setting.StringSetting(TRACE_FILE,
                 ProxyRecorder.DEFAULT_TRACE_PREFIX + "0" + ProxyRecorder.DEFAULT_TRACE_SUFFIX,
-                "the file containing the trace to play back"));
+                "the file(s) containing the trace to play back. To specify many files separate them using ':'"));
         add(new Setting.StringSetting(ADDRESS, "127.0.0.1", "connect to the Freeciv server on this address"));
         add(new Setting.IntSetting(PORT, 5556, "connect to the Freeciv server on ths port"));
         add(new Setting.BoolSetting(IGNORE_TIME, false, "ignore time data in the trace"));
@@ -49,7 +50,7 @@ public class PlayToServer {
     private final Plumbing csPlumbing;
     private final Plumbing scPlumbing;
 
-    public PlayToServer(final InputStream source, Socket server, boolean ignoreDynamic) throws IOException, NoSuchMethodException {
+    public PlayToServer(final InputStream source, Socket server, boolean ignoreDynamic, FirstTimeRequest firstPlayedTime) throws IOException, NoSuchMethodException {
         final PacketsMapping versionKnowledge = new PacketsMapping();
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
@@ -74,7 +75,7 @@ public class PlayToServer {
                     e.printStackTrace();
                 }
             }
-        }, versionKnowledge, ignoreDynamic, true, false, System.currentTimeMillis()),
+        }, versionKnowledge, ignoreDynamic, true, false, firstPlayedTime.getTime()),
                 Arrays.asList(reaction, toServer), timeToExit);
         this.scPlumbing = new Plumbing(new SourceConn(conn, false), Arrays.asList(reaction), timeToExit);
     }
@@ -111,11 +112,18 @@ public class PlayToServer {
 
         UI.printAndExitOnHelp(settings, ProxyRecorder.class);
 
+        final FirstTimeRequest firstPlayedTime = new FirstTimeRequest();
+
+        for (String fileName : settings.<String>getSetting(TRACE_FILE).split(":"))
+            startPlayBack(settings, firstPlayedTime, fileName);
+    }
+
+    private static void startPlayBack(ArgumentSettings settings, FirstTimeRequest firstPlayedTime, String fileName) throws IOException, InvocationTargetException {
         final InputStream traceInn;
         try {
-            traceInn = new BufferedInputStream(new FileInputStream(settings.<String>getSetting(TRACE_FILE)));
+            traceInn = new BufferedInputStream(new FileInputStream(fileName));
         } catch (IOException e) {
-            System.err.println("Failed opening trace file " + settings.<String>getSetting(TRACE_FILE));
+            System.err.println("Failed opening trace file " + fileName);
             System.exit(1);
             return;
         }
@@ -132,7 +140,7 @@ public class PlayToServer {
 
         PlayToServer me;
         try {
-            me = new PlayToServer(traceInn, server, settings.<Boolean>getSetting(IGNORE_TIME));
+            me = new PlayToServer(traceInn, server, settings.<Boolean>getSetting(IGNORE_TIME), firstPlayedTime);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
