@@ -42,9 +42,10 @@ public class SourceTF2 implements Source {
         this.ignoreDynamic = ignoreDynamic;
         this.fromClient = fromClient;
         this.source = new TraceFormat2Read(source, over, new ReentrantLock(),
-                understand ? versionKnowledge : null,
+                versionKnowledge,
                 versionKnowledge.getNewPacketHeaderData(),
-                versionKnowledge.getRequiredPostReceiveRules());
+                versionKnowledge.getRequiredPostReceiveRules(),
+                understand);
 
         this.beganPlaying = beganPlayBack;
         this.sendNextAt = beganPlaying;

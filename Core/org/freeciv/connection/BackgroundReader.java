@@ -27,9 +27,9 @@ public class BackgroundReader extends Thread {
     private final Connection parent;
 
     public BackgroundReader(InputStream in, Connection parent, Lock completeReflexesInOneStep, ReflexPacketKind quickRespond,
-                            final HeaderData currentHeader, PacketsMapping protoCode)
+                            final HeaderData currentHeader, PacketsMapping protoCode, boolean interpreted)
             throws IOException {
-        this.in = new PacketInputStream(in, parent, completeReflexesInOneStep, currentHeader, quickRespond, protoCode);
+        this.in = new PacketInputStream(in, parent, completeReflexesInOneStep, currentHeader, quickRespond, protoCode, interpreted);
         this.parent = parent;
         this.buffered = new LinkedList<Packet>();
 

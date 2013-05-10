@@ -33,14 +33,14 @@ public class PacketInputStream extends FilterInputStream {
     private Lock completeReflexesInOneStep;
     private final DataToPackets dataToPackets;
 
-    public PacketInputStream(InputStream in, Over state, Lock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode) {
+    public PacketInputStream(InputStream in, Over state, Lock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode, boolean interpreted) {
         super(in);
 
         this.state = state;
         this.completeReflexesInOneStep = completeReflexesInOneStep;
         this.headerData = packetHeaderClass;
         this.quickRespond = quickRespond;
-        this.dataToPackets = null == protoCode ? new AlwaysRaw() : new InterpretWhenPossible(protoCode);
+        this.dataToPackets = interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw();
     }
 
     public Packet readPacket() throws IOException, InvocationTargetException {

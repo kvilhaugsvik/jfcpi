@@ -58,7 +58,8 @@ public class PrintTrace {
                     new ReentrantLock(),
                     packetsMapping,
                     packetsMapping.getNewPacketHeaderData(),
-                    packetsMapping.getRequiredPostSendRules()
+                    packetsMapping.getRequiredPostSendRules(),
+                    true
             );
 
             System.out.println(trace.getHumanReadableHeader());

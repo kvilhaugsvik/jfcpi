@@ -40,10 +40,10 @@ public class Plumbing extends Thread {
     }
 
     public static FreecivConnection socket2Connection(Socket connectedSocket, PacketsMapping versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
-        return Connection.interpreted(
+        return Connection.full(
                 connectedSocket.getInputStream(), connectedSocket.getOutputStream(),
                 versionKnowledge.getNewPacketHeaderData(),
-                postReceive, postSend, understand ? versionKnowledge : null);
+                postReceive, postSend, versionKnowledge, understand);
     }
 
     @Override

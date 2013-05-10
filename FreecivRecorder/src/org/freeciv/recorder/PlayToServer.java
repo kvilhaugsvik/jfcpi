@@ -58,7 +58,8 @@ public class PlayToServer {
         final FreecivConnection conn = Connection.uninterpreted(server.getInputStream(), server.getOutputStream(),
                 versionKnowledge.getNewPacketHeaderData(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
-                versionKnowledge.getRequiredPostSendRules());
+                versionKnowledge.getRequiredPostSendRules(),
+                versionKnowledge);
         Sink toServer = new SinkForward(conn, new FilterNot(new FilterOr(
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));
