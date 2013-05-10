@@ -135,6 +135,8 @@ public class ProxyRecorder {
     }
 
     private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections, Filter diskFilters, Filter forwardFilters, SinkInformUser.SharedData console, PacketsMapping versionKnowledge) throws InterruptedException, InvocationTargetException {
+        final FirstTimeRequest firstConnectionTime = new FirstTimeRequest();
+
         while (!timeToExit[0]) {
             final Socket client;
             try {
@@ -167,7 +169,7 @@ public class ProxyRecorder {
 
             try {
                 final ProxyRecorder proxy = new ProxyRecorder(client, server,
-                        getNewTrace(traceOut, connections.size(), settings, diskFilters),
+                        new SinkWriteTrace(diskFilters, traceOut, settings.<Boolean>getSetting(TRACE_DYNAMIC), connections.size(), firstConnectionTime.getTime()),
                         console.forConnection(connections.size()),
                         forwardFilters, settings, versionKnowledge);
                 connections.add(proxy);
@@ -177,10 +179,6 @@ public class ProxyRecorder {
                 continue; // Todo: Should this exit the program?
             }
         }
-    }
-
-    private static SinkWriteTrace getNewTrace(OutputStream trace, int proxyNumber, ArgumentSettings settings, Filter diskFilters) throws IOException {
-        return new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber, System.currentTimeMillis());
     }
 
     private static void failedAcceptingConnection(IOException e) {
