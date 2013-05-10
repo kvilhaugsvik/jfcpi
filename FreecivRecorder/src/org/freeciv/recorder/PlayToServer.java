@@ -115,7 +115,7 @@ public class PlayToServer {
         try {
             traceInn = new BufferedInputStream(new FileInputStream(settings.<String>getSetting(TRACE_FILE)));
         } catch (IOException e) {
-            System.err.println("Failed opening trace file " + TRACE_FILE);
+            System.err.println("Failed opening trace file " + settings.<String>getSetting(TRACE_FILE));
             System.exit(1);
             return;
         }
