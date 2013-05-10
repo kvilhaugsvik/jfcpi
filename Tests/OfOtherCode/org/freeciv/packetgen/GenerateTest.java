@@ -293,7 +293,7 @@ public class GenerateTest {
     private FieldType createFieldTypeSTRING() throws UndefinedException {
         return ((FieldType)Hardcoded.stringBasicFieldType
                 .produce(new Requirement("string(char)", FieldType.class),
-                        Constant.isInt("STRING_ENDER", IntExpression.integer("0")),
+                        Hardcoded.STRING_ENDER,
                         FC_DEFAULT_DATA_ENCODING)
         ).createFieldType("STRING");
     }
@@ -456,15 +456,13 @@ public class GenerateTest {
     }
 
     private void writeTerminatedArrayFieldArrayDiffElement(String targetFolder, FieldType uint8, FieldType uint32) throws IOException, UndefinedException {
-        final Constant<AnInt> diff_array_ender = Constant.isInt("DIFF_ARRAY_ENDER", IntExpression.integer("255"));
-
         Dependency.Item diffElementType = createUINT32DiffElementData(uint32);
         writeJavaFile((ClassWriter) diffElementType, targetFolder);
 
-        Dependency.Item diffElementField = createUINT32DiffElementField(uint8, diffElementType, uint32, diff_array_ender);
+        Dependency.Item diffElementField = createUINT32DiffElementField(uint8, diffElementType, uint32, Hardcoded.DIFF_ARRAY_ENDER);
         writeJavaFile((ClassWriter) diffElementField, targetFolder);
 
-        Dependency.Item diffArray = createUINT32DiffArray((FieldType)diffElementField, diff_array_ender);
+        Dependency.Item diffArray = createUINT32DiffArray((FieldType)diffElementField, Hardcoded.DIFF_ARRAY_ENDER);
         writeJavaFile((ClassWriter) diffArray, targetFolder);
     }
 
@@ -577,8 +575,10 @@ public class GenerateTest {
     }
 
     private void writeConstantClass(String targetFolder) throws IOException {
-        ArrayList<Dependency.Item> willBeSorted = new ArrayList<Dependency.Item>(Hardcoded.values());
+        ArrayList<Dependency.Item> willBeSorted = new ArrayList<Dependency.Item>();
 
+        willBeSorted.add(Hardcoded.DIFF_ARRAY_ENDER);
+        willBeSorted.add(Hardcoded.STRING_ENDER);
         willBeSorted.add(FC_DEFAULT_DATA_ENCODING);
 
         willBeSorted.add(PACKET_HEAD);

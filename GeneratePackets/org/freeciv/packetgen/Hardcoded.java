@@ -57,6 +57,10 @@ public class Hardcoded {
             throw new RuntimeException(e);
         }
     }
+    public static final Constant<AnInt> STRING_ENDER =
+            Constant.isInt("STRING_ENDER", IntExpression.integer("0"));
+    public static final Constant<AnInt> DIFF_ARRAY_ENDER =
+            Constant.isInt("DIFF_ARRAY_ENDER", IntExpression.integer("255"));
 
     private static final Collection<Dependency.Item> hardCodedElements = Arrays.<Dependency.Item>asList(
             new FieldType("uint32", "int", TargetClass.from(Long.class),
@@ -140,8 +144,8 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in constants
              ************************************************************************************************/
-            Constant.isInt("STRING_ENDER", IntExpression.integer("0")),
-            Constant.isInt("DIFF_ARRAY_ENDER", IntExpression.integer("255"))
+            STRING_ENDER,
+            DIFF_ARRAY_ENDER
     );
 
     public static final SimpleDependencyMaker stringBasicFieldType =
