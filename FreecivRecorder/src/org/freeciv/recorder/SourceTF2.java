@@ -56,8 +56,8 @@ public class SourceTF2 implements Source {
             rec = this.source.readRecord();
 
             while (rec.shouldBeIgnored() || fromClient != rec.isClientToServer()) {
+                rec = null; // remove the disqualified record in case the following read fails
                 rec = source.readRecord();
-                continue;
             }
 
             sendNextAt = source.isDynamic() && !ignoreDynamic ? beganPlaying + rec.getTimestamp() : sendNextAt + 1000;
