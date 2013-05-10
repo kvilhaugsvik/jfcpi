@@ -1,7 +1,6 @@
 FreecivRecorder
  * Merge all connections in one file
  * Make more of the filtering accessible from the command line
- * playRecord should be able to play many connections at once to make recording a game with many human players practical
 
 Core
  * Support compression properly
