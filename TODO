@@ -19,3 +19,4 @@ JavaGenerator
 Generally
  * Make the code more consistent by finishing or removing incomplete abstractions
  * Fix misleading names
+ * Improve speed (consider: nio, inlining generated code, compression, etc)
