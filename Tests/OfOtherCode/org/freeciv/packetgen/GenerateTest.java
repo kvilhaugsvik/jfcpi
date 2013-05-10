@@ -18,7 +18,10 @@
 package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.dependency.UndefinedException;
+import com.kvilhaugsvik.javaGenerator.expression.ArrayLiteral;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.packet.Header_2_1;
@@ -30,6 +33,7 @@ import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.Enum;
 import org.freeciv.packetgen.enteties.supporting.*;
 import com.kvilhaugsvik.javaGenerator.*;
+import org.freeciv.utility.Util;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -42,6 +46,35 @@ import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newInva
 public class GenerateTest {
     public static final Constant<AString> FC_DEFAULT_DATA_ENCODING =
             Constant.isString("FC_DEFAULT_DATA_ENCODING", BuiltIn.literal("UTF-8"));
+
+    public static final Constant<? extends AValue> PACKET_HEAD =
+            Constant.isClass(Util.HEADER_NAME, TargetClass.from(Header_2_2.class).callV("class"));
+    public static final Constant<? extends AValue> ENABLE_DELTA =
+            Constant.isBool("enableDelta", BuiltIn.literal(true));
+    public static final Constant<? extends AValue> ENABLE_DELTA_BOOL_FOLD =
+            Constant.isBool("enableDeltaBoolFolding", BuiltIn.literal(true));
+    public static final Constant<? extends AValue> RULES = Constant.isOther(
+            TargetArray.from(TargetClass.from(org.freeciv.connection.ReflexRule.class), 1),
+            Util.RULES_NAME,
+            new ArrayLiteral(new Typed[0]));
+
+    public static final Constant<AString> NETWORK_CAPSTRING_MANDATORY =
+            Constant.isString("NETWORK_CAPSTRING_MANDATORY", BuiltIn.literal("TestData"));
+    public static final Constant<AString> NETWORK_CAPSTRING_OPTIONAL =
+            Constant.isString("NETWORK_CAPSTRING_OPTIONAL", BuiltIn.literal(""));
+    public static final Constant<AString> VERSION_LABEL =
+            Constant.isString("VERSION_LABEL", BuiltIn.literal(""));
+    public static final Constant<AString> MAJOR_VERSION =
+            Constant.isString("MAJOR_VERSION", BuiltIn.literal("0"));
+    public static final Constant<AString> MINOR_VERSION =
+            Constant.isString("MINOR_VERSION", BuiltIn.literal("0"));
+    public static final Constant<AString> PATCH_VERSION =
+            Constant.isString("PATCH_VERSION", BuiltIn.literal("0"));
+
+    public static final Constant<AnInt> COMPRESSION_BORDER =
+            Constant.isInt("COMPRESSION_BORDER", IntExpression.integer("16000"));
+    public static final Constant<AnInt> JUMBO_SIZE =
+            Constant.isInt("JUMBO_SIZE", IntExpression.integer("0xffff"));
 
     public static void main(String[] args) throws IOException, UndefinedException {
         (new GenerateTest()).generate(args);
@@ -545,14 +578,28 @@ public class GenerateTest {
 
     private void writeConstantClass(String targetFolder) throws IOException {
         ArrayList<Dependency.Item> willBeSorted = new ArrayList<Dependency.Item>(Hardcoded.values());
+
         willBeSorted.add(FC_DEFAULT_DATA_ENCODING);
 
+        willBeSorted.add(PACKET_HEAD);
+        willBeSorted.add(ENABLE_DELTA);
+        willBeSorted.add(ENABLE_DELTA_BOOL_FOLD);
+        willBeSorted.add(RULES);
+
+        willBeSorted.add(NETWORK_CAPSTRING_MANDATORY);
+        willBeSorted.add(NETWORK_CAPSTRING_OPTIONAL);
+        willBeSorted.add(VERSION_LABEL);
+        willBeSorted.add(MAJOR_VERSION);
+        willBeSorted.add(MINOR_VERSION);
+        willBeSorted.add(PATCH_VERSION);
+
+        willBeSorted.add(COMPRESSION_BORDER);
+        willBeSorted.add(JUMBO_SIZE);
+
         Set<Constant> constants = new TreeSet<Constant>(new TotalOrderNoCircles(willBeSorted));
-        for (Dependency.Item stringEnd : Hardcoded.values())
+        for (Dependency.Item stringEnd : willBeSorted)
             if (stringEnd instanceof Constant)
                 constants.add((Constant)stringEnd);
-
-        constants.add(FC_DEFAULT_DATA_ENCODING);
 
         TreeMap<Integer, TargetClass> packets = new TreeMap<Integer, TargetClass>();
         packets.put(926, TargetClass.from("org.freeciv.packet", "TestArray"));
