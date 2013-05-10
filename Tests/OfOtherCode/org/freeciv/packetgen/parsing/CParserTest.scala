@@ -356,6 +356,10 @@ class CParserSyntaxTest {
 """
     assertParesSuccess(input, parser.parse(parser.expr, new parser.PackratReader(new CharArrayReader(input.toArray))))
   }
+  @Test def constantDefinedSimpleHexNumber =
+    parsesCorrectly("#define SIMPLE 0x50", ParseCCode)
+  @Test def constantDefinedOtherSimpleHexNumber =
+    parsesCorrectly("#define SIMPLE 0xa4", ParseCCode)
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of typedefs
