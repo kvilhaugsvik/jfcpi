@@ -37,6 +37,8 @@ public class PacketsMapping {
     private final long versionMajor;
     private final long versionMinor;
     private final long versionPatch;
+    private final int compressionBorder;
+    private final int jumboSize;
 
     public PacketsMapping() {
         try {
@@ -45,12 +47,16 @@ public class PacketsMapping {
             packetNumberBytes =
                     (Class<? extends PacketHeader>) constants.getField(Util.HEADER_NAME).get(null);
             this.isDeltaEnabled = constants.getField("enableDelta").getBoolean(null);
+
             capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
             capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
             versionLabel = (String)constants.getField("VERSION_LABEL").get(null);
             versionMajor = Long.parseLong((String)constants.getField("MAJOR_VERSION").get(null));
             versionMinor = Long.parseLong((String)constants.getField("MINOR_VERSION").get(null));
             versionPatch = Long.parseLong((String)constants.getField("PATCH_VERSION").get(null));
+
+            this.compressionBorder = constants.getField("COMPRESSION_BORDER").getInt(null);
+            this.jumboSize = constants.getField("JUMBO_SIZE").getInt(null);
 
             for (Class understood : understoodPackets) {
                 try {
@@ -148,5 +154,13 @@ public class PacketsMapping {
 
     public long getVersionPatch() {
         return versionPatch;
+    }
+
+    public int getJumboSize() {
+        return jumboSize;
+    }
+
+    public int getCompressionBorder() {
+        return compressionBorder;
     }
 }
