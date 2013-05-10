@@ -29,7 +29,7 @@ class SinkWriteTrace extends Sink {
     private final DataOutputStream traceFile;
     private final OverImpl over;
 
-    public SinkWriteTrace(Filter filter, OutputStream traceFile, boolean isDynamic, int id) throws IOException {
+    public SinkWriteTrace(Filter filter, OutputStream traceFile, boolean isDynamic, int id, long recordStartedAt) throws IOException {
         super(filter);
 
         this.id = id;
@@ -44,7 +44,7 @@ class SinkWriteTrace extends Sink {
         };
 
         try {
-            header = new HeaderTF2(System.currentTimeMillis(), isDynamic, false, id);
+            header = new HeaderTF2(recordStartedAt, isDynamic, false, id);
             header.write(this.traceFile);
         } catch (IOException e) {
             throw new IOException(id + ": Unable to write trace headers", e);

@@ -180,7 +180,7 @@ public class ProxyRecorder {
     }
 
     private static SinkWriteTrace getNewTrace(OutputStream trace, int proxyNumber, ArgumentSettings settings, Filter diskFilters) throws IOException {
-        return new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber);
+        return new SinkWriteTrace(diskFilters, trace, settings.<Boolean>getSetting(TRACE_DYNAMIC), proxyNumber, System.currentTimeMillis());
     }
 
     private static void failedAcceptingConnection(IOException e) {

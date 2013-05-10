@@ -37,7 +37,7 @@ public class SourceTF2 implements Source {
     private long sendNextAt;
     private RecordTF2 rec;
 
-    public SourceTF2(InputStream source, Over over, PacketsMapping versionKnowledge, boolean ignoreDynamic, boolean fromClient, boolean understand) throws IOException {
+    public SourceTF2(InputStream source, Over over, PacketsMapping versionKnowledge, boolean ignoreDynamic, boolean fromClient, boolean understand, long beganPlayBack) throws IOException {
         this.over = over;
         this.ignoreDynamic = ignoreDynamic;
         this.fromClient = fromClient;
@@ -46,7 +46,7 @@ public class SourceTF2 implements Source {
                 versionKnowledge.getNewPacketHeaderData(),
                 versionKnowledge.getRequiredPostReceiveRules());
 
-        this.beganPlaying = System.currentTimeMillis();
+        this.beganPlaying = beganPlayBack;
         this.sendNextAt = beganPlaying;
         this.rec = null;
     }
