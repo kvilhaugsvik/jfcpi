@@ -63,7 +63,7 @@ public class PacketInputStream extends FilterInputStream {
         return dataToPackets.convert(head, packet);
     }
 
-    private static byte[] readXBytesFrom(int wanted, byte[] start, InputStream from, Over state)
+    public static byte[] readXBytesFrom(int wanted, byte[] start, InputStream from, Over state)
             throws IOException {
         assert 0 <= wanted : "Can't read a negative number of bytes";
 
