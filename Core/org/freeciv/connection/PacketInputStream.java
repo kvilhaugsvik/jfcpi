@@ -25,6 +25,7 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PacketInputStream extends FilterInputStream {
     private final Over state;
@@ -32,10 +33,10 @@ public class PacketInputStream extends FilterInputStream {
     private final int COMPRESSION_BORDER;
     private final int JUMBO_SIZE;
     private final ReflexPacketKind quickRespond;
-    private Lock completeReflexesInOneStep;
+    private ReentrantLock completeReflexesInOneStep;
     private final DataToPackets dataToPackets;
 
-    public PacketInputStream(InputStream in, Over state, Lock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode, boolean interpreted) {
+    public PacketInputStream(InputStream in, Over state, ReentrantLock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode, boolean interpreted) {
         super(in);
 
         this.state = state;

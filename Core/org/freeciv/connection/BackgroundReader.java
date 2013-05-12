@@ -20,13 +20,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BackgroundReader extends Thread {
     private final PacketInputStream in;
     private final LinkedList<Packet> buffered;
     private final Connection parent;
 
-    public BackgroundReader(InputStream in, Connection parent, Lock completeReflexesInOneStep, ReflexPacketKind quickRespond,
+    public BackgroundReader(InputStream in, Connection parent, ReentrantLock completeReflexesInOneStep, ReflexPacketKind quickRespond,
                             final HeaderData currentHeader, PacketsMapping protoCode, boolean interpreted)
             throws IOException {
         this.in = new PacketInputStream(in, parent, completeReflexesInOneStep, currentHeader, quickRespond, protoCode, interpreted);

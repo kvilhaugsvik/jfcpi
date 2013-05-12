@@ -29,7 +29,7 @@ public class Connection implements FreecivConnection {
     private final OutputStream out;
 
     private final OverImpl overImpl;
-    private final Lock completeReflexesInOneStep;
+    private final ReentrantLock completeReflexesInOneStep;
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
 
