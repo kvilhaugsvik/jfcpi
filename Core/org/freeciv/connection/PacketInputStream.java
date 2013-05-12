@@ -29,6 +29,8 @@ import java.util.concurrent.locks.Lock;
 public class PacketInputStream extends FilterInputStream {
     private final Over state;
     private final HeaderData headerData;
+    private final int COMPRESSION_BORDER;
+    private final int JUMBO_SIZE;
     private final ReflexPacketKind quickRespond;
     private Lock completeReflexesInOneStep;
     private final DataToPackets dataToPackets;
@@ -39,6 +41,9 @@ public class PacketInputStream extends FilterInputStream {
         this.state = state;
         this.completeReflexesInOneStep = completeReflexesInOneStep;
         this.headerData = packetHeaderClass;
+        this.COMPRESSION_BORDER = protoCode.getCompressionBorder();
+        this.JUMBO_SIZE = protoCode.getJumboSize();
+
         this.quickRespond = quickRespond;
         this.dataToPackets = interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw();
     }
