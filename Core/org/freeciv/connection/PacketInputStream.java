@@ -14,17 +14,12 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.SocketException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class PacketInputStream extends FilterInputStream {
@@ -34,7 +29,7 @@ public class PacketInputStream extends FilterInputStream {
     private final int JUMBO_SIZE;
     private final ReflexPacketKind quickRespond;
     private ReentrantLock completeReflexesInOneStep;
-    private final DataToPackets dataToPackets;
+    private final ToPacket toPacket;
 
     public PacketInputStream(InputStream in, Over state, ReentrantLock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode, boolean interpreted) {
         super(in);
@@ -46,7 +41,7 @@ public class PacketInputStream extends FilterInputStream {
         this.JUMBO_SIZE = protoCode.getJumboSize();
 
         this.quickRespond = quickRespond;
-        this.dataToPackets = interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw();
+        this.toPacket = interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw();
     }
 
     public Packet readPacket() throws IOException, InvocationTargetException {
@@ -66,7 +61,7 @@ public class PacketInputStream extends FilterInputStream {
             completeReflexesInOneStep.unlock();
         }
 
-        return dataToPackets.convert(head, packet);
+        return toPacket.convert(head, packet);
     }
 
     public static byte[] readXBytesFrom(int wanted, byte[] start, InputStream from, Over state)
@@ -107,39 +102,4 @@ public class PacketInputStream extends FilterInputStream {
                     "Read " + alreadyRead + " of " + wanted + " bytes");
     }
 
-    private static interface DataToPackets {
-        Packet convert(PacketHeader head, byte[] remaining);
-    }
-
-    private static class AlwaysRaw implements DataToPackets {
-        @Override
-        public Packet convert(PacketHeader head, byte[] packet) {
-            return new RawPacket(packet, head);
-        }
-    }
-
-    private static class InterpretWhenPossible implements DataToPackets {
-        private final PacketsMapping map;
-        private final Map<DeltaKey, Packet> old;
-
-        private InterpretWhenPossible(PacketsMapping map) {
-            this.map = map;
-            this.old = new HashMap<DeltaKey, Packet>();
-        }
-
-        @Override
-        public Packet convert(PacketHeader head, byte[] packet) {
-            try {
-                DataInputStream body = new DataInputStream(new ByteArrayInputStream(packet));
-
-                int toSkip = head.getHeaderSize();
-                while (0 < toSkip)
-                    toSkip = toSkip - body.skipBytes(toSkip);
-
-                return map.interpret(head, body, old);
-            } catch (IOException e) {
-                return new RawPacket(packet, head);
-            }
-        }
-    }
 }
