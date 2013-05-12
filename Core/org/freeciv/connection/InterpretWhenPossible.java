@@ -48,4 +48,17 @@ public class InterpretWhenPossible implements ToPacket {
             return new RawPacket(packet, head);
         }
     }
+
+    @Override
+    public Packet convert(byte[] packet, HeaderData headerData) {
+        try {
+            DataInputStream entirePacket = new DataInputStream(new ByteArrayInputStream(packet));
+
+            PacketHeader head = headerData.newHeaderFromStream(entirePacket);
+
+            return map.interpret(head, entirePacket, old);
+        } catch (IOException e) {
+            return new RawPacket(packet, headerData);
+        }
+    }
 }

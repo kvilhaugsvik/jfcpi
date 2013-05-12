@@ -23,4 +23,9 @@ public class AlwaysRaw implements ToPacket {
     public Packet convert(PacketHeader head, byte[] packet) {
         return new RawPacket(packet, head);
     }
+
+    @Override
+    public Packet convert(byte[] packet, HeaderData headerData) {
+        return new RawPacket(packet, headerData);
+    }
 }

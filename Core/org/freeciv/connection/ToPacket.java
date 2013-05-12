@@ -18,5 +18,8 @@ import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 
 public interface ToPacket {
+    @Deprecated
     public Packet convert(PacketHeader head, byte[] remaining);
+
+    public Packet convert(byte[] packet, HeaderData headerData);
 }
