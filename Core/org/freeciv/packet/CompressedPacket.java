@@ -20,9 +20,9 @@ import org.freeciv.utility.Util;
 
 import java.io.*;
 
-public class CompressedPacket implements Packet {
-    private final byte[] content;
-    private final PacketHeader header;
+public abstract class CompressedPacket implements Packet {
+    protected final byte[] content;
+    protected final PacketHeader header;
     private final boolean jumbo;
 
     public CompressedPacket(final int startSize, Over state, InputStream in,
