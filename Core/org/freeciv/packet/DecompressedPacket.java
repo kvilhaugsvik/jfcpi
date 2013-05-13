@@ -15,7 +15,6 @@
 package org.freeciv.packet;
 
 import org.freeciv.connection.*;
-import org.freeciv.utility.Util;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +27,6 @@ public class DecompressedPacket extends CompressedPacket {
     final LinkedList<Packet> subPackets;
     public DecompressedPacket(final int startSize, Over state, InputStream in,
                               final int COMPRESSION_BORDER, final int JUMBO_SIZE,
-                              ReentrantLock completeReflexesInOneStep,
                               final HeaderData headerData,
                               ReflexPacketKind quickRespond,
                               PacketsMapping protoCode,
@@ -43,7 +41,6 @@ public class DecompressedPacket extends CompressedPacket {
                 new OverImpl() {
                     @Override protected void whenDoneImpl() {}
                 },
-                completeReflexesInOneStep,
                 headerData,
                 quickRespond,
                 protoCode,

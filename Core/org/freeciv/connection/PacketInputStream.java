@@ -20,7 +20,6 @@ import org.freeciv.packet.PacketHeader;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.SocketException;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class PacketInputStream extends FilterInputStream {
     private final Over state;
@@ -28,14 +27,12 @@ public class PacketInputStream extends FilterInputStream {
     private final int COMPRESSION_BORDER;
     private final int JUMBO_SIZE;
     private final ReflexPacketKind quickRespond;
-    private ReentrantLock completeReflexesInOneStep;
     private final ToPacket toPacket;
 
-    public PacketInputStream(InputStream in, Over state, ReentrantLock completeReflexesInOneStep, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode, boolean interpreted) {
+    public PacketInputStream(InputStream in, Over state, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode, boolean interpreted) {
         super(in);
 
         this.state = state;
-        this.completeReflexesInOneStep = completeReflexesInOneStep;
         this.headerData = packetHeaderClass;
         this.COMPRESSION_BORDER = protoCode.getCompressionBorder();
         this.JUMBO_SIZE = protoCode.getJumboSize();
@@ -50,7 +47,7 @@ public class PacketInputStream extends FilterInputStream {
 
         final PacketHeader head;
         final byte[] packet;
-        completeReflexesInOneStep.lock();
+        quickRespond.startedReceivingOrSending();
         try {
             packet = readXBytesFrom(size - 2, start, in, state);
 
@@ -58,7 +55,7 @@ public class PacketInputStream extends FilterInputStream {
 
             quickRespond.handle(head.getPacketKind());
         } finally {
-            completeReflexesInOneStep.unlock();
+            quickRespond.finishedRunningTheReflexes();
         }
 
         return toPacket.convert(head, packet);

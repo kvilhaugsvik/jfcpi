@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class PrintTrace {
     private static final String TRACE_FILE = "file";
@@ -55,7 +54,6 @@ public class PrintTrace {
                             // clean up by hand
                         }
                     },
-                    new ReentrantLock(),
                     packetsMapping,
                     packetsMapping.getNewPacketHeaderData(),
                     packetsMapping.getRequiredPostSendRules(),

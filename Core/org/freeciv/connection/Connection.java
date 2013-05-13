@@ -21,7 +21,6 @@ import org.freeciv.packet.PacketHeader;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Connection implements FreecivConnection {
@@ -29,7 +28,6 @@ public class Connection implements FreecivConnection {
     private final OutputStream out;
 
     private final OverImpl overImpl;
-    private final ReentrantLock completeReflexesInOneStep;
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
 
@@ -61,10 +59,10 @@ public class Connection implements FreecivConnection {
                 }
             }
         };
-        this.completeReflexesInOneStep = new ReentrantLock();
+        final ReentrantLock completeReflexesInOneStep = new ReentrantLock();
         this.in = new BackgroundReader(inn, this,
-                completeReflexesInOneStep, new ReflexPacketKind(postReceive, this), currentHeader, protoCode, interpreted);
-        this.postSend = new ReflexPacketKind(postSend, this);
+                new ReflexPacketKind(postReceive, this, completeReflexesInOneStep), currentHeader, protoCode, interpreted);
+        this.postSend = new ReflexPacketKind(postSend, this, completeReflexesInOneStep);
 
         this.in.start();
     }
@@ -127,7 +125,7 @@ public class Connection implements FreecivConnection {
 
         toSend.encodeTo(packet);
 
-        completeReflexesInOneStep.lock();
+        this.postSend.startedReceivingOrSending();
         try {
             out.write(packetSerialized.toByteArray());
             this.postSend.handle(toSend.getHeader().getPacketKind());
@@ -136,7 +134,7 @@ public class Connection implements FreecivConnection {
             whenDone();
             throw new IOException("Can't send", e);
         } finally {
-            completeReflexesInOneStep.unlock();
+            this.postSend.finishedRunningTheReflexes();
         }
     }
 

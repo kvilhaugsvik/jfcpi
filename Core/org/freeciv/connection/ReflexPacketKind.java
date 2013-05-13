@@ -16,12 +16,15 @@ package org.freeciv.connection;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ReflexPacketKind<WorksOn extends ConnectionRelated> {
     private final HashMap<Integer, ReflexReaction> quickRespond;
     private final WorksOn owner;
+    private final ReentrantLock noReadBeforeWriteAndReflexesAreDone;
 
-    public ReflexPacketKind(Map<Integer, ReflexReaction<WorksOn>> reflexes, WorksOn owner) {
+    public ReflexPacketKind(Map<Integer, ReflexReaction<WorksOn>> reflexes, WorksOn owner, ReentrantLock noReadBeforeWriteAndReflexesAreDone) {
+        this.noReadBeforeWriteAndReflexesAreDone = noReadBeforeWriteAndReflexesAreDone;
         this.owner = owner;
         this.quickRespond = new HashMap<Integer, ReflexReaction>(reflexes);
     }
@@ -29,6 +32,14 @@ public class ReflexPacketKind<WorksOn extends ConnectionRelated> {
     public void handle(int packetKindNumber) {
         if (quickRespond.containsKey(packetKindNumber))
             quickRespond.get(packetKindNumber).apply(owner);
+    }
+
+    public void startedReceivingOrSending() {
+        noReadBeforeWriteAndReflexesAreDone.lock();
+    }
+
+    public void finishedRunningTheReflexes() {
+        noReadBeforeWriteAndReflexesAreDone.unlock();
     }
 
     public static Map<Integer, ReflexReaction> layer(

@@ -24,7 +24,6 @@ import org.freeciv.recorder.traceFormat2.TraceFormat2Read;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class SourceTF2 implements Source {
     private final boolean ignoreDynamic;
@@ -41,7 +40,7 @@ public class SourceTF2 implements Source {
         this.over = over;
         this.ignoreDynamic = ignoreDynamic;
         this.fromClient = fromClient;
-        this.source = new TraceFormat2Read(source, over, new ReentrantLock(),
+        this.source = new TraceFormat2Read(source, over,
                 versionKnowledge,
                 versionKnowledge.getNewPacketHeaderData(),
                 versionKnowledge.getRequiredPostReceiveRules(),
