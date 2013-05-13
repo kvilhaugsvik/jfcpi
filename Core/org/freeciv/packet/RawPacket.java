@@ -27,12 +27,16 @@ public class RawPacket implements Packet {
 
     public RawPacket(byte[] packet, HeaderData stream2Header) {
         this.header = stream2Header.newHeaderFromStream(new DataInputStream(new ByteArrayInputStream(packet)));
-        this.content = Arrays.copyOfRange(packet, header.getHeaderSize(), packet.length);
+        this.content = getBodyBytes(packet, header);
     }
 
     public RawPacket(byte[] packet, PacketHeader header) {
         this.header = header;
-        this.content = Arrays.copyOfRange(packet, header.getHeaderSize(), packet.length);
+        this.content = getBodyBytes(packet, header);
+    }
+
+    private byte[] getBodyBytes(byte[] packet, PacketHeader header) {
+        return Arrays.copyOfRange(packet, header.getHeaderSize(), header.getTotalSize());
     }
 
     public PacketHeader getHeader() {
