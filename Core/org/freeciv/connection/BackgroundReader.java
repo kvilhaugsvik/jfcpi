@@ -28,6 +28,7 @@ public class BackgroundReader extends Thread {
     private final ToPacket toPacket;
     private final HeaderData headerData;
     private final ReflexPacketKind quickRespond;
+    private final PacketsMapping protoCode;
 
     public BackgroundReader(InputStream in, Connection parent, ReflexPacketKind quickRespond,
                             final HeaderData currentHeader, PacketsMapping protoCode, boolean interpreted)
@@ -38,6 +39,7 @@ public class BackgroundReader extends Thread {
         this.toPacket = interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw();
         this.headerData = currentHeader;
         this.quickRespond = quickRespond;
+        this.protoCode = protoCode;
 
         this.setDaemon(true);
     }
@@ -46,14 +48,7 @@ public class BackgroundReader extends Thread {
     public void run() {
         try {
             while(true) {
-                final byte[] start = PacketInputStream.readXBytesFrom(2, new byte[0], in, parent);
-                final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
-
-                SerializedPacketGroup incoming;
-                {
-                    final byte[] packet = PacketInputStream.readXBytesFrom(size - 2, start, in, parent);
-                    incoming = new SerializedSinglePacket(packet, toPacket, headerData, quickRespond);
-                }
+                SerializedPacketGroup incoming = readSerializedPacketGroup();
 
                 synchronized (buffered) {
                     incoming.putPackets(buffered);
@@ -68,6 +63,24 @@ public class BackgroundReader extends Thread {
             parent.setStopReadingWhenOutOfInput();
             parent.whenDone();
         }
+    }
+
+    private SerializedPacketGroup readSerializedPacketGroup() throws IOException {
+        final byte[] start = PacketInputStream.readXBytesFrom(2, new byte[0], in, parent);
+        final int startSize = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
+
+        if (startSize < protoCode.getCompressionBorder()) {
+            final byte[] packet = readNormalPacket(start, startSize);
+            return new SerializedSinglePacket(packet, toPacket, headerData, quickRespond);
+        } else if (startSize < protoCode.getJumboSize()) {
+            throw new UnsupportedOperationException("Compressed packets not supported");
+        } else {
+            throw new UnsupportedOperationException("Compressed packets not supported");
+        }
+    }
+
+    private byte[] readNormalPacket(byte[] start, int startSize) throws IOException {
+        return PacketInputStream.readXBytesFrom(startSize - 2, start, in, parent);
     }
 
     public boolean hasPacket() {
