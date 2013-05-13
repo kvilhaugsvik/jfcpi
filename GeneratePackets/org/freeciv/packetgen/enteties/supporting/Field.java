@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import org.freeciv.packet.fieldtype.*;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.UndefinedException;
@@ -21,7 +22,6 @@ import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
-import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
@@ -64,8 +64,19 @@ public class Field<Kind extends AValue> extends Var<Kind> {
                 annotations.add(new Annotate(Key.class));
             else if ("diff".equals(flag.getName()))
                 annotations.add(new Annotate(ArrayDiff.class));
+            else if ("add-cap".equals(flag.getName()))
+                annotations.add(capAnnotate(flag, CapAdd.class));
+            else if ("remove-cap".equals(flag.getName()))
+                annotations.add(capAnnotate(flag, CapRemove.class));
 
         return annotations;
+    }
+
+    private static Annotate capAnnotate(WeakFlag flag, Class<?> annotation) {
+        assert 1 == flag.getArguments().length :
+                "Unexpected number of capability arguments (" + flag.getArguments().length + ")";
+        return new Annotate(annotation,
+                Reference.SetTo.strToVal("value", BuiltIn.literal(flag.getArguments()[0])));
     }
 
     private static ArrayDeclaration[] decWeakToStrong(WeakField.ArrayDeclaration[] declarations,
