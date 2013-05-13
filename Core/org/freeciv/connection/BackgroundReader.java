@@ -23,17 +23,16 @@ import java.util.LinkedList;
 public class BackgroundReader extends Thread {
     private final InputStream in;
     private final LinkedList<Packet> buffered;
-    private final Connection parent;
+    private final Over parent;
 
     private final SerializedPacketGroup.SeparateSerializedPacketGroups separator;
 
-    public BackgroundReader(InputStream in, Connection parent, ReflexPacketKind quickRespond,
-                            final HeaderData currentHeader, PacketsMapping protoCode, boolean interpreted)
+    public BackgroundReader(InputStream in, Connection parent, SerializedCompressedPackets.SeparateSerializedPacketGroups splitter)
             throws IOException {
         this.in = in;
         this.parent = parent;
         this.buffered = new LinkedList<Packet>();
-        this.separator = new RawFCProto(parent, interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw(), currentHeader, quickRespond, protoCode);
+        this.separator = splitter;
 
         this.setDaemon(true);
     }

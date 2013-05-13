@@ -36,8 +36,7 @@ public class Connection implements FreecivConnection {
             final HeaderData headerData,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            PacketsMapping protoCode,
-            boolean interpreted
+            PacketsMapping protoCode, ToPacket toPacket
     ) throws IOException {
         this.currentHeader = headerData;
         this.out = out;
@@ -59,8 +58,9 @@ public class Connection implements FreecivConnection {
             }
         };
         final ReentrantLock completeReflexesInOneStep = new ReentrantLock();
+        final ReflexPacketKind quickRespond = new ReflexPacketKind(postReceive, this, completeReflexesInOneStep);
         this.in = new BackgroundReader(inn, this,
-                new ReflexPacketKind(postReceive, this, completeReflexesInOneStep), currentHeader, protoCode, interpreted);
+                new RawFCProto(this, toPacket, currentHeader, quickRespond, protoCode));
         this.postSend = new ReflexPacketKind(postSend, this, completeReflexesInOneStep);
 
         this.in.start();
@@ -75,7 +75,8 @@ public class Connection implements FreecivConnection {
             PacketsMapping protoCode,
             boolean interpreted
     ) throws IOException {
-        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, interpreted);
+        return new Connection(inn, out, headerData, postReceive, postSend, protoCode,
+                interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw());
     }
 
     public static Connection interpreted(
@@ -86,7 +87,7 @@ public class Connection implements FreecivConnection {
             final Map<Integer, ReflexReaction> postSend,
             PacketsMapping protoCode
     ) throws IOException {
-        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, true);
+        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, new InterpretWhenPossible(protoCode));
     }
 
     public static Connection uninterpreted(
@@ -97,7 +98,7 @@ public class Connection implements FreecivConnection {
             final Map<Integer, ReflexReaction> postSend,
             final PacketsMapping protoCode
     ) throws IOException {
-        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, false);
+        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, new AlwaysRaw());
     }
 
     public boolean packetReady() {
