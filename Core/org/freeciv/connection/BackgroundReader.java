@@ -80,11 +80,11 @@ public class BackgroundReader extends Thread {
         } else if (startSize < protoCode.getJumboSize()) {
             final byte[] packet = readNormalPacket(start, startSize - protoCode.getCompressionBorder());
 
-            throw new UnsupportedOperationException("Compressed packets not supported");
+            return new SerializedCompressedPackets(packet, false, protoCode, toPacket, headerData, quickRespond);
         } else {
             final byte[] packet = readJumboPacket(start);
 
-            throw new UnsupportedOperationException("Compressed packets not supported");
+            return new SerializedCompressedPackets(packet, true, protoCode, toPacket, headerData, quickRespond);
         }
     }
 

@@ -2,9 +2,6 @@ FreecivRecorder
  * Merge all connections in one file
  * Make more of the filtering accessible from the command line
 
-Core
- * Support compression properly
-
 GeneratePackets
  * Handle all of array diff so the field is stored as a normal array
  * Continue making code generation more typed
