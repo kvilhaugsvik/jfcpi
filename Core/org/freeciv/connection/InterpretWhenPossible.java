@@ -29,7 +29,7 @@ public class InterpretWhenPossible implements ToPacket {
     private final PacketsMapping map;
     private final Map<DeltaKey, Packet> old;
 
-    InterpretWhenPossible(PacketsMapping map) {
+    public InterpretWhenPossible(PacketsMapping map) {
         this.map = map;
         this.old = new HashMap<DeltaKey, Packet>();
     }

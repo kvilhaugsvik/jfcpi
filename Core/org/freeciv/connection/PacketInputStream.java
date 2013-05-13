@@ -14,53 +14,10 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Packet;
-import org.freeciv.packet.PacketHeader;
-
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.net.SocketException;
 
-public class PacketInputStream extends FilterInputStream {
-    private final Over state;
-    private final HeaderData headerData;
-    private final int COMPRESSION_BORDER;
-    private final int JUMBO_SIZE;
-    private final ReflexPacketKind quickRespond;
-    private final ToPacket toPacket;
-
-    public PacketInputStream(InputStream in, Over state, final HeaderData packetHeaderClass, ReflexPacketKind quickRespond, PacketsMapping protoCode, boolean interpreted) {
-        super(in);
-
-        this.state = state;
-        this.headerData = packetHeaderClass;
-        this.COMPRESSION_BORDER = protoCode.getCompressionBorder();
-        this.JUMBO_SIZE = protoCode.getJumboSize();
-
-        this.quickRespond = quickRespond;
-        this.toPacket = interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw();
-    }
-
-    public Packet readPacket() throws IOException, InvocationTargetException {
-        final byte[] start = readXBytesFrom(2, new byte[0], in, state);
-        final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
-
-        final PacketHeader head;
-        final byte[] packet;
-        quickRespond.startedReceivingOrSending();
-        try {
-            packet = readXBytesFrom(size - 2, start, in, state);
-
-            head = headerData.newHeaderFromStream(new DataInputStream(new ByteArrayInputStream(packet)));
-
-            quickRespond.handle(head.getPacketKind());
-        } finally {
-            quickRespond.finishedRunningTheReflexes();
-        }
-
-        return toPacket.convert(head, packet);
-    }
-
+public class PacketInputStream {
     public static byte[] readXBytesFrom(int wanted, byte[] start, InputStream from, Over state)
             throws IOException {
         assert 0 <= wanted : "Can't read a negative number of bytes";
@@ -98,5 +55,4 @@ public class PacketInputStream extends FilterInputStream {
             return new EOFException("Nothing to read and nothing is waiting." +
                     "Read " + alreadyRead + " of " + wanted + " bytes");
     }
-
 }

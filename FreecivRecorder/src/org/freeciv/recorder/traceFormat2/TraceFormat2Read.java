@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class TraceFormat2Read {
-    private final PacketInputStream inAsPacket;
+    private final RawFCProto interpret;
     private final DataInputStream inAsData;
 
     private final HeaderTF2 header;
@@ -35,9 +35,14 @@ public class TraceFormat2Read {
                             boolean interpreted) throws IOException {
         final ReentrantLock completeReflexesInOneStep = new ReentrantLock();
 
-        this.inAsPacket = new PacketInputStream(in, state, headerData,
-                new ReflexPacketKind(postReadReflexes, headerData, completeReflexesInOneStep), packetsHelpUnderstand, interpreted);
         this.inAsData = new DataInputStream(in);
+        this.interpret = new RawFCProto(
+                state,
+                interpreted ? new InterpretWhenPossible(packetsHelpUnderstand) : new AlwaysRaw(),
+                headerData,
+                new ReflexPacketKind(postReadReflexes, headerData, completeReflexesInOneStep),
+                packetsHelpUnderstand
+        );
 
         try {
             header = new HeaderTF2(inAsData);
@@ -59,7 +64,7 @@ public class TraceFormat2Read {
     }
 
     public RecordTF2 readRecord() throws IOException, InvocationTargetException {
-        return new RecordTF2(header, inAsData, inAsPacket);
+        return new RecordTF2(header, inAsData, interpret);
     }
 
     public String getHumanReadableHeader() {

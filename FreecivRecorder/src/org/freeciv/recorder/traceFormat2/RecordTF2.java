@@ -16,6 +16,7 @@ package org.freeciv.recorder.traceFormat2;
 
 import org.freeciv.connection.DoneReading;
 import org.freeciv.connection.PacketInputStream;
+import org.freeciv.connection.RawFCProto;
 import org.freeciv.packet.Packet;
 import org.freeciv.types.FCEnum;
 import org.freeciv.types.UnderstoodBitVector;
@@ -26,6 +27,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.LinkedList;
 
 public class RecordTF2 {
     /*********************
@@ -66,7 +68,7 @@ public class RecordTF2 {
         return flags;
     }
 
-    public RecordTF2(HeaderTF2 traceHeader, DataInputStream inAsData, PacketInputStream inAsPacket) throws IOException, InvocationTargetException {
+    public RecordTF2(HeaderTF2 traceHeader, DataInputStream inAsData, RawFCProto interpret) throws IOException, InvocationTargetException {
         try {
             this.flags = new RecordFlagVector(new byte[]{inAsData.readByte()});
         } catch (EOFException e) {
@@ -85,7 +87,14 @@ public class RecordTF2 {
         if (traceHeader.isRecordHeaderSizeUnexpected())
             TF2.headerSkip(inAsData, traceHeader.getRecordHeaderSize() - calculateRecordHeaderSize(traceHeader.includesTime(), traceHeader.includesConnectionID()));
 
-        this.packet = inAsPacket.readPacket();
+        LinkedList<Packet> p = new LinkedList<Packet>();
+        interpret.fromInputStream(inAsData).putPackets(p);
+
+        if (1 != p.size())
+            throw new IllegalArgumentException("Only one packet pr record is supported at the moment");
+
+        // TODO: Handle more than one packet
+        this.packet = p.get(0);
     }
 
     public void write(DataOutputStream to) throws IOException {
