@@ -35,10 +35,6 @@ public class SerializedSinglePacket implements SerializedPacketGroup {
         this.quickRespond = quickRespond;
     }
 
-    public SerializedSinglePacket(InputStream from, ToPacket converter, HeaderData headerData, int size, byte[] start, Over state, ReflexPacketKind quickRespond) throws IOException {
-        this(PacketInputStream.readXBytesFrom(size - 2, start, from, state), converter, headerData, quickRespond);
-    }
-
     @Override
     public byte[] getAsData() {
         return packet;

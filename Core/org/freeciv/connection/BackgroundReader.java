@@ -49,7 +49,11 @@ public class BackgroundReader extends Thread {
                 final byte[] start = PacketInputStream.readXBytesFrom(2, new byte[0], in, parent);
                 final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
 
-                SerializedSinglePacket incoming = new SerializedSinglePacket(in, toPacket, headerData, size, start, parent, quickRespond);
+                SerializedPacketGroup incoming;
+                {
+                    final byte[] packet = PacketInputStream.readXBytesFrom(size - 2, start, in, parent);
+                    incoming = new SerializedSinglePacket(packet, toPacket, headerData, quickRespond);
+                }
 
                 synchronized (buffered) {
                     incoming.putPackets(buffered);
