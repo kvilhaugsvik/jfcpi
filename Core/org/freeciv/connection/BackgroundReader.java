@@ -18,6 +18,7 @@ import org.freeciv.packet.Packet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
 public class BackgroundReader extends Thread {
@@ -71,16 +72,31 @@ public class BackgroundReader extends Thread {
 
         if (startSize < protoCode.getCompressionBorder()) {
             final byte[] packet = readNormalPacket(start, startSize);
+
             return new SerializedSinglePacket(packet, toPacket, headerData, quickRespond);
         } else if (startSize < protoCode.getJumboSize()) {
+            final byte[] packet = readNormalPacket(start, startSize);
+
             throw new UnsupportedOperationException("Compressed packets not supported");
         } else {
+            final byte[] packet = readJumboPacket(start);
+
             throw new UnsupportedOperationException("Compressed packets not supported");
         }
     }
 
     private byte[] readNormalPacket(byte[] start, int startSize) throws IOException {
         return PacketInputStream.readXBytesFrom(startSize - 2, start, in, parent);
+    }
+
+    private byte[] readJumboPacket(byte[] start) throws IOException {
+        final byte[] lenBytes = PacketInputStream.readXBytesFrom(4, start, in, parent);
+        final int jumboSize = ByteBuffer.wrap(lenBytes).getInt(2);
+
+        if (jumboSize < 0)
+            throw new UnsupportedOperationException("A packet larger than a signed int can measure isn't supported");
+
+        return PacketInputStream.readXBytesFrom(jumboSize - (2 + 4), lenBytes, in, parent);
     }
 
     public boolean hasPacket() {
