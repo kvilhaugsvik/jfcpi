@@ -70,6 +70,9 @@ public class BackgroundReader extends Thread {
         final byte[] start = PacketInputStream.readXBytesFrom(2, new byte[0], in, parent);
         final int startSize = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
 
+        if (startSize < 2)
+            throw new IllegalStateException("Packet size can't be this small: " + startSize);
+
         if (startSize < protoCode.getCompressionBorder()) {
             final byte[] packet = readNormalPacket(start, startSize);
 
