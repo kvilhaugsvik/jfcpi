@@ -16,6 +16,8 @@ package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -34,4 +36,8 @@ public interface SerializedPacketGroup {
      * @return the number of packets added
      */
     public int putPackets(List<Packet> in);
+
+    public interface SeparateSerializedPacketGroups {
+        public SerializedPacketGroup fromInputStream(InputStream in) throws IOException;
+    }
 }
