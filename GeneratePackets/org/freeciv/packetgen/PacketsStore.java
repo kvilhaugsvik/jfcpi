@@ -15,6 +15,7 @@
 package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import org.freeciv.packet.fieldtype.CapAdd;
 import org.freeciv.utility.Util;
 import org.freeciv.connection.ReflexRuleTime;
 import org.freeciv.packet.*;
@@ -144,18 +145,18 @@ public class PacketsStore {
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 assert wasRequired.length == fields.size() + (enableDelta ? 1 : 0) : "Wrong number of arguments";
                 List<Field> fieldList = new LinkedList<Field>();
-                for (int i = 0; i < fields.size(); i++) {
-                    WeakField fieldType = fields.get(i);
-                    fieldList.add(new Field(fieldType.getName(),
-                            (FieldType)wasRequired[i],
-                            name,
-                            fieldType.getFlags(),
-                            fieldType.getDeclarations()));
-                }
+                for (int i = 0; i < fields.size(); i++)
+                    fieldList.add(new Field(fields.get(i).getName(), (FieldType)wasRequired[i], name,
+                            fields.get(i).getFlags(), fields.get(i).getDeclarations()));
+
+                LinkedList<Field> basePacketFieldList = new LinkedList<Field>();
+                for (Field candidate : fieldList)
+                    if (!candidate.isAnnotatedUsing(CapAdd.class))
+                        basePacketFieldList.add(candidate);
 
                 return new Packet(name, number, packetHeaderType, logger, packetFlags,
                         enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
-                        fieldList);
+                        basePacketFieldList);
             }
         });
 
