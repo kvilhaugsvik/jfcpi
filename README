@@ -52,6 +52,10 @@ record it to a file. This kind of file is called a trace. The trace can later be
 a Freeciv client and play back what was recorded. As some things aren't sent between the client and the server you have
 to make sure that the server is in the same state it was when the trace was recorded to play it back.
 
+If Freeciv have changed it may not be possible to ensure that the state is the same. Rules may be different, the built in AI may react to to player actions in a
+new way and the "dice" of the game may start to give different numbers. If the version is the same there are two ways to make sure the state is the same.
+One is to load the same saved game before the recording as before the play back. The other way is to set Freecivs random seeds to the same values. If
+this is done from the client after the recording have began it should be recorded like all other actions.
 
 --- proxyRecorder ---
 The quick start showed the trace-exclude-from-server option of proxyRecorder. There are more options. To change an
