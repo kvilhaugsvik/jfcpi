@@ -5,7 +5,6 @@ FreecivRecorder
 GeneratePackets
  * Handle all of array diff so the field is stored as a normal array
  * Continue making code generation more typed
- * Support capabilities so 2.4 can be understood
 
 JavaGenerator
  * TargetClass should not be AValue
