@@ -78,7 +78,7 @@ public class BackgroundReader extends Thread {
 
             return new SerializedSinglePacket(packet, toPacket, headerData, quickRespond);
         } else if (startSize < protoCode.getJumboSize()) {
-            final byte[] packet = readNormalPacket(start, startSize);
+            final byte[] packet = readNormalPacket(start, startSize - protoCode.getCompressionBorder());
 
             throw new UnsupportedOperationException("Compressed packets not supported");
         } else {
