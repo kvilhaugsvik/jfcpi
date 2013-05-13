@@ -19,19 +19,25 @@ import org.freeciv.packet.Packet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class BackgroundReader extends Thread {
-    private final PacketInputStream in;
+    private final InputStream in;
     private final LinkedList<Packet> buffered;
     private final Connection parent;
+
+    private final ToPacket toPacket;
+    private final HeaderData headerData;
+    private final ReflexPacketKind quickRespond;
 
     public BackgroundReader(InputStream in, Connection parent, ReflexPacketKind quickRespond,
                             final HeaderData currentHeader, PacketsMapping protoCode, boolean interpreted)
             throws IOException {
-        this.in = new PacketInputStream(in, parent, currentHeader, quickRespond, protoCode, interpreted);
+        this.in = in;
         this.parent = parent;
         this.buffered = new LinkedList<Packet>();
+        this.toPacket = interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw();
+        this.headerData = currentHeader;
+        this.quickRespond = quickRespond;
 
         this.setDaemon(true);
     }
@@ -40,10 +46,13 @@ public class BackgroundReader extends Thread {
     public void run() {
         try {
             while(true) {
-                Packet incoming = in.readPacket();
+                final byte[] start = PacketInputStream.readXBytesFrom(2, new byte[0], in, parent);
+                final int size = ((start[0] & 0xFF) << 8) | (start[1] & 0xFF);
+
+                SerializedSinglePacket incoming = new SerializedSinglePacket(in, toPacket, headerData, size, start, parent, quickRespond);
 
                 synchronized (buffered) {
-                    buffered.add(incoming);
+                    incoming.putPackets(buffered);
                 }
             }
         } catch (DoneReading e) {
