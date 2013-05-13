@@ -14,7 +14,6 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.CompressedPacket;
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 
@@ -115,7 +114,7 @@ public class Connection implements FreecivConnection {
     public void toSend(Packet toSend) throws IOException {
         if (!isOpen()) {
             throw new IOException("Is closed. Can't send.");
-        } else if ((!currentHeader.sameType(toSend)) && !(toSend instanceof CompressedPacket)) {
+        } else if (!currentHeader.sameType(toSend)) {
             throw new IllegalArgumentException("Unexpected header kind " +
                     toSend.getHeader().getClass().getCanonicalName());
         }
