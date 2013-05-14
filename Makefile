@@ -1,5 +1,5 @@
 JAVA ?= java
-JAVAC ?= javac
+JAVAC ?= javac -target 1.6 -source 1.6
 JAR ?= jar
 SCALA ?= scala
 SCALAC ?= scalac
