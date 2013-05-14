@@ -26,9 +26,6 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class PlayToServer {
     private static final String TRACE_FILE = "file";
@@ -153,74 +150,5 @@ public class PlayToServer {
             return;
         }
         me.startThreads();
-    }
-
-    private static class WantHackProtocol extends SinkProcess {
-        final Lock fileNameLock;
-        final Condition newFileName;
-        final Condition wroteTheFile;
-
-        String challengeFileName;
-
-        public WantHackProtocol(PacketsMapping versionKnowledge) {
-            super(new FilterPacketKind(Arrays.asList(5, 160, 161)), versionKnowledge);
-            fileNameLock = new ReentrantLock();
-            newFileName = fileNameLock.newCondition();
-            wroteTheFile = fileNameLock.newCondition();
-            challengeFileName = null;
-        }
-
-        @Override
-        public void write(boolean clientToServer, Packet packet) throws IOException {
-            final Packet interpreted = interpret(clientToServer, packet);
-
-            switch (packet.getHeader().getPacketKind()) {
-                case 5:
-                    fileNameLock.lock();
-                    try {
-                        challengeFileName = System.getProperty("user.home") + "/.freeciv/" +
-                                ((PACKET_SERVER_JOIN_REPLY)interpreted).getChallenge_fileValue();
-                        newFileName.signal();
-                    } finally {
-                        fileNameLock.unlock();
-                    }
-                    break;
-                case 160:
-                    fileNameLock.lock();
-                    try {
-                        while (null == challengeFileName)
-                            newFileName.awaitUninterruptibly();
-
-                        String challengeString = "[challenge]\ntoken=\"" +
-                                ((PACKET_SINGLE_WANT_HACK_REQ)interpreted).getTokenValue() + "\"\n";
-
-                        FileOutputStream challengeWrite = new FileOutputStream(challengeFileName);
-                        try {
-                            challengeWrite.write(challengeString.getBytes());
-                            wroteTheFile.signal();
-                        } finally {
-                            challengeWrite.close();
-                        }
-                    } finally {
-                        fileNameLock.unlock();
-                    }
-                    break;
-                case 161:
-                    fileNameLock.lock();
-                    try {
-                        File target = new File(challengeFileName);
-                        while (!target.exists())
-                            wroteTheFile.awaitUninterruptibly();
-
-                        target.delete();
-                    } finally {
-                        fileNameLock.unlock();
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("The packet number " + packet.getHeader().getPacketKind() +
-                            " should have been filtered");
-            }
-        }
     }
 }
