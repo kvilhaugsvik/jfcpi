@@ -7,8 +7,11 @@ FreecivProto.jar
 packetsExtract
 testSignInToServer
 inspectTrace
+inspectTrace.bat
 proxyRecorder
+proxyRecorder.bat
 playRecord
+playRecord.bat
 
 # Make targets
 all

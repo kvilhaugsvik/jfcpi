@@ -157,6 +157,7 @@ compileBindingsUsers: compileFromFreeciv compileUtils
 	touch compileBindingsUsers
 
 scriptTestSignInToServer:
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait %*" > testSignInToServer.bat
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER} org.freeciv.test.SignInAndWait \"\$$@\"" > testSignInToServer
 	chmod +x testSignInToServer
 	touch scriptTestSignInToServer
@@ -168,16 +169,19 @@ runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
 scriptInspectTrace:
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
 	chmod +x inspectTrace
 	touch scriptInspectTrace
 
 scriptRunProxyRecorder:
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
 	touch scriptRunProxyRecorder
 
 scriptRunPlayToServer:
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
 	chmod +x playRecord
 	touch scriptRunPlayToServer
@@ -250,14 +254,14 @@ clean:
 	rm -f ${PROTOCOL_DISTRIBUTION} protojar
 	rm -f all
 	rm -f code
-	rm -rf compileTestSignInToServer testSignInToServer runtestsignintoserver
+	rm -rf compileTestSignInToServer testSignInToServer testSignInToServer.bat runtestsignintoserver
 	rm -rf compileFromFreeciv
 	rm -rf compileBindingsUsers
-	rm -rf compileProxyRecorder proxyRecorder runProxyRecorer
+	rm -rf compileProxyRecorder proxyRecorder.bat proxyRecorder runProxyRecorer
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
-	rm -f scriptRunPlayToServer playRecord
+	rm -f scriptRunPlayToServer playRecord.bat playRecord
 	rm -rf compileUtilsTests runUtilsTests
-	rm -rf scriptInspectTrace inspectTrace
+	rm -rf scriptInspectTrace inspectTrace.bat inspectTrace
 
 distclean: clean
 	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
