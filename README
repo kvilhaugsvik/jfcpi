@@ -59,6 +59,15 @@ version is the same there are two ways to make sure the state is the same. One i
 recording as before the play back. The other way is to set Freecivs random seeds to the same values. If this is done
 from the client after the recording have began it should be recorded like all other actions.
 
+Where the client and server run may also influence the state. Freeciv has a protocol for a client to get "hack" access
+that involves having the client write a file to a agreed upon location that the server then checks. If the server find
+that the file contain what the client told it to expect it gives the client hack access. When playing back a record the
+expected content will be written to the expected location.
+
+If the client in the original record couldn't write to the correct place and the play back can or the player writes to
+the wrong place during play back and the client in the original record wrote to the right place this may result in a
+different state.
+
 --- proxyRecorder ---
 The quick start showed the trace-exclude-from-server option of proxyRecorder. There are more options. To change an
 option write --optionName=newValue (note: no space) where optionName is the option and newValue is the new value.
