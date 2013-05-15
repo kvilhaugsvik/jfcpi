@@ -8,7 +8,7 @@ What you'll need
  * JUnit 4.10 (other versions not tested) if you plan to run the tests
  * GNU Make 3.81 (other versions are probably OK)
  * The Freeciv source code (SVN revision 22865 of trunk and SVN revision 22857 of the 2.4 branch is known to work)
- * Scala 2.9 or 2.10
+ * Scala 2.9 or 2.10 (if you plan to regenerate source code from the Freeciv source code)
 
 Where you can find it
  * Most GNU/Linux distributions will have the OpenJDK Java implementation in their package repositories. Users of
@@ -40,8 +40,6 @@ the command line. You override them by setting them before the command. The info
  * JUNIT - the JUnit library
 To compile using a JUnit located in ~/lib to run the tests and a jar from ~/bin/jar use the command
   JUNIT=~/lib/junit.jar JAR=~/bin/jar make all
-If you don't care about running the tests or don't have JUnit the target "compileProxyRecorder" can be used like this
-  make compileProxyRecorder
 
 Freeciv has its own documentation on how to build it and what you need. You won't have to install it to test recording.
 It is worth having a look at. If all of Freeciv's build dependencies are there entering its folder and running
@@ -49,6 +47,24 @@ It is worth having a look at. If all of Freeciv's build dependencies are there e
 should work.
 
 When this is done see README for instructions on how to record and play back a Freeciv game.
+
+Building without JUnit
+Tests have been included to make sure that everything work as expected. The test code is in the folder Tests. If you
+don't plan to change the code and trust that your system won't break an assumption the code makes you don't have to run
+them. In that case you can use the make target "compileProxyRecorder" in stead of the target "all" to exclude them.
+  make compileProxyRecorder
+should work. Remember to set dependency locations for the other dependencies first.
+
+Building without Scala, the Freeciv source code or JUnit
+Since the Freeciv protocol change between Freeciv versions some of the source code to support it is generated from the
+Freeciv source code. The code in GeneratePackets, JavaGenerator and DependencyHandler is only used for this. It uses
+Scala code to extract (what hopefully is) the needed data from Freeciv's source code. If you don't plan to regenerate
+the Freeciv version dependent source code or run the tests you won't need Scala. To get the generated source code
+download a compiled version. Then use the command
+  make clean
+to remove the compiled versions of the code you now are able to rebuild. Then run
+  make compileProxyRecorder
+to compile what you can rebuild. No tests are run.
 
 ========================================================================================================================
 Distributing
