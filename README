@@ -38,37 +38,47 @@ on Windows.
 ========================================================================================================================
 Quick start
 ========================================================================================================================
+This quick start assume that you run UNIX. If you use Windows use "proxyRecorder.bat" in stead of "./proxyRecorder" and
+"playRecord.bat" in stead of "./playRecord". It also assume that you compiled Freeciv your self but didn't install it.
+If the version of Freeciv the recorder was made for is installed launch the Freeciv server and the Freeciv client from
+the command line using the normal name but keep the parameters.
+
+In other words: If the correct version of Freeciv is installed change "./fcser -p 55555" to "freeciv-server -p 55555"
+on UNIX and to "freeciv-server.exe -p 55555" on Windows.
 
 Record a game
- * Start the Freeciv server. You can do this using the command
-     FREECIV_COMPRESSION_LEVEL=0 ./fcser -p 55555
+ * Start the Freeciv server in a way that makes it listen for clients on port 55555. You can do this using the command
+     ./fcser -p 55555
    in the folder where you have compiled Freeciv.
- * Load a saved game the record should be on top of. It may be right after game start or later.
+ * Set the state to something you can recreate before play back. One way to do this is to load a saved game to start
+   from. The command
      /load alienStart
    on the Freeciv server command line should load a saved game called alienStart.
-   Alternatively you may set the gameseed AND the mapseed via the recorded client.
+   Alternatively you may set the gameseed AND the mapseed variables before the game begins. If you do this via a client
+   and you record it the record it self will take care of setting them when playing it back.
  * Start the recorder. The line below use the default trace name and will overwrite previous traces.
      ./proxyRecorder
    in this folder should do it. As the play back don't use server packets you can reduce the size of the trace using
      ./proxyRecorder --trace-exclude-from-server
+   but be warned that this may cause problems.
  * Connect a client to the port the proxy is listening to.
      ./fcgui -a
-   in the folder where you have compiled Freeciv.
+   in the folder where you have compiled Freeciv should do it.
 
 Play it back:
  * Start the Freeciv server:
-     FREECIV_COMPRESSION_LEVEL=0 ./fcser
+     ./fcser
    in the folder where you have compiled Freeciv
-  * Unless the setting of mapseed and gameseed was recorded load the save game the record should be on top of.
-    It may be right after game start or later.
+  * Recreate the game state from before the record began. If you used a save game called alienStart
      /load alienStart
-   on the Freeciv server command line should load a saved game called alienStart.
+   on the Freeciv server command line should load it. If you set gameseed and mapseed via a client while you were
+   recording the record will do this for you.
  * Start the play back
      ./playRecord 
    in this folder should start playing a record that has the default file name.
  * Connect to the server using a different login name than when you played. In the connection dialog click observe.
-     ./fcgui
-   in the folder where you have compiled Freeciv
+     ./fcgui -a -n recordObserver
+   in the folder where you compiled Freeciv should work unless you used the name recordObserver in the record.
 
 
 ========================================================================================================================
