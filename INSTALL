@@ -7,13 +7,13 @@ What you'll need
  * A Java 7 (Java 6 hasn't been tested for a while) JDK. A JRE is not enough.
  * JUnit 4.10 (other versions not tested) if you plan to run the tests
  * GNU Make 3.81 (other versions are probably OK)
- * The Freeciv trunk source code (SVN revision 22783 is known to work)
+ * The Freeciv source code (SVN revision 22865 of trunk and SVN revision 22857 of the 2.4 branch is known to work)
  * Scala 2.9 (2.10 is not tested yet)
 
 Where you can find it
  * Most GNU/Linux distributions will have the OpenJDK Java implementation in their package repositories. Users of
    Windows and OS X can find Java at http://java.oracle.com. Remember that you need a JDK and not just a JRE. No browser
-   plug in is required.
+   plug in is required. Unofficial installers of OpenJDK for Windows and OS X (without the browser plug in) exist.
  * Most GNU/Linux distributions will have JUnit in their package repositories. Windows and OS X users can find it at
    http://JUnit.org
  * GNU Make is needed to build Freeciv as well. GNU/Linux users will find it in the package repository of their
