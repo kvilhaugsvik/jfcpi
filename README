@@ -15,6 +15,9 @@ You will need Java to run the recorder and play back the records. I use Java 7. 
 The helper scripts assume that Java is in a folder the system will look in when they run. If Java isn't found see
 http://java.com/en/download/help/path.xml to learn how to tell your system where Java is installed.
 
+You will also need Freeciv. As the Freeciv protocol (the way a Freeciv client talk to the server) changes between
+versions you need the Freeciv version this recorder was built for. (See INSTALL to learn how to build it your self)
+
 ========================================================================================================================
 Quick start
 ========================================================================================================================
