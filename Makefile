@@ -158,7 +158,7 @@ compileBindingsUsers: compileFromFreeciv compileUtils
 	touch compileBindingsUsers
 
 scriptTestSignInToServer:
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_BINDINGS_USERS_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.test.SignInAndWait %*" > testSignInToServer.bat
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_BINDINGS_USERS_FOLDER};${COMPILED_UTILS_FOLDER} org.freeciv.test.SignInAndWait %*" > testSignInToServer.bat
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.test.SignInAndWait \"\$$@\"" > testSignInToServer
 	chmod +x testSignInToServer
 	touch scriptTestSignInToServer
@@ -170,19 +170,19 @@ runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
 scriptInspectTrace:
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
 	chmod +x inspectTrace
 	touch scriptInspectTrace
 
 scriptRunProxyRecorder:
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
 	touch scriptRunProxyRecorder
 
 scriptRunPlayToServer:
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
 	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
 	chmod +x playRecord
 	touch scriptRunPlayToServer
