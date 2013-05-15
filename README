@@ -20,8 +20,8 @@ versions you need the Freeciv version this recorder was built for. (See INSTALL 
 
 To make it easier for non programmers to record games helper scripts are included. If a Windows version of a helper
 script exists it has the same name as the UNIX version but it ends in .bat. To start a helper script go the the folder
-where it's located on a command line. Assume a script is named "nameOfHelperScript". On UNIX it can be launched by the
-command
+where it's located on a command line. Assume a script is named "nameOfHelperScript". On UNIX, including GNU/Linux and
+OS X it can be launched by the command
   ./nameOfHelperScript
 On Windows it can be launched by the command
   nameOfHelperScript.bat
