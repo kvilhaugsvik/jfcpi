@@ -81,9 +81,10 @@ class GeneratePackets(sourceLocation: String, packetsDefRPath: String, versionRP
       }
     }
 
+    val genPath = path + "/" + "generated" + "/"
     storage.getJavaCode.foreach((code) => {
       val packagePath = code.getPackage.replaceAll("""\.""", "/")
-      val classFile = new File(path + "/" + packagePath + "/" + code.getName + ".java")
+      val classFile = new File(genPath + packagePath + "/" + code.getName + ".java")
 
       statusPrinter.printCurrent(classFile.getAbsolutePath)
 

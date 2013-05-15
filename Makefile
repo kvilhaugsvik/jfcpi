@@ -17,12 +17,13 @@ LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
 
 # What it should be generated from
 # take instructions from trunk.xml
-VERSIONCONFIGURATION ?= GeneratePackets/config/trunk.xml
+FC_CONF ?= trunk
+VERSIONCONFIGURATION = GeneratePackets/config/${FC_CONF}.xml
 # assume to be placed in a folder in the top level directory of Freeciv's source code unless told otherwise
 FREECIV_SOURCE_PATH ?= ..
 
 # Generated Java source code
-GENERATED_SOURCE_FOLDER ?= BindingsUsers/GeneratedPackets
+GENERATED_SOURCE_FOLDER = FromFreeciv/${FC_CONF}
 GENERATED_TEST_SOURCE_FOLDER ?= Tests/GeneratedTestPeers
 GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
 
@@ -44,7 +45,7 @@ COMPILED_RECORDER_FOLDER ?= out/FreecivRecorder
 # Generated jars
 CORE_JAR = FCJCore.jar
 UTILS_JAR = FCJUtils.jar
-FREECIV_VERSION_JAR = FCJFreecivVersion.jar
+FREECIV_VERSION_JAR = FCJFreecivVersion-${FC_CONF}.jar
 RECORDER_JAR = FCJRecorder.jar
 
 all: tests compileTestSignInToServer compileProxyRecorder
@@ -102,7 +103,7 @@ sourceFromFreeciv: compileCodeGenerator
 
 compileFromFreeciv: sourceFromFreeciv
 	mkdir ${COMPILED_FROM_FREECIV_FOLDER}
-	${JAVAC} -d ${COMPILED_FROM_FREECIV_FOLDER} -cp ${CORE_JAR} `find ${GENERATED_SOURCE_FOLDER} -iname "*.java"`
+	${JAVAC} -d ${COMPILED_FROM_FREECIV_FOLDER} -cp ${CORE_JAR} `find ${GENERATED_SOURCE_FOLDER}/generated -iname "*.java"`
 	${JAR} cf ${FREECIV_VERSION_JAR} -C ${COMPILED_FROM_FREECIV_FOLDER} \.
 	touch compileFromFreeciv
 
@@ -157,7 +158,7 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 
 compileBindingsUsers: compileFromFreeciv compileUtils
 	mkdir -p ${COMPILED_BINDINGS_USERS_FOLDER}
-	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find BindingsUsers/Users -iname "*.java"`
+	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find BindingsUsers -iname "*.java"`
 	touch compileBindingsUsers
 
 scriptTestSignInToServer:
