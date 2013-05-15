@@ -32,6 +32,8 @@ public class WantHackProtocol extends SinkProcess {
     final Condition newFileName;
     final Condition wroteTheFile;
 
+    private static final String fcData = (isWindows() ? appDataOrHome() : getUserHome()) + "/.freeciv/";
+
     String challengeFileName;
 
     public WantHackProtocol(PacketsMapping versionKnowledge) {
@@ -50,8 +52,7 @@ public class WantHackProtocol extends SinkProcess {
             case 5:
                 fileNameLock.lock();
                 try {
-                    challengeFileName = System.getProperty("user.home") + "/.freeciv/" +
-                            ((PACKET_SERVER_JOIN_REPLY)interpreted).getChallenge_fileValue();
+                    challengeFileName = fcData + ((PACKET_SERVER_JOIN_REPLY)interpreted).getChallenge_fileValue();
                     newFileName.signal();
                 } finally {
                     fileNameLock.unlock();
@@ -93,5 +94,28 @@ public class WantHackProtocol extends SinkProcess {
                 throw new IllegalArgumentException("The packet number " + packet.getHeader().getPacketKind() +
                         " should have been filtered");
         }
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+
+    private static String appDataOrHome() {
+        // Freeciv prefers HOME if it is set. See utility/shared.c
+        String home = System.getenv("HOME");
+        if (null != home)
+            return home;
+
+        // try to get the proper AppData folder without having to call SHGetSpecialFolderLocation from Java
+        String appdata = System.getenv("APPDATA");
+        if (null != appdata)
+            return appdata;
+
+        // try to guess the correct location if APPDATA isn't set
+        return getUserHome() + "/AppData/Roaming";
+    }
+
+    private static String getUserHome() {
+        return System.getProperty("user.home");
     }
 }

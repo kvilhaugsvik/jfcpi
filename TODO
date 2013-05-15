@@ -15,3 +15,8 @@ Generally
  * Make the code more consistent by finishing or removing incomplete abstractions
  * Fix misleading names
  * Improve speed (consider: nio, inlining generated code, compression, etc)
+
+Portability
+ * I probably won't do this myself. Check that WantHackProtocol work on various versions and configurations of Windows.
+   Fix issues in a way that won't break other platforms. (So if some special Windows only method is required use it via
+   reflection)
