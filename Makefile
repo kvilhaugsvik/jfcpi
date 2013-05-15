@@ -37,6 +37,7 @@ COMPILED_JAVA_GENERATOR_FOLDER ?= out/JavaGenerator
 COMPILED_DEPENDENCY_FOLDER ?= out/Dependency
 COMPILED_GENERATOR_FOLDER ?= out/GeneratePackages
 COMPILED_TESTS_FOLDER ?= out/Tests
+COMPILED_FROM_FREECIV_FOLDER ?= out/VersionCode
 COMPILED_BINDINGS_USERS_FOLDER ?= out/BindingsUsers
 COMPILED_RECORDER_FOLDER ?= out/FreecivRecorder
 
@@ -96,7 +97,8 @@ sourceFromFreeciv: compileCodeGenerator
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv
-	${JAVAC} -d ${COMPILED_CORE_FOLDER} -cp ${COMPILED_CORE_FOLDER} `find ${GENERATED_SOURCE_FOLDER} -iname "*.java"`
+	mkdir ${COMPILED_FROM_FREECIV_FOLDER}
+	${JAVAC} -d ${COMPILED_FROM_FREECIV_FOLDER} -cp ${COMPILED_CORE_FOLDER} `find ${GENERATED_SOURCE_FOLDER} -iname "*.java"`
 	touch compileFromFreeciv
 
 compileTestPeerGenerator: compileCore compileCodeGenerator folderTestOut
@@ -154,12 +156,12 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 
 compileBindingsUsers: compileFromFreeciv compileUtils
 	mkdir -p ${COMPILED_BINDINGS_USERS_FOLDER}
-	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${COMPILED_CORE_FOLDER}:${COMPILED_UTILS_FOLDER} `find BindingsUsers/Users -iname "*.java"`
+	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${COMPILED_CORE_FOLDER}:${COMPILED_UTILS_FOLDER}:${COMPILED_FROM_FREECIV_FOLDER} `find BindingsUsers/Users -iname "*.java"`
 	touch compileBindingsUsers
 
 scriptTestSignInToServer:
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_BINDINGS_USERS_FOLDER};${COMPILED_UTILS_FOLDER} org.freeciv.test.SignInAndWait %*" > testSignInToServer.bat
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.test.SignInAndWait \"\$$@\"" > testSignInToServer
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_BINDINGS_USERS_FOLDER};${COMPILED_UTILS_FOLDER};${COMPILED_FROM_FREECIV_FOLDER} org.freeciv.test.SignInAndWait %*" > testSignInToServer.bat
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_BINDINGS_USERS_FOLDER}:${COMPILED_UTILS_FOLDER}:${COMPILED_FROM_FREECIV_FOLDER} org.freeciv.test.SignInAndWait \"\$$@\"" > testSignInToServer
 	chmod +x testSignInToServer
 	touch scriptTestSignInToServer
 
@@ -170,26 +172,26 @@ runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
 scriptInspectTrace:
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER};${COMPILED_FROM_FREECIV_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER}:${COMPILED_FROM_FREECIV_FOLDER} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
 	chmod +x inspectTrace
 	touch scriptInspectTrace
 
 scriptRunProxyRecorder:
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER};${COMPILED_FROM_FREECIV_FOLDER} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER}:${COMPILED_FROM_FREECIV_FOLDER} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
 	touch scriptRunProxyRecorder
 
 scriptRunPlayToServer:
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
-	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER};${COMPILED_RECORDER_FOLDER};${COMPILED_UTILS_FOLDER};${COMPILED_FROM_FREECIV_FOLDER} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
+	echo "${JAVA} -ea -cp ${COMPILED_CORE_FOLDER}:${COMPILED_RECORDER_FOLDER}:${COMPILED_UTILS_FOLDER}:${COMPILED_FROM_FREECIV_FOLDER} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
 	chmod +x playRecord
 	touch scriptRunPlayToServer
 
 compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
-	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${COMPILED_CORE_FOLDER}:${COMPILED_UTILS_FOLDER} `find FreecivRecorder/src -iname "*.java"`
+	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${COMPILED_CORE_FOLDER}:${COMPILED_UTILS_FOLDER}:${COMPILED_FROM_FREECIV_FOLDER} `find FreecivRecorder/src -iname "*.java"`
 	touch compileProxyRecorder
 
 # not included in tests since it needs a running Freeciv server and client
@@ -257,7 +259,7 @@ clean:
 	rm -f all
 	rm -f code
 	rm -rf compileTestSignInToServer testSignInToServer testSignInToServer.bat runtestsignintoserver
-	rm -rf compileFromFreeciv
+	rm -rf ${COMPILED_FROM_FREECIV_FOLDER} compileFromFreeciv
 	rm -rf compileBindingsUsers
 	rm -rf compileProxyRecorder proxyRecorder.bat proxyRecorder runProxyRecorer
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
