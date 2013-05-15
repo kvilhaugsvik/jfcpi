@@ -116,7 +116,7 @@ Developers may find the following options interesting
 --- playRecord ---
 The options of playRecord are
  --file - the file containing the trace to play back. Defaults to FreecivCon0.fct. To play many files separate them
-          using a colon like this
+          using you system's path separator (":" on Unix, ";" on Windows) like this
             ./playRecord --file=FreecivCon0.fct:FreecivCon1.fct
 
  --address - where the Freeciv server is. Defaults to your computer

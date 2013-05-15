@@ -36,7 +36,8 @@ public class PlayToServer {
     public static final LinkedList<Setting<?>> SETTINGS = new LinkedList<Setting<?>>() {{
         add(new Setting.StringSetting(TRACE_FILE,
                 ProxyRecorder.DEFAULT_TRACE_PREFIX + "0" + ProxyRecorder.DEFAULT_TRACE_SUFFIX,
-                "the file(s) containing the trace to play back. To specify many files separate them using ':'"));
+                "the file(s) containing the trace to play back. To specify many files separate them using '" +
+                        System.getProperty("path.separator", ":") + "'"));
         add(new Setting.StringSetting(ADDRESS, "127.0.0.1", "connect to the Freeciv server on this address"));
         add(new Setting.IntSetting(PORT, 5556, "connect to the Freeciv server on ths port"));
         add(new Setting.BoolSetting(IGNORE_TIME, false, "ignore time data in the trace"));
@@ -112,7 +113,7 @@ public class PlayToServer {
 
         final FirstTimeRequest firstPlayedTime = new FirstTimeRequest();
 
-        for (String fileName : settings.<String>getSetting(TRACE_FILE).split(":"))
+        for (String fileName : settings.<String>getSetting(TRACE_FILE).split(System.getProperty("path.separator", ":")))
             startPlayBack(settings, firstPlayedTime, fileName);
     }
 
