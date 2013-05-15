@@ -8,7 +8,7 @@ What you'll need
  * JUnit 4.10 (other versions not tested) if you plan to run the tests
  * GNU Make 3.81 (other versions are probably OK)
  * The Freeciv source code (SVN revision 22865 of trunk and SVN revision 22857 of the 2.4 branch is known to work)
- * Scala 2.9 (2.10 is not tested yet)
+ * Scala 2.9 or 2.10
 
 Where you can find it
  * Most GNU/Linux distributions will have the OpenJDK Java implementation in their package repositories. Users of
