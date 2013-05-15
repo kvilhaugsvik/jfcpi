@@ -6,6 +6,7 @@ GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
 FreecivProto.jar
 packetsExtract
 testSignInToServer
+testSignInToServer.bat
 inspectTrace
 inspectTrace.bat
 proxyRecorder
