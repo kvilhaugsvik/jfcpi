@@ -73,12 +73,13 @@ Play it back:
      /load alienStart
    on the Freeciv server command line should load it. If you set gameseed and mapseed via a client while you were
    recording the record will do this for you.
- * Start the play back
-     ./playRecord 
-   in this folder should start playing a record that has the default file name.
  * Connect to the server using a different login name than when you played. In the connection dialog click observe.
      ./fcgui -a -n recordObserver
-   in the folder where you compiled Freeciv should work unless you used the name recordObserver in the record.
+   in the folder where you compiled Freeciv should work unless you used the name recordObserver in the record. Remember
+   to click observe.
+ * Start the play back
+     ./playRecord
+   in this folder should start playing a record that has the default file name.
 
 
 ========================================================================================================================
