@@ -18,6 +18,23 @@ http://java.com/en/download/help/path.xml to learn how to tell your system where
 You will also need Freeciv. As the Freeciv protocol (the way a Freeciv client talk to the server) changes between
 versions you need the Freeciv version this recorder was built for. (See INSTALL to learn how to build it your self)
 
+To make it easier for non programmers to record games helper scripts are included. If a Windows version of a helper
+script exists it has the same name as the UNIX version but it ends in .bat. To start a helper script go the the folder
+where it's located on a command line. Assume a script is named "nameOfHelperScript". On UNIX it can be launched by the
+command
+  ./nameOfHelperScript
+On Windows it can be launched by the command
+  nameOfHelperScript.bat
+The helper scripts takes parameters. A parameter is passed by adding a space after the helper script name followed by
+"--", its name (no space before or after), "=" and its new value (without a space before the new value).
+
+When the parameter "help" is set to "true" it will print the names of all parameters, their value and a short
+description. Then it will exit. To launch the recorder and set its "help" parameter to "true"  is
+  ./proxyRecorder --help=true
+on UNIX and
+  proxyRecorder.bat --help=true
+on Windows.
+
 ========================================================================================================================
 Quick start
 ========================================================================================================================
