@@ -3,7 +3,7 @@ out
 Tests/Generated*
 BindingsUsers/GeneratedPackets
 GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
-FreecivProto.jar
+FCJ*.jar
 packetsExtract
 testSignInToServer
 testSignInToServer.bat
