@@ -1,8 +1,15 @@
+Core
+ * Capability support
+
 FreecivRecorder
+ * Exit on client / server disconnect and no one left even if server don't inform it is shutting down
+ * Have the player check what the server returns
+ * Don't do a proper get hack file creation if it failed in the trace
  * Merge all connections in one file
  * Make more of the filtering accessible from the command line
 
 GeneratePackets
+ * Support all variants when dealing with capabilities
  * Handle all of array diff so the field is stored as a normal array
  * Continue making code generation more typed
 
