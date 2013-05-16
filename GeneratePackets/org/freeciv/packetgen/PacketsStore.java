@@ -14,8 +14,10 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.packet.fieldtype.CapAdd;
+import org.freeciv.packet.fieldtype.CapRemove;
 import org.freeciv.utility.Util;
 import org.freeciv.connection.ReflexRuleTime;
 import org.freeciv.packet.*;
@@ -145,22 +147,48 @@ public class PacketsStore {
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 assert wasRequired.length == fields.size() + (enableDelta ? 1 : 0) : "Wrong number of arguments";
                 List<Field> fieldList = new LinkedList<Field>();
-                for (int i = 0; i < fields.size(); i++)
-                    fieldList.add(new Field(fields.get(i).getName(), (FieldType)wasRequired[i], name,
-                            fields.get(i).getFlags(), fields.get(i).getDeclarations()));
+                Set<Typed<AString>> caps = new HashSet<Typed<AString>>();
+                for (int i = 0; i < fields.size(); i++) {
+                    final Field field = new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
+                            fields.get(i).getFlags(), fields.get(i).getDeclarations());
 
-                LinkedList<Field> basePacketFieldList = new LinkedList<Field>();
-                for (Field candidate : fieldList)
-                    if (!candidate.isAnnotatedUsing(CapAdd.class))
-                        basePacketFieldList.add(candidate);
+                    fieldList.add(field);
+
+                    if (field.isAnnotatedUsing(CapAdd.class))
+                        caps.add((Typed<AString>) field.getAnnotation(CapAdd.class).getValueOf("value"));
+                    if (field.isAnnotatedUsing(CapRemove.class))
+                        caps.add((Typed<AString>) field.getAnnotation(CapRemove.class).getValueOf("value"));
+                }
+
+                LinkedList<Field> maxCapableFieldList = filterForCapabilities(fieldList, caps);
 
                 return new Packet(name, number, packetHeaderType, logger, packetFlags,
                         enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
-                        basePacketFieldList);
+                        maxCapableFieldList);
             }
         });
 
         requirements.demand(me);
+    }
+
+    private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Set<Typed<AString>> usingCaps) {
+        LinkedList<Field> packetFieldList = new LinkedList<Field>();
+        for (Field candidate : fieldList)
+            if (belongHere(candidate, usingCaps))
+                packetFieldList.add(candidate);
+        return packetFieldList;
+    }
+
+    private static boolean belongHere(Field candidate, Set<Typed<AString>> usingCaps) {
+        if (candidate.isAnnotatedUsing(CapAdd.class))
+            return hasCap(candidate, usingCaps, CapAdd.class);
+        if (candidate.isAnnotatedUsing(CapRemove.class))
+            return !hasCap(candidate, usingCaps, CapRemove.class);
+        return true;
+    }
+
+    private static boolean hasCap(Field field, Set<Typed<AString>> usingCaps, Class<?> addOrRemove) {
+        return usingCaps.contains(field.getAnnotation(addOrRemove).getValueOf("value"));
     }
 
     private void validateNameAndNumber(String name, int number) throws PacketCollisionException {
