@@ -36,6 +36,32 @@ on UNIX and
 on Windows.
 
 ========================================================================================================================
+Test if it works
+========================================================================================================================
+It is now time to see if it works. The first test is simple but show that you have managed to get much of the system
+working. Begin by starting a freeciv server. Then launch FCJTestSignIn.jar directly or run the helper script
+testSignInToServer (testSignInToServer.bat on Windows). If you can see a windows of text talking about packets it works.
+What you see is the Freeciv protocol converted to text.
+
+The next thing to test it the recorder and the play back. Start the recorder ("./proxyRecorder" or proxyRecorder.bat).
+Start a Freeciv server listening to port 55555. Then start a client connecting to the regular port. The recorder should
+now listen to the regular port and forward the commands you send via the client to the server. Don't connect using a
+second client while recording the test trace.
+
+If the recorder is forwarding from the client to the server the normal pre game screen should appear. Unfortunately it
+will also appear if you forgot to make the server listen to port 55555 and the client is talking directly to the server.
+See if the messages say you are connected to port 55555.
+
+Now set the gameseed and the mapseed to a value that isn't 0. Do it from the Freeciv client so it becomes part of the
+trace. This takes care of setting the server you play the record on to the same state as the server you recorded on had.
+Now play a few turns while you are recording. Only record a few turns until you know recording is working. When you are
+done playing exit the server by typing "/quit" on its command line.
+
+To play the trace you just recorded start a Freeciv server listening to the normal port. Then run playRecord. Don't
+connect a client until the record is done. When it is done connect using the same user name as when you played. If
+everything is the same as they were when you exited there is a good chance it will work during more complex use as well.
+
+========================================================================================================================
 Quick start
 ========================================================================================================================
 This quick start assume that you run UNIX. If you use Windows use "proxyRecorder.bat" in stead of "./proxyRecorder" and
