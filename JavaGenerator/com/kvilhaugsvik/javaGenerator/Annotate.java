@@ -15,10 +15,13 @@
 package com.kvilhaugsvik.javaGenerator;
 
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
+
+import java.util.NoSuchElementException;
 
 public class Annotate extends Formatted implements HasAtoms {
     private final TargetClass annotation;
@@ -35,6 +38,14 @@ public class Annotate extends Formatted implements HasAtoms {
 
     public boolean sameClass(TargetClass other) {
         return annotation.equals(other);
+    }
+
+    public Typed<?> getValueOf(String name) {
+        for (Reference.SetTo var : arguments)
+            if (var.getReferName().toString().equals(name))
+                return var.getValue();
+
+        throw new NoSuchElementException(name + " not set in annotation " + this);
     }
 
     @Override

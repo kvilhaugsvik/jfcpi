@@ -84,6 +84,14 @@ public class Reference<Contains extends AValue> extends Address implements Value
             this.value = value;
         }
 
+        public Reference getReferName() {
+            return referName;
+        }
+
+        public Typed<Ret> getValue() {
+            return value;
+        }
+
         @Override
         public void writeAtoms(CodeAtoms to) {
             referName.writeAtoms(to);
