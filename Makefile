@@ -31,16 +31,17 @@ GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.jav
 # This makes it easier to follow the GPL when distributing without having to mirror all of some Freeciv SVN snapshot
 NOT_DISTRIBUTED_WITH_FREECIV ?= true
 
+WORK_FOLDER ?= out
 # Generated compiled Java classes
-COMPILED_CORE_FOLDER ?= out/Core
-COMPILED_UTILS_FOLDER ?= out/utils
-COMPILED_JAVA_GENERATOR_FOLDER ?= out/JavaGenerator
-COMPILED_DEPENDENCY_FOLDER ?= out/Dependency
-COMPILED_GENERATOR_FOLDER ?= out/GeneratePackages
-COMPILED_TESTS_FOLDER ?= out/Tests
-COMPILED_FROM_FREECIV_FOLDER ?= out/VersionCode
-COMPILED_BINDINGS_USERS_FOLDER ?= out/BindingsUsers
-COMPILED_RECORDER_FOLDER ?= out/FreecivRecorder
+COMPILED_CORE_FOLDER = ${WORK_FOLDER}/Core
+COMPILED_UTILS_FOLDER = ${WORK_FOLDER}/utils
+COMPILED_JAVA_GENERATOR_FOLDER = ${WORK_FOLDER}/JavaGenerator
+COMPILED_DEPENDENCY_FOLDER = ${WORK_FOLDER}/Dependency
+COMPILED_GENERATOR_FOLDER = ${WORK_FOLDER}/GeneratePackages
+COMPILED_TESTS_FOLDER = ${WORK_FOLDER}/Tests
+COMPILED_FROM_FREECIV_FOLDER = ${WORK_FOLDER}/VersionCode
+COMPILED_BINDINGS_USERS_FOLDER = ${WORK_FOLDER}/BindingsUsers
+COMPILED_RECORDER_FOLDER = ${WORK_FOLDER}/FreecivRecorder
 
 # Generated jars
 CORE_JAR = FCJCore.jar
@@ -57,7 +58,11 @@ code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder scrip
 tests: runTests
 	touch tests
 
-compileCore:
+workFolder:
+	mkdir -p ${WORK_FOLDER}
+	touch workFolder
+
+compileCore: workFolder
 	mkdir -p ${COMPILED_CORE_FOLDER}
 	${JAVAC} -d ${COMPILED_CORE_FOLDER} `find Core -iname "*.java"`
 	${JAR} cf ${CORE_JAR} -C ${COMPILED_CORE_FOLDER} \.
@@ -68,7 +73,7 @@ compileJavaGenerator: compileCore compileUtils
 	${JAVAC} -cp ${CORE_JAR}:${UTILS_JAR} -d ${COMPILED_JAVA_GENERATOR_FOLDER} `find JavaGenerator -iname "*.java"`
 	touch compileJavaGenerator
 
-compileDependency:
+compileDependency: workFolder
 	mkdir -p ${COMPILED_DEPENDENCY_FOLDER}
 	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} `find DependencyHandler -iname "*.java"`
 	touch compileDependency
@@ -124,7 +129,7 @@ compileTestPeers: compileCodeGenerator compileCore sourceTestPeers
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${CORE_JAR} `find ${GENERATED_TEST_SOURCE_FOLDER} -iname "*.java"`
 	touch compileTestPeers
 
-folderTestOut:
+folderTestOut: workFolder
 	mkdir -p ${COMPILED_TESTS_FOLDER}
 	touch folderTestOut
 
@@ -209,7 +214,7 @@ runConnectionTests: compileConnectionTests
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.connection.NetworkUninterpreted
 	touch runConnectionTests
 
-compileUtils: compileCore
+compileUtils: workFolder compileCore
 	mkdir ${COMPILED_UTILS_FOLDER}
 	${JAVAC} -cp ${CORE_JAR} -d ${COMPILED_UTILS_FOLDER} `find Utility -iname "*.java"`
 	${JAR} cf ${UTILS_JAR} -C ${COMPILED_UTILS_FOLDER} \.
@@ -283,4 +288,4 @@ distclean: clean
 	rm -rf packetsExtract scriptPacketsExtract
 	rm -rf ${PACKETGENOUT} compileCodeGenerator
 	rm -rf ${GENERATED_SOURCE_FOLDER} sourceFromFreeciv
-	rm -rf out
+	rm -rf ${WORK_FOLDER} workFolder
