@@ -67,8 +67,7 @@ class GeneratePackets(sourceLocation: String, packetsDefRPath: String, versionRP
   println("Applying manual changes")
   Hardcoded.applyManualChanges(storage);
 
-  def writeToDir(oPath: String, includeOrigSrc: Boolean) {
-    val path = oPath
+  def writeToDir(path: String, includeOrigSrc: Boolean) {
     val statusPrinter = new ChangingConsoleLine("Writing the file ", System.out)
 
     val notFound = storage.explainMissing()
