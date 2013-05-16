@@ -79,3 +79,21 @@ To solve this GeneratePackets can copy the Freeciv sources used to generate the 
 generated Java code if the option --gpl-source is set to true. The Freeciv source code generated from will then end up
 next to the generated code. It is possible to turn of to avoid confusion in cases when Freeciv is there anyway. To turn
 it off when using the bundled Makefile set NOT_DISTRIBUTED_WITH_FREECIV to false when running make.
+
+========================================================================================================================
+Getting this code
+========================================================================================================================
+It seems improbable that you would end up reading this INSTALL file without having the code. If that is the case, or you
+are looking for updates, here are some locations that will work for now.
+ * Tarballs can be found at http://folk.ntnu.no/kvilhaug/freeciv/ in a folder for each version. The plainly named
+   tarballs only contain the source code. Even the source code generated from the Freeciv source code is missing. Those
+   that has a suffix contain what the suffix describe.
+   An example to explain is version 0.0.1. Tarballs for version 0.0.1 can be found in
+   http://folk.ntnu.no/kvilhaug/freeciv/0.0.1 since 0.0.1 is the version name. The file FreecivRecorder-0.0.1.tar.bz2 is
+   source alone. FreecivRecorder-0.0.1-for-freeciv-2.4-beta.tar.bz2 is compiled for the Freeciv 2.4 beta. It contains
+   the source code, some Freeciv source files used to generate more source code, that source code, a mess from the build
+   and the finished jars and launcher scripts.
+ * The newest version of the source code (and its version history) can be downloaded using Bazaar by running the command
+     bzr branch http://folk.ntnu.no/kvilhaug/bazaar/FreecivRecorder/
+   Git users that has a very recent git version and are using the script git-remote-bzr from git contrib can run
+     git clone bzr::http://folk.ntnu.no/kvilhaug/bazaar/FreecivRecorder/
