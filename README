@@ -54,6 +54,7 @@ See if the messages say you are connected to port 55555.
 
 Now set the gameseed and the mapseed to a value that isn't 0. Do it from the Freeciv client so it becomes part of the
 trace. This takes care of setting the server you play the record on to the same state as the server you recorded on had.
+If the state of the server used for play back is different from the state of the recording server play back won't work.
 Now play a few turns while you are recording. Only record a few turns until you know recording is working. When you are
 done playing exit the server by typing "/quit" on its command line.
 
