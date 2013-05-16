@@ -19,7 +19,7 @@ playRecord.bat
 all
 code
 tests
-protojar
+workFolder
 compile*
 folder*
 run*
