@@ -40,7 +40,7 @@ COMPILED_DEPENDENCY_FOLDER = ${WORK_FOLDER}/Dependency
 COMPILED_GENERATOR_FOLDER = ${WORK_FOLDER}/GeneratePackages
 COMPILED_TESTS_FOLDER = ${WORK_FOLDER}/Tests
 COMPILED_FROM_FREECIV_FOLDER = ${WORK_FOLDER}/VersionCode
-COMPILED_BINDINGS_USERS_FOLDER = ${WORK_FOLDER}/BindingsUsers
+COMPILED_TEST_SIGN_IN_FOLDER = ${WORK_FOLDER}/SignInTest
 COMPILED_RECORDER_FOLDER = ${WORK_FOLDER}/FreecivRecorder
 
 # Generated jars
@@ -48,6 +48,7 @@ CORE_JAR = FCJCore.jar
 UTILS_JAR = FCJUtils.jar
 FREECIV_VERSION_JAR = FCJFreecivVersion-${FC_CONF}.jar
 RECORDER_JAR = FCJRecorder.jar
+SIGN_IN_JAR = FCJTestSignIn.jar
 
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
@@ -161,18 +162,18 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} `find Tests/OfGeneratedCode/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileBindingsUsers: compileFromFreeciv compileUtils
-	mkdir -p ${COMPILED_BINDINGS_USERS_FOLDER}
-	${JAVAC} -d ${COMPILED_BINDINGS_USERS_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find BindingsUsers -iname "*.java"`
-	touch compileBindingsUsers
+compileTestSignInToServer: compileFromFreeciv compileUtils scriptTestSignInToServer
+	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
+	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find SignInTest -iname "*.java"`
+	echo "Class-Path: ${CORE_JAR} ${UTILS_JAR} ${FREECIV_VERSION_JAR}" > ${WORK_FOLDER}/signIn.manifest
+	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait ${WORK_FOLDER}/signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
+	touch compileTestSignInToServer
 
 scriptTestSignInToServer:
-	echo "${JAVA} -ea -cp ${CORE_JAR};${COMPILED_BINDINGS_USERS_FOLDER};${UTILS_JAR};${FREECIV_VERSION_JAR} org.freeciv.test.SignInAndWait %*" > testSignInToServer.bat
-	echo "${JAVA} -ea -cp ${CORE_JAR}:${COMPILED_BINDINGS_USERS_FOLDER}:${UTILS_JAR}:${FREECIV_VERSION_JAR} org.freeciv.test.SignInAndWait \"\$$@\"" > testSignInToServer
+	echo "${JAVA} -jar ${SIGN_IN_JAR} %*" > testSignInToServer.bat
+	echo "${JAVA} -jar ${SIGN_IN_JAR} \"\$$@\"" > testSignInToServer
 	chmod +x testSignInToServer
 	touch scriptTestSignInToServer
-
-compileTestSignInToServer: compileBindingsUsers scriptTestSignInToServer
 
 # not included in tests since it needs a running Freeciv server
 runtestsignintoserver: compileTestSignInToServer
@@ -264,13 +265,13 @@ clean:
 	rm -rf runTests tests
 	rm -rf folderTestOut ${COMPILED_TESTS_FOLDER}
 	rm -rf ${GENERATED_TEST_SOURCE_FOLDER} sourceTestPeers
-	rm -rf ${COMPILED_BINDINGS_USERS_FOLDER}
+	rm -rf ${COMPILED_TEST_SIGN_IN_FOLDER}
 	rm -f all
 	rm -f code
 	rm -rf compileTestSignInToServer testSignInToServer testSignInToServer.bat runtestsignintoserver
+	rm -rf ${SIGN_IN_JAR}
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER} compileFromFreeciv
 	rm -rf ${FREECIV_VERSION_JAR}
-	rm -rf compileBindingsUsers
 	rm -rf compileProxyRecorder proxyRecorder.bat proxyRecorder runProxyRecorer ${WORK_FOLDER}/fcr.manifest
 	rm -rf ${RECORDER_JAR}
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
