@@ -133,6 +133,12 @@ public class PacketsStore {
             throws PacketCollisionException, UndefinedException {
         validateNameAndNumber(name, number);
 
+        final Set<Typed<AString>> caps = new HashSet<Typed<AString>>();
+        for (WeakField field : fields)
+            for (WeakFlag flag : field.getFlags())
+                if ("add-cap".equals(flag.getName()) || "remove-cap".equals(flag.getName()))
+                    caps.add(BuiltIn.literal(flag.getArguments()[0]));
+
         Requirement me = new Requirement(name, Packet.class);
         reserveNameAndNumber(name, number, me);
 
@@ -147,18 +153,9 @@ public class PacketsStore {
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
                 assert wasRequired.length == fields.size() + (enableDelta ? 1 : 0) : "Wrong number of arguments";
                 List<Field> fieldList = new LinkedList<Field>();
-                Set<Typed<AString>> caps = new HashSet<Typed<AString>>();
-                for (int i = 0; i < fields.size(); i++) {
-                    final Field field = new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
-                            fields.get(i).getFlags(), fields.get(i).getDeclarations());
-
-                    fieldList.add(field);
-
-                    if (field.isAnnotatedUsing(CapAdd.class))
-                        caps.add((Typed<AString>) field.getAnnotation(CapAdd.class).getValueOf("value"));
-                    if (field.isAnnotatedUsing(CapRemove.class))
-                        caps.add((Typed<AString>) field.getAnnotation(CapRemove.class).getValueOf("value"));
-                }
+                for (int i = 0; i < fields.size(); i++)
+                    fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
+                            fields.get(i).getFlags(), fields.get(i).getDeclarations()));
 
                 LinkedList<Field> maxCapableFieldList = filterForCapabilities(fieldList, caps);
 
