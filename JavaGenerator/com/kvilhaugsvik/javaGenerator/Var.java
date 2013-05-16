@@ -21,9 +21,11 @@ import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
+import org.freeciv.packet.fieldtype.CapAdd;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     private final List<Annotate> annotations;
@@ -155,5 +157,16 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
             if (annotation.sameClass(name))
                 return true;
         return false;
+    }
+
+    public Annotate getAnnotation(Class<?> anno) {
+        return getAnnotation(TargetClass.from(anno));
+    }
+
+    public Annotate getAnnotation(TargetClass anno) {
+        for (Annotate annotation : annotations)
+            if (annotation.sameClass(anno))
+                return annotation;
+        throw new NoSuchElementException("Not annotated using " + anno.getName());
     }
 }
