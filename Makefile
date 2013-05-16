@@ -179,27 +179,28 @@ runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
 scriptInspectTrace:
-	echo "${JAVA} -ea -cp ${CORE_JAR};${RECORDER_JAR};${UTILS_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
-	echo "${JAVA} -ea -cp ${CORE_JAR}:${RECORDER_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
+	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
+	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
 	chmod +x inspectTrace
 	touch scriptInspectTrace
 
 scriptRunProxyRecorder:
-	echo "${JAVA} -ea -cp ${CORE_JAR};${RECORDER_JAR};${UTILS_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
-	echo "${JAVA} -ea -cp ${CORE_JAR}:${RECORDER_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
+	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
+	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
 	touch scriptRunProxyRecorder
 
 scriptRunPlayToServer:
-	echo "${JAVA} -ea -cp ${CORE_JAR};${RECORDER_JAR};${UTILS_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
-	echo "${JAVA} -ea -cp ${CORE_JAR}:${RECORDER_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
+	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
+	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
 	chmod +x playRecord
 	touch scriptRunPlayToServer
 
 compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
 	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find FreecivRecorder/src -iname "*.java"`
-	${JAR} cf ${RECORDER_JAR} -C ${COMPILED_RECORDER_FOLDER} \.
+	echo "Class-Path: ${CORE_JAR} ${UTILS_JAR}" > ${WORK_FOLDER}/fcr.manifest
+	${JAR} cfm ${RECORDER_JAR} ${WORK_FOLDER}/fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
 	touch compileProxyRecorder
 
 # not included in tests since it needs a running Freeciv server and client
@@ -270,7 +271,7 @@ clean:
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER} compileFromFreeciv
 	rm -rf ${FREECIV_VERSION_JAR}
 	rm -rf compileBindingsUsers
-	rm -rf compileProxyRecorder proxyRecorder.bat proxyRecorder runProxyRecorer
+	rm -rf compileProxyRecorder proxyRecorder.bat proxyRecorder runProxyRecorer ${WORK_FOLDER}/fcr.manifest
 	rm -rf ${RECORDER_JAR}
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
 	rm -f scriptRunPlayToServer playRecord.bat playRecord
