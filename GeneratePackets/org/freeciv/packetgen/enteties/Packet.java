@@ -398,40 +398,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 Arrays.asList(streamName, argHeader, old),
                 Arrays.asList(TargetClass.from(FieldTypeException.class)),
                 body));
-
-
-        final Var<TargetClass> argHeaderData = Var.param(TargetClass.from(HeaderData.class), "headerData");
-        addMethod(Method.newPublicConstructorWithException(Comment.doc(
-                "Construct from a DataInput", "",
-                Comment.param(streamName, "data input that is at the start of the packet"),
-                Comment.param(argHeaderData, "data to read the header"),
-                Comment.param(old, "where the Delta protocol should look for older packets"),
-                Comment.docThrows(TargetClass.from(FieldTypeException.class), "if there is a problem in the fields"),
-                Comment.docThrows(TargetClass.from(BadProtocolData.class),
-                        "when data like this class and its user aren't compatible")),
-                Arrays.asList(streamName, argHeaderData, old),
-                Arrays.asList(TargetClass.from(FieldTypeException.class), TargetClass.from(BadProtocolData.class)),
-                new Block(BuiltIn.thisConstr(
-                        streamName.ref(),
-                        argHeaderData.ref().callV("newHeaderFromStream", streamName.ref()),
-                        old.ref()))));
-
-        final Var<AValue> bytes = Var.param(TargetArray.from(byte[].class), "packet");
-        addMethod(Method.newPublicConstructorWithException(Comment.doc(
-                "Construct from a byte array", "",
-                Comment.param(bytes, "the packet as a byte array"),
-                Comment.param(argHeaderData, "data to read the header"),
-                Comment.param(old, "where the Delta protocol should look for older packets"),
-                Comment.docThrows(TargetClass.from(FieldTypeException.class), "if there is a problem in the fields"),
-                Comment.docThrows(TargetClass.from(BadProtocolData.class),
-                        "when data like this class and its user aren't compatible")),
-                Arrays.asList(bytes, argHeaderData, old),
-                Arrays.asList(TargetClass.from(FieldTypeException.class), TargetClass.from(BadProtocolData.class)),
-                new Block(BuiltIn.thisConstr(
-                        TargetClass.from(DataInputStream.class)
-                                .newInstance(TargetClass.from(ByteArrayInputStream.class).newInstance(bytes.ref())),
-                        argHeaderData.ref(),
-                        old.ref()))));
     }
 
     private boolean isBoolFolded(boolean boolFoldEnabled, Field field) {
