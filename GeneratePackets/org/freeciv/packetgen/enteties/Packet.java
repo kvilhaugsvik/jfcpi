@@ -16,8 +16,6 @@ package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
-import org.freeciv.connection.BadProtocolData;
-import org.freeciv.connection.HeaderData;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.NoDelta;
 import org.freeciv.packet.PacketHeader;
@@ -230,7 +228,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         for (Field field : fields) {
             final Var<AValue> asParam = Var.param(
                     field.getTType(),
-                    field.getFieldName());
+                    field.getName());
             params.add(asParam);
             body.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
@@ -285,11 +283,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             Block body = new Block();
 
             for (Field field : fields) {
-                Var<AValue> asParam = Var.param(field.getUnderType(), field.getFieldName());
+                Var<AValue> asParam = Var.param(field.getUnderType(), field.getName());
                 params.add(asParam);
                 body.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
-                Var<AValue> asLocal = Var.local(field.getTType(), field.getFieldName() + "_tmp", null);
+                Var<AValue> asLocal = Var.local(field.getTType(), field.getName() + "_tmp", null);
                 localVars.add(asLocal.ref());
                 body.addStatement(asLocal);
 
@@ -483,7 +481,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                     getField("delta").ref().callV("toString"))));
         for (Field field : fields)
             body.addStatement(BuiltIn.inc(buildOutput, sum(
-                    literal("\\n\\t" + field.getFieldName() + " = "),
+                    literal("\\n\\t" + field.getName() + " = "),
                     field.ref())));
         body.addStatement(RETURN(buildOutput.ref()));
         addMethod(Method.newPublicReadObjectState(Comment.no(), TargetClass.from(String.class), "toString", body));

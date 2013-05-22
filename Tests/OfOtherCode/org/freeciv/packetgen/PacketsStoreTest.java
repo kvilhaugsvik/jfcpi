@@ -210,7 +210,7 @@ public class PacketsStoreTest {
         storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields);
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
-        assertEquals("myNameIs", storage.getPacket("PACKET_HELLO").getFields().get(0).getFieldName());
+        assertEquals("myNameIs", storage.getPacket("PACKET_HELLO").getFields().get(0).getName());
         assertEquals("STRING", storage.getPacket("PACKET_HELLO").getFields().get(0).getType());
     }
 

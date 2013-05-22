@@ -99,15 +99,11 @@ public class Field<Kind extends AValue> extends Var<Kind> {
             return;
 
         for (Field other : neighbours) {
-            if (unsolvedReferences.containsKey(other.getFieldName())) { // the value of the field is used
-                ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getFieldName());
+            if (unsolvedReferences.containsKey(other.getName())) { // the value of the field is used
+                ArrayDeclaration toIntroduce = unsolvedReferences.get(other.getName());
                 toIntroduce.setJavaTypeOfTransfer(other);
             }
         }
-    }
-
-    public String getFieldName() {
-        return super.getName();
     }
 
     public TargetClass getUnderType() {
@@ -192,7 +188,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
                                 BuiltIn.<AnInt>toCode("Integer.MAX_VALUE")));
                         break;
                     case -1:
-                        throw notSupportedIndex(onPacket, getFieldName(), dec);
+                        throw notSupportedIndex(onPacket, getName(), dec);
                 }
             }
         }
@@ -246,7 +242,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
                 // Fixme: stop depending on parameter name = field name or make an official filed name to param converter
                 // assumed to be a parameter
                 fieldValue =
-                        Var.<AnInt>param(elementsToTransferTyped.getUnderType(), elementsToTransferTyped.getFieldName()).ref();
+                        Var.<AnInt>param(elementsToTransferTyped.getUnderType(), elementsToTransferTyped.getName()).ref();
             } else {
                 fieldValue = elementsToTransferTyped.ref().callV("getValue");
             }

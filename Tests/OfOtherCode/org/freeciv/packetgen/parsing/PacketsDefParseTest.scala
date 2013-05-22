@@ -39,7 +39,7 @@ class PacketsDefParseTest {
     assertTrue("Couldn't parse", parser.parsePacketsDef("PACKET_HELLO = 5;\n" + fieldDec + "\nend").successful)
     assertTrue("Didn't store packet", storage.hasPacket(5))
 
-    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getFieldName)
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getName)
     assertTrue("Didn't add field to packet", storedFields.contains("inVoice"))
     assertTrue("Didn't add field to packet", storedFields.contains("friendly"))
   }
@@ -610,7 +610,7 @@ class PacketsDefParseTest {
                                          end""").successful)
     assertTrue(storage.hasPacket(5))
 
-    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getFieldName)
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getName)
     assertTrue(storedFields.contains("friendly"))
     assertTrue(storedFields.contains("inVoice"))
   }
@@ -625,7 +625,7 @@ class PacketsDefParseTest {
                                          end""").successful)
     assertTrue(storage.hasPacket(5))
 
-    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getFieldName)
+    val storedFields = storage.getPacket("PACKET_HELLO").getFields.map(_.getName)
     assertTrue(storedFields.contains("a"))
     assertTrue(storedFields.contains("b"))
     assertTrue(storedFields.contains("c"))
