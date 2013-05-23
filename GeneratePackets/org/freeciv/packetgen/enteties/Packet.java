@@ -277,35 +277,33 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addConstructorFromJavaTypes(List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields) throws UndefinedException {
-        if (0 < fields.size()) {
-            LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
-            LinkedList<Reference<? extends AValue>> localVars = new LinkedList<Reference<? extends AValue>>();
-            Block body = new Block();
+        LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
+        LinkedList<Reference<? extends AValue>> localVars = new LinkedList<Reference<? extends AValue>>();
+        Block body = new Block();
 
-            for (Field field : fields) {
-                Var<AValue> asParam = Var.param(field.getUnderType(), field.getName());
-                params.add(asParam);
-                body.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
+        for (Field field : fields) {
+            Var<AValue> asParam = Var.param(field.getUnderType(), field.getName());
+            params.add(asParam);
+            body.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
-                Var<AValue> asLocal = Var.local(field.getTType(), field.getName() + "_tmp", null);
-                localVars.add(asLocal.ref());
-                body.addStatement(asLocal);
+            Var<AValue> asLocal = Var.local(field.getTType(), field.getName() + "_tmp", null);
+            localVars.add(asLocal.ref());
+            body.addStatement(asLocal);
 
-                Block readAndValidate = new Block();
-                field.validateLimitInsideInt(readAndValidate);
-                readAndValidate.addStatement(asLocal.assign(field.getTType().newInstance(asParam.ref(), field.getSuperLimit(0, true))));
-                final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
-                body.addStatement(readLabeled);
-            }
-
-            final Var<AValue> headerKind = Var.param(TargetClass.from(Constructor.class), "headerKind");
-            params.add(headerKind);
-            localVars.add(headerKind.ref());
-
-            body.addStatement(BuiltIn.RETURN(getAddress().newInstance(localVars.toArray(new Reference[localVars.size()]))));
-
-            addMethod(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS, getAddress(), "fromValues", params, Collections.<TargetClass>emptyList(), body));
+            Block readAndValidate = new Block();
+            field.validateLimitInsideInt(readAndValidate);
+            readAndValidate.addStatement(asLocal.assign(field.getTType().newInstance(asParam.ref(), field.getSuperLimit(0, true))));
+            final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
+            body.addStatement(readLabeled);
         }
+
+        final Var<AValue> headerKind = Var.param(TargetClass.from(Constructor.class), "headerKind");
+        params.add(headerKind);
+        localVars.add(headerKind.ref());
+
+        body.addStatement(BuiltIn.RETURN(getAddress().newInstance(localVars.toArray(new Reference[localVars.size()]))));
+
+        addMethod(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS, getAddress(), "fromValues", params, Collections.<TargetClass>emptyList(), body));
     }
 
     private void addConstructorFromDataInput(String name, List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding) throws UndefinedException {
