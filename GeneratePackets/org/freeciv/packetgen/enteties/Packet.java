@@ -449,6 +449,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             } else {
                 summing = elem1;
             }
+            summing = sum(literal(0), summing);
             for (int i = 1; i < fields.size(); i++)
                 if (!isBoolFolded(enableDeltaBoolFolding, fields.get(i)))
                     summing = sum(summing, calcBodyLen(fields.get(i)));
