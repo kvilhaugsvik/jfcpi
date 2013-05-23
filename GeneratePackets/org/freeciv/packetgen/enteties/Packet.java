@@ -137,13 +137,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         if (delta) {
             if (0 < fields.size()) {
-                addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields, bv_delta_fields);
+                addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
                 addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().newInstance());
             }
         }
 
-        addConstructorFromFields(fields, addExceptionLocation, deltaFields, bv_delta_fields);
-        addConstructorFromJavaTypes(fields, addExceptionLocation, deltaFields, bv_delta_fields);
+        addConstructorFromFields(fields, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
+        addConstructorFromJavaTypes(fields, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
         addConstructorFromDataInput(name, fields, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
     }
 
@@ -190,7 +190,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addConstructorZero(List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation,
-                                    int deltaFields, FieldType bv_delta_fields) throws UndefinedException {
+                                    int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding) throws UndefinedException {
         Block body = new Block();
 
         if (delta)
@@ -207,17 +207,18 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                             .newInstance(zeroes.ref(), field.getSuperLimit(0, false)))),
                     addExceptionLocation));
 
+        final LinkedList<Reference<? extends AValue>> deltaAndFields = getBodyFields(fields, enableDeltaBoolFolding);
         Var header = getField("header");
         body.addStatement(labelExceptionsWithPacketAndField(header, new Block(
                 header.assign(headerKind.newInstance(
-                        sum(getAddress().callV("calcBodyLen", Reference.THIS), headerKind.callV("HEADER_SIZE")),
+                        sum(getAddress().callV("calcBodyLen", deltaAndFields.toArray(new Typed[deltaAndFields.size()])), headerKind.callV("HEADER_SIZE")),
                         getField("number").ref()))), addExceptionLocation));
 
         addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE,
                 Collections.<Var<?>>emptyList(), Collections.<TargetClass>emptyList(), body));
     }
 
-    private void addConstructorFromFields(List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields) throws UndefinedException {
+    private void addConstructorFromFields(List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding) throws UndefinedException {
         Block body = new Block();
 
         if (delta)
@@ -240,8 +241,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 body.addStatement(labelExceptionsWithPacketAndField(field, validate, addExceptionLocation));
         }
 
+        final LinkedList<Reference<? extends AValue>> deltaAndFields = getBodyFields(fields, enableDeltaBoolFolding);
         final Var<AValue> pHeaderKind = Var.param(TargetClass.from(Constructor.class), "headerKind");
-        body.addStatement(generateHeader(pHeaderKind.ref(), addExceptionLocation));
+        body.addStatement(generateHeader(pHeaderKind.ref(), addExceptionLocation, deltaAndFields));
 
         params.add(pHeaderKind);
         addMethod(Method.newPublicConstructor(Comment.no(), params, body));
@@ -255,12 +257,12 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 new Block(THROW(addExceptionLocation.<AValue>call(e.ref(), literal(field.getName())))));
     }
 
-    private Typed<NoValue> generateHeader(Value<? extends AValue> headerKind, TargetMethod addExceptionLocation) {
+    private Typed<NoValue> generateHeader(Value<? extends AValue> headerKind, TargetMethod addExceptionLocation, List<? extends Typed<? extends AValue>> fields) {
         Var header = getField("header");
         return labelExceptionsWithPacketAndField(header, new Block(header.assign(BuiltIn.cast(
                 PacketHeader.class,
                 headerKind.callV("newInstance",
-                        sum(getAddress().callV("calcBodyLen", Reference.THIS),
+                        sum(getAddress().callV("calcBodyLen", fields.toArray(new Typed[fields.size()])),
                                 headerKind.callV("getDeclaringClass").callV("getField", literal("HEADER_SIZE"))
                                         .callV("getInt", NULL)),
                         getField("number").ref())))), addExceptionLocation);
@@ -276,7 +278,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 addExceptionLocation));
     }
 
-    private void addConstructorFromJavaTypes(List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields) throws UndefinedException {
+    private void addConstructorFromJavaTypes(List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding) throws UndefinedException {
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> localVars = new LinkedList<Reference<? extends AValue>>();
         Block body = new Block();
@@ -311,7 +313,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         final Var<TargetClass> streamName = Var.param(TargetClass.from(DataInput.class), "from");
         final Var<TargetClass> old =
                 Var.param(TargetClass.from("java.util", "Map<DeltaKey, Packet>"), "old");
-        Typed<AnInt> calcBodyLenCall = getAddress().<AnInt>callV("calcBodyLen", Reference.THIS);
+
+        final LinkedList<Reference<? extends AValue>> deltaAndFields = getBodyFields(fields, enableDeltaBoolFolding);
+        Typed<AnInt> calcBodyLenCall = getAddress().<AnInt>callV("calcBodyLen", deltaAndFields.toArray(new Typed[deltaAndFields.size()]));
 
         Block body = new Block();
         body.addStatement(validation.call("validateNotNull", argHeader.ref(), literal(argHeader.getName())));
@@ -353,7 +357,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                     field.getSuperLimit(0, false))));
             final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
             body.addStatement(isBoolFolded(enableDeltaBoolFolding, field) ?
-                    field.assign(field.getTType().newInstance(deltaHas(field), Hardcoded.noLimit)) :
+                    field.assign(field.getTType().newInstance(deltaHas(field, getField("delta")), Hardcoded.noLimit)) :
                     ifDeltaElse(field, readLabeled, delta ?
                             field.assign(chosenOld.ref().callV(getterNameJavaish(field))) :
                             literal("Never run")));
@@ -396,6 +400,16 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 body));
     }
 
+    private LinkedList<Reference<? extends AValue>> getBodyFields(List<Field> fields, boolean enableDeltaBoolFolding) {
+        final LinkedList<Reference<? extends AValue>> deltaAndFields = new LinkedList<Reference<? extends AValue>>();
+        if (delta)
+            deltaAndFields.add(getField("delta").ref());
+        for (Field field : fields)
+            if (!isBoolFolded(enableDeltaBoolFolding, field))
+                deltaAndFields.add(field.ref());
+        return deltaAndFields;
+    }
+
     private boolean isBoolFolded(boolean boolFoldEnabled, Field field) {
         return boolFoldEnabled && field.isDelta() && "Boolean".equals(field.getUnderType().getName());
     }
@@ -403,16 +417,16 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private Typed<?> ifDeltaElse(Field field, Typed<?> defaultAction, Typed<?> deltaDisabledAction) {
         return deltaApplies(field) ?
                 (null == deltaDisabledAction ?
-                        IF(deltaHas(field),
+                        IF(deltaHas(field, getField("delta")),
                                 new Block(defaultAction)) :
-                        IF(deltaHas(field),
+                        IF(deltaHas(field, getField("delta")),
                                 new Block(defaultAction),
                                 new Block(deltaDisabledAction))) :
                 defaultAction;
     }
 
-    private Value<ABool> deltaHas(Field field) {
-        return getField("delta").ref().callV("getValue").<ABool>callV("get", literal(field.getDeltaFieldNumber()));
+    private Value<ABool> deltaHas(Field field, Var deltaVar) {
+        return deltaVar.ref().callV("getValue").<ABool>callV("get", literal(field.getDeltaFieldNumber()));
     }
 
     private boolean deltaApplies(Field field) {
@@ -437,29 +451,38 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
     private void addCalcBodyLen(List<Field> fields, boolean enableDeltaBoolFolding) {
         Block body = new Block();
+        LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
+
         Typed<? extends AValue> summing = literal(0);
 
-        if (delta)
-            summing = sum(summing, getField("delta").ref().callV("encodedLength"));
+        Var<? extends AValue> deltaParam = null;
+        if (delta) {
+            deltaParam = Var.param(getField("delta").getTType(), getField("delta").getName());
+            params.add(deltaParam);
+            summing = sum(summing, deltaParam.ref().callV("encodedLength"));
+        }
 
         for (Field field : fields)
-            if (!isBoolFolded(enableDeltaBoolFolding, field))
-                summing = sum(summing, calcBodyLen(field));
+            if (!isBoolFolded(enableDeltaBoolFolding, field)) {
+                Var<AValue> asParam = Var.param(field.getTType(), field.getName());
+                params.add(asParam);
+                summing = sum(summing, calcBodyLen(field, asParam, deltaParam));
+            }
 
         body.addStatement(RETURN(summing));
 
         addMethod(Method.custom(Comment.no(),
-                Visibility.PRIVATE, Scope.OBJECT,
-                TargetClass.from(int.class), "calcBodyLen", Collections.<Var<AValue>>emptyList(),
+                Visibility.PRIVATE, Scope.CLASS,
+                TargetClass.from(int.class), "calcBodyLen", params,
                 Collections.<TargetClass>emptyList(),
                 body));
     }
 
-    private Typed<? extends AValue> calcBodyLen(Field field) {
+    private Typed<? extends AValue> calcBodyLen(Field field, Var<AValue> asParam, Var deltaVar) {
         if (deltaApplies(field))
-            return R_IF(deltaHas(field), field.ref().<AnInt>call("encodedLength"), literal(0));
+            return R_IF(deltaHas(field, deltaVar), asParam.ref().<AnInt>call("encodedLength"), literal(0));
         else
-            return field.ref().<Returnable>call("encodedLength");
+            return asParam.ref().<AnInt>call("encodedLength");
     }
 
     private void addToString(String name, List<Field> fields) {
