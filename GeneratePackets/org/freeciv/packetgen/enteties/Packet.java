@@ -142,6 +142,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             }
         }
 
+        addBasicConstructor(fields);
         addConstructorFromFields(fields, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
         addConstructorFromJavaTypes(fields, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
         addConstructorFromDataInput(name, fields, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
@@ -306,6 +307,27 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         body.addStatement(BuiltIn.RETURN(getAddress().newInstance(localVars.toArray(new Reference[localVars.size()]))));
 
         addMethod(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS, getAddress(), "fromValues", params, Collections.<TargetClass>emptyList(), body));
+    }
+
+    private void addBasicConstructor(List<Field> someFields) throws UndefinedException {
+        Block body = new Block();
+
+        LinkedList<Var> fields = new LinkedList<Var>(someFields);
+
+        if (delta) fields.add(getField("delta"));
+
+        fields.add(getField("header"));
+
+        LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
+        for (Var field : fields) {
+            final Var<AValue> asParam = Var.param(
+                    field.getTType(),
+                    field.getName());
+            params.add(asParam);
+            body.addStatement(field.ref().assign(asParam.ref()));
+        }
+
+        addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE, params, Collections.<TargetClass>emptyList(), body));
     }
 
     private void addConstructorFromDataInput(String name, List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding) throws UndefinedException {
