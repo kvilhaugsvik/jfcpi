@@ -437,26 +437,17 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
     private void addCalcBodyLen(List<Field> fields, boolean enableDeltaBoolFolding) {
         Block body = new Block();
-        if (0 < fields.size()) {
-            final Typed<? extends AValue> elem1 = calcBodyLen(fields.get(0));
-            Typed<? extends AValue> summing;
-            if (delta) {
-                final Value deltaSize = getField("delta").ref().callV("encodedLength");
-                if (isBoolFolded(enableDeltaBoolFolding, fields.get(0)))
-                    summing = deltaSize;
-                else
-                    summing = sum(deltaSize, elem1);
-            } else {
-                summing = elem1;
-            }
-            summing = sum(literal(0), summing);
-            for (int i = 1; i < fields.size(); i++)
-                if (!isBoolFolded(enableDeltaBoolFolding, fields.get(i)))
-                    summing = sum(summing, calcBodyLen(fields.get(i)));
-            body.addStatement(RETURN(summing));
-        } else {
-            body.addStatement(RETURN(literal(0)));
-        }
+        Typed<? extends AValue> summing = literal(0);
+
+        if (delta)
+            summing = sum(summing, getField("delta").ref().callV("encodedLength"));
+
+        for (Field field : fields)
+            if (!isBoolFolded(enableDeltaBoolFolding, field))
+                summing = sum(summing, calcBodyLen(field));
+
+        body.addStatement(RETURN(summing));
+
         addMethod(Method.custom(Comment.no(),
                 Visibility.PRIVATE, Scope.OBJECT,
                 TargetClass.from(int.class), "calcBodyLen", Collections.<Var<AValue>>emptyList(),
