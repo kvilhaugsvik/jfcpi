@@ -162,14 +162,14 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         }
     }
 
-    public Typed getSuperLimit(int pos, boolean fromValue) throws UndefinedException {
+    public Typed getSuperLimit(int pos, boolean inFactory) throws UndefinedException {
         if (pos < declarations.length) {
             LinkedList<Typed<AnInt>> args = new LinkedList<Typed<AnInt>>();
             args.add(declarations[pos].getMaxSize());
             if (declarations[pos].hasTransfer())
-                args.add(declarations[pos].getTransferValue(fromValue));
+                args.add(declarations[pos].getTransferValue(inFactory));
             if (pos + 1 < declarations.length)
-                args.add(getSuperLimit(pos + 1, fromValue));
+                args.add(getSuperLimit(pos + 1, inFactory));
             return TargetClass.from(ElementsLimit.class).callV("limit", args.toArray(new Typed[0]));
         } else {
             return Hardcoded.noLimit;
@@ -235,14 +235,14 @@ public class Field<Kind extends AValue> extends Var<Kind> {
             return maxSize.getReqs();
         }
 
-        private Typed<AnInt> getTransferValue(boolean fromValue) throws UndefinedException {
+        private Typed<AnInt> getTransferValue(boolean inFactory) throws UndefinedException {
             final Value<AnInt> fieldValue;
 
-            if (fromValue) {
-                // Fixme: stop depending on parameter name = field name or make an official filed name to param converter
+            if (inFactory) {
+                // Fixme: stop depending on tmp name make an official filed name to param converter
                 // assumed to be a parameter
                 fieldValue =
-                        Var.<AnInt>param(elementsToTransferTyped.getUnderType(), elementsToTransferTyped.getName()).ref();
+                        Var.<AnInt>param(elementsToTransferTyped.getTType(), elementsToTransferTyped.getName() + "_tmp").ref().callV("getValue");
             } else {
                 fieldValue = elementsToTransferTyped.ref().callV("getValue");
             }
