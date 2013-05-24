@@ -523,18 +523,37 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addGetDeltaKey(int number, List<Field> fields) {
-        List<Typed<? extends AValue>> params = new LinkedList<Typed<? extends AValue>>();
-        params.add(literal(number));
-        for (Field<?> field : getKeyFields(fields))
-            params.add(field.ref());
+        List<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
+        List<Typed<? extends AValue>> fromDynamicArgs = new LinkedList<Typed<? extends AValue>>();
+        List<Typed<? extends AValue>> deltaKeyArgs = new LinkedList<Typed<? extends AValue>>();
+
+        deltaKeyArgs.add(literal(number));
+
+        for (Field<?> field : getKeyFields(fields)) {
+            fromDynamicArgs.add(field.ref());
+            final Var<AValue> asParam = Var.param(field.getTType(), field.getName());
+            params.add(asParam);
+            deltaKeyArgs.add(asParam.ref());
+        }
+
+        addMethod(Method.custom(
+                Comment.doc("Get a delta key for this packet",
+                        "A DeltaKey used in a HashMap makes it easy to find the previous packet of " +
+                                "the same packet kind where all key fields are the same.",
+                        Comment.docReturns("a delta key matching the packet.")),
+                Visibility.PRIVATE, Scope.CLASS, TargetClass.from(DeltaKey.class), "getKeyPrivate",
+                params,
+                Collections.<TargetClass>emptyList(),
+                new Block(RETURN(TargetClass.from(DeltaKey.class)
+                        .newInstance(deltaKeyArgs.toArray(new Typed[deltaKeyArgs.size()]))))));
+
         addMethod(Method.newPublicReadObjectState(
                 Comment.doc("Get a delta key for this packet",
                         "A DeltaKey used in a HashMap makes it easy to find the previous packet of " +
                                 "the same packet kind where all key fields are the same.",
                         Comment.docReturns("a delta key matching the packet.")),
                 TargetClass.from(DeltaKey.class), "getKey",
-                new Block(RETURN(TargetClass.from(DeltaKey.class)
-                        .newInstance(params.toArray(new Typed[params.size()]))))));
+                new Block(RETURN(getAddress().callV("getKeyPrivate", fromDynamicArgs.toArray(new Typed[fromDynamicArgs.size()]))))));
     }
 
     private static List<Field<?>> getKeyFields(List<Field> fields) {
