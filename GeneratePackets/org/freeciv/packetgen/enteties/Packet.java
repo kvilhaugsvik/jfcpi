@@ -303,6 +303,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         final Var<AValue> headerKind = Var.param(TargetClass.from(Constructor.class), "headerKind");
         params.add(headerKind);
         localVars.add(headerKind.ref());
+        body.addStatement(validation.call("validateNotNull", headerKind.ref(), literal(headerKind.getName())));
 
         body.addStatement(BuiltIn.RETURN(getAddress().newInstance(localVars.toArray(new Reference[localVars.size()]))));
 
