@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 public class GeneratedPacketTest {
     @Test
     public void testPacketWithoutFields() throws IOException, NoSuchMethodException {
-        CONN_PONG packet = new CONN_PONG(Header_2_1.class.getConstructor(int.class, int.class));
+        CONN_PONG packet = CONN_PONG.fromValues(Header_2_1.class.getConstructor(int.class, int.class));
 
         assertEquals(3, packet.getHeader().getTotalSize());
         assertEquals(89, packet.getHeader().getPacketKind());
