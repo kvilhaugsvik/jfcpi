@@ -289,7 +289,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             params.add(asParam);
             body.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
 
-            Var<AValue> asLocal = Var.local(field.getTType(), field.getName() + "_tmp", null);
+            Var<AValue> asLocal = field.getTmpLocalVar(null);
             localVars.add(asLocal.ref());
             body.addStatement(asLocal);
 
@@ -364,7 +364,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         if (delta) {
             LinkedList<Value<? extends AValue>> keyArgs = new LinkedList<Value<? extends AValue>>();
             for (Field keyField : getKeyFields(fields))
-                keyArgs.add(Var.local(keyField.getTType(), keyField.getName() + "_tmp", null).ref());
+                keyArgs.add(keyField.getTmpLocalVar(null).ref());
             chosenOld = Var.local(getAddress(), "chosenOld", R_IF(
                     isSame(NULL, old.ref().callV("get", getAddress().callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()])))),
                     getField("zero").ref(),
@@ -375,7 +375,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         LinkedList<Reference<? extends AValue>> constructorParams = new LinkedList<Reference<? extends AValue>>();
         for (Field field : fields) {
-            Var<AValue> asLocal = Var.local(field.getTType(), field.getName() + "_tmp", null);
+            Var<AValue> asLocal = field.getTmpLocalVar(null);
             constructorParams.add(asLocal.ref());
             body.addStatement(asLocal);
 

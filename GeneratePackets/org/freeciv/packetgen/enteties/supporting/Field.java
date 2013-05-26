@@ -118,6 +118,10 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         return type.getUnderType().getName();
     }
 
+    public Var<Kind> getTmpLocalVar(Typed<Kind> value) {
+        return Var.local(getTType(), getName() + "_tmp", value);
+    }
+
     public void setDelta(int deltaNumber) {
         if (deltaNumber < 0)
             throw new IllegalArgumentException("Delta number can't be negative");
@@ -239,10 +243,8 @@ public class Field<Kind extends AValue> extends Var<Kind> {
             final Value<AnInt> fieldValue;
 
             if (inFactory) {
-                // Fixme: stop depending on tmp name make an official filed name to param converter
-                // assumed to be a parameter
-                fieldValue =
-                        Var.<AnInt>param(elementsToTransferTyped.getTType(), elementsToTransferTyped.getName() + "_tmp").ref().callV("getValue");
+                // assumed to be a local temporary variable
+                fieldValue = elementsToTransferTyped.getTmpLocalVar(null).ref().callV("getValue");
             } else {
                 fieldValue = elementsToTransferTyped.ref().callV("getValue");
             }
