@@ -73,7 +73,7 @@ public class SignInAndWait {
                     ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
                     interpreter.getRequiredPostSendRules(), interpreter);
 
-            con.toSend(new PACKET_SERVER_JOIN_REQ(userName,
+            con.toSend(PACKET_SERVER_JOIN_REQ.fromValues(userName,
                     interpreter.getCapStringMandatory(),
                     interpreter.getVersionLabel(),
                     interpreter.getVersionMajor(),
