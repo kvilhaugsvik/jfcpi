@@ -20,13 +20,14 @@ import org.freeciv.packet.*;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class PacketsMapping {
-    private final HashMap<Integer, Constructor> packetMakers = new HashMap<Integer, Constructor>();
+    private final HashMap<Integer, Method> packetMakers = new HashMap<Integer, Method>();
     private final Class<? extends PacketHeader> packetNumberBytes;
     private final Map<Integer, ReflexReaction> protoRulesPostReceive;
     private final Map<Integer, ReflexReaction> protoRulesPostSend;
@@ -61,7 +62,7 @@ public class PacketsMapping {
             for (Class understood : understoodPackets) {
                 try {
                     this.packetMakers.put(understood.getField("number").getInt(null),
-                                          understood.getConstructor(DataInput.class, PacketHeader.class, Map.class));
+                            understood.getMethod("fromHeaderAndStream", DataInput.class, PacketHeader.class, Map.class));
                 } catch (NoSuchFieldException e) {
                     throw new BadProtocolData(understood.getSimpleName() + " is not compatible.\n" +
                             "(The static field number is missing)", e);
@@ -102,9 +103,7 @@ public class PacketsMapping {
         if (!canInterpret(header.getPacketKind()))
             throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
         try {
-            return (Packet)packetMakers.get(header.getPacketKind()).newInstance(in, header, old);
-        } catch (InstantiationException e) {
-            throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
+            return (Packet)packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
         } catch (IllegalAccessException e) {
             throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
         } catch (InvocationTargetException e) {
