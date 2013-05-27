@@ -55,51 +55,6 @@ public class GeneratedPacketTest {
         assertEquals(99L, packet.getPatch_versionValue().longValue());
     }
 
-    @Test
-    public void testPacketWithFieldsFromFields() throws IOException, NoSuchMethodException {
-        SERVER_JOIN_REQ packet =
-                new SERVER_JOIN_REQ(
-                        new STRING("FreecivJava", ElementsLimit.limit(100)),
-                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100)),
-                        new STRING("-dev", ElementsLimit.limit(100)),
-                        new UINT32(2L, ElementsLimit.noLimit()),
-                        new UINT32(3L, ElementsLimit.noLimit()),
-                        new UINT32(99L, ElementsLimit.noLimit()),
-                        Header_2_1.class.getConstructor(int.class, int.class));
-
-        assertEquals(64, packet.getHeader().getTotalSize());
-        assertEquals(4, packet.getHeader().getPacketKind());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void packet_fromFields_notNull() throws IOException, NoSuchMethodException {
-        DeltaVectorTest packet = new DeltaVectorTest(
-                new UINT8(8, ElementsLimit.noLimit()),
-                new STRING("works", ElementsLimit.limit(100)),
-                null,
-                Header_2_2.class.getConstructor(int.class, int.class));
-    }
-
-    @Test
-    public void testPacketWithFieldValuesFromFields() throws IOException, NoSuchMethodException {
-        SERVER_JOIN_REQ packet =
-                new SERVER_JOIN_REQ(
-                        new STRING("FreecivJava", ElementsLimit.limit(100)),
-                        new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100)),
-                        new STRING("-dev", ElementsLimit.limit(100)),
-                        new UINT32(2L, ElementsLimit.noLimit()),
-                        new UINT32(3L, ElementsLimit.noLimit()),
-                        new UINT32(99L, ElementsLimit.noLimit()),
-                        Header_2_1.class.getConstructor(int.class, int.class));
-
-        assertEquals("FreecivJava", packet.getUsernameValue());
-        assertEquals("+Freeciv.Devel-2.4-2011.Aug.02 ", packet.getCapabilityValue());
-        assertEquals("-dev", packet.getVersion_labelValue());
-        assertEquals(2L, packet.getMajor_versionValue().longValue());
-        assertEquals(3L, packet.getMinor_versionValue().longValue());
-        assertEquals(99L, packet.getPatch_versionValue().longValue());
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void packet_fromJava_notNull() throws IOException, NoSuchMethodException {
         DeltaVectorTest packet = DeltaVectorTest.fromValues(8, null, 1260L, Header_2_2.class.getConstructor(int.class, int.class));
@@ -157,31 +112,6 @@ public class GeneratedPacketTest {
         SERVER_JOIN_REQ packet = SERVER_JOIN_REQ.fromHeaderAndStream(inputStream, new Header_2_1(62, 4), new HashMap<DeltaKey, Packet>());
     }
 
-    @Test public void testPacketGetFields() throws NoSuchMethodException {
-        STRING username = new STRING("FreecivJava", ElementsLimit.limit(100));
-        STRING capability = new STRING("+Freeciv.Devel-2.4-2011.Aug.02 ", ElementsLimit.limit(100));
-        STRING version_label = new STRING("-dev", ElementsLimit.limit(100));
-        UINT32 major_version = new UINT32(2L, ElementsLimit.noLimit());
-        UINT32 minor_version = new UINT32(3L, ElementsLimit.noLimit());
-        UINT32 patch_version = new UINT32(99L, ElementsLimit.noLimit());
-        SERVER_JOIN_REQ packet =
-                new SERVER_JOIN_REQ(
-                        username,
-                        capability,
-                        version_label,
-                        major_version,
-                        minor_version,
-                        patch_version,
-                        Header_2_1.class.getConstructor(int.class, int.class));
-
-        assertEquals(username.getValue(), packet.getUsername().getValue());
-        assertEquals(capability.getValue(), packet.getCapability().getValue());
-        assertEquals(version_label.getValue(), packet.getVersion_label().getValue());
-        assertEquals(major_version.getValue(), packet.getMajor_version().getValue());
-        assertEquals(minor_version.getValue(), packet.getMinor_version().getValue());
-        assertEquals(patch_version.getValue(), packet.getPatch_version().getValue());
-    }
-
     @Test public void testGeneratedPacketSerializesCorrectly() throws IOException {
         DataInput inputStream = new DataInputStream(new ByteArrayInputStream(
                 new byte[]{/*0, 64, 4, */70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
@@ -231,26 +161,6 @@ public class GeneratedPacketTest {
         TestArray packet = TestArray.fromValues(new Long[]{5L, 6L, 7L}, Header_2_2.class.getConstructor(int.class, int.class));
     }
 
-    @Test public void generatedPacketWithArrayFieldsSimpleFromFields() throws NoSuchMethodException {
-        UINT32S uint32s = new UINT32S(new Long[]{5L, 6L}, ElementsLimit.limit(2));
-        TestArray packet = new TestArray(uint32s, Header_2_2.class.getConstructor(int.class, int.class));
-        assertEquals("Result not the same as constructor",
-                uint32s,
-                packet.getTheArray());
-    }
-
-    @Test(expected = IllegalNumberOfElementsException.class)
-    public void generatedPacketWithArrayFieldsSimpleFromFields_ArrayToSmall() throws NoSuchMethodException {
-        TestArray packet = new TestArray(new UINT32S(new Long[]{5L}, ElementsLimit.limit(1)),
-                Header_2_2.class.getConstructor(int.class, int.class));
-    }
-
-    @Test(expected = IllegalNumberOfElementsException.class)
-    public void generatedPacketWithArrayFieldsSimpleFromFields_ArrayToBig() throws NoSuchMethodException {
-        TestArray packet = new TestArray(new UINT32S(new Long[]{5L, 6L, 7L}, ElementsLimit.limit(3)),
-                Header_2_2.class.getConstructor(int.class, int.class));
-    }
-
     @Test public void generatedPacketWithArrayFieldsTransferFromJava() throws NoSuchMethodException {
         TestArrayTransfer packet = TestArrayTransfer.fromValues(2, new Long[]{5L, 6L},
                 Header_2_2.class.getConstructor(int.class, int.class));
@@ -272,29 +182,6 @@ public class GeneratedPacketTest {
     @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketWithArrayFieldsTransfer_ArrayToBig() throws NoSuchMethodException {
         TestArrayTransfer packet = TestArrayTransfer.fromValues(3, new Long[]{5L, 6L, 7L, 6L, 7L},
-                Header_2_2.class.getConstructor(int.class, int.class));
-    }
-
-    @Test public void generatedPacketWithArrayFieldsTransferFromFields() throws NoSuchMethodException {
-        UINT32S uint32s = new UINT32S(new Long[]{5L, 6L}, ElementsLimit.limit(2));
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()), uint32s,
-                Header_2_2.class.getConstructor(int.class, int.class));
-        assertEquals("Result not the same as constructor",
-                uint32s,
-                packet.getTheArray());
-    }
-
-    @Test(expected = IllegalNumberOfElementsException.class)
-    public void generatedPacketWithArrayFieldsTransferFromFields_ArrayToSmall() throws NoSuchMethodException {
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()),
-                new UINT32S(new Long[]{5L}, ElementsLimit.limit(1)),
-                Header_2_2.class.getConstructor(int.class, int.class));
-    }
-
-    @Test(expected = IllegalNumberOfElementsException.class)
-    public void generatedPacketWithArrayFieldsTransferFromFields_ArrayToBig() throws NoSuchMethodException {
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(2, ElementsLimit.noLimit()),
-                new UINT32S(new Long[]{5L, 6L, 7L}, ElementsLimit.limit(3)),
                 Header_2_2.class.getConstructor(int.class, int.class));
     }
 

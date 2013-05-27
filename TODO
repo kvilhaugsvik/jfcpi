@@ -12,6 +12,8 @@ GeneratePackets
  * Support all variants when dealing with capabilities
  * Handle all of array diff so the field is stored as a normal array
  * Continue making code generation more typed
+ * Mark named basic data types without using Field
+   - as the boxed numbers can't be extended in Java the alternatives are annotation or wrapper class
 
 JavaGenerator
  * TargetClass should not be AValue

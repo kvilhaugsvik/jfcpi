@@ -143,7 +143,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
 
         addBasicConstructor(fields);
-        addConstructorFromFields(fields, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
         addConstructorFromJavaTypes(fields, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
         addConstructorFromDataInput(name, fields, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
     }
@@ -217,37 +216,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE,
                 Collections.<Var<?>>emptyList(), Collections.<TargetClass>emptyList(), body));
-    }
-
-    private void addConstructorFromFields(List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding) throws UndefinedException {
-        Block body = new Block();
-
-        if (delta)
-            addDeltaField(addExceptionLocation, deltaFields, body, bv_delta_fields, getField("delta"));
-
-
-        LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
-        for (Field field : fields) {
-            final Var<AValue> asParam = Var.param(
-                    field.getTType(),
-                    field.getName());
-            params.add(asParam);
-            body.addStatement(validation.call("validateNotNull", asParam.ref(), literal(asParam.getName())));
-
-            field.validateLimitInsideInt(body);
-            body.addStatement(field.ref().assign(asParam.ref()));
-            Block validate = new Block();
-            field.appendArrayEaterValidationTo(validate);
-            if (0 < validate.numberOfStatements())
-                body.addStatement(labelExceptionsWithPacketAndField(field, validate, addExceptionLocation));
-        }
-
-        final LinkedList<Reference<? extends AValue>> deltaAndFields = getBodyFields(fields, enableDeltaBoolFolding);
-        final Var<AValue> pHeaderKind = Var.param(TargetClass.from(Constructor.class), "headerKind");
-        body.addStatement(generateHeader(pHeaderKind.ref(), addExceptionLocation, deltaAndFields, getField("header")));
-
-        params.add(pHeaderKind);
-        addMethod(Method.newPublicConstructor(Comment.no(), params, body));
     }
 
     private Typed<NoValue> labelExceptionsWithPacketAndField(Var field, Block operation, TargetMethod addExceptionLocation) {
