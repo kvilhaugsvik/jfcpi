@@ -462,26 +462,25 @@ public class GeneratedPacketTest {
 
     @Test(expected = IllegalNumberOfElementsException.class)
     public void generatedPacketStringToBig() throws NoSuchMethodException {
-        StringArray packet = new StringArray(new STRING("Not an ArrayNot an Array",
-                ElementsLimit.limit(30)),
-                new STRINGS(new String[]{
-                                "Element 1",
-                                "Element 2",
-                                "Element 3"
-                        }, ElementsLimit.limit(3, ElementsLimit.limit(10))),
+        StringArray packet = StringArray.fromValues("Not an ArrayNot an Array",
+                new String[]{
+                        "Element 1",
+                        "Element 2",
+                        "Element 3"
+                },
                 Header_2_2.class.getConstructor(int.class, int.class));
     }
 
     @Test
     public void generatedPacketExceptionTellsWhere() throws NoSuchMethodException {
         try {
-            StringArray packet = new StringArray(
-                    new STRING("Not an ArrayNot an Array", ElementsLimit.limit(30)),
-                    new STRINGS(new String[]{
-                                        "Element 1",
-                                        "Element 2",
-                                        "Element 3"
-                                }, ElementsLimit.limit(3, ElementsLimit.limit(10))),
+            StringArray packet = StringArray.fromValues(
+                    "Not an ArrayNot an Array",
+                    new String[]{
+                            "Element 1",
+                            "Element 2",
+                            "Element 3"
+                    },
                     Header_2_2.class.getConstructor(int.class, int.class));
             fail("No exception cast");
         } catch (FieldTypeException e) {
