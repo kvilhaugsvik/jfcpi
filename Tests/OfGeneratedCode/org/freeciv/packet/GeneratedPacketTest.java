@@ -299,9 +299,8 @@ public class GeneratedPacketTest {
     }
 
     @Test(expected = IllegalLimitSizeException.class)
-    public void generatedPacketWithArrayFieldsTransferFromFields_ToBigTransfer() throws NoSuchMethodException {
-        UINT32S uint32s = new UINT32S(new Long[]{5L, 6L, 5L, 6L, 8L}, ElementsLimit.limit(5));
-        TestArrayTransfer packet = new TestArrayTransfer(new UINT8(5, ElementsLimit.noLimit()), uint32s,
+    public void generatedPacketWithArrayFieldsTransfer_ToBigTransfer() throws NoSuchMethodException {
+        TestArrayTransfer packet = TestArrayTransfer.fromValues(5, new Long[]{5L, 6L, 5L, 6L, 8L},
                 Header_2_2.class.getConstructor(int.class, int.class));
     }
 
