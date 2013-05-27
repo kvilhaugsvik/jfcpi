@@ -275,7 +275,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             delta_tmp = Var.param(getField("delta").getTType(), "delta" + "_tmp");
             body.addStatement(delta_tmp);
             addDeltaField(addExceptionLocation, deltaFields, body, bv_delta_fields, delta_tmp);
-            localVars.add(delta_tmp.ref());
+            localVars.addFirst(delta_tmp.ref());
             sizeArgs.addFirst(delta_tmp.ref());
         }
 
@@ -294,12 +294,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addBasicConstructor(List<Field> someFields) throws UndefinedException {
-        // TODO: move delta to a consistent place as a parameter compared to calcBodyLen
         Block body = new Block();
 
         LinkedList<Var> fields = new LinkedList<Var>(someFields);
 
-        if (delta) fields.add(getField("delta"));
+        if (delta) fields.addFirst(getField("delta"));
 
         fields.add(getField("header"));
 
@@ -387,7 +386,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         body.groupBoundary();
 
         if (delta)
-            constructorParams.add(delta_tmp.ref());
+            constructorParams.addFirst(delta_tmp.ref());
         constructorParams.add(argHeader.ref());
         Var me = Var.local(getAddress(), "me", getAddress().newInstance(constructorParams.toArray(new Typed[constructorParams.size()])));
         body.addStatement(me);
@@ -490,7 +489,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addCalcBodyLen(List<Field> fields, boolean enableDeltaBoolFolding) {
-        // TODO: move delta to a consistent place as a parameter compared to basic constructor
         Block body = new Block();
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
 
