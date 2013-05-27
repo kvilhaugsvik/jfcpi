@@ -22,7 +22,7 @@ import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
-public class GeneratedPacketTest {
+public class GeneratedUsingEntetiesAlone {
     @Test
     public void testPacketWithoutFields() throws IOException, NoSuchMethodException {
         CONN_PONG packet = CONN_PONG.fromValues(Header_2_1.class.getConstructor(int.class, int.class));

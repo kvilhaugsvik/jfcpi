@@ -114,10 +114,12 @@ compileFromFreeciv: sourceFromFreeciv
 	touch compileFromFreeciv
 
 compileTestPeerGenerator: compileCore compileCodeGenerator folderTestOut
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT} Tests/ThatGenerateSourceCode/org/freeciv/packetgen/FromEntetiesAlone.java
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT} `find Tests/ThatGenerateSourceCode -iname "*.java"`
+	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT} `find Tests/ThatGenerateSourceCode -iname "*.scala"`
 	touch compileTestPeerGenerator
 
 sourceTestPeers: compileTestPeerGenerator
+	${SCALA} -classpath ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.UsingGenerator ${GENERATED_TEST_SOURCE_FOLDER}
 	${JAVA} -cp ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.FromEntetiesAlone ${GENERATED_TEST_SOURCE_FOLDER}
 	touch sourceTestPeers
 
@@ -246,7 +248,8 @@ runPacketTest: compilePacketTest
 	touch runPacketTest
 
 runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnectionTests runUtilsTests
-	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedPacketTest
+	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingEntetiesAlone
+	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingFullGenerator
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedStructTest
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.FieldTypeTests
