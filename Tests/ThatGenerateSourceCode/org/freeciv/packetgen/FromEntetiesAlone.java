@@ -245,7 +245,7 @@ public class FromEntetiesAlone {
                 org.freeciv.packet.Packet.class.getPackage(),
                 org.freeciv.packet.fieldtype.FieldType.class.getPackage()
         }) {
-            (new File(targetFolder + "/" + pack.getName().replace('.', '/'))).mkdirs();
+            (new File(targetFolder + "/" + "generated" + "/" + pack.getName().replace('.', '/'))).mkdirs();
         }
     }
 
@@ -628,7 +628,7 @@ public class FromEntetiesAlone {
 
     private static void writeJavaFile(ClassWriter content, String targetFolder) throws IOException {
         String packagePath = content.getPackage().replace('.', '/');
-        File classFile = new File(targetFolder +
+        File classFile = new File(targetFolder + "/" + "generated" +
                 "/" + packagePath + "/" + content.getName() + ".java");
         System.out.println(classFile.getAbsolutePath());
         classFile.createNewFile();

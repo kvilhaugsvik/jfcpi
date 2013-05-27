@@ -127,7 +127,7 @@ runTestPeerCreationAsTests: compileTestPeerGenerator
 	touch runTestPeerCreationAsTests
 
 compileTestPeers: compileCodeGenerator compileCore sourceTestPeers
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${CORE_JAR} `find ${GENERATED_TEST_SOURCE_FOLDER} -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${CORE_JAR} `find ${GENERATED_TEST_SOURCE_FOLDER}/generated -iname "*.java"`
 	touch compileTestPeers
 
 folderTestOut: workFolder
