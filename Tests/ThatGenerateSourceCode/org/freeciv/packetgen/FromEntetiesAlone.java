@@ -43,7 +43,7 @@ import java.util.*;
 import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newEnumValue;
 import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newInvalidEnum;
 
-public class GenerateTest {
+public class FromEntetiesAlone {
     public static final Constant<AString> FC_DEFAULT_DATA_ENCODING =
             Constant.isString("FC_DEFAULT_DATA_ENCODING", BuiltIn.literal("UTF-8"));
 
@@ -77,7 +77,7 @@ public class GenerateTest {
             Constant.isInt("JUMBO_SIZE", IntExpression.integer("0xffff"));
 
     public static void main(String[] args) throws IOException, UndefinedException {
-        (new GenerateTest()).generate(args);
+        (new FromEntetiesAlone()).generate(args);
     }
 
     public void generate(String[] args) throws IOException, UndefinedException {

@@ -114,16 +114,16 @@ compileFromFreeciv: sourceFromFreeciv
 	touch compileFromFreeciv
 
 compileTestPeerGenerator: compileCore compileCodeGenerator folderTestOut
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT} Tests/OfOtherCode/org/freeciv/packetgen/GenerateTest.java
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT} Tests/ThatGenerateSourceCode/org/freeciv/packetgen/FromEntetiesAlone.java
 	touch compileTestPeerGenerator
 
 sourceTestPeers: compileTestPeerGenerator
-	${JAVA} -cp ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.GenerateTest ${GENERATED_TEST_SOURCE_FOLDER}
+	${JAVA} -cp ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.FromEntetiesAlone ${GENERATED_TEST_SOURCE_FOLDER}
 	touch sourceTestPeers
 
 # not included in tests since make will run the code when generating test peers
 runTestPeerCreationAsTests: compileTestPeerGenerator
-	${JAVA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.GenerateTest
+	${JAVA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.FromEntetiesAlone
 	touch runTestPeerCreationAsTests
 
 compileTestPeers: compileCodeGenerator compileCore sourceTestPeers
