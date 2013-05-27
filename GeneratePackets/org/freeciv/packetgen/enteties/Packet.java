@@ -123,7 +123,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
 
         for (Field field : fields) {
-            addObjectConstantAndGetter(field);
+            addField(field);
             addJavaGetter(field);
         }
 
@@ -380,7 +380,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             body.addStatement(isBoolFolded(enableDeltaBoolFolding, field) ?
                     asLocal.assign(field.getTType().newInstance(deltaHas(field, delta_tmp), Hardcoded.noLimit)) :
                     ifDeltaElse(field, readLabeled, delta ?
-                            asLocal.assign(chosenOld.ref().callV(getterNameJavaish(field))) :
+                            asLocal.assign(chosenOld.ref().callV(field.getName())) :
                             literal("Never run"), delta_tmp));
         }
 

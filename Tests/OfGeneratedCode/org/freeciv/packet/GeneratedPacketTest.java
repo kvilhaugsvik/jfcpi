@@ -383,9 +383,9 @@ public class GeneratedPacketTest {
 
         DeltaVectorTest packet = DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(16, 933), new HashMap<DeltaKey, Packet>());
 
-        assertEquals(50, packet.getId().getValue().intValue());
-        assertEquals("works", packet.getField1().getValue());
-        assertEquals(256, packet.getField2().getValue().intValue());
+        assertEquals(50, packet.getIdValue().intValue());
+        assertEquals("works", packet.getField1Value());
+        assertEquals(256, packet.getField2Value().intValue());
     }
 
     @Test
@@ -396,9 +396,9 @@ public class GeneratedPacketTest {
 
         DeltaVectorTest packet = DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(10, 933), new HashMap<DeltaKey, Packet>());
 
-        assertEquals(50, packet.getId().getValue().intValue());
-        assertEquals("", packet.getField1().getValue());
-        assertEquals(256, packet.getField2().getValue().intValue());
+        assertEquals(50, packet.getIdValue().intValue());
+        assertEquals("", packet.getField1Value());
+        assertEquals(256, packet.getField2Value().intValue());
     }
 
     @Test
@@ -412,9 +412,9 @@ public class GeneratedPacketTest {
         DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(16, 933), old);
         DeltaVectorTest packet = DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(10, 933), old);
 
-        assertEquals(100, packet.getId().getValue().intValue());
-        assertEquals("", packet.getField1().getValue());
-        assertEquals(256, packet.getField2().getValue().intValue());
+        assertEquals(100, packet.getIdValue().intValue());
+        assertEquals("", packet.getField1Value());
+        assertEquals(256, packet.getField2Value().intValue());
     }
 
     @Test
@@ -428,9 +428,9 @@ public class GeneratedPacketTest {
         DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(16, 933), old);
         DeltaVectorTest packet = DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(10, 933), old);
 
-        assertEquals(50, packet.getId().getValue().intValue());
-        assertEquals("works", packet.getField1().getValue());
-        assertEquals(256, packet.getField2().getValue().intValue());
+        assertEquals(50, packet.getIdValue().intValue());
+        assertEquals("works", packet.getField1Value());
+        assertEquals(256, packet.getField2Value().intValue());
     }
 
     @Test
