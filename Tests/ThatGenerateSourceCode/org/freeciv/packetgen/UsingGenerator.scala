@@ -24,10 +24,6 @@ class UsingGenerator {
 }
 
 object UsingGenerator {
-  def main(args: Array[String]) {
-    simple(if (0 == args.length) GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER else args(0))
-  }
-
   def simple(generated_test_source_folder: String) {
     var full = new GeneratePackets("Tests/ThatGenerateSourceCode/", "simple/simple.def", "simple/simple.var", Nil,
       List[(String, String)](),
@@ -35,5 +31,9 @@ object UsingGenerator {
       false, PacketHeaderKinds.FC_trunk,
       true, true)
     full.writeToDir(generated_test_source_folder, true)
+  }
+
+  def main(args: Array[String]) {
+    simple(if (0 == args.length) GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER else args(0))
   }
 }
