@@ -177,14 +177,13 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        if (!SELF_TYPED.equals(this))
-            to.hintStart(TargetClass.class.getName());
-        if (SELF_TYPED.equals(this))
+        if (SELF_TYPED.equals(this)) {
             name.writeAtoms(to);
-        else
+        } else {
+            to.hintStart(TargetClass.class.getName());
             super.writeAtoms(to);
-        if (!SELF_TYPED.equals(this))
             to.hintEnd(TargetClass.class.getName());
+        }
     }
 
     private static TargetClass getExisting(String name) {
