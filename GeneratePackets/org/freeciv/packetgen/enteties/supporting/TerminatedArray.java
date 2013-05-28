@@ -200,9 +200,9 @@ public class TerminatedArray extends FieldType {
 
                 Typed<ABool> noTerminatorFound;
                 if (!notTerminatable(terminator))
-                    if ("byte".equals(current.getTType().getName()))
+                    if ("byte".equals(current.getTType().getSimpleName()))
                         noTerminatorFound = isNotSame(cast(byte.class, terminator.ref()), current.ref());
-                    else if (current.getTType().getName().endsWith("_DIFF"))
+                    else if (current.getTType().getSimpleName().endsWith("_DIFF"))
                         noTerminatorFound = isNotSame(terminator.ref(),
                                 current.ref().callV("getValue").callV("getIndex").callV("intValue"));
                     else
@@ -427,7 +427,7 @@ public class TerminatedArray extends FieldType {
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var elem) {
-                        final Typed<AValue> from = "int".equals(elem.getTType().getName()) ?
+                        final Typed<AValue> from = "int".equals(elem.getTType().getSimpleName()) ?
                                 kind.getUnderType().newInstance(elem.ref(), NULL) :
                                 elem.ref();
                         return new Block(kind.getAddress()
@@ -454,7 +454,7 @@ public class TerminatedArray extends FieldType {
                 sameNumberOfBufferElementsAndValueElements,
                 Arrays.<Method.Helper>asList(lenInBytesHelper, buffer2value),
                 arrayEater,
-                TargetArray.from(kind.getAddress(), 1).getOf().getName().endsWith("_DIFF"),
+                TargetArray.from(kind.getAddress(), 1).getOf().getSimpleName().endsWith("_DIFF"),
                 Collections.<Var<? extends AValue>>emptyList()
         );
     }

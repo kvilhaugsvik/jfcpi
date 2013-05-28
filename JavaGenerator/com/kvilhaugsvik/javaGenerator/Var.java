@@ -21,7 +21,6 @@ import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
-import org.freeciv.packet.fieldtype.CapAdd;
 
 import java.util.Collections;
 import java.util.List;
@@ -68,7 +67,7 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
     }
 
     public String getType() {
-        return type.getName();
+        return type.getSimpleName();
     }
 
     public String getName() {
@@ -167,6 +166,6 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         for (Annotate annotation : annotations)
             if (annotation.sameClass(anno))
                 return annotation;
-        throw new NoSuchElementException("Not annotated using " + anno.getName());
+        throw new NoSuchElementException("Not annotated using " + anno.getSimpleName());
     }
 }

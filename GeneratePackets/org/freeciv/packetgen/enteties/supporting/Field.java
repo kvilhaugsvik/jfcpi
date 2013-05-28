@@ -115,7 +115,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
     }
 
     public String getJType() {
-        return type.getUnderType().getName();
+        return type.getUnderType().getSimpleName();
     }
 
     public Var<Kind> getTmpLocalVar(Typed<Kind> value) {

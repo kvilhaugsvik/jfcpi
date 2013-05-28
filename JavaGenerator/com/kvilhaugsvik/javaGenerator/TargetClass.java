@@ -96,11 +96,11 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         return where;
     }
 
-    public CodeAtom getCName() {
+    public CodeAtom getTypedSimpleName() {
         return name;
     }
 
-    public String getName() {
+    public String getSimpleName() {
         return name.get();
     }
 
@@ -141,7 +141,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     private void methodExists(String method) {
         if (!hasMethod(method))
-            throw new IllegalArgumentException("No method named " + method + " on " + getName());
+            throw new IllegalArgumentException("No method named " + method + " on " + getSimpleName());
     }
 
     private void initIfPossibleAndNotDone() {

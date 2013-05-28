@@ -477,7 +477,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private boolean isBoolFolded(boolean boolFoldEnabled, Field field) {
-        return boolFoldEnabled && field.isDelta() && "Boolean".equals(field.getUnderType().getName());
+        return boolFoldEnabled && field.isDelta() && "Boolean".equals(field.getUnderType().getSimpleName());
     }
 
     private Typed<?> ifDeltaElse(Field field, Typed<?> defaultAction, Typed<?> deltaDisabledAction, Var deltaVar) {

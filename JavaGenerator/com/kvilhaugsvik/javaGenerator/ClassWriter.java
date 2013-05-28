@@ -194,7 +194,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
             public boolean isTrueFor(IR.CodeAtom argument) {
                 return HasAtoms.SELF.equals(argument);
             }
-        }, myAddress.getCName());
+        }, myAddress.getTypedSimpleName());
 
         scopeData.writeAtoms(to);
 
@@ -203,7 +203,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
         visibility.writeAtoms(to);
         kind.writeAtoms(to);
-        to.add(myAddress.getCName());
+        to.add(myAddress.getTypedSimpleName());
         if (!DEFAULT_PARENT.equals(parent)) {
             to.add(EXTENDS);
             parent.writeAtoms(to);
@@ -242,7 +242,7 @@ public class ClassWriter extends Formatted implements HasAtoms {
     }
 
     public String getName() {
-        return myAddress.getName();
+        return myAddress.getSimpleName();
     }
 
     public TargetClass getAddress() {
