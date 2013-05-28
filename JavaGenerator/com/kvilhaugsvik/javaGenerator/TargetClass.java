@@ -32,7 +32,6 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     public static final TargetClass SELF_TYPED = new TargetClass(HasAtoms.SELF);
     public static final TargetClass TYPE_NOT_KNOWN = new TargetClass(new CodeAtom(""));
 
-    private final CodeAtom name;
     private final HashMap<String, TargetMethod> methods;
 
     TargetClass parent = null;
@@ -41,10 +40,8 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     protected TargetClass(String inPackage, String className) {
         super(TargetPackage.from(inPackage), addressString2Components(className));
-        final CodeAtom name = super.components[super.components.length - 1];
         final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
 
-        this.name = name;
         this.methods = methods;
 
         registerBuiltIn();
@@ -74,7 +71,6 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     public TargetClass(TargetPackage where, CodeAtom name) {
         super(where, name);
-        this.name = name;
         this.methods = new HashMap<String, TargetMethod>();
 
         registerBuiltIn();
@@ -82,7 +78,6 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     private TargetClass(CodeAtom symbol) {
         super(TargetPackage.TOP_LEVEL, symbol);
-        this.name = symbol;
         this.methods = new HashMap<String, TargetMethod>();
 
         registerBuiltIn();
@@ -97,11 +92,11 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     public CodeAtom getTypedSimpleName() {
-        return name;
+        return components[components.length - 1];
     }
 
     public String getSimpleName() {
-        return name.get();
+        return getTypedSimpleName().get();
     }
 
     protected Class<?> getRepresents() {
