@@ -141,7 +141,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     private void methodExists(String method) {
         if (!hasMethod(method))
-            throw new IllegalArgumentException("No method named " + method + " on " + name.get());
+            throw new IllegalArgumentException("No method named " + method + " on " + getName());
     }
 
     private void initIfPossibleAndNotDone() {
