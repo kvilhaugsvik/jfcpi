@@ -19,9 +19,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.NoDelta;
 import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.fieldtype.ElementsLimit;
-import org.freeciv.packet.fieldtype.FieldTypeException;
-import org.freeciv.packet.fieldtype.Key;
+import org.freeciv.packet.fieldtype.*;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.dependency.Dependency;
@@ -72,17 +70,26 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
     }
 
+    @Deprecated
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags,
                   boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,
                   List<Field> fields) throws UndefinedException {
+        this(name, number, headerKind, logger, packetFlags, deltaIsOn, enableDeltaBoolFolding, bv_delta_fields, fields, new TreeSet<String>());
+    }
+
+    public Packet(String name, int number, TargetClass headerKind, String logger,
+                  List<Annotate> packetFlags,
+                  boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,
+                  List<Field> allFields,
+                  SortedSet<String> caps) throws UndefinedException {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
                 Imports.are(),
                 "Freeciv's protocol definition", packetFlags, name,
                       DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.Packet.class)));
 
         this.number = number;
-        this.fields = fields;
+        this.fields = filterForCapabilities(allFields, new HashSet<Typed<AString>>());
 
         this.logger = logger;
         this.delta = deltaIsOn && hasDelta(packetFlags) && hasAtLeastOneDeltaField(fields);
@@ -145,6 +152,26 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         addBasicConstructor(fields);
         addConstructorFromJavaTypes(fields, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
         addConstructorFromDataInput(name, fields, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
+    }
+
+    private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Set<Typed<AString>> usingCaps) {
+        LinkedList<Field> packetFieldList = new LinkedList<Field>();
+        for (Field candidate : fieldList)
+            if (belongHere(candidate, usingCaps))
+                packetFieldList.add(candidate);
+        return packetFieldList;
+    }
+
+    private static boolean belongHere(Field candidate, Set<Typed<AString>> usingCaps) {
+        if (candidate.isAnnotatedUsing(CapAdd.class))
+            return hasCap(candidate, usingCaps, CapAdd.class);
+        if (candidate.isAnnotatedUsing(CapRemove.class))
+            return !hasCap(candidate, usingCaps, CapRemove.class);
+        return true;
+    }
+
+    private static boolean hasCap(Field field, Set<Typed<AString>> usingCaps, Class<?> addOrRemove) {
+        return usingCaps.contains(field.getAnnotation(addOrRemove).getValueOf("value"));
     }
 
     private static boolean hasAtLeastOneDeltaField(List<Field> fields) {

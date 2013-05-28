@@ -133,11 +133,11 @@ public class PacketsStore {
             throws PacketCollisionException, UndefinedException {
         validateNameAndNumber(name, number);
 
-        final Set<Typed<AString>> caps = new HashSet<Typed<AString>>();
+        final TreeSet<String> caps = new TreeSet<String>();
         for (WeakField field : fields)
             for (WeakFlag flag : field.getFlags())
                 if ("add-cap".equals(flag.getName()) || "remove-cap".equals(flag.getName()))
-                    caps.add(BuiltIn.literal(flag.getArguments()[0]));
+                    caps.add(flag.getArguments()[0]);
 
         Requirement me = new Requirement(name, Packet.class);
         reserveNameAndNumber(name, number, me);
@@ -157,35 +157,13 @@ public class PacketsStore {
                     fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
                             fields.get(i).getFlags(), fields.get(i).getDeclarations()));
 
-                LinkedList<Field> maxCapableFieldList = filterForCapabilities(fieldList, new HashSet<Typed<AString>>());
-
                 return new Packet(name, number, packetHeaderType, logger, packetFlags,
                         enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
-                        maxCapableFieldList);
+                        fieldList, caps);
             }
         });
 
         requirements.demand(me);
-    }
-
-    private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Set<Typed<AString>> usingCaps) {
-        LinkedList<Field> packetFieldList = new LinkedList<Field>();
-        for (Field candidate : fieldList)
-            if (belongHere(candidate, usingCaps))
-                packetFieldList.add(candidate);
-        return packetFieldList;
-    }
-
-    private static boolean belongHere(Field candidate, Set<Typed<AString>> usingCaps) {
-        if (candidate.isAnnotatedUsing(CapAdd.class))
-            return hasCap(candidate, usingCaps, CapAdd.class);
-        if (candidate.isAnnotatedUsing(CapRemove.class))
-            return !hasCap(candidate, usingCaps, CapRemove.class);
-        return true;
-    }
-
-    private static boolean hasCap(Field field, Set<Typed<AString>> usingCaps, Class<?> addOrRemove) {
-        return usingCaps.contains(field.getAnnotation(addOrRemove).getValueOf("value"));
     }
 
     private void validateNameAndNumber(String name, int number) throws PacketCollisionException {
