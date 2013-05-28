@@ -21,6 +21,11 @@ class UsingGenerator {
   def simple() {
     UsingGenerator.simple(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER)
   }
+
+  @Test
+  def caps() {
+    UsingGenerator.caps(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER)
+  }
 }
 
 object UsingGenerator {
@@ -33,7 +38,19 @@ object UsingGenerator {
     full.writeToDir(generated_test_source_folder, true)
   }
 
+  def caps(generated_test_source_folder: String) {
+    var full = new GeneratePackets("Tests/ThatGenerateSourceCode/", "capabilities/packets.def", "capabilities/vars", Nil,
+      List[(String, String)](),
+      GeneratorDefaults.LOG_TO,
+      false, PacketHeaderKinds.FC_trunk,
+      true, true)
+    full.writeToDir(generated_test_source_folder, true)
+  }
+
   def main(args: Array[String]) {
-    simple(if (0 == args.length) GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER else args(0))
+    val generated_test_source_folder = if (0 == args.length) GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER else args(0)
+
+    simple(generated_test_source_folder)
+    caps(generated_test_source_folder)
   }
 }

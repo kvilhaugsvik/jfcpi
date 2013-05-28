@@ -1,0 +1,25 @@
+type FIELDTYPE_LIKE_JAVA_INT = sint32(int)
+type FIELDTYPE_LIKE_JAVA_BYTE = sint8(int)
+type FIELDTYPE_STRING = string(char)
+
+PACKET_CAP_ADD = 1010; cs, sc
+  FIELDTYPE_LIKE_JAVA_INT alwaysThere;
+  FIELDTYPE_LIKE_JAVA_BYTE thereWhenAdded; add-cap(isAdded)
+end
+
+PACKET_CAP_REMOVE = 1011; cs, sc
+  FIELDTYPE_LIKE_JAVA_INT alwaysThere;
+  FIELDTYPE_LIKE_JAVA_BYTE thereUnlessRemoved; remove-cap(isRemoved)
+end
+
+PACKET_CAP_ADD_AND_REMOVE = 1012; cs, sc
+  FIELDTYPE_LIKE_JAVA_INT alwaysThere;
+  FIELDTYPE_STRING old_field[10]; remove-cap(updated)
+  FIELDTYPE_LIKE_JAVA_INT new_field; add-cap(updated)
+end
+
+PACKET_CAP_USES_TWO_CAPS = 1013; cs, sc
+  FIELDTYPE_LIKE_JAVA_INT alwaysThere;
+  FIELDTYPE_LIKE_JAVA_BYTE addedByCap1; add-cap(cap1)
+  FIELDTYPE_STRING addedByCap2[15]; add-cap(cap2)
+end
