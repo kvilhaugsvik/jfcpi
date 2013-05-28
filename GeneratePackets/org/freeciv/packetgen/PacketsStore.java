@@ -157,7 +157,7 @@ public class PacketsStore {
                     fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
                             fields.get(i).getFlags(), fields.get(i).getDeclarations()));
 
-                LinkedList<Field> maxCapableFieldList = filterForCapabilities(fieldList, caps);
+                LinkedList<Field> maxCapableFieldList = filterForCapabilities(fieldList, new HashSet<Typed<AString>>());
 
                 return new Packet(name, number, packetHeaderType, logger, packetFlags,
                         enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
