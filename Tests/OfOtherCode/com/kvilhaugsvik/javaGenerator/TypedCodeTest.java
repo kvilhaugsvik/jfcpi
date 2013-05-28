@@ -460,6 +460,17 @@ public class TypedCodeTest {
         assertEquals("java.lang.Integer...", TargetClass.from("java.lang", "Integer...").getFullAddress());
     }
 
+    @Test public void targetClass_inner_fromString() {
+        assertEquals("Target class representing an inner class gave the wrong address",
+                "java.util.AbstractMap.SimpleImmutableEntry",
+                TargetClass.from(java.util.AbstractMap.SimpleImmutableEntry.class).getFullAddress());
+    }
+
+    @Test public void targetClass_inner_fromClass() {
+        assertEquals("Target class representing an inner class gave the wrong address",
+                "top.next.HostClass.Inner", TargetClass.from("top.next", "HostClass.Inner").getFullAddress());
+    }
+
     @Test public void scopeData_class_notInScope() {
         Imports.ScopeDataForJavaFile scopeData = Imports.are().getScopeData(TargetClass.from("org.one", "User"));
         CodeAtoms used = new CodeAtoms(TargetClass.from("org.other", "Used"));

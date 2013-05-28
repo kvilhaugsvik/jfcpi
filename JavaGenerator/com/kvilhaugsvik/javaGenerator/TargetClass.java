@@ -25,8 +25,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class TargetClass extends Address<TargetPackage> implements AValue {
     public static final TargetClass SELF_TYPED = new TargetClass(HasAtoms.SELF);
@@ -48,9 +47,21 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     protected TargetClass(Class wrapped) {
-        this(TargetPackage.from(wrapped.getPackage()), new CodeAtom(wrapped.getSimpleName()));
+        this(TargetPackage.from(wrapped.getPackage()), getClassNames(wrapped));
 
         setRepresents(wrapped);
+    }
+
+    private static LinkedList<CodeAtom> getClassNames(Class wrapped) {
+        if (null == wrapped.getEnclosingClass()) {
+            LinkedList<CodeAtom> parts = new LinkedList<CodeAtom>();
+            parts.add(new CodeAtom(wrapped.getSimpleName()));
+            return parts;
+        } else {
+            LinkedList<CodeAtom> parts = getClassNames(wrapped.getEnclosingClass());
+            parts.add(new CodeAtom(wrapped.getSimpleName()));
+            return parts;
+        }
     }
 
     private static void convertMethods(TargetClass target, Class wrapped) {
@@ -70,7 +81,11 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     public TargetClass(TargetPackage where, CodeAtom name) {
-        super(where, name);
+        this(where, Arrays.asList(name));
+    }
+
+    public TargetClass(TargetPackage where, List<CodeAtom> name) {
+        super(where, name.toArray(new CodeAtom[name.size()]));
         this.methods = new HashMap<String, TargetMethod>();
 
         registerBuiltIn();
