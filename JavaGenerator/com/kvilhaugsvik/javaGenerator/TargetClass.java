@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 public class TargetClass extends Address<TargetPackage> implements AValue {
-    public static final TargetClass SELF_TYPED = new TargetClass();
-    public static final TargetClass TYPE_NOT_KNOWN = new TargetClass();
+    public static final TargetClass SELF_TYPED = new TargetClass(HasAtoms.SELF);
+    public static final TargetClass TYPE_NOT_KNOWN = new TargetClass(new CodeAtom(""));
 
     private final CodeAtom name;
     private final HashMap<String, TargetMethod> methods;
@@ -80,9 +80,9 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         registerBuiltIn();
     }
 
-    private TargetClass() {
-        super(TargetPackage.TOP_LEVEL);
-        this.name = HasAtoms.SELF;
+    private TargetClass(CodeAtom symbol) {
+        super(TargetPackage.TOP_LEVEL, symbol);
+        this.name = symbol;
         this.methods = new HashMap<String, TargetMethod>();
 
         registerBuiltIn();
