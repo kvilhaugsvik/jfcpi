@@ -178,7 +178,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     @Override
     public void writeAtoms(CodeAtoms to) {
         if (SELF_TYPED.equals(this)) {
-            name.writeAtoms(to);
+            super.writeAtoms(to);
         } else {
             to.hintStart(TargetClass.class.getName());
             super.writeAtoms(to);
