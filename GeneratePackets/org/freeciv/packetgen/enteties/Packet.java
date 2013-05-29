@@ -90,6 +90,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         this.number = number;
         this.fields = filterForCapabilities(allFields, new HashSet<Typed<AString>>());
+        final String capCombName = "";
 
         this.logger = logger;
         this.delta = deltaIsOn && hasDelta(packetFlags) && hasAtLeastOneDeltaField(fields);
@@ -150,8 +151,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
 
         addBasicConstructor(fields);
-        addConstructorFromJavaTypes(fields, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
-        addConstructorFromDataInput(name, fields, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
+        addConstructorFromJavaTypes(fields, capCombName, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
+        addConstructorFromDataInput(name, fields, capCombName, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
     }
 
     private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Set<Typed<AString>> usingCaps) {
@@ -296,7 +297,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 addExceptionLocation));
     }
 
-    private void addConstructorFromJavaTypes(List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding) throws UndefinedException {
+    private void addConstructorFromJavaTypes(List<Field> fields, String capsName, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding) throws UndefinedException {
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> localVars = new LinkedList<Reference<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> sizeArgs = new LinkedList<Reference<? extends AValue>>();
@@ -340,7 +341,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         body.addStatement(BuiltIn.RETURN(getAddress().newInstance(localVars.toArray(new Reference[localVars.size()]))));
 
-        addMethod(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS, getAddress(), "fromValues", params, Collections.<TargetClass>emptyList(), body));
+        addMethod(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS, getAddress(), "fromValues" + capsName, params, Collections.<TargetClass>emptyList(), body));
     }
 
     private void addBasicConstructor(List<Field> someFields) throws UndefinedException {
@@ -364,7 +365,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE, params, Collections.<TargetClass>emptyList(), body));
     }
 
-    private void addConstructorFromDataInput(String name, List<Field> fields, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding) throws UndefinedException {
+    private void addConstructorFromDataInput(String name, List<Field> fields, String capsName, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding) throws UndefinedException {
         Var<TargetClass> argHeader = Var.param(TargetClass.from(PacketHeader.class), "header");
         final Var<TargetClass> streamName = Var.param(TargetClass.from(DataInput.class), "from");
         final Var<TargetClass> old =
@@ -483,7 +484,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 Visibility.PUBLIC,
                 Scope.CLASS,
                 getAddress(),
-                "fromHeaderAndStream",
+                "fromHeaderAndStream" + capsName,
                 Arrays.asList(streamName, argHeader, old),
                 Arrays.asList(TargetClass.from(FieldTypeException.class)),
                 body));
