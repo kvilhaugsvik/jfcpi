@@ -137,7 +137,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         this.addMethod(createEncoder(fields, enableDeltaBoolFolding, delta, getField("header"), getField("delta")));
         this.addMethod(createdCalcBodyLen(fields, enableDeltaBoolFolding, getField("delta"), delta));
-        addGetDeltaKey(number, fields);
+        this.addMethod(createGetDeltaKeyPrivate(number, fields));
+        this.addMethod(createGetDeltaKeyPublic(fields, getAddress()));
 
         this.addMethod(createToString(name, fields, delta, getField("number").ref(), getField("delta")));
 
@@ -590,21 +591,36 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return Method.newPublicReadObjectState(Comment.no(), TargetClass.from(String.class), "toString", body);
     }
 
-    private void addGetDeltaKey(int number, List<Field> fields) {
-        List<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
+    private Method createGetDeltaKeyPublic(List<Field> fields, TargetClass address) {
         List<Typed<? extends AValue>> fromDynamicArgs = new LinkedList<Typed<? extends AValue>>();
+
+        for (Field<?> field : getKeyFields(fields)) {
+            fromDynamicArgs.add(field.ref());
+        }
+
+        return Method.newPublicReadObjectState(
+                Comment.doc("Get a delta key for this packet",
+                        "A DeltaKey used in a HashMap makes it easy to find the previous packet of " +
+                                "the same packet kind where all key fields are the same.",
+                        Comment.docReturns("a delta key matching the packet.")),
+                TargetClass.from(DeltaKey.class), "getKey",
+                new Block(RETURN(address.callV("getKeyPrivate",
+                        fromDynamicArgs.toArray(new Typed[fromDynamicArgs.size()])))));
+    }
+
+    private static Method createGetDeltaKeyPrivate(int number, List<Field> fields) {
+        List<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         List<Typed<? extends AValue>> deltaKeyArgs = new LinkedList<Typed<? extends AValue>>();
 
         deltaKeyArgs.add(literal(number));
 
         for (Field<?> field : getKeyFields(fields)) {
-            fromDynamicArgs.add(field.ref());
             final Var<AValue> asParam = Var.param(field.getTType(), field.getName());
             params.add(asParam);
             deltaKeyArgs.add(asParam.ref());
         }
 
-        addMethod(Method.custom(
+        return Method.custom(
                 Comment.doc("Get a delta key for this packet",
                         "A DeltaKey used in a HashMap makes it easy to find the previous packet of " +
                                 "the same packet kind where all key fields are the same.",
@@ -613,15 +629,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 params,
                 Collections.<TargetClass>emptyList(),
                 new Block(RETURN(TargetClass.from(DeltaKey.class)
-                        .newInstance(deltaKeyArgs.toArray(new Typed[deltaKeyArgs.size()]))))));
-
-        addMethod(Method.newPublicReadObjectState(
-                Comment.doc("Get a delta key for this packet",
-                        "A DeltaKey used in a HashMap makes it easy to find the previous packet of " +
-                                "the same packet kind where all key fields are the same.",
-                        Comment.docReturns("a delta key matching the packet.")),
-                TargetClass.from(DeltaKey.class), "getKey",
-                new Block(RETURN(getAddress().callV("getKeyPrivate", fromDynamicArgs.toArray(new Typed[fromDynamicArgs.size()]))))));
+                        .newInstance(deltaKeyArgs.toArray(new Typed[deltaKeyArgs.size()])))));
     }
 
     private static List<Field<?>> getKeyFields(List<Field> fields) {
