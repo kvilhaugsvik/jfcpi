@@ -19,7 +19,6 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
-import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR;
 
 import java.lang.reflect.Field;
@@ -27,13 +26,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class TargetMethod extends Address<TargetClass> {
-    private final HasAtoms name;
     private final TargetClass returns;
     private final Called kind;
 
     public TargetMethod(TargetClass where, String named, TargetClass returns, Called kind) {
         super(where, new IR.CodeAtom(named));
-        this.name = super.components[super.components.length - 1];
         this.returns = returns;
         this.kind = kind;
     }
@@ -52,10 +49,6 @@ public class TargetMethod extends Address<TargetClass> {
                 Modifier.isStatic(has.getModifiers()) ? Called.STATIC_FIELD : Called.DYNAMIC_FIELD);
     }
 
-    public String getName() {
-        return name.toString();
-    }
-
     public boolean isDynamic() {
         return Called.DYNAMIC.equals(kind);
     }
@@ -70,7 +63,7 @@ public class TargetMethod extends Address<TargetClass> {
 
     public <Ret extends AValue> MethodCall.HasResult<Ret> callV(Typed<? extends AValue>... parameters) {
         if (void.class.getCanonicalName().equals(returns.getFullAddress()))
-            throw new IllegalArgumentException(getName() + ": Wrong return type");
+            throw new IllegalArgumentException(getSimpleName() + ": Wrong return type");
 
         return new MethodCall.HasResult<Ret>(kind, returns, this, parameters);
     }
@@ -82,7 +75,7 @@ public class TargetMethod extends Address<TargetClass> {
             case DYNAMIC:
             case DYNAMIC_ARRAY_GET:
             case DYNAMIC_FIELD:
-                name.writeAtoms(to);
+                getTypedSimpleName().writeAtoms(to);
                 break;
             case STATIC:
             case STATIC_FIELD:

@@ -106,14 +106,6 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         return where;
     }
 
-    public CodeAtom getTypedSimpleName() {
-        return components[components.length - 1];
-    }
-
-    public String getSimpleName() {
-        return getTypedSimpleName().get();
-    }
-
     protected Class<?> getRepresents() {
         return this.represents;
     }
@@ -127,12 +119,12 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     public void register(TargetMethod has) {
         // TODO: Fix underlying issue. For now work around by sparing dynamic non void methods from over writing
-        if (methods.containsKey(has.getName())
-                && methods.get(has.getName()).isDynamic()
-                && methods.get(has.getName()).returnsAValue())
+        if (methods.containsKey(has.getSimpleName())
+                && methods.get(has.getSimpleName()).isDynamic()
+                && methods.get(has.getSimpleName()).returnsAValue())
             return;
 
-        methods.put(has.getName(), has);
+        methods.put(has.getSimpleName(), has);
     }
 
     public void setParent(TargetClass parent) {

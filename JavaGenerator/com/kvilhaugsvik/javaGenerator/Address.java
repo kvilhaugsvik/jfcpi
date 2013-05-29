@@ -86,6 +86,14 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
         return !(symbolic || where.symbolic);
     }
 
+    public CodeAtom getTypedSimpleName() {
+        return components[components.length - 1];
+    }
+
+    public String getSimpleName() {
+        return getTypedSimpleName().get();
+    }
+
     @Override
     public void writeAtoms(CodeAtoms to) {
         if (includeWhere()) {
