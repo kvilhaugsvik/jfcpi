@@ -23,9 +23,6 @@ import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 import com.kvilhaugsvik.javaGenerator.formating.TokensToStringStyle;
-import com.kvilhaugsvik.javaGenerator.formating.CodeStyleBuilder;
-import com.kvilhaugsvik.javaGenerator.formating.CodeStyleBuilder.*;
-import com.kvilhaugsvik.javaGenerator.formating.ScopeStack;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR;
@@ -44,11 +41,12 @@ public class ClassWriter extends Formatted implements HasAtoms {
     private final LinkedList<Annotate> classAnnotate;
     private final TargetClass parent;
     private final List<TargetClass> implementsInterface;
+    private final boolean isOuter;
 
     private final LinkedHashMap<String, Var> fields = new LinkedHashMap<String, Var>();
-
     private final LinkedList<Method> methods = new LinkedList<Method>();
     protected final EnumElements enums = new EnumElements();
+    private final LinkedHashMap<String, ClassWriter> innerClasses = new LinkedHashMap<String, ClassWriter>();
 
     private boolean constructorFromAllFields = false;
 
@@ -75,6 +73,24 @@ public class ClassWriter extends Formatted implements HasAtoms {
         }
 
         this.scopeData = imports.getScopeData(this.myAddress);
+        this.isOuter = true;
+    }
+
+    private ClassWriter(TargetClass inside, ClassKind kind, String name, TargetClass parent, List<TargetClass> implementsInterface, Imports.ScopeDataForJavaFile scopeData) {
+        LinkedList<IR.CodeAtom> classPart = new LinkedList<IR.CodeAtom>();
+        classPart.addAll(inside.getTypedClassName());
+        classPart.add(new ClassWriter.Atom(name));
+        this.myAddress = new TargetClass(inside.getPackage(), classPart);
+        this.myAddress.setParent(parent);
+
+        this.classAnnotate = new LinkedList<Annotate>();
+        this.visibility = Visibility.PUBLIC;
+        this.kind = kind;
+        this.parent = parent;
+        this.implementsInterface = implementsInterface;
+
+        this.scopeData = scopeData;
+        this.isOuter = false;
     }
 
     public void addField(Var field) {
@@ -143,6 +159,15 @@ public class ClassWriter extends Formatted implements HasAtoms {
         enums.add(element);
     }
 
+    public ClassWriter newInnerClass(ClassKind kind, String name, TargetClass parent, List<TargetClass> implementsInterface) {
+        innerClasses.put(name, new ClassWriter(this.getAddress(), kind, name, parent, implementsInterface, scopeData));
+        return getInnerClass(name);
+    }
+
+    private ClassWriter getInnerClass(String name) {
+        return innerClasses.get(name);
+    }
+
     /**
      * Get a line that sets a field's value to the value of the variable of the same name.
      * @param field Name of the field (and variable)
@@ -187,8 +212,6 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     @Override
     public void writeAtoms(CodeAtoms to) {
-        to.hintStart(TokensToStringStyle.OUTER_LEVEL);
-
         to.rewriteRule(new Util.OneCondition<IR.CodeAtom>() {
             @Override
             public boolean isTrueFor(IR.CodeAtom argument) {
@@ -196,7 +219,11 @@ public class ClassWriter extends Formatted implements HasAtoms {
             }
         }, myAddress.getTypedSimpleName());
 
-        scopeData.writeAtoms(to);
+        if (isOuter) {
+            to.hintStart(TokensToStringStyle.OUTER_LEVEL);
+
+            scopeData.writeAtoms(to);
+        }
 
         for (Annotate ann : classAnnotate)
             ann.writeAtoms(to);
@@ -236,9 +263,14 @@ public class ClassWriter extends Formatted implements HasAtoms {
         for (Method method : other)
             method.writeAtoms(to);
 
+        for (String innerName : innerClasses.keySet())
+            innerClasses.get(innerName).writeAtoms(to);
+
         to.add(HasAtoms.RSC);
 
-        to.hintEnd(TokensToStringStyle.OUTER_LEVEL);
+        if (isOuter) {
+            to.hintEnd(TokensToStringStyle.OUTER_LEVEL);
+        }
     }
 
     public String getName() {

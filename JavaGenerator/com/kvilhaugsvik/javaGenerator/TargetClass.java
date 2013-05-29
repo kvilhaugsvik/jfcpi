@@ -17,6 +17,7 @@ package com.kvilhaugsvik.javaGenerator;
 import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
+import com.kvilhaugsvik.javaGenerator.representation.IR;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
@@ -104,6 +105,10 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
 
     public TargetPackage getPackage() {
         return where;
+    }
+
+    public Collection<? extends CodeAtom> getTypedClassName() {
+        return Arrays.asList(components);
     }
 
     protected Class<?> getRepresents() {

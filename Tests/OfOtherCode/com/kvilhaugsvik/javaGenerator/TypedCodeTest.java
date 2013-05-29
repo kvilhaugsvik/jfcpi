@@ -14,6 +14,7 @@
 
 package com.kvilhaugsvik.javaGenerator;
 
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import org.freeciv.utility.Util;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
@@ -39,6 +40,7 @@ import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TypedCodeTest {
     @Test public void targetArrayNewInstance() {
@@ -524,5 +526,65 @@ public class TypedCodeTest {
         TargetClass.from("org.other", "Used").writeAtoms(used);
 
         assertFalse(scopeData.isInScope(used.toArray()));
+    }
+
+    @Test public void innerClass_enum() {
+        final ClassWriter outer = new ClassWriter(
+                ClassKind.CLASS, TargetPackage.from("top.sub"),
+                Imports.are(),
+                "hardcoded test",
+                Collections.<Annotate>emptyList(),
+                "Outer", ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
+        final ClassWriter inner = outer.newInnerClass(ClassKind.ENUM, "Inner",
+                ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
+
+        assertAtomsAre(new String[]{
+                "top", ".", "sub", ".", "Outer", ".", "Inner"
+        }, inner.getAddress());
+    }
+
+    @Test public void innerClass_subClass() {
+        final ClassWriter outer = new ClassWriter(
+                ClassKind.CLASS, TargetPackage.from("top.sub"),
+                Imports.are(),
+                "hardcoded test",
+                Collections.<Annotate>emptyList(),
+                "Parent", ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
+        final ClassWriter inner = outer.newInnerClass(ClassKind.CLASS, "Child",
+                outer.getAddress(), Collections.<TargetClass>emptyList());
+
+        assertAtomsAre(new String[]{
+                "top", ".", "sub", ".", "Parent", ".", "Child"
+        }, inner.getAddress());
+    }
+
+    @Test public void innerClass_callMethodOnInnerClass() {
+        final ClassWriter outer = new ClassWriter(
+                ClassKind.CLASS, TargetPackage.from("top.sub"),
+                Imports.are(),
+                "hardcoded test",
+                Collections.<Annotate>emptyList(),
+                "Parent", ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
+        final ClassWriter inner = outer.newInnerClass(ClassKind.CLASS, "Child",
+                outer.getAddress(), Collections.<TargetClass>emptyList());
+        inner.addMethod(Method.newReadClassState(Comment.no(), TargetClass.from(String.class), "getString", new Block(
+                BuiltIn.RETURN(BuiltIn.literal("a string"))
+        )));
+
+        Typed call = inner.getAddress().callV("getString");
+        assertAtomsAre(new String[]{
+                "top", ".", "sub", ".", "Parent", ".", "Child", ".", "getString", "(", ")"
+        }, call);
+    }
+
+    public static void assertAtomsAre(String[] expected, HasAtoms code) {
+        assertAtomsAre(expected, new CodeAtoms(code));
+    }
+
+    public static void assertAtomsAre(String[] expected, CodeAtoms atoms) {
+        for (int i = 0; i < expected.length; i++)
+            assertEquals("Element number " + i + " not as expected", expected[i], atoms.get(i).getAtom().get());
+
+        assertEquals("Same start but different length", expected.length, atoms.toArray().length);
     }
 }
