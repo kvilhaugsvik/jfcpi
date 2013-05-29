@@ -174,6 +174,29 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return usingCaps.contains(field.getAnnotation(addOrRemove).getValueOf("value"));
     }
 
+    private static LinkedHashMap<String, Set<Typed<AString>>> allPossibleCombinations(SortedSet<String> caps) {
+        ArrayList<String> capsList = new ArrayList<String>();
+        ArrayList<Typed<AString>> capsListTyped = new ArrayList<Typed<AString>>();
+        for (String cap : caps) {
+            capsList.add(cap);
+            capsListTyped.add(BuiltIn.literal(cap));
+        }
+
+        final LinkedHashMap<String, Set<Typed<AString>>> allPossbile = new LinkedHashMap<String, Set<Typed<AString>>>();
+        final double combinations = Math.pow(2, caps.size());
+        for (int combination = 0; combination < combinations; combination++) {
+            StringBuilder capsName = new StringBuilder();
+            HashSet<Typed<AString>> capsSet = new HashSet<Typed<AString>>();
+            for (int i = 0; i < capsList.size(); i++)
+                if ((combination & (1 << i)) != 0) {
+                    capsName.append("_").append(capsList.get(i));
+                    capsSet.add(capsListTyped.get(i));
+                }
+            allPossbile.put(capsName.toString(), capsSet);
+        }
+        return allPossbile;
+    }
+
     private static boolean hasAtLeastOneDeltaField(List<Field> fields) {
         for (Field field : fields)
             if (!field.isAnnotatedUsing(keyFlagg))
