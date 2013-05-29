@@ -455,14 +455,14 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                                 argHeader.ref().<AnInt>call("getPacketKind"))),
                         literal("header"))))));
 
-        body.addStatement(IF(isNotSame(sum(argHeader.ref().<AnInt>call("getHeaderSize"),
-                calcBodyLenCall), argHeader.ref().<AnInt>call("getTotalSize")),
+        body.addStatement(IF(
+                argHeader.ref().<ABool>call("isWrongBodySize", calcBodyLenCall),
                 new Block(THROW(addExceptionLocation.callV(
                         TargetClass.from(FieldTypeException.class).newInstance(sum(
-                                literal("interpreted packet size ("),
-                                GROUP(sum(argHeader.ref().<AnInt>call("getHeaderSize"), calcBodyLenCall)),
-                                literal(") don't match header packet size ("),
-                                argHeader.ref().<AnInt>call("getTotalSize"),
+                                literal("interpreted packet body size ("),
+                                calcBodyLenCall,
+                                literal(") don't match header packet body size ("),
+                                argHeader.ref().<AnInt>call("getBodySize"),
                                 literal(") for "), getAddress().callV("toString", me.ref()))),
                         literal("header"))))));
 

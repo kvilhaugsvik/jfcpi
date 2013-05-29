@@ -70,6 +70,16 @@ public abstract class PacketHeader {
         return totalSize;
     }
 
+    /**
+     * Check if the body size is approved.
+     * This is used to see if encoding / decoding is OK. Don't override this unless the header is fake and the real
+     * body size is unknown.
+     * @return false if the total size is as expected.
+     */
+    public boolean isWrongBodySize(int candidate) {
+        return candidate != getBodySize();
+    }
+
     /***
      * serialize the packet to the format on the line
      * @param to The output to write the packet to
