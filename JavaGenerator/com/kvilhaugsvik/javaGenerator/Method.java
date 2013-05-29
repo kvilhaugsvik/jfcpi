@@ -59,7 +59,7 @@ public class Method extends Formatted implements HasAtoms {
 
     @Override
     public String toString() {
-        return this.getJavaCodeIndented("\t", ClassWriter.DEFAULT_STYLE_INDENT) + "\n";
+        return this.getJavaCodeIndented("\t", DefaultStyle.DEFAULT_STYLE_INDENT) + "\n";
     }
 
     @Override

@@ -14,7 +14,7 @@
 
 package com.kvilhaugsvik.javaGenerator.util;
 
-import com.kvilhaugsvik.javaGenerator.ClassWriter;
+import com.kvilhaugsvik.javaGenerator.DefaultStyle;
 import com.kvilhaugsvik.javaGenerator.formating.TokensToStringStyle;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
@@ -46,7 +46,7 @@ public abstract class Formatted implements HasAtoms {
     }
 
     public String toString() {
-        return toString(ClassWriter.DEFAULT_STYLE_INDENT);
+        return toString(DefaultStyle.DEFAULT_STYLE_INDENT);
     }
 
     public static abstract class Type<Return extends Returnable> extends Formatted implements Typed<Return> {}

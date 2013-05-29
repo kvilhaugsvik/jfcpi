@@ -15,6 +15,7 @@
 package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.dependency.UndefinedException;
+import com.kvilhaugsvik.javaGenerator.DefaultStyle;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.enteties.Constant;
@@ -290,7 +291,7 @@ public class PacketsStoreTest {
         storage.registerPacket("PACKET_HELLO", 0, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
 
         assertEquals("{org.freeciv.packet.PACKET_HELLO.class}",
-                Util.joinStringArray(ClassWriter.DEFAULT_STYLE_INDENT.asFormattedLines(
+                Util.joinStringArray(DefaultStyle.DEFAULT_STYLE_INDENT.asFormattedLines(
                         new CodeAtoms(getVersionData(storage).getField("understandsPackets").getValue())).toArray(),
                         "\n", "", ""));
     }
