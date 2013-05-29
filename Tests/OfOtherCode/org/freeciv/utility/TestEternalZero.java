@@ -46,4 +46,12 @@ public class TestEternalZero {
         assertEquals("Beginning missing", 2, stream.read());
         assertEquals("3rd byte not 0", 0, stream.read());
     }
+
+    @Test
+    public void byteIsSignedReadIsUnsigned() throws IOException {
+        EndsInEternalZero stream = new EndsInEternalZero(new byte[]{(byte)255});
+
+        assertEquals("Wrong beginning", 255, stream.read());
+        assertEquals("2nd byte not 0", 0, stream.read());
+    }
 }

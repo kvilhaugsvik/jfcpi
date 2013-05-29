@@ -34,7 +34,7 @@ public class EndsInEternalZero extends InputStream {
         pos++;
 
         if (pos < beginning.length)
-            return beginning[pos];
+            return 0xff & beginning[pos];
         else
             return 0;
     }
