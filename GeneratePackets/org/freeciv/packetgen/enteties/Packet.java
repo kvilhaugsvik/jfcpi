@@ -144,27 +144,28 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         TargetMethod addExceptionLocation = addExceptionLocationAdder();
 
-        if (delta) {
-            if (0 < fields.size()) {
-                // TODO: This registers "fromHeaderAndStream" + capCombName before its created since it uses zero.
-                // TODO: Consider if a more elegant solution can be had.
-                getAddress().register(new TargetMethod(getAddress(), "fromHeaderAndStream" + capCombName, getAddress(),
-                        TargetMethod.Called.STATIC));
-
-                addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().callV(
-                        "fromHeaderAndStream" + capCombName,
-                        TargetClass.from(DataInputStream.class).newInstance(
-                                TargetClass.from(EndsInEternalZero.class).newInstance(
-                                        bv_delta_fields.getUnderType().newInstance(TRUE, literal(deltaFields))
-                                                .callV("getAsByteArray"))),
-                        TargetClass.from(org.freeciv.packet.Header_NA.class).newInstance(getField("number").ref()),
-                        TargetClass.from("java.util", "HashMap<DeltaKey, Packet>").newInstance()));
-            }
-        }
+        if (delta)
+            Packet.addZeroField(capCombName, bv_delta_fields, deltaFields, this);
 
         this.addMethod(createBasicConstructor(fields, delta, getField("delta"), getField("header")));
         addConstructorFromJavaTypes(fields, capCombName, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
         addConstructorFromDataInput(name, fields, capCombName, addExceptionLocation, deltaFields, enableDeltaBoolFolding);
+    }
+
+    private static void addZeroField(String capCombName, FieldType bv_delta_fields, int deltaFields, ClassWriter to) {
+        // TODO: This registers "fromHeaderAndStream" + capCombName before its created since it uses zero.
+        // TODO: Consider if a more elegant solution can be found.
+        to.getAddress().register(new TargetMethod(to.getAddress(), "fromHeaderAndStream" + capCombName, to.getAddress(),
+                TargetMethod.Called.STATIC));
+
+        to.addClassConstant(Visibility.PUBLIC, to.getAddress(), "zero", to.getAddress().callV(
+                "fromHeaderAndStream" + capCombName,
+                TargetClass.from(DataInputStream.class).newInstance(
+                        TargetClass.from(EndsInEternalZero.class).newInstance(
+                                bv_delta_fields.getUnderType().newInstance(TRUE, literal(deltaFields))
+                                        .callV("getAsByteArray"))),
+                TargetClass.from(org.freeciv.packet.Header_NA.class).newInstance(to.getField("number").ref()),
+                TargetClass.from("java.util", "HashMap<DeltaKey, Packet>").newInstance()));
     }
 
     private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Set<Typed<AString>> usingCaps) {
