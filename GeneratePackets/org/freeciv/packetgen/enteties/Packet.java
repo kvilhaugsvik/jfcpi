@@ -146,8 +146,19 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         if (delta) {
             if (0 < fields.size()) {
-                addConstructorZero(fields, headerKind, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding);
-                addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().newInstance());
+                // TODO: This registers "fromHeaderAndStream" + capCombName before its created since it uses zero.
+                // TODO: Consider if a more elegant solution can be had.
+                getAddress().register(new TargetMethod(getAddress(), "fromHeaderAndStream" + capCombName, getAddress(),
+                        TargetMethod.Called.STATIC));
+
+                addClassConstant(Visibility.PUBLIC, getAddress(), "zero", getAddress().callV(
+                        "fromHeaderAndStream" + capCombName,
+                        TargetClass.from(DataInputStream.class).newInstance(
+                                TargetClass.from(EndsInEternalZero.class).newInstance(
+                                        bv_delta_fields.getUnderType().newInstance(TRUE, literal(deltaFields))
+                                                .callV("getAsByteArray"))),
+                        TargetClass.from(org.freeciv.packet.Header_NA.class).newInstance(getField("number").ref()),
+                        TargetClass.from("java.util", "HashMap<DeltaKey, Packet>").newInstance()));
             }
         }
 
@@ -239,35 +250,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         addMethod(addExceptionLocation);
 
         return addExceptionLocation.getAddressOn(this.getAddress());
-    }
-
-    private void addConstructorZero(List<Field> fields, TargetClass headerKind, TargetMethod addExceptionLocation,
-                                    int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding) throws UndefinedException {
-        Block body = new Block();
-
-        if (delta)
-            addDeltaField(addExceptionLocation, deltaFields, body, bv_delta_fields, getField("delta"));
-
-        Var<AValue> zeroes = Var.local(TargetClass.from(DataInputStream.class), "zeroStream",
-                TargetClass.from(DataInputStream.class)
-                        .newInstance(TargetClass.from(EndsInEternalZero.class).newInstance()));
-        body.addStatement(zeroes);
-
-        for (Field field : fields)
-            body.addStatement(labelExceptionsWithPacketAndField(field,
-                    new Block(field.ref().assign(field.getTType()
-                            .newInstance(zeroes.ref(), field.getSuperLimit(0, false)))),
-                    addExceptionLocation));
-
-        final LinkedList<Reference<? extends AValue>> deltaAndFields = getBodyFields(fields, enableDeltaBoolFolding);
-        Var header = getField("header");
-        body.addStatement(labelExceptionsWithPacketAndField(header, new Block(
-                header.assign(headerKind.newInstance(
-                        sum(getAddress().callV("calcBodyLen", deltaAndFields.toArray(new Typed[deltaAndFields.size()])), headerKind.callV("HEADER_SIZE")),
-                        getField("number").ref()))), addExceptionLocation));
-
-        addMethod(Method.newConstructor(Comment.no(), Visibility.PRIVATE,
-                Collections.<Var<?>>emptyList(), Collections.<TargetClass>emptyList(), body));
     }
 
     private Typed<NoValue> labelExceptionsWithPacketAndField(Var field, Block operation, TargetMethod addExceptionLocation) {
