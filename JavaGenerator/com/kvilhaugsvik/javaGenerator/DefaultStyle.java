@@ -82,8 +82,6 @@ public class DefaultStyle {
                 maker.condLeftIs(Visibility.Atom.class),
                 CodeStyleBuilder.DependsOn.token_left,
                 maker.INSERT_SPACE);
-        maker.whenFirst(maker.condRightIs(ClassKind.Atom.class), maker.condTopHintIs(TokensToStringStyle.OUTER_LEVEL),
-                CodeStyleBuilder.DependsOn.token_right, maker.BREAK_LINE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.EOL), CodeStyleBuilder.DependsOn.token_left, maker.BREAK_LINE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.LSC), CodeStyleBuilder.DependsOn.token_left, maker.BREAK_LINE);
         maker.whenFirst(maker.condLeftIs(HasAtoms.RSC), CodeStyleBuilder.DependsOn.token_left, maker.BREAK_LINE);
