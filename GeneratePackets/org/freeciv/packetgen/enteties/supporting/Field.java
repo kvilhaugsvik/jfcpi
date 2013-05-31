@@ -131,6 +131,10 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         this.deltaFieldNumber = deltaNumber;
     }
 
+    public void resetDelta() {
+        this.deltaFieldNumber = DELTA_NUMBER_NOT_SET;
+    }
+
     public boolean isDelta() {
         return DELTA_NUMBER_NOT_SET != this.deltaFieldNumber;
     }
