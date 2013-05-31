@@ -20,13 +20,14 @@ import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 
 public enum ClassKind implements HasAtoms {
     CLASS,
+    ABSTRACT_CLASS,
     ENUM,
     INTERFACE;
 
     private final CodeAtom code;
 
     ClassKind() {
-        this.code = new ClassKind.Atom(name().toLowerCase());
+        this.code = new ClassKind.Atom(name().toLowerCase().replace('_', ' '));
     }
 
     @Override
