@@ -577,6 +577,110 @@ public class TypedCodeTest {
         }, call);
     }
 
+    @Test public void autoConstructor_noFields() {
+        ClassWriter on = new ClassWriter(ClassKind.CLASS, TargetPackage.TOP_LEVEL, Imports.are(),
+                "test", Collections.<Annotate>emptyList(),
+                "NoFields", ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
+        on.addConstructorFields();
+
+        assertAtomsAre(
+                new String[]{
+                        "@javax.annotation.Generated",
+                        "(",
+                        "comments",
+                        "=",
+                        "\"Auto generated from test\"",
+                        ",",
+                        "value",
+                        "=",
+                        "\"com.kvilhaugsvik.javaGenerator.ClassWriter\"",
+                        ")",
+                        "public",
+                        "class",
+                        "NoFields",
+                        "{",
+                        "public",
+                        "NoFields",
+                        "(",
+                        ")",
+                        "{",
+                        "}",
+                        "}"
+                },
+                on
+        );
+    }
+
+    @Test public void autoConstructor_twoObjectFields() {
+        ClassWriter on = new ClassWriter(ClassKind.CLASS, TargetPackage.TOP_LEVEL, Imports.are(),
+                "test", Collections.<Annotate>emptyList(),
+                "SomeFields", ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
+        on.addConstructorFields();
+        on.addObjectConstant(String.class, "field1");
+        on.addObjectConstant(int.class, "field2");
+
+        assertAtomsAre(
+                new String[]{
+                        "@javax.annotation.Generated",
+                        "(",
+                        "comments",
+                        "=",
+                        "\"Auto generated from test\"",
+                        ",",
+                        "value",
+                        "=",
+                        "\"com.kvilhaugsvik.javaGenerator.ClassWriter\"",
+                        ")",
+                        "public",
+                        "class",
+                        "SomeFields",
+                        "{",
+                        "private",
+                        "final",
+                        "java",
+                        ".",
+                        "lang",
+                        ".",
+                        "String",
+                        "field1",
+                        ";","private",
+                        "final",
+                        "int",
+                        "field2",
+                        ";",
+                        "public",
+                        "SomeFields",
+                        "(",
+                        "java",
+                        ".",
+                        "lang",
+                        ".",
+                        "String",
+                        "field1",
+                        ",",
+                        "int",
+                        "field2",
+                        ")",
+                        "{",
+                        "this",
+                        ".",
+                        "field1",
+                        "=",
+                        "field1",
+                        ";",
+                        "this",
+                        ".",
+                        "field2",
+                        "=",
+                        "field2",
+                        ";",
+                        "}",
+                        "}"
+                },
+                on
+        );
+    }
+
     public static void assertAtomsAre(String[] expected, HasAtoms code) {
         assertAtomsAre(expected, new CodeAtoms(code));
     }
