@@ -681,6 +681,63 @@ public class TypedCodeTest {
         );
     }
 
+    @Test public void autoConstructor_objectFieldAndClassField() {
+        ClassWriter on = new ClassWriter(ClassKind.CLASS, TargetPackage.TOP_LEVEL, Imports.are(),
+                "test", Collections.<Annotate>emptyList(),
+                "SomeFields", ClassWriter.DEFAULT_PARENT, Collections.<TargetClass>emptyList());
+        on.addConstructorFields();
+        on.addClassConstant(Visibility.PACKAGE, String.class, "onTheClass", null);
+        on.addObjectConstant(int.class, "oneEachObject");
+
+        assertAtomsAre(
+                new String[]{
+                        "@javax.annotation.Generated",
+                        "(",
+                        "comments",
+                        "=",
+                        "\"Auto generated from test\"",
+                        ",",
+                        "value",
+                        "=",
+                        "\"com.kvilhaugsvik.javaGenerator.ClassWriter\"",
+                        ")",
+                        "public",
+                        "class",
+                        "SomeFields",
+                        "{",
+                        "static",
+                        "final",
+                        "java",
+                        ".",
+                        "lang",
+                        ".",
+                        "String",
+                        "onTheClass",
+                        ";","private",
+                        "final",
+                        "int",
+                        "oneEachObject",
+                        ";",
+                        "public",
+                        "SomeFields",
+                        "(",
+                        "int",
+                        "oneEachObject",
+                        ")",
+                        "{",
+                        "this",
+                        ".",
+                        "oneEachObject",
+                        "=",
+                        "oneEachObject",
+                        ";",
+                        "}",
+                        "}"
+                },
+                on
+        );
+    }
+
     public static void assertAtomsAre(String[] expected, HasAtoms code) {
         assertAtomsAre(expected, new CodeAtoms(code));
     }
