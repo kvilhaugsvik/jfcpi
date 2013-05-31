@@ -33,6 +33,8 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class ClassWriter extends Formatted implements HasAtoms {
     public static final TargetClass DEFAULT_PARENT = TargetClass.from(Object.class);
+    protected final Reference<AValue> internal_ref_this;
+    protected final Reference<AValue> internal_ref_super;
 
     private final TargetClass myAddress;
     private final Imports.ScopeDataForJavaFile scopeData;
@@ -62,6 +64,9 @@ public class ClassWriter extends Formatted implements HasAtoms {
         this.myAddress = new TargetClass(where, new ClassWriter.Atom(name));
         myAddress.setParent(parent);
 
+        this.internal_ref_this = Var.param(getAddress(), "this").ref();
+        this.internal_ref_super = Var.param(parent, "super").ref();
+
         this.classAnnotate = new LinkedList<Annotate>(classAnnotate);
         this.parent = parent;
         this.implementsInterface = implementsInterface;
@@ -82,8 +87,12 @@ public class ClassWriter extends Formatted implements HasAtoms {
         LinkedList<IR.CodeAtom> classPart = new LinkedList<IR.CodeAtom>();
         classPart.addAll(inside.getTypedClassName());
         classPart.add(new ClassWriter.Atom(name));
+
         this.myAddress = new TargetClass(inside.getPackage(), classPart);
         this.myAddress.setParent(parent);
+
+        this.internal_ref_this = Var.param(getAddress(), "this").ref();
+        this.internal_ref_super = Var.param(parent, "super").ref();
 
         this.classAnnotate = new LinkedList<Annotate>();
         this.visibility = Visibility.PUBLIC;
@@ -287,6 +296,14 @@ public class ClassWriter extends Formatted implements HasAtoms {
 
     public TargetClass getAddress() {
         return myAddress;
+    }
+
+    public Reference getInternalReferenceThis() {
+        return internal_ref_this;
+    }
+
+    public Reference getInternalReferenceSuper() {
+        return internal_ref_super;
     }
 
     public String getPackage() {

@@ -26,8 +26,6 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 import com.kvilhaugsvik.javaGenerator.util.ValueHelper;
 
 public class Reference<Contains extends AValue> extends Address implements Value<Contains> {
-    public static final Reference<AValue> THIS = Var.<AValue>param(TargetClass.SELF_TYPED, "this").ref();
-
     private final ValueHelper valueHelper;
 
     Reference(TargetClass type, Address where, IR.CodeAtom name) {
@@ -41,7 +39,7 @@ public class Reference<Contains extends AValue> extends Address implements Value
             case CLASS:
                 return new Reference(of.getTType(), locatedOn, name);
             case OBJECT:
-                return new Reference(of.getTType(), THIS, name);
+                return new Reference(of.getTType(), Var.<AValue>param(locatedOn, "this").ref(), name);
             case CODE_BLOCK:
             default:
                 return new Reference(of.getTType(), Address.LOCAL_CODE_BLOCK, name);
