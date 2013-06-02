@@ -453,7 +453,7 @@ public class GeneratedUsingEntetiesAlone {
         DeltaVectorTest packet = DeltaVectorTest.fromValues(8, "works", 1260L,
                 Header_2_2.class.getConstructor(int.class, int.class));
 
-        boolean[] dv = packet.getDeltaVector();
+        boolean[] dv = packet.getDelta().getValue().getBits();
 
         assertEquals("Wrong delta vector size", 2, dv.length);
         assertTrue("Should be sent", dv[0]);
@@ -468,7 +468,7 @@ public class GeneratedUsingEntetiesAlone {
 
         DeltaVectorTest packet = DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(10, 933), new HashMap<DeltaKey, Packet>());
 
-        boolean[] dv = packet.getDeltaVector();
+        boolean[] dv = packet.getDelta().getValue().getBits();
 
         assertEquals("Wrong delta vector size", 2, dv.length);
         assertFalse("Should not be sent", dv[0]);
