@@ -70,14 +70,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
     }
 
-    @Deprecated
-    public Packet(String name, int number, TargetClass headerKind, String logger,
-                  List<Annotate> packetFlags,
-                  boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,
-                  List<Field> fields) throws UndefinedException {
-        this(name, number, headerKind, logger, packetFlags, deltaIsOn, enableDeltaBoolFolding, bv_delta_fields, fields, new TreeSet<String>());
-    }
-
     public Packet(String name, int number, TargetClass headerKind, String logger,
                   List<Annotate> packetFlags,
                   boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,

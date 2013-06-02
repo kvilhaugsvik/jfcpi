@@ -17,6 +17,7 @@ package org.freeciv.packetgen.enteties;
 import com.kvilhaugsvik.javaGenerator.Annotate;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
 import org.freeciv.packet.Header_2_2;
+import org.freeciv.packet.NoDelta;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.UndefinedException;
 import org.freeciv.packetgen.enteties.supporting.*;
@@ -24,6 +25,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -35,14 +37,16 @@ public class PacketTest {
     public void deltaHeader_shouldExist() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
                 Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
-                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())));
+                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())),
+                new TreeSet<String>());
         assertNotNull("Should have a delta field", packet.getField("delta"));
     }
 
     @Test
     public void deltaHeader_shouldNotExist_noFields() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
-                Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField, Collections.<Field>emptyList());
+                Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField, Collections.<Field>emptyList(),
+                new TreeSet<String>());
         assertNull("Shouldn't have delta when there are no other fields", packet.getField("delta"));
     }
 
@@ -50,15 +54,18 @@ public class PacketTest {
     public void deltaHeader_shouldNotExist_onlyAKeyField() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
                 Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
-                Arrays.asList(new Field("aField", floatalias, "Test", Arrays.asList(new WeakFlag("key")))));
+                Arrays.asList(new Field("aField", floatalias, "Test",
+                Arrays.asList(new WeakFlag("key")))),
+                new TreeSet<String>());
         assertNull("Shouldn't have delta when there only are key fields", packet.getField("delta"));
     }
 
     @Test
     public void deltaHeader_shouldNotExist_annotationNoDelta() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
-                Arrays.asList(new Annotate(org.freeciv.packet.NoDelta.class)), true, false, Hardcoded.deltaField,
-                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())));
+                Arrays.asList(new Annotate(NoDelta.class)), true, false, Hardcoded.deltaField,
+                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())),
+                new TreeSet<String>());
         assertNull("Shouldn't have delta when packet has the flag no-delta", packet.getField("delta"));
     }
 
@@ -66,7 +73,8 @@ public class PacketTest {
     public void deltaHeader_shouldNotExist_deltaOf() throws UndefinedException {
         Packet packet = new Packet("Test", 33, TargetClass.from(Header_2_2.class), "Logger.GLOBAL_LOGGER_NAME",
                 Collections.<Annotate>emptyList(), false, false, null,
-                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())));
+                Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())),
+                new TreeSet<String>());
         assertNull("Shouldn't have delta when delta is off", packet.getField("delta"));
     }
 }

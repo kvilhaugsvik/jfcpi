@@ -147,7 +147,8 @@ public class FromEntetiesAlone {
                                 new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                         new Field("major_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList()),
                         new Field("minor_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList()),
-                        new Field("patch_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList()))),
+                        new Field("patch_version", uint32, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList())),
+                new TreeSet<String>()),
                 targetFolder);
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
@@ -161,21 +162,23 @@ public class FromEntetiesAlone {
                                 new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
                         new Field("challenge_file", string, "you_can_join", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
-                        new Field("conn_id", connection, "you_can_join", Collections.<WeakFlag>emptyList()))),
+                        new Field("conn_id", connection, "you_can_join", Collections.<WeakFlag>emptyList())),
+                new TreeSet<String>()),
                 targetFolder);
         writePacket(new Packet("CONN_PING", 88, TargetClass.from(Header_2_1.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
-                Collections.<Field>emptyList()), targetFolder);
+                Collections.<Field>emptyList(), new TreeSet<String>()), targetFolder);
         writePacket(new Packet("CONN_PONG", 89, TargetClass.from(Header_2_1.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
-                Collections.<Field>emptyList()), targetFolder);
+                Collections.<Field>emptyList(), new TreeSet<String>()), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
                 TargetClass.from(Header_2_2.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("theArray", uint32s, "TestArray", Collections.<WeakFlag>emptyList(),
-                                new WeakField.ArrayDeclaration(IntExpression.integer("2"), null)))),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("2"), null))),
+                new TreeSet<String>()),
                 targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
@@ -184,7 +187,8 @@ public class FromEntetiesAlone {
                 Arrays.asList(
                         new Field("toTransfer", uint8, "TestArrayTransfer", Collections.<WeakFlag>emptyList()),
                         new Field("theArray", uint32s, "TestArrayTransfer", Collections.<WeakFlag>emptyList(),
-                                new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer")))),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"))),
+                new TreeSet<String>()),
                 targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
@@ -193,7 +197,8 @@ public class FromEntetiesAlone {
                 Arrays.asList(
                         new Field("theArray", uint32s2d, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
-                                new WeakField.ArrayDeclaration(IntExpression.integer("3"), null)))),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("3"), null))),
+                new TreeSet<String>()),
                 targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
@@ -204,7 +209,8 @@ public class FromEntetiesAlone {
                         new Field("toTransfer2", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
                         new Field("theArray", uint32s2d, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("4"), "toTransfer"),
-                                new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2")))),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("5"), "toTransfer2"))),
+                new TreeSet<String>()),
                 targetFolder);
         writePacket(new Packet("StringArray",
                 930,
@@ -215,7 +221,8 @@ public class FromEntetiesAlone {
                                 new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
                         new Field("theArray", strings, "StringArray", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("3"), null),
-                                new WeakField.ArrayDeclaration(IntExpression.integer("10"), null)))),
+                                new WeakField.ArrayDeclaration(IntExpression.integer("10"), null))),
+                new TreeSet<String>()),
                 targetFolder);
     }
 
@@ -517,7 +524,8 @@ public class FromEntetiesAlone {
                 false,
                 null,
                 Arrays.asList(new Field("theBitStingField", fieldAlias, "TestBitString", Collections.<WeakFlag>emptyList(),
-                        new WeakField.ArrayDeclaration(IntExpression.integer("9"), null))));
+                        new WeakField.ArrayDeclaration(IntExpression.integer("9"), null))),
+                new TreeSet<String>());
         writeJavaFile(packet, targetFolder);
     }
 
@@ -565,7 +573,8 @@ public class FromEntetiesAlone {
                         new Field("id", uint8, "DeltaTest", Arrays.asList(new WeakFlag("key"))),
                         new Field("field1", string, "DeltaTest", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
-                        new Field("field2", uint32, "DeltaTest", Collections.<WeakFlag>emptyList()))),
+                        new Field("field2", uint32, "DeltaTest", Collections.<WeakFlag>emptyList())),
+                new TreeSet<String>()),
                 targetFolder);
     }
 
