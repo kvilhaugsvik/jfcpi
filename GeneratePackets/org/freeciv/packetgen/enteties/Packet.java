@@ -537,16 +537,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 body));
     }
 
-    private LinkedList<Reference<? extends AValue>> getBodyFields(List<Field> fields, boolean enableDeltaBoolFolding) {
-        final LinkedList<Reference<? extends AValue>> deltaAndFields = new LinkedList<Reference<? extends AValue>>();
-        if (delta)
-            deltaAndFields.add(getField("delta").ref());
-        for (Field field : fields)
-            if (!isBoolFolded(enableDeltaBoolFolding, field))
-                deltaAndFields.add(field.ref());
-        return deltaAndFields;
-    }
-
     private static boolean isBoolFolded(boolean boolFoldEnabled, Field field) {
         return boolFoldEnabled && field.isDelta() && "Boolean".equals(field.getUnderType().getSimpleName());
     }
