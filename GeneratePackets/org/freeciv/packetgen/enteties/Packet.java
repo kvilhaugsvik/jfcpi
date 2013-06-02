@@ -70,7 +70,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
     }
 
-    public Packet(String name, int number, TargetClass headerKind, String logger,
+    public Packet(String name, int number, String logger,
                   List<Annotate> packetFlags,
                   boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,
                   List<Field> packetFields,

@@ -14,10 +14,7 @@
 
 package org.freeciv.packetgen;
 
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import org.freeciv.packet.fieldtype.CapAdd;
-import org.freeciv.packet.fieldtype.CapRemove;
 import org.freeciv.utility.Util;
 import org.freeciv.connection.ReflexRuleTime;
 import org.freeciv.packet.*;
@@ -157,7 +154,7 @@ public class PacketsStore {
                     fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
                             fields.get(i).getFlags(), fields.get(i).getDeclarations()));
 
-                return new Packet(name, number, packetHeaderType, logger, packetFlags,
+                return new Packet(name, number, logger, packetFlags,
                         enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
                         fieldList, caps);
             }

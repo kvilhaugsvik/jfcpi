@@ -24,7 +24,6 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.Requirement;
@@ -136,7 +135,6 @@ public class FromEntetiesAlone {
 
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
-                TargetClass.from(Header_2_1.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("username", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
@@ -152,7 +150,6 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
-                TargetClass.from(Header_2_1.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("you_can_join", bool, "you_can_join", Collections.<WeakFlag>emptyList()),
@@ -165,15 +162,14 @@ public class FromEntetiesAlone {
                         new Field("conn_id", connection, "you_can_join", Collections.<WeakFlag>emptyList())),
                 new TreeSet<String>()),
                 targetFolder);
-        writePacket(new Packet("CONN_PING", 88, TargetClass.from(Header_2_1.class),
+        writePacket(new Packet("CONN_PING", 88,
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Collections.<Field>emptyList(), new TreeSet<String>()), targetFolder);
-        writePacket(new Packet("CONN_PONG", 89, TargetClass.from(Header_2_1.class),
+        writePacket(new Packet("CONN_PONG", 89,
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Collections.<Field>emptyList(), new TreeSet<String>()), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
-                TargetClass.from(Header_2_2.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("theArray", uint32s, "TestArray", Collections.<WeakFlag>emptyList(),
@@ -182,7 +178,6 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
-                TargetClass.from(Header_2_2.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("toTransfer", uint8, "TestArrayTransfer", Collections.<WeakFlag>emptyList()),
@@ -192,7 +187,6 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
-                TargetClass.from(Header_2_2.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("theArray", uint32s2d, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
@@ -202,7 +196,6 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
-                TargetClass.from(Header_2_2.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("toTransfer", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
@@ -214,7 +207,6 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("StringArray",
                 930,
-                TargetClass.from(Header_2_2.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("notAnArray", string, "StringArray", Collections.<WeakFlag>emptyList(),
@@ -517,7 +509,6 @@ public class FromEntetiesAlone {
 
     private void writeBitStringUsingPacket(String targetFolder, FieldType fieldAlias) throws UndefinedException, IOException {
         Packet packet = new Packet("TestBitString", 931,
-                TargetClass.from(Header_2_2.class),
                 GeneratorDefaults.LOG_TO,
                 Collections.<Annotate>emptyList(),
                 false,
@@ -567,7 +558,6 @@ public class FromEntetiesAlone {
         writeJavaFile(Hardcoded.deltaField, targetFolder);
         writePacket(new Packet("DeltaVectorTest",
                 933,
-                TargetClass.from(Header_2_2.class),
                 GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
                 Arrays.asList(
                         new Field("id", uint8, "DeltaTest", Arrays.asList(new WeakFlag("key"))),
