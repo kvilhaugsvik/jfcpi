@@ -22,10 +22,12 @@ import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
-public class Method extends Formatted implements HasAtoms {
+public class Method extends Formatted implements HasAtoms, IAnnotatable {
     private final Comment comment;
+    private final LinkedList<Annotate> methodAnnotate;
     private final Visibility visibility;
     private final Scope scope;
     private final TargetClass type;
@@ -38,6 +40,7 @@ public class Method extends Formatted implements HasAtoms {
                      TargetClass type, String name, List<? extends Var<? extends AValue>> paramList,
                      List<TargetClass> exceptionList, Block body) {
         this.comment = comment;
+        this.methodAnnotate = new LinkedList<Annotate>();
         this.visibility = visibility;
         this.scope = scope;
         this.type = type;
@@ -45,6 +48,11 @@ public class Method extends Formatted implements HasAtoms {
         this.paramList = paramList;
         this.exceptionList = exceptionList;
         this.body = body;
+    }
+
+    @Override
+    public void annotateMe(Annotate using) {
+        methodAnnotate.add(using);
     }
 
     public TargetMethod getAddress() {
@@ -65,6 +73,8 @@ public class Method extends Formatted implements HasAtoms {
     @Override
     public void writeAtoms(CodeAtoms to) {
         comment.writeAtoms(to);
+        for (Annotate ann : methodAnnotate)
+            ann.writeAtoms(to);
         visibility.writeAtoms(to);
         scope.writeAtoms(to);
         type.writeAtoms(to);

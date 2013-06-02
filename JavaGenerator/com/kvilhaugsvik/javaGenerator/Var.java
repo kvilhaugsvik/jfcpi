@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
+public class Var<Kind extends AValue> extends Formatted implements Typed<Kind>, IAnnotatable {
     private final List<Annotate> annotations;
     private final Visibility visibility;
     private final Scope scope;
@@ -48,6 +48,11 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind> {
         this.value = value;
 
         this.reference = Reference.refOn(locatedOn, this);
+    }
+
+    @Override
+    public void annotateMe(Annotate using) {
+        annotations.add(using);
     }
 
     public Visibility getVisibility() {

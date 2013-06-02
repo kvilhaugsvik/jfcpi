@@ -31,7 +31,7 @@ import java.util.*;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
-public class ClassWriter extends Formatted implements HasAtoms {
+public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
     public static final TargetClass DEFAULT_PARENT = TargetClass.from(Object.class);
     protected final Reference<AValue> internal_ref_this;
     protected final Reference<AValue> internal_ref_super;
@@ -169,6 +169,11 @@ public class ClassWriter extends Formatted implements HasAtoms {
                 TargetMethod.Called.STATIC_FIELD));
 
         enums.add(element);
+    }
+
+    @Override
+    public void annotateMe(Annotate using) {
+        classAnnotate.add(using);
     }
 
     public ClassWriter newInnerClass(ClassKind kind, String name, TargetClass parent, List<TargetClass> implementsInterface) {
