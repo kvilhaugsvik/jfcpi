@@ -9,7 +9,6 @@ FreecivRecorder
  * Make more of the filtering accessible from the command line
 
 GeneratePackets
- * Support all variants when dealing with capabilities
  * Handle all of array diff so the field is stored as a normal array
  * Continue making code generation more typed
  * Mark named basic data types without using Field

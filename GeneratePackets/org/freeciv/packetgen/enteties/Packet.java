@@ -25,12 +25,14 @@ import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.ReqKind;
 import com.kvilhaugsvik.dependency.Requirement;
+import org.freeciv.packetgen.enteties.supporting.FactoryCapabilityCombination;
 import org.freeciv.packetgen.enteties.supporting.Field;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
+import org.freeciv.packetgen.enteties.supporting.PacketCapabilities;
 import org.freeciv.utility.EndsInEternalZero;
 import org.freeciv.utility.Validation;
 
@@ -94,6 +96,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         iFulfill = new Requirement(getName(), Packet.class);
 
+        annotateMe(new PacketCapabilities(caps));
+
         addClassConstant(Visibility.PUBLIC, int.class, "number", literal(number));
 
         final Var<AValue> headerVar = Var.field(Collections.<Annotate>emptyList(),
@@ -114,7 +118,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         this.addConstructorFields();
 
-        final LinkedHashMap<String, Set<Typed<AString>>> capabilityCombinations = allPossibleCombinations(caps);
+        final LinkedHashMap<String, List<Typed<AString>>> capabilityCombinations = allPossibleCombinations(caps);
         for (String capCombName : capabilityCombinations.keySet()) {
             final LinkedList<Field> implFields = filterForCapabilities(packetFields, capabilityCombinations.get(capCombName));
 
@@ -152,8 +156,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
             inner.addMethod(createBasicConstructor(implFieldsAll, sharedFields));
 
-            addConstructorFromJavaTypes(implFields, capCombName, addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding, inner.getAddress());
-            addConstructorFromDataInput(name, implFields, capCombName, addExceptionLocation, deltaFields, enableDeltaBoolFolding, inner.getAddress(), zeroVal);
+            addConstructorFromJavaTypes(implFields, capCombName, capabilityCombinations.get(capCombName), addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding, inner.getAddress());
+            addConstructorFromDataInput(name, implFields, capCombName, capabilityCombinations.get(capCombName), addExceptionLocation, deltaFields, enableDeltaBoolFolding, inner.getAddress(), zeroVal);
         }
     }
 
@@ -215,7 +219,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 TargetClass.from("java.util", "HashMap<DeltaKey, Packet>").newInstance()));
     }
 
-    private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Set<Typed<AString>> usingCaps) {
+    private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Collection<Typed<AString>> usingCaps) {
         LinkedList<Field> packetFieldList = new LinkedList<Field>();
         for (Field candidate : fieldList)
             if (belongHere(candidate, usingCaps))
@@ -223,7 +227,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return packetFieldList;
     }
 
-    private static boolean belongHere(Field candidate, Set<Typed<AString>> usingCaps) {
+    private static boolean belongHere(Field candidate, Collection<Typed<AString>> usingCaps) {
         if (candidate.isAnnotatedUsing(CapAdd.class))
             return hasCap(candidate, usingCaps, CapAdd.class);
         if (candidate.isAnnotatedUsing(CapRemove.class))
@@ -231,11 +235,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return true;
     }
 
-    private static boolean hasCap(Field field, Set<Typed<AString>> usingCaps, Class<?> addOrRemove) {
+    private static boolean hasCap(Field field, Collection<Typed<AString>> usingCaps, Class<?> addOrRemove) {
         return usingCaps.contains(field.getAnnotation(addOrRemove).getValueOf("value"));
     }
 
-    private static LinkedHashMap<String, Set<Typed<AString>>> allPossibleCombinations(SortedSet<String> caps) {
+    private static LinkedHashMap<String, List<Typed<AString>>> allPossibleCombinations(Set<String> caps) {
         ArrayList<String> capsList = new ArrayList<String>();
         ArrayList<Typed<AString>> capsListTyped = new ArrayList<Typed<AString>>();
         for (String cap : caps) {
@@ -243,11 +247,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             capsListTyped.add(BuiltIn.literal(cap));
         }
 
-        final LinkedHashMap<String, Set<Typed<AString>>> allPossbile = new LinkedHashMap<String, Set<Typed<AString>>>();
+        final LinkedHashMap<String, List<Typed<AString>>> allPossbile = new LinkedHashMap<String, List<Typed<AString>>>();
         final double combinations = Math.pow(2, caps.size());
         for (int combination = 0; combination < combinations; combination++) {
             StringBuilder capsName = new StringBuilder();
-            HashSet<Typed<AString>> capsSet = new HashSet<Typed<AString>>();
+            List<Typed<AString>> capsSet = new ArrayList<Typed<AString>>();
             for (int i = 0; i < capsList.size(); i++)
                 if ((combination & (1 << i)) != 0) {
                     capsName.append("_").append(capsList.get(i));
@@ -328,7 +332,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 addExceptionLocation));
     }
 
-    private void addConstructorFromJavaTypes(List<Field> fields, String capsName, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding, TargetClass impl) throws UndefinedException {
+    private void addConstructorFromJavaTypes(List<Field> fields, String capsName, List<Typed<AString>> caps, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding, TargetClass impl) throws UndefinedException {
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> localVars = new LinkedList<Reference<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> sizeArgs = new LinkedList<Reference<? extends AValue>>();
@@ -372,7 +376,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         body.addStatement(BuiltIn.RETURN(impl.newInstance(localVars.toArray(new Reference[localVars.size()]))));
 
-        addMethod(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS, impl, "fromValues" + capsName, params, Collections.<TargetClass>emptyList(), body));
+        Method result = Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS, impl, "fromValues" + capsName, params, Collections.<TargetClass>emptyList(), body);
+        result.annotateMe(new FactoryCapabilityCombination(caps));
+        addMethod(result);
     }
 
     private static Method createBasicConstructor(List<? extends Var<AValue>> fields, List<Var<AValue>> shared) throws UndefinedException {
@@ -401,7 +407,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return Method.newConstructor(Comment.no(), Visibility.PRIVATE, params, Collections.<TargetClass>emptyList(), body);
     }
 
-    private void addConstructorFromDataInput(String name, List<Field> fields, String capsName, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding, TargetClass impl, Typed<? extends AValue> zero) throws UndefinedException {
+    private void addConstructorFromDataInput(String name, List<Field> fields, String capsName, List<Typed<AString>> caps, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding, TargetClass impl, Typed<? extends AValue> zero) throws UndefinedException {
         Var<TargetClass> argHeader = Var.param(TargetClass.from(PacketHeader.class), "header");
         final Var<TargetClass> streamName = Var.param(TargetClass.from(DataInput.class), "from");
         final Var<TargetClass> old =
@@ -521,7 +527,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         body.addStatement(RETURN(me.ref()));
 
-        addMethod(Method.custom(
+        Method result = Method.custom(
                 Comment.doc(
                         "Construct an object from a DataInput", new String(),
                         Comment.param(streamName, "data stream that is at the start of the package body"),
@@ -534,7 +540,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 "fromHeaderAndStream" + capsName,
                 Arrays.asList(streamName, argHeader, old),
                 Arrays.asList(TargetClass.from(FieldTypeException.class)),
-                body));
+                body);
+        result.annotateMe(new FactoryCapabilityCombination(caps));
+        addMethod(result);
     }
 
     private static boolean isBoolFolded(boolean boolFoldEnabled, Field field) {
