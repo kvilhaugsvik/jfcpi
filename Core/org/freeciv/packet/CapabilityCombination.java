@@ -14,9 +14,16 @@
 
 package org.freeciv.packet;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * List the combination of capabilities a factory was created for
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
 public @interface CapabilityCombination {
     public String[] value();
 }

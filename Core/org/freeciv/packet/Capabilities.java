@@ -14,9 +14,16 @@
 
 package org.freeciv.packet;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * List all capabilities that are relevant to a packet
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
 public @interface Capabilities {
     public String[] value();
 }
