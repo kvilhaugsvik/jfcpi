@@ -26,10 +26,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InterpretWhenPossible implements ToPacket {
-    private final PacketsMapping map;
+    private final PacketsMapping.Interpret map;
     private final Map<DeltaKey, Packet> old;
 
-    public InterpretWhenPossible(PacketsMapping map) {
+    public InterpretWhenPossible(PacketsMapping.Interpret map) {
         this.map = map;
         this.old = new HashMap<DeltaKey, Packet>();
     }

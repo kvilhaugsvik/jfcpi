@@ -18,14 +18,12 @@ import org.freeciv.utility.Util;
 import org.freeciv.packet.*;
 
 import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
 public class PacketsMapping {
-    private final Map<Integer, Method> packetMakers;
+    private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
     private final Class<? extends PacketHeader> packetNumberBytes;
     private final Map<Integer, ReflexReaction> protoRulesPostReceive;
     private final Map<Integer, ReflexReaction> protoRulesPostSend;
@@ -78,7 +76,7 @@ public class PacketsMapping {
                             variant.put(pNumber, cadidate);
             }
 
-            packetMakers = globalVariants.get(Collections.<String>emptySet());
+            this.protocolVariants = globalVariants;
 
             HashMap<Integer, ReflexReaction> neededPostSend = new HashMap<Integer, ReflexReaction>();
             HashMap<Integer, ReflexReaction> neededPostReceive = new HashMap<Integer, ReflexReaction>();
@@ -107,28 +105,16 @@ public class PacketsMapping {
         }
     }
 
-    public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException {
-        if (!canInterpret(header.getPacketKind()))
-            throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
-        try {
-            return (Packet)packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
-        } catch (IllegalAccessException e) {
-            throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
-        } catch (InvocationTargetException e) {
-            throw new IOException(internalErrorMessage(header.getPacketKind()), e);
-        }
-    }
-
     private static String internalErrorMessage(int packetKind) {
         return "Internal error while trying to read packet numbered " + packetKind + " from network";
     }
 
-    boolean canInterpret(int kind) {
-        return packetMakers.containsKey(kind);
-    }
-
     public HeaderData getNewPacketHeaderData() {
         return new HeaderData(packetNumberBytes);
+    }
+
+    public Interpret getNewPacketMapper() {
+        return new Interpret(this.protocolVariants);
     }
 
     public Map<Integer, ReflexReaction> getRequiredPostReceiveRules() {
@@ -214,5 +200,39 @@ public class PacketsMapping {
             out.add(comb);
         }
         return out;
+    }
+
+    public static class Interpret {
+        private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
+        private final Set<String> enabledCapabilities;
+
+        private Map<Integer, Method> packetMakers;
+
+        Interpret(Map<Set<String>, Map<Integer, Method>> protocolVariants) {
+            this.protocolVariants = protocolVariants;
+            this.enabledCapabilities = new HashSet<String>();
+
+            updateVariant();
+        }
+
+        boolean canInterpret(int kind) {
+            return packetMakers.containsKey(kind);
+        }
+
+        public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException {
+            if (!canInterpret(header.getPacketKind()))
+                throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
+            try {
+                return (Packet)packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
+            } catch (IllegalAccessException e) {
+                throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
+            } catch (InvocationTargetException e) {
+                throw new IOException(internalErrorMessage(header.getPacketKind()), e);
+            }
+        }
+
+        private void updateVariant() {
+            this.packetMakers = this.protocolVariants.get(this.enabledCapabilities);
+        }
     }
 }

@@ -31,12 +31,13 @@ public abstract class SinkProcess extends Sink {
     protected final HashMap<DeltaKey, Packet> oldFromClient = new HashMap<DeltaKey, Packet>();
 
     private final Over over;
-    private final PacketsMapping versionKnowledge;
+    private final PacketsMapping.Interpret versionKnowledge;
 
     public SinkProcess(Filter filter, PacketsMapping versionKnowledge) {
         super(filter);
 
-        this.versionKnowledge = versionKnowledge;
+        // FIXME: the packet mapper should come from the connection as it will have a state when capabilities can be set
+        this.versionKnowledge = versionKnowledge.getNewPacketMapper();
         this.over = new OverImpl() {
             @Override
             protected void whenDoneImpl() {

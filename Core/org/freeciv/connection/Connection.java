@@ -76,7 +76,7 @@ public class Connection implements FreecivConnection {
             boolean interpreted
     ) throws IOException {
         return new Connection(inn, out, headerData, postReceive, postSend, protoCode,
-                interpreted ? new InterpretWhenPossible(protoCode) : new AlwaysRaw());
+                interpreted ? new InterpretWhenPossible(protoCode.getNewPacketMapper()) : new AlwaysRaw());
     }
 
     public static Connection interpreted(
@@ -87,7 +87,7 @@ public class Connection implements FreecivConnection {
             final Map<Integer, ReflexReaction> postSend,
             PacketsMapping protoCode
     ) throws IOException {
-        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, new InterpretWhenPossible(protoCode));
+        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, new InterpretWhenPossible(protoCode.getNewPacketMapper()));
     }
 
     public static Connection uninterpreted(
