@@ -69,7 +69,6 @@ public class SignInAndWait {
             final PacketsMapping interpreter = new PacketsMapping();
             final Socket connection = new Socket(address, portNumber);
             final Connection con = Connection.interpreted(connection.getInputStream(), connection.getOutputStream(),
-                    interpreter.getNewPacketHeaderData(),
                     ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
                     interpreter.getRequiredPostSendRules(), interpreter);
 

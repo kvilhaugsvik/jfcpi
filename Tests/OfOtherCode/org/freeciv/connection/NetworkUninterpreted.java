@@ -33,7 +33,7 @@ public class NetworkUninterpreted {
     public void pureHeader() throws IOException, ExecutionException, TimeoutException, InterruptedException, NotReadyYetException {
         Socket other = helperDataSender(new byte[]{0, 3, 0});
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
-                new HeaderData(Header_2_1.class), Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap(),
+                Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap(),
                 new PacketsMapping());
 
         Packet packet = assertPacketIsThere(self);
@@ -55,7 +55,7 @@ public class NetworkUninterpreted {
         postReceive.put(5, new ReflexActionChangeHeaderKind(Header_2_2.class));
 
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
-                new HeaderData(Header_2_1.class), postReceive, Collections.<Integer, ReflexReaction>emptyMap(),
+                postReceive, Collections.<Integer, ReflexReaction>emptyMap(),
                 new PacketsMapping());
 
         Packet packetBeforeChange = assertPacketIsThere(self);

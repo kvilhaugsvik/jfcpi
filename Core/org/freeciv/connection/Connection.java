@@ -33,12 +33,11 @@ public class Connection implements FreecivConnection {
     private Connection(
             final InputStream inn,
             final OutputStream out,
-            final HeaderData headerData,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
             PacketsMapping protoCode, ToPacket toPacket
     ) throws IOException {
-        this.currentHeader = headerData;
+        this.currentHeader = protoCode.getNewPacketHeaderData();
         this.out = out;
         this.overImpl = new OverImpl() {
             @Override
@@ -69,36 +68,33 @@ public class Connection implements FreecivConnection {
     public static Connection full(
             final InputStream inn,
             final OutputStream out,
-            final HeaderData headerData,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
             PacketsMapping protoCode,
             boolean interpreted
     ) throws IOException {
-        return new Connection(inn, out, headerData, postReceive, postSend, protoCode,
+        return new Connection(inn, out, postReceive, postSend, protoCode,
                 interpreted ? new InterpretWhenPossible(protoCode.getNewPacketMapper()) : new AlwaysRaw());
     }
 
     public static Connection interpreted(
             final InputStream inn,
             final OutputStream out,
-            final HeaderData headerData,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
             PacketsMapping protoCode
     ) throws IOException {
-        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, new InterpretWhenPossible(protoCode.getNewPacketMapper()));
+        return new Connection(inn, out, postReceive, postSend, protoCode, new InterpretWhenPossible(protoCode.getNewPacketMapper()));
     }
 
     public static Connection uninterpreted(
             final InputStream inn,
             final OutputStream out,
-            final HeaderData headerData,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
             final PacketsMapping protoCode
     ) throws IOException {
-        return new Connection(inn, out, headerData, postReceive, postSend, protoCode, new AlwaysRaw());
+        return new Connection(inn, out, postReceive, postSend, protoCode, new AlwaysRaw());
     }
 
     public boolean packetReady() {

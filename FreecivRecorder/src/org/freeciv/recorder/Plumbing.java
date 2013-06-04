@@ -42,7 +42,6 @@ public class Plumbing extends Thread {
     public static FreecivConnection socket2Connection(Socket connectedSocket, PacketsMapping versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
         return Connection.full(
                 connectedSocket.getInputStream(), connectedSocket.getOutputStream(),
-                versionKnowledge.getNewPacketHeaderData(),
                 postReceive, postSend, versionKnowledge, understand);
     }
 
