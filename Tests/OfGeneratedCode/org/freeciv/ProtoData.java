@@ -34,4 +34,37 @@ public class ProtoData {
         assertTrue("Missing settable capability", allSettableCaps.contains("isRemoved"));
         assertTrue("Missing settable capability", allSettableCaps.contains("updated"));
     }
+
+    @Test
+    public void cap_disabledAsStandard() {
+        PacketsMapping.Interpret map = new PacketsMapping().getNewPacketMapper();
+
+        assertFalse(map.isCapabilityEnabled("isAdded"));
+    }
+
+    @Test
+    public void cap_canEnable() {
+        PacketsMapping.Interpret map = new PacketsMapping().getNewPacketMapper();
+
+        assertFalse(map.isCapabilityEnabled("isAdded"));
+        map.enableCapability("isAdded");
+        assertTrue(map.isCapabilityEnabled("isAdded"));
+    }
+
+    @Test
+    public void cap_canDisable() {
+        PacketsMapping.Interpret map = new PacketsMapping().getNewPacketMapper();
+
+        map.enableCapability("isAdded");
+        assertTrue(map.isCapabilityEnabled("isAdded"));
+        map.disableCapability("isAdded");
+        assertFalse(map.isCapabilityEnabled("isAdded"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cap_unsupportedByData() {
+        PacketsMapping.Interpret map = new PacketsMapping().getNewPacketMapper();
+
+        assertFalse(map.isCapabilityEnabled("longNameToMakeSureItIsNotAdded"));
+    }
 }

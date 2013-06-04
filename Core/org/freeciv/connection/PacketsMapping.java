@@ -119,7 +119,7 @@ public class PacketsMapping {
     }
 
     public Interpret getNewPacketMapper() {
-        return new Interpret(this.protocolVariants);
+        return new Interpret(this.protocolVariants, this.capsOptional);
     }
 
     public Map<Integer, ReflexReaction> getRequiredPostReceiveRules() {
@@ -214,11 +214,13 @@ public class PacketsMapping {
     public static class Interpret {
         private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
         private final Set<String> enabledCapabilities;
+        private final Set<String> possibleCapabilities;
 
         private Map<Integer, Method> packetMakers;
 
-        Interpret(Map<Set<String>, Map<Integer, Method>> protocolVariants) {
+        Interpret(Map<Set<String>, Map<Integer, Method>> protocolVariants, Set<String> possibleCapabilities) {
             this.protocolVariants = protocolVariants;
+            this.possibleCapabilities = possibleCapabilities;
             this.enabledCapabilities = new HashSet<String>();
 
             updateVariant();
@@ -238,6 +240,28 @@ public class PacketsMapping {
             } catch (InvocationTargetException e) {
                 throw new IOException(internalErrorMessage(header.getPacketKind()), e);
             }
+        }
+
+        public boolean isCapabilityEnabled(String cap) {
+            validateCapability(cap);
+            return this.enabledCapabilities.contains(cap);
+        }
+
+        public void disableCapability(String cap) {
+            validateCapability(cap);
+            this.enabledCapabilities.remove(cap);
+            updateVariant();
+        }
+
+        public void enableCapability(String cap) {
+            validateCapability(cap);
+            this.enabledCapabilities.add(cap);
+            updateVariant();
+        }
+
+        private void validateCapability(String cap) {
+            if (!this.possibleCapabilities.contains(cap))
+                throw new IllegalArgumentException("Capability \"" + cap + "\" not supported.");
         }
 
         private void updateVariant() {
