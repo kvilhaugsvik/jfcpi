@@ -24,7 +24,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import org.freeciv.packet.Header_2_2;
+import org.freeciv.packet.Header_2_1;
 import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.Requirement;
 import com.kvilhaugsvik.dependency.TotalOrderNoCircles;
@@ -47,7 +47,7 @@ public class FromEntetiesAlone {
             Constant.isString("FC_DEFAULT_DATA_ENCODING", BuiltIn.literal("UTF-8"));
 
     public static final Constant<? extends AValue> PACKET_HEAD =
-            Constant.isClass(Util.HEADER_NAME, TargetClass.from(Header_2_2.class).callV("class"));
+            Constant.isClass(Util.HEADER_NAME, TargetClass.from(Header_2_1.class).callV("class"));
     public static final Constant<? extends AValue> ENABLE_DELTA =
             Constant.isBool("enableDelta", BuiltIn.literal(true));
     public static final Constant<? extends AValue> ENABLE_DELTA_BOOL_FOLD =

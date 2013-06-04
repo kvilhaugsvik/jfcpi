@@ -31,15 +31,15 @@ import static org.junit.Assert.*;
 public class NetworkUninterpreted {
     @Test
     public void pureHeader() throws IOException, ExecutionException, TimeoutException, InterruptedException, NotReadyYetException {
-        Socket other = helperDataSender(new byte[]{0, 4, 0, 0});
+        Socket other = helperDataSender(new byte[]{0, 3, 0});
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
-                new HeaderData(Header_2_2.class), Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap(),
+                new HeaderData(Header_2_1.class), Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap(),
                 new PacketsMapping());
 
         Packet packet = assertPacketIsThere(self);
 
         assertEquals("Wrong kind", 0, packet.getHeader().getPacketKind());
-        assertEquals("Wrong size", 4, packet.getHeader().getHeaderSize());
+        assertEquals("Wrong size", 3, packet.getHeader().getHeaderSize());
     }
 
     @Test
