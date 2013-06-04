@@ -18,16 +18,14 @@ import org.freeciv.utility.Util;
 import org.freeciv.packet.*;
 
 import java.io.*;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class PacketsMapping {
-    private final HashMap<Integer, Method> packetMakers = new HashMap<Integer, Method>();
+    private final Map<Integer, Method> packetMakers;
     private final Class<? extends PacketHeader> packetNumberBytes;
     private final Map<Integer, ReflexReaction> protoRulesPostReceive;
     private final Map<Integer, ReflexReaction> protoRulesPostSend;
@@ -59,18 +57,28 @@ public class PacketsMapping {
             this.compressionBorder = constants.getField("COMPRESSION_BORDER").getInt(null);
             this.jumboSize = constants.getField("JUMBO_SIZE").getInt(null);
 
+            final Map<Set<String>, Map<Integer, Method>> globalVariants = initGlobalVariants();
+
             for (Class understood : understoodPackets) {
+                final int pNumber;
+
+                final Map<Set<String>, List<Map<Integer, Method>>> localToGlobal =
+                        mapVariantsLocalToAllGlobal(globalVariants, understood);
+
                 try {
-                    this.packetMakers.put(understood.getField("number").getInt(null),
-                            understood.getMethod("fromHeaderAndStream", DataInput.class, PacketHeader.class, Map.class));
+                    pNumber = understood.getField("number").getInt(null);
                 } catch (NoSuchFieldException e) {
                     throw new BadProtocolData(understood.getSimpleName() + " is not compatible.\n" +
                             "(The static field number is missing)", e);
-                } catch (NoSuchMethodException e) {
-                    throw new BadProtocolData(understood.getSimpleName() + " is not compatible.\n" +
-                                                  "(No constructor from DataInput, PacketHeader, Map found)", e);
                 }
+
+                for (Method cadidate : understood.getDeclaredMethods())
+                    if (cadidate.getName().startsWith("fromHeaderAndStream"))
+                        for (Map<Integer, Method> variant : localToGlobal.get(new HashSet<String>(Arrays.asList(cadidate.getAnnotation(CapabilityCombination.class).value()))))
+                            variant.put(pNumber, cadidate);
             }
+
+            packetMakers = globalVariants.get(Collections.<String>emptySet());
 
             HashMap<Integer, ReflexReaction> neededPostSend = new HashMap<Integer, ReflexReaction>();
             HashMap<Integer, ReflexReaction> neededPostReceive = new HashMap<Integer, ReflexReaction>();
@@ -161,5 +169,50 @@ public class PacketsMapping {
 
     public int getCompressionBorder() {
         return compressionBorder;
+    }
+
+    private static Map<Set<String>, List<Map<Integer, Method>>> mapVariantsLocalToAllGlobal(Map<Set<String>, Map<Integer, Method>> globalVariants, Class packet) {
+        final Map<Set<String>, List<Map<Integer, Method>>> out = new HashMap<Set<String>, List<Map<Integer, Method>>>();
+
+        final String[] localVariants = ((Capabilities) packet.getAnnotation(Capabilities.class)).value();
+
+        for (Set<String> localVariant : allCombinations(localVariants))
+            out.put(localVariant, new LinkedList<Map<Integer, Method>>());
+
+        for (Set<String> globalVariant : globalVariants.keySet()) {
+            Set<String> localVariant = new HashSet<String>();
+
+            for (String s : localVariants)
+                if(globalVariant.contains(s))
+                    localVariant.add(s);
+
+            out.get(localVariant).add(globalVariants.get(globalVariant));
+        }
+
+        return out;
+    }
+
+    private Map<Set<String>, Map<Integer, Method>> initGlobalVariants() {
+        final Map<Set<String>, Map<Integer, Method>> globalVariant = new HashMap<Set<String>, Map<Integer, Method>>();
+        for (Set<String> combination : allCombinations(this.getCapStringOptional().split(" ")))
+            globalVariant.put(combination, new HashMap<Integer, Method>());
+        return globalVariant;
+    }
+
+    private static Set<Set<String>> allCombinations(String[] caps) {
+        if (1 == caps.length && "".equals(caps[0]))
+            caps = new String[0];
+
+        HashSet<Set<String>> out = new HashSet<Set<String>>();
+        final double combinations = Math.pow(2, caps.length);
+        for (int combination = 0; combination < combinations; combination++) {
+            Set<String> comb = new HashSet<String>();
+            for (int i = 0; i < caps.length; i++)
+                if ((combination & (1 << i)) != 0) {
+                    comb.add(caps[i]);
+                }
+            out.add(comb);
+        }
+        return out;
     }
 }
