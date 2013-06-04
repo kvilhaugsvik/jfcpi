@@ -60,7 +60,7 @@ public class FromEntetiesAlone {
     public static final Constant<AString> NETWORK_CAPSTRING_MANDATORY =
             Constant.isString("NETWORK_CAPSTRING_MANDATORY", BuiltIn.literal("TestData"));
     public static final Constant<AString> NETWORK_CAPSTRING_OPTIONAL =
-            Constant.isString("NETWORK_CAPSTRING_OPTIONAL", BuiltIn.literal(""));
+            Constant.isString("NETWORK_CAPSTRING_OPTIONAL", BuiltIn.literal("cap1 cap2 isAdded isRemoved updated"));
     public static final Constant<AString> VERSION_LABEL =
             Constant.isString("VERSION_LABEL", BuiltIn.literal(""));
     public static final Constant<AString> MAJOR_VERSION =

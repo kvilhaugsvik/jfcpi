@@ -24,6 +24,8 @@ import java.util.*;
 
 public class PacketsMapping {
     private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
+    private final Set<String> capsOptional;
+
     private final Class<? extends PacketHeader> packetNumberBytes;
     private final Map<Integer, ReflexReaction> protoRulesPostReceive;
     private final Map<Integer, ReflexReaction> protoRulesPostSend;
@@ -55,7 +57,10 @@ public class PacketsMapping {
             this.compressionBorder = constants.getField("COMPRESSION_BORDER").getInt(null);
             this.jumboSize = constants.getField("JUMBO_SIZE").getInt(null);
 
-            final Map<Set<String>, Map<Integer, Method>> globalVariants = initGlobalVariants();
+            final String[] optionalCaps = this.getCapStringOptional().split(" ");
+            this.capsOptional = new HashSet<String>(Arrays.asList(optionalCaps));
+
+            final Map<Set<String>, Map<Integer, Method>> globalVariants = initGlobalVariants(optionalCaps);
 
             for (Class understood : understoodPackets) {
                 final int pNumber;
@@ -133,6 +138,10 @@ public class PacketsMapping {
         return capStringOptional;
     }
 
+    public Set<String> getAllSettableCaps() {
+        return Collections.unmodifiableSet(capsOptional);
+    }
+
     public String getVersionLabel() {
         return versionLabel;
     }
@@ -178,9 +187,9 @@ public class PacketsMapping {
         return out;
     }
 
-    private Map<Set<String>, Map<Integer, Method>> initGlobalVariants() {
+    private Map<Set<String>, Map<Integer, Method>> initGlobalVariants(String[] optionalCaps) {
         final Map<Set<String>, Map<Integer, Method>> globalVariant = new HashMap<Set<String>, Map<Integer, Method>>();
-        for (Set<String> combination : allCombinations(this.getCapStringOptional().split(" ")))
+        for (Set<String> combination : allCombinations(optionalCaps))
             globalVariant.put(combination, new HashMap<Integer, Method>());
         return globalVariant;
     }
