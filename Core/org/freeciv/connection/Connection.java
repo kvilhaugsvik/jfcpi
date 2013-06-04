@@ -73,8 +73,10 @@ public class Connection implements FreecivConnection {
             PacketsMapping protoCode,
             boolean interpreted
     ) throws IOException {
-        return new Connection(inn, out, postReceive, postSend, protoCode,
-                interpreted ? new InterpretWhenPossible(protoCode.getNewPacketMapper()) : new AlwaysRaw());
+        if (interpreted)
+            return interpreted(inn, out, postReceive, postSend, protoCode);
+        else
+            return uninterpreted(inn, out, postReceive, postSend, protoCode);
     }
 
     public static Connection interpreted(
