@@ -17,8 +17,6 @@ package org.freeciv.connection;
 import org.freeciv.utility.Util;
 import org.freeciv.packet.*;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -110,16 +108,12 @@ public class PacketsMapping {
         }
     }
 
-    private static String internalErrorMessage(int packetKind) {
-        return "Internal error while trying to read packet numbered " + packetKind + " from network";
-    }
-
     public HeaderData getNewPacketHeaderData() {
         return new HeaderData(packetNumberBytes);
     }
 
-    public Interpret getNewPacketMapper() {
-        return new Interpret(this.protocolVariants, this.capsOptional);
+    public ProtocolVariantManually getNewPacketMapper() {
+        return new ProtocolVariantManually(this.protocolVariants, this.capsOptional);
     }
 
     public Map<Integer, ReflexReaction> getRequiredPostReceiveRules() {
@@ -209,63 +203,5 @@ public class PacketsMapping {
             out.add(comb);
         }
         return out;
-    }
-
-    public static class Interpret {
-        private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
-        private final Set<String> enabledCapabilities;
-        private final Set<String> possibleCapabilities;
-
-        private Map<Integer, Method> packetMakers;
-
-        Interpret(Map<Set<String>, Map<Integer, Method>> protocolVariants, Set<String> possibleCapabilities) {
-            this.protocolVariants = protocolVariants;
-            this.possibleCapabilities = possibleCapabilities;
-            this.enabledCapabilities = new HashSet<String>();
-
-            updateVariant();
-        }
-
-        boolean canInterpret(int kind) {
-            return packetMakers.containsKey(kind);
-        }
-
-        public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException {
-            if (!canInterpret(header.getPacketKind()))
-                throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
-            try {
-                return (Packet)packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
-            } catch (IllegalAccessException e) {
-                throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
-            } catch (InvocationTargetException e) {
-                throw new IOException(internalErrorMessage(header.getPacketKind()), e);
-            }
-        }
-
-        public boolean isCapabilityEnabled(String cap) {
-            validateCapability(cap);
-            return this.enabledCapabilities.contains(cap);
-        }
-
-        public void disableCapability(String cap) {
-            validateCapability(cap);
-            this.enabledCapabilities.remove(cap);
-            updateVariant();
-        }
-
-        public void enableCapability(String cap) {
-            validateCapability(cap);
-            this.enabledCapabilities.add(cap);
-            updateVariant();
-        }
-
-        private void validateCapability(String cap) {
-            if (!this.possibleCapabilities.contains(cap))
-                throw new IllegalArgumentException("Capability \"" + cap + "\" not supported.");
-        }
-
-        private void updateVariant() {
-            this.packetMakers = this.protocolVariants.get(this.enabledCapabilities);
-        }
     }
 }
