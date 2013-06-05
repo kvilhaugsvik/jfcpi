@@ -73,7 +73,7 @@ public class SignInAndWait {
                     interpreter.getRequiredPostSendRules(), interpreter);
 
             con.toSend(PACKET_SERVER_JOIN_REQ.fromValues(userName,
-                    interpreter.getCapStringMandatory(),
+                    interpreter.getCapStringMandatory() + " " + interpreter.getCapStringOptional(),
                     interpreter.getVersionLabel(),
                     interpreter.getVersionMajor(),
                     interpreter.getVersionMinor(),
