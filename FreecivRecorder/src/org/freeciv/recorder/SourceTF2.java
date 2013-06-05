@@ -16,7 +16,7 @@ package org.freeciv.recorder;
 
 import org.freeciv.connection.NotReadyYetException;
 import org.freeciv.connection.Over;
-import org.freeciv.connection.PacketsMapping;
+import org.freeciv.connection.ProtocolData;
 import org.freeciv.packet.Packet;
 import org.freeciv.recorder.traceFormat2.RecordTF2;
 import org.freeciv.recorder.traceFormat2.TraceFormat2Read;
@@ -36,7 +36,7 @@ public class SourceTF2 implements Source {
     private long sendNextAt;
     private RecordTF2 rec;
 
-    public SourceTF2(InputStream source, Over over, PacketsMapping versionKnowledge, boolean ignoreDynamic, boolean fromClient, boolean understand, long beganPlayBack) throws IOException {
+    public SourceTF2(InputStream source, Over over, ProtocolData versionKnowledge, boolean ignoreDynamic, boolean fromClient, boolean understand, long beganPlayBack) throws IOException {
         this.over = over;
         this.ignoreDynamic = ignoreDynamic;
         this.fromClient = fromClient;

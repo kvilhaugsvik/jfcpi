@@ -16,7 +16,7 @@ package org.freeciv.recorder;
 
 import org.freeciv.connection.Over;
 import org.freeciv.connection.OverImpl;
-import org.freeciv.connection.PacketsMapping;
+import org.freeciv.connection.ProtocolData;
 import org.freeciv.connection.ProtocolVariantManually;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.Packet;
@@ -34,7 +34,7 @@ public abstract class SinkProcess extends Sink {
     private final Over over;
     private final ProtocolVariantManually versionKnowledge;
 
-    public SinkProcess(Filter filter, PacketsMapping versionKnowledge) {
+    public SinkProcess(Filter filter, ProtocolData versionKnowledge) {
         super(filter);
 
         // FIXME: the packet mapper should come from the connection as it will have a state when capabilities can be set

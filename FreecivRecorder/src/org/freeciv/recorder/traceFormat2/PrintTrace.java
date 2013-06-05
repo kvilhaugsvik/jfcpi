@@ -16,7 +16,7 @@ package org.freeciv.recorder.traceFormat2;
 
 import org.freeciv.connection.DoneReading;
 import org.freeciv.connection.OverImpl;
-import org.freeciv.connection.PacketsMapping;
+import org.freeciv.connection.ProtocolData;
 import org.freeciv.recorder.ProxyRecorder;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
@@ -45,7 +45,7 @@ public class PrintTrace {
 
         final FileInputStream file = new FileInputStream(fileName);
         try {
-            final PacketsMapping packetsMapping = new PacketsMapping();
+            final ProtocolData protocolData = new ProtocolData();
             TraceFormat2Read trace = new TraceFormat2Read(
                     file,
                     new OverImpl() {
@@ -54,9 +54,9 @@ public class PrintTrace {
                             // clean up by hand
                         }
                     },
-                    packetsMapping,
-                    packetsMapping.getNewPacketHeaderData(),
-                    packetsMapping.getRequiredPostSendRules(),
+                    protocolData,
+                    protocolData.getNewPacketHeaderData(),
+                    protocolData.getRequiredPostSendRules(),
                     true
             );
 

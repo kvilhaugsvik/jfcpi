@@ -30,7 +30,7 @@ public class TraceFormat2Read {
     private final HeaderTF2 header;
 
     public TraceFormat2Read(InputStream in, Over state,
-                            PacketsMapping packetsHelpUnderstand, HeaderData headerData,
+                            ProtocolData packetsHelpUnderstand, HeaderData headerData,
                             Map<Integer, ReflexReaction> postReadReflexes,
                             boolean interpreted) throws IOException {
         final ReentrantLock completeReflexesInOneStep = new ReentrantLock();

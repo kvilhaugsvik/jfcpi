@@ -35,7 +35,7 @@ public class Connection implements FreecivConnection {
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            PacketsMapping protoCode, ToPacket toPacket
+            ProtocolData protoCode, ToPacket toPacket
     ) throws IOException {
         this.currentHeader = protoCode.getNewPacketHeaderData();
         this.out = out;
@@ -70,7 +70,7 @@ public class Connection implements FreecivConnection {
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            PacketsMapping protoCode,
+            ProtocolData protoCode,
             boolean interpreted
     ) throws IOException {
         if (interpreted)
@@ -84,7 +84,7 @@ public class Connection implements FreecivConnection {
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            PacketsMapping protoCode
+            ProtocolData protoCode
     ) throws IOException {
         return new Connection(inn, out, postReceive, postSend, protoCode, new InterpretWhenPossible(protoCode.getNewPacketMapper()));
     }
@@ -94,7 +94,7 @@ public class Connection implements FreecivConnection {
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            final PacketsMapping protoCode
+            final ProtocolData protoCode
     ) throws IOException {
         return new Connection(inn, out, postReceive, postSend, protoCode, new AlwaysRaw());
     }

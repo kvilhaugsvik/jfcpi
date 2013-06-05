@@ -39,7 +39,7 @@ public class Plumbing extends Thread {
         this.sinks = sinks;
     }
 
-    public static FreecivConnection socket2Connection(Socket connectedSocket, PacketsMapping versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
+    public static FreecivConnection socket2Connection(Socket connectedSocket, ProtocolData versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
         return Connection.full(
                 connectedSocket.getInputStream(), connectedSocket.getOutputStream(),
                 postReceive, postSend, versionKnowledge, understand);

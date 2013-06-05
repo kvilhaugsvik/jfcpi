@@ -14,7 +14,7 @@
 
 package org.freeciv;
 
-import org.freeciv.connection.PacketsMapping;
+import org.freeciv.connection.ProtocolData;
 import org.freeciv.connection.ProtocolVariantManually;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 public class ProtoData {
     @Test
     public void hasSettableCaps() {
-        PacketsMapping protoData = new PacketsMapping();
+        ProtocolData protoData = new ProtocolData();
 
         final Set<String> allSettableCaps = protoData.getAllSettableCaps();
 
@@ -38,14 +38,14 @@ public class ProtoData {
 
     @Test
     public void cap_disabledAsStandard() {
-        ProtocolVariantManually map = new PacketsMapping().getNewPacketMapper();
+        ProtocolVariantManually map = new ProtocolData().getNewPacketMapper();
 
         assertFalse(map.isCapabilityEnabled("isAdded"));
     }
 
     @Test
     public void cap_canEnable() {
-        ProtocolVariantManually map = new PacketsMapping().getNewPacketMapper();
+        ProtocolVariantManually map = new ProtocolData().getNewPacketMapper();
 
         assertFalse(map.isCapabilityEnabled("isAdded"));
         map.enableCapability("isAdded");
@@ -54,7 +54,7 @@ public class ProtoData {
 
     @Test
     public void cap_canDisable() {
-        ProtocolVariantManually map = new PacketsMapping().getNewPacketMapper();
+        ProtocolVariantManually map = new ProtocolData().getNewPacketMapper();
 
         map.enableCapability("isAdded");
         assertTrue(map.isCapabilityEnabled("isAdded"));
@@ -64,7 +64,7 @@ public class ProtoData {
 
     @Test(expected = IllegalArgumentException.class)
     public void cap_unsupportedByData() {
-        ProtocolVariantManually map = new PacketsMapping().getNewPacketMapper();
+        ProtocolVariantManually map = new ProtocolData().getNewPacketMapper();
 
         assertFalse(map.isCapabilityEnabled("longNameToMakeSureItIsNotAdded"));
     }

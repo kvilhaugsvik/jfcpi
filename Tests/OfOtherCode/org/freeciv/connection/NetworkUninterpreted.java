@@ -14,7 +14,6 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.Header_2_1;
 import org.freeciv.packet.Header_2_2;
 import org.freeciv.packet.Packet;
 import org.junit.Test;
@@ -34,7 +33,7 @@ public class NetworkUninterpreted {
         Socket other = helperDataSender(new byte[]{0, 3, 0});
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
                 Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap(),
-                new PacketsMapping());
+                new ProtocolData());
 
         Packet packet = assertPacketIsThere(self);
 
@@ -56,7 +55,7 @@ public class NetworkUninterpreted {
 
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
                 postReceive, Collections.<Integer, ReflexReaction>emptyMap(),
-                new PacketsMapping());
+                new ProtocolData());
 
         Packet packetBeforeChange = assertPacketIsThere(self);
 

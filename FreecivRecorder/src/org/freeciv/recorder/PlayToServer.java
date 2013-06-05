@@ -49,7 +49,7 @@ public class PlayToServer {
     private final Plumbing scPlumbing;
 
     public PlayToServer(final InputStream source, Socket server, boolean ignoreDynamic, FirstTimeRequest firstPlayedTime) throws IOException, NoSuchMethodException {
-        final PacketsMapping versionKnowledge = new PacketsMapping();
+        final ProtocolData versionKnowledge = new ProtocolData();
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
 

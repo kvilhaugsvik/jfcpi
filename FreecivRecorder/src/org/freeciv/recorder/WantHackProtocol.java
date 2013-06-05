@@ -14,7 +14,7 @@
 
 package org.freeciv.recorder;
 
-import org.freeciv.connection.PacketsMapping;
+import org.freeciv.connection.ProtocolData;
 import org.freeciv.packet.PACKET_SERVER_JOIN_REPLY;
 import org.freeciv.packet.PACKET_SINGLE_WANT_HACK_REQ;
 import org.freeciv.packet.Packet;
@@ -36,7 +36,7 @@ public class WantHackProtocol extends SinkProcess {
 
     String challengeFileName;
 
-    public WantHackProtocol(PacketsMapping versionKnowledge) {
+    public WantHackProtocol(ProtocolData versionKnowledge) {
         super(new FilterPacketKind(Arrays.asList(5, 160, 161)), versionKnowledge);
         fileNameLock = new ReentrantLock();
         newFileName = fileNameLock.newCondition();

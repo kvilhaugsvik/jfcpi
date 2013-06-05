@@ -81,7 +81,7 @@ public class ProxyRecorder {
         UI.printAndExitOnHelp(settings, ProxyRecorder.class);
         printStarted(settings);
 
-        final PacketsMapping versionKnowledge = loadProtocol();
+        final ProtocolData versionKnowledge = loadProtocol();
 
         final Filter forwardFilters = new FilterAllAccepted(); // Forward everything to the network
         final Filter diskFilters = buildTraceFilters(settings);
@@ -101,9 +101,9 @@ public class ProxyRecorder {
         System.exit(0);
     }
 
-    private static PacketsMapping loadProtocol() {
+    private static ProtocolData loadProtocol() {
         try {
-            return new PacketsMapping();
+            return new ProtocolData();
         } catch (BadProtocolData e) {
             System.err.println("Problem loading protocol data.");
             System.exit(1);
@@ -134,7 +134,7 @@ public class ProxyRecorder {
         }
     }
 
-    private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections, Filter diskFilters, Filter forwardFilters, SinkInformUser.SharedData console, PacketsMapping versionKnowledge) throws InterruptedException, InvocationTargetException {
+    private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections, Filter diskFilters, Filter forwardFilters, SinkInformUser.SharedData console, ProtocolData versionKnowledge) throws InterruptedException, InvocationTargetException {
         final FirstTimeRequest firstConnectionTime = new FirstTimeRequest();
 
         while (!timeToExit[0]) {
@@ -224,7 +224,7 @@ public class ProxyRecorder {
             }
     }
 
-    public ProxyRecorder(Socket client, Socket server, Sink traceSink, Sink console, Filter forwardFilters, ArgumentSettings settings, PacketsMapping versionKnowledge)
+    public ProxyRecorder(Socket client, Socket server, Sink traceSink, Sink console, Filter forwardFilters, ArgumentSettings settings, ProtocolData versionKnowledge)
             throws IOException, InterruptedException {
         final FreecivConnection clientCon = Plumbing.socket2Connection(client, versionKnowledge,
                 settings.<Boolean>getSetting(UNDERSTAND),

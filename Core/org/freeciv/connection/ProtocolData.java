@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Sveinung Kvilhaugsvik
+ * Copyright (c) 2012, 2013. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@ import org.freeciv.packet.*;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class PacketsMapping {
+public class ProtocolData {
     private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
     private final Set<String> capsOptional;
 
@@ -37,7 +37,7 @@ public class PacketsMapping {
     private final int compressionBorder;
     private final int jumboSize;
 
-    public PacketsMapping() {
+    public ProtocolData() {
         try {
             Class constants = Class.forName(Util.VERSION_DATA_CLASS);
             Class[] understoodPackets = (Class[])constants.getField(Util.PACKET_MAP_NAME).get(null);

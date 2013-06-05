@@ -16,26 +16,23 @@ package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
-import java.util.zip.InflaterInputStream;
 
 public class SerializedCompressedPackets implements SerializedPacketGroup {
     private final byte[] packet;
     private final boolean jumbo;
-    private final PacketsMapping protoCode;
+    private final ProtocolData protoCode;
     private final ToPacket converter;
     private final HeaderData headerData;
     private final ReflexPacketKind quickRespond;
 
     private final LinkedList<Packet> subPackets;
 
-    public SerializedCompressedPackets(byte[] packet, boolean jumbo, PacketsMapping protoCode, ToPacket converter, HeaderData headerData, ReflexPacketKind quickRespond) {
+    public SerializedCompressedPackets(byte[] packet, boolean jumbo, ProtocolData protoCode, ToPacket converter, HeaderData headerData, ReflexPacketKind quickRespond) {
         this.packet = packet;
         this.jumbo = jumbo;
         this.protoCode = protoCode;
