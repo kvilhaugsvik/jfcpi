@@ -40,7 +40,7 @@ Test if it works
 ========================================================================================================================
 It is now time to see if it works. The first test is simple but show that you have managed to get much of the system
 working. Begin by starting a freeciv server. Then launch FCJTestSignIn.jar directly or run the helper script
-testSignInToServer (testSignInToServer.bat on Windows). If you can see a windows of text talking about packets it works.
+testSignInToServer (testSignInToServer.bat on Windows). If you can see a window of text talking about packets it works.
 What you see is the Freeciv protocol converted to text.
 
 The next thing to test it the recorder and the play back. Start the recorder ("./proxyRecorder" or proxyRecorder.bat).
