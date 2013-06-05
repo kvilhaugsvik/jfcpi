@@ -16,6 +16,7 @@ package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
+import org.freeciv.packet.RawPacket;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -29,15 +30,21 @@ public class Connection implements FreecivConnection {
     private final OverImpl overImpl;
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
+    private final ProtocolVariantAutomatic variant;
+    private final ProtocolData protoCode;
 
     private Connection(
             final InputStream inn,
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            ProtocolData protoCode, ToPacket toPacket
+            ProtocolData protoCode,
+            ToPacket toPacket,
+            ProtocolVariantAutomatic protocolVariant
     ) throws IOException {
+        this.protoCode = protoCode;
         this.currentHeader = protoCode.getNewPacketHeaderData();
+        this.variant = protocolVariant;
         this.out = out;
         this.overImpl = new OverImpl() {
             @Override
@@ -86,7 +93,9 @@ public class Connection implements FreecivConnection {
             final Map<Integer, ReflexReaction> postSend,
             ProtocolData protoCode
     ) throws IOException {
-        return new Connection(inn, out, postReceive, postSend, protoCode, new InterpretWhenPossible(protoCode.getNewPacketMapper()));
+        final ProtocolVariantAutomatic protocolVariant = new ProtocolVariantAutomatic(protoCode.getNewPacketMapper());
+        return new Connection(inn, out, postReceive, postSend, protoCode,
+                new InterpretWhenPossible(protocolVariant), protocolVariant);
     }
 
     public static Connection uninterpreted(
@@ -96,7 +105,8 @@ public class Connection implements FreecivConnection {
             final Map<Integer, ReflexReaction> postSend,
             final ProtocolData protoCode
     ) throws IOException {
-        return new Connection(inn, out, postReceive, postSend, protoCode, new AlwaysRaw());
+        return new Connection(inn, out, postReceive, postSend, protoCode,
+                new AlwaysRaw(), new ProtocolVariantAutomatic(null));
     }
 
     public boolean packetReady() {
@@ -127,6 +137,13 @@ public class Connection implements FreecivConnection {
         try {
             out.write(packetSerialized.toByteArray());
             this.postSend.handle(toSend.getHeader().getPacketKind());
+
+            // need to look for capability setters in sending as well
+            if (variant.needToKnowCaps())
+                variant.extractVariantInfo(toSend instanceof RawPacket ?
+                        new InterpretWhenPossible(protoCode.getNewPacketMapper())
+                                .convert(toSend.getHeader(), packetSerialized.toByteArray()) :
+                        toSend);
         } catch (IOException e) {
             setStopReadingWhenOutOfInput();
             whenDone();

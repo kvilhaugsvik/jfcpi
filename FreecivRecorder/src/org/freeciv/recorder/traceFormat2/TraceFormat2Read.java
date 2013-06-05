@@ -38,7 +38,9 @@ public class TraceFormat2Read {
         this.inAsData = new DataInputStream(in);
         this.interpret = new RawFCProto(
                 state,
-                interpreted ? new InterpretWhenPossible(packetsHelpUnderstand.getNewPacketMapper()) : new AlwaysRaw(),
+                interpreted ?
+                        new InterpretWhenPossible(new ProtocolVariantAutomatic(packetsHelpUnderstand.getNewPacketMapper())) :
+                        new AlwaysRaw(),
                 headerData,
                 new ReflexPacketKind(postReadReflexes, headerData, completeReflexesInOneStep),
                 packetsHelpUnderstand

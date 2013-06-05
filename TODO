@@ -1,6 +1,3 @@
-Core
- * Capability support
-
 FreecivRecorder
  * Exit on client / server disconnect and no one left even if server don't inform it is shutting down
  * Have the player check what the server returns
