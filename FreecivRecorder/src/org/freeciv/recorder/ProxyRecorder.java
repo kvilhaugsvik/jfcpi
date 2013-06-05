@@ -142,6 +142,8 @@ public class ProxyRecorder {
             try {
                 client = serverProxy.accept();
             } catch (SocketTimeoutException e) {
+                if (0 < connections.size() && allAreFinished(connections))
+                    timeToExit[0] = true;
                 continue;
             } catch (IOException e) {
                 failedAcceptingConnection(e);
@@ -216,10 +218,19 @@ public class ProxyRecorder {
         }
     }
 
+    private static boolean allAreFinished(ArrayList<ProxyRecorder> connections) {
+        for (ProxyRecorder connection : connections)
+            if (!connection.isFinished()) {
+                return false;
+            }
+
+        return true;
+    }
+
     private static void letThemFinish(ArrayList<ProxyRecorder> connections) {
         // wait for all the connections
         for (ProxyRecorder connection : connections)
-            while (!(connection.csPlumbing.isFinished() && connection.scPlumbing.isFinished())) {
+            while (!connection.isFinished()) {
                 Thread.yield();
             }
     }
@@ -293,5 +304,9 @@ public class ProxyRecorder {
     public void startThreads() throws IOException, InvocationTargetException {
         this.csPlumbing.start();
         this.scPlumbing.start();
+    }
+
+    public boolean isFinished() {
+        return csPlumbing.isFinished() && scPlumbing.isFinished();
     }
 }

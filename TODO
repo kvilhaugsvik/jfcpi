@@ -1,5 +1,4 @@
 FreecivRecorder
- * Exit on client / server disconnect and no one left even if server don't inform it is shutting down
  * Have the player check what the server returns
  * Don't do a proper get hack file creation if it failed in the trace
  * Merge all connections in one file
