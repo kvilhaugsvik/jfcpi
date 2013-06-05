@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class ProtocolVariantManually {
+public class ProtocolVariantManually implements ProtocolVariant {
     private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
     private final Set<String> enabledCapabilities;
     private final Set<String> possibleCapabilities;
@@ -46,6 +46,7 @@ public class ProtocolVariantManually {
         return packetMakers.containsKey(kind);
     }
 
+    @Override
     public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException {
         if (!canInterpret(header.getPacketKind()))
             throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
@@ -58,6 +59,7 @@ public class ProtocolVariantManually {
         }
     }
 
+    @Override
     public boolean isCapabilityEnabled(String cap) {
         validateCapability(cap);
         return this.enabledCapabilities.contains(cap);

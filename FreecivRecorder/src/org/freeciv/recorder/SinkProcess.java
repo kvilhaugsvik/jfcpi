@@ -14,10 +14,7 @@
 
 package org.freeciv.recorder;
 
-import org.freeciv.connection.Over;
-import org.freeciv.connection.OverImpl;
-import org.freeciv.connection.ProtocolData;
-import org.freeciv.connection.ProtocolVariantManually;
+import org.freeciv.connection.*;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.RawPacket;
@@ -32,7 +29,7 @@ public abstract class SinkProcess extends Sink {
     protected final HashMap<DeltaKey, Packet> oldFromClient = new HashMap<DeltaKey, Packet>();
 
     private final Over over;
-    private final ProtocolVariantManually versionKnowledge;
+    private final ProtocolVariant versionKnowledge;
 
     public SinkProcess(Filter filter, ProtocolData versionKnowledge) {
         super(filter);
