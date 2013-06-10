@@ -51,7 +51,7 @@ public class PlayToServer {
     public PlayToServer(final InputStream source, Socket server, boolean ignoreDynamic, FirstTimeRequest firstPlayedTime) throws IOException, NoSuchMethodException {
         final ProtocolData versionKnowledge = new ProtocolData();
 
-        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
+        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes(versionKnowledge);
 
         final FreecivConnection conn = Connection.uninterpreted(server.getInputStream(), server.getOutputStream(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
@@ -78,13 +78,13 @@ public class PlayToServer {
         this.scPlumbing = new Plumbing(new SourceConn(conn, false), Arrays.asList(reaction), timeToExit);
     }
 
-    private static HashMap<Integer, ReflexReaction> createStandardReflexes() {
+    private static HashMap<Integer, ReflexReaction> createStandardReflexes(final ProtocolData versionKnowledge) {
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
             public void apply(PacketWrite connection) {
                 try {
-                    connection.toSend(PACKET_CONN_PONG.fromValues(connection.getFields2Header()));
+                    connection.toSend(versionKnowledge.newPong(connection.getFields2Header()));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }

@@ -14,14 +14,15 @@
 
 package org.freeciv.recorder;
 
+import org.freeciv.connection.BadProtocolData;
 import org.freeciv.connection.ProtocolData;
-import org.freeciv.packet.PACKET_SERVER_JOIN_REPLY;
-import org.freeciv.packet.PACKET_SINGLE_WANT_HACK_REQ;
 import org.freeciv.packet.Packet;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -31,6 +32,8 @@ public class WantHackProtocol extends SinkProcess {
     final Lock fileNameLock;
     final Condition newFileName;
     final Condition wroteTheFile;
+    private final Method getChallenge_fileValue;
+    private final Method getTokenValue;
 
     private static final String fcData = (isWindows() ? appDataOrHome() : getUserHome()) + "/.freeciv/";
 
@@ -38,6 +41,18 @@ public class WantHackProtocol extends SinkProcess {
 
     public WantHackProtocol(ProtocolData versionKnowledge) {
         super(new FilterPacketKind(Arrays.asList(5, 160, 161)), versionKnowledge);
+
+        try {
+            getChallenge_fileValue = versionKnowledge.getServerJoinReply().getMethod("getChallenge_fileValue");
+        } catch (NoSuchMethodException e) {
+            throw new BadProtocolData("Not able to access challenge file name", e);
+        }
+        try {
+            getTokenValue = versionKnowledge.getPacket(160).getMethod("getTokenValue");
+        } catch (NoSuchMethodException e) {
+            throw new BadProtocolData("Not able to access challenge value", e);
+        }
+
         fileNameLock = new ReentrantLock();
         newFileName = fileNameLock.newCondition();
         wroteTheFile = fileNameLock.newCondition();
@@ -52,7 +67,13 @@ public class WantHackProtocol extends SinkProcess {
             case 5:
                 fileNameLock.lock();
                 try {
-                    challengeFileName = fcData + ((PACKET_SERVER_JOIN_REPLY)interpreted).getChallenge_fileValue();
+                    try {
+                        challengeFileName = fcData + getChallenge_fileValue.invoke(interpreted);
+                    } catch (IllegalAccessException e) {
+                        throw new BadProtocolData("Not allowed to access challenge file name", e);
+                    } catch (InvocationTargetException e) {
+                        throw new BadProtocolData("Problem while accessing challenge file name", e);
+                    }
                     newFileName.signal();
                 } finally {
                     fileNameLock.unlock();
@@ -64,8 +85,14 @@ public class WantHackProtocol extends SinkProcess {
                     while (null == challengeFileName)
                         newFileName.awaitUninterruptibly();
 
-                    String challengeString = "[challenge]\ntoken=\"" +
-                            ((PACKET_SINGLE_WANT_HACK_REQ)interpreted).getTokenValue() + "\"\n";
+                    String challengeString = null;
+                    try {
+                        challengeString = "[challenge]\ntoken=\"" + getTokenValue.invoke(interpreted) + "\"\n";
+                    } catch (IllegalAccessException e) {
+                        throw new BadProtocolData("Not allowed to access challenge value", e);
+                    } catch (InvocationTargetException e) {
+                        throw new BadProtocolData("Problem while accessing challenge value", e);
+                    }
 
                     FileOutputStream challengeWrite = new FileOutputStream(challengeFileName);
                     try {
