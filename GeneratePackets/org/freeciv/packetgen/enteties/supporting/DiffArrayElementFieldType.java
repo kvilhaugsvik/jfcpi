@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.dependency.*;
 import com.kvilhaugsvik.javaGenerator.*;
@@ -23,6 +23,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.Struct;

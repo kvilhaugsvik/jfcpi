@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.dependency.*;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
