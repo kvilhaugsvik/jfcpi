@@ -314,6 +314,10 @@ public class ProtocolData {
         }
     }
 
+    public Class<Packet> getPacket(int number) {
+        return (Class<Packet>) protocolVariants.get(Collections.<String>emptySet()).get(number).getDeclaringClass();
+    }
+
     private static Map<Set<String>, List<Map<Integer, Method>>> mapVariantsLocalToAllGlobal(Map<Set<String>, Map<Integer, Method>> globalVariants, Class packet) {
         final Map<Set<String>, List<Map<Integer, Method>>> out = new HashMap<Set<String>, List<Map<Integer, Method>>>();
 
