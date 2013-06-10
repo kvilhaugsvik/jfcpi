@@ -17,6 +17,8 @@ package org.freeciv.connection;
 import org.freeciv.utility.Util;
 import org.freeciv.packet.*;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -37,9 +39,13 @@ public class ProtocolData {
     private final int compressionBorder;
     private final int jumboSize;
     private final Class<Packet> serverJoinRequest;
+    private final Method serverJoinRequestFromValues;
     private final Class<Packet> serverJoinReply;
+    private final Method serverJoinReplyFromValues;
     private final Class<Packet> ping;
+    private final Method pingFromValues;
     private final Class<Packet> pong;
+    private final Method pongFromValues;
 
     public ProtocolData() {
         try {
@@ -108,15 +114,21 @@ public class ProtocolData {
 
             validatePacketWasFound(serverJoinRequest, "server join request");
             this.serverJoinRequest = serverJoinRequest;
+            this.serverJoinRequestFromValues = extractFromValues(serverJoinRequest, "server join request",
+                    String.class, String.class, String.class, Long.class, Long.class, Long.class);
 
             validatePacketWasFound(serverJoinReply, "server join reply");
             this.serverJoinReply = serverJoinReply;
+            this.serverJoinReplyFromValues = extractFromValues(serverJoinReply, "server join reply",
+                    Boolean.class, String.class, String.class, String.class, Integer.class);
 
             validatePacketWasFound(ping, "ping");
             this.ping = ping;
+            this.pingFromValues = extractFromValues(ping, "ping");
 
             validatePacketWasFound(pong, "pong");
             this.pong = pong;
+            this.pongFromValues = extractFromValues(pong, "pong");
 
             HashMap<Integer, ReflexReaction> neededPostSend = new HashMap<Integer, ReflexReaction>();
             HashMap<Integer, ReflexReaction> neededPostReceive = new HashMap<Integer, ReflexReaction>();
@@ -142,6 +154,18 @@ public class ProtocolData {
             throw new BadProtocolData("Version information not compatible", e);
         } catch (IllegalAccessException e) {
             throw new BadProtocolData("Refused to read version information", e);
+        }
+    }
+
+    private static Method extractFromValues(Class<Packet> packet, String name, Class... sig) {
+        Class[] fullSig = new Class[sig.length + 1];
+        System.arraycopy(sig, 0, fullSig, 0, sig.length);
+        fullSig[sig.length] = java.lang.reflect.Constructor.class;
+
+        try {
+            return packet.getMethod("fromValues", fullSig);
+        } catch (NoSuchMethodException e) {
+            throw new BadProtocolData("No constructor from values for packet " + name, e);
         }
     }
 
@@ -206,16 +230,88 @@ public class ProtocolData {
         return serverJoinRequest;
     }
 
+    public Packet newServerJoinRequest(String userName, Constructor<? extends PacketHeader> headerMaker) {
+        return newServerJoinRequest(userName, getCapStringOptional(), headerMaker);
+    }
+
+    public Packet newServerJoinRequest(String userName,
+                                       String optionalCaps,
+                                       Constructor<? extends PacketHeader> headerMaker) {
+        try {
+            return (Packet) serverJoinRequestFromValues.invoke(null,
+                    userName,
+                    getCapStringMandatory() + " " + optionalCaps,
+                    getVersionLabel(),
+                    getVersionMajor(),
+                    getVersionMinor(),
+                    getVersionPatch(),
+                    headerMaker);
+        } catch (IllegalAccessException e) {
+            throw new BadProtocolData("Not allowed to construct", e);
+        } catch (InvocationTargetException e) {
+            throw new BadProtocolData("Problem while constructing construct", e);
+        }
+    }
+
     public Class<Packet> getServerJoinReply() {
         return serverJoinReply;
+    }
+
+    public Packet newServerJoinReply(Boolean you_can_join,
+                                     String message,
+                                     String challenge_file,
+                                     Integer conn_id,
+                                     Constructor<? extends PacketHeader> headerMaker) {
+        return newServerJoinReply(you_can_join, message, getCapStringOptional(), challenge_file, conn_id, headerMaker);
+    }
+
+    public Packet newServerJoinReply(Boolean you_can_join,
+                                     String message,
+                                     String optionalCaps,
+                                     String challenge_file,
+                                     Integer conn_id,
+                                     Constructor<? extends PacketHeader> headerMaker) {
+        try {
+            return (Packet) serverJoinReplyFromValues.invoke(null,
+                    you_can_join,
+                    message,
+                    getCapStringMandatory() + " " + optionalCaps,
+                    challenge_file,
+                    conn_id,
+                    headerMaker);
+        } catch (IllegalAccessException e) {
+            throw new BadProtocolData("Not allowed to construct", e);
+        } catch (InvocationTargetException e) {
+            throw new BadProtocolData("Problem while constructing construct", e);
+        }
     }
 
     public Class<Packet> getPing() {
         return ping;
     }
 
+    public Packet newPing(Constructor<? extends PacketHeader> headerMaker) {
+        try {
+            return (Packet) pingFromValues.invoke(null, headerMaker);
+        } catch (IllegalAccessException e) {
+            throw new BadProtocolData("Not allowed to construct", e);
+        } catch (InvocationTargetException e) {
+            throw new BadProtocolData("Problem while constructing construct", e);
+        }
+    }
+
     public Class<Packet> getPong() {
         return pong;
+    }
+
+    public Packet newPong(Constructor<? extends PacketHeader> headerMaker) {
+        try {
+            return (Packet) pongFromValues.invoke(null, headerMaker);
+        } catch (IllegalAccessException e) {
+            throw new BadProtocolData("Not allowed to construct", e);
+        } catch (InvocationTargetException e) {
+            throw new BadProtocolData("Problem while constructing construct", e);
+        }
     }
 
     private static Map<Set<String>, List<Map<Integer, Method>>> mapVariantsLocalToAllGlobal(Map<Set<String>, Map<Integer, Method>> globalVariants, Class packet) {
