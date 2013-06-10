@@ -36,6 +36,10 @@ public class ProtocolData {
     private final long versionPatch;
     private final int compressionBorder;
     private final int jumboSize;
+    private final Class<Packet> serverJoinRequest;
+    private final Class<Packet> serverJoinReply;
+    private final Class<Packet> ping;
+    private final Class<Packet> pong;
 
     public ProtocolData() {
         try {
@@ -58,6 +62,12 @@ public class ProtocolData {
             final String[] optionalCaps = this.getCapStringOptional().split(" ");
             this.capsOptional = new HashSet<String>(Arrays.asList(optionalCaps));
 
+
+            Class<Packet> serverJoinRequest = null;
+            Class<Packet> serverJoinReply = null;
+            Class<Packet> ping = null;
+            Class<Packet> pong = null;
+
             final Map<Set<String>, Map<Integer, Method>> globalVariants = initGlobalVariants(optionalCaps);
 
             for (Class understood : understoodPackets) {
@@ -73,6 +83,21 @@ public class ProtocolData {
                             "(The static field number is missing)", e);
                 }
 
+                switch (pNumber) {
+                    case 4:
+                        serverJoinRequest = understood;
+                        break;
+                    case 5:
+                        serverJoinReply = understood;
+                        break;
+                    case 88:
+                        ping = understood;
+                        break;
+                    case 89:
+                        pong = understood;
+                        break;
+                }
+
                 for (Method cadidate : understood.getDeclaredMethods())
                     if (cadidate.getName().startsWith("fromHeaderAndStream"))
                         for (Map<Integer, Method> variant : localToGlobal.get(new HashSet<String>(Arrays.asList(cadidate.getAnnotation(CapabilityCombination.class).value()))))
@@ -80,6 +105,18 @@ public class ProtocolData {
             }
 
             this.protocolVariants = globalVariants;
+
+            validatePacketWasFound(serverJoinRequest, "server join request");
+            this.serverJoinRequest = serverJoinRequest;
+
+            validatePacketWasFound(serverJoinReply, "server join reply");
+            this.serverJoinReply = serverJoinReply;
+
+            validatePacketWasFound(ping, "ping");
+            this.ping = ping;
+
+            validatePacketWasFound(pong, "pong");
+            this.pong = pong;
 
             HashMap<Integer, ReflexReaction> neededPostSend = new HashMap<Integer, ReflexReaction>();
             HashMap<Integer, ReflexReaction> neededPostReceive = new HashMap<Integer, ReflexReaction>();
@@ -106,6 +143,11 @@ public class ProtocolData {
         } catch (IllegalAccessException e) {
             throw new BadProtocolData("Refused to read version information", e);
         }
+    }
+
+    private static void validatePacketWasFound(Class<Packet> serverJoinRequest, String name) {
+        if (null == serverJoinRequest)
+            throw new BadProtocolData("Packet " + name + " missing");
     }
 
     public HeaderData getNewPacketHeaderData() {
@@ -158,6 +200,22 @@ public class ProtocolData {
 
     public int getCompressionBorder() {
         return compressionBorder;
+    }
+
+    public Class<Packet> getServerJoinRequest() {
+        return serverJoinRequest;
+    }
+
+    public Class<Packet> getServerJoinReply() {
+        return serverJoinReply;
+    }
+
+    public Class<Packet> getPing() {
+        return ping;
+    }
+
+    public Class<Packet> getPong() {
+        return pong;
     }
 
     private static Map<Set<String>, List<Map<Integer, Method>>> mapVariantsLocalToAllGlobal(Map<Set<String>, Map<Integer, Method>> globalVariants, Class packet) {

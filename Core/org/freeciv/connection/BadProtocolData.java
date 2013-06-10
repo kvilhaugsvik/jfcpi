@@ -21,4 +21,8 @@ public class BadProtocolData extends IllegalStateException {
     public BadProtocolData(String message, Throwable e) {
         super(message, e);
     }
+
+    public BadProtocolData(String message) {
+        super(message);
+    }
 }

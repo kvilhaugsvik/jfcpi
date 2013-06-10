@@ -601,6 +601,10 @@ public class FromEntetiesAlone {
                 constants.add((Constant)stringEnd);
 
         TreeMap<Integer, TargetClass> packets = new TreeMap<Integer, TargetClass>();
+        packets.put(4, TargetClass.from("org.freeciv.packet", "SERVER_JOIN_REQ"));
+        packets.put(5, TargetClass.from("org.freeciv.packet", "SERVER_JOIN_REPLY"));
+        packets.put(88, TargetClass.from("org.freeciv.packet", "CONN_PING"));
+        packets.put(89, TargetClass.from("org.freeciv.packet", "CONN_PONG"));
         packets.put(926, TargetClass.from("org.freeciv.packet", "TestArray"));
         packets.put(927, TargetClass.from("org.freeciv.packet", "TestArrayTransfer"));
         packets.put(928, TargetClass.from("org.freeciv.packet", "TestArrayDouble"));
