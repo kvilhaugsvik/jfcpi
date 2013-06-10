@@ -48,12 +48,14 @@ public class SignInAndWait {
         int portNumber = settings.<Integer>getSetting(PORT);
         String userName = settings.getSetting(USER_NAME);
 
+        final ProtocolData interpreter = new ProtocolData();
+
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
             public void apply(PacketWrite connection) {
                 try {
-                    connection.toSend(PACKET_CONN_PONG.fromValues(connection.getFields2Header()));
+                    connection.toSend(interpreter.newPong(connection.getFields2Header()));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }
@@ -66,19 +68,12 @@ public class SignInAndWait {
             }
         });
         try {
-            final ProtocolData interpreter = new ProtocolData();
             final Socket connection = new Socket(address, portNumber);
             final Connection con = Connection.interpreted(connection.getInputStream(), connection.getOutputStream(),
                     ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
                     interpreter.getRequiredPostSendRules(), interpreter);
 
-            con.toSend(PACKET_SERVER_JOIN_REQ.fromValues(userName,
-                    interpreter.getCapStringMandatory() + " " + interpreter.getCapStringOptional(),
-                    interpreter.getVersionLabel(),
-                    interpreter.getVersionMajor(),
-                    interpreter.getVersionMinor(),
-                    interpreter.getVersionPatch(),
-                    con.getFields2Header()));
+            con.toSend(interpreter.newServerJoinRequest(userName, con.getFields2Header()));
 
             while(con.isOpen() || con.packetReady()) {
                 try {
