@@ -41,6 +41,7 @@ public class PacketsStoreTest {
 
         // String needs this
         packetsStore.addDependency(Constant.isString("FC_DEFAULT_DATA_ENCODING", BuiltIn.literal("UTF-8")));
+        packetsStore.addDependency(Constant.isInt("STRING_ENDER", IntExpression.integer("0")));
 
         return packetsStore;
     }

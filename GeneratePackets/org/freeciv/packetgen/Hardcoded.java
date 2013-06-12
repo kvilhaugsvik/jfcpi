@@ -57,8 +57,10 @@ public class Hardcoded {
             throw new RuntimeException(e);
         }
     }
+    @Deprecated
     public static final Constant<AnInt> STRING_ENDER =
             Constant.isInt("STRING_ENDER", IntExpression.integer("0"));
+    @Deprecated
     public static final Constant<AnInt> DIFF_ARRAY_ENDER =
             Constant.isInt("DIFF_ARRAY_ENDER", IntExpression.integer("255"));
 
@@ -143,13 +145,7 @@ public class Hardcoded {
             new BitVector(), // bit string
             deltaBasic,
 
-            (Dependency.Item)(new SimpleTypeAlias("universals_u", Integer.class, 0)), // 4 currently untranslated bytes
-
-            /************************************************************************************************
-             * Built in constants
-             ************************************************************************************************/
-            STRING_ENDER,
-            DIFF_ARRAY_ENDER
+            (Dependency.Item)(new SimpleTypeAlias("universals_u", Integer.class, 0)) // 4 currently untranslated bytes
     );
 
     public static final SimpleDependencyMaker stringBasicFieldType =

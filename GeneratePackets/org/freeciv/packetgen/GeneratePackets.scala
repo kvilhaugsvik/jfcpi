@@ -34,6 +34,12 @@ class GeneratePackets(sourceLocation: String, packetsDefRPath: String, versionRP
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
   requested.filter(item => "type".equals(item._1)).foreach(cons => storage.requestType(cons._2))
 
+  private def createAndRegister(location: String, cr: String): SourceFile = {
+    val src = GeneratePackets.readFileAsString(location, cr)
+    storage.addSource(src)
+    src
+  }
+
   // checking that all input files are there BEFORE wasting time working on some of it is now done during reading
   println("Reading the source code")
 
@@ -43,11 +49,9 @@ class GeneratePackets(sourceLocation: String, packetsDefRPath: String, versionRP
   private val vpSource: SourceFile = GeneratePackets.readFileAsString(sourceLocation, versionRPath)
   storage.addSource(vpSource)
 
-  private val cSources: List[SourceFile] = cRPaths.map(cr => {
-    val src = GeneratePackets.readFileAsString(sourceLocation, cr)
-    storage.addSource(src)
-    src
-  })
+  private val cSources: List[SourceFile] =
+    createAndRegister("GeneratePackets/", "data/constants.h") ::
+      cRPaths.map(createAndRegister(sourceLocation, _))
 
   println("Extracting from Freeciv version information")
   VariableAssignmentsExtractor.extract(vpSource).foreach(storage.addDependency(_))
