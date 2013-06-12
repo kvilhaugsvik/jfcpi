@@ -59,13 +59,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
     static { // TODO: Make target class support generics and remove this work arround
         try {
-            TargetClass.from("java.util", "Map<DeltaKey, Packet>")
+            TargetClass.from("java.util", "Map<org.freeciv.packet.DeltaKey, org.freeciv.packet.Packet>")
                     .register(new TargetMethod(Map.class.getMethod("get", Object.class)));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Is this Java? Map is supposed to have get(Object)...", e);
         }
         try {
-            TargetClass.from("java.util", "Map<DeltaKey, Packet>")
+            TargetClass.from("java.util", "Map<org.freeciv.packet.DeltaKey, org.freeciv.packet.Packet>")
                     .register(new TargetMethod(Map.class.getMethod("put", Object.class, Object.class)));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Is this Java? Map is supposed to have put...", e);
@@ -216,7 +216,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                                 bv_delta_fields.getUnderType().newInstance(TRUE, literal(deltaFields))
                                         .callV("getAsByteArray"))),
                 TargetClass.from(org.freeciv.packet.Header_NA.class).newInstance(outer.getField("number").ref()),
-                TargetClass.from("java.util", "HashMap<DeltaKey, Packet>").newInstance()));
+                TargetClass.from("java.util", "HashMap<org.freeciv.packet.DeltaKey, org.freeciv.packet.Packet>").newInstance()));
     }
 
     private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Collection<Typed<AString>> usingCaps) {
@@ -411,7 +411,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         Var<TargetClass> argHeader = Var.param(TargetClass.from(PacketHeader.class), "header");
         final Var<TargetClass> streamName = Var.param(TargetClass.from(DataInput.class), "from");
         final Var<TargetClass> old =
-                Var.param(TargetClass.from("java.util", "Map<DeltaKey, Packet>"), "old");
+                Var.param(TargetClass.from("java.util", "Map<org.freeciv.packet.DeltaKey, org.freeciv.packet.Packet>"), "old");
 
         final LinkedList<Reference<? extends AValue>> deltaAndFields = new LinkedList<Reference<? extends AValue>>();
 
