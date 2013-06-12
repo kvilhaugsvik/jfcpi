@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
+import com.kvilhaugsvik.javaGenerator.TargetClass;
 import org.freeciv.packet.Sent;
 import com.kvilhaugsvik.javaGenerator.Annotate;
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
@@ -29,13 +30,13 @@ public class Sender extends Annotate {
     private static Typed<AValue> sender(int number) {
         switch (number) {
             case 0:
-                return BuiltIn.<AValue>toCode("Sent.From.UNKNOWN");
+                return TargetClass.from(Sent.From.class).callV("UNKNOWN");
             case 1:
-                return BuiltIn.<AValue>toCode("Sent.From.CLIENT");
+                return TargetClass.from(Sent.From.class).callV("CLIENT");
             case 2:
-                return BuiltIn.<AValue>toCode("Sent.From.SERVER");
+                return TargetClass.from(Sent.From.class).callV("SERVER");
             case 3:
-                return BuiltIn.<AValue>toCode("Sent.From.BOTH");
+                return TargetClass.from(Sent.From.class).callV("BOTH");
         }
         throw new Error("This code should not be reachable");
     }
