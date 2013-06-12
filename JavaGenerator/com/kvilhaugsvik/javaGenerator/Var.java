@@ -122,7 +122,11 @@ public class Var<Kind extends AValue> extends Formatted implements Typed<Kind>, 
     }
 
     public static <Kind extends AValue> Var<Kind> local(TargetClass type, String name, Typed<Kind> value) {
-        return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, Modifiable.YES, type, name, value, TargetClass.SELF_TYPED);
+        return Var.<Kind>local(Modifiable.YES, type, name, value);
+    }
+
+    public static <Kind extends AValue> Var<Kind> local(Modifiable canChange, TargetClass type, String name, Typed<Kind> value) {
+        return new Var<Kind>(Collections.<Annotate>emptyList(), null, Scope.CODE_BLOCK, canChange, type, name, value, TargetClass.SELF_TYPED);
     }
 
     public static <Kind extends AValue> Var<Kind> param(TargetClass kind, String name) {
