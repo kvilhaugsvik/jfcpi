@@ -187,6 +187,10 @@ public class BuiltIn {
         return BuiltIn.<AnInt>toCode(inte + "");
     }
 
+    public static Typed<AnInt> literal(long inte) {
+        return BuiltIn.<AnInt>toCode(inte + "L");
+    }
+
     public static Typed<AnInt> literal(float num) {
         return BuiltIn.<AnInt>toCode(num + "f");
     }
