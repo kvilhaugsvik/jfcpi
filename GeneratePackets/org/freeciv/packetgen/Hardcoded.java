@@ -73,11 +73,15 @@ public class Hardcoded {
                     new From2<Block, Var, Var>() {
                         @Override
                         public Block x(Var to, Var from) {
+                            final TargetClass integerClass = TargetClass.from(Integer.class);
+                            Var removedByCast = Var.local(Modifiable.NO, TargetClass.from(long.class), "removedByCast",
+                                    sum(multiply(literal(-1L), integerClass.callV("MIN_VALUE")),
+                                            integerClass.callV("MAX_VALUE"), literal(1L)));
                             Var buf = Var.local(int.class, "bufferValue", from.ref().<AnInt>call("readInt"));
-                            return new Block(buf, IF(BuiltIn.<ABool>toCode("0 <= bufferValue"), new Block(
-                                    to.assign(BuiltIn.<AValue>toCode("(long)bufferValue"))), Block.fromStrings(
-                                    "final long removedByCast = (-1L * Integer.MIN_VALUE) + Integer.MAX_VALUE + " + "1L",
-                                    "this.value = (long)bufferValue + removedByCast")));
+                            return new Block(buf, IF(BuiltIn.<ABool>isSmallerThanOrEq(literal(0), buf.ref()),
+                                    new Block(to.assign(cast(long.class, buf.ref()))),
+                                    new Block(removedByCast,
+                                            to.assign(sum(cast(long.class, buf.ref()), removedByCast.ref())))));
                         }
                     },
                     new From2<Block, Var, Var>() {
