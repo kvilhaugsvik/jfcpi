@@ -57,12 +57,6 @@ public class Hardcoded {
             throw new RuntimeException(e);
         }
     }
-    @Deprecated
-    public static final Constant<AnInt> STRING_ENDER =
-            Constant.isInt("STRING_ENDER", IntExpression.integer("0"));
-    @Deprecated
-    public static final Constant<AnInt> DIFF_ARRAY_ENDER =
-            Constant.isInt("DIFF_ARRAY_ENDER", IntExpression.integer("255"));
 
     private static final Collection<Dependency.Item> hardCodedElements = Arrays.<Dependency.Item>asList(
             new FieldType("uint32", "int", TargetClass.from(Long.class),

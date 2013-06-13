@@ -45,6 +45,10 @@ import static org.freeciv.packetgen.enteties.Enum.EnumElementKnowsNumber.newInva
 public class FromEntetiesAlone {
     public static final Constant<AString> FC_DEFAULT_DATA_ENCODING =
             Constant.isString("FC_DEFAULT_DATA_ENCODING", BuiltIn.literal("UTF-8"));
+    public static final Constant<AnInt> STRING_ENDER =
+            Constant.isInt("STRING_ENDER", IntExpression.integer("0"));
+    public static final Constant<AnInt> DIFF_ARRAY_ENDER =
+            Constant.isInt("DIFF_ARRAY_ENDER", IntExpression.integer("255"));
 
     public static final Constant<? extends AValue> PACKET_HEAD =
             Constant.isClass(Util.HEADER_NAME, TargetClass.from(Header_2_1.class).callV("class"));
@@ -292,7 +296,7 @@ public class FromEntetiesAlone {
     private FieldType createFieldTypeSTRING() throws UndefinedException {
         return ((FieldType)Hardcoded.stringBasicFieldType
                 .produce(new Requirement("string(char)", FieldType.class),
-                        Hardcoded.STRING_ENDER,
+                        STRING_ENDER,
                         FC_DEFAULT_DATA_ENCODING)
         ).createFieldType("STRING");
     }
@@ -458,10 +462,10 @@ public class FromEntetiesAlone {
         Dependency.Item diffElementType = createUINT32DiffElementData(uint32);
         writeJavaFile((ClassWriter) diffElementType, targetFolder);
 
-        Dependency.Item diffElementField = createUINT32DiffElementField(uint8, diffElementType, uint32, Hardcoded.DIFF_ARRAY_ENDER);
+        Dependency.Item diffElementField = createUINT32DiffElementField(uint8, diffElementType, uint32, DIFF_ARRAY_ENDER);
         writeJavaFile((ClassWriter) diffElementField, targetFolder);
 
-        Dependency.Item diffArray = createUINT32DiffArray((FieldType)diffElementField, Hardcoded.DIFF_ARRAY_ENDER);
+        Dependency.Item diffArray = createUINT32DiffArray((FieldType)diffElementField, DIFF_ARRAY_ENDER);
         writeJavaFile((ClassWriter) diffArray, targetFolder);
     }
 
@@ -576,8 +580,8 @@ public class FromEntetiesAlone {
     private void writeConstantClass(String targetFolder) throws IOException {
         ArrayList<Dependency.Item> willBeSorted = new ArrayList<Dependency.Item>();
 
-        willBeSorted.add(Hardcoded.DIFF_ARRAY_ENDER);
-        willBeSorted.add(Hardcoded.STRING_ENDER);
+        willBeSorted.add(DIFF_ARRAY_ENDER);
+        willBeSorted.add(STRING_ENDER);
         willBeSorted.add(FC_DEFAULT_DATA_ENCODING);
 
         willBeSorted.add(PACKET_HEAD);
