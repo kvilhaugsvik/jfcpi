@@ -61,6 +61,10 @@ public class Util {
         return joinStringArrayGeneric(elements, separator, "(", ")");
     }
 
+    public static String joinStringArray(List<?> elements, String separator, String begin, String end) {
+        return joinStringArrayGeneric(elements.toArray(), separator, begin, end);
+    }
+
     public static <Argument1, Argument2, Cond extends TwoConditions<Argument1, Argument2>> Cond getFirstFound(
             List<Cond> lookedAt,
             Argument1 arg1,
