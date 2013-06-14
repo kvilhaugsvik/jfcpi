@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Sveinung Kvilhaugsvik
+ * Copyright (c) 2013. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,5 +14,5 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
-public interface AString extends AnObject {
+public interface AnObject extends AValue {
 }

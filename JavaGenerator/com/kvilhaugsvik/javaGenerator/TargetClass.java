@@ -27,7 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class TargetClass extends Address<TargetPackage> implements AValue {
+public class TargetClass extends Address<TargetPackage> {
     public static final TargetClass SELF_TYPED = new TargetClass(HasAtoms.SELF);
     public static final TargetClass TYPE_NOT_KNOWN = new TargetClass(new CodeAtom(""));
 

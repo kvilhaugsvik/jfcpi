@@ -311,8 +311,8 @@ public class TerminatedArray extends FieldType {
             TargetClass elemtype = ((TargetArray)(fValue.getTType())).getOf();
             Var element = Var.local(elemtype, "element", null);
             verifyInsideLimits.addStatement(FOR(element, fValue.ref(), new Block(
-                    buffertype.getOf().newInstance(element.ref(), pLimits.ref().<TargetClass>call("next"))
-                            .call(SELF_VALIDATOR_NAME, pLimits.ref().<TargetClass>call("next"))
+                    buffertype.getOf().newInstance(element.ref(), pLimits.ref().<AnObject>call("next"))
+                            .call(SELF_VALIDATOR_NAME, pLimits.ref().<AnObject>call("next"))
             )));
         }
 
@@ -461,7 +461,7 @@ public class TerminatedArray extends FieldType {
 
     private static Typed<? extends AValue> getNext(boolean arrayEater) {
         return arrayEater ?
-                Hardcoded.pLimits.ref().<TargetClass>call("next") :
+                Hardcoded.pLimits.ref().<AnObject>call("next") :
                 Hardcoded.noLimit;
     }
 

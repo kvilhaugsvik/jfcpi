@@ -19,15 +19,12 @@ package com.kvilhaugsvik.javaGenerator;
 
 import com.kvilhaugsvik.javaGenerator.formating.CodeStyleBuilder;
 import com.kvilhaugsvik.javaGenerator.formating.ScopeStack;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.utility.Util;
 import org.freeciv.connection.Connection;
 import org.freeciv.packet.fieldtype.FieldType;
 import com.kvilhaugsvik.javaGenerator.expression.EnumElement;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.formating.TokensToStringStyle;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
@@ -515,7 +512,7 @@ public class CodeGenTest {
 
     @Test public void testPublicConstructor() {
         TargetClass ioe = TargetClass.from(IOException.class);
-        Var<TargetClass> pFrom = Var.param(TargetClass.from(DataInput.class), "from");
+        Var<AnObject> pFrom = Var.param(TargetClass.from(DataInput.class), "from");
         Var<AnInt> pHeaderLen = Var.param(int.class, "headerLen");
         Var<AnInt> pPacket = Var.param(int.class, "packet");
         Block body = new Block(

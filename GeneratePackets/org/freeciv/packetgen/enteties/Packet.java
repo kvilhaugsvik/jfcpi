@@ -408,9 +408,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void addConstructorFromDataInput(String name, List<Field> fields, String capsName, List<Typed<AString>> caps, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding, TargetClass impl, Typed<? extends AValue> zero) throws UndefinedException {
-        Var<TargetClass> argHeader = Var.param(TargetClass.from(PacketHeader.class), "header");
-        final Var<TargetClass> streamName = Var.param(TargetClass.from(DataInput.class), "from");
-        final Var<TargetClass> old =
+        Var<AnObject> argHeader = Var.param(TargetClass.from(PacketHeader.class), "header");
+        final Var<AnObject> streamName = Var.param(TargetClass.from(DataInput.class), "from");
+        final Var<AnObject> old =
                 Var.param(TargetClass.from("java.util", "Map<org.freeciv.packet.DeltaKey, org.freeciv.packet.Packet>"), "old");
 
         final LinkedList<Reference<? extends AValue>> deltaAndFields = new LinkedList<Reference<? extends AValue>>();
@@ -569,7 +569,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private static Method createEncoder(List<Field> fields, boolean enableDeltaBoolFolding, boolean delta, Value<AValue> headerVal, Value<AValue> deltaVal) {
-        Var<TargetClass> pTo = Var.<TargetClass>param(TargetClass.from(DataOutput.class), "to");
+        Var<AnObject> pTo = Var.<AnObject>param(TargetClass.from(DataOutput.class), "to");
         Block body = new Block();
         body.addStatement(headerVal.<NoValue>call("encodeTo", pTo.ref()));
         if (0 < fields.size()) {

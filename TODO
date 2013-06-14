@@ -11,7 +11,6 @@ GeneratePackets
    - as the boxed numbers can't be extended in Java the alternatives are annotation or wrapper class
 
 JavaGenerator
- * TargetClass should not be AValue
  * Support rewrite formatting
  * Support formatting -5 as -5 without turning 2 - 5 in to 2 -5
  * Review or rewrite the default code style

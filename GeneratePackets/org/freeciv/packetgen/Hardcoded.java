@@ -16,6 +16,7 @@ package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.dependency.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.supporting.*;
@@ -26,10 +27,6 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -39,7 +36,7 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 //TODO: Move data to file
 public class Hardcoded {
     // TODO: Make parameters in stead
-    public static final Var<TargetClass> pLimits = Var.param(ElementsLimit.class, "limits");
+    public static final Var<AnObject> pLimits = Var.param(ElementsLimit.class, "limits");
     public static final Var pValue = Var.param(String.class, "value"); // can't know type
     public static final Var fMaxSize = Var.field(Collections.<Annotate>emptyList(),
             Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,

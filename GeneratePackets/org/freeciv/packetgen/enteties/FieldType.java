@@ -50,9 +50,9 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     private final List<? extends Var<? extends AValue>> fieldsToAdd;
     private final List<? extends Method> methodsToAdd;
 
-    protected final Var<TargetClass> fValue;
-    private final Var<TargetClass> pTo;
-    private final Var<TargetClass> pFromStream;
+    protected final Var<AnObject> fValue;
+    private final Var<AnObject> pTo;
+    private final Var<AnObject> pFromStream;
 
     private final Collection<Requirement> requirement;
 
@@ -126,7 +126,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.addObjectConstant(javaType, "value");
 
         List<TargetClass> tIOExcept = Arrays.asList(TargetClass.from(IOException.class));
-        Var<TargetClass> pValue = Var.param(javaType, "value");
+        Var<AnObject> pValue = Var.param(javaType, "value");
 
         this.addMethod(Method.newPublicConstructor(Comment.no(),
                 new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
@@ -146,7 +146,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.from(String.class), "toString",
                 new Block(RETURN(value2String.x(this.getField("value"))))));
-        Var<TargetClass> paramOther = Var.param(TargetClass.from(Object.class), "other");
+        Var<AnObject> paramOther = Var.param(TargetClass.from(Object.class), "other");
         this.addMethod(Method.custom(Comment.no(),
                 Visibility.PUBLIC, Scope.OBJECT,
                 TargetClass.from(boolean.class), "equals", Arrays.asList(paramOther),

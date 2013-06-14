@@ -1,6 +1,7 @@
 package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.dependency.Dependency;
@@ -16,10 +17,6 @@ import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,8 +26,8 @@ import java.util.List;
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class BitVector extends ClassWriter implements Dependency.Item, Dependency.Maker, DataType {
-    private static final Var<TargetArray> pFromByte = Var.param(byteArray, "from");
-    private static final Var<TargetArray> pFromBits = Var.param(boolArray, "from");
+    private static final Var<AnObject> pFromByte = Var.param(byteArray, "from");
+    private static final Var<AnObject> pFromBits = Var.param(boolArray, "from");
     private static final Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
     private static final Var<AnInt> pSize = Var.param(int.class, "sizeInBits");
 
