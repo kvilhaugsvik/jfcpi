@@ -46,9 +46,6 @@ public class TargetArray extends TargetClass {
         super(wrapped.getPackage().getFullAddress(), wrapped.getSimpleName() + Strings.repeat("[]", levels), ClassKind.CLASS);
         this.of = wrapped;
 
-        if (null != wrapped.getRepresents())
-            this.setRepresents(Array.newInstance(wrapped.getRepresents(), levels).getClass());
-
         if (levels < 1)
             throw new IllegalArgumentException("Not an array");
 
@@ -75,6 +72,8 @@ public class TargetArray extends TargetClass {
     }
 
     private void registerBuiltIn() {
+        setRepresents(Object.class); // an array inherits all methods from Object
+
         register(new TargetMethod(this, "[]", of, TargetMethod.Called.DYNAMIC_ARRAY_GET));
         register(new TargetMethod(this, "length", TargetClass.from(int.class), TargetMethod.Called.DYNAMIC_FIELD));
     }
