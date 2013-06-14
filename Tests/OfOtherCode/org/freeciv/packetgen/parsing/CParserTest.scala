@@ -757,7 +757,7 @@ public enum test implements org.freeciv.types.FCEnum {
 				return element;
 			}
 		}
-		return INVALID;
+		return org.freeciv.types.test.INVALID;
 	}
 }
 """, enum.toString)
