@@ -223,7 +223,7 @@ public class CodeGenTest {
     @Test public void testMethodClassStateReader() {
         Method toTest = Method.newReadClassState(Comment.no(),
                 TargetClass.from(boolean.class), "isTrue",
-                Block.fromStrings("return true"));
+                new Block(RETURN(TRUE)));
         assertEquals("Generated Class state reader source code not as espected",
                 "\t" + "public static boolean isTrue() {" + "\n" +
                         "\t\t" + "return true;" + "\n" +
@@ -497,9 +497,14 @@ public class CodeGenTest {
     // Tests based on real examples
 
     @Test public void testPublicConstructorNoExceptions() {
+        final Var<AValue> field = Var.field(Collections.<Annotate>emptyList(),
+                Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, Object.class, "unit_id", null);
+        final Var<AValue> param = Var.param(Integer.class, "unit_id");
         String result = Method.newPublicConstructor(Comment.no(),
-                Arrays.asList(Var.param(Integer.class, "unit_id")),
-                Block.fromStrings("this.unit_id = new UNIT(unit_id)")).toString();
+                Arrays.asList(param),
+                new Block(field.assign(
+                        TargetClass.from(TargetPackage.TOP_LEVEL_AS_STRING, "UNIT").newInstance(param.ref())))
+        ).toString();
 
         assertEquals("Generated source not as expected",
                 "\t" + "public " + HasAtoms.SELF.get() + "(java.lang.Integer unit_id) {" + "\n" +
@@ -516,7 +521,7 @@ public class CodeGenTest {
         Block body = new Block(
                 BuiltIn.<AValue>toCode("this.unit_id = new UNIT(from)"),
                 IF(BuiltIn.<ABool>toCode("getNumber() != packet"),
-                        Block.fromStrings("throw new java.io.IOException(\"Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was \" + packet)")));
+                        new Block(THROW(ioe.newInstance(sum(literal("Tried to create package PACKET_CITY_NAME_SUGGESTION_REQ but packet number was "), pPacket.ref()))))));
         body.groupBoundary();
         body.addStatement(IF(BuiltIn.<ABool>toCode("getEncodedSize() != headerLen"),
                 new Block(THROW((TargetClass.from(IOException.class))

@@ -84,11 +84,4 @@ public class Block extends Formatted {
         to.add(RSC);
         to.refuseNextIf(eolKiller);
     }
-
-    @Deprecated public static Block fromStrings(String... firstStatements) {
-        Block out = new Block();
-        for (String statement : firstStatements)
-            out.addStatement(BuiltIn.<NoValue>toCode(statement));
-        return out;
-    }
 }
