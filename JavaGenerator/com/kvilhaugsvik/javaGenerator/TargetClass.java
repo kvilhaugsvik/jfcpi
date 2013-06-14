@@ -17,7 +17,6 @@ package com.kvilhaugsvik.javaGenerator;
 import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
-import com.kvilhaugsvik.javaGenerator.representation.IR;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
@@ -33,22 +32,25 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     public static final TargetClass TYPE_NOT_KNOWN = new TargetClass(new CodeAtom(""));
 
     private final HashMap<String, TargetMethod> methods;
+    private final ClassKind kind;
 
     TargetClass parent = null;
     boolean shallow = true;
     Class represents = null;
 
-    protected TargetClass(String inPackage, String className) {
+    protected TargetClass(String inPackage, String className, ClassKind kind) {
         super(TargetPackage.from(inPackage), addressString2Components(className));
         final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
 
         this.methods = methods;
+        this.kind = kind;
 
         registerBuiltIn();
     }
 
     protected TargetClass(Class wrapped) {
-        this(TargetPackage.from(wrapped.getPackage()), getClassNames(wrapped));
+        this(TargetPackage.from(wrapped.getPackage()), getClassNames(wrapped),
+                wrapped.isEnum() ? ClassKind.ENUM : ClassKind.CLASS);
 
         setRepresents(wrapped);
     }
@@ -81,9 +83,10 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         target.shallow = false;
     }
 
-    public TargetClass(TargetPackage where, List<? extends CodeAtom> name) {
+    public TargetClass(TargetPackage where, List<? extends CodeAtom> name, ClassKind kind) {
         super(where, name.toArray(new CodeAtom[name.size()]));
         this.methods = new HashMap<String, TargetMethod>();
+        this.kind = kind;
 
         registerBuiltIn();
     }
@@ -91,12 +94,18 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     private TargetClass(CodeAtom symbol) {
         super(TargetPackage.TOP_LEVEL, symbol);
         this.methods = new HashMap<String, TargetMethod>();
+        this.kind = ClassKind.CLASS;
 
         registerBuiltIn();
     }
 
     private void registerBuiltIn() {
         register(new TargetMethod(this, "class", TargetClass.from(Class.class), TargetMethod.Called.STATIC_FIELD));
+
+        if (ClassKind.ENUM.equals(this.kind)) {
+            register(new TargetMethod(this, "values", TargetArray.from(this, 1), TargetMethod.Called.STATIC));
+            register(new TargetMethod(this, "valueOf", this, TargetMethod.Called.STATIC));
+        }
     }
 
     public TargetPackage getPackage() {
@@ -194,10 +203,11 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
     }
 
     public static TargetClass from(String inPackage, String className) {
+        final ClassKind kind = ClassKind.CLASS; // TODO: Make a parameter
         try {
             return getExisting((TargetPackage.TOP_LEVEL_AS_STRING.equals(inPackage) ? "" : inPackage + ".") + className);
         } catch (NoSuchElementException e) {
-            return new TargetClass(inPackage, className);
+            return new TargetClass(inPackage, className, kind);
         }
     }
 

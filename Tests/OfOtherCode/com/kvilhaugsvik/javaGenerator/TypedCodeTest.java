@@ -317,7 +317,7 @@ public class TypedCodeTest {
     }
 
     @Test public void addressInTopLevelPackage_NoArtifactsAdded() {
-        Address inTop = new TargetClass(TargetPackage.TOP_LEVEL, Arrays.asList(new CodeAtom("WhoNeedPackets")));
+        Address inTop = new TargetClass(TargetPackage.TOP_LEVEL, Arrays.asList(new CodeAtom("WhoNeedPackets")), ClassKind.CLASS);
         CodeAtoms atoms = new CodeAtoms(inTop);
         assertEquals("WhoNeedPackets", atoms.get(0).getAtom().get());
         assertEquals(1, atoms.toArray().length);
@@ -329,7 +329,7 @@ public class TypedCodeTest {
     }
 
     @Test public void address_getFirstComponent_onAbstract_correctComponent() {
-        CodeAtom firstComponent = new TargetClass(TargetPackage.TOP_LEVEL, Arrays.asList(new CodeAtom("WhoNeedPackets"))).getFirstComponent();
+        CodeAtom firstComponent = new TargetClass(TargetPackage.TOP_LEVEL, Arrays.asList(new CodeAtom("WhoNeedPackets")), ClassKind.CLASS).getFirstComponent();
         assertEquals("WhoNeedPackets", firstComponent.get());
     }
 

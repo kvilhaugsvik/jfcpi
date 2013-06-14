@@ -43,7 +43,7 @@ public class TargetArray extends TargetClass {
     }
 
     private TargetArray(TargetClass wrapped, int levels) {
-        super(wrapped.getPackage().getFullAddress(), wrapped.getSimpleName() + Strings.repeat("[]", levels));
+        super(wrapped.getPackage().getFullAddress(), wrapped.getSimpleName() + Strings.repeat("[]", levels), ClassKind.CLASS);
         this.of = wrapped;
 
         if (null != wrapped.getRepresents())
@@ -61,7 +61,7 @@ public class TargetArray extends TargetClass {
     }
 
     private TargetArray(String inPacket, String inClass, int levels) {
-        super(inPacket, inClass + Strings.repeat("[]", levels));
+        super(inPacket, inClass + Strings.repeat("[]", levels), ClassKind.CLASS);
         this.of = TargetClass.from(inPacket, inClass);
 
         if (levels < 1)
