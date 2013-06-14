@@ -137,8 +137,9 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 Collections.<TargetClass>emptyList(),
                 new Block(
                         FOR(element, this.getAddress().callV("values"),
-                                new Block(IF(BuiltIn.<ABool>toCode("element.getNumber() == number"), new Block(RETURN(element.ref()))))),
-                        RETURN(BuiltIn.<AValue>toCode(this.getAddress().getFullAddress() + "." + "INVALID")))));
+                                new Block(IF(isSame(element.ref().callV("getNumber"), paramNumber.ref()),
+                                        new Block(RETURN(element.ref()))))),
+                        RETURN(getAddress().callV("INVALID")))));
     }
 
     public static Enum specEnum(String enumName, boolean nameOverride, boolean bitwise, List<EnumElementFC> values) {
