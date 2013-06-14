@@ -109,7 +109,7 @@ public class TypedCodeTest {
 
     @Test public void targetArrayReadEnd() {
         Var arrayVal = Var.param(TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2), "arrayVal");
-        CodeAtoms asAtoms = new CodeAtoms(arrayVal.ref().<Returnable>call("[]", BuiltIn.literal(3), BuiltIn.literal(5)));
+        CodeAtoms asAtoms = new CodeAtoms(arrayVal.ref().<Returnable>call("get", BuiltIn.literal(3), BuiltIn.literal(5)));
 
         assertEquals("arrayVal", asAtoms.get(0).getAtom().get());
         assertEquals("[", asAtoms.get(1).getAtom().get());
@@ -123,7 +123,7 @@ public class TypedCodeTest {
 
     @Test public void targetArrayReadSubArray() {
         Var arrayVal = Var.param(TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2), "arrayVal");
-        CodeAtoms asAtoms = new CodeAtoms(arrayVal.ref().<Returnable>call("[]", BuiltIn.literal(3)));
+        CodeAtoms asAtoms = new CodeAtoms(arrayVal.ref().<Returnable>call("get", BuiltIn.literal(3)));
 
         assertEquals("arrayVal", asAtoms.get(0).getAtom().get());
         assertEquals("[", asAtoms.get(1).getAtom().get());

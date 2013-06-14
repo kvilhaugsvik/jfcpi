@@ -74,7 +74,7 @@ public class TargetArray extends TargetClass {
     private void registerBuiltIn() {
         setRepresents(Object.class); // an array inherits all methods from Object
 
-        register(new TargetMethod(this, "[]", of, TargetMethod.Called.DYNAMIC_ARRAY_GET));
+        register(new TargetMethod(this, "get", of, TargetMethod.Called.DYNAMIC_ARRAY_GET));
         register(new TargetMethod(this, "length", TargetClass.from(int.class), TargetMethod.Called.DYNAMIC_FIELD));
     }
 

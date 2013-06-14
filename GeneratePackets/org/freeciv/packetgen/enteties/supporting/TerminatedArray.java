@@ -407,7 +407,7 @@ public class TerminatedArray extends FieldType {
                 new Block(
                         oVal,
                         FOR(count, isSmallerThan(count.ref(), pBuf.ref().callV("length")), inc(count), new Block(
-                                arraySetElement(oVal, count.ref(), pBuf.ref().callV("[]", count.ref()).<AValue>call("getValue"))
+                                arraySetElement(oVal, count.ref(), pBuf.ref().callV("get", count.ref()).<AValue>call("getValue"))
                         )),
                         RETURN(oVal.ref())
                 ));
