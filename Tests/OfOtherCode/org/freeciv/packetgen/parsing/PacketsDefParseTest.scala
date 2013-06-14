@@ -26,7 +26,7 @@ import org.freeciv.packetgen.enteties.supporting.{WeakFlag, WeakField, Field}
 
 class PacketsDefParseTest {
   @inline def storePars = {
-    val storage = new PacketsStore(PacketHeaderKinds.FC_2_4_99_2011_11_02, GeneratorDefaults.LOG_TO, false, false)
+    val storage = new PacketsStore("notToDisk", PacketHeaderKinds.FC_2_4_99_2011_11_02, GeneratorDefaults.LOG_TO, false, false)
     val parser = new ParsePacketsDef(storage)
     (storage, parser)
   }

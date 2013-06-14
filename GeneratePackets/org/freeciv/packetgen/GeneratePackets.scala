@@ -23,12 +23,12 @@ import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
 import com.kvilhaugsvik.dependency.UndefinedException
 import org.freeciv.packetgen.enteties.SourceFile
 
-class GeneratePackets(sourceLocation: String, packetsDefRPath: String, versionRPath: String, cRPaths: List[String],
+class GeneratePackets(configName: String, sourceLocation: String, packetsDefRPath: String, versionRPath: String, cRPaths: List[String],
                       requested: List[(String, String)], logger: String,
                       devMode: Boolean, packetHeader: PacketHeaderKinds, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) {
   private val packetsDefPath: File = new File(sourceLocation + packetsDefRPath)
 
-  private val storage = new PacketsStore(packetHeader, logger, enableDelta, enableDeltaBoolFolding)
+  private val storage = new PacketsStore(configName, packetHeader, logger, enableDelta, enableDeltaBoolFolding)
   private val Parser = new ParsePacketsDef(storage)
 
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
@@ -144,6 +144,8 @@ object GeneratePackets {
 
     val versionConfiguration = readVersionParameters(new File(settings.getSetting[String](VERSION_INFORMATION)))
 
+    val configName = versionConfiguration.attribute("name").get.text
+
     val packetHeader = PacketHeaderKinds.valueOf(versionConfiguration.attribute("packetHeaderKind").get.text)
 
     val enableDelta = versionConfiguration.attribute("enableDelta").get.text.toBoolean
@@ -156,6 +158,7 @@ object GeneratePackets {
       ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
 
     val self = new GeneratePackets(
+      configName,
       settings.getSetting[String](SOURCE_CODE_LOCATION) + "/",
       inputSources("packets").head,
       inputSources("variables").head,

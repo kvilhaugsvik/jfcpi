@@ -31,6 +31,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import java.util.*;
 
 public class PacketsStore {
+    private final String configName;
     private final TargetClass packetHeaderType;
     private final String logger;
     private final boolean enableDelta;
@@ -43,7 +44,7 @@ public class PacketsStore {
     private final HashMap<String, Requirement> packets = new HashMap<String, Requirement>();
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
-    public PacketsStore(PacketHeaderKinds bytesInPacketNumber, String logger, boolean enableDelta, boolean enableDeltaBoolFolding) {
+    public PacketsStore(String configName, PacketHeaderKinds bytesInPacketNumber, String logger, boolean enableDelta, boolean enableDeltaBoolFolding) {
         requirements = new DependencyStore();
         for (Dependency.Item primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
@@ -56,6 +57,7 @@ public class PacketsStore {
         requirements.addMaker(new DiffArrayElementDataType());
         requirements.addMaker(new DiffArrayElementFieldType());
 
+        this.configName = configName;
         this.logger = logger;
         this.enableDelta = enableDelta;
         this.enableDeltaBoolFolding = enableDeltaBoolFolding;
