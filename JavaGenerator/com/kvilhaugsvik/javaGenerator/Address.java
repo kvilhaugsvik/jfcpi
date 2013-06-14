@@ -30,6 +30,7 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
 
     protected final On where;
     protected final List<? extends CodeAtom> components;
+    protected final List<? extends CodeAtom> afterDotPart;
 
     protected final boolean symbolic;
 
@@ -38,11 +39,13 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
 
         where = null;
         components = Collections.<CodeAtom>emptyList();
+        afterDotPart = Collections.<CodeAtom>emptyList();
     }
 
-    public Address(On start, List<? extends CodeAtom> parts) {
+    public Address(On start, List<? extends CodeAtom> parts, List<CodeAtom> afterDotPart) {
         this.where = start;
         this.components = parts;
+        this.afterDotPart = afterDotPart;
 
         symbolic = false;
 
@@ -76,22 +79,38 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
     }
 
     public String getFullAddress() {
+        StringBuilder to = new StringBuilder();
+
         if (includeWhere())
-            return where.getFullAddress() + "." + Util.joinStringArray(components, ".", "", "");
-        else
-            return Util.joinStringArray(components, ".", "", "");
+            to.append(where.getFullAddress()).append(".");
+
+        to.append(Util.joinStringArray(components, ".", "", ""));
+
+        for (CodeAtom atom : this.afterDotPart)
+            to.append(atom.get());
+
+        return to.toString();
     }
 
     private boolean includeWhere() {
         return !(symbolic || where.symbolic);
     }
 
+    // TODO: Include afterDotPart?
     public CodeAtom getTypedSimpleName() {
         return components.get(components.size() - 1);
     }
 
     public String getSimpleName() {
-        return getTypedSimpleName().get();
+        final String start = getTypedSimpleName().get();
+
+        if (null == start)
+            return null;
+
+        StringBuilder out = new StringBuilder(start);
+        for (CodeAtom atom : this.afterDotPart)
+            out.append(atom.get());
+        return out.toString();
     }
 
     @Override
@@ -100,7 +119,11 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
             where.writeAtoms(to);
             to.add(HasAtoms.HAS);
         }
+
         to.joinSep(HAS, components);
+
+        for (CodeAtom atom : this.afterDotPart)
+            to.add(atom);
     }
 
     public static <A extends Address> A getExisting(String name, Class<A> kind) {

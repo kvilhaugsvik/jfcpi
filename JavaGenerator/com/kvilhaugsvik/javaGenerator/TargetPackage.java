@@ -15,7 +15,9 @@
 package com.kvilhaugsvik.javaGenerator;
 
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
+import com.kvilhaugsvik.javaGenerator.representation.IR;
 
+import java.util.Collections;
 import java.util.NoSuchElementException;
 
 public class TargetPackage extends Address<TargetPackage> {
@@ -27,7 +29,7 @@ public class TargetPackage extends Address<TargetPackage> {
     }
 
     private TargetPackage(String parts) {
-        super(TOP_LEVEL, addressString2Components(parts));
+        super(TOP_LEVEL, addressString2Components(parts), Collections.<IR.CodeAtom>emptyList());
     }
 
     public static TargetPackage from(Package wrapped) {

@@ -39,7 +39,7 @@ public class TargetClass extends Address<TargetPackage> {
     Class represents = null;
 
     protected TargetClass(String inPackage, String className, ClassKind kind) {
-        super(TargetPackage.from(inPackage), addressString2Components(className));
+        super(TargetPackage.from(inPackage), addressString2Components(className), Collections.<CodeAtom>emptyList());
         final HashMap<String, TargetMethod> methods = new HashMap<String, TargetMethod>();
 
         this.methods = methods;
@@ -84,7 +84,7 @@ public class TargetClass extends Address<TargetPackage> {
     }
 
     public TargetClass(TargetPackage where, List<? extends CodeAtom> name, ClassKind kind) {
-        super(where, name);
+        super(where, name, Collections.<CodeAtom>emptyList());
         this.methods = new HashMap<String, TargetMethod>();
         this.kind = kind;
 
@@ -92,7 +92,7 @@ public class TargetClass extends Address<TargetPackage> {
     }
 
     private TargetClass(CodeAtom symbol) {
-        super(TargetPackage.TOP_LEVEL, Arrays.asList(symbol));
+        super(TargetPackage.TOP_LEVEL, Arrays.asList(symbol), Collections.<CodeAtom>emptyList());
         this.methods = new HashMap<String, TargetMethod>();
         this.kind = ClassKind.CLASS;
 

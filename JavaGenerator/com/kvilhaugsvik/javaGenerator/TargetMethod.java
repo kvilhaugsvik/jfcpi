@@ -25,13 +25,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class TargetMethod extends Address<TargetClass> {
     private final TargetClass returns;
     private final Called kind;
 
     public TargetMethod(TargetClass where, String named, TargetClass returns, Called kind) {
-        super(where, Arrays.asList(new IR.CodeAtom(named)));
+        super(where, Arrays.asList(new IR.CodeAtom(named)), Collections.<IR.CodeAtom>emptyList());
         this.returns = returns;
         this.kind = kind;
     }

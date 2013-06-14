@@ -26,12 +26,13 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 import com.kvilhaugsvik.javaGenerator.util.ValueHelper;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Reference<Contains extends AValue> extends Address implements Value<Contains> {
     private final ValueHelper valueHelper;
 
     Reference(TargetClass type, Address where, IR.CodeAtom name) {
-        super(where, Arrays.asList(name));
+        super(where, Arrays.asList(name), Collections.<IR.CodeAtom>emptyList());
         this.valueHelper = new ValueHelper(type, this);
     }
 
