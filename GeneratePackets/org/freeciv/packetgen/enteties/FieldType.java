@@ -88,10 +88,6 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.fieldsToAdd = fieldsToAdd;
         this.methodsToAdd = methodsToAdd;
 
-        // TODO: remove when fixed
-        this.javaType.register(new TargetMethod(javaType, "toString", TargetClass.from(String.class), TargetMethod.Called.DYNAMIC));
-        this.javaType.register(new TargetMethod(javaType, "equals", TargetClass.from(Boolean.class), TargetMethod.Called.DYNAMIC));
-
         requirement = needs;
 
         assemble();
