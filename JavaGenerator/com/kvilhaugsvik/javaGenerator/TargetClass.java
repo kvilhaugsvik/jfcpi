@@ -50,7 +50,7 @@ public class TargetClass extends Address<TargetPackage> {
 
     protected TargetClass(Class wrapped) {
         this(TargetPackage.from(wrapped.getPackage()), getClassNames(wrapped),
-                wrapped.isEnum() ? ClassKind.ENUM : ClassKind.CLASS);
+                wrapped.isEnum() ? ClassKind.ENUM : ClassKind.CLASS, Collections.<CodeAtom>emptyList());
 
         setRepresents(wrapped);
     }
@@ -83,8 +83,8 @@ public class TargetClass extends Address<TargetPackage> {
         target.shallow = false;
     }
 
-    public TargetClass(TargetPackage where, List<? extends CodeAtom> name, ClassKind kind) {
-        super(where, name, Collections.<CodeAtom>emptyList());
+    public TargetClass(TargetPackage where, List<? extends CodeAtom> name, ClassKind kind, List<CodeAtom> afterDotPart) {
+        super(where, name, afterDotPart);
         this.methods = new HashMap<String, TargetMethod>();
         this.kind = kind;
 

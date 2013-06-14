@@ -15,12 +15,17 @@
 package com.kvilhaugsvik.javaGenerator;
 
 import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
+import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
+import com.kvilhaugsvik.javaGenerator.representation.IR;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import org.freeciv.utility.Strings;
 
-import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class TargetArray extends TargetClass {
@@ -43,7 +48,8 @@ public class TargetArray extends TargetClass {
     }
 
     private TargetArray(TargetClass wrapped, int levels) {
-        super(wrapped.getPackage().getFullAddress(), wrapped.getSimpleName() + Strings.repeat("[]", levels), ClassKind.CLASS);
+        super(wrapped.getPackage(), wrapped.components, ClassKind.CLASS,
+                createArrayLevels(wrapped.afterDotPart, levels));
         this.of = wrapped;
 
         if (levels < 1)
@@ -57,8 +63,18 @@ public class TargetArray extends TargetClass {
         registerBuiltIn();
     }
 
+    private static List<IR.CodeAtom> createArrayLevels(List<? extends IR.CodeAtom> afterDotPart, int levels) {
+        LinkedList<IR.CodeAtom> out = new LinkedList<IR.CodeAtom>(afterDotPart);
+        for (int i = 0; i < levels; i++) {
+            out.add(HasAtoms.ARRAY_ACCESS_START);
+            out.add(HasAtoms.ARRAY_ACCESS_END);
+        }
+        return out;
+    }
+
     private TargetArray(String inPacket, String inClass, int levels) {
-        super(inPacket, inClass + Strings.repeat("[]", levels), ClassKind.CLASS);
+        super(TargetPackage.from(inPacket), addressString2Components(inClass), ClassKind.CLASS,
+                createArrayLevels(Collections.<IR.CodeAtom>emptyList(), levels));
         this.of = TargetClass.from(inPacket, inClass);
 
         if (levels < 1)
