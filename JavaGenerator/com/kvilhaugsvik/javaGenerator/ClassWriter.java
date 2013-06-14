@@ -185,15 +185,6 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         return innerClasses.get(name);
     }
 
-    /**
-     * Get a line that sets a field's value to the value of the variable of the same name.
-     * @param field Name of the field (and variable)
-     * @return a line of Java setting the field's value to the value of the variable with the same name
-     */
-    protected Typed<? extends Returnable> setFieldToVariableSameName(String field) {
-        return getField(field).assign(BuiltIn.<AValue>toCode(field));
-    }
-
     private static void formatVariableDeclarations(CodeAtoms to, final Collection<Var> fields) {
         if (!fields.isEmpty()) {
             to.hintStart(TokensToStringStyle.GROUP);
@@ -219,8 +210,9 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
             if (dec.getScope().equals(Scope.CLASS))
                 continue;
 
-            body.addStatement(setFieldToVariableSameName(dec.getName()));
-            args.add(Var.param(dec.getTType(), dec.getName()));
+            final Var<AValue> param = Var.param(dec.getTType(), dec.getName());
+            body.addStatement(dec.assign(param.ref()));
+            args.add(param);
         }
         Method.newPublicConstructor(Comment.no(), args, body).writeAtoms(to);
     }
