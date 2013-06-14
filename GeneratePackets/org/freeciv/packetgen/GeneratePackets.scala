@@ -142,7 +142,9 @@ object GeneratePackets {
 
     UI.printAndExitOnHelp(settings, classOf[GeneratePackets])
 
-    val versionConfiguration = readVersionParameters(new File(settings.getSetting[String](VERSION_INFORMATION)))
+    val needed = readSettings(new File("GeneratePackets/data/core_needs.xml"))
+
+    val versionConfiguration = readSettings(new File(settings.getSetting[String](VERSION_INFORMATION)))
 
     val configName = versionConfiguration.attribute("name").get.text
 
@@ -155,7 +157,7 @@ object GeneratePackets {
       elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
 
     val requested: List[(String, String)] =
-      ((versionConfiguration \ "requested") \ "_").map(item => item.label -> item.text).toList
+      ((needed \ "requested") \ "_").map(item => item.label -> item.text).toList
 
     val self = new GeneratePackets(
       configName,
@@ -193,7 +195,7 @@ object GeneratePackets {
     return new SourceFile(itemRPath, content)
   }
 
-  def readVersionParameters(listFile: File) = {
+  def readSettings(listFile: File) = {
     checkFileCanRead(listFile)
     XML.loadFile(listFile)
   }

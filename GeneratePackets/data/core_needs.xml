@@ -1,0 +1,13 @@
+<fcdata>
+    <requested>
+        <constant>NETWORK_CAPSTRING_MANDATORY</constant>
+        <constant>NETWORK_CAPSTRING_OPTIONAL</constant>
+        <constant>MAJOR_VERSION</constant>
+        <constant>MINOR_VERSION</constant>
+        <constant>PATCH_VERSION</constant>
+        <constant>VERSION_LABEL</constant>
+
+        <constant>COMPRESSION_BORDER</constant>
+        <constant>JUMBO_SIZE</constant>
+    </requested>
+</fcdata>
