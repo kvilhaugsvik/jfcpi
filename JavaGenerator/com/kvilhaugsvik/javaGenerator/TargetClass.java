@@ -84,7 +84,7 @@ public class TargetClass extends Address<TargetPackage> {
     }
 
     public TargetClass(TargetPackage where, List<? extends CodeAtom> name, ClassKind kind) {
-        super(where, name.toArray(new CodeAtom[name.size()]));
+        super(where, name);
         this.methods = new HashMap<String, TargetMethod>();
         this.kind = kind;
 
@@ -92,7 +92,7 @@ public class TargetClass extends Address<TargetPackage> {
     }
 
     private TargetClass(CodeAtom symbol) {
-        super(TargetPackage.TOP_LEVEL, symbol);
+        super(TargetPackage.TOP_LEVEL, Arrays.asList(symbol));
         this.methods = new HashMap<String, TargetMethod>();
         this.kind = ClassKind.CLASS;
 
@@ -113,7 +113,7 @@ public class TargetClass extends Address<TargetPackage> {
     }
 
     public Collection<? extends CodeAtom> getTypedClassName() {
-        return Arrays.asList(components);
+        return components;
     }
 
     protected Class<?> getRepresents() {

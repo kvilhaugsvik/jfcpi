@@ -29,7 +29,7 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
     protected static final HashMap<String, Address> cached = new HashMap<String, Address>();
 
     protected final On where;
-    protected final CodeAtom[] components;
+    protected final List<? extends CodeAtom> components;
 
     protected final boolean symbolic;
 
@@ -37,10 +37,10 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
         symbolic = true;
 
         where = null;
-        components = new CodeAtom[0];
+        components = Collections.<CodeAtom>emptyList();
     }
 
-    public Address(On start, CodeAtom... parts) {
+    public Address(On start, List<? extends CodeAtom> parts) {
         this.where = start;
         this.components = parts;
 
@@ -50,7 +50,7 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
     }
 
     private static final Pattern ADDRESS_SPLITTER = Pattern.compile("\\.");
-    protected static CodeAtom[] addressString2Components(String address) {
+    protected static List<CodeAtom> addressString2Components(String address) {
         String[] parts = ADDRESS_SPLITTER.split(address);
         ArrayList<CodeAtom> build = new ArrayList<CodeAtom>(parts.length);
         for (String part : parts)
@@ -63,14 +63,14 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
             build.add(new CodeAtom(""));
         }
 
-        return build.toArray(new CodeAtom[build.size()]);
+        return build;
     }
 
     public CodeAtom getFirstComponent() {
         if (includeWhere())
             return where.getFirstComponent();
-        else if (0 < components.length)
-            return components[0];
+        else if (0 < components.size())
+            return components.get(0);
         else
             throw new NoSuchElementException("No components at all");
     }
@@ -87,7 +87,7 @@ public abstract class Address<On extends Address<?>> extends Formatted implement
     }
 
     public CodeAtom getTypedSimpleName() {
-        return components[components.length - 1];
+        return components.get(components.size() - 1);
     }
 
     public String getSimpleName() {

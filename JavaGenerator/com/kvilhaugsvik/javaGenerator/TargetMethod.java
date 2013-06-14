@@ -24,13 +24,14 @@ import com.kvilhaugsvik.javaGenerator.representation.IR;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 public class TargetMethod extends Address<TargetClass> {
     private final TargetClass returns;
     private final Called kind;
 
     public TargetMethod(TargetClass where, String named, TargetClass returns, Called kind) {
-        super(where, new IR.CodeAtom(named));
+        super(where, Arrays.asList(new IR.CodeAtom(named)));
         this.returns = returns;
         this.kind = kind;
     }
