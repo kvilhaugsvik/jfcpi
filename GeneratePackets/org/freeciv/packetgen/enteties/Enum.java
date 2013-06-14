@@ -136,7 +136,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 this.getAddress(), "valueOf", Arrays.asList(paramNumber),
                 Collections.<TargetClass>emptyList(),
                 new Block(
-                        FOR(element, new MethodCall<AValue>("values", new Typed[0]),
+                        FOR(element, this.getAddress().callV("values"),
                                 new Block(IF(BuiltIn.<ABool>toCode("element.getNumber() == number"), new Block(RETURN(element.ref()))))),
                         RETURN(BuiltIn.<AValue>toCode("INVALID")))));
     }
