@@ -81,11 +81,7 @@ public class TargetClass extends Address<TargetPackage> implements AValue {
         target.shallow = false;
     }
 
-    public TargetClass(TargetPackage where, CodeAtom name) {
-        this(where, Arrays.asList(name));
-    }
-
-    public TargetClass(TargetPackage where, List<CodeAtom> name) {
+    public TargetClass(TargetPackage where, List<? extends CodeAtom> name) {
         super(where, name.toArray(new CodeAtom[name.size()]));
         this.methods = new HashMap<String, TargetMethod>();
 
