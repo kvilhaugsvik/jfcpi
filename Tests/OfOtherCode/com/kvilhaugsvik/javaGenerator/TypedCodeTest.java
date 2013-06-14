@@ -459,7 +459,7 @@ public class TypedCodeTest {
     }
 
     @Test public void targetClass_fromString_varArg() {
-        assertEquals("java.lang.Integer...", TargetClass.from("java.lang", "Integer...").getFullAddress());
+        assertEquals("java.lang.Integer...", TargetArray.varArg(TargetClass.from("java.lang", "Integer")).getFullAddress());
     }
 
     @Test public void targetClass_inner_fromString() {

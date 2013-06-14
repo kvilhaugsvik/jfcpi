@@ -87,6 +87,24 @@ public class TargetArray extends TargetClass {
         registerBuiltIn();
     }
 
+    private TargetArray(TargetClass wrapped) {
+        super(wrapped.getPackage(), wrapped.components, ClassKind.CLASS,
+                createVarArg(wrapped.afterDotPart));
+        this.of = wrapped;
+
+        this.dimensions = 1 + (wrapped instanceof TargetArray ? ((TargetArray)wrapped).dimensions : 0);
+
+        registerBuiltIn();
+    }
+
+    private static List<IR.CodeAtom> createVarArg(List<? extends IR.CodeAtom> afterDotPart) {
+        LinkedList<IR.CodeAtom> out = new LinkedList<IR.CodeAtom>(afterDotPart);
+        out.add(HasAtoms.HAS);
+        out.add(HasAtoms.HAS);
+        out.add(HasAtoms.HAS);
+        return out;
+    }
+
     private void registerBuiltIn() {
         setRepresents(Object.class); // an array inherits all methods from Object
 
@@ -141,5 +159,9 @@ public class TargetArray extends TargetClass {
 
     public static TargetArray from(String inPacket, String className, int levels) {
         return new TargetArray(inPacket, className, levels);
+    }
+
+    public static TargetArray varArg(TargetClass wrapped) {
+        return new TargetArray(wrapped);
     }
 }

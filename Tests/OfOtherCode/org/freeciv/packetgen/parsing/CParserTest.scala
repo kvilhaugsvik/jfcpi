@@ -24,7 +24,7 @@ import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader
 import java.util.Collection
 import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, DataType}
-import com.kvilhaugsvik.javaGenerator.TargetClass
+import com.kvilhaugsvik.javaGenerator.{TargetArray, TargetClass}
 import com.kvilhaugsvik.dependency.UndefinedException
 import org.freeciv.utility.Util
 
@@ -860,7 +860,7 @@ public enum test implements org.freeciv.types.FCEnum {
     assertTrue("Where is pointer to int in " + wants, wants.contains(new Requirement("int16*", classOf[DataType])))
 
     val result = maker.produce(toCreate,
-      new SimpleTypeAlias("int*", TargetClass.from("java.lang", "Integer..."), null, 0))
+      new SimpleTypeAlias("int*", TargetArray.varArg(TargetClass.from("java.lang", "Integer")), null, 0))
 
     assertEquals("java.lang.Integer...", result.asInstanceOf[SimpleTypeAlias].getAddress.getFullAddress)
   }
