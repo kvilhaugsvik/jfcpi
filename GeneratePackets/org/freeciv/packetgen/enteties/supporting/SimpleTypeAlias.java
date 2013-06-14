@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.dependency.*;
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
 import com.kvilhaugsvik.javaGenerator.Var;
@@ -63,8 +64,7 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var to) {
-                        return new Block(
-                                to.assign(BuiltIn.<AValue>toCode("value")));
+                        return new Block(to.assign(Hardcoded.pValue.ref()));
                     }
                 },
                 new From2<Block, Var, Var>() {

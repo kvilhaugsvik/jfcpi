@@ -193,7 +193,7 @@ public class Field<Kind extends AValue> extends Var<Kind> {
                         break;
                     case 1:
                         transferTypeCheck.add(isSmallerThan(dec.getMaxSize(),
-                                BuiltIn.<AnInt>toCode("java.lang.Integer.MAX_VALUE")));
+                                TargetClass.from(Integer.class).callV("MAX_VALUE")));
                         break;
                     case -1:
                         throw notSupportedIndex(onPacket, getName(), dec);

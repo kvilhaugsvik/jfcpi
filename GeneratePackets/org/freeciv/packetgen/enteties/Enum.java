@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.dependency.*;
+import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
@@ -128,7 +129,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         addMethod(Method.newReadClassState(Comment.doc("Is the enum bitwise?",
                 "An enum is bitwise if it's number increase by two's exponent.",
                 Comment.docReturns("true if the enum is bitwise")),
-                TargetClass.from(boolean.class), "isBitWise", new Block(RETURN(BuiltIn.<ABool>toCode(bitwise + "")))));
+                TargetClass.from(boolean.class), "isBitWise", new Block(RETURN(BuiltIn.literal(bitwise)))));
 
         Var element = Var.local(this.getAddress(), "element", null);
         addMethod(Method.custom(Comment.no(),
@@ -209,7 +210,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
-                        return new Block(arg1.assign(BuiltIn.<AValue>toCode("value")));
+                        return new Block(arg1.assign(Hardcoded.pValue.ref()));
                     }
                 },
                 new From2<Block, Var, Var>() {

@@ -334,7 +334,7 @@ public class Hardcoded {
                 new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var arg1) {
-                        return BuiltIn.<AnInt>toCode("4");
+                        return BuiltIn.literal(4);
                     }
                 },
                 TO_STRING_OBJECT,
