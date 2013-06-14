@@ -379,11 +379,6 @@ public class TerminatedArray extends FieldType {
     }
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
-                                             final FieldType kind) {
-        return fieldArray(dataIOType, publicType, kind, null);
-    }
-
-    public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
                                              final FieldType kind, final Constant<?> stopElem) {
         final TargetArray type = TargetArray.from(kind.getUnderType(), 1);
         final boolean arrayEater = kind.isArrayEater();
