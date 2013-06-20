@@ -60,7 +60,7 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         if (null == where)
             throw new IllegalArgumentException("null given as package. (Did you mean TargetPackage.TOP_LEVEL?)");
 
-        this.myAddress = new TargetClass(where, Arrays.asList(new Atom(name)), kind, Collections.<IR.CodeAtom>emptyList());
+        this.myAddress = new TargetClass(where, Arrays.asList(new Atom(name)), kind, Collections.<HasAtoms>emptyList(), new HashMap<String, TargetMethod>(), null);
         myAddress.setParent(parent);
 
         this.internal_ref_this = Var.param(getAddress(), "this").ref();
@@ -87,7 +87,7 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         classPart.addAll(inside.getTypedClassName());
         classPart.add(new ClassWriter.Atom(name));
 
-        this.myAddress = new TargetClass(inside.getPackage(), classPart, kind, Collections.<IR.CodeAtom>emptyList());
+        this.myAddress = new TargetClass(inside.getPackage(), classPart, kind, Collections.<HasAtoms>emptyList(), new HashMap<String, TargetMethod>(), null);
         this.myAddress.setParent(parent);
 
         this.internal_ref_this = Var.param(getAddress(), "this").ref();

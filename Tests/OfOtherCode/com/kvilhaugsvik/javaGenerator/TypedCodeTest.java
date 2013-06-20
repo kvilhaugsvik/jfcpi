@@ -33,10 +33,7 @@ import com.kvilhaugsvik.javaGenerator.formating.CodeStyleBuilder;
 import com.kvilhaugsvik.javaGenerator.testData.TheChildReferredToUseOnlyOnce;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -317,7 +314,7 @@ public class TypedCodeTest {
     }
 
     @Test public void addressInTopLevelPackage_NoArtifactsAdded() {
-        Address inTop = new TargetClass(TargetPackage.TOP_LEVEL, Arrays.asList(new CodeAtom("WhoNeedPackets")), ClassKind.CLASS, Collections.<CodeAtom>emptyList());
+        Address inTop = new TargetClass(TargetPackage.TOP_LEVEL, Arrays.asList(new CodeAtom("WhoNeedPackets")), ClassKind.CLASS, Collections.<HasAtoms>emptyList(), new HashMap<String, TargetMethod>(), null);
         CodeAtoms atoms = new CodeAtoms(inTop);
         assertEquals("WhoNeedPackets", atoms.get(0).getAtom().get());
         assertEquals(1, atoms.toArray().length);
@@ -329,7 +326,7 @@ public class TypedCodeTest {
     }
 
     @Test public void address_getFirstComponent_onAbstract_correctComponent() {
-        CodeAtom firstComponent = new TargetClass(TargetPackage.TOP_LEVEL, Arrays.asList(new CodeAtom("WhoNeedPackets")), ClassKind.CLASS, Collections.<CodeAtom>emptyList()).getFirstComponent();
+        CodeAtom firstComponent = new TargetClass(TargetPackage.TOP_LEVEL, Arrays.asList(new CodeAtom("WhoNeedPackets")), ClassKind.CLASS, Collections.<HasAtoms>emptyList(), new HashMap<String, TargetMethod>(), null).getFirstComponent();
         assertEquals("WhoNeedPackets", firstComponent.get());
     }
 
@@ -471,6 +468,64 @@ public class TypedCodeTest {
     @Test public void targetClass_inner_fromClass() {
         assertEquals("Target class representing an inner class gave the wrong address",
                 "top.next.HostClass.Inner", TargetClass.from("top.next", "HostClass.Inner").getFullAddress());
+    }
+
+    @Test public void targeClass_generics_addsTypeParam() {
+        final TargetClass orig = TargetClass.from(HashMap.class);
+        final TargetClass typeArgs =
+                orig.addGenericTypeArguments(Arrays.asList(TargetClass.from(String.class), TargetClass.from(Integer.class)));
+
+        assertAtomsAre(new String[]{
+                "java",
+                ".",
+                "util",
+                ".",
+                "HashMap",
+                "<",
+                "java",
+                ".",
+                "lang",
+                ".",
+                "String",
+                ",",
+                "java",
+                ".",
+                "lang",
+                ".",
+                "Integer",
+                ">"
+        }, typeArgs);
+    }
+
+    @Test public void targeClass_generics_originalLeftAlone() {
+        final TargetClass orig = TargetClass.from(HashMap.class);
+        final TargetClass typeArgs =
+                orig.addGenericTypeArguments(Arrays.asList(TargetClass.from(String.class), TargetClass.from(Integer.class)));
+
+        assertAtomsAre(new String[]{
+                "java",
+                ".",
+                "util",
+                ".",
+                "HashMap"
+        }, orig);
+    }
+
+    @Test public void targeClass_generics_hasMethods() {
+        final TargetClass orig = TargetClass.from(List.class);
+        final TargetClass typeArgs =
+                orig.addGenericTypeArguments(Arrays.asList(TargetClass.from(String.class)));
+
+        final Value<AValue> result = Var.param(typeArgs, "var").ref().callV("get", BuiltIn.literal(2));
+        final String[] expected = {
+                "var",
+                ".",
+                "get",
+                "(",
+                "2",
+                ")"
+        };
+        assertAtomsAre(expected, result);
     }
 
     @Test public void scopeData_class_notInScope() {

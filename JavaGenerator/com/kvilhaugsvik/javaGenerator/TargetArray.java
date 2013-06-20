@@ -20,12 +20,8 @@ import com.kvilhaugsvik.javaGenerator.representation.IR;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
-import org.freeciv.utility.Strings;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class TargetArray extends TargetClass {
@@ -49,7 +45,7 @@ public class TargetArray extends TargetClass {
 
     private TargetArray(TargetClass wrapped, int levels) {
         super(wrapped.getPackage(), wrapped.components, ClassKind.CLASS,
-                createArrayLevels(wrapped.afterDotPart, levels));
+                createArrayLevels(wrapped.afterDotPart, levels), new HashMap<String, TargetMethod>(), null);
         this.of = wrapped;
 
         if (levels < 1)
@@ -63,8 +59,8 @@ public class TargetArray extends TargetClass {
         registerBuiltIn();
     }
 
-    private static List<IR.CodeAtom> createArrayLevels(List<? extends IR.CodeAtom> afterDotPart, int levels) {
-        LinkedList<IR.CodeAtom> out = new LinkedList<IR.CodeAtom>(afterDotPart);
+    private static List<HasAtoms> createArrayLevels(List<? extends HasAtoms> afterDotPart, int levels) {
+        LinkedList<HasAtoms> out = new LinkedList<HasAtoms>(afterDotPart);
         for (int i = 0; i < levels; i++) {
             out.add(HasAtoms.ARRAY_ACCESS_START);
             out.add(HasAtoms.ARRAY_ACCESS_END);
@@ -74,7 +70,7 @@ public class TargetArray extends TargetClass {
 
     private TargetArray(String inPacket, String inClass, int levels) {
         super(TargetPackage.from(inPacket), addressString2Components(inClass), ClassKind.CLASS,
-                createArrayLevels(Collections.<IR.CodeAtom>emptyList(), levels));
+                createArrayLevels(Collections.<IR.CodeAtom>emptyList(), levels), new HashMap<String, TargetMethod>(), null);
         this.of = TargetClass.from(inPacket, inClass);
 
         if (levels < 1)
@@ -89,7 +85,7 @@ public class TargetArray extends TargetClass {
 
     private TargetArray(TargetClass wrapped) {
         super(wrapped.getPackage(), wrapped.components, ClassKind.CLASS,
-                createVarArg(wrapped.afterDotPart));
+                createVarArg(wrapped.afterDotPart), new HashMap<String, TargetMethod>(), null);
         this.of = wrapped;
 
         this.dimensions = 1 + (wrapped instanceof TargetArray ? ((TargetArray)wrapped).dimensions : 0);
@@ -97,8 +93,8 @@ public class TargetArray extends TargetClass {
         registerBuiltIn();
     }
 
-    private static List<IR.CodeAtom> createVarArg(List<? extends IR.CodeAtom> afterDotPart) {
-        LinkedList<IR.CodeAtom> out = new LinkedList<IR.CodeAtom>(afterDotPart);
+    private static List<HasAtoms> createVarArg(List<? extends HasAtoms> afterDotPart) {
+        LinkedList<HasAtoms> out = new LinkedList<HasAtoms>(afterDotPart);
         out.add(HasAtoms.HAS);
         out.add(HasAtoms.HAS);
         out.add(HasAtoms.HAS);

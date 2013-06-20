@@ -217,6 +217,9 @@ public class DefaultStyle {
                 CodeStyleBuilder.DependsOn.token_left, maker.BREAK_LINE);
         maker.whenFirst(maker.condRightIs(HasAtoms.OR), CodeStyleBuilder.DependsOn.token_right, maker.DO_NOTHING);
         maker.whenFirst(maker.condRightIs(HasAtoms.AND), CodeStyleBuilder.DependsOn.token_right, maker.DO_NOTHING);
+        maker.whenFirst(maker.condLeftIs(HasAtoms.GENERIC_START), CodeStyleBuilder.DependsOn.token_left, maker.DO_NOTHING);
+        maker.whenFirst(maker.condRightIs(HasAtoms.GENERIC_START), CodeStyleBuilder.DependsOn.token_right, maker.DO_NOTHING);
+        maker.whenFirst(maker.condRightIs(HasAtoms.GENERIC_END), CodeStyleBuilder.DependsOn.token_right, maker.DO_NOTHING);
 
         maker.alwaysWhen(
                 new Util.OneCondition<DefaultStyleScopeInfo>() {

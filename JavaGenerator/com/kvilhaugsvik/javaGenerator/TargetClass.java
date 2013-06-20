@@ -50,7 +50,7 @@ public class TargetClass extends Address<TargetPackage> {
 
     protected TargetClass(Class wrapped) {
         this(TargetPackage.from(wrapped.getPackage()), getClassNames(wrapped),
-                wrapped.isEnum() ? ClassKind.ENUM : ClassKind.CLASS, Collections.<CodeAtom>emptyList());
+                wrapped.isEnum() ? ClassKind.ENUM : ClassKind.CLASS, Collections.<HasAtoms>emptyList(), new HashMap<String, TargetMethod>(), null);
 
         setRepresents(wrapped);
     }
@@ -83,10 +83,12 @@ public class TargetClass extends Address<TargetPackage> {
         target.shallow = false;
     }
 
-    public TargetClass(TargetPackage where, List<? extends CodeAtom> name, ClassKind kind, List<CodeAtom> afterDotPart) {
+    public TargetClass(TargetPackage where, List<? extends CodeAtom> name, ClassKind kind, List<HasAtoms> afterDotPart, HashMap<String, TargetMethod> methods, TargetClass parent) {
         super(where, name, afterDotPart);
-        this.methods = new HashMap<String, TargetMethod>();
         this.kind = kind;
+
+        this.methods = methods;
+        this.parent = parent;
 
         registerBuiltIn();
     }
@@ -97,6 +99,22 @@ public class TargetClass extends Address<TargetPackage> {
         this.kind = ClassKind.CLASS;
 
         registerBuiltIn();
+    }
+
+    private static List<HasAtoms> addTypeArgs(List<? extends HasAtoms> afterDotPart, List<TargetClass> typeArgs) {
+        List<HasAtoms> out = new LinkedList<HasAtoms>(afterDotPart);
+        out.add(HasAtoms.GENERIC_START);
+        for (int i = 0; i < typeArgs.size(); i++) {
+            if (0 < i)
+                out.add(HasAtoms.SEP);
+            out.add(typeArgs.get(i));
+        }
+        out.add(HasAtoms.GENERIC_END);
+        return out;
+    }
+
+    public TargetClass addGenericTypeArguments(List<TargetClass> typeArgs) {
+        return new TargetClass(this.getPackage(), this.components, this.kind, addTypeArgs(this.afterDotPart, typeArgs), methods, this);
     }
 
     private void registerBuiltIn() {
