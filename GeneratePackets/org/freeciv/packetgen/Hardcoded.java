@@ -55,49 +55,51 @@ public class Hardcoded {
         }
     }
 
+    private static final FieldType uint32 = new FieldType("uint32", "int", TargetClass.from(Long.class),
+            new From1<Block, Var>() {
+                @Override
+                public Block x(Var arg1) {
+                    return new Block(arg1.assign(pValue.ref()));
+                }
+            },
+            new From2<Block, Var, Var>() {
+                @Override
+                public Block x(Var to, Var from) {
+                    final TargetClass integerClass = TargetClass.from(Integer.class);
+                    Var removedByCast = Var.local(Modifiable.NO, TargetClass.from(long.class), "removedByCast",
+                            sum(multiply(literal(-1L), integerClass.callV("MIN_VALUE")),
+                                    integerClass.callV("MAX_VALUE"), literal(1L)));
+                    Var buf = Var.local(int.class, "bufferValue", from.ref().<AnInt>call("readInt"));
+                    return new Block(buf, IF(BuiltIn.<ABool>isSmallerThanOrEq(literal(0), buf.ref()),
+                            new Block(to.assign(cast(long.class, buf.ref()))),
+                            new Block(removedByCast,
+                                    to.assign(sum(cast(long.class, buf.ref()), removedByCast.ref())))));
+                }
+            },
+            new From2<Block, Var, Var>() {
+                @Override
+                public Block x(Var val, Var to) {
+                    Block out = new Block();
+                    out.addStatement(new Statement(to.ref().<Returnable>call("writeInt", val.ref().<AnInt>call("intValue")),
+                            Comment.c("int is two's compliment so a uint32 don't lose information")));
+                    return out;
+                }
+            },
+            new From1<Typed<AnInt>, Var>() {
+                @Override
+                public Typed<AnInt> x(Var arg1) {
+                    return literal(4);
+                }
+            },
+            TO_STRING_OBJECT,
+            false,
+            Collections.<Requirement>emptySet(),
+            Collections.<Var<AValue>>emptyList(),
+            Collections.<Method>emptyList()
+    );
+
     private static final Collection<Dependency.Item> hardCodedElements = Arrays.<Dependency.Item>asList(
-            new FieldType("uint32", "int", TargetClass.from(Long.class),
-                    new From1<Block, Var>() {
-                        @Override
-                        public Block x(Var arg1) {
-                            return new Block(arg1.assign(pValue.ref()));
-                        }
-                    },
-                    new From2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var to, Var from) {
-                            final TargetClass integerClass = TargetClass.from(Integer.class);
-                            Var removedByCast = Var.local(Modifiable.NO, TargetClass.from(long.class), "removedByCast",
-                                    sum(multiply(literal(-1L), integerClass.callV("MIN_VALUE")),
-                                            integerClass.callV("MAX_VALUE"), literal(1L)));
-                            Var buf = Var.local(int.class, "bufferValue", from.ref().<AnInt>call("readInt"));
-                            return new Block(buf, IF(BuiltIn.<ABool>isSmallerThanOrEq(literal(0), buf.ref()),
-                                    new Block(to.assign(cast(long.class, buf.ref()))),
-                                    new Block(removedByCast,
-                                            to.assign(sum(cast(long.class, buf.ref()), removedByCast.ref())))));
-                        }
-                    },
-                    new From2<Block, Var, Var>() {
-                        @Override
-                        public Block x(Var val, Var to) {
-                            Block out = new Block();
-                            out.addStatement(new Statement(to.ref().<Returnable>call("writeInt", val.ref().<AnInt>call("intValue")),
-                                    Comment.c("int is two's compliment so a uint32 don't lose information")));
-                            return out;
-                        }
-                    },
-                    new From1<Typed<AnInt>, Var>() {
-                        @Override
-                        public Typed<AnInt> x(Var arg1) {
-                            return literal(4);
-                        }
-                    },
-                    TO_STRING_OBJECT,
-                    false,
-                    Collections.<Requirement>emptySet(),
-                    Collections.<Var<AValue>>emptyList(),
-                    Collections.<Method>emptyList()
-            ),
+            uint32,
             getFloat("100"),
             getFloat("10000"),
             getFloat("1000000"),
@@ -319,13 +321,20 @@ public class Hardcoded {
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var out, Var inn) {
-                        return new Block(out.assign(divide(inn.ref().<AValue>call("readFloat"), BuiltIn.<AValue>toCode(times))));
+                        return new Block(out.assign(divide(
+                                uint32.getAddress().newInstance(inn.ref(), noLimit).callV("getValue").callV("floatValue"),
+                                BuiltIn.<AValue>toCode(times))));
                     }
                 },
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var value, Var to) {
-                        return new Block(to.ref().<Returnable>call("writeFloat", BuiltIn.<AnInt>multiply(value.ref(), BuiltIn.<AnInt>toCode(times))));
+                        return new Block(
+                                uint32.getAddress().newInstance(
+                                        TargetClass.from(Float.class).newInstance(BuiltIn.<AnInt>multiply(
+                                                value.ref(),
+                                                BuiltIn.<AnInt>toCode(times))).callV("longValue"),
+                                        noLimit).call("encodeTo", to.ref()));
                     }
                 },
                 new From1<Typed<AnInt>, Var>() {
@@ -336,7 +345,7 @@ public class Hardcoded {
                 },
                 TO_STRING_OBJECT,
                 false,
-                Collections.<Requirement>emptySet(),
+                Arrays.asList(uint32.getIFulfillReq()),
                 Collections.<Var<AValue>>emptyList(),
                 Collections.<Method>emptyList()
         );
