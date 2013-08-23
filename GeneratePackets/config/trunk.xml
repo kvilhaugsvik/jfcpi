@@ -13,6 +13,7 @@
         <file>common/city.h</file>
         <file>common/disaster.h</file>
         <file>common/road.h</file>
+        <file>common/extras.h</file>
         <file>common/unittype.h</file>
         <file>common/base.h</file>
         <file>common/connection.h</file>
