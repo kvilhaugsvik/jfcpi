@@ -9,6 +9,7 @@
     </inputSource>
 
     <inputSource parseAs="C">
+        <file>common/actions.h</file>
         <file>common/spaceship.h</file>
         <file>common/city.h</file>
         <file>common/disaster.h</file>
