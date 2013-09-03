@@ -152,7 +152,7 @@ object ParseCCode extends ExtractableParser {
           Enum.specEnumCountNotNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             sortedEnumValues.asJava)
       else
-        Enum.specEnum(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)
+        Enum.specEnumBitwise(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)
   }
 
   def enumValue = intExpr

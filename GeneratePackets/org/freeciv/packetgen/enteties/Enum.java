@@ -139,7 +139,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                         RETURN(getAddress().callV("INVALID")))));
     }
 
-    public static Enum specEnum(String enumName, boolean nameOverride, boolean bitwise, List<EnumElementFC> values) {
+    public static Enum specEnumBitwise(String enumName, boolean nameOverride, boolean bitwise, List<EnumElementFC> values) {
         return new Enum(enumName, nameOverride, bitwise, null, null, Collections.<Requirement>emptySet(), values);
     }
 

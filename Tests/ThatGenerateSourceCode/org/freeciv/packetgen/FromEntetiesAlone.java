@@ -337,7 +337,7 @@ public class FromEntetiesAlone {
     }
 
     public static void writeEnumSimple(String targetFolder) throws IOException {
-        Enum test = Enum.specEnum("test", false, false, Arrays.<Enum.EnumElementFC>asList(
+        Enum test = Enum.specEnumBitwise("test", false, false, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
                 newEnumValue("three", 3),
@@ -352,7 +352,7 @@ public class FromEntetiesAlone {
     }
 
     public static void writeEnumDefaultInvalid(String targetFolder) throws IOException {
-        Enum testDefaultInvalid = Enum.specEnum("testDefaultInvalid", false, false, Arrays.<Enum.EnumElementFC>asList(
+        Enum testDefaultInvalid = Enum.specEnumBitwise("testDefaultInvalid", false, false, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
                 newEnumValue("three", 3)));
@@ -381,7 +381,7 @@ public class FromEntetiesAlone {
     }
 
     public static void writeEnumBitwise(String targetFolder) throws IOException {
-        Enum bitwise = Enum.specEnum("bitwise", false, true, Arrays.<Enum.EnumElementFC>asList(
+        Enum bitwise = Enum.specEnumBitwise("bitwise", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("one", 1),
                 newEnumValue("two", 2),
                 newEnumValue("four", 4)));
@@ -395,7 +395,7 @@ public class FromEntetiesAlone {
     }
 
     public static void writeEnumWithSettableName(String targetFolder) throws IOException {
-        Enum result = Enum.specEnum("UserMod", true, false, Arrays.asList(
+        Enum result = Enum.specEnumBitwise("UserMod", true, false, Arrays.asList(
                 Enum.EnumElementFC.newEnumValue("user1", IntExpression.integer("1")),
                 Enum.EnumElementFC.newEnumValue("user2", IntExpression.integer("2")),
                 Enum.EnumElementFC.newEnumValue("user3", IntExpression.integer("3")),

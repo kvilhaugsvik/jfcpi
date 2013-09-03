@@ -29,62 +29,62 @@ import static org.junit.Assert.*;
 
 public class EnumTest {
     @Test public void testBitWiseHasANumber0() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("NOT2EXP", 0)));
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("NOT2EXP", 0)));
     }
 
     @Test public void testBitWiseHasANumber1() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("NOT2EXP", 1)));
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("NOT2EXP", 1)));
     }
 
     @Test public void testBitWiseHasANumber2() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("NOT2EXP", 2)));
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("NOT2EXP", 2)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber3() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("TWO", 2),
                 newEnumValue("THREE", 3)));
     }
 
     @Test public void testBitWiseHasANumber4() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("NOT2EXP", 4)));
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("NOT2EXP", 4)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber15() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("TWO", 2),
                 newEnumValue("NOT2EXP", 15)));
     }
 
     @Test public void testBitWiseHasANumber16() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("TWO", 2),
                 newEnumValue("NOT2EXP", 16)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber17() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("TWO", 2),
                 newEnumValue("NOT2EXP", 17)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBitWiseHasNoNumber18() {
-        Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(
+        Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("TWO", 2),
                 newEnumValue("NOT2EXP", 18)));
     }
 
     @Test public void testBitWiseIsBitWise() {
-        Enum result = Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("TWO", 2)));
+        Enum result = Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(newEnumValue("TWO", 2)));
         assertTrue("A bitwise Enum should report to be bitwise", result.isBitwise());
     }
 
     private Enum enumWithValues() {
-        return Enum.specEnum("test", false, false, Arrays.<Enum.EnumElementFC>asList(
+        return Enum.specEnumBitwise("test", false, false, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2)));
@@ -186,7 +186,7 @@ public class EnumTest {
     }
 
     @Test public void enumInvalidBitwise() {
-        Enum result = Enum.specEnum("test", false, true, Arrays.<Enum.EnumElementFC>asList(
+        Enum result = Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newInvalidEnum(-2),
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1),
@@ -200,7 +200,7 @@ public class EnumTest {
 
     @Test public void enumProvidesValues() {
         HashMap<String, Constant> constants = new HashMap<String, Constant>();
-        Enum hasValues = Enum.specEnum("Count", false, false, Arrays.<Enum.EnumElementFC>asList(
+        Enum hasValues = Enum.specEnumBitwise("Count", false, false, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2)));
 
