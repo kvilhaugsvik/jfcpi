@@ -366,7 +366,7 @@ public class FromEntetiesAlone {
     }
 
     public static void writeEnumNamedCount(String targetFolder) throws IOException {
-        Enum testCount = Enum.specEnum("testCount", false, "COUNT", "\"numbers listed\"", Arrays.<Enum.EnumElementFC>asList(
+        Enum testCount = Enum.specEnumCountNamed("testCount", false, "COUNT", "\"numbers listed\"", Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("zero", 0),
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),

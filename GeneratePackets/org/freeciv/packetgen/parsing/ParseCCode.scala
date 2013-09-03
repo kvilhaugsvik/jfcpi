@@ -146,10 +146,10 @@ object ParseCCode extends ExtractableParser {
       val sortedEnumValues: List[EnumElementFC] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
       if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
-          Enum.specEnum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
+          Enum.specEnumCountNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             enumerations.get("COUNT" + NAME).get, sortedEnumValues.asJava)
         else
-          Enum.specEnum(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
+          Enum.specEnumCountNotNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             sortedEnumValues.asJava)
       else
         Enum.specEnum(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)

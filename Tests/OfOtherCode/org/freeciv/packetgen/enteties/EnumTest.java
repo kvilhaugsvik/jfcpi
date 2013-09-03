@@ -146,7 +146,7 @@ public class EnumTest {
     }
 
     @Test public void enumCount() {
-        Enum result = Enum.specEnum("test", false, "ELEMENTS", Arrays.<Enum.EnumElementFC>asList(
+        Enum result = Enum.specEnumCountNotNamed("test", false, "ELEMENTS", Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2)));
@@ -158,7 +158,7 @@ public class EnumTest {
     }
 
     @Test public void enumCount2Elements() {
-        Enum result = Enum.specEnum("test", false, "ELEMENTS", Arrays.<Enum.EnumElementFC>asList(
+        Enum result = Enum.specEnumCountNotNamed("test", false, "ELEMENTS", Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1)));
         assertNotNull("Counting element not added", result.getCount());
@@ -169,7 +169,7 @@ public class EnumTest {
     }
 
     @Test public void enumCountNamed() {
-        Enum result = Enum.specEnum("test", false, "ELEMENTS", "\"the elements\"", Arrays.<Enum.EnumElementFC>asList(
+        Enum result = Enum.specEnumCountNamed("test", false, "ELEMENTS", "\"the elements\"", Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("ZERO", 0, "\"nothing\""),
                 newEnumValue("ONE", 1)));
         assertNotNull("Counting element not added", result.getCount());

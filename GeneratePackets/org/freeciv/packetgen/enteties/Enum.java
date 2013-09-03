@@ -23,7 +23,6 @@ import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.expression.EnumElement;
-import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
@@ -74,10 +73,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         }
         if (null != cntCode) {
             if (bitwise) throw new IllegalArgumentException("");
-            this.countElement = EnumElementKnowsNumber.newInvalidEnum(cntCode,
-                                                                      (null == cntString ? '"' + cntCode + '"' :
-                                                                              cntString),
-                                                                      numberOfElements);
+            this.countElement = EnumElementKnowsNumber.newInvalidEnum(cntCode, cntString, numberOfElements);
             this.addEnumerated(this.countElement);
         } else {
             this.countElement = null;
@@ -147,11 +143,11 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         return new Enum(enumName, nameOverride, bitwise, null, null, Collections.<Requirement>emptySet(), values);
     }
 
-    public static Enum specEnum(String enumName, boolean nameOverride, String cntCode, List<EnumElementFC> values) {
-        return specEnum(enumName, nameOverride, cntCode, null, values);
+    public static Enum specEnumCountNotNamed(String enumName, boolean nameOverride, String cntCode, List<EnumElementFC> values) {
+        return specEnumCountNamed(enumName, nameOverride, cntCode, '"' + cntCode + '"', values);
     }
 
-    public static Enum specEnum(String enumName, boolean nameOverride, String cntCode, String cntString, List<EnumElementFC> values) {
+    public static Enum specEnumCountNamed(String enumName, boolean nameOverride, String cntCode, String cntString, List<EnumElementFC> values) {
         return new Enum(enumName, nameOverride, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
     }
 
