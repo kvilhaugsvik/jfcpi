@@ -759,6 +759,13 @@ public enum test implements org.freeciv.types.FCEnum {
 		}
 		return org.freeciv.types.test.INVALID;
 	}
+
+	/**
+	 * Amount of valid elements in the enum. Should equal the count element.
+	 */
+	public static int countValidElements() {
+		return 3;
+	}
 }
 """, enum.toString)
   }

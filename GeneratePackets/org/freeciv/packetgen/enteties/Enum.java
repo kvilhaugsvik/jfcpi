@@ -53,6 +53,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         this.iRequire = reqs;
         fieldTypeBasicForMe = Pattern.compile("(\\w+)\\((" + getIFulfillReq().getName() + ")\\)");
 
+        // TODO: NumberOfElements can be different if the specenum skips elements
         int numberOfElements = 0;
         EnumElementFC invalidCandidate = null;
         for (EnumElementFC value : values) {
@@ -137,6 +138,13 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                                 new Block(IF(isSame(element.ref().callV("getNumber"), paramNumber.ref()),
                                         new Block(RETURN(element.ref()))))),
                         RETURN(getAddress().callV("INVALID")))));
+
+        addMethod(Method.custom(
+                Comment.doc("Amount of valid elements", "in the enum. Should equal the count element."),
+                Visibility.PUBLIC, Scope.CLASS,
+                TargetClass.from(int.class), "countValidElements", Collections.<Var<?>>emptyList(),
+                Collections.<TargetClass>emptyList(),
+                new Block(RETURN(BuiltIn.literal(numberOfElements)))));
     }
 
     public static Enum specEnumBitwise(String enumName, boolean nameOverride, boolean bitwise, List<EnumElementFC> values) {
