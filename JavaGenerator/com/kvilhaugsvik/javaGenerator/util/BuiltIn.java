@@ -374,9 +374,11 @@ public class BuiltIn {
         return new Formatted.Type<Ret>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
+                to.add(LPR);
                 a.writeAtoms(to);
                 to.add(op);
                 b.writeAtoms(to);
+                to.add(RPR);
             }
         };
     }

@@ -753,7 +753,7 @@ public enum test implements org.freeciv.types.FCEnum {
 
 	public static org.freeciv.types.test valueOf(int number) {
 		for (org.freeciv.types.test element : org.freeciv.types.test.values()) {
-			if (element.getNumber() == number) {
+			if ((element.getNumber() == number)) {
 				return element;
 			}
 		}
