@@ -16,6 +16,7 @@ package org.freeciv.utility;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class EndsInEternalZero extends InputStream {
     private final byte[] beginning;
@@ -37,5 +38,11 @@ public class EndsInEternalZero extends InputStream {
             return 0xff & beginning[pos];
         else
             return 0;
+    }
+
+    public static byte[] allOneBytes(int bytes) {
+        byte[] out = new byte[bytes];
+        Arrays.fill(out, (byte) -1);
+        return out;
     }
 }

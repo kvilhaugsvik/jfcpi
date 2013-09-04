@@ -198,8 +198,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 "fromHeaderAndStream" + capCombName,
                 TargetClass.from(DataInputStream.class).newInstance(
                         TargetClass.from(EndsInEternalZero.class).newInstance(
-                                bv_delta_fields.getUnderType().newInstance(TRUE, literal(deltaFields))
-                                        .callV("getAsByteArray"))),
+                                TargetClass.from(EndsInEternalZero.class).callV("allOneBytes",
+                                        BuiltIn.sum(BuiltIn.divide(BuiltIn.subtract(literal(deltaFields), literal(1)),
+                                                literal(8)), literal(1))))),
                 TargetClass.from(org.freeciv.packet.Header_NA.class).newInstance(outer.getField("number").ref()),
                 TargetClass.from(java.util.HashMap.class).addGenericTypeArguments(Arrays.asList(TargetClass.from(org.freeciv.packet.DeltaKey.class), TargetClass.from(org.freeciv.packet.Packet.class))).newInstance()));
     }
