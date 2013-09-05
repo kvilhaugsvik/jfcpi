@@ -156,7 +156,10 @@ public class FieldTypeTests {
     private static void checkString(String text, STRING fromJava, int maxLen) {
         assertEquals("Wrong content", text, fromJava.getValue());
         // TODO: figure out if String has the terminator when it is at its max size
-        assertEquals("Wrong length", text.getBytes().length + 1, fromJava.encodedLength());
+        assertEquals("Wrong length",
+                text.getBytes(
+                        java.nio.charset.Charset.forName(org.freeciv.VersionData.FC_DEFAULT_DATA_ENCODING)).length + 1,
+                fromJava.encodedLength());
     }
 
     @Test public void STRING_ASCII() throws IOException {
