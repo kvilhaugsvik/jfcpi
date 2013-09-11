@@ -94,6 +94,6 @@ are looking for updates, here are some locations that will work for now.
    the source code, some Freeciv source files used to generate more source code, that source code, a mess from the build
    and the finished jars and launcher scripts.
  * The newest version of the source code (and its version history) can be downloaded using Bazaar by running the command
-     bzr branch http://folk.ntnu.no/kvilhaug/bazaar/FreecivRecorder/
+     bzr branch lp:jfcpi
    Git users that has a very recent git version and are using the script git-remote-bzr from git contrib can run
-     git clone bzr::http://folk.ntnu.no/kvilhaug/bazaar/FreecivRecorder/
+     git clone bzr::lp:jfcpi
