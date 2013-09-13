@@ -58,7 +58,7 @@ public class BitVector {
         return vec[bitNumber];
     }
 
-    // TODO: Move to subclass so this can be made imputable
+    // TODO: Move to subclass so this can be made immutable
     public void set(final int bitNumber, final boolean value) {
         vec[bitNumber] = value;
     }
