@@ -110,7 +110,8 @@ public class Hardcoded {
              ************************************************************************************************/
             deltaField,
 
-            // Workaround: the field data in PACKET_PLAYER_ATTRIBUTE_CHUNK claims to use array diff. Don't believe it.
+            /* Workaround: before commit 23314 on trunk (2.6) the field data in PACKET_PLAYER_ATTRIBUTE_CHUNK
+               claimed to use array diff. Override. */
             TerminatedArray.xBytes("memory", "unsigned char").createFieldType("MEMORY_DIFF"),
 
             /************************************************************************************************
