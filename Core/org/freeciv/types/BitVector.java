@@ -21,7 +21,7 @@ import java.util.Arrays;
 public class BitVector {
     protected final boolean[] vec;
 
-    private BitVector(final int size) {
+    public BitVector(final int size) {
         this.vec = new boolean[size];
     }
 
@@ -33,13 +33,6 @@ public class BitVector {
 
         for (int pos = 0; pos < sizeInBits; pos++)
             vec[pos] = 0 != (src[isInByteNumber(pos)] & (1 << isBitNumberInAByte(pos)));
-    }
-
-    public BitVector(final int size, final boolean setAllTo) {
-        this(size);
-        for (int toSet = 0; toSet < size; toSet++) {
-            vec[toSet] = setAllTo;
-        }
     }
 
     protected BitVector(final boolean[] normal) {

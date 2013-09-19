@@ -28,7 +28,6 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 public class BitVector extends ClassWriter implements Dependency.Item, Dependency.Maker, DataType {
     private static final Var<AnObject> pFromByte = Var.param(byteArray, "from");
     private static final Var<AnObject> pFromBits = Var.param(boolArray, "from");
-    private static final Var<ABool> pFromBit = Var.param(boolean.class, "setAllTo");
     private static final Var<AnInt> pSize = Var.param(int.class, "sizeInBits");
 
     private final Collection<Requirement> iRequire;
@@ -86,9 +85,9 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
         }
         {
             List<? extends Var<? extends AValue>> pList = knowsSize ?
-                    Arrays.asList(pFromBit) :
-                    Arrays.asList(pFromBit, pSize);
-            Block constructorBody = new Block(BuiltIn.superConstr(sizeForNotFromData, pFromBit.ref()));
+                    Collections.<Var<? extends AValue>>emptyList() :
+                    Arrays.asList(pSize);
+            Block constructorBody = new Block(BuiltIn.superConstr(sizeForNotFromData));
             if (!knowsSize)
                 constructorBody.addStatement(getField("size").assign(pSize.ref()));
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));

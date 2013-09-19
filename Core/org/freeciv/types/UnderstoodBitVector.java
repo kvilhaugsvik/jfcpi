@@ -30,7 +30,7 @@ public class UnderstoodBitVector<Of extends FCEnum> extends BitVector {
     }
 
     public UnderstoodBitVector(int size, Class<Of> of) {
-        super(size, false);
+        super(size);
         this.numberToEnumConstant = setNumberToEnumConstant(of);
     }
 
