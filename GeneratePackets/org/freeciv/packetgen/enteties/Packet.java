@@ -312,8 +312,10 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         body.addStatement(labelExceptionsWithPacketAndField(
                 deltaVar,
                 new Block(deltaVar.assign(bv_delta_fields.getAddress().newInstance(
-                        bv_delta_fields.getUnderType()
-                                .newInstance(TRUE, literal(deltaFields)),
+                        TargetClass.from(DataInputStream.class).newInstance(TargetClass.from(EndsInEternalZero.class)
+                                .newInstance(TargetClass.from(EndsInEternalZero.class).callV("allOneBytes",
+                                        BuiltIn.sum(BuiltIn.divide(BuiltIn.subtract(
+                                                literal(deltaFields), literal(1)), literal(8)), literal(1))))),
                         TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields))))),
                 addExceptionLocation));
     }
