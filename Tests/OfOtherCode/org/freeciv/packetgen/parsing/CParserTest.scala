@@ -601,6 +601,7 @@ enum implicitFirst {
   --------------------------------------------------------------------------------------------------------------------*/
   @inline def parsesSpecEnumCorrectly(expression: String, isBitWise: Boolean, values: (String, String, String)*): Enum  = {
     val parsed: Enum = parsesCorrectly(expression, ParseCCode, ParseCCode.specEnumDefConverted).get
+      .apply(0).asInstanceOf[Enum] // FIX ME: Get rid of this hack
     return checkEnum(parsed, isBitWise, values: _*)
   }
 

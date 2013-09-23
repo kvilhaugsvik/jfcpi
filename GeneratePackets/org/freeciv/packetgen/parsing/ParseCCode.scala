@@ -102,7 +102,8 @@ object ParseCCode extends ExtractableParser {
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
-      se("INVALID", sInteger)) ^^ {parsed => (parsed._1 -> parsed._2)} |
+      se("INVALID", sInteger) |
+      se("BITVECTOR", identifierRegEx)) ^^ {parsed => (parsed._1 -> parsed._2)} |
       CComment ^^ {comment => "comment" -> comment} |
       se("NAMEOVERRIDE") ^^ {nameOverride => nameOverride._1 ->
         "override element names (probably from the ruleset)"} |
@@ -144,7 +145,8 @@ object ParseCCode extends ExtractableParser {
       else
         outEnumValues += newInvalidEnum(-1) // All spec enums have an invalid. Default value is -1
       val sortedEnumValues: List[EnumElementFC] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
-      if (enumerations.contains("COUNT"))
+
+      val out = if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
           Enum.specEnumCountNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             enumerations.get("COUNT" + NAME).get, sortedEnumValues.asJava)
@@ -153,6 +155,11 @@ object ParseCCode extends ExtractableParser {
             sortedEnumValues.asJava)
       else
         Enum.specEnumBitwise(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)
+
+      if (enumerations.contains("BITVECTOR"))
+        List(out, new BitVector(enumerations.get("BITVECTOR").get, out))
+      else
+        List(out)
   }
 
   def enumValue = intExpr
@@ -269,7 +276,7 @@ object ParseCCode extends ExtractableParser {
 
   def exprConverted : Parser[List[Dependency]] =
     oneAsMany(cEnumDefConverted) |
-      oneAsMany(specEnumDefConverted) |
+      specEnumDefConverted |
       oneAsMany(structConverted) |
       oneAsMany(bitVectorDefConverted) |
       oneAsMany(typedefConverted) |
