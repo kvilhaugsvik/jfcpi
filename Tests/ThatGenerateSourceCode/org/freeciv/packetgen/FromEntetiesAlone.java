@@ -94,7 +94,7 @@ public class FromEntetiesAlone {
 
         writeEnumSimple(targetFolder);
         writeEnumDefaultInvalid(targetFolder);
-        writeEnumNamedCount(targetFolder);
+        Enum enumNamedCount = writeEnumNamedCount(targetFolder);
         writeEnumBitwise(targetFolder);
         writeEnumWithSettableName(targetFolder);
 
@@ -102,6 +102,7 @@ public class FromEntetiesAlone {
 
         writeGenBVTestPeers(targetFolder);
         writeBitStringTestPeers(targetFolder);
+        writeTypedBitVectorType(targetFolder, enumNamedCount);
 
         writeConstantClass(targetFolder);
 
@@ -365,14 +366,20 @@ public class FromEntetiesAlone {
         writeEnumNamedCount(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER);
     }
 
-    public static void writeEnumNamedCount(String targetFolder) throws IOException {
-        Enum testCount = Enum.specEnumCountNamed("testCount", false, "COUNT", "\"numbers listed\"", Arrays.<Enum.EnumElementFC>asList(
+    public static Enum writeEnumNamedCount(String targetFolder) throws IOException {
+        Enum testCount = createEnumNameCount();
+
+        writeJavaFile(testCount, targetFolder);
+
+        return testCount;
+    }
+
+    private static Enum createEnumNameCount() {
+        return Enum.specEnumCountNamed("testCount", false, "COUNT", "\"numbers listed\"", Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("zero", 0),
                 newEnumValue("one", 1),
                 newEnumValue("two", 2, "\"2nd\""),
                 newEnumValue("three", 3)));
-
-        writeJavaFile(testCount, targetFolder);
     }
 
     @Test
@@ -481,6 +488,15 @@ public class FromEntetiesAlone {
 
     private Dependency.Item createUINT32DiffArray(FieldType diffElementField, Constant<AnInt> diff_array_ender) {
         return TerminatedArray.fieldArray("n", "a", diffElementField, diff_array_ender).createFieldType("UINT32_DIFF_ARRAY");
+    }
+
+    @Test public void writeTypedBitVectorTestPeers() throws IOException, UndefinedException {
+        writeTypedBitVectorType(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER, createEnumNameCount());
+    }
+
+    private void writeTypedBitVectorType(String targetFolder, Enum enumNameCount) throws IOException, UndefinedException {
+        BitVector type = new BitVector("bv_enum_typed", enumNameCount);
+        writeJavaFile(type, targetFolder);
     }
 
     @Test public void writeBitStringTestPeers() throws IOException, UndefinedException {

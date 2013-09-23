@@ -13,15 +13,11 @@ import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.Block;
-import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
@@ -40,22 +36,38 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
 
     private final Required bvFieldType;
 
+    public BitVector(String name, Enum kind) {  // Typed
+        this(name, IntExpression.readFromOther(kind, kind.getAddress().<AnInt>callV("countValidElements")),
+                TerminatedArray.MaxArraySize.LIMITED_BY_TYPE, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name,
+                TargetClass.from(org.freeciv.types.UnderstoodBitVector.class)
+                        .addGenericTypeArguments(Arrays.asList(kind.getAddress())),
+                Arrays.asList(kind.getAddress().callV("class")));
+    }
+
     public BitVector(String name, IntExpression knownSize) {
-        this(name, knownSize, TerminatedArray.MaxArraySize.LIMITED_BY_TYPE, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name);
+        this(name, knownSize,
+                TerminatedArray.MaxArraySize.LIMITED_BY_TYPE, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name,
+                TargetClass.from(org.freeciv.types.BitVector.class), Collections.<Typed<AValue>>emptyList());
     }
 
     public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
-        this("BitString", null, TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.SERIALIZED, "char");
+        this("BitString", null,
+                TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.SERIALIZED, "char",
+                TargetClass.from(org.freeciv.types.BitVector.class), Collections.<Typed<AValue>>emptyList());
     }
 
     public BitVector(String name) {
-        this(name, null, TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name);
+        this(name, null,
+                TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name,
+                TargetClass.from(org.freeciv.types.BitVector.class), Collections.<Typed<AValue>>emptyList());
     }
 
-    private BitVector(String name, IntExpression knownSize, TerminatedArray.MaxArraySize maxArraySizeKind, TerminatedArray.TransferArraySize transferArraySizeKind, String reqName) {
+    private BitVector(String name, IntExpression knownSize, TerminatedArray.MaxArraySize maxArraySizeKind,
+                      TerminatedArray.TransferArraySize transferArraySizeKind, String reqName, TargetClass parent,
+                      List<? extends Typed<? extends AValue>> appendParam) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.types.BitVector.class.getPackage()), Imports.are(),
                 "Freeciv C code", Collections.<Annotate>emptyList(), name,
-                TargetClass.from(org.freeciv.types.BitVector.class), Collections.<TargetClass>emptyList());
+                parent, Collections.<TargetClass>emptyList());
         this.knowsSize = null != knownSize;
 
         this.maxArraySizeKind = maxArraySizeKind;
@@ -71,25 +83,47 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
             List<? extends Var<? extends AValue>> pList = knowsSize ?
                     Arrays.asList(pFromByte) :
                     Arrays.asList(pFromByte, pSize);
-            Block constructorBody = new Block(BuiltIn.superConstr(sizeForNotFromData, pFromByte.ref()));
+
+            List<Typed<? extends AValue>> args = new LinkedList<Typed<? extends AValue>>();
+            args.add(sizeForNotFromData);
+            args.add(pFromByte.ref());
+            args.addAll(appendParam);
+
+            Block constructorBody = new Block(BuiltIn.superConstr(args.toArray(new Typed[args.size()])));
+
             if (!knowsSize)
                 constructorBody.addStatement(getField("size").assign(pSize.ref()));
+
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
         }
         {
             List<? extends Var<? extends AValue>> pList = Arrays.asList(pFromBits);
-            Block constructorBody = new Block(BuiltIn.superConstr(pFromBits.ref()));
+
+            List<Typed<? extends AValue>> args = new LinkedList<Typed<? extends AValue>>();
+            args.add(pFromBits.ref());
+            args.addAll(appendParam);
+
+            Block constructorBody = new Block(BuiltIn.superConstr(args.toArray(new Typed[args.size()])));
+
             if (!knowsSize)
                 constructorBody.addStatement(getField("size").assign(pFromBits.ref().callV("length")));
+
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
         }
         {
             List<? extends Var<? extends AValue>> pList = knowsSize ?
                     Collections.<Var<? extends AValue>>emptyList() :
                     Arrays.asList(pSize);
-            Block constructorBody = new Block(BuiltIn.superConstr(sizeForNotFromData));
+
+            List<Typed<? extends AValue>> args = new LinkedList<Typed<? extends AValue>>();
+            args.add(sizeForNotFromData);
+            args.addAll(appendParam);
+
+            Block constructorBody = new Block(BuiltIn.superConstr(args.toArray(new Typed[args.size()])));
+
             if (!knowsSize)
                 constructorBody.addStatement(getField("size").assign(pSize.ref()));
+
             addMethod(Method.newPublicConstructor(Comment.no(), pList, constructorBody));
         }
 

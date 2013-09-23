@@ -253,6 +253,7 @@ runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnecti
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.ProtoData
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedStructTest
+	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedBVTest
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.FieldTypeTests
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.IsolatedBugCausers
 	touch runTests
