@@ -95,7 +95,11 @@ object ParseCCode extends ExtractableParser {
   Parser[(String, String)] =
     defineLine(DEFINE, followedBy(regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
 
-  def specEnumOrName(kind: String): Parser[(String, String)] = se(kind + NAME, quotedString.r) |
+  /* A String that can be used as it is. */
+  def freecivString = quotedString.r |
+    "N_(" ~> quotedString.r <~ ")" /* Mark a string for translation. No other meaning. */
+
+  def specEnumOrName(kind: String): Parser[(String, String)] = se(kind + NAME, freecivString) |
     se(kind, identifierRegEx)
 
   def specEnumDef: Parser[~[String, Map[String, String]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
