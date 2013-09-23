@@ -24,9 +24,10 @@ import util.parsing.combinator.Parsers
 import util.parsing.input.CharArrayReader
 import java.util.Collection
 import org.freeciv.packetgen.enteties.supporting.{SimpleTypeAlias, DataType}
-import com.kvilhaugsvik.javaGenerator.{TargetArray, TargetClass}
+import com.kvilhaugsvik.javaGenerator.{ClassWriter, TargetArray, TargetClass}
 import com.kvilhaugsvik.dependency.UndefinedException
 import org.freeciv.utility.Util
+import com.kvilhaugsvik.dependency.Dependency.{Maker, Item}
 
 object CParserTest {
   /*--------------------------------------------------------------------------------------------------------------------
@@ -453,13 +454,7 @@ class CParserSemanticTest {
     assertTrue("Element " + nameInCode + " should be valid", element.isValid)
   }
 
-  @inline def parseEnumCorrectly(expression: String,
-                                     parser: ParseShared,
-                                     converter: ParseShared#Parser[Enum],
-                                     isBitWise: Boolean,
-                                     values: (String, String, String)*): Enum = {
-    val result = parsesCorrectly(expression, parser, converter).get
-
+  @inline def checkEnum(result : Enum, isBitWise: Boolean, values: (String, String, String)*): Enum = {
     assertEquals("Wrong name for enumeration class", "test", result.getName)
     assertTrue("Wrong bitwise for enumeration class", result.isBitwise == isBitWise)
 
@@ -477,7 +472,8 @@ class CParserSemanticTest {
   Test semantics of enums declared with the enum name {element, element} syntax
   --------------------------------------------------------------------------------------------------------------------*/
   @inline def parsesCEnumCorrectly(expression: String, values: (String, String,  String)*): Enum  = {
-    return parseEnumCorrectly(expression, ParseCCode, ParseCCode.cEnumDefConverted, false, values: _*)
+    val parsed: Enum = parsesCorrectly(expression, ParseCCode, ParseCCode.cEnumDefConverted).get
+    return checkEnum(parsed, false, values: _*)
   }
 
   @Test def testCEnum1ElementNoAssign: Unit = {
@@ -604,7 +600,8 @@ enum implicitFirst {
   Test semantics of enums declared with SPECENUM
   --------------------------------------------------------------------------------------------------------------------*/
   @inline def parsesSpecEnumCorrectly(expression: String, isBitWise: Boolean, values: (String, String, String)*): Enum  = {
-    return parseEnumCorrectly(expression, ParseCCode, ParseCCode.specEnumDefConverted, isBitWise, values: _*)
+    val parsed: Enum = parsesCorrectly(expression, ParseCCode, ParseCCode.specEnumDefConverted).get
+    return checkEnum(parsed, isBitWise, values: _*)
   }
 
   @Test(expected = classOf[UndefinedException])
