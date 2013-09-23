@@ -223,7 +223,7 @@ object ParseCCode extends ExtractableParser {
 
   // TODO: if needed: support defining a anonymous enum, struct or union instead of refering to an existing definition
   // in that case throw away typedef and return the anon
-  def typedefConverted = typedef ^^ {
+  def typedefConverted: Parser[Dependency] = typedef ^^ {
     case types ~ name => {
       val translatedTypes = cTypeDecsToJava(types)
       new SimpleTypeAlias.Incomplete(name, translatedTypes)
@@ -267,12 +267,13 @@ object ParseCCode extends ExtractableParser {
     case _ => throw new UnsupportedOperationException("Can't handle this kind of constant.")
   }
 
-  def exprConverted = cEnumDefConverted |
-    specEnumDefConverted |
-    structConverted |
-    bitVectorDefConverted |
-    typedefConverted |
-    constantValueDefConverted
+  def exprConverted : Parser[List[Dependency]] =
+    oneAsMany(cEnumDefConverted) |
+      oneAsMany(specEnumDefConverted) |
+      oneAsMany(structConverted) |
+      oneAsMany(bitVectorDefConverted) |
+      oneAsMany(typedefConverted) |
+      oneAsMany(constantValueDefConverted)
 
   def expr = cEnumDef |
     specEnumDef |

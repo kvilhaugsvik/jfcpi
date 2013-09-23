@@ -230,8 +230,21 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 }
 
 abstract class ExtractableParser extends ParseShared {
+  def oneAsMany(orig : ExtractableParser.this.Parser[Dependency]) : ExtractableParser.this.Parser[List[Dependency]] = {
+    new Parser[List[Dependency]] {
+      def apply(in : ExtractableParser.this.type#Input): ParseResult[List[Dependency]] = {
+        val orig_result = orig(in)
+        orig_result match {
+          case Success(result, next) => new Success(List(result), next)
+          case Failure(msg, input) => new Failure(msg, input)
+          case Error(msg, input) => new Error(msg, input)
+        }
+      }
+    }
+  }
+
   def startsOfExtractable : List[String]
-  def exprConverted: Parser[Dependency]
+  def exprConverted: Parser[List[Dependency]]
 }
 
 abstract class ExtractorShared(protected val parser : ExtractableParser) {
@@ -240,13 +253,13 @@ abstract class ExtractorShared(protected val parser : ExtractableParser) {
   def findPossibleStartPositions(lookIn: String): List[Int] =
     lookFor.findAllIn(lookIn).matchData.map(_.start).toList
 
-  def extract(lookIn: SourceFile) = {
+  def extract(lookIn: SourceFile): List[Dependency] = {
     val positions = findPossibleStartPositions(lookIn.getContent)
     val lookInAsReader = new parser.PackratReader(new CharArrayReader(lookIn.getContent.toArray))
 
     positions.map(position => parser.parse(parser.exprConverted, lookInAsReader.drop(position)))
-      .filter(!_.isEmpty).map(_.get)
+      .filter(!_.isEmpty).map(_.get).flatten
   }
 
-  override def toString = "Extracts(" + parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _) + ")"
+  override def toString: String = "Extracts(" + parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _) + ")"
 }

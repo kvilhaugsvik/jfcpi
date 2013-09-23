@@ -37,7 +37,7 @@ object ParseVariableAssignments extends ExtractableParser {
     case _ => throw new IllegalArgumentException("Internal error: Asked to interpret unknown type")
   }
 
-  def exprConverted = assignmentConverted
+  def exprConverted = oneAsMany(assignmentConverted)
 }
 
 object VariableAssignmentsExtractor extends ExtractorShared(ParseVariableAssignments)

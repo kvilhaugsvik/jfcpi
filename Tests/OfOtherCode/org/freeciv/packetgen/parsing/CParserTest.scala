@@ -241,6 +241,15 @@ object CParserTest {
     return parsed
   }
 
+  @inline def oneConvertedElement[Elem, PR](expression: String,
+                                            parser: ParseShared,
+                                            toTest: ParseShared#Parser[PR],
+                                            elemClass : Class[Elem]): Elem = {
+    val parsed = parsesCorrectly(expression, parser, toTest).get.asInstanceOf[List[Elem]]
+    assertEquals(1, parsed.size)
+    return parsed(0)
+  }
+
   @inline def assertPrefixWillNotParse(expression: String, parser: ParseShared) =
     assertFalse("No failure on " + expression,
       parser.parse(parser.expr, new parser.PackratReader(new CharArrayReader(expression.toArray))).successful)
@@ -516,76 +525,79 @@ class CParserSemanticTest {
 
   @Test def cEnumNeedingConstant {
     val parser = ParseCCode
-    val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
+    val result = oneConvertedElement(cEnumHavingExternalStartValue, parser, parser.exprConverted,
+      classOf[Dependency.Item])
     assertTrue("C enum based on external constant should depend on it",
-      result.get.asInstanceOf[Dependency.Item].getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
+      result.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
   }
 
   @Test def cEnumElementParanoidValueGeneratorSimple {
     val parser = ParseCCode
-    val result = parsesCorrectly(cEnumHavingExternalStartValue, parser, parser.exprConverted)
+    val result = oneConvertedElement(cEnumHavingExternalStartValue, parser, parser.exprConverted, classOf[Enum])
 
     assertTrue("C enum based on external constant should depend on it",
-      result.get.asInstanceOf[Dependency.Item].getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
+      result.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
 
     assertEquals("Should get value of constant",
       Util.VERSION_DATA_CLASS + ".START_VALUE",
-      result.get.asInstanceOf[Enum].getEnumValue("ONE").getValueGenerator)
+      result.getEnumValue("ONE").getValueGenerator)
 
     assertEquals("Should get value of constant",
       "1 + ONE.getNumber()",
-      result.get.asInstanceOf[Enum].getEnumValue("TWO").getValueGenerator)
+      result.getEnumValue("TWO").getValueGenerator)
   }
 
   @Test def cEnumElementParanoidValueGeneratorExpression {
     val parser = ParseCCode
-    val result = parsesCorrectly(cEnumStartValueIsAnExpressionInvolvingExternal, parser, parser.exprConverted)
+    val result = oneConvertedElement(cEnumStartValueIsAnExpressionInvolvingExternal, parser, parser.exprConverted,
+      classOf[Enum])
 
     assertTrue("C enum based on external constant should depend on it",
-      result.get.asInstanceOf[Dependency.Item].getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
+      result.getReqs.contains(new Requirement("START_VALUE", classOf[Constant[_]])))
 
     assertEquals("Should contain calculation",
       Util.VERSION_DATA_CLASS + ".START_VALUE * 16",
-      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+      result.getEnumValue("FIRST").getValueGenerator)
 
     assertEquals("Should get value of constant",
       "1 + FIRST.getNumber()",
-      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+      result.getEnumValue("NEXT").getValueGenerator)
   }
 
   @Test def cEnumElementParanoidValueGeneratorPreviousExpression {
     val parser = ParseCCode
-    val result = parsesCorrectly(cEnumHavingExternalStartValueRefersBack, parser, parser.exprConverted)
+    val result = oneConvertedElement(cEnumHavingExternalStartValueRefersBack, parser, parser.exprConverted,
+      classOf[Enum])
     assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
-      result.get.asInstanceOf[Dependency.Item].getReqs.isEmpty)
+      result.getReqs.isEmpty)
 
     assertEquals("Wrong value",
       "1",
-      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+      result.getEnumValue("FIRST").getValueGenerator)
 
     assertEquals("Should get value of constant",
       "FIRST.getNumber() * 3",
-      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+      result.getEnumValue("NEXT").getValueGenerator)
   }
 
   @Test def cEnumElementParanoidValueGeneratorFirstIsSane {
     val parser = ParseCCode
-    val result = parsesCorrectly("""
+    val result = oneConvertedElement("""
 enum implicitFirst {
   FIRST,
   NEXT = FIRST + 32
 }
-    """, parser, parser.exprConverted)
+    """, parser, parser.exprConverted, classOf[Enum])
     assertTrue("Shouldn't depends on anything as all is numbers or internal constants",
-      result.get.asInstanceOf[Dependency.Item].getReqs.isEmpty)
+      result.getReqs.isEmpty)
 
     assertEquals("Wrong value",
       "0",
-      result.get.asInstanceOf[Enum].getEnumValue("FIRST").getValueGenerator)
+      result.getEnumValue("FIRST").getValueGenerator)
 
     assertEquals("Should get value of constant",
       "FIRST.getNumber() + 32",
-      result.get.asInstanceOf[Enum].getEnumValue("NEXT").getValueGenerator)
+      result.getEnumValue("NEXT").getValueGenerator)
   }
 
   /*--------------------------------------------------------------------------------------------------------------------
@@ -828,40 +840,41 @@ public enum test implements org.freeciv.types.FCEnum {
   --------------------------------------------------------------------------------------------------------------------*/
   @Test def bvInteger = {
     val parser = ParseCCode
-    val result = parsesCorrectly("BV_DEFINE(bv_test, 8);", parser, parser.exprConverted).get
+    val result = oneConvertedElement("BV_DEFINE(bv_test, 8);", parser, parser.exprConverted, classOf[Dependency.Item])
 
-    assertTrue("No need for any constant", result.asInstanceOf[Dependency.Item].getReqs.isEmpty)
+    assertTrue("No need for any constant", result.getReqs.isEmpty)
     assertEquals("Should provide it self",
       new Requirement("bv_test", classOf[DataType]),
-      result.asInstanceOf[Dependency.Item].getIFulfillReq)
+      result.getIFulfillReq)
   }
 
   @Test def bvConstant = {
     val parser = ParseCCode
-    val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT);", parser, parser.exprConverted).get
+    val result = oneConvertedElement("BV_DEFINE(bv_test, CONSTANT);", parser, parser.exprConverted, classOf[Dependency.Item])
 
-    assertTrue("Should need CONSTANT", result.asInstanceOf[Dependency.Item].getReqs.contains(
+    assertTrue("Should need CONSTANT", result.getReqs.contains(
       new Requirement("CONSTANT", classOf[Constant[_]])))
     assertEquals("Should provide it self",
       new Requirement("bv_test", classOf[DataType]),
-      result.asInstanceOf[Dependency.Item].getIFulfillReq)
+      result.getIFulfillReq)
   }
 
   @Test def bvConstantAddInteger = {
     val parser = ParseCCode
-    val result = parsesCorrectly("BV_DEFINE(bv_test, CONSTANT + 1);", parser, parser.exprConverted).get
+    val result = oneConvertedElement("BV_DEFINE(bv_test, CONSTANT + 1);", parser, parser.exprConverted,
+      classOf[Dependency.Item])
 
-    assertTrue("Should need CONSTANT", result.asInstanceOf[Dependency.Item].getReqs.contains(
+    assertTrue("Should need CONSTANT", result.getReqs.contains(
       new Requirement("CONSTANT", classOf[Constant[_]])))
     assertEquals("Should provide it self",
       new Requirement("bv_test", classOf[DataType]),
-      result.asInstanceOf[Dependency.Item].getIFulfillReq)
+      result.getIFulfillReq)
   }
 
   @Test def pointToIntIsIntVarArgs = {
     val toCreate: Requirement = new Requirement("more_complicated", classOf[DataType])
-    val maker = parsesCorrectly("typedef int *more_complicated;", ParseCCode, ParseCCode.exprConverted)
-      .get.asInstanceOf[Dependency.Maker]
+    val maker = oneConvertedElement("typedef int *more_complicated;", ParseCCode, ParseCCode.exprConverted,
+      classOf[Dependency.Maker])
 
     val wants: java.util.List[Requirement] = maker.neededInput(toCreate)
     assertTrue("Where is pointer to int in " + wants, wants.contains(new Requirement("int16*", classOf[DataType])))
@@ -874,8 +887,8 @@ public enum test implements org.freeciv.types.FCEnum {
 
   @Test def pointToCharIsString = {
     val toCreate: Requirement = new Requirement("more_complicated", classOf[DataType])
-    val maker = parsesCorrectly("typedef char *more_complicated;", ParseCCode, ParseCCode.exprConverted)
-      .get.asInstanceOf[Dependency.Maker]
+    val maker = oneConvertedElement("typedef char *more_complicated;", ParseCCode, ParseCCode.exprConverted,
+      classOf[Dependency.Maker])
 
     val wants: java.util.List[Requirement] = maker.neededInput(toCreate)
     assertTrue("Where is string in " + wants, wants.contains(new Requirement("string", classOf[DataType])))
