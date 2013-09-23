@@ -34,6 +34,11 @@ public class UnderstoodBitVector<Of extends FCEnum> extends BitVector {
         this.numberToEnumConstant = setNumberToEnumConstant(of);
     }
 
+    public UnderstoodBitVector(boolean[] from, Class<Of> of) {
+        super(from);
+        this.numberToEnumConstant = setNumberToEnumConstant(of);
+    }
+
     private Method setNumberToEnumConstant(Class<Of> of) {
         // TODO: validate numberToEnumConstant
         try {
