@@ -184,29 +184,6 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         }
     }
 
-    public void validateLimitInsideInt(Block to) throws UndefinedException {
-        LinkedList<Typed<ABool>> transferTypeCheck = new LinkedList<Typed<ABool>>();
-        for (ArrayDeclaration dec : declarations) {
-            if (dec.hasTransfer()) {
-                switch (intClassOf(dec.getJavaTypeOfTransfer())) {
-                    case 0:
-                        break;
-                    case 1:
-                        transferTypeCheck.add(isSmallerThan(dec.getMaxSize(),
-                                TargetClass.from(Integer.class).callV("MAX_VALUE")));
-                        break;
-                    case -1:
-                        throw notSupportedIndex(onPacket, getName(), dec);
-                }
-            }
-        }
-
-        // TODO: make sure it will cause a compile time error or throw an error here
-        if (!transferTypeCheck.isEmpty())
-            to.addStatement(ASSERT(and(transferTypeCheck.toArray(new Typed[transferTypeCheck.size()])),
-                    literal("Can't prove that index value will stay in the range Java's signed integers can represent.")));
-    }
-
     public Collection<Requirement> getReqs() {
         HashSet<Requirement> reqs = new HashSet<Requirement>();
         reqs.add(new Requirement(getFType(), org.freeciv.packetgen.enteties.FieldType.class));

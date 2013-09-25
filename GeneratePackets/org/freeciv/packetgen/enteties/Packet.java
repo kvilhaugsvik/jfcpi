@@ -338,7 +338,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             body.addStatement(asLocal);
 
             Block readAndValidate = new Block();
-            field.validateLimitInsideInt(readAndValidate);
             readAndValidate.addStatement(asLocal.assign(field.getTType().newInstance(asParam.ref(), field.getSuperLimit(0, true))));
             final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
             body.addStatement(readLabeled);
@@ -453,7 +452,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 }
             }
             Block readAndValidate = new Block();
-            field.validateLimitInsideInt(readAndValidate);
             readAndValidate.addStatement(asLocal.assign(asLocal.getTType().newInstance(streamName.ref(),
                     field.getSuperLimit(0, true))));
 
