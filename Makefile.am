@@ -1,4 +1,3 @@
-SCALA ?= scala
 SCALALIB ?= /usr/share/java/scala-library.jar
 JUNIT ?= /usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar
 
