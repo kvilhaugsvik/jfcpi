@@ -1,4 +1,3 @@
-SCALALIB ?= /usr/share/java/scala-library.jar
 JUNIT ?= /usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar
 
 # Ignore issues that shouldn't be there in a release.
@@ -94,7 +93,7 @@ scriptPacketsExtract:
 
 compileCodeGenerator: sourceDefaultsForGenerator compileCore compileUtils compileJavaGenerator scriptPacketsExtract compileDependency
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
-	${JAVAC} -cp ${CORE_JAR}:${SCALALIB}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
+	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
 	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.scala"`
 	touch compileCodeGenerator
 
