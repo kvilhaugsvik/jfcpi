@@ -258,7 +258,7 @@ runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnecti
 	${JAVA} -cp ${CORE_JAR}:${JUNIT}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.IsolatedBugCausers
 	touch runTests
 
-clean:
+clean-local:
 	rm -rf runPacketTest compilePacketTest
 	rm -rf runConnectionTests compileConnectionTests
 	rm -rf compileTestPeerGenerator
@@ -284,7 +284,7 @@ clean:
 	rm -rf compileUtilsTests runUtilsTests
 	rm -rf scriptInspectTrace inspectTrace.bat inspectTrace
 
-distclean: clean
+distclean-local: clean
 	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
 	rm -rf ${COMPILED_CORE_FOLDER} compileCore
 	rm -rf ${CORE_JAR}
