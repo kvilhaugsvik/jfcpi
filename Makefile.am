@@ -1,6 +1,3 @@
-JAVA ?= java
-JAVAC ?= javac -target 1.6 -source 1.6
-JAR ?= jar
 SCALA ?= scala
 SCALAC ?= scalac
 SCALALIB ?= /usr/share/java/scala-library.jar
