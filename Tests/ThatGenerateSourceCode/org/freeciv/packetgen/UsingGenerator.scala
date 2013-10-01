@@ -30,20 +30,24 @@ class UsingGenerator {
 
 object UsingGenerator {
   def simple(generated_test_source_folder: String) {
-    var full = new GeneratePackets("simple", "Tests/ThatGenerateSourceCode/", "simple/simple.def", "simple/simple.var", Nil,
+    val simpleVersion = new VersionConfig("simple",
+      PacketHeaderKinds.FC_trunk, true, true,
+      Map("packets" -> List("simple/simple.def"), "variables" -> List("simple/simple.var"), "C" -> Nil))
+    var full = new GeneratePackets(simpleVersion, "Tests/ThatGenerateSourceCode/",
       List[(String, String)](),
       GeneratorDefaults.LOG_TO,
-      false, PacketHeaderKinds.FC_trunk,
-      true, true)
+      false)
     full.writeToDir(generated_test_source_folder, true)
   }
 
   def caps(generated_test_source_folder: String) {
-    var full = new GeneratePackets("capabilities", "Tests/ThatGenerateSourceCode/", "capabilities/packets.def", "capabilities/vars", Nil,
+    val capsVersion = new VersionConfig("capabilities",
+      PacketHeaderKinds.FC_trunk, true, true,
+      Map("packets" -> List("capabilities/packets.def"), "variables" -> List("capabilities/vars"), "C" -> Nil))
+    var full = new GeneratePackets(capsVersion, "Tests/ThatGenerateSourceCode/",
       List[(String, String)](),
       GeneratorDefaults.LOG_TO,
-      false, PacketHeaderKinds.FC_trunk,
-      true, true)
+      false)
     full.writeToDir(generated_test_source_folder, true)
   }
 

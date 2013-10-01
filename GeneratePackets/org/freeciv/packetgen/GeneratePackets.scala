@@ -23,12 +23,14 @@ import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
 import com.kvilhaugsvik.dependency.UndefinedException
 import org.freeciv.packetgen.enteties.SourceFile
 
-class GeneratePackets(configName: String, sourceLocation: String, packetsDefRPath: String, versionRPath: String, cRPaths: List[String],
-                      requested: List[(String, String)], logger: String,
-                      devMode: Boolean, packetHeader: PacketHeaderKinds, enableDelta: Boolean, enableDeltaBoolFolding: Boolean) {
+class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
+                      requested: List[(String, String)], logger: String, devMode: Boolean) {
+  /* TODO: Merge packetsDefRPath and packetsDefPath */
+  private val packetsDefRPath: String = versionConfig.inputSources("packets").head
   private val packetsDefPath: File = new File(sourceLocation + packetsDefRPath)
 
-  private val storage = new PacketsStore(configName, packetHeader, logger, enableDelta, enableDeltaBoolFolding)
+  private val storage = new PacketsStore(versionConfig.configName, versionConfig.packetHeader, logger,
+    versionConfig.enableDelta, versionConfig.enableDeltaBoolFolding)
   private val Parser = new ParsePacketsDef(storage)
 
   requested.filter(item => "constant".equals(item._1)).foreach(cons => storage.requestConstant(cons._2))
@@ -46,12 +48,13 @@ class GeneratePackets(configName: String, sourceLocation: String, packetsDefRPat
   private val pdSource: SourceFile = GeneratePackets.readFileAsString(sourceLocation, packetsDefRPath)
   storage.addSource(pdSource)
 
-  private val vpSource: SourceFile = GeneratePackets.readFileAsString(sourceLocation, versionRPath)
+  private val vpSource: SourceFile =
+    GeneratePackets.readFileAsString(sourceLocation, versionConfig.inputSources("variables").head)
   storage.addSource(vpSource)
 
   private val cSources: List[SourceFile] =
     createAndRegister("GeneratePackets/", "data/constants.h") ::
-      cRPaths.map(createAndRegister(sourceLocation, _))
+      versionConfig.inputSources("C").toList.map(createAndRegister(sourceLocation, _))
 
   println("Extracting from Freeciv version information")
   VariableAssignmentsExtractor.extract(vpSource).foreach(storage.addDependency(_))
@@ -144,33 +147,15 @@ object GeneratePackets {
 
     val needed = readSettings(new File("GeneratePackets/data/core_needs.xml"))
 
-    val versionConfiguration = readSettings(new File(settings.getSetting[String](VERSION_INFORMATION)))
-
-    val configName = versionConfiguration.attribute("name").get.text
-
-    val packetHeader = PacketHeaderKinds.valueOf(versionConfiguration.attribute("packetHeaderKind").get.text)
-
-    val enableDelta = versionConfiguration.attribute("enableDelta").get.text.toBoolean
-    val enableDeltaBoolFolding = versionConfiguration.attribute("enableDeltaBoolFolding").get.text.toBoolean
-
-    val inputSources = (versionConfiguration \ "inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
-
     val requested: List[(String, String)] =
       ((needed \ "requested") \ "_").map(item => item.label -> item.text).toList
 
     val self = new GeneratePackets(
-      configName,
+      VersionConfig.fromFile(settings.getSetting[String](VERSION_INFORMATION)),
       settings.getSetting[String](SOURCE_CODE_LOCATION) + "/",
-      inputSources("packets").head,
-      inputSources("variables").head,
-      inputSources("C").toList,
       requested,
       settings.getSetting[String](PACKETS_SHOULD_LOG_TO),
-      settings.getSetting[Boolean](IGNORE_PROBLEMS),
-      packetHeader,
-      enableDelta,
-      enableDeltaBoolFolding)
+      settings.getSetting[Boolean](IGNORE_PROBLEMS))
 
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER, settings.getSetting[Boolean](GPL_SOURCE))
   }
@@ -199,4 +184,30 @@ object GeneratePackets {
     checkFileCanRead(listFile)
     XML.loadFile(listFile)
   }
+}
+
+class VersionConfig(val configName: String,
+                    val packetHeader: org.freeciv.packetgen.PacketHeaderKinds,
+                    val enableDelta: Boolean, val enableDeltaBoolFolding: Boolean,
+                    val inputSources: Map[String, Seq[String]]) {
+}
+
+object VersionConfig {
+  def fromFile(from: File): VersionConfig = {
+    val versionConfiguration = GeneratePackets.readSettings(from)
+
+    val configName = versionConfiguration.attribute("name").get.text
+
+    val packetHeader = PacketHeaderKinds.valueOf(versionConfiguration.attribute("packetHeaderKind").get.text)
+
+    val enableDelta = versionConfiguration.attribute("enableDelta").get.text.toBoolean
+    val enableDeltaBoolFolding = versionConfiguration.attribute("enableDeltaBoolFolding").get.text.toBoolean
+
+    val inputSources = (versionConfiguration \ "inputSource").map(elem =>
+      elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
+
+    new VersionConfig(configName, packetHeader, enableDelta, enableDeltaBoolFolding, inputSources)
+  }
+
+  def fromFile(from: String): VersionConfig = fromFile(new File(from))
 }
