@@ -1,9 +1,3 @@
-# Ignore issues that shouldn't be there in a release.
-# All it controls for now is if missing required items in stead of aborting the
-# code generation should be ignored so items that don't depend on them still
-# are generated.
-IGNORE_ISSUES ?= false
-
 # where to log errors
 LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
 

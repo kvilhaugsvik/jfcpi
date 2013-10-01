@@ -14,5 +14,14 @@ AX_PROG_SCALAC
 AX_FIND_SCALA_STDLIB
 AX_FIND_JUNIT
 
+AC_ARG_ENABLE(strict,
+  AS_HELP_STRING(
+   [--enable-strict],
+   [stop the build if a problem is found (default is yes)]),
+  AS_IF(test x"$enableval" != xno,
+    AC_SUBST(IGNORE_ISSUES, false),
+    AC_SUBST(IGNORE_ISSUES, true)),
+  AC_SUBST(IGNORE_ISSUES, false))
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
