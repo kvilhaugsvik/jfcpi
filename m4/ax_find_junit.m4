@@ -26,7 +26,8 @@ AC_CACHE_VAL(ax_cv_junit_cpf, [
 AS_IF([test x"$JUNIT_JAR" != x],
 [ax_cv_junit_cpf="$JUNIT_JAR$PATH_SEPARATOR"],
 [
-AX_XTRA_CLASSPATH(ax_cv_junit_cpf, org.junit.Assert, junit.jar junit4.jar)
+AX_XTRA_CLASSPATH(ax_cv_junit_cpf, org.junit.Assert,
+  [junit4-4.11.jar junit4.jar junit.jar])
 ])
 ])
 
