@@ -28,6 +28,19 @@ AS_IF([test x"$JUNIT_JAR" != x],
 [
 AX_XTRA_CLASSPATH(ax_cv_junit_cpf, org.junit.Assert,
   [junit4-4.11.jar junit4.jar junit.jar])
+
+# junit.jar may not have org.hamcrest.Matcher
+classpath_when_starting_ax_find_junit="$CLASSPATH"
+CLASSPATH="$ax_cv_junit_cpf$classpath_when_starting_ax_find_junit"
+AC_CHECK_CLASS(org.hamcrest.Matcher,
+  built_in_hamcrest=yes, built_in_hamcrest=no)
+CLASSPATH="$classpath_when_starting_ax_find_junit"
+
+AS_IF([test x"$built_in_hamcrest" = xno], [
+AX_FIND_HAMCREST
+ax_cv_junit_cpf="$HAMCREST_CPF$ax_cv_junit_cpf"
+])
+
 ])
 ])
 
