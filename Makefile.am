@@ -5,8 +5,6 @@ LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
 # take instructions from trunk.xml
 FC_CONF ?= trunk
 VERSIONCONFIGURATION = GeneratePackets/config/${FC_CONF}.xml
-# assume to be placed in a folder in the top level directory of Freeciv's source code unless told otherwise
-FREECIV_SOURCE_PATH ?= ..
 
 # Generated Java source code
 GENERATED_SOURCE_FOLDER = FromFreeciv/${FC_CONF}
