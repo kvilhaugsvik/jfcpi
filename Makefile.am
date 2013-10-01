@@ -2,8 +2,8 @@
 LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
 
 # What it should be generated from
-# take instructions from trunk.xml
-FC_CONF ?= trunk
+# take instructions from 2.6.xml
+FC_CONF ?= 2.6
 VERSIONCONFIGURATION = GeneratePackets/config/${FC_CONF}.xml
 
 # Generated Java source code
