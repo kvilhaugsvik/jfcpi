@@ -20,11 +20,27 @@ import java.io._
 import collection.JavaConversions._
 import xml.XML
 import org.freeciv.utility.{UI, ChangingConsoleLine, ArgumentSettings, Setting}
-import com.kvilhaugsvik.dependency.UndefinedException
-import org.freeciv.packetgen.enteties.SourceFile
+import com.kvilhaugsvik.dependency.{Dependency, UndefinedException}
+import org.freeciv.packetgen.enteties.{Constant, SourceFile}
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue
 
-class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
+class GeneratePackets(chosenVersion: String, sourceLocation: String,
                       requested: List[(String, String)], logger: String, devMode: Boolean) {
+  val versionConfig: VersionConfig =
+    if ("detect".equals(chosenVersion)) {
+      /* Auto detect Freeciv version */
+      println("Reading " + sourceLocation + "fc_version")
+      val vpSource: SourceFile =
+      GeneratePackets.readFileAsString(sourceLocation, "fc_version")
+      val fc_version: List[Dependency] = VariableAssignmentsExtractor.extract(vpSource)
+
+      val version: String = GeneratePackets.detectFreecivVersion(fc_version)
+      println("Source code of Freeciv " + version + " auto detected.")
+      VersionConfig.fromFile("GeneratePackets/config/" + version + ".xml")
+    } else {
+      VersionConfig.fromFile(chosenVersion)
+    }
+
   /* TODO: Merge packetsDefRPath and packetsDefPath */
   private val packetsDefRPath: String = versionConfig.inputSources("packets").head
   private val packetsDefPath: File = new File(sourceLocation + packetsDefRPath)
@@ -56,7 +72,7 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
     createAndRegister("GeneratePackets/", "data/constants.h") ::
       versionConfig.inputSources("C").toList.map(createAndRegister(sourceLocation, _))
 
-  println("Extracting from Freeciv version information")
+  println("Adding Freeciv version information")
   VariableAssignmentsExtractor.extract(vpSource).foreach(storage.addDependency(_))
 
   print("Extracting from provided C code")
@@ -151,7 +167,7 @@ object GeneratePackets {
       ((needed \ "requested") \ "_").map(item => item.label -> item.text).toList
 
     val self = new GeneratePackets(
-      VersionConfig.fromFile(settings.getSetting[String](VERSION_INFORMATION)),
+      settings.getSetting[String](VERSION_INFORMATION),
       settings.getSetting[String](SOURCE_CODE_LOCATION) + "/",
       requested,
       settings.getSetting[String](PACKETS_SHOULD_LOG_TO),
@@ -183,6 +199,32 @@ object GeneratePackets {
   def readSettings(listFile: File) = {
     checkFileCanRead(listFile)
     XML.loadFile(listFile)
+  }
+
+  def detectFreecivVersion(fc_version: List[Dependency]): String = {
+    def stripQuotes(orig: String) = orig.substring(1, orig.length - 1)
+
+    def getExpr(constants: Map[String, Constant[_ <: AValue]], name: String) = {
+      if (!constants.contains(name)) {
+        throw new Exception("Unable to detect Freeciv version. No " + name + " found")
+      }
+      constants.get(name).get.getExpression
+    }
+
+    def getUnquotedExpr(constants: Map[String, Constant[_ <: AValue]], name: String) =
+      stripQuotes(getExpr(constants, name))
+
+    val fc_version_constants: Map[String, Constant[_ <: AValue]] =
+      fc_version.filter((dep: Dependency) => dep.isInstanceOf[Constant[_ <: AValue]])
+        .map((dep: Dependency) => dep.asInstanceOf[Constant[_ <: AValue]])
+        .map((con: Constant[_ <: AValue]) => con.getName -> con).toMap
+
+    val minor_str = getUnquotedExpr(fc_version_constants, "MINOR_VERSION")
+    val patch_str = getUnquotedExpr(fc_version_constants, "PATCH_VERSION")
+    val major_str = getUnquotedExpr(fc_version_constants, "MAJOR_VERSION")
+
+    val minor = minor_str.toInt + (if ("99".equals(patch_str)) 1 else 0)
+    major_str + "." + minor
   }
 }
 

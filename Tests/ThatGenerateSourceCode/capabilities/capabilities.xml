@@ -1,0 +1,14 @@
+<fcsource name="capabilities" packetHeaderKind="FC_trunk" enableDelta="true" enableDeltaBoolFolding="true">
+
+    <inputSource parseAs="packets">
+        <file>capabilities/packets.def</file>
+    </inputSource>
+
+    <inputSource parseAs="variables">
+        <file>capabilities/vars</file>
+    </inputSource>
+
+    <inputSource parseAs="C">
+    </inputSource>
+
+</fcsource>
