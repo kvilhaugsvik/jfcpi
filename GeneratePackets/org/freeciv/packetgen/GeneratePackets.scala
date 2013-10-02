@@ -41,9 +41,7 @@ class GeneratePackets(chosenVersion: String, sourceLocation: String,
       VersionConfig.fromFile(chosenVersion)
     }
 
-  /* TODO: Merge packetsDefRPath and packetsDefPath */
   private val packetsDefRPath: String = versionConfig.inputSources("packets").head
-  private val packetsDefPath: File = new File(sourceLocation + packetsDefRPath)
 
   private val storage = new PacketsStore(versionConfig.configName, versionConfig.packetHeader, logger,
     versionConfig.enableDelta, versionConfig.enableDeltaBoolFolding)
@@ -82,9 +80,9 @@ class GeneratePackets(chosenVersion: String, sourceLocation: String,
   println("Extracting from protocol definition")
   //TODO: Port packetDef understanding to extract system
   private val packetsDefResult =
-    Parser.parsePacketsDef(StreamReader(new InputStreamReader(new FileInputStream(packetsDefPath))))
+    Parser.parsePacketsDef(StreamReader(new StringReader(pdSource.getContent)))
   if (!packetsDefResult.successful) {
-    throw new IOException("Can't parse " + packetsDefPath.getAbsolutePath + "\n" + packetsDefResult.toString)
+    throw new IOException("Can't parse " + pdSource.getPath + "\n" + packetsDefResult.toString)
   }
 
   println("Applying manual changes")
