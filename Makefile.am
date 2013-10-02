@@ -3,14 +3,14 @@ LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
 
 # Generated Java source code
 GENERATED_SOURCE_FOLDER = FromFreeciv/${VERSION_NAME}
-GENERATED_TEST_SOURCE_FOLDER ?= Tests/GeneratedTestPeers
-GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
+GENERATED_TEST_SOURCE_FOLDER = Tests/GeneratedTestPeers
+GENERATORDEFAULTS = GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
 
 # Copy the Freeciv source code used to generate Java code to GENERATED_SOURCE_FOLDER
 # This makes it easier to follow the GPL when distributing without having to mirror all of some Freeciv SVN snapshot
 NOT_DISTRIBUTED_WITH_FREECIV ?= true
 
-WORK_FOLDER ?= out
+WORK_FOLDER = out
 # Generated compiled Java classes
 COMPILED_CORE_FOLDER = ${WORK_FOLDER}/Core
 COMPILED_UTILS_FOLDER = ${WORK_FOLDER}/utils
