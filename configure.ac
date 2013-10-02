@@ -34,6 +34,10 @@ AC_ARG_VAR(VERSIONCONFIGURATION,
 AS_IF([test x"$VERSIONCONFIGURATION" = x],
   AC_SUBST(VERSIONCONFIGURATION, detect))
 
+AC_ARG_VAR(LOG_TO, [Java logger to use])
+AS_IF([test x"$LOG_TO" = x],
+  AC_SUBST(LOG_TO, [java.util.logging.Logger.GLOBAL_LOGGER_NAME]))
+
 AC_ARG_ENABLE(strict,
   AS_HELP_STRING(
    [--enable-strict],

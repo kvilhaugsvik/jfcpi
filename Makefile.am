@@ -1,6 +1,3 @@
-# where to log errors
-LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
-
 # Generated Java source code
 GENERATED_SOURCE_FOLDER = FromFreeciv/${VERSION_NAME}
 GENERATED_TEST_SOURCE_FOLDER = Tests/GeneratedTestPeers
