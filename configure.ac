@@ -43,5 +43,14 @@ AC_ARG_ENABLE(strict,
     AC_SUBST(IGNORE_ISSUES, true)),
   AC_SUBST(IGNORE_ISSUES, false))
 
+AC_ARG_ENABLE(sourcecode,
+  AS_HELP_STRING(
+   [--enable-sourcecode],
+   [copy the Freeciv code used to generate Java code (default is yes)]),
+  AS_IF(test x"$enableval" != xno,
+    AC_SUBST(NOT_DISTRIBUTED_WITH_FREECIV, true),
+    AC_SUBST(NOT_DISTRIBUTED_WITH_FREECIV, false)),
+  AC_SUBST(NOT_DISTRIBUTED_WITH_FREECIV, true))
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
