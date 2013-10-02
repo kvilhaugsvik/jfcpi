@@ -255,8 +255,6 @@ clean-local:
 	rm -f scriptRunPlayToServer playRecord.bat playRecord
 	rm -rf compileUtilsTests runUtilsTests
 	rm -rf scriptInspectTrace inspectTrace.bat inspectTrace
-
-distclean-local: clean
 	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
 	rm -rf ${COMPILED_CORE_FOLDER} compileCore
 	rm -rf ${CORE_JAR}
