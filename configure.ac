@@ -24,6 +24,16 @@ AC_CHECK_FILE("$FREECIV_SOURCE_PATH/fc_version",
   AC_MSG_NOTICE(Freeciv source code found in $FREECIV_SOURCE_PATH),
   AC_MSG_ERROR([Freeciv source code not found in $FREECIV_SOURCE_PATH]))
 
+AC_ARG_VAR(VERSION_NAME,
+  [a custom name for the generated Freeciv version support code])
+AS_IF([test x"$VERSION_NAME" = x],
+  AC_SUBST(VERSION_NAME, `${FREECIV_SOURCE_PATH}/fc_version`))
+
+AC_ARG_VAR(VERSIONCONFIGURATION,
+  [the location of a custom Freeciv version configuration])
+AS_IF([test x"$VERSIONCONFIGURATION" = x],
+  AC_SUBST(VERSIONCONFIGURATION, detect))
+
 AC_ARG_ENABLE(strict,
   AS_HELP_STRING(
    [--enable-strict],

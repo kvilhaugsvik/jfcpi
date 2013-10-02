@@ -1,13 +1,8 @@
 # where to log errors
 LOG_TO ?= "java.util.logging.Logger.GLOBAL_LOGGER_NAME"
 
-# What it should be generated from
-# take instructions from 2.6.xml
-FC_CONF ?= 2.6
-VERSIONCONFIGURATION = GeneratePackets/config/${FC_CONF}.xml
-
 # Generated Java source code
-GENERATED_SOURCE_FOLDER = FromFreeciv/${FC_CONF}
+GENERATED_SOURCE_FOLDER = FromFreeciv/${VERSION_NAME}
 GENERATED_TEST_SOURCE_FOLDER ?= Tests/GeneratedTestPeers
 GENERATORDEFAULTS ?= GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
 
@@ -30,7 +25,7 @@ COMPILED_RECORDER_FOLDER = ${WORK_FOLDER}/FreecivRecorder
 # Generated jars
 CORE_JAR = FCJCore.jar
 UTILS_JAR = FCJUtils.jar
-FREECIV_VERSION_JAR = FCJFreecivVersion-${FC_CONF}.jar
+FREECIV_VERSION_JAR = FCJFreecivVersion-${VERSION_NAME}.jar
 RECORDER_JAR = FCJRecorder.jar
 SIGN_IN_JAR = FCJTestSignIn.jar
 
