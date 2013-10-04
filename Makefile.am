@@ -1,8 +1,3 @@
-# Generated Java source code
-GENERATED_SOURCE_FOLDER = FromFreeciv/${VERSION_NAME}
-GENERATED_TEST_SOURCE_FOLDER = Tests/GeneratedTestPeers
-GENERATORDEFAULTS = GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
-
 WORK_FOLDER = out
 # Generated compiled Java classes
 COMPILED_CORE_FOLDER = ${WORK_FOLDER}/Core
@@ -25,7 +20,7 @@ SIGN_IN_JAR = FCJTestSignIn.jar
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
 
-code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace sourceDefaultsForGenerator sourceTestPeers sourceFromFreeciv
+code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace sourceTestPeers sourceFromFreeciv
 	touch code
 
 tests: runTests
@@ -51,25 +46,12 @@ compileDependency: workFolder
 	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} `find DependencyHandler -iname "*.java"`
 	touch compileDependency
 
-sourceDefaultsForGenerator:
-	echo "package org.freeciv.packetgen;" > ${GENERATORDEFAULTS}
-	echo "public class GeneratorDefaults {" >> ${GENERATORDEFAULTS}
-	echo "  public static final String GENERATED_SOURCE_FOLDER = \"${GENERATED_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final String GENERATED_TEST_SOURCE_FOLDER = \"${GENERATED_TEST_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final boolean IGNORE_ISSUES = ${IGNORE_ISSUES};" >> ${GENERATORDEFAULTS}
-	echo "  public static final String LOG_TO = \"${LOG_TO}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final boolean NOT_DISTRIBUTED_WITH_FREECIV = ${NOT_DISTRIBUTED_WITH_FREECIV};" >> ${GENERATORDEFAULTS}
-	echo "}" >>${GENERATORDEFAULTS}
-	touch sourceDefaultsForGenerator
-
 scriptPacketsExtract:
 	echo "${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.GeneratePackets \"\$$@\"" > packetsExtract
 	chmod +x packetsExtract
 	touch scriptPacketsExtract
 
-compileCodeGenerator: sourceDefaultsForGenerator compileCore compileUtils compileJavaGenerator scriptPacketsExtract compileDependency
+compileCodeGenerator: compileCore compileUtils compileJavaGenerator scriptPacketsExtract compileDependency
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
 	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
 	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.scala"`
@@ -255,7 +237,6 @@ clean-local:
 	rm -f scriptRunPlayToServer playRecord.bat playRecord
 	rm -rf compileUtilsTests runUtilsTests
 	rm -rf scriptInspectTrace inspectTrace.bat inspectTrace
-	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
 	rm -rf ${COMPILED_CORE_FOLDER} compileCore
 	rm -rf ${CORE_JAR}
 	rm -rf ${COMPILED_UTILS_FOLDER} compileUtils

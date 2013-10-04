@@ -56,5 +56,10 @@ AC_ARG_ENABLE(sourcecode,
     AC_SUBST(NOT_DISTRIBUTED_WITH_FREECIV, false)),
   AC_SUBST(NOT_DISTRIBUTED_WITH_FREECIV, true))
 
-AC_CONFIG_FILES([Makefile])
+# Where to put the generated code by default
+AC_SUBST(GENERATED_SOURCE_FOLDER, FromFreeciv/$VERSION_NAME)
+AC_SUBST(GENERATED_TEST_SOURCE_FOLDER, Tests/GeneratedTestPeers)
+
+AC_CONFIG_FILES([Makefile]
+ [GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java])
 AC_OUTPUT
