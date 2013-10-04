@@ -1,22 +1,3 @@
-WORK_FOLDER = out
-# Generated compiled Java classes
-COMPILED_CORE_FOLDER = ${WORK_FOLDER}/Core
-COMPILED_UTILS_FOLDER = ${WORK_FOLDER}/utils
-COMPILED_JAVA_GENERATOR_FOLDER = ${WORK_FOLDER}/JavaGenerator
-COMPILED_DEPENDENCY_FOLDER = ${WORK_FOLDER}/Dependency
-COMPILED_GENERATOR_FOLDER = ${WORK_FOLDER}/GeneratePackages
-COMPILED_TESTS_FOLDER = ${WORK_FOLDER}/Tests
-COMPILED_FROM_FREECIV_FOLDER = ${WORK_FOLDER}/VersionCode
-COMPILED_TEST_SIGN_IN_FOLDER = ${WORK_FOLDER}/SignInTest
-COMPILED_RECORDER_FOLDER = ${WORK_FOLDER}/FreecivRecorder
-
-# Generated jars
-CORE_JAR = FCJCore.jar
-UTILS_JAR = FCJUtils.jar
-FREECIV_VERSION_JAR = FCJFreecivVersion-${VERSION_NAME}.jar
-RECORDER_JAR = FCJRecorder.jar
-SIGN_IN_JAR = FCJTestSignIn.jar
-
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
 
