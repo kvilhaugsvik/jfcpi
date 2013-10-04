@@ -28,7 +28,6 @@ compileDependency: workFolder
 	touch compileDependency
 
 scriptPacketsExtract:
-	echo "${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.GeneratePackets \"\$$@\"" > packetsExtract
 	chmod +x packetsExtract
 	touch scriptPacketsExtract
 
@@ -224,7 +223,7 @@ clean-local:
 	rm -rf ${UTILS_JAR}
 	rm -rf ${COMPILED_JAVA_GENERATOR_FOLDER} compileJavaGenerator
 	rm -rf ${COMPILED_DEPENDENCY_FOLDER} compileDependency
-	rm -rf packetsExtract scriptPacketsExtract
+	rm -rf scriptPacketsExtract
 	rm -rf ${PACKETGENOUT} compileCodeGenerator
 	rm -rf ${GENERATED_SOURCE_FOLDER} sourceFromFreeciv
 	rm -rf ${WORK_FOLDER} workFolder

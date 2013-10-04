@@ -89,5 +89,6 @@ AC_SUBST(RECORDER_JAR, FCJRecorder.jar)
 AC_SUBST(SIGN_IN_JAR, FCJTestSignIn.jar)
 
 AC_CONFIG_FILES([Makefile]
- [GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java])
+ [GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java]
+ [packetsExtract])
 AC_OUTPUT
