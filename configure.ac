@@ -9,6 +9,13 @@ AX_PROG_JAVAC
 AX_PROG_JAR
 
 AX_PROG_SCALA
+
+AX_COMPARE_VERSION($SCALA_VERSION, [lt], [2.9],
+  AC_MSG_ERROR([Scala version >= 2.9.x requested but version $SCALA_VERSION found]))
+
+AX_COMPARE_VERSION($SCALA_VERSION, [gt], [2.10.999],
+  AC_MSG_ERROR([Scala version <= 2.10.x requested but version $SCALA_VERSION found]))
+
 AX_PROG_SCALAC
 
 AX_FIND_SCALA_STDLIB
