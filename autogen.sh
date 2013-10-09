@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Make it possible to run ./configure && make
+# Will run ./configure and pass its parameters to it
+
 echo "Finding the source code"
 sh listFiles.sh Core
 sh listFiles.sh Utility
