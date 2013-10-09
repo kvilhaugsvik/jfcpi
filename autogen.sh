@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "Finding the source code"
+sh listFiles.sh DependencyHandler
+
 echo "Generating the configure script and related files"
 autoreconf --install
 

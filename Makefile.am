@@ -1,3 +1,5 @@
+include $(top_srcdir)/DependencyHandler/source_code.list
+
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
 
@@ -24,7 +26,7 @@ compileJavaGenerator: compileCore compileUtils
 
 compileDependency: workFolder
 	mkdir -p ${COMPILED_DEPENDENCY_FOLDER}
-	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} `find DependencyHandler -iname "*.java"`
+	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} ${DependencyHandler_java_src}
 	touch compileDependency
 
 scriptPacketsExtract:
