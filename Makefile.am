@@ -4,6 +4,7 @@ include $(top_srcdir)/Utility/source_code.list
 include $(top_srcdir)/JavaGenerator/source_code.list
 include $(top_srcdir)/GeneratePackets/source_code.list
 include $(top_srcdir)/FreecivRecorder/source_code.list
+include $(top_srcdir)/SignInTest/source_code.list
 
 # GeneratorDefaults.java is generated during ./configure
 GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
@@ -111,7 +112,7 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 
 compileTestSignInToServer: compileFromFreeciv compileUtils scriptTestSignInToServer
 	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
-	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find SignInTest -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${SignInTest_java_src}
 	echo "Class-Path: ${CORE_JAR} ${UTILS_JAR} ${FREECIV_VERSION_JAR}" > ${WORK_FOLDER}/signIn.manifest
 	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait ${WORK_FOLDER}/signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
 	touch compileTestSignInToServer
