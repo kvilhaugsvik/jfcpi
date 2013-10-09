@@ -2,6 +2,11 @@ include $(top_srcdir)/DependencyHandler/source_code.list
 include $(top_srcdir)/Core/source_code.list
 include $(top_srcdir)/Utility/source_code.list
 include $(top_srcdir)/JavaGenerator/source_code.list
+include $(top_srcdir)/GeneratePackets/source_code.list
+
+# GeneratorDefaults.java is generated during ./configure
+GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
+	GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
@@ -38,8 +43,8 @@ scriptPacketsExtract:
 
 compileCodeGenerator: compileCore compileUtils compileJavaGenerator scriptPacketsExtract compileDependency
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
-	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
-	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.scala"`
+	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_java_src_defaults}
+	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR} -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_scala_src}
 	touch compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
