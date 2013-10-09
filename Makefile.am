@@ -3,6 +3,7 @@ include $(top_srcdir)/Core/source_code.list
 include $(top_srcdir)/Utility/source_code.list
 include $(top_srcdir)/JavaGenerator/source_code.list
 include $(top_srcdir)/GeneratePackets/source_code.list
+include $(top_srcdir)/FreecivRecorder/source_code.list
 
 # GeneratorDefaults.java is generated during ./configure
 GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
@@ -145,7 +146,7 @@ scriptRunPlayToServer:
 
 compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
-	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find FreecivRecorder/src -iname "*.java"`
+	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${FreecivRecorder_java_src}
 	echo "Class-Path: ${CORE_JAR} ${UTILS_JAR}" > ${WORK_FOLDER}/fcr.manifest
 	${JAR} cfm ${RECORDER_JAR} ${WORK_FOLDER}/fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
 	touch compileProxyRecorder
