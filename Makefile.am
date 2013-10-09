@@ -1,4 +1,5 @@
 include $(top_srcdir)/DependencyHandler/source_code.list
+include $(top_srcdir)/Core/source_code.list
 
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
@@ -15,7 +16,7 @@ workFolder:
 
 compileCore: workFolder
 	mkdir -p ${COMPILED_CORE_FOLDER}
-	${JAVAC} -d ${COMPILED_CORE_FOLDER} `find Core -iname "*.java"`
+	${JAVAC} -d ${COMPILED_CORE_FOLDER} ${Core_java_src}
 	${JAR} cf ${CORE_JAR} -C ${COMPILED_CORE_FOLDER} \.
 	touch compileCore
 
