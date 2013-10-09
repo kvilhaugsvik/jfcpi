@@ -1,5 +1,6 @@
 include $(top_srcdir)/DependencyHandler/source_code.list
 include $(top_srcdir)/Core/source_code.list
+include $(top_srcdir)/Utility/source_code.list
 
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
@@ -157,7 +158,7 @@ runConnectionTests: compileConnectionTests
 
 compileUtils: workFolder compileCore
 	mkdir ${COMPILED_UTILS_FOLDER}
-	${JAVAC} -cp ${CORE_JAR} -d ${COMPILED_UTILS_FOLDER} `find Utility -iname "*.java"`
+	${JAVAC} -cp ${CORE_JAR} -d ${COMPILED_UTILS_FOLDER} ${Utility_java_src}
 	${JAR} cf ${UTILS_JAR} -C ${COMPILED_UTILS_FOLDER} \.
 	touch compileUtils
 
