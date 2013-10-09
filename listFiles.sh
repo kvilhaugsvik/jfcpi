@@ -3,6 +3,11 @@
 # name the parameters
 scanFolder="$1"
 
+if test x"$scanFolder" = x; then
+  echo "Please specify what module to generate a list for"
+  exit 1
+fi;
+
 # output location
 outputFile="$scanFolder/source_code.list"
 
