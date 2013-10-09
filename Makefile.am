@@ -1,6 +1,7 @@
 include $(top_srcdir)/DependencyHandler/source_code.list
 include $(top_srcdir)/Core/source_code.list
 include $(top_srcdir)/Utility/source_code.list
+include $(top_srcdir)/JavaGenerator/source_code.list
 
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
@@ -23,7 +24,7 @@ compileCore: workFolder
 
 compileJavaGenerator: compileCore compileUtils
 	mkdir -p ${COMPILED_JAVA_GENERATOR_FOLDER}
-	${JAVAC} -cp ${CORE_JAR}:${UTILS_JAR} -d ${COMPILED_JAVA_GENERATOR_FOLDER} `find JavaGenerator -iname "*.java"`
+	${JAVAC} -cp ${CORE_JAR}:${UTILS_JAR} -d ${COMPILED_JAVA_GENERATOR_FOLDER} ${JavaGenerator_java_src}
 	touch compileJavaGenerator
 
 compileDependency: workFolder
