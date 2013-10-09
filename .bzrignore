@@ -2,7 +2,7 @@
 out
 Tests/Generated*
 FromFreeciv/*
-GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
+GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 FCJ*.jar
 packetsExtract
 testSignInToServer
