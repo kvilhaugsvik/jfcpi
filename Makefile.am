@@ -132,8 +132,6 @@ scriptInspectTrace:
 	touch scriptInspectTrace
 
 scriptRunProxyRecorder:
-	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
-	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
 	touch scriptRunProxyRecorder
 
@@ -221,7 +219,7 @@ clean-local:
 	rm -rf ${SIGN_IN_JAR}
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER} compileFromFreeciv
 	rm -rf ${FREECIV_VERSION_JAR}
-	rm -rf compileProxyRecorder proxyRecorder.bat proxyRecorder runProxyRecorer ${WORK_FOLDER}/fcr.manifest
+	rm -rf compileProxyRecorder runProxyRecorer ${WORK_FOLDER}/fcr.manifest
 	rm -rf ${RECORDER_JAR}
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
 	rm -f scriptRunPlayToServer playRecord.bat playRecord

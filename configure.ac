@@ -92,5 +92,7 @@ AC_CONFIG_FILES([Makefile]
  [GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java]
  [inspectTrace]
  [inspectTrace.bat]
+ [proxyRecorder]
+ [proxyRecorder.bat]
  [packetsExtract])
 AC_OUTPUT
