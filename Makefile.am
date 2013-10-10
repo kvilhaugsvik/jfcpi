@@ -128,8 +128,6 @@ runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
 scriptInspectTrace:
-	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
-	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
 	chmod +x inspectTrace
 	touch scriptInspectTrace
 
@@ -228,7 +226,7 @@ clean-local:
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
 	rm -f scriptRunPlayToServer playRecord.bat playRecord
 	rm -rf compileUtilsTests runUtilsTests
-	rm -rf scriptInspectTrace inspectTrace.bat inspectTrace
+	rm -rf scriptInspectTrace
 	rm -rf ${COMPILED_CORE_FOLDER} compileCore
 	rm -rf ${CORE_JAR}
 	rm -rf ${COMPILED_UTILS_FOLDER} compileUtils

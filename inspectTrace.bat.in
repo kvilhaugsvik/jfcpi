@@ -1,0 +1,1 @@
+@JAVA@ -ea -cp @RECORDER_JAR@;@FREECIV_VERSION_JAR@ org.freeciv.recorder.traceFormat2.PrintTrace %*
