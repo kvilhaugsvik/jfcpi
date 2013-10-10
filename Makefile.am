@@ -140,8 +140,7 @@ scriptRunPlayToServer:
 compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
 	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${FreecivRecorder_java_src}
-	echo "Class-Path: ${CORE_JAR} ${UTILS_JAR}" > ${WORK_FOLDER}/fcr.manifest
-	${JAR} cfm ${RECORDER_JAR} ${WORK_FOLDER}/fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
+	${JAR} cfm ${RECORDER_JAR} fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
 	touch compileProxyRecorder
 
 # not included in tests since it needs a running Freeciv server and client
@@ -215,7 +214,7 @@ clean-local:
 	rm -rf ${SIGN_IN_JAR}
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER} compileFromFreeciv
 	rm -rf ${FREECIV_VERSION_JAR}
-	rm -rf compileProxyRecorder runProxyRecorer ${WORK_FOLDER}/fcr.manifest
+	rm -rf compileProxyRecorder runProxyRecorer
 	rm -rf ${RECORDER_JAR}
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
 	rm -f scriptRunPlayToServer
