@@ -113,8 +113,7 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 compileTestSignInToServer: compileFromFreeciv compileUtils scriptTestSignInToServer
 	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
 	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${SignInTest_java_src}
-	echo "Class-Path: ${CORE_JAR} ${UTILS_JAR} ${FREECIV_VERSION_JAR}" > ${WORK_FOLDER}/signIn.manifest
-	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait ${WORK_FOLDER}/signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
+	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
 	touch compileTestSignInToServer
 
 scriptTestSignInToServer:

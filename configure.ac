@@ -91,6 +91,7 @@ AC_SUBST(SIGN_IN_JAR, FCJTestSignIn.jar)
 AC_CONFIG_FILES([Makefile]
  [GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java]
  [fcr.manifest]
+ [signIn.manifest]
  [inspectTrace]
  [inspectTrace.bat]
  [proxyRecorder]
