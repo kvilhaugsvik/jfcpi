@@ -96,5 +96,7 @@ AC_CONFIG_FILES([Makefile]
  [proxyRecorder.bat]
  [playRecord]
  [playRecord.bat]
+ [testSignInToServer]
+ [testSignInToServer.bat]
  [packetsExtract])
 AC_OUTPUT

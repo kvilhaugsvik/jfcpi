@@ -118,8 +118,6 @@ compileTestSignInToServer: compileFromFreeciv compileUtils scriptTestSignInToSer
 	touch compileTestSignInToServer
 
 scriptTestSignInToServer:
-	echo "${JAVA} -jar ${SIGN_IN_JAR} %*" > testSignInToServer.bat
-	echo "${JAVA} -jar ${SIGN_IN_JAR} \"\$$@\"" > testSignInToServer
 	chmod +x testSignInToServer
 	touch scriptTestSignInToServer
 
@@ -213,7 +211,7 @@ clean-local:
 	rm -rf ${COMPILED_TEST_SIGN_IN_FOLDER}
 	rm -f all
 	rm -f code
-	rm -rf compileTestSignInToServer testSignInToServer testSignInToServer.bat runtestsignintoserver
+	rm -rf compileTestSignInToServer runtestsignintoserver
 	rm -rf ${SIGN_IN_JAR}
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER} compileFromFreeciv
 	rm -rf ${FREECIV_VERSION_JAR}
