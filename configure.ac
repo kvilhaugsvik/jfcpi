@@ -94,5 +94,7 @@ AC_CONFIG_FILES([Makefile]
  [inspectTrace.bat]
  [proxyRecorder]
  [proxyRecorder.bat]
+ [playRecord]
+ [playRecord.bat]
  [packetsExtract])
 AC_OUTPUT

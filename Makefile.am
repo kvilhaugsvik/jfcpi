@@ -136,8 +136,6 @@ scriptRunProxyRecorder:
 	touch scriptRunProxyRecorder
 
 scriptRunPlayToServer:
-	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
-	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
 	chmod +x playRecord
 	touch scriptRunPlayToServer
 
@@ -222,7 +220,7 @@ clean-local:
 	rm -rf compileProxyRecorder runProxyRecorer ${WORK_FOLDER}/fcr.manifest
 	rm -rf ${RECORDER_JAR}
 	rm -f scriptRunProxyRecorder scriptTestSignInToServer
-	rm -f scriptRunPlayToServer playRecord.bat playRecord
+	rm -f scriptRunPlayToServer
 	rm -rf compileUtilsTests runUtilsTests
 	rm -rf scriptInspectTrace
 	rm -rf ${COMPILED_CORE_FOLDER} compileCore
