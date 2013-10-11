@@ -5,21 +5,36 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_MACRO_DIR([m4])
 
 AX_PROG_JAVA
+AS_IF([test x"$JAVA" = x],
+  AC_MSG_ERROR([Java not found]))
+
 AX_PROG_JAVAC
+AS_IF([test x"$JAVAC" = x],
+  AC_MSG_ERROR([Java compiler not found]))
+
 AX_PROG_JAR
+AS_IF([test x"$JAR" = x],
+  AC_MSG_ERROR([Jar not found]))
 
 AX_PROG_SCALA
-
+AS_IF([test x"$SCALA" = x],
+  AC_MSG_ERROR([Scala not found]))
 AX_COMPARE_VERSION($SCALA_VERSION, [lt], [2.9],
   AC_MSG_ERROR([Scala version >= 2.9.x requested but version $SCALA_VERSION found]))
-
 AX_COMPARE_VERSION($SCALA_VERSION, [gt], [2.10.999],
   AC_MSG_ERROR([Scala version <= 2.10.x requested but version $SCALA_VERSION found]))
 
 AX_PROG_SCALAC
+AS_IF([test x"$SCALAC" = x],
+  AC_MSG_ERROR([Scala compiler not found]))
 
 AX_FIND_SCALA_STDLIB
+AS_IF([test x"$SCALA_STDLIB_CPF" = x],
+  AC_MSG_ERROR([Scala Standard Library not found]))
+
 AX_FIND_JUNIT
+AS_IF([test x"$JUNIT_CPF" = x],
+  AC_MSG_ERROR([JUnit not found]))
 
 AC_MSG_NOTICE([Looking for the Freeciv source code])
 # override
