@@ -23,23 +23,23 @@ workFolder:
 	mkdir -p ${WORK_FOLDER}
 	touch workFolder
 
-compileCore: workFolder
+compileCore: workFolder ${Core_src}
 	mkdir -p ${COMPILED_CORE_FOLDER}
 	${JAVAC} -d ${COMPILED_CORE_FOLDER} ${Core_java_src}
 	${JAR} cf ${CORE_JAR} -C ${COMPILED_CORE_FOLDER} \.
 	touch compileCore
 
-compileJavaGenerator: compileCore compileUtils
+compileJavaGenerator: compileCore compileUtils ${JavaGenerator_src}
 	mkdir -p ${COMPILED_JAVA_GENERATOR_FOLDER}
 	${JAVAC} -cp ${CORE_JAR}:${UTILS_JAR} -d ${COMPILED_JAVA_GENERATOR_FOLDER} ${JavaGenerator_java_src}
 	touch compileJavaGenerator
 
-DependencyHandler.jar: workFolder
+DependencyHandler.jar: workFolder ${DependencyHandler_src}
 	mkdir -p ${COMPILED_DEPENDENCY_FOLDER}
 	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} ${DependencyHandler_java_src}
 	${JAR} cf DependencyHandler.jar -C ${COMPILED_DEPENDENCY_FOLDER} \.
 
-compileCodeGenerator: compileCore compileUtils compileJavaGenerator DependencyHandler.jar
+compileCodeGenerator: compileCore compileUtils compileJavaGenerator DependencyHandler.jar ${GeneratePackets_src} GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 	chmod +x packetsExtract
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
 	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_java_src_defaults}
@@ -107,7 +107,7 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfGeneratedCode/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileTestSignInToServer: compileFromFreeciv compileUtils
+compileTestSignInToServer: compileFromFreeciv compileUtils ${SignInTest_src}
 	chmod +x testSignInToServer
 	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
 	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${SignInTest_java_src}
@@ -118,7 +118,7 @@ compileTestSignInToServer: compileFromFreeciv compileUtils
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
-compileProxyRecorder: compileFromFreeciv compileUtils
+compileProxyRecorder: compileFromFreeciv compileUtils ${FreecivRecorder_src}
 	chmod +x inspectTrace
 	chmod +x proxyRecorder
 	chmod +x playRecord
@@ -139,7 +139,7 @@ runConnectionTests: compileConnectionTests
 	${JAVA} -cp ${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.connection.NetworkUninterpreted
 	touch runConnectionTests
 
-compileUtils: workFolder compileCore
+compileUtils: workFolder compileCore ${Utility_src}
 	mkdir ${COMPILED_UTILS_FOLDER}
 	${JAVAC} -cp ${CORE_JAR} -d ${COMPILED_UTILS_FOLDER} ${Utility_java_src}
 	${JAR} cf ${UTILS_JAR} -C ${COMPILED_UTILS_FOLDER} \.

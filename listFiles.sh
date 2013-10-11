@@ -25,4 +25,6 @@ for sourceFile in `find $scanFolder/src -iname "*.scala"`; do
 done;
 echo $scala_src >> $outputFile
 
+echo "${scanFolder}_src = \${${scanFolder}_java_src} \${${scanFolder}_scala_src}" >> $outputFile
+
 echo "" >> $outputFile
