@@ -22,6 +22,7 @@ import java.io.IOException;
 
 public interface Source extends Over {
     public boolean isFromClient();
+    public int getConnectionID();
     public boolean packetReady();
     public Packet getPacket() throws IOException, NotReadyYetException;
 }

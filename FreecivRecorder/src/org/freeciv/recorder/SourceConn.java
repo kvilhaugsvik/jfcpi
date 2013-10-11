@@ -23,15 +23,22 @@ import java.io.IOException;
 public class SourceConn implements Source {
     private final PacketRead source;
     private final boolean fromClient;
+    private final int connectionID;
 
-    public SourceConn(PacketRead source, boolean fromClient) {
+    public SourceConn(PacketRead source, boolean fromClient, int connectionID) {
         this.source = source;
         this.fromClient = fromClient;
+        this.connectionID = connectionID;
     }
 
     @Override
     public boolean isFromClient() {
         return fromClient;
+    }
+
+    @Override
+    public int getConnectionID() {
+        return connectionID;
     }
 
     @Override

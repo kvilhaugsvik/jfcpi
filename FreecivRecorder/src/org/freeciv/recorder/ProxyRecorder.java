@@ -170,8 +170,10 @@ public class ProxyRecorder {
             }
 
             try {
-                final ProxyRecorder proxy = new ProxyRecorder(client, server,
-                        new SinkWriteTrace(diskFilters, traceOut, settings.<Boolean>getSetting(TRACE_DYNAMIC), connections.size(), firstConnectionTime.getTime()),
+                final ProxyRecorder proxy = new ProxyRecorder(
+                        connections.size(), client, server,
+                        new SinkWriteTrace(diskFilters, traceOut, settings.<Boolean>getSetting(TRACE_DYNAMIC),
+                                connections.size(), firstConnectionTime.getTime()),
                         console.forConnection(connections.size()),
                         forwardFilters, settings, versionKnowledge);
                 connections.add(proxy);
@@ -235,7 +237,7 @@ public class ProxyRecorder {
             }
     }
 
-    public ProxyRecorder(Socket client, Socket server, Sink traceSink, Sink console, Filter forwardFilters, ArgumentSettings settings, ProtocolData versionKnowledge)
+    public ProxyRecorder(int connectionID, Socket client, Socket server, Sink traceSink, Sink console, Filter forwardFilters, ArgumentSettings settings, ProtocolData versionKnowledge)
             throws IOException, InterruptedException {
         final FreecivConnection clientCon = Plumbing.socket2Connection(client, versionKnowledge,
                 settings.<Boolean>getSetting(UNDERSTAND),
@@ -247,10 +249,10 @@ public class ProxyRecorder {
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), getServerConnectionReflexes()),
                 versionKnowledge.getRequiredPostSendRules());
 
-        final Source serverSource = new SourceConn(serverCon, false);
+        final Source serverSource = new SourceConn(serverCon, false, connectionID);
         final Sink sinkServer = new SinkForward(serverCon, forwardFilters);
 
-        final Source clientSource = new SourceConn(clientCon, true);
+        final Source clientSource = new SourceConn(clientCon, true, connectionID);
         final Sink sinkClient = new SinkForward(clientCon, forwardFilters);
 
         this.csPlumbing = new Plumbing(clientSource, Arrays.asList(console, traceSink, sinkServer), timeToExit);

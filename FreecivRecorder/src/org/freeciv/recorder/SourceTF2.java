@@ -94,6 +94,11 @@ public class SourceTF2 implements Source {
     }
 
     @Override
+    public int getConnectionID() {
+        return interestingConnectionID;
+    }
+
+    @Override
     public boolean packetReady() {
         return null != rec;
     }

@@ -75,7 +75,7 @@ public class PlayToServer {
             }
         }, versionKnowledge, ignoreDynamic, true, RecordTF2.NO_CONNECTION_ID, false, firstPlayedTime.getTime()),
                 Arrays.asList(reaction, toServer), timeToExit);
-        this.scPlumbing = new Plumbing(new SourceConn(conn, false), Arrays.asList(reaction), timeToExit);
+        this.scPlumbing = new Plumbing(new SourceConn(conn, false, RecordTF2.NO_CONNECTION_ID), Arrays.asList(reaction), timeToExit);
     }
 
     private static HashMap<Integer, ReflexReaction> createStandardReflexes(final ProtocolData versionKnowledge) {
