@@ -51,7 +51,7 @@ sourceFromFreeciv: compileCodeGenerator
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv
-	mkdir ${COMPILED_FROM_FREECIV_FOLDER}
+	mkdir -p ${COMPILED_FROM_FREECIV_FOLDER}
 	${JAVAC} -d ${COMPILED_FROM_FREECIV_FOLDER} -cp ${CORE_JAR} `find ${GENERATED_SOURCE_FOLDER}/generated -iname "*.java"`
 	${JAR} cf ${FREECIV_VERSION_JAR} -C ${COMPILED_FROM_FREECIV_FOLDER} \.
 	touch compileFromFreeciv
@@ -140,7 +140,7 @@ runConnectionTests: compileConnectionTests
 	touch runConnectionTests
 
 compileUtils: workFolder compileCore ${Utility_src}
-	mkdir ${COMPILED_UTILS_FOLDER}
+	mkdir -p ${COMPILED_UTILS_FOLDER}
 	${JAVAC} -cp ${CORE_JAR} -d ${COMPILED_UTILS_FOLDER} ${Utility_java_src}
 	${JAR} cf ${UTILS_JAR} -C ${COMPILED_UTILS_FOLDER} \.
 	touch compileUtils
