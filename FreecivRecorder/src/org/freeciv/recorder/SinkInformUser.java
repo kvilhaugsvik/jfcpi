@@ -38,7 +38,10 @@ class SinkInformUser extends Sink {
         };
     }
 
-    public void write(boolean clientToServer, Packet packet) {
+    public void write(Packet packet, boolean clientToServer, int connectionID) {
+        assert proxyNumber == connectionID
+                : "Can only handle one connection. Expected " + proxyNumber + ", got " + connectionID + ".";
+
         writeLock.lock();
         try {
             System.out.println(proxyNumber + (clientToServer ? " c2s: " : " s2c: ") + packet);

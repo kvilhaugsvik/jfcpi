@@ -51,7 +51,8 @@ class SinkWriteTrace extends Sink {
         }
     }
 
-    public synchronized void write(boolean clientToServer, Packet packet) throws IOException {
+    public synchronized void write(Packet packet, boolean clientToServer, int connectionID) throws IOException {
+        assert id == connectionID : "Many connections in one file not supported yet";
         try {
             final RecordTF2 record =
                     new RecordTF2(header, clientToServer, System.currentTimeMillis() - header.getOriginalStartTime(), packet, false, id);

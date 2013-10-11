@@ -115,7 +115,7 @@ public class Plumbing extends Thread {
             }
 
             for (Sink sink : sinks)
-                sink.filteredWrite(readFrom.isFromClient(), packet);
+                sink.filteredWrite(packet, readFrom.isFromClient(), readFrom.getConnectionID());
 
         } catch (NotReadyYetException e) {
             Thread.yield();

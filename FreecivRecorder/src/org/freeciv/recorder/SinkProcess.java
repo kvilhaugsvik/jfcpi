@@ -45,7 +45,7 @@ public abstract class SinkProcess extends Sink {
     }
 
     @Override
-    public abstract void write(boolean clientToServer, Packet packet) throws IOException;
+    public abstract void write(Packet packet, boolean clientToServer, int connectionID) throws IOException;
 
     @Override
     public void setStopReadingWhenOutOfInput() {

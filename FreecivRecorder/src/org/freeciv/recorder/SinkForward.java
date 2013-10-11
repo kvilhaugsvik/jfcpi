@@ -27,7 +27,7 @@ class SinkForward extends Sink {
         this.writeTo = writeTo;
     }
 
-    public synchronized void write(boolean clientToServer, Packet packet) throws IOException {
+    public synchronized void write(Packet packet, boolean clientToServer, int connectionID) throws IOException {
         try {
             writeTo.toSend(packet);
         } catch (IOException e) {

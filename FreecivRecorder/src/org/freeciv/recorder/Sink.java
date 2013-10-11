@@ -26,13 +26,13 @@ abstract class Sink implements Over {
         this.filter = filter;
     }
 
-    public abstract void write(boolean clientToServer, Packet packet) throws IOException;
+    public abstract void write(Packet packet, boolean clientToServer, int connectionID) throws IOException;
 
-    public void filteredWrite(boolean clientToServer, Packet packet) throws IOException {
+    public void filteredWrite(Packet packet, boolean clientToServer, int connectionID) throws IOException {
         filter.update(packet);
 
         if (filter.isAccepted(packet, clientToServer))
-            this.write(clientToServer, packet);
+            this.write(packet, clientToServer, connectionID);
 
         filter.inform(packet);
     }
