@@ -30,6 +30,8 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class RecordTF2 {
+    public static final int NO_CONNECTION_ID = -1;
+
     /*********************
      * Stored in the trace
      *********************/
@@ -79,7 +81,7 @@ public class RecordTF2 {
 
         this.when = traceHeader.includesTime() ? inAsData.readLong() : -1;
 
-        this.connID = traceHeader.includesConnectionID() ? inAsData.readChar() : -1;
+        this.connID = traceHeader.includesConnectionID() ? inAsData.readChar() : NO_CONNECTION_ID;
 
         this.ignoreMe = ((skipIfUnknownTraceHeader() && traceHeader.isTraceHeaderSizeUnexpected()) ||
                 (skipIfUnknownRecordHeader() && traceHeader.isRecordHeaderSizeUnexpected()));
@@ -123,6 +125,14 @@ public class RecordTF2 {
 
     public long getTimestamp() {
         return when;
+    }
+
+    /**
+     * Get the connection ID of this record
+     * @return the connection number if one is defined and NO_CONNECTION_ID if not
+     */
+    public int getConnectionID() {
+        return connID;
     }
 
     public Packet getPacket() {

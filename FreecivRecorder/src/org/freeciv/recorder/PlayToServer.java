@@ -15,7 +15,7 @@
 package org.freeciv.recorder;
 
 import org.freeciv.connection.*;
-import org.freeciv.packet.*;
+import org.freeciv.recorder.traceFormat2.RecordTF2;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
@@ -73,7 +73,7 @@ public class PlayToServer {
                     e.printStackTrace();
                 }
             }
-        }, versionKnowledge, ignoreDynamic, true, false, firstPlayedTime.getTime()),
+        }, versionKnowledge, ignoreDynamic, true, RecordTF2.NO_CONNECTION_ID, false, firstPlayedTime.getTime()),
                 Arrays.asList(reaction, toServer), timeToExit);
         this.scPlumbing = new Plumbing(new SourceConn(conn, false), Arrays.asList(reaction), timeToExit);
     }

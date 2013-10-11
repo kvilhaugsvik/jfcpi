@@ -28,18 +28,37 @@ import java.lang.reflect.InvocationTargetException;
 public class SourceTF2 implements Source {
     private final boolean ignoreDynamic;
     private final boolean fromClient;
+    private final int interestingConnectionID;
     private final TraceFormat2Read source;
     private final Over over;
 
+    private final boolean careAboutConnectionID;
     private final long beganPlaying;
 
     private long sendNextAt;
     private RecordTF2 rec;
 
-    public SourceTF2(InputStream source, Over over, ProtocolData versionKnowledge, boolean ignoreDynamic, boolean fromClient, boolean understand, long beganPlayBack) throws IOException {
+    /**
+     * A Trace Format 2 source
+     *
+     * @param source the input stream to read from
+     * @param over over implementation
+     * @param versionKnowledge protocol data
+     * @param ignoreDynamic should new packets appear at the same time they originally did?
+     * @param fromClient the direction to not ignore (true if client2server, false if server2client)
+     * @param interestingConnectionID the connection ID to not ignore. Set to -1 to let everything pass.
+     * @param understand should the packets be interpreted?
+     * @param beganPlayBack the time when the play back started
+     * @throws IOException when there is a problem while reading the headers
+     */
+    public SourceTF2(InputStream source, Over over, ProtocolData versionKnowledge,
+                     boolean ignoreDynamic, boolean fromClient, int interestingConnectionID, boolean understand,
+                     long beganPlayBack) throws IOException {
         this.over = over;
         this.ignoreDynamic = ignoreDynamic;
         this.fromClient = fromClient;
+        this.interestingConnectionID = interestingConnectionID;
+        this.careAboutConnectionID = interestingConnectionID != RecordTF2.NO_CONNECTION_ID;
         this.source = new TraceFormat2Read(source, over,
                 versionKnowledge,
                 versionKnowledge.getNewPacketHeaderData(),
@@ -55,7 +74,9 @@ public class SourceTF2 implements Source {
         try {
             rec = this.source.readRecord();
 
-            while (rec.shouldBeIgnored() || fromClient != rec.isClientToServer()) {
+            while (rec.shouldBeIgnored()
+                    || fromClient != rec.isClientToServer()
+                    || careAboutConnectionID && interestingConnectionID != rec.getConnectionID()) {
                 rec = null; // remove the disqualified record in case the following read fails
                 rec = source.readRecord();
             }
