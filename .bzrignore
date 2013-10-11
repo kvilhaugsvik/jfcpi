@@ -23,7 +23,6 @@ compile*
 folder*
 run*
 source*
-script*
 
 # autotools
 Makefile

@@ -13,7 +13,7 @@ GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
 
-code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace sourceTestPeers sourceFromFreeciv
+code: sourceTestPeers sourceFromFreeciv
 	touch code
 
 tests: runTests
@@ -39,11 +39,8 @@ compileDependency: workFolder
 	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} ${DependencyHandler_java_src}
 	touch compileDependency
 
-scriptPacketsExtract:
+compileCodeGenerator: compileCore compileUtils compileJavaGenerator compileDependency
 	chmod +x packetsExtract
-	touch scriptPacketsExtract
-
-compileCodeGenerator: compileCore compileUtils compileJavaGenerator scriptPacketsExtract compileDependency
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
 	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_java_src_defaults}
 	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR} -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_scala_src}
@@ -110,33 +107,21 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfGeneratedCode/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileTestSignInToServer: compileFromFreeciv compileUtils scriptTestSignInToServer
+compileTestSignInToServer: compileFromFreeciv compileUtils
+	chmod +x testSignInToServer
 	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
 	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${SignInTest_java_src}
 	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
 	touch compileTestSignInToServer
 
-scriptTestSignInToServer:
-	chmod +x testSignInToServer
-	touch scriptTestSignInToServer
-
 # not included in tests since it needs a running Freeciv server
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
-scriptInspectTrace:
+compileProxyRecorder: compileFromFreeciv compileUtils
 	chmod +x inspectTrace
-	touch scriptInspectTrace
-
-scriptRunProxyRecorder:
 	chmod +x proxyRecorder
-	touch scriptRunProxyRecorder
-
-scriptRunPlayToServer:
 	chmod +x playRecord
-	touch scriptRunPlayToServer
-
-compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
 	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${FreecivRecorder_java_src}
 	${JAR} cfm ${RECORDER_JAR} fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
@@ -215,17 +200,13 @@ clean-local:
 	rm -rf ${FREECIV_VERSION_JAR}
 	rm -rf compileProxyRecorder runProxyRecorer
 	rm -rf ${RECORDER_JAR}
-	rm -f scriptRunProxyRecorder scriptTestSignInToServer
-	rm -f scriptRunPlayToServer
 	rm -rf compileUtilsTests runUtilsTests
-	rm -rf scriptInspectTrace
 	rm -rf ${COMPILED_CORE_FOLDER} compileCore
 	rm -rf ${CORE_JAR}
 	rm -rf ${COMPILED_UTILS_FOLDER} compileUtils
 	rm -rf ${UTILS_JAR}
 	rm -rf ${COMPILED_JAVA_GENERATOR_FOLDER} compileJavaGenerator
 	rm -rf ${COMPILED_DEPENDENCY_FOLDER} compileDependency
-	rm -rf scriptPacketsExtract
 	rm -rf ${PACKETGENOUT} compileCodeGenerator
 	rm -rf ${GENERATED_SOURCE_FOLDER} sourceFromFreeciv
 	rm -rf ${WORK_FOLDER} workFolder
