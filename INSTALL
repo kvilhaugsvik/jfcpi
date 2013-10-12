@@ -9,6 +9,9 @@ What you'll need
  * GNU Make 3.81 (other versions are probably OK)
  * The Freeciv source code (SVN revision 22865 of trunk and SVN revision 22857 of the 2.4 branch is known to work)
  * Scala 2.9 or 2.10 (if you plan to regenerate source code from the Freeciv source code)
+ * If you aren't building from a release (there is no ./configure script) you will need more. The list may not be complete:
+   - GNU Autotools: GNU Autoconf and GNU Automake
+   - The GNU Autoconf Archive, preferably one released after 3rd October 2013
 
 Where you can find it
  * Most GNU/Linux distributions will have the OpenJDK Java implementation in their package repositories. Users of
@@ -25,21 +28,17 @@ Where you can find it
    The Freeciv web page has instructions for downloading the trunk version using Git or SVN at
    http://freeciv.wikia.com/wiki/Freeciv_source_code_repository
  * Scala is in the package repositories of some GNU/Linux distributions. It can also be found at http://scala-lang.org
+ * The GNU Autoconf archive can be found at http://www.gnu.org/software/autoconf-archive/ (or in your distro's repo)
 
 Building
-The Makefile in this folder don't have a ./configure script. It therefore may need to be told where it can find its
-dependencies. If you are running Debian Wheezy and installed all the dependencies from the official Debian repository
-and have placed this folder in Freeciv trunk the defaults should be OK. If not you must override the default values from
-the command line. You override them by setting them before the command. The information that is needed is:
- * JAVA - the java application launcher
- * JAVAC - the java compiler
- * JAR - the jar utility
- * SCALA - the scala application launcher
- * SCALAC - the scala compiler
- * SCALALIB - the scala library
- * JUNIT - the JUnit library
-To compile using a JUnit located in ~/lib to run the tests and a jar from ~/bin/jar use the command
-  JUNIT=~/lib/junit.jar JAR=~/bin/jar make all
+If you are building from a release simply do ./configure && make. If the
+./configure file is missing you will have to run the script autogen.sh
+located in the top folder.
+
+The configure script may not be able to find everything on its own. An
+example is when the Freeciv source code isn't in the parent directory. Run
+  ./configure --help
+to learn how to inform it where things are located.
 
 Freeciv has its own documentation on how to build it and what you need. You won't have to install it to test recording.
 It is worth having a look at. If all of Freeciv's build dependencies are there entering its folder and running

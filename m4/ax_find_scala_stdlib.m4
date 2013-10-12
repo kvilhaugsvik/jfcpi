@@ -22,20 +22,13 @@
 AC_ARG_VAR(SCALA_STDLIB, [path to the Scala Standard Library])
 
 AC_DEFUN([AX_FIND_SCALA_STDLIB], [
-AC_CACHE_VAL(ax_cv_scala_libray, [
+  AC_CACHE_VAL(ax_cv_scala_libray, [
+    AS_IF([test x"$SCALA_STDLIB" != x],
+      [ax_cv_scala_stdlib_cpf="$SCALA_STDLIB$PATH_SEPARATOR"],
+      [AX_XTRA_CLASSPATH(ax_cv_scala_stdlib_cpf,
+        scala.collection.immutable.List, scala-library.jar)])])
 
-AS_IF([test x"$SCALA_STDLIB" != x],
-[ax_cv_scala_stdlib_cpf="$SCALA_STDLIB$PATH_SEPARATOR"],
-[
-AX_XTRA_CLASSPATH(ax_cv_scala_stdlib_cpf,
-scala.collection.immutable.List, scala-library.jar)
-])
-])
-
-AS_IF([test x"$ax_cv_scala_stdlib_cpf" != x], [ 
-AC_MSG_NOTICE([Scala Standard Library found $ax_cv_scala_stdlib_cpf])
-AC_SUBST(SCALA_STDLIB_CPF, $ax_cv_scala_stdlib_cpf)
-], 
-AC_MSG_WARN([Scala Standard Library not found])
-)
-])
+  AS_IF([test x"$ax_cv_scala_stdlib_cpf" != x], [ 
+    AC_MSG_NOTICE([Scala Standard Library found $ax_cv_scala_stdlib_cpf])
+    AC_SUBST(SCALA_STDLIB_CPF, $ax_cv_scala_stdlib_cpf)
+  ], AC_MSG_WARN([Scala Standard Library not found]))])

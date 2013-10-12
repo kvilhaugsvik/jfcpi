@@ -5,14 +5,36 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_MACRO_DIR([m4])
 
 AX_PROG_JAVA
+AS_IF([test x"$JAVA" = x],
+  AC_MSG_ERROR([Java not found]))
+
 AX_PROG_JAVAC
+AS_IF([test x"$JAVAC" = x],
+  AC_MSG_ERROR([Java compiler not found]))
+
 AX_PROG_JAR
+AS_IF([test x"$JAR" = x],
+  AC_MSG_ERROR([Jar not found]))
 
 AX_PROG_SCALA
+AS_IF([test x"$SCALA" = x],
+  AC_MSG_ERROR([Scala not found]))
+AX_COMPARE_VERSION($SCALA_VERSION, [lt], [2.9],
+  AC_MSG_ERROR([Scala version >= 2.9.x requested but version $SCALA_VERSION found]))
+AX_COMPARE_VERSION($SCALA_VERSION, [gt], [2.10.999],
+  AC_MSG_ERROR([Scala version <= 2.10.x requested but version $SCALA_VERSION found]))
+
 AX_PROG_SCALAC
+AS_IF([test x"$SCALAC" = x],
+  AC_MSG_ERROR([Scala compiler not found]))
 
 AX_FIND_SCALA_STDLIB
+AS_IF([test x"$SCALA_STDLIB_CPF" = x],
+  AC_MSG_ERROR([Scala Standard Library not found]))
+
 AX_FIND_JUNIT
+AS_IF([test x"$JUNIT_CPF" = x],
+  AC_MSG_ERROR([JUnit not found]))
 
 AC_MSG_NOTICE([Looking for the Freeciv source code])
 # override
@@ -56,5 +78,42 @@ AC_ARG_ENABLE(sourcecode,
     AC_SUBST(NOT_DISTRIBUTED_WITH_FREECIV, false)),
   AC_SUBST(NOT_DISTRIBUTED_WITH_FREECIV, true))
 
-AC_CONFIG_FILES([Makefile])
+# Where to put the generated code by default
+AC_SUBST(GENERATED_SOURCE_FOLDER, FromFreeciv/$VERSION_NAME)
+AC_SUBST(GENERATED_TEST_SOURCE_FOLDER, Tests/GeneratedTestPeers)
+
+# TODO: Change to autotool's system
+AC_SUBST(WORK_FOLDER, out)
+
+# Generated compiled Java classes
+AC_SUBST(COMPILED_CORE_FOLDER, ${WORK_FOLDER}/Core)
+AC_SUBST(COMPILED_UTILS_FOLDER, ${WORK_FOLDER}/utils)
+AC_SUBST(COMPILED_JAVA_GENERATOR_FOLDER, ${WORK_FOLDER}/JavaGenerator)
+AC_SUBST(COMPILED_DEPENDENCY_FOLDER, ${WORK_FOLDER}/Dependency)
+AC_SUBST(COMPILED_GENERATOR_FOLDER, ${WORK_FOLDER}/GeneratePackages)
+AC_SUBST(COMPILED_TESTS_FOLDER, ${WORK_FOLDER}/Tests)
+AC_SUBST(COMPILED_FROM_FREECIV_FOLDER, ${WORK_FOLDER}/VersionCode)
+AC_SUBST(COMPILED_TEST_SIGN_IN_FOLDER, ${WORK_FOLDER}/SignInTest)
+AC_SUBST(COMPILED_RECORDER_FOLDER, ${WORK_FOLDER}/FreecivRecorder)
+
+# Generated jars
+AC_SUBST(CORE_JAR, FCJCore.jar)
+AC_SUBST(UTILS_JAR, FCJUtils.jar)
+AC_SUBST(FREECIV_VERSION_JAR, FCJFreecivVersion-${VERSION_NAME}.jar)
+AC_SUBST(RECORDER_JAR, FCJRecorder.jar)
+AC_SUBST(SIGN_IN_JAR, FCJTestSignIn.jar)
+
+AC_CONFIG_FILES([Makefile]
+ [GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java]
+ [fcr.manifest]
+ [signIn.manifest]
+ [inspectTrace]
+ [inspectTrace.bat]
+ [proxyRecorder]
+ [proxyRecorder.bat]
+ [playRecord]
+ [playRecord.bat]
+ [testSignInToServer]
+ [testSignInToServer.bat]
+ [packetsExtract])
 AC_OUTPUT

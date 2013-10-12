@@ -1,31 +1,19 @@
-# Generated Java source code
-GENERATED_SOURCE_FOLDER = FromFreeciv/${VERSION_NAME}
-GENERATED_TEST_SOURCE_FOLDER = Tests/GeneratedTestPeers
-GENERATORDEFAULTS = GeneratePackets/org/freeciv/packetgen/GeneratorDefaults.java
+include $(top_srcdir)/DependencyHandler/source_code.list
+include $(top_srcdir)/Core/source_code.list
+include $(top_srcdir)/Utility/source_code.list
+include $(top_srcdir)/JavaGenerator/source_code.list
+include $(top_srcdir)/GeneratePackets/source_code.list
+include $(top_srcdir)/FreecivRecorder/source_code.list
+include $(top_srcdir)/SignInTest/source_code.list
 
-WORK_FOLDER = out
-# Generated compiled Java classes
-COMPILED_CORE_FOLDER = ${WORK_FOLDER}/Core
-COMPILED_UTILS_FOLDER = ${WORK_FOLDER}/utils
-COMPILED_JAVA_GENERATOR_FOLDER = ${WORK_FOLDER}/JavaGenerator
-COMPILED_DEPENDENCY_FOLDER = ${WORK_FOLDER}/Dependency
-COMPILED_GENERATOR_FOLDER = ${WORK_FOLDER}/GeneratePackages
-COMPILED_TESTS_FOLDER = ${WORK_FOLDER}/Tests
-COMPILED_FROM_FREECIV_FOLDER = ${WORK_FOLDER}/VersionCode
-COMPILED_TEST_SIGN_IN_FOLDER = ${WORK_FOLDER}/SignInTest
-COMPILED_RECORDER_FOLDER = ${WORK_FOLDER}/FreecivRecorder
-
-# Generated jars
-CORE_JAR = FCJCore.jar
-UTILS_JAR = FCJUtils.jar
-FREECIV_VERSION_JAR = FCJFreecivVersion-${VERSION_NAME}.jar
-RECORDER_JAR = FCJRecorder.jar
-SIGN_IN_JAR = FCJTestSignIn.jar
+# GeneratorDefaults.java is generated during ./configure
+GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
+	GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 
 all: tests compileTestSignInToServer compileProxyRecorder
 	touch all
 
-code: scriptPacketsExtract scriptTestSignInToServer scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace sourceDefaultsForGenerator sourceTestPeers sourceFromFreeciv
+code: sourceTestPeers sourceFromFreeciv
 	touch code
 
 tests: runTests
@@ -35,44 +23,27 @@ workFolder:
 	mkdir -p ${WORK_FOLDER}
 	touch workFolder
 
-compileCore: workFolder
+compileCore: workFolder ${Core_src}
 	mkdir -p ${COMPILED_CORE_FOLDER}
-	${JAVAC} -d ${COMPILED_CORE_FOLDER} `find Core -iname "*.java"`
+	${JAVAC} -d ${COMPILED_CORE_FOLDER} ${Core_java_src}
 	${JAR} cf ${CORE_JAR} -C ${COMPILED_CORE_FOLDER} \.
 	touch compileCore
 
-compileJavaGenerator: compileCore compileUtils
+compileJavaGenerator: compileCore compileUtils ${JavaGenerator_src}
 	mkdir -p ${COMPILED_JAVA_GENERATOR_FOLDER}
-	${JAVAC} -cp ${CORE_JAR}:${UTILS_JAR} -d ${COMPILED_JAVA_GENERATOR_FOLDER} `find JavaGenerator -iname "*.java"`
+	${JAVAC} -cp ${CORE_JAR}:${UTILS_JAR} -d ${COMPILED_JAVA_GENERATOR_FOLDER} ${JavaGenerator_java_src}
 	touch compileJavaGenerator
 
-compileDependency: workFolder
+DependencyHandler.jar: workFolder ${DependencyHandler_src}
 	mkdir -p ${COMPILED_DEPENDENCY_FOLDER}
-	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} `find DependencyHandler -iname "*.java"`
-	touch compileDependency
+	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} ${DependencyHandler_java_src}
+	${JAR} cf DependencyHandler.jar -C ${COMPILED_DEPENDENCY_FOLDER} \.
 
-sourceDefaultsForGenerator:
-	echo "package org.freeciv.packetgen;" > ${GENERATORDEFAULTS}
-	echo "public class GeneratorDefaults {" >> ${GENERATORDEFAULTS}
-	echo "  public static final String GENERATED_SOURCE_FOLDER = \"${GENERATED_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final String GENERATED_TEST_SOURCE_FOLDER = \"${GENERATED_TEST_SOURCE_FOLDER}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final String FREECIV_SOURCE_PATH = \"${FREECIV_SOURCE_PATH}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final String VERSIONCONFIGURATION = \"${VERSIONCONFIGURATION}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final boolean IGNORE_ISSUES = ${IGNORE_ISSUES};" >> ${GENERATORDEFAULTS}
-	echo "  public static final String LOG_TO = \"${LOG_TO}\";" >> ${GENERATORDEFAULTS}
-	echo "  public static final boolean NOT_DISTRIBUTED_WITH_FREECIV = ${NOT_DISTRIBUTED_WITH_FREECIV};" >> ${GENERATORDEFAULTS}
-	echo "}" >>${GENERATORDEFAULTS}
-	touch sourceDefaultsForGenerator
-
-scriptPacketsExtract:
-	echo "${SCALA} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.GeneratePackets \"\$$@\"" > packetsExtract
+compileCodeGenerator: compileCore compileUtils compileJavaGenerator DependencyHandler.jar ${GeneratePackets_src} GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 	chmod +x packetsExtract
-	touch scriptPacketsExtract
-
-compileCodeGenerator: sourceDefaultsForGenerator compileCore compileUtils compileJavaGenerator scriptPacketsExtract compileDependency
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
-	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.java"`
-	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR} -d ${COMPILED_GENERATOR_FOLDER} `find GeneratePackets -iname "*.scala"`
+	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_java_src_defaults}
+	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:DependencyHandler.jar:${UTILS_JAR} -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_scala_src}
 	touch compileCodeGenerator
 
 sourceFromFreeciv: compileCodeGenerator
@@ -80,19 +51,19 @@ sourceFromFreeciv: compileCodeGenerator
 	touch sourceFromFreeciv
 
 compileFromFreeciv: sourceFromFreeciv
-	mkdir ${COMPILED_FROM_FREECIV_FOLDER}
+	mkdir -p ${COMPILED_FROM_FREECIV_FOLDER}
 	${JAVAC} -d ${COMPILED_FROM_FREECIV_FOLDER} -cp ${CORE_JAR} `find ${GENERATED_SOURCE_FOLDER}/generated -iname "*.java"`
 	${JAR} cf ${FREECIV_VERSION_JAR} -C ${COMPILED_FROM_FREECIV_FOLDER} \.
 	touch compileFromFreeciv
 
 compileTestPeerGenerator: compileCore compileCodeGenerator folderTestOut
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF} `find Tests/ThatGenerateSourceCode -iname "*.java"`
-	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF} `find Tests/ThatGenerateSourceCode -iname "*.scala"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF} `find Tests/ThatGenerateSourceCode -iname "*.java"`
+	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF} `find Tests/ThatGenerateSourceCode -iname "*.scala"`
 	touch compileTestPeerGenerator
 
 sourceTestPeers: compileTestPeerGenerator
-	${SCALA} -classpath ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.UsingGenerator ${GENERATED_TEST_SOURCE_FOLDER}
-	${JAVA} -cp ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.FromEntetiesAlone ${GENERATED_TEST_SOURCE_FOLDER}
+	${SCALA} -classpath ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.UsingGenerator ${GENERATED_TEST_SOURCE_FOLDER}
+	${JAVA} -cp ${COMPILED_TESTS_FOLDER}:${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${UTILS_JAR} org.freeciv.packetgen.FromEntetiesAlone ${GENERATED_TEST_SOURCE_FOLDER}
 	touch sourceTestPeers
 
 # not included in tests since make will run the code when generating test peers
@@ -110,72 +81,50 @@ folderTestOut: workFolder
 
 compileTestsOfGenerator: folderTestOut compileCodeGenerator
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT_CPF} `find Tests/OfOtherCode/com/ -iname "*.java"`
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${JUNIT_CPF} `find Tests/OfOtherCode/org/freeciv/packetgen/ -iname "*.java"`
-	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfOtherCode/org/freeciv/packetgen/ -iname "*.scala"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${JUNIT_CPF} `find Tests/OfOtherCode/org/freeciv/packetgen/ -iname "*.java"`
+	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfOtherCode/org/freeciv/packetgen/ -iname "*.scala"`
 	touch compileTestsOfGenerator
 
 runTestsOfGenerator: compileTestsOfGenerator
-	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
+	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
 	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.CodeGenTest
 	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER}:${UTILS_JAR} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.TypedCodeTest
 	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestTreeIR
 	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestTreeCodeAtoms
 	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestPosition
-	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.EnumTest
-	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${JUNIT_CPF}:${UTILS_JAR}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.FieldTypeTest
-	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${JUNIT_CPF}:${UTILS_JAR}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.PacketTest
-	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${COMPILED_DEPENDENCY_FOLDER}:${CORE_JAR}:${JUNIT_CPF}:${UTILS_JAR}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.DependencyStoreTest
-	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${JUNIT_CPF}:${UTILS_JAR}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.ParseSharedTest
-	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.PacketsDefParseTest
-	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.CParserSyntaxTest
-	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.CParserSemanticTest
-	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:${COMPILED_DEPENDENCY_FOLDER}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.FromCExtractorTest
+	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.EnumTest
+	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:DependencyHandler.jar:${JUNIT_CPF}:${UTILS_JAR}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.FieldTypeTest
+	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:DependencyHandler.jar:${JUNIT_CPF}:${UTILS_JAR}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.PacketTest
+	${JAVA} -ea -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:DependencyHandler.jar:${CORE_JAR}:${JUNIT_CPF}:${UTILS_JAR}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.DependencyStoreTest
+	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:DependencyHandler.jar:${JUNIT_CPF}:${UTILS_JAR}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.ParseSharedTest
+	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:DependencyHandler.jar:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.PacketsDefParseTest
+	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:DependencyHandler.jar:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.CParserSyntaxTest
+	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:DependencyHandler.jar:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.CParserSemanticTest
+	${SCALA} -cp ${COMPILED_GENERATOR_FOLDER}:${COMPILED_JAVA_GENERATOR_FOLDER}:${CORE_JAR}:DependencyHandler.jar:${UTILS_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.FromCExtractorTest
 	touch runTestsOfGenerator
 
 compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfGeneratedCode/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileTestSignInToServer: compileFromFreeciv compileUtils scriptTestSignInToServer
-	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
-	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find SignInTest -iname "*.java"`
-	echo "Class-Path: ${CORE_JAR} ${UTILS_JAR} ${FREECIV_VERSION_JAR}" > ${WORK_FOLDER}/signIn.manifest
-	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait ${WORK_FOLDER}/signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
-	touch compileTestSignInToServer
-
-scriptTestSignInToServer:
-	echo "${JAVA} -jar ${SIGN_IN_JAR} %*" > testSignInToServer.bat
-	echo "${JAVA} -jar ${SIGN_IN_JAR} \"\$$@\"" > testSignInToServer
+compileTestSignInToServer: compileFromFreeciv compileUtils ${SignInTest_src}
 	chmod +x testSignInToServer
-	touch scriptTestSignInToServer
+	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
+	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${SignInTest_java_src}
+	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
+	touch compileTestSignInToServer
 
 # not included in tests since it needs a running Freeciv server
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
-scriptInspectTrace:
-	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.traceFormat2.PrintTrace %*" > inspectTrace.bat
-	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.traceFormat2.PrintTrace \"\$$@\" | less" > inspectTrace
+compileProxyRecorder: compileFromFreeciv compileUtils ${FreecivRecorder_src}
 	chmod +x inspectTrace
-	touch scriptInspectTrace
-
-scriptRunProxyRecorder:
-	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.ProxyRecorder %*" > proxyRecorder.bat
-	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.ProxyRecorder \"\$$@\"" > proxyRecorder
 	chmod +x proxyRecorder
-	touch scriptRunProxyRecorder
-
-scriptRunPlayToServer:
-	echo "${JAVA} -ea -cp ${RECORDER_JAR};${FREECIV_VERSION_JAR} org.freeciv.recorder.PlayToServer %*" > playRecord.bat
-	echo "${JAVA} -ea -cp ${RECORDER_JAR}:${FREECIV_VERSION_JAR} org.freeciv.recorder.PlayToServer \"\$$@\"" > playRecord
 	chmod +x playRecord
-	touch scriptRunPlayToServer
-
-compileProxyRecorder: compileFromFreeciv compileUtils scriptRunProxyRecorder scriptRunPlayToServer scriptInspectTrace
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
-	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} `find FreecivRecorder/src -iname "*.java"`
-	echo "Class-Path: ${CORE_JAR} ${UTILS_JAR}" > ${WORK_FOLDER}/fcr.manifest
-	${JAR} cfm ${RECORDER_JAR} ${WORK_FOLDER}/fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
+	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${FreecivRecorder_java_src}
+	${JAR} cfm ${RECORDER_JAR} fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
 	touch compileProxyRecorder
 
 # not included in tests since it needs a running Freeciv server and client
@@ -190,9 +139,9 @@ runConnectionTests: compileConnectionTests
 	${JAVA} -cp ${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.connection.NetworkUninterpreted
 	touch runConnectionTests
 
-compileUtils: workFolder compileCore
-	mkdir ${COMPILED_UTILS_FOLDER}
-	${JAVAC} -cp ${CORE_JAR} -d ${COMPILED_UTILS_FOLDER} `find Utility -iname "*.java"`
+compileUtils: workFolder compileCore ${Utility_src}
+	mkdir -p ${COMPILED_UTILS_FOLDER}
+	${JAVAC} -cp ${CORE_JAR} -d ${COMPILED_UTILS_FOLDER} ${Utility_java_src}
 	${JAR} cf ${UTILS_JAR} -C ${COMPILED_UTILS_FOLDER} \.
 	touch compileUtils
 
@@ -245,24 +194,19 @@ clean-local:
 	rm -rf ${COMPILED_TEST_SIGN_IN_FOLDER}
 	rm -f all
 	rm -f code
-	rm -rf compileTestSignInToServer testSignInToServer testSignInToServer.bat runtestsignintoserver
+	rm -rf compileTestSignInToServer runtestsignintoserver
 	rm -rf ${SIGN_IN_JAR}
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER} compileFromFreeciv
 	rm -rf ${FREECIV_VERSION_JAR}
-	rm -rf compileProxyRecorder proxyRecorder.bat proxyRecorder runProxyRecorer ${WORK_FOLDER}/fcr.manifest
+	rm -rf compileProxyRecorder runProxyRecorer
 	rm -rf ${RECORDER_JAR}
-	rm -f scriptRunProxyRecorder scriptTestSignInToServer
-	rm -f scriptRunPlayToServer playRecord.bat playRecord
 	rm -rf compileUtilsTests runUtilsTests
-	rm -rf scriptInspectTrace inspectTrace.bat inspectTrace
-	rm -rf ${GENERATORDEFAULTS} sourceDefaultsForGenerator
 	rm -rf ${COMPILED_CORE_FOLDER} compileCore
 	rm -rf ${CORE_JAR}
 	rm -rf ${COMPILED_UTILS_FOLDER} compileUtils
 	rm -rf ${UTILS_JAR}
 	rm -rf ${COMPILED_JAVA_GENERATOR_FOLDER} compileJavaGenerator
-	rm -rf ${COMPILED_DEPENDENCY_FOLDER} compileDependency
-	rm -rf packetsExtract scriptPacketsExtract
+	rm -rf ${COMPILED_DEPENDENCY_FOLDER} DependencyHandler.jar
 	rm -rf ${PACKETGENOUT} compileCodeGenerator
 	rm -rf ${GENERATED_SOURCE_FOLDER} sourceFromFreeciv
 	rm -rf ${WORK_FOLDER} workFolder
