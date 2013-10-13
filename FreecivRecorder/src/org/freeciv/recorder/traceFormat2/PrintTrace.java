@@ -39,11 +39,18 @@ public class PrintTrace {
     }};
 
     public static void main(String[] args) throws IOException, InvocationTargetException {
-        ArgumentSettings settings = new ArgumentSettings(SETTINGS, args);
+        final ArgumentSettings settings;
+        final String fileName;
+        final FileInputStream file;
 
-        final String fileName = settings.<String>getSetting(TRACE_FILE);
+        /* Settings */
+        settings = new ArgumentSettings(SETTINGS, args);
+        UI.printAndExitOnHelp(settings, PrintTrace.class);
 
-        final FileInputStream file = new FileInputStream(fileName);
+        /* Open file */
+        fileName = settings.<String>getSetting(TRACE_FILE);
+        file = new FileInputStream(fileName);
+
         try {
             final ProtocolData protocolData = new ProtocolData();
             TraceFormat2Read trace = new TraceFormat2Read(
