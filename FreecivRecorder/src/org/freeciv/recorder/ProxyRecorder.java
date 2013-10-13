@@ -33,6 +33,7 @@ public class ProxyRecorder {
     private static final String TRACE_NAME_START = "trace-name-start";
     private static final String TRACE_NAME_END = "trace-name-end";
     private static final String TRACE_DYNAMIC = "record-time";
+    private static final String TRACE_SPLIT = "split-files";
     private static final String TRACE_EXCLUDE_CONNECTION = "trace-exclude-connection";
     private static final String TRACE_EXCLUDE_C2S = "trace-exclude-from-client";
     private static final String TRACE_EXCLUDE_S2C = "trace-exclude-from-server";
@@ -55,6 +56,7 @@ public class ProxyRecorder {
         add(new Setting.StringSetting(TRACE_NAME_START, DEFAULT_TRACE_PREFIX, "prefix of the trace file names"));
         add(new Setting.StringSetting(TRACE_NAME_END, DEFAULT_TRACE_SUFFIX, "suffix of the trace file names"));
         add(new Setting.BoolSetting(TRACE_DYNAMIC, true, "should time be recorded in the trace"));
+        add(new Setting.BoolSetting(TRACE_SPLIT, true, "one file for each connection in stead of all in one file"));
         add(new Setting.BoolSetting(TRACE_EXCLUDE_CONNECTION, true,
                 "don't record connection packets in the trace"));
         add(new Setting.BoolSetting(TRACE_EXCLUDE_C2S, false,
@@ -115,8 +117,17 @@ public class ProxyRecorder {
         System.out.println("Listening for Freeciv clients on port " + settings.getSetting(PROXY_PORT));
         System.out.println("Will connect to Freeciv server at " + settings.getSetting(REAL_SERVER_ADDRESS) +
                 ", port " + settings.getSetting(REAL_SERVER_PORT));
-        System.out.println("Trace files will be named " + settings.getSetting(TRACE_NAME_START) + "#" +
+        if (settings.<Boolean>getSetting(TRACE_SPLIT)) {
+            System.out.println("Will record each connection in a separate file.");
+            System.out.println("Trace files will be named " + settings.getSetting(TRACE_NAME_START) + "#" +
                 settings.getSetting(TRACE_NAME_END) + " (# is the logged connection number)");
+        } else {
+            System.out.println("Will record all connections in the same file.");
+            System.err.println("WARNING: This support is still experimental and BROKEN.");
+            System.err.println("WARNING: The records you create using this may become unreadable in the future.");
+            System.out.println("Trace file will be named " + settings.getSetting(TRACE_NAME_START) +
+                    settings.getSetting(TRACE_NAME_END));
+        }
         if (settings.<Boolean>getSetting(VERBOSE))
             for (Setting.Settable option : settings.getAll())
                 System.out.println(option.name() + " = " + option.get() + "\t" + option.describe());
@@ -134,8 +145,90 @@ public class ProxyRecorder {
         }
     }
 
+    public interface CorrectSinkFile {
+        /**
+         * Get the sink that will store the trace to disk
+         * @param connectionNumber the connection number that will be stored
+         * @return the sink that will write the trace to disk
+         * @throws IOException when something goes wrong
+         */
+        public SinkWriteTrace getTraceSink(int connectionNumber) throws IOException;
+    }
+
+    /**
+     * Store all connections in a single file
+     */
+    public static class SingleFile implements CorrectSinkFile {
+        public static final int DEFAULT_CONNECTION = 0;
+        private final FirstTimeRequest firstConnectionTime;
+
+        private final SinkWriteTrace traceSink;
+
+        SingleFile(ArgumentSettings settings, Filter diskFilters) {
+            this.firstConnectionTime = new FirstTimeRequest();
+
+            final String fileName = settings.<String>getSetting(TRACE_NAME_START)
+                    + settings.<String>getSetting(TRACE_NAME_END);
+
+            try {
+                final OutputStream traceOut = new BufferedOutputStream(new FileOutputStream(fileName));
+                try {
+                    traceSink = new SinkWriteTrace(diskFilters, traceOut, settings.<Boolean>getSetting(TRACE_DYNAMIC),
+                            DEFAULT_CONNECTION, firstConnectionTime.getTime(), true);
+                } catch (IOException e) {
+                    closeIt(traceOut);
+                    throw new Error("Unable to open trace output file " + fileName, e);
+                }
+            } catch (FileNotFoundException e) {
+                throw new Error("Unable to open trace output file " + fileName, e);
+            }
+        }
+
+        public SinkWriteTrace getTraceSink(int connectionNumber) throws IOException {
+            return traceSink;
+        }
+    }
+
+    /**
+     * Store each connection in its own file
+     */
+    public static class FilePrConnection implements CorrectSinkFile {
+        private final FirstTimeRequest firstConnectionTime;
+        private final ArgumentSettings settings;
+        private final Filter diskFilters;
+
+        FilePrConnection(ArgumentSettings settings, Filter diskFilters) {
+            this.settings = settings;
+            this.diskFilters = diskFilters;
+            this.firstConnectionTime = new FirstTimeRequest();
+
+        }
+
+        public SinkWriteTrace getTraceSink(int connectionNumber) throws IOException {
+            final String fileName;
+            final OutputStream traceOut;
+
+            fileName = settings.<String>getSetting(TRACE_NAME_START) +
+                    connectionNumber + settings.<String>getSetting(TRACE_NAME_END);
+            traceOut = new BufferedOutputStream(new FileOutputStream(fileName));
+
+            try {
+                return new SinkWriteTrace(diskFilters, traceOut, settings.<Boolean>getSetting(TRACE_DYNAMIC),
+                        connectionNumber, firstConnectionTime.getTime(), false);
+            } catch (IOException e) {
+                closeIt(traceOut);
+                throw new Error("Unable to open trace output file " + fileName, e);
+            }
+        }
+    }
+
     private static void fakeServer(ArgumentSettings settings, ServerSocket serverProxy, ArrayList<ProxyRecorder> connections, Filter diskFilters, Filter forwardFilters, SinkInformUser.SharedData console, ProtocolData versionKnowledge) throws InterruptedException, InvocationTargetException {
-        final FirstTimeRequest firstConnectionTime = new FirstTimeRequest();
+        final CorrectSinkFile sinkGetter;
+        if (settings.<Boolean>getSetting(TRACE_SPLIT)) {
+            sinkGetter = new FilePrConnection(settings, diskFilters);
+        } else {
+            sinkGetter = new SingleFile(settings, diskFilters);
+        }
 
         while (!timeToExit[0]) {
             final Socket client;
@@ -159,27 +252,16 @@ public class ProxyRecorder {
                 continue; // Todo: Should this exit the program?
             }
 
-            final OutputStream traceOut;
-            try {
-                traceOut = new BufferedOutputStream(
-                        new FileOutputStream(settings.<String>getSetting(TRACE_NAME_START) +
-                                connections.size() + settings.<String>getSetting(TRACE_NAME_END)));
-            } catch (IOException e) {
-                failedOpeningTraceFile(client, server, e);
-                continue; // Todo: Should this exit the program?
-            }
-
             try {
                 final ProxyRecorder proxy = new ProxyRecorder(
                         connections.size(), client, server,
-                        new SinkWriteTrace(diskFilters, traceOut, settings.<Boolean>getSetting(TRACE_DYNAMIC),
-                                connections.size(), firstConnectionTime.getTime(), false),
+                        sinkGetter.getTraceSink(connections.size()),
                         console.forConnection(connections.size()),
                         forwardFilters, settings, versionKnowledge);
                 connections.add(proxy);
                 proxy.startThreads();
             } catch (IOException e) {
-                failedStarting(client, server, traceOut, e);
+                failedStarting(client, server, e);
                 continue; // Todo: Should this exit the program?
             }
         }
@@ -196,17 +278,9 @@ public class ProxyRecorder {
         closeIt(client);
     }
 
-    private static void failedOpeningTraceFile(Socket client, Socket server, IOException e) {
-        System.err.println("Incoming connection: Failed opening trace file");
-        e.printStackTrace();
-        closeIt(client);
-        closeIt(server);
-    }
-
-    private static void failedStarting(Socket client, Socket server, OutputStream traceOut, IOException e) {
+    private static void failedStarting(Socket client, Socket server, IOException e) {
         System.err.println("Incoming connection: Failed starting");
         e.printStackTrace();
-        closeIt(traceOut);
         closeIt(client);
         closeIt(server);
     }
