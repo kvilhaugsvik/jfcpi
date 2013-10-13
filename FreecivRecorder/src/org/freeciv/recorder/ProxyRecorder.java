@@ -173,7 +173,7 @@ public class ProxyRecorder {
                 final ProxyRecorder proxy = new ProxyRecorder(
                         connections.size(), client, server,
                         new SinkWriteTrace(diskFilters, traceOut, settings.<Boolean>getSetting(TRACE_DYNAMIC),
-                                connections.size(), firstConnectionTime.getTime()),
+                                connections.size(), firstConnectionTime.getTime(), false),
                         console.forConnection(connections.size()),
                         forwardFilters, settings, versionKnowledge);
                 connections.add(proxy);

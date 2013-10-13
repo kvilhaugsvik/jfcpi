@@ -29,7 +29,7 @@ class SinkWriteTrace extends Sink {
     private final DataOutputStream traceFile;
     private final OverImpl over;
 
-    public SinkWriteTrace(Filter filter, OutputStream traceFile, boolean isDynamic, int id, long recordStartedAt) throws IOException {
+    public SinkWriteTrace(Filter filter, OutputStream traceFile, boolean isDynamic, int id, long recordStartedAt, boolean multiConn) throws IOException {
         super(filter);
 
         this.id = id;
@@ -44,7 +44,7 @@ class SinkWriteTrace extends Sink {
         };
 
         try {
-            header = new HeaderTF2(recordStartedAt, isDynamic, false, id);
+            header = new HeaderTF2(recordStartedAt, isDynamic, multiConn, id);
             header.write(this.traceFile);
         } catch (IOException e) {
             throw new IOException(id + ": Unable to write trace headers", e);
@@ -52,7 +52,6 @@ class SinkWriteTrace extends Sink {
     }
 
     public synchronized void write(Packet packet, boolean clientToServer, int connectionID) throws IOException {
-        assert id == connectionID : "Many connections in one file not supported yet";
         try {
             final RecordTF2 record =
                     new RecordTF2(header, clientToServer,
