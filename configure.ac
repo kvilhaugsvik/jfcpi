@@ -102,6 +102,7 @@ AC_SUBST(UTILS_JAR, FCJUtils.jar)
 AC_SUBST(FREECIV_VERSION_JAR, FCJFreecivVersion-${VERSION_NAME}.jar)
 AC_SUBST(RECORDER_JAR, FCJRecorder.jar)
 AC_SUBST(SIGN_IN_JAR, FCJTestSignIn.jar)
+AC_SUBST(DEP_HAND_JAR, DependencyHandler.jar)
 
 AC_CONFIG_FILES([Makefile]
  [GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java]
