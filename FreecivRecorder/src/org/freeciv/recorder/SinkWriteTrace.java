@@ -55,7 +55,9 @@ class SinkWriteTrace extends Sink {
         assert id == connectionID : "Many connections in one file not supported yet";
         try {
             final RecordTF2 record =
-                    new RecordTF2(header, clientToServer, System.currentTimeMillis() - header.getOriginalStartTime(), packet, false, id);
+                    new RecordTF2(header, clientToServer,
+                            System.currentTimeMillis() - header.getOriginalStartTime(),
+                            packet, false, connectionID);
             record.write(traceFile);
         } catch (IOException e) {
             throw new IOException(id + ": Failed to write a packet to trace", e);
