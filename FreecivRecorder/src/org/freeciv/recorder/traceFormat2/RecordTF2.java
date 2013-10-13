@@ -15,7 +15,6 @@
 package org.freeciv.recorder.traceFormat2;
 
 import org.freeciv.connection.DoneReading;
-import org.freeciv.connection.PacketInputStream;
 import org.freeciv.connection.RawFCProto;
 import org.freeciv.packet.Packet;
 import org.freeciv.types.FCEnum;
@@ -56,7 +55,7 @@ public class RecordTF2 {
     }
 
     private static boolean skipUnlessYouReadConnectionID(HeaderTF2 traceHeader, int connID) {
-        return traceHeader.includesConnectionID() && connID != traceHeader.compatibleConnection;
+        return traceHeader.includesConnectionID() && connID != traceHeader.defaultConnection;
     }
 
     private static UnderstoodBitVector<RecordFlag> recordFlags(boolean client2server, boolean traceHeaderSizeSkip, boolean recordHeaderSizeSkip) {

@@ -37,16 +37,18 @@ public class HeaderTF2 {
      *************************/
     final boolean unexpectedTraceHeaderSize;
     final boolean unexpectedRecordHeaderSize;
-    final int compatibleConnection;
 
-    public HeaderTF2(long recordStartedAt, boolean isDynamic, boolean isMultiConn, int compatibleConnection) {
+    /** The default connection ID. If a tool only support one connection this will be chosen. */
+    final int defaultConnection;
+
+    public HeaderTF2(long recordStartedAt, boolean isDynamic, boolean isMultiConn, int defaultConnection) {
         this.flags = traceFlags(isDynamic, isMultiConn);
         this.formatVersion = TF2.FORMAT_VERSION;
         this.traceHeaderSize = calculateFileHeaderSize(includesTime());
         this.recordHeaderSize = RecordTF2.calculateRecordHeaderSize(includesTime(), includesConnectionID());
         this.recordStartedAt = recordStartedAt;
 
-        this.compatibleConnection = compatibleConnection;
+        this.defaultConnection = defaultConnection;
         this.unexpectedTraceHeaderSize = false;
         this.unexpectedRecordHeaderSize = false;
     }
@@ -86,7 +88,8 @@ public class HeaderTF2 {
         if (unexpectedTraceHeaderSize)
             TF2.headerSkip(inAsData, (long) (traceHeaderSize - calculateFileHeaderSize(dynamic)));
 
-        this.compatibleConnection = -1; // the records not marked for skipping if unknown size has the real number
+        /* Not a part of the header. Each record not asking to be skipped has it. */
+        this.defaultConnection = -1;
     }
 
     public void write(DataOutputStream to) throws IOException {
@@ -165,6 +168,12 @@ public class HeaderTF2 {
             out.append(" (");
             out.append(recordStartedAt);
             out.append(")\n");
+        }
+
+        if (flags.get(TraceFlag.INCLUDES_CONN_ID)) {
+            out.append("Default connection ID: ");
+            out.append(defaultConnection);
+            out.append("\n");
         }
 
         if (unexpectedTraceHeaderSize) {
