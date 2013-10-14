@@ -10,7 +10,7 @@ include $(top_srcdir)/SignInTest/source_code.list
 GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
 	GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 
-all: tests compileTestSignInToServer compileProxyRecorder
+all: tests @SIGN_IN_JAR@ compileProxyRecorder
 	touch all
 
 code: sourceTestPeers sourceFromFreeciv
@@ -105,15 +105,14 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfGeneratedCode/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileTestSignInToServer: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
+@SIGN_IN_JAR@: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
 	chmod +x testSignInToServer
 	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
 	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:@FREECIV_VERSION_JAR@ ${SignInTest_java_src}
-	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
-	touch compileTestSignInToServer
+	${JAR} cfem @SIGN_IN_JAR@ org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
 
 # not included in tests since it needs a running Freeciv server
-runtestsignintoserver: compileTestSignInToServer
+runtestsignintoserver: @SIGN_IN_JAR@
 	sh testSignInToServer && touch runtestsignintoserver
 
 compileProxyRecorder: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${FreecivRecorder_src} fcr.manifest inspectTrace proxyRecorder playRecord
@@ -192,8 +191,8 @@ clean-local:
 	rm -rf ${COMPILED_TEST_SIGN_IN_FOLDER}
 	rm -f all
 	rm -f code
-	rm -rf compileTestSignInToServer runtestsignintoserver
-	rm -rf ${SIGN_IN_JAR}
+	rm -rf runtestsignintoserver
+	rm -rf @SIGN_IN_JAR@
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER}
 	rm -rf @FREECIV_VERSION_JAR@
 	rm -rf compileProxyRecorder runProxyRecorer
