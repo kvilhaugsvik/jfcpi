@@ -1,1 +1,1 @@
-@SCALA@ -classpath @COMPILED_GENERATOR_FOLDER@:@COMPILED_JAVA_GENERATOR_FOLDER@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@ org.freeciv.packetgen.GeneratePackets "$@"
+@SCALA@ -classpath @COMPILED_GENERATOR_FOLDER@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@ org.freeciv.packetgen.GeneratePackets "$@"
