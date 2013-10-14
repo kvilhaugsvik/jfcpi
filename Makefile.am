@@ -39,7 +39,7 @@ compileJavaGenerator: compileCore compileUtils ${JavaGenerator_src}
 	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} ${DependencyHandler_java_src}
 	${JAR} cf @DEP_HAND_JAR@ -C ${COMPILED_DEPENDENCY_FOLDER} \.
 
-compileCodeGenerator: compileCore compileUtils compileJavaGenerator @DEP_HAND_JAR@ ${GeneratePackets_src} GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
+compileCodeGenerator: compileCore compileUtils compileJavaGenerator @DEP_HAND_JAR@ ${GeneratePackets_src} GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java packetsExtract
 	chmod +x packetsExtract
 	mkdir -p ${COMPILED_GENERATOR_FOLDER}
 	${JAVAC} -cp ${CORE_JAR}:${SCALA_STDLIB_CPF}:${COMPILED_JAVA_GENERATOR_FOLDER}:@DEP_HAND_JAR@ -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_java_src_defaults}
@@ -107,7 +107,7 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp ${COMPILED_GENERATOR_FOLDER}:${CORE_JAR}:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfGeneratedCode/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileTestSignInToServer: compileFromFreeciv compileUtils ${SignInTest_src} signIn.manifest
+compileTestSignInToServer: compileFromFreeciv compileUtils ${SignInTest_src} signIn.manifest testSignInToServer
 	chmod +x testSignInToServer
 	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
 	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp ${CORE_JAR}:${UTILS_JAR}:${FREECIV_VERSION_JAR} ${SignInTest_java_src}
@@ -118,7 +118,7 @@ compileTestSignInToServer: compileFromFreeciv compileUtils ${SignInTest_src} sig
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
-compileProxyRecorder: compileFromFreeciv compileUtils ${FreecivRecorder_src} fcr.manifest
+compileProxyRecorder: compileFromFreeciv compileUtils ${FreecivRecorder_src} fcr.manifest inspectTrace proxyRecorder playRecord
 	chmod +x inspectTrace
 	chmod +x proxyRecorder
 	chmod +x playRecord
