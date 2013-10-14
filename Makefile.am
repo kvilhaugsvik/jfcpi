@@ -10,7 +10,7 @@ include $(top_srcdir)/SignInTest/source_code.list
 GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
 	GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 
-all: tests @SIGN_IN_JAR@ compileProxyRecorder
+all: tests @SIGN_IN_JAR@ @RECORDER_JAR@
 	touch all
 
 code: sourceTestPeers sourceFromFreeciv
@@ -115,17 +115,16 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 runtestsignintoserver: @SIGN_IN_JAR@
 	sh testSignInToServer && touch runtestsignintoserver
 
-compileProxyRecorder: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${FreecivRecorder_src} fcr.manifest inspectTrace proxyRecorder playRecord
+@RECORDER_JAR@: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${FreecivRecorder_src} fcr.manifest inspectTrace proxyRecorder playRecord
 	chmod +x inspectTrace
 	chmod +x proxyRecorder
 	chmod +x playRecord
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
 	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:@FREECIV_VERSION_JAR@ ${FreecivRecorder_java_src}
-	${JAR} cfm ${RECORDER_JAR} fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
-	touch compileProxyRecorder
+	${JAR} cfm @RECORDER_JAR@ fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
 
 # not included in tests since it needs a running Freeciv server and client
-runProxyRecorer: compileProxyRecorder
+runProxyRecorer: @RECORDER_JAR@
 	sh proxyRecorder && touch runProxyRecorer
 
 compileConnectionTests: folderTestOut @CORE_JAR@
@@ -195,8 +194,8 @@ clean-local:
 	rm -rf @SIGN_IN_JAR@
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER}
 	rm -rf @FREECIV_VERSION_JAR@
-	rm -rf compileProxyRecorder runProxyRecorer
-	rm -rf ${RECORDER_JAR}
+	rm -rf runProxyRecorer
+	rm -rf @RECORDER_JAR@
 	rm -rf compileUtilsTests runUtilsTests
 	rm -rf ${COMPILED_CORE_FOLDER}
 	rm -rf @CORE_JAR@
