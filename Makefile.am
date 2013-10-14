@@ -49,11 +49,10 @@ sourceFromFreeciv: @CODE_GEN_JAR@
 	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${IGNORE_ISSUES} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
 	touch sourceFromFreeciv
 
-compileFromFreeciv: sourceFromFreeciv
+@FREECIV_VERSION_JAR@: sourceFromFreeciv
 	mkdir -p ${COMPILED_FROM_FREECIV_FOLDER}
 	${JAVAC} -d ${COMPILED_FROM_FREECIV_FOLDER} -cp @CORE_JAR@ `find ${GENERATED_SOURCE_FOLDER}/generated -iname "*.java"`
-	${JAR} cf ${FREECIV_VERSION_JAR} -C ${COMPILED_FROM_FREECIV_FOLDER} \.
-	touch compileFromFreeciv
+	${JAR} cf @FREECIV_VERSION_JAR@ -C ${COMPILED_FROM_FREECIV_FOLDER} \.
 
 compileTestPeerGenerator: @CORE_JAR@ @CODE_GEN_JAR@ folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find Tests/ThatGenerateSourceCode -iname "*.java"`
@@ -106,10 +105,10 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfGeneratedCode/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
-compileTestSignInToServer: compileFromFreeciv @UTILS_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
+compileTestSignInToServer: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
 	chmod +x testSignInToServer
 	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
-	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:${FREECIV_VERSION_JAR} ${SignInTest_java_src}
+	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:@FREECIV_VERSION_JAR@ ${SignInTest_java_src}
 	${JAR} cfem ${SIGN_IN_JAR} org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
 	touch compileTestSignInToServer
 
@@ -117,12 +116,12 @@ compileTestSignInToServer: compileFromFreeciv @UTILS_JAR@ ${SignInTest_src} sign
 runtestsignintoserver: compileTestSignInToServer
 	sh testSignInToServer && touch runtestsignintoserver
 
-compileProxyRecorder: compileFromFreeciv @UTILS_JAR@ ${FreecivRecorder_src} fcr.manifest inspectTrace proxyRecorder playRecord
+compileProxyRecorder: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${FreecivRecorder_src} fcr.manifest inspectTrace proxyRecorder playRecord
 	chmod +x inspectTrace
 	chmod +x proxyRecorder
 	chmod +x playRecord
 	mkdir -p ${COMPILED_RECORDER_FOLDER}
-	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:${FREECIV_VERSION_JAR} ${FreecivRecorder_java_src}
+	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:@FREECIV_VERSION_JAR@ ${FreecivRecorder_java_src}
 	${JAR} cfm ${RECORDER_JAR} fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
 	touch compileProxyRecorder
 
@@ -195,8 +194,8 @@ clean-local:
 	rm -f code
 	rm -rf compileTestSignInToServer runtestsignintoserver
 	rm -rf ${SIGN_IN_JAR}
-	rm -rf ${COMPILED_FROM_FREECIV_FOLDER} compileFromFreeciv
-	rm -rf ${FREECIV_VERSION_JAR}
+	rm -rf ${COMPILED_FROM_FREECIV_FOLDER}
+	rm -rf @FREECIV_VERSION_JAR@
 	rm -rf compileProxyRecorder runProxyRecorer
 	rm -rf ${RECORDER_JAR}
 	rm -rf compileUtilsTests runUtilsTests
