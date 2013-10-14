@@ -104,10 +104,12 @@ AC_SUBST(RECORDER_JAR, FCJRecorder.jar)
 AC_SUBST(SIGN_IN_JAR, FCJTestSignIn.jar)
 AC_SUBST(DEP_HAND_JAR, DependencyHandler.jar)
 AC_SUBST(JAVA_GEN_JAR, FCJJavaGen.jar)
+AC_SUBST(CODE_GEN_JAR, FCJGeneratePackets.jar)
 
 AC_CONFIG_FILES([Makefile]
  [GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java]
  [javaGen.manifest]
+ [codeGen.manifest]
  [fcr.manifest]
  [signIn.manifest]
  [inspectTrace]
