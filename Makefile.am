@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 include $(top_srcdir)/DependencyHandler/source_code.list
 include $(top_srcdir)/Core/source_code.list
 include $(top_srcdir)/Utility/source_code.list
