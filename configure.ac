@@ -80,7 +80,7 @@ AC_ARG_ENABLE(sourcecode,
 
 # Where to put the generated code by default
 AC_SUBST(GENERATED_SOURCE_FOLDER, FromFreeciv/$VERSION_NAME)
-AC_SUBST(GENERATED_TEST_SOURCE_FOLDER, Tests/GeneratedTestPeers)
+AC_SUBST(GENERATED_TEST_SOURCE_FOLDER, LegacyTests/GeneratedTestPeers)
 
 # TODO: Change to autotool's system
 AC_SUBST(WORK_FOLDER, out)
@@ -91,7 +91,7 @@ AC_SUBST(COMPILED_UTILS_FOLDER, ${WORK_FOLDER}/utils)
 AC_SUBST(COMPILED_JAVA_GENERATOR_FOLDER, ${WORK_FOLDER}/JavaGenerator)
 AC_SUBST(COMPILED_DEPENDENCY_FOLDER, ${WORK_FOLDER}/Dependency)
 AC_SUBST(COMPILED_GENERATOR_FOLDER, ${WORK_FOLDER}/GeneratePackages)
-AC_SUBST(COMPILED_TESTS_FOLDER, ${WORK_FOLDER}/Tests)
+AC_SUBST(COMPILED_TESTS_FOLDER, ${WORK_FOLDER}/LegacyTests)
 AC_SUBST(COMPILED_FROM_FREECIV_FOLDER, ${WORK_FOLDER}/VersionCode)
 AC_SUBST(COMPILED_TEST_SIGN_IN_FOLDER, ${WORK_FOLDER}/SignInTest)
 AC_SUBST(COMPILED_RECORDER_FOLDER, ${WORK_FOLDER}/FreecivRecorder)
@@ -102,9 +102,14 @@ AC_SUBST(UTILS_JAR, FCJUtils.jar)
 AC_SUBST(FREECIV_VERSION_JAR, FCJFreecivVersion-${VERSION_NAME}.jar)
 AC_SUBST(RECORDER_JAR, FCJRecorder.jar)
 AC_SUBST(SIGN_IN_JAR, FCJTestSignIn.jar)
+AC_SUBST(DEP_HAND_JAR, DependencyHandler.jar)
+AC_SUBST(JAVA_GEN_JAR, FCJJavaGen.jar)
+AC_SUBST(CODE_GEN_JAR, FCJGeneratePackets.jar)
 
 AC_CONFIG_FILES([Makefile]
  [GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java]
+ [javaGen.manifest]
+ [codeGen.manifest]
  [fcr.manifest]
  [signIn.manifest]
  [inspectTrace]
