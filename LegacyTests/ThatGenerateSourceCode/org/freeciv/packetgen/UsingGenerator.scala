@@ -30,8 +30,8 @@ class UsingGenerator {
 
 object UsingGenerator {
   def simple(generated_test_source_folder: String) {
-    var full = new GeneratePackets("Tests/ThatGenerateSourceCode/simple/simple.xml",
-      "Tests/ThatGenerateSourceCode/",
+    var full = new GeneratePackets("LegacyTests/ThatGenerateSourceCode/simple/simple.xml",
+      "LegacyTests/ThatGenerateSourceCode/",
       List[(String, String)](),
       GeneratorDefaults.LOG_TO,
       false)
@@ -39,8 +39,8 @@ object UsingGenerator {
   }
 
   def caps(generated_test_source_folder: String) {
-    var full = new GeneratePackets("Tests/ThatGenerateSourceCode/capabilities/capabilities.xml",
-      "Tests/ThatGenerateSourceCode/",
+    var full = new GeneratePackets("LegacyTests/ThatGenerateSourceCode/capabilities/capabilities.xml",
+      "LegacyTests/ThatGenerateSourceCode/",
       List[(String, String)](),
       GeneratorDefaults.LOG_TO,
       false)

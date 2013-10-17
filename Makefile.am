@@ -57,8 +57,8 @@ sourceFromFreeciv: @CODE_GEN_JAR@
 	${JAR} cf @FREECIV_VERSION_JAR@ -C ${COMPILED_FROM_FREECIV_FOLDER} \.
 
 compileTestPeerGenerator: @CORE_JAR@ @CODE_GEN_JAR@ folderTestOut
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find Tests/ThatGenerateSourceCode -iname "*.java"`
-	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find Tests/ThatGenerateSourceCode -iname "*.scala"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find LegacyTests/ThatGenerateSourceCode -iname "*.java"`
+	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find LegacyTests/ThatGenerateSourceCode -iname "*.scala"`
 	touch compileTestPeerGenerator
 
 sourceTestPeers: compileTestPeerGenerator
@@ -80,9 +80,9 @@ folderTestOut: workFolder
 	touch folderTestOut
 
 compileTestsOfGenerator: folderTestOut @CODE_GEN_JAR@
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:${JUNIT_CPF} `find Tests/OfOtherCode/com/ -iname "*.java"`
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:${JUNIT_CPF} `find Tests/OfOtherCode/org/freeciv/packetgen/ -iname "*.java"`
-	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfOtherCode/org/freeciv/packetgen/ -iname "*.scala"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/com/ -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/packetgen/ -iname "*.java"`
+	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find LegacyTests/OfOtherCode/org/freeciv/packetgen/ -iname "*.scala"`
 	touch compileTestsOfGenerator
 
 runTestsOfGenerator: compileTestsOfGenerator
@@ -104,7 +104,7 @@ runTestsOfGenerator: compileTestsOfGenerator
 	touch runTestsOfGenerator
 
 compileTestGeneratedCode: compileTestPeers folderTestOut
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find Tests/OfGeneratedCode/ -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find LegacyTests/OfGeneratedCode/ -iname "*.java"`
 	touch compileTestGeneratedCode
 
 @SIGN_IN_JAR@: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
@@ -130,7 +130,7 @@ runProxyRecorer: @RECORDER_JAR@
 	sh proxyRecorder && touch runProxyRecorer
 
 compileConnectionTests: folderTestOut @CORE_JAR@
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find Tests/OfOtherCode/org/freeciv/connection/ -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/connection/ -iname "*.java"`
 	touch compileConnectionTests
 
 runConnectionTests: compileConnectionTests
@@ -144,7 +144,7 @@ runConnectionTests: compileConnectionTests
 	touch @UTILS_JAR@
 
 compileUtilsTests: folderTestOut @UTILS_JAR@
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find Tests/OfOtherCode/org/freeciv/utility/ -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/utility/ -iname "*.java"`
 	touch compileUtilsTests
 
 runUtilsTests: compileUtilsTests
@@ -155,8 +155,8 @@ runUtilsTests: compileUtilsTests
 	touch runUtilsTests
 
 compilePacketTest: folderTestOut @CORE_JAR@
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find Tests/OfOtherCode/org/freeciv/packet/ -iname "*.java"`
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find Tests/OfOtherCode/org/freeciv/types/ -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/packet/ -iname "*.java"`
+	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/types/ -iname "*.java"`
 	touch compilePacketTest
 
 runPacketTest: compilePacketTest
