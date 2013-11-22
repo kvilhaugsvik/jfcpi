@@ -28,3 +28,6 @@ echo $scala_src >> $outputFile
 echo "${scanFolder}_src = \${${scanFolder}_java_src} \${${scanFolder}_scala_src}" >> $outputFile
 
 echo "" >> $outputFile
+
+echo "COMPILED_${scanFolder}_FOLDER = @WORK_FOLDER@/${scanFolder}" >> $outputFile
+echo "" >> $outputFile

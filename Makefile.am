@@ -26,26 +26,26 @@ workFolder:
 	touch workFolder
 
 @CORE_JAR@: workFolder ${Core_src}
-	mkdir -p ${COMPILED_CORE_FOLDER}
-	${JAVAC} -d ${COMPILED_CORE_FOLDER} ${Core_java_src}
-	${JAR} cf @CORE_JAR@ -C ${COMPILED_CORE_FOLDER} \.
+	mkdir -p ${COMPILED_Core_FOLDER}
+	${JAVAC} -d ${COMPILED_Core_FOLDER} ${Core_java_src}
+	${JAR} cf @CORE_JAR@ -C ${COMPILED_Core_FOLDER} \.
 
 @JAVA_GEN_JAR@: @CORE_JAR@ @UTILS_JAR@ javaGen.manifest ${JavaGenerator_src}
-	mkdir -p ${COMPILED_JAVA_GENERATOR_FOLDER}
-	${JAVAC} -cp @CORE_JAR@:@UTILS_JAR@ -d ${COMPILED_JAVA_GENERATOR_FOLDER} ${JavaGenerator_java_src}
-	${JAR} cfm @JAVA_GEN_JAR@ javaGen.manifest -C ${COMPILED_JAVA_GENERATOR_FOLDER} \.
+	mkdir -p ${COMPILED_JavaGenerator_FOLDER}
+	${JAVAC} -cp @CORE_JAR@:@UTILS_JAR@ -d ${COMPILED_JavaGenerator_FOLDER} ${JavaGenerator_java_src}
+	${JAR} cfm @JAVA_GEN_JAR@ javaGen.manifest -C ${COMPILED_JavaGenerator_FOLDER} \.
 
 @DEP_HAND_JAR@: workFolder ${DependencyHandler_src}
-	mkdir -p ${COMPILED_DEPENDENCY_FOLDER}
-	${JAVAC} -d ${COMPILED_DEPENDENCY_FOLDER} ${DependencyHandler_java_src}
-	${JAR} cf @DEP_HAND_JAR@ -C ${COMPILED_DEPENDENCY_FOLDER} \.
+	mkdir -p ${COMPILED_DependencyHandler_FOLDER}
+	${JAVAC} -d ${COMPILED_DependencyHandler_FOLDER} ${DependencyHandler_java_src}
+	${JAR} cf @DEP_HAND_JAR@ -C ${COMPILED_DependencyHandler_FOLDER} \.
 
 @CODE_GEN_JAR@: @CORE_JAR@ @UTILS_JAR@ @JAVA_GEN_JAR@ @DEP_HAND_JAR@ codeGen.manifest ${GeneratePackets_src} GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java packetsExtract
 	chmod +x packetsExtract
-	mkdir -p ${COMPILED_GENERATOR_FOLDER}
-	${JAVAC} -cp @CORE_JAR@:${SCALA_STDLIB_CPF}:@JAVA_GEN_JAR@:@DEP_HAND_JAR@ -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_java_src_defaults}
-	${SCALAC} -classpath ${COMPILED_GENERATOR_FOLDER}:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:@UTILS_JAR@ -d ${COMPILED_GENERATOR_FOLDER} ${GeneratePackets_scala_src}
-	${JAR} cfm @CODE_GEN_JAR@ codeGen.manifest -C ${COMPILED_GENERATOR_FOLDER} \.
+	mkdir -p ${COMPILED_GeneratePackets_FOLDER}
+	${JAVAC} -cp @CORE_JAR@:${SCALA_STDLIB_CPF}:@JAVA_GEN_JAR@:@DEP_HAND_JAR@ -d ${COMPILED_GeneratePackets_FOLDER} ${GeneratePackets_java_src_defaults}
+	${SCALAC} -classpath ${COMPILED_GeneratePackets_FOLDER}:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:@UTILS_JAR@ -d ${COMPILED_GeneratePackets_FOLDER} ${GeneratePackets_scala_src}
+	${JAR} cfm @CODE_GEN_JAR@ codeGen.manifest -C ${COMPILED_GeneratePackets_FOLDER} \.
 
 sourceFromFreeciv: @CODE_GEN_JAR@
 	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${IGNORE_ISSUES} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
@@ -109,9 +109,9 @@ compileTestGeneratedCode: compileTestPeers folderTestOut
 
 @SIGN_IN_JAR@: @FREECIV_VERSION_JAR@ @UTILS_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
 	chmod +x testSignInToServer
-	mkdir -p ${COMPILED_TEST_SIGN_IN_FOLDER}
-	${JAVAC} -d ${COMPILED_TEST_SIGN_IN_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:@FREECIV_VERSION_JAR@ ${SignInTest_java_src}
-	${JAR} cfem @SIGN_IN_JAR@ org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_TEST_SIGN_IN_FOLDER} \.
+	mkdir -p ${COMPILED_SignInTest_FOLDER}
+	${JAVAC} -d ${COMPILED_SignInTest_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:@FREECIV_VERSION_JAR@ ${SignInTest_java_src}
+	${JAR} cfem @SIGN_IN_JAR@ org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_SignInTest_FOLDER} \.
 
 # not included in tests since it needs a running Freeciv server
 runtestsignintoserver: @SIGN_IN_JAR@
@@ -121,9 +121,9 @@ runtestsignintoserver: @SIGN_IN_JAR@
 	chmod +x inspectTrace
 	chmod +x proxyRecorder
 	chmod +x playRecord
-	mkdir -p ${COMPILED_RECORDER_FOLDER}
-	${JAVAC} -d ${COMPILED_RECORDER_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:@FREECIV_VERSION_JAR@ ${FreecivRecorder_java_src}
-	${JAR} cfm @RECORDER_JAR@ fcr.manifest -C ${COMPILED_RECORDER_FOLDER} \.
+	mkdir -p ${COMPILED_FreecivRecorder_FOLDER}
+	${JAVAC} -d ${COMPILED_FreecivRecorder_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:@FREECIV_VERSION_JAR@ ${FreecivRecorder_java_src}
+	${JAR} cfm @RECORDER_JAR@ fcr.manifest -C ${COMPILED_FreecivRecorder_FOLDER} \.
 
 # not included in tests since it needs a running Freeciv server and client
 runProxyRecorer: @RECORDER_JAR@
@@ -138,9 +138,9 @@ runConnectionTests: compileConnectionTests
 	touch runConnectionTests
 
 @UTILS_JAR@: workFolder @CORE_JAR@ ${Utility_src}
-	mkdir -p ${COMPILED_UTILS_FOLDER}
-	${JAVAC} -cp @CORE_JAR@ -d ${COMPILED_UTILS_FOLDER} ${Utility_java_src}
-	${JAR} cf @UTILS_JAR@ -C ${COMPILED_UTILS_FOLDER} \.
+	mkdir -p ${COMPILED_Utility_FOLDER}
+	${JAVAC} -cp @CORE_JAR@ -d ${COMPILED_Utility_FOLDER} ${Utility_java_src}
+	${JAR} cf @UTILS_JAR@ -C ${COMPILED_Utility_FOLDER} \.
 	touch @UTILS_JAR@
 
 compileUtilsTests: folderTestOut @UTILS_JAR@
@@ -189,7 +189,7 @@ clean-local:
 	rm -rf runTests tests
 	rm -rf folderTestOut ${COMPILED_TESTS_FOLDER}
 	rm -rf ${GENERATED_TEST_SOURCE_FOLDER} sourceTestPeers
-	rm -rf ${COMPILED_TEST_SIGN_IN_FOLDER}
+	rm -rf ${COMPILED_SignInTest_FOLDER}
 	rm -f all
 	rm -f code
 	rm -rf runtestsignintoserver
@@ -199,13 +199,13 @@ clean-local:
 	rm -rf runProxyRecorer
 	rm -rf @RECORDER_JAR@
 	rm -rf compileUtilsTests runUtilsTests
-	rm -rf ${COMPILED_CORE_FOLDER}
+	rm -rf ${COMPILED_Core_FOLDER}
 	rm -rf @CORE_JAR@
-	rm -rf ${COMPILED_UTILS_FOLDER}
+	rm -rf ${COMPILED_Utility_FOLDER}
 	rm -rf @UTILS_JAR@
-	rm -rf ${COMPILED_JAVA_GENERATOR_FOLDER} @JAVA_GEN_JAR@
-	rm -rf ${COMPILED_DEPENDENCY_FOLDER} @DEP_HAND_JAR@
+	rm -rf ${COMPILED_JavaGenerator_FOLDER} @JAVA_GEN_JAR@
+	rm -rf ${COMPILED_DependencyHandler_FOLDER} @DEP_HAND_JAR@
 	rm -rf @CODE_GEN_JAR@
-	rm -rf ${COMPILED_GENERATOR_FOLDER}
+	rm -rf ${COMPILED_GeneratePackets_FOLDER}
 	rm -rf ${GENERATED_SOURCE_FOLDER} sourceFromFreeciv
 	rm -rf ${WORK_FOLDER} workFolder
