@@ -36,10 +36,8 @@ configure
 install-sh
 missing
 
-# while waiting for my modifications to be accepted in the GNU Autoconf Archive
-m4/ax_xtra_classpath.m4
-m4/ax_try_compile_java.m4
-m4/ax_try_run_java.m4
+# submit modifications to the GNU Autoconf Archive
+m4/*.m4
 
 # Generated before make
 */source_code.list
