@@ -101,9 +101,6 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         Var<AString> paramToStrName = Var.param(String.class, "toStringName");
         Var<ABool> paramValid = Var.param(boolean.class, "valid");
         addMethod(Method.newConstructor(Comment.no(),
-                Visibility.PRIVATE, Arrays.asList(paramNumber, paramToStrName),
-                new Block(BuiltIn.thisConstr(paramNumber.ref(), paramToStrName.ref(), TRUE))));
-        addMethod(Method.newConstructor(Comment.no(),
                 Visibility.PRIVATE, Arrays.asList(paramNumber, paramToStrName, paramValid),
                 new Block(fieldNumber.assign(paramNumber.ref()),
                         fieldToStringName.assign(paramToStrName.ref()),
@@ -309,14 +306,10 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
 
         private static Typed<? extends AValue>[] parList(IntExpression valueGen, String toStringName, boolean valid) {
             Typed<? extends AValue>[] out;
-            if (valid) {
-                out = new Typed[2];
-            } else {
-                out = new Typed[3];
-                out[2] = valid ? BuiltIn.TRUE : BuiltIn.FALSE;
-            }
+            out = new Typed[3];
             out[0] = valueGen;
             out[1] = BuiltIn.<AString>toCode(toStringName);
+            out[2] = valid ? BuiltIn.TRUE : BuiltIn.FALSE;
             return out;
         }
 

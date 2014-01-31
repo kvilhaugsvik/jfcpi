@@ -721,19 +721,15 @@ enum implicitFirst {
 
 @javax.annotation.Generated(comments = "Auto generated from Freeciv C code", value = "com.kvilhaugsvik.javaGenerator.ClassWriter")
 public enum test implements org.freeciv.types.FCEnum {
-	ONE(0, "ONE"),
-	TWO(1, "TWO"),
-	THREE(2, "THREE"),
+	ONE(0, "ONE", true),
+	TWO(1, "TWO", true),
+	THREE(2, "THREE", true),
 	ELEMENTS(3, "ELEMENTS", false),
 	INVALID(-2, "INVALID", false);
 
 	private final int number;
 	private final boolean valid;
 	private final java.lang.String toStringName;
-
-	private test(int number, java.lang.String toStringName) {
-		this(number, toStringName, true);
-	}
 
 	private test(int number, java.lang.String toStringName, boolean valid) {
 		this.number = number;

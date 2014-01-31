@@ -233,13 +233,13 @@ public class EnumTest {
 
     @Test public void testEnumElement() {
         assertEquals("Generated source not as expected",
-                "ONE(1, \"one\")",
+                "ONE(1, \"one\", true)",
                 newEnumValue("ONE", 1, "\"one\"").toString());
     }
 
     @Test public void testEnumElementNoToStringButOkEntryPoint() {
         assertEquals("Generated source not as expected",
-                "ONE(1, \"ONE\")",
+                "ONE(1, \"ONE\", true)",
                 newEnumValue("ONE", 1).toString());
     }
 
@@ -263,7 +263,7 @@ public class EnumTest {
 
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
-                "/* An integer */ ONE(1, \"one\")",
+                "/* An integer */ ONE(1, \"one\", true)",
                 newEnumValue(Comment.c("An integer"), "ONE", 1, "\"one\"").toString());
     }
 
