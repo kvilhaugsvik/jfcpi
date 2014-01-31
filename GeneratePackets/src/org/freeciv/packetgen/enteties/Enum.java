@@ -44,7 +44,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
     private final EnumElementFC countElement;
 
     protected Enum(String enumName, boolean nameOverride, boolean bitwise,
-                   String cntCode, String cntString, Collection<Requirement> reqs,
+                   String cntCode, Typed<? extends AString> cntString, Collection<Requirement> reqs,
                 List<EnumElementFC> values) {
         super(ClassKind.ENUM, TargetPackage.from(FCEnum.class.getPackage()), Imports.are(), "Freeciv C code", Collections.<Annotate>emptyList(), enumName,
                 DEFAULT_PARENT, Arrays.asList(TargetClass.from(FCEnum.class)));
@@ -149,10 +149,10 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
     }
 
     public static Enum specEnumCountNotNamed(String enumName, boolean nameOverride, String cntCode, List<EnumElementFC> values) {
-        return specEnumCountNamed(enumName, nameOverride, cntCode, '"' + cntCode + '"', values);
+        return specEnumCountNamed(enumName, nameOverride, cntCode, BuiltIn.literal(cntCode), values);
     }
 
-    public static Enum specEnumCountNamed(String enumName, boolean nameOverride, String cntCode, String cntString, List<EnumElementFC> values) {
+    public static Enum specEnumCountNamed(String enumName, boolean nameOverride, String cntCode, Typed<? extends AString> cntString, List<EnumElementFC> values) {
         return new Enum(enumName, nameOverride, false, cntCode, cntString, Collections.<Requirement>emptySet(), values);
     }
 
@@ -248,7 +248,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
     public static class EnumElementKnowsNumber extends EnumElementFC {
         private final int number;
 
-        EnumElementKnowsNumber(Comment comment, String elementName, int number, String toStringName, boolean valid) {
+        EnumElementKnowsNumber(Comment comment, String elementName, int number, Typed<? extends AString> toStringName, boolean valid) {
             super(comment, elementName, IntExpression.integer(number + ""), toStringName, valid);
 
             if (null == elementName)
@@ -266,33 +266,33 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         }
 
         public static EnumElementKnowsNumber newEnumValue(String enumValueName, int number) {
-            return newEnumValue(enumValueName, number, '"' + enumValueName + '"');
+            return newEnumValue(enumValueName, number, BuiltIn.literal(enumValueName));
         }
 
-        public static EnumElementKnowsNumber newEnumValue(String enumValueName, int number, String toStringName) {
+        public static EnumElementKnowsNumber newEnumValue(String enumValueName, int number, Typed<? extends AString> toStringName) {
             return newEnumValue(Comment.no(), enumValueName, number, toStringName);
         }
 
         public static EnumElementKnowsNumber newEnumValue(Comment comment, String enumValueName, int number,
-                                                   String toStringName) {
+                                                          Typed<? extends AString> toStringName) {
             return new EnumElementKnowsNumber(comment, enumValueName, number, toStringName, true);
         }
 
         public static EnumElementKnowsNumber newInvalidEnum(int value) {
-            return newInvalidEnum("INVALID", "\"INVALID\"", value);
+            return newInvalidEnum("INVALID", BuiltIn.literal("INVALID"), value);
         }
 
-        public static EnumElementKnowsNumber newInvalidEnum(String nameInCode, String toStringName, int value) {
+        public static EnumElementKnowsNumber newInvalidEnum(String nameInCode, Typed<? extends AString> toStringName, int value) {
             return new EnumElementKnowsNumber(Comment.no(), nameInCode, value, toStringName, false);
         }
     }
 
     public static class EnumElementFC extends EnumElement {
         private final IntExpression valueGen;
-        private final String toStringName;
+        private final Typed<? extends AString> toStringName;
         private final boolean valid;
 
-        protected EnumElementFC(Comment comment, String elementName, IntExpression valueGen, String toStringName, boolean valid) {
+        protected EnumElementFC(Comment comment, String elementName, IntExpression valueGen, Typed<? extends AString> toStringName, boolean valid) {
             super(comment, elementName, parList(valueGen, toStringName, valid));
 
             // Look up numbers in a uniform way
@@ -304,11 +304,11 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
             this.valid = valid;
         }
 
-        private static Typed<? extends AValue>[] parList(IntExpression valueGen, String toStringName, boolean valid) {
+        private static Typed<? extends AValue>[] parList(IntExpression valueGen, Typed<? extends AString> toStringName, boolean valid) {
             Typed<? extends AValue>[] out;
             out = new Typed[3];
             out[0] = valueGen;
-            out[1] = BuiltIn.<AString>toCode(toStringName);
+            out[1] = toStringName;
             out[2] = valid ? BuiltIn.TRUE : BuiltIn.FALSE;
             return out;
         }
@@ -317,8 +317,9 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
             return valueGen.toString();
         }
 
+        /* Only for UI/test use */
         public String getToStringName() {
-            return toStringName;
+            return toStringName.toString();
         }
 
         public boolean isValid() {
@@ -330,10 +331,10 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         }
 
         public static EnumElementFC newEnumValue(Comment comment, String enumValueName, IntExpression number) {
-            return newEnumValue(comment, enumValueName, number, "\"" + enumValueName + "\"");
+            return newEnumValue(comment, enumValueName, number, BuiltIn.literal(enumValueName));
         }
 
-        public static EnumElementFC newEnumValue(Comment comment, String enumValueName, IntExpression number, String toStringName) {
+        public static EnumElementFC newEnumValue(Comment comment, String enumValueName, IntExpression number, Typed<? extends AString> toStringName) {
             return new EnumElementFC(comment, enumValueName, number, toStringName, true);
         }
     }

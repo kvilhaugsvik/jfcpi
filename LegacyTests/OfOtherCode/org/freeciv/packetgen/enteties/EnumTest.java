@@ -19,6 +19,7 @@ import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import com.kvilhaugsvik.javaGenerator.Comment;
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.junit.Test;
 
 import java.util.*;
@@ -85,7 +86,7 @@ public class EnumTest {
 
     private Enum enumWithValues() {
         return Enum.specEnumBitwise("test", false, false, Arrays.<Enum.EnumElementFC>asList(
-                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ZERO", 0, BuiltIn.literal("nothing")),
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2)));
     }
@@ -147,7 +148,7 @@ public class EnumTest {
 
     @Test public void enumCount() {
         Enum result = Enum.specEnumCountNotNamed("test", false, "ELEMENTS", Arrays.<Enum.EnumElementFC>asList(
-                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ZERO", 0, BuiltIn.literal("nothing")),
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2)));
         assertNotNull("Counting element not added", result.getCount());
@@ -159,7 +160,7 @@ public class EnumTest {
 
     @Test public void enumCount2Elements() {
         Enum result = Enum.specEnumCountNotNamed("test", false, "ELEMENTS", Arrays.<Enum.EnumElementFC>asList(
-                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ZERO", 0, BuiltIn.literal("nothing")),
                 newEnumValue("ONE", 1)));
         assertNotNull("Counting element not added", result.getCount());
         assertFalse("Counting element should be invalid", result.getCount().isValid());
@@ -169,8 +170,8 @@ public class EnumTest {
     }
 
     @Test public void enumCountNamed() {
-        Enum result = Enum.specEnumCountNamed("test", false, "ELEMENTS", "\"the elements\"", Arrays.<Enum.EnumElementFC>asList(
-                newEnumValue("ZERO", 0, "\"nothing\""),
+        Enum result = Enum.specEnumCountNamed("test", false, "ELEMENTS", BuiltIn.literal("the elements"), Arrays.<Enum.EnumElementFC>asList(
+                newEnumValue("ZERO", 0, BuiltIn.literal("nothing")),
                 newEnumValue("ONE", 1)));
         assertNotNull("Counting element not added", result.getCount());
         assertFalse("Counting element should be invalid", result.getCount().isValid());
@@ -181,14 +182,14 @@ public class EnumTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void enumCountBitwiseSpecified() {
-        Enum result = new Enum("test", false, true, "ELEMENTS", "\"the elements\"", Collections.<Requirement>emptySet(),
+        Enum result = new Enum("test", false, true, "ELEMENTS", BuiltIn.literal("the elements"), Collections.<Requirement>emptySet(),
                 Arrays.<Enum.EnumElementFC>asList(newEnumValue("ONE", 1)));
     }
 
     @Test public void enumInvalidBitwise() {
         Enum result = Enum.specEnumBitwise("test", false, true, Arrays.<Enum.EnumElementFC>asList(
                 newInvalidEnum(-2),
-                newEnumValue("ZERO", 0, "\"nothing\""),
+                newEnumValue("ZERO", 0, BuiltIn.literal("nothing")),
                 newEnumValue("ONE", 1),
                 newEnumValue("TWO", 2)));
         assertNotNull("Invalid element not added", result.getInvalidDefault());
@@ -234,7 +235,7 @@ public class EnumTest {
     @Test public void testEnumElement() {
         assertEquals("Generated source not as expected",
                 "ONE(1, \"one\", true)",
-                newEnumValue("ONE", 1, "\"one\"").toString());
+                newEnumValue("ONE", 1, BuiltIn.literal("one")).toString());
     }
 
     @Test public void testEnumElementNoToStringButOkEntryPoint() {
@@ -258,20 +259,20 @@ public class EnumTest {
     @Test public void testEnumElementCount() {
         assertEquals("Generated source not as expected",
                 "NUMBEROFF(64, \"number off\", false)",
-                newInvalidEnum("NUMBEROFF", "\"number off\"", 64).toString());
+                newInvalidEnum("NUMBEROFF", BuiltIn.literal("number off"), 64).toString());
     }
 
     @Test public void testEnumElementCommented() {
         assertEquals("Generated source not as expected",
                 "/* An integer */ ONE(1, \"one\", true)",
-                newEnumValue(Comment.c("An integer"), "ONE", 1, "\"one\"").toString());
+                newEnumValue(Comment.c("An integer"), "ONE", 1, BuiltIn.literal("one")).toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEnumElementNoName() {
         assertEquals("Generated source not as expected",
                 "ONE(1, \"one\")",
-                newEnumValue(null, 1, "\"one\"").toString());
+                newEnumValue(null, 1, BuiltIn.literal("one")).toString());
     }
 
     @Test(expected = IllegalArgumentException.class)

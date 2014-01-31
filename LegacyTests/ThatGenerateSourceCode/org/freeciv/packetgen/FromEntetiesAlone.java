@@ -340,7 +340,7 @@ public class FromEntetiesAlone {
     public static void writeEnumSimple(String targetFolder) throws IOException {
         Enum test = Enum.specEnumBitwise("test", false, false, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("one", 1),
-                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("two", 2, BuiltIn.literal("2nd")),
                 newEnumValue("three", 3),
                 newInvalidEnum(-3)));
 
@@ -355,7 +355,7 @@ public class FromEntetiesAlone {
     public static void writeEnumDefaultInvalid(String targetFolder) throws IOException {
         Enum testDefaultInvalid = Enum.specEnumBitwise("testDefaultInvalid", false, false, Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("one", 1),
-                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("two", 2, BuiltIn.literal("2nd")),
                 newEnumValue("three", 3)));
 
         writeJavaFile(testDefaultInvalid, targetFolder);
@@ -375,10 +375,10 @@ public class FromEntetiesAlone {
     }
 
     private static Enum createEnumNameCount() {
-        return Enum.specEnumCountNamed("testCount", false, "COUNT", "\"numbers listed\"", Arrays.<Enum.EnumElementFC>asList(
+        return Enum.specEnumCountNamed("testCount", false, "COUNT", BuiltIn.literal("numbers listed"), Arrays.<Enum.EnumElementFC>asList(
                 newEnumValue("zero", 0),
                 newEnumValue("one", 1),
-                newEnumValue("two", 2, "\"2nd\""),
+                newEnumValue("two", 2, BuiltIn.literal("2nd")),
                 newEnumValue("three", 3)));
     }
 

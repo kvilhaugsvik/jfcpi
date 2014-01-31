@@ -135,13 +135,14 @@ object ParseCCode extends ExtractableParser {
           else
             specenumnumber
           if (enumerations.contains(key + NAME))
-            newEnumValue(nameInCode, inCodeNumber, enumerations.get(key + NAME).get)
+            newEnumValue(nameInCode, inCodeNumber, BuiltIn.toCode[AString](enumerations.get(key + NAME).get))
           else
             newEnumValue(nameInCode, inCodeNumber)
         }).toSeq: _*)
       if (enumerations.contains("ZERO"))
         if (enumerations.contains("ZERO" + NAME))
-          outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0, enumerations.get("ZERO" + NAME).get)
+          outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0,
+            BuiltIn.toCode[AString](enumerations.get("ZERO" + NAME).get))
         else
           outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
       if (enumerations.contains("INVALID"))
@@ -153,7 +154,7 @@ object ParseCCode extends ExtractableParser {
       val out = if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
           Enum.specEnumCountNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
-            enumerations.get("COUNT" + NAME).get, sortedEnumValues.asJava)
+            BuiltIn.toCode[AString](enumerations.get("COUNT" + NAME).get), sortedEnumValues.asJava)
         else
           Enum.specEnumCountNotNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
             sortedEnumValues.asJava)
