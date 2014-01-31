@@ -47,4 +47,9 @@ public class WrapCodeString<Returns extends Returnable> implements HasAtoms, Typ
     public int hashCode() {
         return javaCode.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return javaCode;
+    }
 }
