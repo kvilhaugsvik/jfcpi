@@ -60,8 +60,17 @@ public class MissingItemExplained implements Comparable<MissingItemExplained> {
     @Override
     public int compareTo(MissingItemExplained missingItemExplained) {
         // TODO: When claimed to be same check blames as well
-        // TODO: Override equals
         return missing.compareTo(missingItemExplained.missing);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof MissingItemExplained) {
+            MissingItemExplained that = (MissingItemExplained)other;
+            return this.missing.equals(that.missing);
+        } else {
+            return false;
+        }
     }
 
     public static class Blame {
