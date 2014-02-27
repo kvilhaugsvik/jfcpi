@@ -30,6 +30,20 @@ workFolder:
 	${JAVAC} -d ${COMPILED_Core_FOLDER} ${Core_java_src}
 	${JAR} cf @CORE_JAR@ -C ${COMPILED_Core_FOLDER} \.
 
+${COMPILED_Core_TEST_FOLDER}/compile: @CORE_JAR@ ${Core_java_test_src}
+	mkdir -p ${COMPILED_Core_TEST_FOLDER}
+	${JAVAC} -cp @CORE_JAR@:${JUNIT_CPF} -d ${COMPILED_Core_TEST_FOLDER} ${Core_java_test_src}
+	touch ${COMPILED_Core_TEST_FOLDER}/compile
+
+${COMPILED_Core_TEST_FOLDER}/run: ${COMPILED_Core_TEST_FOLDER}/compile
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packet.ElementsLimitTest
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packet.HeaderTest
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packet.PacketTest
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.types.TestUnderstoodBitVector
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.utility.TestEternalZero
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.utility.TestValidation
+	touch ${COMPILED_Core_TEST_FOLDER}/run
+
 @JAVA_GEN_JAR@: @CORE_JAR@ @UTILS_JAR@ javaGen.manifest ${JavaGenerator_src}
 	mkdir -p ${COMPILED_JavaGenerator_FOLDER}
 	${JAVAC} -cp @CORE_JAR@:@UTILS_JAR@ -d ${COMPILED_JavaGenerator_FOLDER} ${JavaGenerator_java_src}
@@ -176,30 +190,7 @@ ${COMPILED_Utility_TEST_FOLDER}/run: ${COMPILED_Utility_TEST_FOLDER}/compile  @C
 	${JAVA} -cp ${COMPILED_Utility_TEST_FOLDER}:@UTILS_JAR@:${JUNIT_CPF}:@CORE_JAR@ org.junit.runner.JUnitCore org.freeciv.utility.TestSettings
 	touch ${COMPILED_Utility_TEST_FOLDER}/run
 
-# only tests for core
-compileUtilsTests: folderTestOut @UTILS_JAR@
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/utility/ -iname "*.java"`
-	touch compileUtilsTests
-
-# depend on ${COMPILED_Utility_TEST_FOLDER}/run so the parts outside core is tested too
-runUtilsTests: compileUtilsTests ${COMPILED_Utility_TEST_FOLDER}/run
-	${JAVA} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestValidation
-	${JAVA} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestEternalZero
-	touch runUtilsTests
-
-compilePacketTest: folderTestOut @CORE_JAR@
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/packet/ -iname "*.java"`
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/types/ -iname "*.java"`
-	touch compilePacketTest
-
-runPacketTest: compilePacketTest
-	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.PacketTest
-	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.HeaderTest
-	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.ElementsLimitTest
-	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.types.TestUnderstoodBitVector
-	touch runPacketTest
-
-runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnectionTests runUtilsTests
+runTests: compileTestGeneratedCode runTestsOfGenerator ${COMPILED_Core_TEST_FOLDER}/run runConnectionTests ${COMPILED_Utility_TEST_FOLDER}/run
 	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingEntetiesAlone
 	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingFullGenerator
 	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.ProtoData
@@ -211,7 +202,6 @@ runTests: compileTestGeneratedCode runTestsOfGenerator runPacketTest runConnecti
 	touch runTests
 
 clean-local:
-	rm -rf runPacketTest compilePacketTest
 	rm -rf runConnectionTests compileConnectionTests
 	rm -rf compileTestPeerGenerator
 	rm -rf compileTestPeers
@@ -230,7 +220,6 @@ clean-local:
 	rm -rf @FREECIV_VERSION_JAR@
 	rm -rf runProxyRecorer
 	rm -rf @RECORDER_JAR@
-	rm -rf compileUtilsTests runUtilsTests
 	rm -rf ${COMPILED_Core_FOLDER}
 	rm -rf @CORE_JAR@
 	rm -rf ${COMPILED_Utility_FOLDER}
