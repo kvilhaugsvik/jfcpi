@@ -70,6 +70,26 @@ ${COMPILED_DependencyHandler_TEST_FOLDER}/run: ${COMPILED_DependencyHandler_TEST
 	${SCALAC} -classpath ${COMPILED_GeneratePackets_FOLDER}:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:@UTILS_JAR@ -d ${COMPILED_GeneratePackets_FOLDER} ${GeneratePackets_scala_src}
 	${JAR} cfm @CODE_GEN_JAR@ codeGen.manifest -C ${COMPILED_GeneratePackets_FOLDER} \.
 
+# @DEP_HAND_JAR@, @JAVA_GEN_JAR@ and @CORE_JAR@ are used by the packet generator
+${COMPILED_GeneratePackets_TEST_FOLDER}/compile: @CODE_GEN_JAR@ @DEP_HAND_JAR@ ${GeneratePackets_java_test_src}
+	mkdir -p ${COMPILED_GeneratePackets_TEST_FOLDER}
+	${JAVAC} -cp @CODE_GEN_JAR@:${JUNIT_CPF} -d ${COMPILED_GeneratePackets_TEST_FOLDER} ${GeneratePackets_java_test_src}
+	${SCALAC} -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF}:@DEP_HAND_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@ -d ${COMPILED_GeneratePackets_TEST_FOLDER} ${GeneratePackets_scala_test_src}
+	touch ${COMPILED_GeneratePackets_TEST_FOLDER}/compile
+
+# Need the Scala standard library since running compiled Scala
+${COMPILED_GeneratePackets_TEST_FOLDER}/run: ${COMPILED_GeneratePackets_TEST_FOLDER}/compile
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.EnumTest
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.FieldTypeTest
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.PacketTest
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF}:${SCALA_STDLIB_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.ParseSharedTest
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF}:${SCALA_STDLIB_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.PacketsDefParseTest
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF}:${SCALA_STDLIB_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.CParserSyntaxTest
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF}:${SCALA_STDLIB_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.CParserSemanticTest
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF}:${SCALA_STDLIB_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.FromCExtractorTest
+	touch ${COMPILED_GeneratePackets_TEST_FOLDER}/run
+
 sourceFromFreeciv: @CODE_GEN_JAR@
 	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${IGNORE_ISSUES} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
 	touch sourceFromFreeciv
@@ -102,21 +122,7 @@ folderTestOut: workFolder
 	mkdir -p ${COMPILED_TESTS_FOLDER}
 	touch folderTestOut
 
-compileTestsOfGenerator: folderTestOut @CODE_GEN_JAR@ ${COMPILED_DependencyHandler_TEST_FOLDER}/compile
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/packetgen/ -iname "*.java"`
-	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find LegacyTests/OfOtherCode/org/freeciv/packetgen/ -iname "*.scala"`
-	touch compileTestsOfGenerator
-
-runTestsOfGenerator: compileTestsOfGenerator ${COMPILED_DependencyHandler_TEST_FOLDER}/run ${COMPILED_JavaGenerator_TEST_FOLDER}/run
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.EnumTest
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:${JUNIT_CPF}:@UTILS_JAR@:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.FieldTypeTest
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:${JUNIT_CPF}:@UTILS_JAR@:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.PacketTest
-	${SCALA} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:${JUNIT_CPF}:@UTILS_JAR@:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.ParseSharedTest
-	${SCALA} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.PacketsDefParseTest
-	${SCALA} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.CParserSyntaxTest
-	${SCALA} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.CParserSemanticTest
-	${SCALA} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.FromCExtractorTest
+runTestsOfGenerator: ${COMPILED_DependencyHandler_TEST_FOLDER}/run ${COMPILED_JavaGenerator_TEST_FOLDER}/run ${COMPILED_GeneratePackets_TEST_FOLDER}/run
 	touch runTestsOfGenerator
 
 compileTestGeneratedCode: compileTestPeers folderTestOut
@@ -210,7 +216,6 @@ clean-local:
 	rm -rf compileTestPeerGenerator
 	rm -rf compileTestPeers
 	rm -rf compileTestGeneratedCode
-	rm -rf compileTestsOfGenerator
 	rm -rf runTestPeerCreationAsTests
 	rm -rf runTestsOfGenerator
 	rm -rf runTests tests
