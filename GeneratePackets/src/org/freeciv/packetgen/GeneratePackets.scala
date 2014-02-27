@@ -24,22 +24,13 @@ import com.kvilhaugsvik.dependency.{Dependency, UndefinedException}
 import org.freeciv.packetgen.enteties.{Constant, SourceFile}
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue
 
-class GeneratePackets(chosenVersion: String, sourceLocation: String,
+class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
                       requested: List[(String, String)], logger: String, devMode: Boolean) {
-  val versionConfig: VersionConfig =
-    if ("detect".equals(chosenVersion)) {
-      /* Auto detect Freeciv version */
-      println("Reading " + sourceLocation + "fc_version")
-      val vpSource: SourceFile =
-      GeneratePackets.readFileAsString(sourceLocation, "fc_version")
-      val fc_version: List[Dependency] = VariableAssignmentsExtractor.extract(vpSource)
-
-      val version: String = GeneratePackets.detectFreecivVersion(fc_version)
-      println("Source code of Freeciv " + version + " auto detected.")
-      VersionConfig.fromFile("GeneratePackets/config/" + version + ".xml")
-    } else {
-      VersionConfig.fromFile(chosenVersion)
-    }
+  def this(chosenVersion: String, sourceLocation: String,
+           requested: List[(String, String)], logger: String, devMode: Boolean) {
+    this(GeneratePackets.createVersionConfig(chosenVersion, sourceLocation),
+      sourceLocation, requested, logger, devMode)
+  }
 
   private val packetsDefRPath: String = versionConfig.inputSources("packets").head
 
@@ -223,6 +214,22 @@ object GeneratePackets {
 
     val minor = minor_str.toInt + (if ("99".equals(patch_str)) 1 else 0)
     major_str + "." + minor
+  }
+
+  private def createVersionConfig(chosenVersion: String, sourceLocation: String): VersionConfig = {
+    if ("detect".equals(chosenVersion)) {
+      /* Auto detect Freeciv version */
+      println("Reading " + sourceLocation + "fc_version")
+      val vpSource: SourceFile =
+        GeneratePackets.readFileAsString(sourceLocation, "fc_version")
+      val fc_version: List[Dependency] = VariableAssignmentsExtractor.extract(vpSource)
+
+      val version: String = GeneratePackets.detectFreecivVersion(fc_version)
+      println("Source code of Freeciv " + version + " auto detected.")
+      VersionConfig.fromFile("GeneratePackets/config/" + version + ".xml")
+    } else {
+      VersionConfig.fromFile(chosenVersion)
+    }
   }
 }
 
