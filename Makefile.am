@@ -152,13 +152,24 @@ runConnectionTests: compileConnectionTests
 	${JAR} cf @UTILS_JAR@ -C ${COMPILED_Utility_FOLDER} \.
 	touch @UTILS_JAR@
 
+${COMPILED_Utility_TEST_FOLDER}/compile: @UTILS_JAR@ ${Utility_java_test_src}
+	mkdir -p ${COMPILED_Utility_TEST_FOLDER}
+	${JAVAC} -cp @UTILS_JAR@:${JUNIT_CPF} -d ${COMPILED_Utility_TEST_FOLDER} ${Utility_java_test_src}
+	touch ${COMPILED_Utility_TEST_FOLDER}/compile
+
+# run time depend on @CORE_JAR@
+${COMPILED_Utility_TEST_FOLDER}/run: ${COMPILED_Utility_TEST_FOLDER}/compile  @CORE_JAR@
+	${JAVA} -cp ${COMPILED_Utility_TEST_FOLDER}:@UTILS_JAR@:${JUNIT_CPF}:@CORE_JAR@ org.junit.runner.JUnitCore org.freeciv.utility.TestArgumentSettings
+	${JAVA} -cp ${COMPILED_Utility_TEST_FOLDER}:@UTILS_JAR@:${JUNIT_CPF}:@CORE_JAR@ org.junit.runner.JUnitCore org.freeciv.utility.TestSettings
+	touch ${COMPILED_Utility_TEST_FOLDER}/run
+
+# only tests for core
 compileUtilsTests: folderTestOut @UTILS_JAR@
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/utility/ -iname "*.java"`
 	touch compileUtilsTests
 
-runUtilsTests: compileUtilsTests
-	${JAVA} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestArgumentSettings
-	${JAVA} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestSettings
+# depend on ${COMPILED_Utility_TEST_FOLDER}/run so the parts outside core is tested too
+runUtilsTests: compileUtilsTests ${COMPILED_Utility_TEST_FOLDER}/run
 	${JAVA} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestValidation
 	${JAVA} -cp @CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.utility.TestEternalZero
 	touch runUtilsTests
