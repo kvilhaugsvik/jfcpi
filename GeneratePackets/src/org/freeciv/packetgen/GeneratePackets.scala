@@ -131,6 +131,7 @@ object GeneratePackets {
   private val PACKETS_SHOULD_LOG_TO = "packets-should-log-to"
   private val IGNORE_PROBLEMS = "ignore-problems"
   private val GPL_SOURCE = "gpl-source"
+  private val PRINT_FILES = "print-source-files"
 
   def main(args: Array[String]) {
     val settings = new ArgumentSettings(List(
@@ -145,7 +146,9 @@ object GeneratePackets {
       new Setting.BoolSetting(GPL_SOURCE, GeneratorDefaults.NOT_DISTRIBUTED_WITH_FREECIV,
         "copy the Freeciv source code used as a source to generate Java code to the generated code's location" +
           ". This makes it easy to remember including it when the generated Java code is distributed."),
-      UI.HELP_SETTING
+      UI.HELP_SETTING,
+      new Setting.BoolSetting(PRINT_FILES, false, "print the path of the needed Freeciv source files and exit."
+        + " Nothing else is printed.")
     ), args: _*)
 
     UI.printAndExitOnHelp(settings, classOf[GeneratePackets])
@@ -154,6 +157,20 @@ object GeneratePackets {
 
     val requested: List[(String, String)] =
       ((needed \ "requested") \ "_").map(item => item.label -> item.text).toList
+
+    if (settings.getSetting[Boolean](PRINT_FILES)) {
+      val conf = GeneratePackets.createVersionConfig(
+        settings.getSetting[String](VERSION_INFORMATION),
+        settings.getSetting[String](SOURCE_CODE_LOCATION) + "/",
+        true)
+
+      val files = conf.inputSources.flatMap(_._2)
+        .map((file: String) => settings.getSetting[String](SOURCE_CODE_LOCATION) + "/" + file)
+
+      files.foreach(println(_))
+
+      return
+    }
 
     val self = new GeneratePackets(
       settings.getSetting[String](VERSION_INFORMATION),
@@ -216,16 +233,23 @@ object GeneratePackets {
     major_str + "." + minor
   }
 
-  private def createVersionConfig(chosenVersion: String, sourceLocation: String): VersionConfig = {
+  private def createVersionConfig(chosenVersion: String, sourceLocation: String,
+                                  silent: Boolean = false): VersionConfig = {
     if ("detect".equals(chosenVersion)) {
       /* Auto detect Freeciv version */
-      println("Reading " + sourceLocation + "fc_version")
+
+      if (!silent)
+        println("Reading " + sourceLocation + "fc_version")
+
       val vpSource: SourceFile =
         GeneratePackets.readFileAsString(sourceLocation, "fc_version")
       val fc_version: List[Dependency] = VariableAssignmentsExtractor.extract(vpSource)
 
       val version: String = GeneratePackets.detectFreecivVersion(fc_version)
-      println("Source code of Freeciv " + version + " auto detected.")
+
+      if (!silent)
+        println("Source code of Freeciv " + version + " auto detected.")
+
       VersionConfig.fromFile("GeneratePackets/config/" + version + ".xml")
     } else {
       VersionConfig.fromFile(chosenVersion)
