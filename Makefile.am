@@ -35,6 +35,19 @@ workFolder:
 	${JAVAC} -cp @CORE_JAR@:@UTILS_JAR@ -d ${COMPILED_JavaGenerator_FOLDER} ${JavaGenerator_java_src}
 	${JAR} cfm @JAVA_GEN_JAR@ javaGen.manifest -C ${COMPILED_JavaGenerator_FOLDER} \.
 
+${COMPILED_JavaGenerator_TEST_FOLDER}/compile: @JAVA_GEN_JAR@ ${JavaGenerator_java_test_src}
+	mkdir -p ${COMPILED_JavaGenerator_TEST_FOLDER}
+	${JAVAC} -cp @JAVA_GEN_JAR@:${JUNIT_CPF} -d ${COMPILED_JavaGenerator_TEST_FOLDER} ${JavaGenerator_java_test_src}
+	touch ${COMPILED_JavaGenerator_TEST_FOLDER}/compile
+
+${COMPILED_JavaGenerator_TEST_FOLDER}/run: ${COMPILED_JavaGenerator_TEST_FOLDER}/compile
+	${JAVA} -ea -cp ${COMPILED_JavaGenerator_TEST_FOLDER}:@JAVA_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.CodeGenTest
+	${JAVA} -ea -cp ${COMPILED_JavaGenerator_TEST_FOLDER}:@JAVA_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.TypedCodeTest
+	${JAVA} -ea -cp ${COMPILED_JavaGenerator_TEST_FOLDER}:@JAVA_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestTreeIR
+	${JAVA} -ea -cp ${COMPILED_JavaGenerator_TEST_FOLDER}:@JAVA_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestTreeCodeAtoms
+	${JAVA} -ea -cp ${COMPILED_JavaGenerator_TEST_FOLDER}:@JAVA_GEN_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestPosition
+	touch ${COMPILED_JavaGenerator_TEST_FOLDER}/run
+
 @DEP_HAND_JAR@: workFolder ${DependencyHandler_src}
 	mkdir -p ${COMPILED_DependencyHandler_FOLDER}
 	${JAVAC} -d ${COMPILED_DependencyHandler_FOLDER} ${DependencyHandler_java_src}
@@ -90,18 +103,12 @@ folderTestOut: workFolder
 	touch folderTestOut
 
 compileTestsOfGenerator: folderTestOut @CODE_GEN_JAR@ ${COMPILED_DependencyHandler_TEST_FOLDER}/compile
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/com/ -iname "*.java"`
 	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/packetgen/ -iname "*.java"`
 	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find LegacyTests/OfOtherCode/org/freeciv/packetgen/ -iname "*.scala"`
 	touch compileTestsOfGenerator
 
-runTestsOfGenerator: compileTestsOfGenerator ${COMPILED_DependencyHandler_TEST_FOLDER}/run
+runTestsOfGenerator: compileTestsOfGenerator ${COMPILED_DependencyHandler_TEST_FOLDER}/run ${COMPILED_JavaGenerator_TEST_FOLDER}/run
 	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.CodeGenTest
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER}:@UTILS_JAR@ org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.TypedCodeTest
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestTreeIR
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestTreeCodeAtoms
-	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore com.kvilhaugsvik.javaGenerator.representation.TestPosition
 	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@DEP_HAND_JAR@:@CORE_JAR@:@UTILS_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.EnumTest
 	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:${JUNIT_CPF}:@UTILS_JAR@:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.FieldTypeTest
 	${JAVA} -ea -cp @CODE_GEN_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@:@DEP_HAND_JAR@:${JUNIT_CPF}:@UTILS_JAR@:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.PacketTest
