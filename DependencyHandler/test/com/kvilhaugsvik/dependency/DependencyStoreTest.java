@@ -12,9 +12,8 @@
  * GNU General Public License for more details.
  */
 
-package org.freeciv.packetgen;
+package com.kvilhaugsvik.dependency;
 
-import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.enteties.Constant;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
