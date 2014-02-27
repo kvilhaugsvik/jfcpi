@@ -31,3 +31,20 @@ echo "" >> $outputFile
 
 echo "COMPILED_${scanFolder}_FOLDER = @WORK_FOLDER@/${scanFolder}" >> $outputFile
 echo "" >> $outputFile
+
+# test Java code
+java_test_src="${scanFolder}_java_test_src ="
+for sourceFile in `find $scanFolder/test -iname "*.java"`; do
+  java_test_src="$java_test_src \\\\\n\t$sourceFile"
+done;
+echo $java_test_src >> $outputFile
+
+# test Scala code
+scala_test_src="${scanFolder}_scala_test_src ="
+for sourceFile in `find $scanFolder/test -iname "*.scala"`; do
+  scala_test_src="$scala_test_src \\\\\n\t$sourceFile"
+done;
+echo $scala_test_src >> $outputFile
+
+echo "COMPILED_${scanFolder}_TEST_FOLDER = @WORK_FOLDER@/${scanFolder}_TEST" >> $outputFile
+echo "" >> $outputFile
