@@ -12,18 +12,10 @@ fi;
 outputFile="$scanFolder/source_code.list"
 
 # Java code used in the program it self
-java_src="${scanFolder}_java_src ="
-for sourceFile in `find $scanFolder/src -iname "*.java"`; do
-  java_src="$java_src \\\\\n\t$sourceFile"
-done;
-echo $java_src > $outputFile
+sh listVar.sh "${scanFolder}_java_src" "`find ${scanFolder}/src -iname '*.java'`" > $outputFile
 
 # Scala code used in the program it self
-scala_src="${scanFolder}_scala_src ="
-for sourceFile in `find $scanFolder/src -iname "*.scala"`; do
-  scala_src="$scala_src \\\\\n\t$sourceFile"
-done;
-echo $scala_src >> $outputFile
+sh listVar.sh "${scanFolder}_scala_src" "`find $scanFolder/src -iname '*.scala'`" >> $outputFile
 
 echo "${scanFolder}_src = \${${scanFolder}_java_src} \${${scanFolder}_scala_src}" >> $outputFile
 
@@ -33,18 +25,10 @@ echo "COMPILED_${scanFolder}_FOLDER = @WORK_FOLDER@/${scanFolder}" >> $outputFil
 echo "" >> $outputFile
 
 # test Java code
-java_test_src="${scanFolder}_java_test_src ="
-for sourceFile in `find $scanFolder/test -iname "*.java"`; do
-  java_test_src="$java_test_src \\\\\n\t$sourceFile"
-done;
-echo $java_test_src >> $outputFile
+sh listVar.sh "${scanFolder}_java_test_src" "`find $scanFolder/test -iname '*.java'`" >> $outputFile
 
 # test Scala code
-scala_test_src="${scanFolder}_scala_test_src ="
-for sourceFile in `find $scanFolder/test -iname "*.scala"`; do
-  scala_test_src="$scala_test_src \\\\\n\t$sourceFile"
-done;
-echo $scala_test_src >> $outputFile
+sh listVar.sh "${scanFolder}_scala_test_src" "`find $scanFolder/test -iname '*.scala'`" >> $outputFile
 
 echo "COMPILED_${scanFolder}_TEST_FOLDER = @WORK_FOLDER@/${scanFolder}_TEST" >> $outputFile
 echo "" >> $outputFile
