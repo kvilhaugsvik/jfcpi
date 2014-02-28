@@ -11,8 +11,11 @@ fi;
 # output location
 outputFile="$scanFolder/source_code.list"
 
+# explain what it is
+echo "# This is an auto generated list of files for the Makefile." > $outputFile
+
 # Java code used in the program it self
-sh listVar.sh "${scanFolder}_java_src" "`find ${scanFolder}/src -iname '*.java'`" > $outputFile
+sh listVar.sh "${scanFolder}_java_src" "`find ${scanFolder}/src -iname '*.java'`" >> $outputFile
 
 # Scala code used in the program it self
 sh listVar.sh "${scanFolder}_scala_src" "`find $scanFolder/src -iname '*.scala'`" >> $outputFile
