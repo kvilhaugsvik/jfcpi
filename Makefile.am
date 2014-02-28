@@ -104,7 +104,7 @@ ${COMPILED_GeneratePackets_TEST_FOLDER}/run: ${COMPILED_GeneratePackets_TEST_FOL
 	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF}:${SCALA_STDLIB_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.FromCExtractorTest
 	touch ${COMPILED_GeneratePackets_TEST_FOLDER}/run
 
-sourceFromFreeciv: @CODE_GEN_JAR@
+sourceFromFreeciv: @CODE_GEN_JAR@ ${FREECIV_SOURCE_FILES}
 	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --packets-should-log-to=${LOG_TO} --ignore-problems=${IGNORE_ISSUES} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
 	touch sourceFromFreeciv
 

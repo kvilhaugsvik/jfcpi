@@ -99,6 +99,12 @@ AC_SUBST(DEP_HAND_JAR, DependencyHandler.jar)
 AC_SUBST(JAVA_GEN_JAR, FCJJavaGen.jar)
 AC_SUBST(CODE_GEN_JAR, FCJGeneratePackets.jar)
 
+# TODO: Split the build system so CODE_GEN_JAR can be created before it is needed
+AS_IF([test -f $CODE_GEN_JAR],
+  [FREECIV_SOURCE_FILES_TMP=`sh packetsExtract --print-source-files`;
+    AC_SUBST(FREECIV_SOURCE_FILES, `sh listVar.sh = "$FREECIV_SOURCE_FILES_TMP"`)],
+  [AC_SUBST(FREECIV_SOURCE_FILES, "")])
+
 AC_CONFIG_FILES([Makefile]
  [GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java]
  [javaGen.manifest]

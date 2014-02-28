@@ -9,8 +9,14 @@ fi;
 # could be empthy so no check
 fileList="$2"
 
+# '=' is a special value that indicate no variable should be declared
+if test "${var_name}" != "="; then
+  declaration="${var_name} ="
+else
+  declaration=""
+fi;
+
 # Format a list
-declaration="${var_name} ="
 for file_to_add in ${fileList}; do
   declaration="$declaration \\\\\n\t$file_to_add"
 done;
