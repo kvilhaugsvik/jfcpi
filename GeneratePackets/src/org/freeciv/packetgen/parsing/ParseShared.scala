@@ -174,10 +174,28 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     }
   }
 
+  /**
+   * Are line breaks insignificant?
+   * @param source text being parsed
+   * @param offset position in the text
+   * @return true if line break should be ignored
+   */
   protected def isNewLineIgnored(source: CharSequence, offset: Int): Boolean
 
+  /**
+   * Is non line break white space insignificant?
+   * @param source text being parsed
+   * @param offset position in the text
+   * @return true if non line break white space should be ignored
+   */
   protected def isLineWSIgnored(source: CharSequence, offset: Int): Boolean
 
+  /**
+   * Is comments insignificant?
+   * @param source text being parsed
+   * @param offset position in the text
+   * @return true if comments should be ignored
+   */
   protected def areCommentsIgnored(source: CharSequence, offset: Int): Boolean
 
   private val space = (spaceBetweenWords + "+").r
