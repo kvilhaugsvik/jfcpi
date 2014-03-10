@@ -17,6 +17,9 @@ package com.kvilhaugsvik.dependency;
 import java.util.Collection;
 import java.util.HashSet;
 
+/**
+ * How and why an item wasn't resolved.
+ */
 public class MissingItemExplained implements Comparable<MissingItemExplained> {
     private final Requirement missing;
     private final Status how;
@@ -49,6 +52,10 @@ public class MissingItemExplained implements Comparable<MissingItemExplained> {
         return out.toString();
     }
 
+    /**
+     * Recursively get all missing items as requirements
+     * @return a collection containing all missing requirements
+     */
     public Collection<? extends Requirement> toRequirements() {
         HashSet<Requirement> out = new HashSet<Requirement>();
         out.add(missing);
@@ -73,6 +80,9 @@ public class MissingItemExplained implements Comparable<MissingItemExplained> {
         }
     }
 
+    /**
+     * How a MissingItemExplained blames another for not being resolved.
+     */
     public static class Blame {
         private final MissingItemExplained problem;
         private final Relation what;
@@ -88,6 +98,38 @@ public class MissingItemExplained implements Comparable<MissingItemExplained> {
         }
     }
 
-    public enum Status {IS_MISSING, EXIST_BUT}
-    public enum Relation {DEPEND_ON, MADE_FROM, BLAMED_ON}
+    /**
+     * How wasn't the item resolved?
+     */
+    public enum Status {
+        /**
+         * The item isn't there.
+         */
+        IS_MISSING,
+
+        /**
+         * The item is there but another problem makes it useless
+         */
+        EXIST_BUT
+    }
+
+    /**
+     * In what way did the MissingItemExplained depend on the other?
+     */
+    public enum Relation {
+        /**
+         * It required the other item directly
+         */
+        DEPEND_ON,
+
+        /**
+         * It could have been made from the other item
+         */
+        MADE_FROM,
+
+        /**
+         * It blames the other item for some other reason
+         */
+        BLAMED_ON
+    }
 }
