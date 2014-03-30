@@ -370,6 +370,10 @@ class CParserSyntaxTest {
 """
     assertParesSuccess(input, parser.parse(parser.expr, new parser.PackratReader(new CharArrayReader(input.toArray))))
   }
+  @Test def constantDefinedFollowedByMultiLineComment =
+    parsesCorrectly("""
+#define NAME 7 /* Line one
+                * Line two */""", ParseCCode)
   @Test def constantDefinedSimpleHexNumber =
     parsesCorrectly("#define SIMPLE 0x50", ParseCCode)
   @Test def constantDefinedOtherSimpleHexNumber =
