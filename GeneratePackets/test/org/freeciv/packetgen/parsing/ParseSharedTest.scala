@@ -42,6 +42,10 @@ class ParseSharedTest {
 
   @Test def value = assertIntExpressionBecomes("4", "4")
 
+  @Test def hexValue = assertIntExpressionBecomes("0xFA53", "0xFA53")
+
+  @Test def lowerCaseHexValue = assertIntExpressionBecomes("0xfa53", "0xfa53")
+
   @Test def constantName = assertIntExpressionBecomes(Util.VERSION_DATA_CLASS + ".MAX_THING", "MAX_THING")
 
   // Parses basic unary operations

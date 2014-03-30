@@ -349,6 +349,10 @@ class CParserSyntaxTest {
   @Test def constantDefinedTwoSimpleNumbersComments =
     parsesCorrectly("#define SIMPLE 5//comment C++ style\n#define OTHER /* Comment C style */ 7",
       ParseCCode)
+  @Test def constantDefinedHexNumber =
+    parsesCorrectly("#define SIMPLE 0x4D\n", ParseCCode)
+  @Test def constantWrongHexNumberFails =
+    assertPrefixWillNotParse("#define WRONG 0xFG\n", ParseCCode)
   @Test def constantDefinedAddition =
     parsesCorrectly("#define SIMPLE 2 + 5", ParseCCode)
   @Test def constantDefinedOther =
