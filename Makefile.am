@@ -30,7 +30,7 @@ workFolder:
 	${JAVAC} -d ${COMPILED_Core_FOLDER} ${Core_java_src}
 	${JAR} cf @CORE_JAR@ -C ${COMPILED_Core_FOLDER} \.
 
-${COMPILED_Core_TEST_FOLDER}/compile: @CORE_JAR@ ${Core_java_test_src}
+${COMPILED_Core_TEST_FOLDER}/compile: @CORE_JAR@ ${Core_test_src}
 	mkdir -p ${COMPILED_Core_TEST_FOLDER}
 	${JAVAC} -cp @CORE_JAR@:${JUNIT_CPF} -d ${COMPILED_Core_TEST_FOLDER} ${Core_java_test_src}
 	touch ${COMPILED_Core_TEST_FOLDER}/compile
@@ -49,7 +49,7 @@ ${COMPILED_Core_TEST_FOLDER}/run: ${COMPILED_Core_TEST_FOLDER}/compile
 	${JAVAC} -cp @CORE_JAR@:@UTILS_JAR@ -d ${COMPILED_JavaGenerator_FOLDER} ${JavaGenerator_java_src}
 	${JAR} cfm @JAVA_GEN_JAR@ javaGen.manifest -C ${COMPILED_JavaGenerator_FOLDER} \.
 
-${COMPILED_JavaGenerator_TEST_FOLDER}/compile: @JAVA_GEN_JAR@ ${JavaGenerator_java_test_src}
+${COMPILED_JavaGenerator_TEST_FOLDER}/compile: @JAVA_GEN_JAR@ ${JavaGenerator_test_src}
 	mkdir -p ${COMPILED_JavaGenerator_TEST_FOLDER}
 	${JAVAC} -cp @JAVA_GEN_JAR@:${JUNIT_CPF} -d ${COMPILED_JavaGenerator_TEST_FOLDER} ${JavaGenerator_java_test_src}
 	touch ${COMPILED_JavaGenerator_TEST_FOLDER}/compile
@@ -68,7 +68,7 @@ ${COMPILED_JavaGenerator_TEST_FOLDER}/run: ${COMPILED_JavaGenerator_TEST_FOLDER}
 	${JAR} cf @DEP_HAND_JAR@ -C ${COMPILED_DependencyHandler_FOLDER} \.
 
 # @JAVA_GEN_JAR@ and @CODE_GEN_JAR@ are used by tests.
-${COMPILED_DependencyHandler_TEST_FOLDER}/compile: @DEP_HAND_JAR@ @JAVA_GEN_JAR@ @CODE_GEN_JAR@ ${DependencyHandler_java_test_src}
+${COMPILED_DependencyHandler_TEST_FOLDER}/compile: @DEP_HAND_JAR@ @JAVA_GEN_JAR@ @CODE_GEN_JAR@ ${DependencyHandler_test_src}
 	mkdir -p ${COMPILED_DependencyHandler_TEST_FOLDER}
 	${JAVAC} -cp @DEP_HAND_JAR@:${JUNIT_CPF}:@JAVA_GEN_JAR@:@CODE_GEN_JAR@ -d ${COMPILED_DependencyHandler_TEST_FOLDER} ${DependencyHandler_java_test_src}
 	touch ${COMPILED_DependencyHandler_TEST_FOLDER}/compile
@@ -85,7 +85,7 @@ ${COMPILED_DependencyHandler_TEST_FOLDER}/run: ${COMPILED_DependencyHandler_TEST
 	${JAR} cfm @CODE_GEN_JAR@ codeGen.manifest -C ${COMPILED_GeneratePackets_FOLDER} \.
 
 # @DEP_HAND_JAR@, @JAVA_GEN_JAR@ and @CORE_JAR@ are used by the packet generator
-${COMPILED_GeneratePackets_TEST_FOLDER}/compile: @CODE_GEN_JAR@ @DEP_HAND_JAR@ ${GeneratePackets_java_test_src}
+${COMPILED_GeneratePackets_TEST_FOLDER}/compile: @CODE_GEN_JAR@ @DEP_HAND_JAR@ ${GeneratePackets_test_src}
 	mkdir -p ${COMPILED_GeneratePackets_TEST_FOLDER}
 	${JAVAC} -cp @CODE_GEN_JAR@:${JUNIT_CPF} -d ${COMPILED_GeneratePackets_TEST_FOLDER} ${GeneratePackets_java_test_src}
 	${SCALAC} -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@CODE_GEN_JAR@:${JUNIT_CPF}:@DEP_HAND_JAR@:@JAVA_GEN_JAR@:@CORE_JAR@ -d ${COMPILED_GeneratePackets_TEST_FOLDER} ${GeneratePackets_scala_test_src}
@@ -179,7 +179,7 @@ runConnectionTests: compileConnectionTests
 	${JAR} cf @UTILS_JAR@ -C ${COMPILED_Utility_FOLDER} \.
 	touch @UTILS_JAR@
 
-${COMPILED_Utility_TEST_FOLDER}/compile: @UTILS_JAR@ ${Utility_java_test_src}
+${COMPILED_Utility_TEST_FOLDER}/compile: @UTILS_JAR@ ${Utility_test_src}
 	mkdir -p ${COMPILED_Utility_TEST_FOLDER}
 	${JAVAC} -cp @UTILS_JAR@:${JUNIT_CPF} -d ${COMPILED_Utility_TEST_FOLDER} ${Utility_java_test_src}
 	touch ${COMPILED_Utility_TEST_FOLDER}/compile

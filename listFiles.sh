@@ -33,5 +33,9 @@ sh listVar.sh "${scanFolder}_java_test_src" "`find $scanFolder/test -iname '*.ja
 # test Scala code
 sh listVar.sh "${scanFolder}_scala_test_src" "`find $scanFolder/test -iname '*.scala'`" >> $outputFile
 
+echo "${scanFolder}_test_src = \${${scanFolder}_java_test_src} \${${scanFolder}_scala_test_src}" >> $outputFile
+
+echo "" >> $outputFile
+
 echo "COMPILED_${scanFolder}_TEST_FOLDER = @WORK_FOLDER@/${scanFolder}_TEST" >> $outputFile
 echo "" >> $outputFile
