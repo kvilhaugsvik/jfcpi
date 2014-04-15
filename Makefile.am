@@ -42,6 +42,7 @@ ${COMPILED_Core_TEST_FOLDER}/run: ${COMPILED_Core_TEST_FOLDER}/compile
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.types.TestUnderstoodBitVector
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.utility.TestEternalZero
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.utility.TestValidation
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@CORE_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.connection.NetworkUninterpreted
 	touch ${COMPILED_Core_TEST_FOLDER}/run
 
 @JAVA_GEN_JAR@: @CORE_JAR@ @UTILS_JAR@ javaGen.manifest ${JavaGenerator_src}
@@ -165,14 +166,6 @@ runtestsignintoserver: @SIGN_IN_JAR@
 runProxyRecorer: @RECORDER_JAR@
 	sh proxyRecorder && touch runProxyRecorer
 
-compileConnectionTests: folderTestOut @CORE_JAR@
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @CORE_JAR@:${JUNIT_CPF} `find LegacyTests/OfOtherCode/org/freeciv/connection/ -iname "*.java"`
-	touch compileConnectionTests
-
-runConnectionTests: compileConnectionTests
-	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.connection.NetworkUninterpreted
-	touch runConnectionTests
-
 @UTILS_JAR@: workFolder @CORE_JAR@ ${Utility_src}
 	mkdir -p ${COMPILED_Utility_FOLDER}
 	${JAVAC} -cp @CORE_JAR@ -d ${COMPILED_Utility_FOLDER} ${Utility_java_src}
@@ -190,7 +183,7 @@ ${COMPILED_Utility_TEST_FOLDER}/run: ${COMPILED_Utility_TEST_FOLDER}/compile  @C
 	${JAVA} -cp ${COMPILED_Utility_TEST_FOLDER}:@UTILS_JAR@:${JUNIT_CPF}:@CORE_JAR@ org.junit.runner.JUnitCore org.freeciv.utility.TestSettings
 	touch ${COMPILED_Utility_TEST_FOLDER}/run
 
-runTests: compileTestGeneratedCode runTestsOfGenerator ${COMPILED_Core_TEST_FOLDER}/run runConnectionTests ${COMPILED_Utility_TEST_FOLDER}/run
+runTests: compileTestGeneratedCode runTestsOfGenerator ${COMPILED_Core_TEST_FOLDER}/run ${COMPILED_Utility_TEST_FOLDER}/run
 	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingEntetiesAlone
 	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingFullGenerator
 	${JAVA} -cp @CORE_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.ProtoData
@@ -202,7 +195,6 @@ runTests: compileTestGeneratedCode runTestsOfGenerator ${COMPILED_Core_TEST_FOLD
 	touch runTests
 
 clean-local:
-	rm -rf runConnectionTests compileConnectionTests
 	rm -rf compileTestPeerGenerator
 	rm -rf compileTestPeers
 	rm -rf compileTestGeneratedCode

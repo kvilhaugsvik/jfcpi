@@ -33,7 +33,7 @@ public class NetworkUninterpreted {
         Socket other = helperDataSender(new byte[]{0, 3, 0});
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
                 Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap(),
-                new ProtocolData());
+                new UninterpretedProtocolData());
 
         Packet packet = assertPacketIsThere(self);
 
@@ -55,7 +55,7 @@ public class NetworkUninterpreted {
 
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
                 postReceive, Collections.<Integer, ReflexReaction>emptyMap(),
-                new ProtocolData());
+                new UninterpretedProtocolData());
 
         Packet packetBeforeChange = assertPacketIsThere(self);
 
@@ -148,5 +148,25 @@ public class NetworkUninterpreted {
 
         assertTrue("There should be a packet here", self.packetReady());
         return self.getPacket();
+    }
+
+    /**
+     * Dummy protocol data
+     */
+    private static class UninterpretedProtocolData implements BasicProtocolData {
+        @Override
+        public HeaderData getNewPacketHeaderData() {
+            return new HeaderData(org.freeciv.packet.Header_2_1.class);
+        }
+
+        @Override
+        public int getCompressionBorder() {
+            return 16000;
+        }
+
+        @Override
+        public int getJumboSize() {
+            return 0xffff;
+        }
     }
 }
