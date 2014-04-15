@@ -31,7 +31,6 @@ public class Connection implements FreecivConnection {
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
     private final ProtocolVariantAutomatic variant;
-    private final ProtocolData protoCode;
 
     private Connection(
             final InputStream inn,
@@ -42,7 +41,6 @@ public class Connection implements FreecivConnection {
             ToPacket toPacket,
             ProtocolVariantAutomatic protocolVariant
     ) throws IOException {
-        this.protoCode = protoCode;
         this.currentHeader = protoCode.getNewPacketHeaderData();
         this.variant = protocolVariant;
         this.out = out;
@@ -141,7 +139,7 @@ public class Connection implements FreecivConnection {
             // need to look for capability setters in sending as well
             if (variant.needToKnowCaps())
                 variant.extractVariantInfo(toSend instanceof RawPacket ?
-                        new InterpretWhenPossible(protoCode.getNewPacketMapper())
+                        new InterpretWhenPossible(variant)
                                 .convert(toSend.getHeader(), packetSerialized.toByteArray()) :
                         toSend);
         } catch (IOException e) {
