@@ -37,7 +37,7 @@ public class Connection implements FreecivConnection {
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            ProtocolData protoCode,
+            BasicProtocolData protoCode,
             ToPacket toPacket,
             ProtocolVariantAutomatic protocolVariant
     ) throws IOException {
@@ -101,7 +101,7 @@ public class Connection implements FreecivConnection {
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            final ProtocolData protoCode
+            final BasicProtocolData protoCode
     ) throws IOException {
         return new Connection(inn, out, postReceive, postSend, protoCode,
                 new AlwaysRaw(), new ProtocolVariantAutomatic(null));

@@ -25,14 +25,14 @@ import java.util.zip.Inflater;
 public class SerializedCompressedPackets implements SerializedPacketGroup {
     private final byte[] packet;
     private final boolean jumbo;
-    private final ProtocolData protoCode;
+    private final BasicProtocolData protoCode;
     private final ToPacket converter;
     private final HeaderData headerData;
     private final ReflexPacketKind quickRespond;
 
     private final LinkedList<Packet> subPackets;
 
-    public SerializedCompressedPackets(byte[] packet, boolean jumbo, ProtocolData protoCode, ToPacket converter, HeaderData headerData, ReflexPacketKind quickRespond) {
+    public SerializedCompressedPackets(byte[] packet, boolean jumbo, BasicProtocolData protoCode, ToPacket converter, HeaderData headerData, ReflexPacketKind quickRespond) {
         this.packet = packet;
         this.jumbo = jumbo;
         this.protoCode = protoCode;

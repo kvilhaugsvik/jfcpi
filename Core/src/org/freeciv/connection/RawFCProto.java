@@ -23,9 +23,9 @@ public class RawFCProto implements SerializedPacketGroup.SeparateSerializedPacke
     private final ToPacket toPacket;
     private final HeaderData headerData;
     private final ReflexPacketKind quickRespond;
-    private final ProtocolData protoCode;
+    private final BasicProtocolData protoCode;
 
-    public RawFCProto(Over state, ToPacket toPacket, HeaderData headerData, ReflexPacketKind quickRespond, ProtocolData protoCode) {
+    public RawFCProto(Over state, ToPacket toPacket, HeaderData headerData, ReflexPacketKind quickRespond, BasicProtocolData protoCode) {
         this.state = state;
         this.toPacket = toPacket;
         this.headerData = headerData;
@@ -39,7 +39,7 @@ public class RawFCProto implements SerializedPacketGroup.SeparateSerializedPacke
     }
 
     private static SerializedPacketGroup readSerializedPacketGroup(InputStream from,
-                                                                   Over state, ProtocolData protoCode,
+                                                                   Over state, BasicProtocolData protoCode,
                                                                    ToPacket toPacket, HeaderData headerData,
                                                                    ReflexPacketKind quickRespond) throws IOException {
         final byte[] start = PacketInputStream.readXBytesFrom(2, new byte[0], from, state);

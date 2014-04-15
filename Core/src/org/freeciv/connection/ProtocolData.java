@@ -22,7 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class ProtocolData {
+public class ProtocolData implements BasicProtocolData {
     private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
     private final Set<String> capsOptional;
 
@@ -176,6 +176,7 @@ public class ProtocolData {
             throw new BadProtocolData("Packet " + name + " missing");
     }
 
+    @Override
     public HeaderData getNewPacketHeaderData() {
         return new HeaderData(packetNumberBytes);
     }
@@ -236,10 +237,12 @@ public class ProtocolData {
         return isBoolFoldEnabled;
     }
 
+    @Override
     public int getJumboSize() {
         return jumboSize;
     }
 
+    @Override
     public int getCompressionBorder() {
         return compressionBorder;
     }
