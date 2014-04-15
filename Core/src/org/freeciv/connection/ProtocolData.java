@@ -218,6 +218,14 @@ public class ProtocolData {
         return versionPatch;
     }
 
+    /**
+     * Is this the delta protocol or the simpler variant?
+     * @return true if the delta protocol is enabled
+     */
+    public boolean isDelta() {
+        return isDeltaEnabled;
+    }
+
     public int getJumboSize() {
         return jumboSize;
     }
