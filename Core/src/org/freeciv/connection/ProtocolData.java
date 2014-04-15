@@ -30,6 +30,7 @@ public class ProtocolData {
     private final Map<Integer, ReflexReaction> protoRulesPostReceive;
     private final Map<Integer, ReflexReaction> protoRulesPostSend;
     private final boolean isDeltaEnabled;
+    private final boolean isBoolFoldEnabled;
     private final String capStringMandatory;
     private final String capStringOptional;
     private final String versionLabel;
@@ -54,6 +55,7 @@ public class ProtocolData {
             packetNumberBytes =
                     (Class<? extends PacketHeader>) constants.getField(Util.HEADER_NAME).get(null);
             this.isDeltaEnabled = constants.getField("enableDelta").getBoolean(null);
+            this.isBoolFoldEnabled = constants.getField("enableDeltaBoolFolding").getBoolean(null);
 
             capStringMandatory = (String)constants.getField("NETWORK_CAPSTRING_MANDATORY").get(null);
             capStringOptional = (String)constants.getField("NETWORK_CAPSTRING_OPTIONAL").get(null);
@@ -224,6 +226,14 @@ public class ProtocolData {
      */
     public boolean isDelta() {
         return isDeltaEnabled;
+    }
+
+    /**
+     * Is this the protocol variant that puts boolean packet variables into its delta header?
+     * @return true if boolean variables are folded into the delta header.
+     */
+    public boolean isBoolFold() {
+        return isBoolFoldEnabled;
     }
 
     public int getJumboSize() {
