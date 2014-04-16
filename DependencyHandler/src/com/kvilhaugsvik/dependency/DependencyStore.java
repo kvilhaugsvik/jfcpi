@@ -55,6 +55,16 @@ public final class DependencyStore {
 
     public void addMaker(Dependency.Maker maker) {
         if  (null == maker) throw new NullPointerException(nullNotAllowed);
+
+        if (maker instanceof Dependency.BlameShifter) {
+            Map<Requirement, Collection<Requirement>> suspects = ((Dependency.BlameShifter) maker).blameSuspects();
+
+            for (Requirement req : suspects.keySet()) {
+                /* TODO: Don't be so trusting. */
+                this.blameMissingOn(req, suspects.get(req));
+            }
+        }
+
         makers.add(maker);
     }
 

@@ -213,6 +213,50 @@ public class DependencyStoreTest {
                 store.getMissingRequirements().contains(reqFor("Existing")));
     }
 
+    @Test public void blameShifterNeededInput() {
+        final Requirement wanted = reqFor("Wanted");
+        final Requirement needed = reqFor("Needed");
+        final Requirement preNeeded = reqFor("Pre Needed");
+
+        final Dependency.BlameShifter knowWhatMyInputIsMadeOf = new Dependency.BlameShifter() {
+            @Override
+            public List<Requirement> neededInput(Requirement toProduce) {
+                return Arrays.asList(needed);
+            }
+
+            @Override
+            public Required getICanProduceReq() {
+                return wanted;
+            }
+
+            @Override
+            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
+                throw new UndefinedException("Should never run since needed dependency is missing");
+            }
+
+            @Override
+            public Map<Requirement, Collection<Requirement>> blameSuspects() {
+                HashMap<Requirement, Collection<Requirement>> out = new HashMap<Requirement, Collection<Requirement>>();
+
+                out.put(needed, Arrays.asList(preNeeded));
+
+                return out;
+            }
+        };
+
+        final DependencyStore store = new DependencyStore();
+
+        store.addMaker(knowWhatMyInputIsMadeOf);
+        store.demand(wanted);
+
+        assertTrue("Should tell about the demanded but missing item",
+                store.getMissingRequirements().contains(reqFor("Wanted")));
+        assertTrue("Should tell about the missing item required to make the demanded item",
+                store.getMissingRequirements().contains(reqFor("Needed")));
+        assertTrue("Should tell about the missing item blamed for the abstense of the item required to make the demanded item",
+                store.getMissingRequirements().contains(reqFor("Pre Needed")));
+    }
+
     @Test public void makerWorksNoDependencies() {
         final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
         final Requirement req = new Requirement("Value", Constant.class);

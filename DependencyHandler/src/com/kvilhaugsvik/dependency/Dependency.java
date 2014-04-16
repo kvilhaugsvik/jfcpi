@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Sveinung Kvilhaugsvik
+ * Copyright (c) 2012 - 2014. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,5 +26,20 @@ public interface Dependency {
         public List<Requirement> neededInput(Requirement toProduce);
         public Required getICanProduceReq();
         public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException;
+    }
+
+    /**
+     * This Maker has (potentially unreliable) information about why a requirement is missing.
+     *
+     * Limited to makers for now since they are more likely to have reliable information.
+     */
+    public static interface BlameShifter extends Maker {
+        /**
+         * Collection of what unresolved requirements the BlameShifter suspects is to blame if a requirement is missing.
+         * The information is only a suspicion / hint and could be wrong.
+         *
+         * @return a map mapping from the missing requirement to all blamed suspects
+         */
+        public Map<Requirement, Collection<Requirement>> blameSuspects();
     }
 }
