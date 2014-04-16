@@ -101,12 +101,7 @@ public class PacketsStore {
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
         Requirement to = new Requirement(iotype + "(" + ptype + ")", FieldType.class);
         final Requirement from = new Requirement(alias, FieldType.class);
-        requirements.addMaker(new SimpleDependencyMaker(from, to) {
-            @Override
-            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                return ((FieldType)wasRequired[0]).createFieldType(alias);
-            }
-        });
+        requirements.addMaker(new FieldTypeMaker(from, to, alias));
         requirements.blameMissingOn(from, to);
         requirements.blameMissingOn(to,
                 new Requirement(ptype, DataType.class), new Requirement(iotype, NetworkIO.class));
@@ -115,12 +110,7 @@ public class PacketsStore {
     public void registerTypeAlias(final String alias, String aliased) throws UndefinedException {
         final Requirement from = new Requirement(alias, FieldType.class);
         final Requirement to = new Requirement(aliased, FieldType.class);
-        requirements.addMaker(new SimpleDependencyMaker(from, to) {
-            @Override
-            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                return ((FieldType) wasRequired[0]).createFieldType(alias);
-            }
-        });
+        requirements.addMaker(new FieldTypeMaker(from, to, alias));
         requirements.blameMissingOn(from, to);
     }
 
