@@ -65,8 +65,18 @@ public final class DependencyStore {
      * @param blamed requirements to add when it is missing
      */
     public void blameMissingOn(Requirement missing, Requirement... blamed) {
-        assert blamed.length != 0 : "No one to blame";
-        blameDeeperWhenNoItem.put(missing, new HashSet(Arrays.asList(blamed)));
+        blameMissingOn(missing, Arrays.asList(blamed));
+    }
+
+    /**
+     * Add information on what missing requirements to suspect when a certain requirement is missing. This may be a
+     * maker that could have produced it, a parameter to the maker or something the item would have required.
+     * @param missing the missing item
+     * @param blamed requirements to add when it is missing
+     */
+    public void blameMissingOn(Requirement missing, Collection<Requirement> blamed) {
+        assert blamed.size() != 0 : "No one to blame";
+        blameDeeperWhenNoItem.put(missing, new HashSet<Requirement>(blamed));
     }
 
     @Deprecated
