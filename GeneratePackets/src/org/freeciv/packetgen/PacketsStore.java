@@ -102,7 +102,6 @@ public class PacketsStore {
         Requirement to = new Requirement(iotype + "(" + ptype + ")", FieldType.class);
         final Requirement from = new Requirement(alias, FieldType.class);
         requirements.addMaker(new FieldTypeMaker(from, to, alias));
-        requirements.blameMissingOn(from, to);
         requirements.blameMissingOn(to,
                 new Requirement(ptype, DataType.class), new Requirement(iotype, NetworkIO.class));
     }
@@ -111,7 +110,6 @@ public class PacketsStore {
         final Requirement from = new Requirement(alias, FieldType.class);
         final Requirement to = new Requirement(aliased, FieldType.class);
         requirements.addMaker(new FieldTypeMaker(from, to, alias));
-        requirements.blameMissingOn(from, to);
     }
 
     public boolean doesFieldTypeResolve(String name) {
