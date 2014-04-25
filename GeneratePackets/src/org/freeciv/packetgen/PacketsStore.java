@@ -99,17 +99,11 @@ public class PacketsStore {
     }
 
     public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
-        Requirement to = new Requirement(iotype + "(" + ptype + ")", FieldType.class);
-        final Requirement from = new Requirement(alias, FieldType.class);
-        requirements.addMaker(new FieldTypeMaker(from, to, alias));
-        requirements.blameMissingOn(to,
-                new Requirement(ptype, DataType.class), new Requirement(iotype, NetworkIO.class));
+        this.addDependency(FieldTypeMaker.basic(alias, iotype, ptype));
     }
 
     public void registerTypeAlias(final String alias, String aliased) throws UndefinedException {
-        final Requirement from = new Requirement(alias, FieldType.class);
-        final Requirement to = new Requirement(aliased, FieldType.class);
-        requirements.addMaker(new FieldTypeMaker(from, to, alias));
+        this.addDependency(FieldTypeMaker.alias(alias, aliased));
     }
 
     public boolean doesFieldTypeResolve(String name) {
