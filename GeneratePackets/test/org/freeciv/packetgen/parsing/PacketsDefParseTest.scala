@@ -621,9 +621,6 @@ class PacketsDefParseTest {
 
     val results: List[WeakField] = result.get
 
-    storage.addDependency(FieldTypeMaker.basic("UINT8", "uint8", "int")) // TODO: Kill with fire in a refactoring
-    storage.registerPacket("JUST_FOR_SIDE_EFFECTS", 42, List.empty[WeakFlag], results) // TODO: Kill with fire in a refactoring
-
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "maxB"), results(0))
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "a"), results(1))
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "b", "7", null), results(2))
