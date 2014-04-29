@@ -54,14 +54,14 @@ public class PacketsStoreTest {
 
     @Test public void registerType() throws UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("ALIAS", "uint32", "int");
+        storage.addDependency(FieldTypeMaker.basic("ALIAS", "uint32", "int"));
 
         assertTrue(storage.doesFieldTypeResolve("ALIAS"));
     }
 
     @Test public void registerTypePreCondKnownLater() throws UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("ALIAS", "sint16", "fbbf");
+        storage.addDependency(FieldTypeMaker.basic("ALIAS", "sint16", "fbbf"));
         storage.addDependency(new SimpleTypeAlias("fbbf", TargetClass.from("org.freeciv.types", "BitString"), null, 0));
 
         assertTrue(storage.doesFieldTypeResolve("ALIAS"));
@@ -69,16 +69,16 @@ public class PacketsStoreTest {
 
     @Test public void registerTypeAlias() throws UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("ALIASED", "uint32", "int");
-        storage.registerTypeAlias("ALIAS", "ALIASED");
+        storage.addDependency(FieldTypeMaker.basic("ALIASED", "uint32", "int"));
+        storage.addDependency(FieldTypeMaker.alias("ALIAS", "ALIASED"));
 
         assertTrue(storage.doesFieldTypeResolve("ALIAS"));
     }
 
     @Test public void registerTypeAliasToTypeRegisteredLater() throws UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("ALIAS", "ALIASED");
-        storage.registerTypeAlias("ALIASED", "uint32", "int");
+        storage.addDependency(FieldTypeMaker.alias("ALIAS", "ALIASED"));
+        storage.addDependency(FieldTypeMaker.basic("ALIASED", "uint32", "int"));
 
         assertTrue(storage.doesFieldTypeResolve("ALIAS"));
     }
@@ -92,7 +92,7 @@ public class PacketsStoreTest {
 
     @Test public void registerTypeRequiredNotExisting() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("ACTIVITY", "uint8", "enum unit_activity");
+        storage.addDependency(FieldTypeMaker.basic("ACTIVITY", "uint8", "enum unit_activity"));
 
         registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
 
@@ -102,7 +102,7 @@ public class PacketsStoreTest {
 
     @Test public void registerTypeNotExisting() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("THISSHOULDNOTEXIST", "UINT32");
+        storage.addDependency(FieldTypeMaker.alias("THISSHOULDNOTEXIST", "UINT32"));
 
         registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
 
@@ -112,7 +112,7 @@ public class PacketsStoreTest {
 
     @Test public void registerTypeBasicTypeNotExisting() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("THISSHOULDNOTEXIST", "notexisting128(void)");
+        storage.addDependency(FieldTypeMaker.alias("THISSHOULDNOTEXIST", "notexisting128(void)"));
 
         registerPacketToPullInnFieldtype(storage, "THISSHOULDNOTEXIST", 0);
 
@@ -123,7 +123,7 @@ public class PacketsStoreTest {
     @Test public void registerTypeRequired() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
         storage.addDependency(Enum.specEnumBitwise("unit_activity", false, false, Collections.<Enum.EnumElementFC>emptyList()));
-        storage.registerTypeAlias("ACTIVITY", "uint8", "enum unit_activity");
+        storage.addDependency(FieldTypeMaker.basic("ACTIVITY", "uint8", "enum unit_activity"));
 
         registerPacketToPullInnFieldtype(storage, "ACTIVITY", 0);
 
@@ -138,8 +138,8 @@ public class PacketsStoreTest {
     @Test public void codeIsThere() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
 
-        storage.registerTypeAlias("UINT32", "uint32", "int");
-        storage.registerTypeAlias("UNSIGNEDINT32", "UINT32");
+        storage.addDependency(FieldTypeMaker.basic("UINT32", "uint32", "int"));
+        storage.addDependency(FieldTypeMaker.alias("UNSIGNEDINT32", "UINT32"));
 
         registerPacketToPullInnFieldtype(storage, "UINT32", 0);
         registerPacketToPullInnFieldtype(storage, "UNSIGNEDINT32", 1);
@@ -182,7 +182,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerTypeAlias("STRING", "string", "char");
+        storage.addDependency(FieldTypeMaker.basic("STRING", "string", "char"));
         WeakField field1 = new WeakField("myNameIs", "STRING", Collections.<WeakFlag>emptyList(),
                 new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
@@ -208,7 +208,7 @@ public class PacketsStoreTest {
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
 
-        storage.registerTypeAlias("STRING", "string", "char");
+        storage.addDependency(FieldTypeMaker.basic("STRING", "string", "char"));
         storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields);
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
@@ -242,7 +242,7 @@ public class PacketsStoreTest {
         WeakField field1 = new WeakField("myNameIs", "STRING",
                 Collections.<WeakFlag>emptyList(), new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
         storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), Arrays.asList(field1));
-        storage.registerTypeAlias("STRING", "string", "char");
+        storage.addDependency(FieldTypeMaker.basic("STRING", "string", "char"));
 
         assertTrue("Packet not created", storage.hasPacket("PACKET_HELLO"));
         assertEquals("Should have one field", 1, storage.getPacket("PACKET_HELLO").getFields().size());
@@ -301,8 +301,8 @@ public class PacketsStoreTest {
     public void generateFieldArraySimple() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
 
-        storage.registerTypeAlias("DEX", "uint8", "int");
-        storage.registerTypeAlias("UNDER", "uint8", "int");
+        storage.addDependency(FieldTypeMaker.basic("DEX", "uint8", "int"));
+        storage.addDependency(FieldTypeMaker.basic("UNDER", "uint8", "int"));
 
         List<WeakField> fieldList = Arrays.asList(
                 new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
@@ -323,8 +323,8 @@ public class PacketsStoreTest {
     public void generateFieldArray5Dimensions() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
 
-        storage.registerTypeAlias("DEX", "uint8", "int");
-        storage.registerTypeAlias("UNDER", "uint8", "int");
+        storage.addDependency(FieldTypeMaker.basic("DEX", "uint8", "int"));
+        storage.addDependency(FieldTypeMaker.basic("UNDER", "uint8", "int"));
 
         List<WeakField> fieldList = Arrays.asList(
                 new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
@@ -349,8 +349,8 @@ public class PacketsStoreTest {
     public void generateFieldArray15Dimensions() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
 
-        storage.registerTypeAlias("DEX", "uint8", "int");
-        storage.registerTypeAlias("UNDER", "uint8", "int");
+        storage.addDependency(FieldTypeMaker.basic("DEX", "uint8", "int"));
+        storage.addDependency(FieldTypeMaker.basic("UNDER", "uint8", "int"));
 
         List<WeakField> fieldList = Arrays.asList(
                 new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
@@ -375,8 +375,8 @@ public class PacketsStoreTest {
     public void generateFieldArrayEaterUnder() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
 
-        storage.registerTypeAlias("DEX", "uint8", "int");
-        storage.registerTypeAlias("UNDER", "string", "char");
+        storage.addDependency(FieldTypeMaker.basic("DEX", "uint8", "int"));
+        storage.addDependency(FieldTypeMaker.basic("UNDER", "string", "char"));
 
         List<WeakField> fieldList = Arrays.asList(
                 new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),
@@ -399,8 +399,8 @@ public class PacketsStoreTest {
     public void generateFieldArrayButNotFor1DArrayEater() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
 
-        storage.registerTypeAlias("DEX", "uint8", "int");
-        storage.registerTypeAlias("UNDER", "string", "char");
+        storage.addDependency(FieldTypeMaker.basic("DEX", "uint8", "int"));
+        storage.addDependency(FieldTypeMaker.basic("UNDER", "string", "char"));
 
         List<WeakField> fieldList = Arrays.asList(
                 new WeakField("elems", "DEX", Collections.<WeakFlag>emptyList()),

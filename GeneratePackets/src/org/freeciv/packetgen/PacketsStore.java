@@ -98,14 +98,6 @@ public class PacketsStore {
         requirements.addWanted(Constant.isBool("enableDeltaBoolFolding", BuiltIn.literal(this.enableDeltaBoolFolding)));
     }
 
-    public void registerTypeAlias(final String alias, String iotype, String ptype) throws UndefinedException {
-        this.addDependency(FieldTypeMaker.basic(alias, iotype, ptype));
-    }
-
-    public void registerTypeAlias(final String alias, String aliased) throws UndefinedException {
-        this.addDependency(FieldTypeMaker.alias(alias, aliased));
-    }
-
     public boolean doesFieldTypeResolve(String name) {
         return requirements.isAwareOfProvider(new Requirement(name, FieldType.class));
     }

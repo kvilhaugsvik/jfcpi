@@ -22,7 +22,7 @@ import org.junit.Assert._
 import collection.JavaConversions._
 import util.parsing.input.CharArrayReader
 import org.freeciv.packetgen.{GeneratorDefaults, PacketHeaderKinds, PacketsStore}
-import org.freeciv.packetgen.enteties.supporting.{WeakFlag, WeakField, Field}
+import org.freeciv.packetgen.enteties.supporting._
 
 class PacketsDefParseTest {
   @inline def storePars = {
@@ -34,7 +34,7 @@ class PacketsDefParseTest {
   def testBooleanFieldsFriendlyAndInvoiceInPacket(fieldDec: String) {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8", "bool")
+    storage.addDependency(FieldTypeMaker.basic("BOOL", "bool8", "bool"))
 
     assertTrue("Couldn't parse", parser.parsePacketsDef("PACKET_HELLO = 5;\n" + fieldDec + "\nend").successful)
     assertTrue("Didn't store packet", storage.hasPacket(5))
@@ -566,7 +566,7 @@ class PacketsDefParseTest {
   @Test def storesTwoFieldsInOneDefine() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8", "bool")
+    storage.addDependency(FieldTypeMaker.basic("BOOL", "bool8", "bool"))
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly, inVoice;
@@ -581,7 +581,7 @@ class PacketsDefParseTest {
   @Test def storesManyFieldsInOneDefine() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8", "bool")
+    storage.addDependency(FieldTypeMaker.basic("BOOL", "bool8", "bool"))
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL a, b, c;
@@ -621,7 +621,7 @@ class PacketsDefParseTest {
 
     val results: List[WeakField] = result.get
 
-    storage.registerTypeAlias("UINT8", "uint8", "int") // TODO: Kill with fire in a refactoring
+    storage.addDependency(FieldTypeMaker.basic("UINT8", "uint8", "int")) // TODO: Kill with fire in a refactoring
     storage.registerPacket("JUST_FOR_SIDE_EFFECTS", 42, List.empty[WeakFlag], results) // TODO: Kill with fire in a refactoring
 
     assertWeakFieldIs("Field parsed in wrong format", Array("UINT8", "maxB"), results(0))

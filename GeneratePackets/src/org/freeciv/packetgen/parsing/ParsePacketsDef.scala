@@ -17,7 +17,7 @@ package org.freeciv.packetgen.parsing
 import util.parsing.input.Reader
 import collection.JavaConversions._
 import org.freeciv.packetgen.PacketsStore
-import org.freeciv.packetgen.enteties.supporting.{WeakFlag, WeakField, Field}
+import org.freeciv.packetgen.enteties.supporting._
 
 class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldTypeAlias = regex(identifierRegEx)
@@ -29,9 +29,12 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
   def fieldType: PackratParser[Any] = basicFieldType | fieldTypeAlias
 
   def fieldTypeAssign: Parser[Any] = "type" ~> fieldTypeAlias ~ ("=" ~> fieldType) ^^ {
-    case alias ~ (aliased: String) => storage.registerTypeAlias(alias, aliased)
-    case alias ~ Pair((iotype: String), (ptype: String)) => storage.registerTypeAlias(alias, iotype, ptype)
-    case result => failure(result + " was not recognized as a new field type alias and what it's aliasing")
+    case alias ~ (aliased: String) =>
+      storage.addDependency(FieldTypeMaker.alias(alias, aliased))
+    case alias ~ Pair((iotype: String), (ptype: String)) =>
+      storage.addDependency(FieldTypeMaker.basic(alias, iotype, ptype))
+    case result =>
+      failure(result + " was not recognized as a new field type alias and what it's aliasing")
   }
 
   def comment = CComment |
