@@ -363,8 +363,6 @@ class PacketsDefParseTest {
   @Test def parsesCommentPythonStyleAmongFieldsInPacket() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly; key
                                            # comment in the line
@@ -374,8 +372,6 @@ class PacketsDefParseTest {
 
   @Test def parsesTwoCommentsInARowAmongFieldsInPacket() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly; key
@@ -387,8 +383,6 @@ class PacketsDefParseTest {
 
   @Test def parsesCommentPythonStyleBeforeFieldsInPacket() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            # comment in the line
@@ -421,8 +415,6 @@ class PacketsDefParseTest {
   @Test def parsePackageWithFieldCanParse() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertTrue(parser.parsePacketsDef("""PACKET_HI = 57;
                                            BOOL friendly;
                                          end""").successful)
@@ -430,8 +422,6 @@ class PacketsDefParseTest {
 
   @Test def parsePackageWithFieldsCanParse() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly;
@@ -464,7 +454,6 @@ class PacketsDefParseTest {
   @Test def parsePackageWithFlagThatTakesAnArgumentCanParse() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
     parser.parsePacketsDef("""PACKET_HI = 57; cs
                                            BOOL friendly;
                                          end""")
@@ -478,8 +467,6 @@ class PacketsDefParseTest {
   @Test def parsePackageWithFlagOnField() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly; key
                                          end""").successful)
@@ -488,8 +475,6 @@ class PacketsDefParseTest {
   @Test def parsePackageWithFlagsOnField() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly; key, diff
                                          end""").successful)
@@ -497,8 +482,6 @@ class PacketsDefParseTest {
 
   @Test def parsePackageWithFlagOnFieldAndFieldAfter() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly; key
@@ -509,8 +492,6 @@ class PacketsDefParseTest {
   @Test def parsePackageWithArgumentUsingFlagOnField() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly; add-cap(attitude)
                                          end""").successful)
@@ -518,8 +499,6 @@ class PacketsDefParseTest {
 
   @Test def parseFieldWithOneArrayDeclaration() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly[1];
@@ -529,8 +508,6 @@ class PacketsDefParseTest {
   @Test def parseFieldWithTwoArrayDeclarations() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly[1][5];
                                          end""").successful)
@@ -539,8 +516,6 @@ class PacketsDefParseTest {
   @Test def parseFieldWithArrayDeclarationWithConstant() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly[PLAYERS];
                                          end""").successful)
@@ -548,9 +523,6 @@ class PacketsDefParseTest {
 
   @Test def parseFieldWithArrayDeclarationWithElementsToTransfer() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-    storage.registerTypeAlias("UINT8", "uint8(int)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            UINT8 waysToBeFriendly;
@@ -561,8 +533,6 @@ class PacketsDefParseTest {
   @Test def parseElementsToTransferIsNotANumber() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertFalse(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly[20:3];
                                          end""").successful)
@@ -570,9 +540,6 @@ class PacketsDefParseTest {
 
   @Test def parseFieldWithArrayDeclarationWithOperatorInConstant() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-    storage.registerTypeAlias("UINT8", "uint8(int)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            UINT8 waysToBeFriendly;
@@ -583,8 +550,6 @@ class PacketsDefParseTest {
   @Test def parseTwoFieldsInOneDefine() {
     val (storage, parser) = storePars
 
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
-
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL friendly, inVoice;
                                          end""").successful)
@@ -592,8 +557,6 @@ class PacketsDefParseTest {
 
   @Test def parseManyFieldsInOneDefine() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("BOOL", "bool8(bool)")
 
     assertTrue(parser.parsePacketsDef("""PACKET_HELLO = 5;
                                            BOOL a, b, c;
@@ -672,8 +635,6 @@ class PacketsDefParseTest {
 
   @Test def parsesManyFieldsInOneDefineSomeWithArrayDeclarations() {
     val (storage, parser) = storePars
-
-    storage.registerTypeAlias("UINT8", "uint8(int)")
 
     val result = parser.parsePacketsDef("PACKET_TEST = 42;\n" +
       manyFieldsInOneDefineSomeWithArrayDeclarations +
