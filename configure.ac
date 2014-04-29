@@ -95,7 +95,7 @@ AC_SUBST(UTILS_JAR, FCJUtils.jar)
 AC_SUBST(FREECIV_VERSION_JAR, FCJFreecivVersion-${VERSION_NAME}.jar)
 AC_SUBST(RECORDER_JAR, FCJRecorder.jar)
 AC_SUBST(SIGN_IN_JAR, FCJTestSignIn.jar)
-AC_SUBST(DEP_HAND_JAR, DependencyHandler.jar)
+AC_SUBST(DEP_HAND_JAR, FCJDependencyHandler.jar)
 AC_SUBST(JAVA_GEN_JAR, FCJJavaGen.jar)
 AC_SUBST(CODE_GEN_JAR, FCJGeneratePackets.jar)
 

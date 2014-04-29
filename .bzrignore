@@ -4,7 +4,6 @@ LegacyTests/Generated*
 FromFreeciv/*
 GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 FCJ*.jar
-DependencyHandler.jar
 packetsExtract
 testSignInToServer
 testSignInToServer.bat
