@@ -11,6 +11,7 @@ sh listFiles.sh DependencyHandler
 sh listFiles.sh GeneratePackets
 sh listFiles.sh FreecivRecorder
 sh listFiles.sh SignInTest
+sh listFiles.sh GenerateTestCode
 
 echo "Generating the configure script and related files"
 autoreconf --install

@@ -106,35 +106,41 @@ sourceFromFreeciv: @GeneratePackets_JAR@ ${FREECIV_SOURCE_FILES}
 	${JAVAC} -d ${COMPILED_FROM_FREECIV_FOLDER} -cp @Core_JAR@ `find ${GENERATED_SOURCE_FOLDER}/generated -iname "*.java"`
 	${JAR} cf @FREECIV_VERSION_JAR@ -C ${COMPILED_FROM_FREECIV_FOLDER} \.
 
-compileTestPeerGenerator: @Core_JAR@ @GeneratePackets_JAR@ folderTestOut
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@:${JUNIT_CPF} `find LegacyTests/ThatGenerateSourceCode -iname "*.java"`
-	${SCALAC} -d ${COMPILED_TESTS_FOLDER} -classpath @GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@:${JUNIT_CPF} `find LegacyTests/ThatGenerateSourceCode -iname "*.scala"`
-	touch compileTestPeerGenerator
+@GenerateTestCode_JAR@: @Core_JAR@ @GeneratePackets_JAR@ ${GenerateTestCode_src}
+	mkdir -p ${COMPILED_GenerateTestCode_FOLDER}
+	${JAVAC} -d ${COMPILED_GenerateTestCode_FOLDER} -cp @GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@:${JUNIT_CPF} ${GenerateTestCode_java_src}
+	${SCALAC} -d ${COMPILED_GenerateTestCode_FOLDER} -classpath @GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@:${JUNIT_CPF} ${GenerateTestCode_scala_src}
+	${JAR} cf @GenerateTestCode_JAR@ -C ${COMPILED_GenerateTestCode_FOLDER} \.
 
-sourceTestPeers: compileTestPeerGenerator
-	${SCALA} -classpath ${COMPILED_TESTS_FOLDER}:@GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@ org.freeciv.packetgen.UsingGenerator ${GENERATED_TEST_SOURCE_FOLDER}
-	${JAVA} -cp ${COMPILED_TESTS_FOLDER}:@GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@ org.freeciv.packetgen.FromEntetiesAlone ${GENERATED_TEST_SOURCE_FOLDER}
+@COMPILED_GenerateTestCode_TEST_FOLDER@/compile: sourceTestPeers @GeneratePackets_JAR@ @Core_JAR@ ${GenerateTestCode_test_src}
+	mkdir -p @COMPILED_GenerateTestCode_TEST_FOLDER@
+	${JAVAC} -d @COMPILED_GenerateTestCode_TEST_FOLDER@ -cp @Core_JAR@ `find ${GENERATED_TEST_SOURCE_FOLDER}/generated -iname "*.java"`
+	${JAVAC} -d @COMPILED_GenerateTestCode_TEST_FOLDER@ -cp @GeneratePackets_JAR@:@Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ ${GenerateTestCode_java_test_src}
+	touch @COMPILED_GenerateTestCode_TEST_FOLDER@/compile
+
+@COMPILED_GenerateTestCode_TEST_FOLDER@/run: @COMPILED_GenerateTestCode_TEST_FOLDER@/compile
+	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingEntetiesAlone
+	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingFullGenerator
+	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.ProtoData
+	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
+	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.test.GeneratedStructTest
+	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.test.GeneratedBVTest
+	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.test.FieldTypeTests
+	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.test.IsolatedBugCausers
+	touch @COMPILED_GenerateTestCode_TEST_FOLDER@/run
+
+sourceTestPeers: @GenerateTestCode_JAR@
+	${SCALA} -classpath @GenerateTestCode_JAR@:@GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@ org.freeciv.packetgen.UsingGenerator ${GENERATED_TEST_SOURCE_FOLDER}
+	${JAVA} -cp @GenerateTestCode_JAR@:@GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@ org.freeciv.packetgen.FromEntetiesAlone ${GENERATED_TEST_SOURCE_FOLDER}
 	touch sourceTestPeers
 
 # not included in tests since make will run the code when generating test peers
-runTestPeerCreationAsTests: compileTestPeerGenerator
-	${JAVA} -cp @GeneratePackets_JAR@:@JavaGenerator_JAR@:@Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packetgen.FromEntetiesAlone
+runTestPeerCreationAsTests: @GenerateTestCode_JAR@
+	${JAVA} -cp @GeneratePackets_JAR@:@JavaGenerator_JAR@:@Core_JAR@:${JUNIT_CPF}:@GenerateTestCode_JAR@ org.junit.runner.JUnitCore org.freeciv.packetgen.FromEntetiesAlone
 	touch runTestPeerCreationAsTests
-
-compileTestPeers: @GeneratePackets_JAR@ @Core_JAR@ sourceTestPeers
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @Core_JAR@ `find ${GENERATED_TEST_SOURCE_FOLDER}/generated -iname "*.java"`
-	touch compileTestPeers
-
-folderTestOut: workFolder
-	mkdir -p ${COMPILED_TESTS_FOLDER}
-	touch folderTestOut
 
 runTestsOfGenerator: ${COMPILED_DependencyHandler_TEST_FOLDER}/run ${COMPILED_JavaGenerator_TEST_FOLDER}/run ${COMPILED_GeneratePackets_TEST_FOLDER}/run
 	touch runTestsOfGenerator
-
-compileTestGeneratedCode: compileTestPeers folderTestOut
-	${JAVAC} -d ${COMPILED_TESTS_FOLDER} -cp @GeneratePackets_JAR@:@Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} `find LegacyTests/OfGeneratedCode/ -iname "*.java"`
-	touch compileTestGeneratedCode
 
 @SignInTest_JAR@: @FREECIV_VERSION_JAR@ @Utility_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
 	chmod +x testSignInToServer
@@ -175,25 +181,15 @@ runProxyRecorer: @FreecivRecorder_JAR@
 	${JAVA} -cp ${COMPILED_Utility_TEST_FOLDER}:@Utility_JAR@:${JUNIT_CPF}:@Core_JAR@ org.junit.runner.JUnitCore org.freeciv.utility.TestSettings
 	touch ${COMPILED_Utility_TEST_FOLDER}/run
 
-runTests: compileTestGeneratedCode runTestsOfGenerator ${COMPILED_Core_TEST_FOLDER}/run ${COMPILED_Utility_TEST_FOLDER}/run
-	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingEntetiesAlone
-	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.packet.GeneratedUsingFullGenerator
-	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.ProtoData
-	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedEnumTest
-	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedStructTest
-	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.GeneratedBVTest
-	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.FieldTypeTests
-	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:${COMPILED_TESTS_FOLDER} org.junit.runner.JUnitCore org.freeciv.test.IsolatedBugCausers
+runTests: @COMPILED_GenerateTestCode_TEST_FOLDER@/compile runTestsOfGenerator ${COMPILED_Core_TEST_FOLDER}/run ${COMPILED_Utility_TEST_FOLDER}/run
 	touch runTests
 
 clean-local:
-	rm -rf compileTestPeerGenerator
-	rm -rf compileTestPeers
-	rm -rf compileTestGeneratedCode
+	rm -rf @GenerateTestCode_JAR@
+	rm -rf @COMPILED_GenerateTestCode_TEST_FOLDER@
 	rm -rf runTestPeerCreationAsTests
 	rm -rf runTestsOfGenerator
 	rm -rf runTests tests
-	rm -rf folderTestOut ${COMPILED_TESTS_FOLDER}
 	rm -rf ${GENERATED_TEST_SOURCE_FOLDER} sourceTestPeers
 	rm -rf ${COMPILED_SignInTest_FOLDER}
 	rm -f all

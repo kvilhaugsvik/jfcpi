@@ -15,6 +15,7 @@ FILE_LIST_JavaGenerator
 FILE_LIST_GeneratePackets
 FILE_LIST_FreecivRecorder
 FILE_LIST_SignInTest
+FILE_LIST_GenerateTestCode
 
 AX_PROG_JAVA
 AS_IF([test x"$JAVA" = x],
@@ -92,10 +93,10 @@ AC_ARG_ENABLE(sourcecode,
 
 # Where to put the generated code by default
 AC_SUBST(GENERATED_SOURCE_FOLDER, FromFreeciv/$VERSION_NAME)
-AC_SUBST(GENERATED_TEST_SOURCE_FOLDER, LegacyTests/GeneratedTestPeers)
+AC_SUBST(GENERATED_TEST_SOURCE_FOLDER, GenerateTestCode/GeneratedTestPeers)
 
 # Generated compiled Java classes
-AC_SUBST(COMPILED_TESTS_FOLDER, ${WORK_FOLDER}/LegacyTests)
+AC_SUBST(COMPILED_TESTS_FOLDER, ${WORK_FOLDER}/TestGenerated)
 AC_SUBST(COMPILED_FROM_FREECIV_FOLDER, ${WORK_FOLDER}/VersionCode)
 
 # Generated jars
