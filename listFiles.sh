@@ -28,7 +28,7 @@ sh listVar.sh "${scanFolder}_src" "\${${scanFolder}_java_src} \${${scanFolder}_s
 
 echo "" >> $outputFile
 
-sh listVar.sh "COMPILED_${scanFolder}_FOLDER" \${WORK_FOLDER}/${scanFolder} >> $outputFile
+echo "AC_SUBST(COMPILED_${scanFolder}_FOLDER, [\${WORK_FOLDER}/${scanFolder}])" >> $outputFile
 echo "" >> $outputFile
 
 # test Java code
@@ -42,7 +42,7 @@ sh listVar.sh "${scanFolder}_test_src" "\${${scanFolder}_java_test_src} \${${sca
 
 echo "" >> $outputFile
 
-sh listVar.sh "COMPILED_${scanFolder}_TEST_FOLDER" "\${WORK_FOLDER}/${scanFolder}_TEST" >> $outputFile
+echo "AC_SUBST(COMPILED_${scanFolder}_TEST_FOLDER, [\${WORK_FOLDER}/${scanFolder}_TEST])" >> $outputFile
 echo "" >> $outputFile
 
 # name of the corresponding Jar file
