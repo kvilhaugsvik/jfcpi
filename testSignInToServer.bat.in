@@ -1,1 +1,1 @@
-@JAVA@ -jar @SIGN_IN_JAR@ %*
+@JAVA@ -jar @SignInTest_JAR@ %*

@@ -1,1 +1,1 @@
-@JAVA@ -ea -cp @RECORDER_JAR@:@FREECIV_VERSION_JAR@ org.freeciv.recorder.PlayToServer "$@"
+@JAVA@ -ea -cp @FreecivRecorder_JAR@:@FREECIV_VERSION_JAR@ org.freeciv.recorder.PlayToServer "$@"

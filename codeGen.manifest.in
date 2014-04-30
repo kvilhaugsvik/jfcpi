@@ -1,1 +1,1 @@
-Class-Path: @JAVA_GEN_JAR@ @CORE_JAR@ @DEP_HAND_JAR@ @UTILS_JAR@
+Class-Path: @JavaGenerator_JAR@ @Core_JAR@ @DependencyHandler_JAR@ @Utility_JAR@

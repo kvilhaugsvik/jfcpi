@@ -99,14 +99,7 @@ AC_SUBST(COMPILED_TESTS_FOLDER, ${WORK_FOLDER}/LegacyTests)
 AC_SUBST(COMPILED_FROM_FREECIV_FOLDER, ${WORK_FOLDER}/VersionCode)
 
 # Generated jars
-AC_SUBST(CORE_JAR, FCJCore.jar)
-AC_SUBST(UTILS_JAR, FCJUtils.jar)
 AC_SUBST(FREECIV_VERSION_JAR, FCJFreecivVersion-${VERSION_NAME}.jar)
-AC_SUBST(RECORDER_JAR, FCJRecorder.jar)
-AC_SUBST(SIGN_IN_JAR, FCJTestSignIn.jar)
-AC_SUBST(DEP_HAND_JAR, FCJDependencyHandler.jar)
-AC_SUBST(JAVA_GEN_JAR, FCJJavaGen.jar)
-AC_SUBST(CODE_GEN_JAR, FCJGeneratePackets.jar)
 
 # TODO: Split the build system so CODE_GEN_JAR can be created before it is needed
 AS_IF([test -f $CODE_GEN_JAR],

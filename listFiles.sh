@@ -43,6 +43,10 @@ sh listVar.sh "${scanFolder}_test_src" "\${${scanFolder}_java_test_src} \${${sca
 echo "" >> $outputFile
 
 sh listVar.sh "COMPILED_${scanFolder}_TEST_FOLDER" "\${WORK_FOLDER}/${scanFolder}_TEST" >> $outputFile
+echo "" >> $outputFile
+
+# name of the corresponding Jar file
+echo "AC_SUBST(${scanFolder}_JAR, [FCJ${scanFolder}.jar])" >> $outputFile
 
 echo "])" >> $outputFile
 echo "" >> $outputFile

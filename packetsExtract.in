@@ -1,1 +1,1 @@
-@SCALA@ -classpath @CODE_GEN_JAR@ org.freeciv.packetgen.GeneratePackets "$@"
+@SCALA@ -classpath @GeneratePackets_JAR@ org.freeciv.packetgen.GeneratePackets "$@"

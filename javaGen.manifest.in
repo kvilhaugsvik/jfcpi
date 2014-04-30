@@ -1,1 +1,1 @@
-Class-Path: @CORE_JAR@ @UTILS_JAR@
+Class-Path: @Core_JAR@ @Utility_JAR@
