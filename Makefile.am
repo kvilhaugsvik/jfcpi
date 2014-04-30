@@ -139,9 +139,6 @@ runTestPeerCreationAsTests: @GenerateTestCode_JAR@
 	${JAVA} -cp @GeneratePackets_JAR@:@JavaGenerator_JAR@:@Core_JAR@:${JUNIT_CPF}:@GenerateTestCode_JAR@ org.junit.runner.JUnitCore org.freeciv.packetgen.FromEntetiesAlone
 	touch runTestPeerCreationAsTests
 
-runTestsOfGenerator: ${COMPILED_DependencyHandler_TEST_FOLDER}/run ${COMPILED_JavaGenerator_TEST_FOLDER}/run ${COMPILED_GeneratePackets_TEST_FOLDER}/run
-	touch runTestsOfGenerator
-
 @SignInTest_JAR@: @FREECIV_VERSION_JAR@ @Utility_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
 	chmod +x testSignInToServer
 	mkdir -p ${COMPILED_SignInTest_FOLDER}
@@ -181,14 +178,13 @@ runProxyRecorer: @FreecivRecorder_JAR@
 	${JAVA} -cp ${COMPILED_Utility_TEST_FOLDER}:@Utility_JAR@:${JUNIT_CPF}:@Core_JAR@ org.junit.runner.JUnitCore org.freeciv.utility.TestSettings
 	touch ${COMPILED_Utility_TEST_FOLDER}/run
 
-runTests: @COMPILED_GenerateTestCode_TEST_FOLDER@/compile runTestsOfGenerator ${COMPILED_Core_TEST_FOLDER}/run ${COMPILED_Utility_TEST_FOLDER}/run
+runTests: @COMPILED_GenerateTestCode_TEST_FOLDER@/run ${COMPILED_DependencyHandler_TEST_FOLDER}/run ${COMPILED_JavaGenerator_TEST_FOLDER}/run ${COMPILED_GeneratePackets_TEST_FOLDER}/run ${COMPILED_Core_TEST_FOLDER}/run ${COMPILED_Utility_TEST_FOLDER}/run
 	touch runTests
 
 clean-local:
 	rm -rf @GenerateTestCode_JAR@
 	rm -rf @COMPILED_GenerateTestCode_TEST_FOLDER@
 	rm -rf runTestPeerCreationAsTests
-	rm -rf runTestsOfGenerator
 	rm -rf runTests tests
 	rm -rf ${GENERATED_TEST_SOURCE_FOLDER} sourceTestPeers
 	rm -rf ${COMPILED_SignInTest_FOLDER}
