@@ -11,13 +11,19 @@ fileList="$2"
 
 # '=' is a special value that indicate no variable should be declared
 if test "${var_name}" != "="; then
-  declaration="${var_name} ="
+  declaration="AC_SUBST(${var_name}, [\""
 else
   declaration=""
 fi;
 
 # Format a list
 for file_to_add in ${fileList}; do
-  declaration="$declaration \\\\\n\t$file_to_add"
+  declaration="$declaration \\\\\n $file_to_add"
 done;
+
+# '=' is a special value that indicate no variable should be declared
+if test "${var_name}" != "="; then
+  declaration="$declaration\"])"
+fi;
+
 echo $declaration

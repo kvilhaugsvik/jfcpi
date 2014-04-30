@@ -1,13 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
 
-include $(top_srcdir)/DependencyHandler/source_code.list
-include $(top_srcdir)/Core/source_code.list
-include $(top_srcdir)/Utility/source_code.list
-include $(top_srcdir)/JavaGenerator/source_code.list
-include $(top_srcdir)/GeneratePackets/source_code.list
-include $(top_srcdir)/FreecivRecorder/source_code.list
-include $(top_srcdir)/SignInTest/source_code.list
-
 # GeneratorDefaults.java is generated during ./configure
 GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
 	GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
