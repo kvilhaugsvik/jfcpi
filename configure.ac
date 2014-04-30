@@ -96,7 +96,6 @@ AC_SUBST(GENERATED_SOURCE_FOLDER, FromFreeciv/$VERSION_NAME)
 AC_SUBST(GENERATED_TEST_SOURCE_FOLDER, GenerateTestCode/GeneratedTestPeers)
 
 # Generated compiled Java classes
-AC_SUBST(COMPILED_TESTS_FOLDER, ${WORK_FOLDER}/TestGenerated)
 AC_SUBST(COMPILED_FROM_FREECIV_FOLDER, ${WORK_FOLDER}/VersionCode)
 
 # Generated jars
