@@ -103,48 +103,14 @@ public class PacketsStore {
 
     public void registerPacket(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields)
             throws PacketCollisionException, UndefinedException {
+        final PacketMaker packetMaker = PacketMaker.create(name, number, flags, fields, enableDelta);
+
         validateNameAndNumber(name, number);
+        reserveNameAndNumber(name, number, (Requirement)packetMaker.getICanProduceReq());
 
-        final TreeSet<String> caps = new TreeSet<String>();
-        for (WeakField field : fields)
-            for (WeakFlag flag : field.getFlags())
-                if ("add-cap".equals(flag.getName()) || "remove-cap".equals(flag.getName()))
-                    caps.add(flag.getArguments()[0]);
+        requirements.addMaker(packetMaker);
 
-        Requirement me = new Requirement(name, Packet.class);
-        reserveNameAndNumber(name, number, me);
-
-        final List<Annotate> packetFlags = extractFlags(flags);
-
-        List<Requirement> allNeeded = extractFieldRequirements(fields);
-        allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
-        allNeeded.add(new Requirement("enableDelta", Constant.class));
-        allNeeded.add(new Requirement("enableDeltaBoolFolding", Constant.class));
-        allNeeded.add(new Requirement("JavaLogger", StringItem.class));
-
-        requirements.addMaker(new SimpleDependencyMaker(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
-            @Override
-            public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                assert wasRequired.length == fields.size() + 1 + 2 + 1 : "Wrong number of arguments";
-
-                final String logger = ((StringItem) wasRequired[wasRequired.length - 1]).getValue();
-                final boolean enableDeltaBoolFolding
-                        = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 2]).getValue());
-                final boolean enableDelta
-                        = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 3]).getValue());
-
-                List<Field> fieldList = new LinkedList<Field>();
-                for (int i = 0; i < fields.size(); i++)
-                    fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
-                            fields.get(i).getFlags(), fields.get(i).getDeclarations()));
-
-                return new Packet(name, number, logger, packetFlags,
-                        enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
-                        fieldList, caps);
-            }
-        });
-
-        requirements.demand(me);
+        requirements.demand((Requirement)packetMaker.getICanProduceReq());
     }
 
     private void validateNameAndNumber(String name, int number) throws PacketCollisionException {
@@ -158,49 +124,6 @@ public class PacketsStore {
     private void reserveNameAndNumber(String name, int number, Requirement packetID) {
         packets.put(name, packetID);
         packetsByNumber.put(number, name);
-    }
-
-    private static List<Annotate> extractFlags(List<WeakFlag> flags) {
-        List<Annotate> packetFlags = new LinkedList<Annotate>();
-        byte sentBy = 0;
-        LinkedList<String> canceled = new LinkedList<String>();
-        for (WeakFlag flag : flags) {
-            if ("sc".equals(flag.getName()))
-                sentBy += 2;
-            else if ("cs".equals(flag.getName()))
-                sentBy += 1;
-            else if ("no-delta".equals(flag.getName()))
-                packetFlags.add(new Annotate(NoDelta.class));
-            else if ("is-info".equals(flag.getName()))
-                packetFlags.add(new Annotate(IsInfo.class));
-            else if ("is-game-info".equals(flag.getName()))
-                packetFlags.add(new Annotate(IsGameInfo.class));
-            else if ("force".equals(flag.getName()))
-                packetFlags.add(new Annotate(Force.class));
-            else if ("post-send".equals(flag.getName()))
-                packetFlags.add(new Annotate(PostSend.class));
-            else if ("post-recv".equals(flag.getName()))
-                packetFlags.add(new Annotate(PostRecv.class));
-            else if ("cancel".equals(flag.getName()))
-                canceled.add(flag.getArguments()[0]);
-
-        }
-        if (!canceled.isEmpty()) packetFlags.add(new Canceler(canceled));
-        packetFlags.add(new Sender(sentBy));
-        return packetFlags;
-    }
-
-    private List<Requirement> extractFieldRequirements(List<WeakField> fields) {
-        LinkedList<Requirement> allNeeded = new LinkedList<Requirement>();
-        for (WeakField fieldType : fields) {
-            String type = fieldType.getType();
-
-            if (0 < fieldType.getDeclarations().length)
-                type = type + "_" + (enableDelta && hasFlag("diff", fieldType.getFlags()) ? "DIFF" : "") + fieldType.getDeclarations().length;
-
-            allNeeded.add(new Requirement(type, FieldType.class));
-        }
-        return allNeeded;
     }
 
     private static boolean hasFlag(String name, List<WeakFlag> flags) {
@@ -322,5 +245,107 @@ public class PacketsStore {
 
     public void requestType(String type) {
         requirements.demand(new Requirement(type, DataType.class));
+    }
+
+    private static class PacketMaker extends SimpleDependencyMaker {
+        private final List<WeakField> fields;
+        private final String name;
+        private final int number;
+        private final List<Annotate> packetFlags;
+        private final TreeSet<String> caps;
+
+        private PacketMaker(Requirement me, List<Requirement> allNeeded, List<WeakField> fields, String name, int number, List<Annotate> packetFlags, TreeSet<String> caps) {
+            super(me, allNeeded.toArray(new Requirement[allNeeded.size()]));
+            this.fields = fields;
+            this.name = name;
+            this.number = number;
+            this.packetFlags = packetFlags;
+            this.caps = caps;
+        }
+
+        @Override
+        public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
+            assert wasRequired.length == fields.size() + 1 + 2 + 1 : "Wrong number of arguments";
+
+            final String logger = ((StringItem) wasRequired[wasRequired.length - 1]).getValue();
+            final boolean enableDeltaBoolFolding
+                    = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 2]).getValue());
+            final boolean enableDelta
+                    = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 3]).getValue());
+
+            List<Field> fieldList = new LinkedList<Field>();
+            for (int i = 0; i < fields.size(); i++)
+                fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
+                        fields.get(i).getFlags(), fields.get(i).getDeclarations()));
+
+            return new Packet(name, number, logger, packetFlags,
+                    enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
+                    fieldList, caps);
+        }
+
+        private static List<Annotate> extractFlags(List<WeakFlag> flags) {
+            List<Annotate> packetFlags = new LinkedList<Annotate>();
+            byte sentBy = 0;
+            LinkedList<String> canceled = new LinkedList<String>();
+            for (WeakFlag flag : flags) {
+                if ("sc".equals(flag.getName()))
+                    sentBy += 2;
+                else if ("cs".equals(flag.getName()))
+                    sentBy += 1;
+                else if ("no-delta".equals(flag.getName()))
+                    packetFlags.add(new Annotate(NoDelta.class));
+                else if ("is-info".equals(flag.getName()))
+                    packetFlags.add(new Annotate(IsInfo.class));
+                else if ("is-game-info".equals(flag.getName()))
+                    packetFlags.add(new Annotate(IsGameInfo.class));
+                else if ("force".equals(flag.getName()))
+                    packetFlags.add(new Annotate(Force.class));
+                else if ("post-send".equals(flag.getName()))
+                    packetFlags.add(new Annotate(PostSend.class));
+                else if ("post-recv".equals(flag.getName()))
+                    packetFlags.add(new Annotate(PostRecv.class));
+                else if ("cancel".equals(flag.getName()))
+                    canceled.add(flag.getArguments()[0]);
+
+            }
+            if (!canceled.isEmpty()) packetFlags.add(new Canceler(canceled));
+            packetFlags.add(new Sender(sentBy));
+            return packetFlags;
+        }
+
+        private static List<Requirement> extractFieldRequirements(List<WeakField> fields,
+                                                                  boolean enableDelta) {
+            LinkedList<Requirement> allNeeded = new LinkedList<Requirement>();
+            for (WeakField fieldType : fields) {
+                String type = fieldType.getType();
+
+                if (0 < fieldType.getDeclarations().length)
+                    type = type + "_" + (enableDelta && hasFlag("diff", fieldType.getFlags()) ? "DIFF" : "") + fieldType.getDeclarations().length;
+
+                allNeeded.add(new Requirement(type, FieldType.class));
+            }
+            return allNeeded;
+        }
+
+        public static PacketMaker create(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields,
+                                         boolean enableDelta) {
+            final TreeSet<String> caps = new TreeSet<String>();
+            for (WeakField field : fields)
+                for (WeakFlag flag : field.getFlags())
+                    if ("add-cap".equals(flag.getName()) || "remove-cap".equals(flag.getName()))
+                        caps.add(flag.getArguments()[0]);
+
+            Requirement me = new Requirement(name, Packet.class);
+
+            final List<Annotate> packetFlags = extractFlags(flags);
+
+            List<Requirement> allNeeded = extractFieldRequirements(fields, enableDelta);
+            allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
+            allNeeded.add(new Requirement("enableDelta", Constant.class));
+            allNeeded.add(new Requirement("enableDeltaBoolFolding", Constant.class));
+            allNeeded.add(new Requirement("JavaLogger", StringItem.class));
+
+            return new PacketMaker(me, allNeeded, fields, name, number, packetFlags, caps);
+        }
     }
 }
