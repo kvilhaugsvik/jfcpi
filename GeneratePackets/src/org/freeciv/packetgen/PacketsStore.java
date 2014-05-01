@@ -33,7 +33,6 @@ import java.util.*;
 public class PacketsStore {
     private final String configName;
     private final TargetClass packetHeaderType;
-    private final String logger;
     private final boolean enableDelta;
     private final boolean enableDeltaBoolFolding;
 
@@ -58,9 +57,10 @@ public class PacketsStore {
         requirements.addMaker(new DiffArrayElementFieldType());
 
         this.configName = configName;
-        this.logger = logger;
         this.enableDelta = enableDelta;
         this.enableDeltaBoolFolding = enableDeltaBoolFolding;
+
+        requirements.addPossibleRequirement(new StringItem("JavaLogger", logger));
 
         final TargetClass rule = TargetClass.from(org.freeciv.connection.ReflexRule.class);
         final Typed[] protoRules;
@@ -120,11 +120,15 @@ public class PacketsStore {
         List<Requirement> allNeeded = extractFieldRequirements(fields);
         if (enableDelta)
             allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
+        allNeeded.add(new Requirement("JavaLogger", StringItem.class));
 
         requirements.addMaker(new SimpleDependencyMaker(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                assert wasRequired.length == fields.size() + (enableDelta ? 1 : 0) : "Wrong number of arguments";
+                assert wasRequired.length == fields.size() + 1 + (enableDelta ? 1 : 0) : "Wrong number of arguments";
+
+                final String logger = ((StringItem) wasRequired[wasRequired.length - 1]).getValue();
+
                 List<Field> fieldList = new LinkedList<Field>();
                 for (int i = 0; i < fields.size(); i++)
                     fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
