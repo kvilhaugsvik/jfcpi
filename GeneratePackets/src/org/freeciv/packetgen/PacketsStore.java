@@ -118,14 +118,13 @@ public class PacketsStore {
         final List<Annotate> packetFlags = extractFlags(flags);
 
         List<Requirement> allNeeded = extractFieldRequirements(fields);
-        if (enableDelta)
-            allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
+        allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
         allNeeded.add(new Requirement("JavaLogger", StringItem.class));
 
         requirements.addMaker(new SimpleDependencyMaker(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                assert wasRequired.length == fields.size() + 1 + (enableDelta ? 1 : 0) : "Wrong number of arguments";
+                assert wasRequired.length == fields.size() + 1 + 1 : "Wrong number of arguments";
 
                 final String logger = ((StringItem) wasRequired[wasRequired.length - 1]).getValue();
 
