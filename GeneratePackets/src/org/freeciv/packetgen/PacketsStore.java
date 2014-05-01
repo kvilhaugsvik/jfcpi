@@ -152,7 +152,7 @@ public class PacketsStore {
         packetsByNumber.put(number, name);
     }
 
-    private List<Annotate> extractFlags(List<WeakFlag> flags) {
+    private static List<Annotate> extractFlags(List<WeakFlag> flags) {
         List<Annotate> packetFlags = new LinkedList<Annotate>();
         byte sentBy = 0;
         LinkedList<String> canceled = new LinkedList<String>();
