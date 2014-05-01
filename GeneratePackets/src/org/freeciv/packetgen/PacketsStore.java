@@ -14,6 +14,7 @@
 
 package org.freeciv.packetgen;
 
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.utility.Util;
 import org.freeciv.connection.ReflexRuleTime;
@@ -34,7 +35,6 @@ public class PacketsStore {
     private final String configName;
     private final TargetClass packetHeaderType;
     private final boolean enableDelta;
-    private final boolean enableDeltaBoolFolding;
 
     private final DependencyStore requirements;
 
@@ -58,7 +58,6 @@ public class PacketsStore {
 
         this.configName = configName;
         this.enableDelta = enableDelta;
-        this.enableDeltaBoolFolding = enableDeltaBoolFolding;
 
         requirements.addPossibleRequirement(new StringItem("JavaLogger", logger));
 
@@ -95,7 +94,7 @@ public class PacketsStore {
                 packetHeaderType.callV("class")));
 
         requirements.addWanted(Constant.isBool("enableDelta", BuiltIn.literal(enableDelta)));
-        requirements.addWanted(Constant.isBool("enableDeltaBoolFolding", BuiltIn.literal(this.enableDeltaBoolFolding)));
+        requirements.addWanted(Constant.isBool("enableDeltaBoolFolding", BuiltIn.literal(enableDeltaBoolFolding)));
     }
 
     public boolean doesFieldTypeResolve(String name) {
@@ -119,14 +118,20 @@ public class PacketsStore {
 
         List<Requirement> allNeeded = extractFieldRequirements(fields);
         allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
+        allNeeded.add(new Requirement("enableDelta", Constant.class));
+        allNeeded.add(new Requirement("enableDeltaBoolFolding", Constant.class));
         allNeeded.add(new Requirement("JavaLogger", StringItem.class));
 
         requirements.addMaker(new SimpleDependencyMaker(me, allNeeded.toArray(new Requirement[allNeeded.size()])) {
             @Override
             public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
-                assert wasRequired.length == fields.size() + 1 + 1 : "Wrong number of arguments";
+                assert wasRequired.length == fields.size() + 1 + 2 + 1 : "Wrong number of arguments";
 
                 final String logger = ((StringItem) wasRequired[wasRequired.length - 1]).getValue();
+                final boolean enableDeltaBoolFolding
+                        = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 2]).getValue());
+                final boolean enableDelta
+                        = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 3]).getValue());
 
                 List<Field> fieldList = new LinkedList<Field>();
                 for (int i = 0; i < fields.size(); i++)
