@@ -257,6 +257,14 @@ public class DependencyStoreTest {
                 store.getMissingRequirements().contains(reqFor("Pre Needed")));
     }
 
+    @Test
+    public void stringItemHasValue() {
+        final String value = "value";
+        final StringItem item = new StringItem("name", value);
+
+        assertEquals(value, item.getValue());
+    }
+
     @Test public void makerWorksNoDependencies() {
         final Constant<AString> made = Constant.isString("Value", BuiltIn.literal("a value"));
         final Requirement req = new Requirement("Value", Constant.class);
