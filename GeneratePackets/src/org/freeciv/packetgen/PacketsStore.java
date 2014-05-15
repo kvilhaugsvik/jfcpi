@@ -34,7 +34,6 @@ import java.util.*;
 public class PacketsStore {
     private final String configName;
     private final TargetClass packetHeaderType;
-    private final boolean enableDelta;
 
     private final DependencyStore requirements;
 
@@ -57,7 +56,6 @@ public class PacketsStore {
         requirements.addMaker(new DiffArrayElementFieldType());
 
         this.configName = configName;
-        this.enableDelta = enableDelta;
 
         requirements.addPossibleRequirement(new StringItem("JavaLogger", logger));
 
@@ -103,7 +101,7 @@ public class PacketsStore {
 
     public void registerPacket(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields)
             throws PacketCollisionException, UndefinedException {
-        final PacketMaker packetMaker = PacketMaker.create(name, number, flags, fields, enableDelta);
+        final PacketMaker packetMaker = PacketMaker.create(name, number, flags, fields);
 
         validateNameAndNumber(name, number);
         reserveNameAndNumber(name, number, (Requirement)packetMaker.getICanProduceReq());
@@ -265,21 +263,25 @@ public class PacketsStore {
 
         @Override
         public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
-            assert wasRequired.length == fields.size() + 1 + 2 + 1 : "Wrong number of arguments";
+            assert wasRequired.length == fields.size() * 2 + 1 + 2 + 1 : "Wrong number of arguments";
 
             final String logger = ((StringItem) wasRequired[wasRequired.length - 1]).getValue();
             final boolean enableDeltaBoolFolding
                     = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 2]).getValue());
             final boolean enableDelta
                     = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 3]).getValue());
+            final FieldType deltaFieldType = (FieldType)wasRequired[wasRequired.length - 4];
+
+            /* First element in the delta or the first element in the non delta field type list */
+            final int firstFieldTypePos = enableDelta ? fields.size() : 0;
 
             List<Field> fieldList = new LinkedList<Field>();
             for (int i = 0; i < fields.size(); i++)
-                fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i], name,
+                fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i + firstFieldTypePos], name,
                         fields.get(i).getFlags(), fields.get(i).getDeclarations()));
 
             return new Packet(name, number, logger, packetFlags,
-                    enableDelta, enableDeltaBoolFolding, enableDelta ? (FieldType)wasRequired[fields.size()] : null,
+                    enableDelta, enableDeltaBoolFolding, enableDelta ? deltaFieldType : null,
                     fieldList, caps);
         }
 
@@ -312,22 +314,33 @@ public class PacketsStore {
             return packetFlags;
         }
 
-        private static List<Requirement> extractFieldRequirements(List<WeakField> fields,
-                                                                  boolean enableDelta) {
+        private static List<Requirement> extractFieldRequirements(List<WeakField> fields) {
             LinkedList<Requirement> allNeeded = new LinkedList<Requirement>();
+
+            /* Non delta version */
             for (WeakField fieldType : fields) {
                 String type = fieldType.getType();
 
                 if (0 < fieldType.getDeclarations().length)
-                    type = type + "_" + (enableDelta && hasFlag("diff", fieldType.getFlags()) ? "DIFF" : "") + fieldType.getDeclarations().length;
+                    type = type + "_" + fieldType.getDeclarations().length;
 
                 allNeeded.add(new Requirement(type, FieldType.class));
             }
+
+            /* Delta version */
+            for (WeakField fieldType : fields) {
+                String type = fieldType.getType();
+
+                if (0 < fieldType.getDeclarations().length)
+                    type = type + "_" + (hasFlag("diff", fieldType.getFlags()) ? "DIFF" : "") + fieldType.getDeclarations().length;
+
+                allNeeded.add(new Requirement(type, FieldType.class));
+            }
+
             return allNeeded;
         }
 
-        public static PacketMaker create(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields,
-                                         boolean enableDelta) {
+        public static PacketMaker create(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields) {
             final TreeSet<String> caps = new TreeSet<String>();
             for (WeakField field : fields)
                 for (WeakFlag flag : field.getFlags())
@@ -338,7 +351,7 @@ public class PacketsStore {
 
             final List<Annotate> packetFlags = extractFlags(flags);
 
-            List<Requirement> allNeeded = extractFieldRequirements(fields, enableDelta);
+            List<Requirement> allNeeded = extractFieldRequirements(fields);
             allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
             allNeeded.add(new Requirement("enableDelta", Constant.class));
             allNeeded.add(new Requirement("enableDeltaBoolFolding", Constant.class));
