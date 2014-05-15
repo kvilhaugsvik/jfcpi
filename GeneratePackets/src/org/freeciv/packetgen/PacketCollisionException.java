@@ -14,6 +14,9 @@
 
 package org.freeciv.packetgen;
 
+/**
+ * The packet name or the packet number is already in use.
+ */
 public class PacketCollisionException extends RuntimeException {
     public PacketCollisionException(String errorMessage) {
         super(errorMessage);
