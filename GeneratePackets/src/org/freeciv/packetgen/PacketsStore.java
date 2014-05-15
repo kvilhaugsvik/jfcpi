@@ -306,7 +306,6 @@ public class PacketsStore {
                     packetFlags.add(new Annotate(PostRecv.class));
                 else if ("cancel".equals(flag.getName()))
                     canceled.add(flag.getArguments()[0]);
-
             }
             if (!canceled.isEmpty()) packetFlags.add(new Canceler(canceled));
             packetFlags.add(new Sender(sentBy));
