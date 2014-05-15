@@ -98,16 +98,17 @@ public class PacketsStore {
         return requirements.isAwareOfProvider(new Requirement(name, FieldType.class));
     }
 
-    public void registerPacket(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields)
-            throws PacketCollisionException, UndefinedException {
-        final PacketMaker packetMaker = PacketMaker.create(name, number, flags, fields);
+    /**
+     * A new packet has arrived. Check if it is valid and register it if it is.
+     * @param packet the new packet
+     * @throws PacketCollisionException if the packet name or number already is in use
+     */
+    private void processNewPacket(PacketMaker packet) throws PacketCollisionException {
+        validateNameAndNumber(packet.getName(), packet.getNumber());
+        reserveNameAndNumber(packet.getName(), packet.getNumber(),
+                (Requirement) packet.getICanProduceReq());
 
-        validateNameAndNumber(name, number);
-        reserveNameAndNumber(name, number, (Requirement)packetMaker.getICanProduceReq());
-
-        requirements.addMaker(packetMaker);
-
-        requirements.demand((Requirement)packetMaker.getICanProduceReq());
+        requirements.demand((Requirement)packet.getICanProduceReq());
     }
 
     private void validateNameAndNumber(String name, int number) throws PacketCollisionException {
@@ -213,6 +214,8 @@ public class PacketsStore {
     }
 
     public void addDependency(Dependency fulfillment) {
+        if (fulfillment instanceof PacketMaker)
+            processNewPacket((PacketMaker) fulfillment);
         if (fulfillment instanceof Enum)
             for (Dependency.Item constant : ((Enum)fulfillment).getEnumConstants())
                 requirements.addPossibleRequirement(constant);

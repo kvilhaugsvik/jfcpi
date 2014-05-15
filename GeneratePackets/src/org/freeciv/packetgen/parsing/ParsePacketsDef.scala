@@ -91,11 +91,11 @@ class ParsePacketsDef(storage: PacketsStore) extends ParseShared {
     fieldList <~
     "end" ^^ {
     case name ~ number ~ flags ~ fields =>
-      storage.registerPacket(
+      storage.addDependency(PacketMaker.create(
         name,
         Integer.parseInt(number),
         wrapFlags(flags),
-        fields)
+        fields))
   }
 
   def wrapFlags(flags: List[~[String, Option[String]]]): List[WeakFlag] =

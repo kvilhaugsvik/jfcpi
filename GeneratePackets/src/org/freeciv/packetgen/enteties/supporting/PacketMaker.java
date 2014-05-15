@@ -46,6 +46,22 @@ public class PacketMaker extends SimpleDependencyMaker {
         this.caps = caps;
     }
 
+    /**
+     * Get the name of the packet that can be make
+     * @return the name of the packet that can be make
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Get the number of the packet that can be make
+     * @return the number of the packet that can be make
+     */
+    public int getNumber() {
+        return number;
+    }
+
     @Override
     public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
         assert wasRequired.length == fields.size() * 2 + 1 + 2 + 1 : "Wrong number of arguments";

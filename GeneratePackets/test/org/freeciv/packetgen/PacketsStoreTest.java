@@ -87,7 +87,7 @@ public class PacketsStoreTest {
             throws PacketCollisionException, UndefinedException {
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(new WeakField("DragInnDep", fieldTypeName, Collections.<WeakFlag>emptyList()));
-        storage.registerPacket("DragInnDep" + time, 42 + time, Collections.<WeakFlag>emptyList(), fields);
+        storage.addDependency(PacketMaker.create("DragInnDep" + time, 42 + time, Collections.<WeakFlag>emptyList(), fields));
     }
 
     @Test public void registerTypeRequiredNotExisting() throws UndefinedException, PacketCollisionException {
@@ -159,7 +159,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithoutFields() throws UndefinedException, PacketCollisionException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>()));
 
         assertTrue(storage.hasPacket(25));
         assertTrue(storage.hasPacket("PACKET_HELLO"));
@@ -169,15 +169,15 @@ public class PacketsStoreTest {
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameNumber() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
-        storage.registerPacket("PACKET_HI", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>()));
+        storage.addDependency(PacketMaker.create("PACKET_HI", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>()));
     }
 
     @Test(expected = PacketCollisionException.class)
     public void registerTwoPacketsWithTheSameName() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
-        storage.registerPacket("PACKET_HELLO", 50, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>()));
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 50, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>()));
     }
 
     @Test public void registerPacketWithFields() throws PacketCollisionException, UndefinedException {
@@ -187,7 +187,7 @@ public class PacketsStoreTest {
                 new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
-        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields);
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields));
 
         assertTrue(storage.doesFieldTypeResolve("STRING"));
         assertTrue(storage.hasPacket(25));
@@ -209,7 +209,7 @@ public class PacketsStoreTest {
         fields.add(field1);
 
         storage.addDependency(FieldTypeMaker.basic("STRING", "string", "char"));
-        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields);
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields));
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
         assertEquals("myNameIs", storage.getPacket("PACKET_HELLO").getFields().get(0).getName());
@@ -218,7 +218,7 @@ public class PacketsStoreTest {
 
     @Test public void registerPacketWithoutFieldsHasNoFields() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>()));
 
         assertTrue(storage.hasPacket("PACKET_HELLO"));
         assertTrue(storage.getPacket("PACKET_HELLO").getFields().isEmpty());
@@ -230,7 +230,7 @@ public class PacketsStoreTest {
         LinkedList<WeakField> fields = new LinkedList<WeakField>();
         fields.add(field1);
 
-        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields);
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), fields));
 
         assertNull(storage.getPacket(25));
         assertNull(storage.getPacket("PACKET_HELLO"));
@@ -241,7 +241,7 @@ public class PacketsStoreTest {
         PacketsStore storage = defaultStorage();
         WeakField field1 = new WeakField("myNameIs", "STRING",
                 Collections.<WeakFlag>emptyList(), new WeakField.ArrayDeclaration(IntExpression.integer("50"), null));
-        storage.registerPacket("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), Arrays.asList(field1));
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 25, Collections.<WeakFlag>emptyList(), Arrays.asList(field1)));
         storage.addDependency(FieldTypeMaker.basic("STRING", "string", "char"));
 
         assertTrue("Packet not created", storage.hasPacket("PACKET_HELLO"));
@@ -289,7 +289,7 @@ public class PacketsStoreTest {
 
     @Test public void packetIsListed() throws PacketCollisionException, UndefinedException {
         PacketsStore storage = defaultStorage();
-        storage.registerPacket("PACKET_HELLO", 0, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>());
+        storage.addDependency(PacketMaker.create("PACKET_HELLO", 0, Collections.<WeakFlag>emptyList(), new LinkedList<WeakField>()));
 
         assertEquals("{org.freeciv.packet.PACKET_HELLO.class}",
                 Util.joinStringArray(DefaultStyle.DEFAULT_STYLE_INDENT.asFormattedLines(
@@ -309,7 +309,7 @@ public class PacketsStoreTest {
                 new WeakField("field", "UNDER_1", Collections.<WeakFlag>emptyList(),
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
 
-        storage.registerPacket("Array1D", 44, Collections.<WeakFlag>emptyList(), fieldList);
+        storage.addDependency(PacketMaker.create("Array1D", 44, Collections.<WeakFlag>emptyList(), fieldList));
 
         HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
@@ -331,7 +331,7 @@ public class PacketsStoreTest {
                 new WeakField("field", "UNDER_5", Collections.<WeakFlag>emptyList(),
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
 
-        storage.registerPacket("Array5D", 44, Collections.<WeakFlag>emptyList(), fieldList);
+        storage.addDependency(PacketMaker.create("Array5D", 44, Collections.<WeakFlag>emptyList(), fieldList));
 
         HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
@@ -357,7 +357,7 @@ public class PacketsStoreTest {
                 new WeakField("field", "UNDER_15", Collections.<WeakFlag>emptyList(),
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
 
-        storage.registerPacket("Array15D", 44, Collections.<WeakFlag>emptyList(), fieldList);
+        storage.addDependency(PacketMaker.create("Array15D", 44, Collections.<WeakFlag>emptyList(), fieldList));
 
         HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
@@ -383,7 +383,7 @@ public class PacketsStoreTest {
                 new WeakField("field", "UNDER_3", Collections.<WeakFlag>emptyList(),
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
 
-        storage.registerPacket("ArrayEat", 44, Collections.<WeakFlag>emptyList(), fieldList);
+        storage.addDependency(PacketMaker.create("ArrayEat", 44, Collections.<WeakFlag>emptyList(), fieldList));
 
         HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
@@ -407,7 +407,7 @@ public class PacketsStoreTest {
                 new WeakField("field", "UNDER_1", Collections.<WeakFlag>emptyList(),
                         new WeakField.ArrayDeclaration(IntExpression.integer("5"), "elems")));
 
-        storage.registerPacket("ArrayEat", 44, Collections.<WeakFlag>emptyList(), fieldList);
+        storage.addDependency(PacketMaker.create("ArrayEat", 44, Collections.<WeakFlag>emptyList(), fieldList));
 
         HashMap<String, ClassWriter> results = getJavaCodeIndexedOnClassName(storage);
 
