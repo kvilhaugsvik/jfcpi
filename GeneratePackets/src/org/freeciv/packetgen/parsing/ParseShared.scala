@@ -247,7 +247,17 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   }
 }
 
+/**
+ * A parser meant to be used with an Extractor.
+ */
 abstract class ExtractableParser extends ParseShared {
+  /**
+   * Wrap a parser that returns a single Dependency object so it returns a List containing the single Dependency object.
+   * Helper function for parser functions that return a Dependency but should be used in
+   * [[org.freeciv.packetgen.parsing.ExtractableParser.exprConverted]].
+   * @param orig a parser function that returns a single Dependency object.
+   * @return a parser that use the original parser but return a List containing the Dependency object.
+   */
   def oneAsMany(orig : ExtractableParser.this.Parser[Dependency]) : ExtractableParser.this.Parser[List[Dependency]] = {
     new Parser[List[Dependency]] {
       def apply(in : ExtractableParser.this.type#Input): ParseResult[List[Dependency]] = {
@@ -261,7 +271,18 @@ abstract class ExtractableParser extends ParseShared {
     }
   }
 
+  /**
+   * List of patterns that recognize locations the parser should try to extract from. When found an attempt to parse
+   * from the found position will be made. If something is extracted it is added. If not it will be ignored.
+   * @return a list of patterns that recognize possible extractable prefixes.
+   */
   def startsOfExtractable : List[String]
+
+  /**
+   * A parser that can parse and convert any Dependency the ExtractableParser can extract. A single conversion may
+   * result in multiple Dependency objects.
+   * @return the parser that can parse and convert any supported Dependency.
+   */
   def exprConverted: Parser[List[Dependency]]
 }
 
