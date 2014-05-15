@@ -30,6 +30,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
+/**
+ * Produce code for understanding the specified packet type
+ *
+ * Generating packet type code requires a lot of data that the parser shouldn't have to care about. It should therefore
+ * create a PacketMaker in stead. The PacketMaker knows what packet it wants to create and what data it is missing. When
+ * given the required data it will produce it.
+ */
 public class PacketMaker extends SimpleDependencyMaker {
     private final List<WeakField> fields;
     private final String name;
@@ -37,7 +44,7 @@ public class PacketMaker extends SimpleDependencyMaker {
     private final List<Annotate> packetFlags;
     private final TreeSet<String> caps;
 
-    PacketMaker(Requirement me, List<Requirement> allNeeded, List<WeakField> fields, String name, int number, List<Annotate> packetFlags, TreeSet<String> caps) {
+    private PacketMaker(Requirement me, List<Requirement> allNeeded, List<WeakField> fields, String name, int number, List<Annotate> packetFlags, TreeSet<String> caps) {
         super(me, allNeeded.toArray(new Requirement[allNeeded.size()]));
         this.fields = fields;
         this.name = name;
@@ -149,6 +156,14 @@ public class PacketMaker extends SimpleDependencyMaker {
         return allNeeded;
     }
 
+    /**
+     * Create a PacketMaker that will produce code for understanding the specified packet type.
+     * @param name the wanted packet name
+     * @param number the wanted packet number
+     * @param flags the wanted packet flags
+     * @param fields the fields of the wanted packet
+     * @return a PacketMaker that can produce the wanted packet
+     */
     public static PacketMaker create(final String name, final int number, List<WeakFlag> flags, final List<WeakField> fields) {
         final TreeSet<String> caps = new TreeSet<String>();
         for (WeakField field : fields)
