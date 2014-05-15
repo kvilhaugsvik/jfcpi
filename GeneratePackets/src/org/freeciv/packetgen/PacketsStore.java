@@ -124,14 +124,6 @@ public class PacketsStore {
         packetsByNumber.put(number, name);
     }
 
-    private static boolean hasFlag(String name, List<WeakFlag> flags) {
-        for (WeakFlag flag : flags)
-            if (name.equals(flag.getName()))
-                return true;
-
-        return false;
-    }
-
     public boolean hasPacket(String name) {
         return packets.containsKey(name);
     }
@@ -312,6 +304,14 @@ public class PacketsStore {
             if (!canceled.isEmpty()) packetFlags.add(new Canceler(canceled));
             packetFlags.add(new Sender(sentBy));
             return packetFlags;
+        }
+
+        private static boolean hasFlag(String name, List<WeakFlag> flags) {
+            for (WeakFlag flag : flags)
+                if (name.equals(flag.getName()))
+                    return true;
+
+            return false;
         }
 
         private static List<Requirement> extractFieldRequirements(List<WeakField> fields) {
