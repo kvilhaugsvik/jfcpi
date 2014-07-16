@@ -286,12 +286,33 @@ abstract class ExtractableParser extends ParseShared {
   def exprConverted: Parser[List[Dependency]]
 }
 
+/**
+ * Extract elements without parsing, or even knowing how to parse, all of it.
+ *
+ * This is done in two steps. The first step uses a regular expression to identify positions that may contain
+ * interesting elements. The second step tries to parse the interesting locations. A parsed location may result in zero,
+ * one or more Dependency. If an interesting location is a false positive a list of zero Dependency should be returned.
+ *
+ * It is recommended to make its children singleton objects.
+ *
+ * @param parser A parser that knows what prefix patterns indicates the beginning of an element it should try to parse.
+ */
 abstract class ExtractorShared(protected val parser : ExtractableParser) {
   protected val lookFor = parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _).r
 
+  /**
+   * Search the supplied String for positions that may contain something interesting
+   * @param lookIn the String to search
+   * @return a list of possible locations that may be the start of a Dependency
+   */
   def findPossibleStartPositions(lookIn: String): List[Int] =
     lookFor.findAllIn(lookIn).matchData.map(_.start).toList
 
+  /**
+   * Extract all Dependency in the supplied SourceFile
+   * @param lookIn The SourceFile to extract from
+   * @return a list of every Dependency generated while parsing the interesting locations of the document.
+   */
   def extract(lookIn: SourceFile): List[Dependency] = {
     val positions = findPossibleStartPositions(lookIn.getContent)
     val lookInAsReader = new parser.PackratReader(new CharArrayReader(lookIn.getContent.toArray))
