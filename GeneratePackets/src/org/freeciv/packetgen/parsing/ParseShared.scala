@@ -248,7 +248,9 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 }
 
 /**
- * A parser meant to be used with an Extractor.
+ * A parser meant to be used with an [[org.freeciv.packetgen.parsing.ExtractorShared]].
+ * Has a list of patterns that recognizes possible prefixes of wanted elements.
+ * Can return zero (nothing found) one or more Dependency when parsing an element.
  */
 abstract class ExtractableParser extends ParseShared {
   /**
@@ -280,7 +282,8 @@ abstract class ExtractableParser extends ParseShared {
 
   /**
    * A parser that can parse and convert any Dependency the ExtractableParser can extract. A single conversion may
-   * result in multiple Dependency objects.
+   * result in multiple Dependency objects. Should return a list of zero objects if the parsing fails. (The parsing may
+   * fail because the location is a false positive)
    * @return the parser that can parse and convert any supported Dependency.
    */
   def exprConverted: Parser[List[Dependency]]
