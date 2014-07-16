@@ -296,11 +296,12 @@ abstract class ExtractableParser extends ParseShared {
  * interesting elements. The second step tries to parse the interesting locations. A parsed location may result in zero,
  * one or more Dependency. If an interesting location is a false positive a list of zero Dependency should be returned.
  *
- * It is recommended to make its children singleton objects.
+ * It is recommended to make a singleton object that extends ExtractorShared for each
+ * [[org.freeciv.packetgen.parsing.ExtractableParser]] if the ExtractableParser is a singleton object.
  *
  * @param parser A parser that knows what prefix patterns indicates the beginning of an element it should try to parse.
  */
-abstract class ExtractorShared(protected val parser : ExtractableParser) {
+class ExtractorShared(protected val parser : ExtractableParser) {
   protected val lookFor = parser.startsOfExtractable.map("(" + _ + ")").reduce(_ + "|" + _).r
 
   /**
