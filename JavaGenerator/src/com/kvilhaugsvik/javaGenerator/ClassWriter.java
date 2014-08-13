@@ -159,7 +159,7 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         addPublicObjectConstant(TargetClass.from(type), name);
     }
 
-    public void addObjectConstantAndGetter(Var field) {
+    public void addObjectConstantAndGetter(Var<AValue> field) {
         addField(field);
         addMethod(Method.newPublicReadObjectState(Comment.no(),
                 field.getTType(),
