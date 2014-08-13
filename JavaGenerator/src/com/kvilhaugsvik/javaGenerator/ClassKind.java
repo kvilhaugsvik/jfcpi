@@ -18,6 +18,9 @@ import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 
+/**
+ * A Java class kind
+ */
 public enum ClassKind implements HasAtoms {
     CLASS,
     ABSTRACT_CLASS,

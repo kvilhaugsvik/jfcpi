@@ -18,6 +18,9 @@ import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 
+/**
+ * Is this modifiable?
+ */
 public enum Modifiable implements HasAtoms {
     YES(null),
     NO("final");

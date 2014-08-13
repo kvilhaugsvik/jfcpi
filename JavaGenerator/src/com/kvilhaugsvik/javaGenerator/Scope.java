@@ -18,9 +18,23 @@ import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 
+/**
+ * What Java scope something can be accessed from.
+ */
 public enum Scope implements HasAtoms {
+    /**
+     * Shared between the object instances of the class.
+     */
     CLASS("static"),
+
+    /**
+     * Local to the object.
+     */
     OBJECT(null),
+
+    /**
+     * Local to the code block that use it.
+     */
     CODE_BLOCK(null);
 
     private final CodeAtom code;

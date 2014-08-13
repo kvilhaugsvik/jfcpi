@@ -30,6 +30,9 @@ import java.util.*;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
+/**
+ * Generate a Java Class. Will automatically wrap it in the correct source code file.
+ */
 public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
     public static final TargetClass DEFAULT_PARENT = TargetClass.from(Object.class);
     protected final Reference<AValue> internal_ref_this;
@@ -52,6 +55,18 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
 
     private boolean constructorFromAllFields = false;
 
+    /**
+     * Create a new Java source code file
+     * @param kind The kind of Java source file to create.
+     * @param where What package the class live in
+     * @param imports What classes should be imported so they can be referred to without using the full address.
+     *                Note that this applies to the source file the class is inside.
+     * @param madeFrom Where the data used to generate this class came from.
+     * @param classAnnotate annotations to put on this class.
+     * @param name the name of the class.
+     * @param parent the class the generated class should extend. Default is {@see java.lang.Object}.
+     * @param implementsInterface interfaces the class implements.
+     */
     public ClassWriter(ClassKind kind, TargetPackage where, Imports imports,
                        String madeFrom, List<Annotate> classAnnotate,
                        String name,
@@ -104,6 +119,10 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         this.isOuter = false;
     }
 
+    /**
+     * Add a field to the class
+     * @param field the field to add
+     */
     public void addField(Var field) {
         if (field.getScope().equals(Scope.CODE_BLOCK))
             throw new IllegalArgumentException("Can't add a local variable declaration as a field");
@@ -152,11 +171,18 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         return "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
     }
 
+    /**
+     * Add a method to the generated class.
+     * @param toAdd the method to add.
+     */
     public void addMethod(Method toAdd) {
         methods.add(toAdd);
         myAddress.register(toAdd.getAddressOn(this.getAddress()));
     }
 
+    /**
+     * Generate a constructor from all the fields of the class
+     */
     public void addConstructorFields() {
         constructorFromAllFields = true;
     }
@@ -175,6 +201,14 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         classAnnotate.add(using);
     }
 
+    /**
+     * Create an inner Java class
+     * @param kind The Java class kind.
+     * @param name The name of the inner class.
+     * @param parent The class the inner class should extend. Default is {@see java.lang.Object}.
+     * @param implementsInterface interfaces implemented by the inner class.
+     * @return a reference to the new inner class.
+     */
     public ClassWriter newInnerClass(ClassKind kind, String name, TargetClass parent, List<TargetClass> implementsInterface) {
         innerClasses.put(name, new ClassWriter(this.getAddress(), kind, name, parent, implementsInterface, scopeData));
         return getInnerClass(name);
@@ -286,10 +320,18 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         }
     }
 
+    /**
+     * Get the simple name of the class as a {@see java.lang.String}
+     * @return the simple name of the class
+     */
     public String getName() {
         return myAddress.getSimpleName();
     }
 
+    /**
+     * Get the full address of the class as a {@see com.kvilhaugsvik.javaGenerator.TargetClass}
+     * @return the full address of the class
+     */
     public TargetClass getAddress() {
         return myAddress;
     }
@@ -302,14 +344,28 @@ public class ClassWriter extends Formatted implements HasAtoms, IAnnotatable {
         return internal_ref_super;
     }
 
+    /**
+     * Get the package as a {@see java.lang.String}
+     * @return the full package address
+     */
     public String getPackage() {
         return myAddress.getPackage().getFullAddress();
     }
 
+    /**
+     * Get a field with the given name. If no such field exists NULL is returned.
+     * @param name the name of the wanted field
+     * @return the wanted field if found. Null if it isn't.
+     */
     public Var getField(String name) {
         return fields.get(name);
     }
 
+    /**
+     * Does a constant with the given name exist in the class?
+     * @param name name of the constant to look for.
+     * @return true if the field exists and is unmodifiable.
+     */
     public boolean hasConstant(String name) {
         Var field = getField(name);
         return null != field && field.getModifiable().equals(Modifiable.NO);
