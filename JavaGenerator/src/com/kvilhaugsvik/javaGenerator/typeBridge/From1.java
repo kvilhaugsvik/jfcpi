@@ -18,8 +18,8 @@ import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 
 /**
  * An expression that returns a value of type Return given Argument1
- * @param <Returns>
- * @param <Argument1>
+ * @param <Returns> the type of the return value
+ * @param <Argument1> the type of the first argument
  */
 public interface From1<Returns extends HasAtoms, Argument1 extends HasAtoms> {
     /**

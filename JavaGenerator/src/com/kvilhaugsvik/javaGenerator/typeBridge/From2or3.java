@@ -16,6 +16,13 @@ package com.kvilhaugsvik.javaGenerator.typeBridge;
 
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 
+/**
+ * An expression that returns a value of type Return given Argument1 and Argument2 or given Argument1, Argument2 and Argument3
+ * @param <Returns> the type of the return value
+ * @param <Argument1> the type of the first argument
+ * @param <Argument2> the type of the second argument
+ * @param <Argument3> the type of the third argument
+ */
 public interface From2or3<Returns extends HasAtoms, Argument1 extends HasAtoms, Argument2 extends HasAtoms, Argument3 extends HasAtoms>
         extends From2<Returns, Argument1, Argument2>, From3<Returns, Argument1, Argument2, Argument3> {
 }

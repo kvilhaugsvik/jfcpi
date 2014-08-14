@@ -21,5 +21,10 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
  * @param <Kind> the kind of value this location can hold
  */
 public interface Location<Kind extends AValue> extends Value<Kind> {
+    /**
+     * Generate code that assigns the value to this location.
+     * @param value the value to assign to this location
+     * @return an assignment expression that assigns {see value} to the represented location
+     */
     public Value<Kind> assign(final Value<Kind> value);
 }
