@@ -14,5 +14,8 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
+/**
+ * Represents the void type.
+ */
 public interface NoValue extends Returnable {
 }

@@ -14,5 +14,8 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
+/**
+ * Represents the {@see int} value type.
+ */
 public interface AnInt extends AValue {
 }

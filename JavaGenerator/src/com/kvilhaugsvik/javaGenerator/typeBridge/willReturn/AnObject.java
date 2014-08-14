@@ -14,5 +14,8 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
+/**
+ * Represents a type defined by a Java class.
+ */
 public interface AnObject extends AValue {
 }

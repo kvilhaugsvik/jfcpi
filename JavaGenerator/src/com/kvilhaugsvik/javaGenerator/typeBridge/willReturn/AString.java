@@ -14,5 +14,8 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
+/**
+ * Represents the {@see java.lang.String} value type.
+ */
 public interface AString extends AnObject {
 }

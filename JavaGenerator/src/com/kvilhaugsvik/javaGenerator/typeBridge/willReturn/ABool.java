@@ -14,5 +14,8 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
+/**
+ * Represents the {@see boolean} value type.
+ */
 public interface ABool extends AValue {
 }

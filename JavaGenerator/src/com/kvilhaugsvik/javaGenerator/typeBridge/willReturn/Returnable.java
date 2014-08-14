@@ -14,5 +14,8 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
+/**
+ * Represents any type that may be returned by a method, including void.
+ */
 public interface Returnable {
 }

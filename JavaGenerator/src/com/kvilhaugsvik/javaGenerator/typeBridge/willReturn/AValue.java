@@ -14,5 +14,8 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
+/**
+ * Represents a non void value type.
+ */
 public interface AValue extends Returnable {
 }

@@ -14,5 +14,8 @@
 
 package com.kvilhaugsvik.javaGenerator.typeBridge.willReturn;
 
+/**
+ * Represents the {@see long} value type.
+ */
 public interface ALong extends AValue {
 }
