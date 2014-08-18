@@ -16,6 +16,14 @@ package org.freeciv.packetgen
 
 import java.io.File
 
+/**
+ * The configuration data for a Freeciv version
+ * @param configName the name given to the configuration
+ * @param packetHeader the kind of packet header
+ * @param enableDelta should the delta protocol be enabled?
+ * @param enableDeltaBoolFolding should boolean variables be folded into the delta header?
+ * @param inputSources the source files to extract the protocol from
+ */
 class VersionConfig(val configName: String,
                     val packetHeader: org.freeciv.packetgen.PacketHeaderKinds,
                     val enableDelta: Boolean, val enableDeltaBoolFolding: Boolean,
@@ -23,6 +31,11 @@ class VersionConfig(val configName: String,
 }
 
 object VersionConfig {
+  /**
+   * Create a new VersionConfig from an xml file
+   * @param from the xml file to parse
+   * @return the configuration data for the Freeciv version specified in the provided xml file
+   */
   def fromFile(from: File): VersionConfig = {
     val versionConfiguration = GeneratePackets.readSettings(from)
 
@@ -39,5 +52,10 @@ object VersionConfig {
     new VersionConfig(configName, packetHeader, enableDelta, enableDeltaBoolFolding, inputSources)
   }
 
+  /**
+   * Create a new VersionConfig from the path to an xml file
+   * @param from the path of the xml file to parse
+   * @return the configuration data for the Freeciv version specified in the provided xml file
+   */
   def fromFile(from: String): VersionConfig = fromFile(new File(from))
 }
