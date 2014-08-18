@@ -256,29 +256,3 @@ object GeneratePackets {
     }
   }
 }
-
-class VersionConfig(val configName: String,
-                    val packetHeader: org.freeciv.packetgen.PacketHeaderKinds,
-                    val enableDelta: Boolean, val enableDeltaBoolFolding: Boolean,
-                    val inputSources: Map[String, Seq[String]]) {
-}
-
-object VersionConfig {
-  def fromFile(from: File): VersionConfig = {
-    val versionConfiguration = GeneratePackets.readSettings(from)
-
-    val configName = versionConfiguration.attribute("name").get.text
-
-    val packetHeader = PacketHeaderKinds.valueOf(versionConfiguration.attribute("packetHeaderKind").get.text)
-
-    val enableDelta = versionConfiguration.attribute("enableDelta").get.text.toBoolean
-    val enableDeltaBoolFolding = versionConfiguration.attribute("enableDeltaBoolFolding").get.text.toBoolean
-
-    val inputSources = (versionConfiguration \ "inputSource").map(elem =>
-      elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
-
-    new VersionConfig(configName, packetHeader, enableDelta, enableDeltaBoolFolding, inputSources)
-  }
-
-  def fromFile(from: String): VersionConfig = fromFile(new File(from))
-}
