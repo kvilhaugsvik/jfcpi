@@ -87,6 +87,15 @@ public class UnderstoodBitVector<Of extends FCEnum> extends BitVector {
         super.set(element.getNumber(), value);
     }
 
+
+    /**
+     * Set the given enumerator to absent in the bit vector.
+     * @param element the enumerator to be set to present.
+     */
+    public void unset(final Of element) {
+        set(element, false);
+    }
+
     /**
      * Get if the given enumerator is present in the bit vector.
      * @param element the enumerator to look for.

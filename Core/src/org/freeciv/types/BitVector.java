@@ -73,13 +73,29 @@ public class BitVector {
     }
 
     /**
-     * Set the value of a specific bit.
+     * Set the value of a specific bit to the given value.
      * @param bitNumber the position of the bit to set.
      * @param value the value to set it to.
      */
     // TODO: Move to subclass so this can be made immutable
     public void set(final int bitNumber, final boolean value) {
         vec[bitNumber] = value;
+    }
+
+    /**
+     * Set the value of a specific bit to true.
+     * @param bitNumber the position of the bit to set.
+     */
+    public void set(final int bitNumber) {
+        set(bitNumber, true);
+    }
+
+    /**
+     * Set the value of a specific bit to false.
+     * @param bitNumber the position of the bit to unset.
+     */
+    public void unset(final int bitNumber) {
+        set(bitNumber, false);
     }
 
     /**
