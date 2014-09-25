@@ -207,7 +207,14 @@ object GeneratePackets {
     XML.loadFile(listFile)
   }
 
-  def detectFreecivVersion(fc_version: List[Dependency]): String = {
+  /**
+   * Detect the major/minor version of the Freeciv source code from the file fc_version.
+   * @param fc_version the fc_version file from the root dir of the Freeciv source tree
+   * @return a version string consisting of the major and minor version (eg 2.4, 2.6, etc)
+   */
+  def detectFreecivVersion(fc_version: SourceFile): String = {
+    val fc_version_vars: List[Dependency] = VariableAssignmentsExtractor.extract(fc_version)
+
     def stripQuotes(orig: String) = orig.substring(1, orig.length - 1)
 
     def getExpr(constants: Map[String, Constant[_ <: AValue]], name: String) = {
@@ -221,7 +228,7 @@ object GeneratePackets {
       stripQuotes(getExpr(constants, name))
 
     val fc_version_constants: Map[String, Constant[_ <: AValue]] =
-      fc_version.filter((dep: Dependency) => dep.isInstanceOf[Constant[_ <: AValue]])
+      fc_version_vars.filter((dep: Dependency) => dep.isInstanceOf[Constant[_ <: AValue]])
         .map((dep: Dependency) => dep.asInstanceOf[Constant[_ <: AValue]])
         .map((con: Constant[_ <: AValue]) => con.getName -> con).toMap
 
@@ -243,9 +250,7 @@ object GeneratePackets {
 
       val vpSource: SourceFile =
         GeneratePackets.readFileAsString(sourceLocation, "fc_version")
-      val fc_version: List[Dependency] = VariableAssignmentsExtractor.extract(vpSource)
-
-      val version: String = GeneratePackets.detectFreecivVersion(fc_version)
+      val version: String = GeneratePackets.detectFreecivVersion(vpSource)
 
       if (!silent)
         println("Source code of Freeciv " + version + " auto detected.")
