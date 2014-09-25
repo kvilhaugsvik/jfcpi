@@ -79,6 +79,11 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
   println("Applying manual changes")
   Hardcoded.applyManualChanges(storage);
 
+  /**
+   * Write the generated code (and maybe its input files) to the given directory.
+   * @param path the output folder were the files should be written.
+   * @param includeOrigSrc should the input files be copied to the output folder?
+   */
   def writeToDir(path: String, includeOrigSrc: Boolean) {
     val statusPrinter = new ChangingConsoleLine("Writing the file ", System.out)
 
@@ -125,6 +130,9 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
   }
 }
 
+/**
+ * Generates Java code that helps understanding the Freeciv protocol from the Freeciv source code.
+ */
 object GeneratePackets {
   private val SOURCE_CODE_LOCATION = "source-code-location"
   private val VERSION_INFORMATION = "version-information"
@@ -182,6 +190,11 @@ object GeneratePackets {
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER, settings.getSetting[Boolean](GPL_SOURCE))
   }
 
+  /**
+   * Check that the given file can be read,
+   * @param fileToValidate the file to test if can be read.
+   * @throws IOException if the file don't exist or can't be read
+   */
   def checkFileCanRead(fileToValidate: File) {
     if (!fileToValidate.exists()) {
       throw new IOException(fileToValidate.getAbsolutePath + " doesn't exist.")
@@ -209,6 +222,12 @@ object GeneratePackets {
     return new SourceFile(itemRPath, content)
   }
 
+  /**
+   * Read the settings file.
+   * @param listFile the setting file.
+   * @return the settings
+   * @throws IOException if the file don't exist or can't be read
+   */
   def readSettings(listFile: File) = {
     checkFileCanRead(listFile)
     XML.loadFile(listFile)
