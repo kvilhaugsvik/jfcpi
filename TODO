@@ -15,6 +15,10 @@ JavaGenerator
  * Support formatting -5 as -5 without turning 2 - 5 in to 2 -5
  * Review or rewrite the default code style
 
+Documentation:
+ * Add support for Javadoc and Scaladoc to the build system
+ * Add Javadoc and Scaladoc to the undocumented source files
+
 Generally
  * Make the code more consistent by finishing or removing incomplete abstractions
  * Fix misleading names
