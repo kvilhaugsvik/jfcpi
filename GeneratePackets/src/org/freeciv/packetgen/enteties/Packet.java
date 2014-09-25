@@ -449,7 +449,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                     zero,
                     cast(impl, old.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()]))))));
         } else {
-            chosenOld = null;
+            chosenOld = Var.local(impl, "chosenOld", NULL);
         }
 
         LinkedList<Reference<? extends AValue>> constructorParams = new LinkedList<Reference<? extends AValue>>();
@@ -461,7 +461,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             if (!isBoolFolded(enableDeltaBoolFolding, field))
                 deltaAndFields.add(asLocal.ref());
 
-            if (delta && oldNeeded) {
+            if (oldNeeded) {
                 if (!field.isAnnotatedUsing(keyFlagg)) {
                     oldNeeded = false;
                     body.addStatement(chosenOld);
