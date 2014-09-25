@@ -42,7 +42,7 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
   requested.filter(item => "type".equals(item._1)).foreach(cons => storage.requestType(cons._2))
 
   private def createAndRegister(location: String, cr: String): SourceFile = {
-    val src = GeneratePackets.readFileAsString(location, cr)
+    val src = GeneratePackets.readSourceFile(location, cr)
     storage.addSource(src)
     src
   }
@@ -50,11 +50,11 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
   // checking that all input files are there BEFORE wasting time working on some of it is now done during reading
   println("Reading the source code")
 
-  private val pdSource: SourceFile = GeneratePackets.readFileAsString(sourceLocation, packetsDefRPath)
+  private val pdSource: SourceFile = GeneratePackets.readSourceFile(sourceLocation, packetsDefRPath)
   storage.addSource(pdSource)
 
   private val vpSource: SourceFile =
-    GeneratePackets.readFileAsString(sourceLocation, versionConfig.inputSources("variables").head)
+    GeneratePackets.readSourceFile(sourceLocation, versionConfig.inputSources("variables").head)
   storage.addSource(vpSource)
 
   private val cSources: List[SourceFile] =
@@ -190,7 +190,14 @@ object GeneratePackets {
     }
   }
 
-  def readFileAsString(sourceLocation: String, itemRPath: String): SourceFile = {
+  /**
+   * Read the given file into memory.
+   * @param sourceLocation location of the file
+   * @param itemRPath name of the file
+   * @return a SourceFile with the content of the file and its path
+   * @throws IOException if the file don't exist or can't be read
+   */
+  def readSourceFile(sourceLocation: String, itemRPath: String): SourceFile = {
     val code: File = new File(sourceLocation + itemRPath)
 
     GeneratePackets.checkFileCanRead(code)
@@ -249,7 +256,7 @@ object GeneratePackets {
         println("Reading " + sourceLocation + "fc_version")
 
       val vpSource: SourceFile =
-        GeneratePackets.readFileAsString(sourceLocation, "fc_version")
+        GeneratePackets.readSourceFile(sourceLocation, "fc_version")
       val version: String = GeneratePackets.detectFreecivVersion(vpSource)
 
       if (!silent)
