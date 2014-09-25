@@ -43,6 +43,9 @@ import java.util.logging.Level;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
+/**
+ * Generates the Java code for understanding a network packet in the Freeciv protocol
+ */
 public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private static final TargetClass validation = TargetClass.from(Validation.class);
     private static final TargetClass noDeltaFlag = TargetClass.from(NoDelta.class);
@@ -57,6 +60,19 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private final Requirement iFulfill;
     private final HashSet<Requirement> requirements;
 
+    /**
+     * Construct a new packet Java code generator.
+     * @param name the name of the packet.
+     * @param number the number of the packet.
+     * @param logger where to log problems.
+     * @param packetFlags the flags the packet is self has.
+     * @param deltaIsOn is the delta protocol enabled?
+     * @param enableDeltaBoolFolding is delta bool folding enabled?
+     * @param bv_delta_fields the bit vector kind that will what fields in this packet should be read and not copied.
+     * @param packetFields the fields of the packet
+     * @param caps what capabilities this packet have
+     * @throws UndefinedException when required information is missing
+     */
     public Packet(String name, int number, String logger,
                   List<Annotate> packetFlags,
                   boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,
@@ -681,10 +697,18 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 body);
     }
 
+    /**
+     * Get the number of the packet the generated code will understand.
+     * @return the packet number.
+     */
     public int getNumber() {
         return number;
     }
 
+    /**
+     * Get the number of fields in the packet the generated code will understand.
+     * @return the number fields in the packet.
+     */
     public List<? extends Field> getFields() {
         return Collections.unmodifiableList(fields);
     }
