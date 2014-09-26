@@ -332,7 +332,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                                 .newInstance(TargetClass.from(EndsInEternalZero.class).callV("allOneBytes",
                                         BuiltIn.sum(BuiltIn.divide(BuiltIn.subtract(
                                                 literal(deltaFields), literal(1)), literal(8)), literal(1))))),
-                        TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields))))),
+                        TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)), NULL))),
                 addExceptionLocation));
     }
 
@@ -431,7 +431,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             Block operation = new Block();
             operation.addStatement(delta_tmp.assign(delta_tmp.getTType().newInstance(
                     streamName.ref(),
-                    TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)))));
+                    TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)),
+                    NULL)));
             body.addStatement(labelExceptionsWithPacketAndField(
                     delta_tmp,
                     operation,
@@ -469,7 +470,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             }
             Block readAndValidate = new Block();
             readAndValidate.addStatement(asLocal.assign(asLocal.getTType().newInstance(streamName.ref(),
-                    field.getSuperLimit(0, true))));
+                    field.getSuperLimit(0, true), NULL)));
 
             final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
             if (isBoolFolded(enableDeltaBoolFolding, field)) {

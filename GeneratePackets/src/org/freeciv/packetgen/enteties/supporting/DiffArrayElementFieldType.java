@@ -87,11 +87,11 @@ public class DiffArrayElementFieldType implements Dependency.Maker {
                     @Override
                     public Block x(Var to, Var from) {
                         final Var<AValue> index = Var.local(ftIndex.getUnderType(), "index",
-                                ftIndex.getAddress().newInstance(from.ref(), Hardcoded.noLimit).callV("getValue"));
+                                ftIndex.getAddress().newInstance(from.ref(), Hardcoded.noLimit, NULL).callV("getValue"));
                         final Var<AValue> newValue = Var.local(ftValue.getUnderType(), "newValue",
                                 BuiltIn.<AValue>R_IF(index.ref().<ABool>callV("equals", stopValue.ref()),
                                         NULL,
-                                        ftValue.getAddress().newInstance(from.ref(), Hardcoded.noLimit)
+                                        ftValue.getAddress().newInstance(from.ref(), Hardcoded.noLimit, NULL)
                                                 .callV("getValue")));
 
                         return new Block(

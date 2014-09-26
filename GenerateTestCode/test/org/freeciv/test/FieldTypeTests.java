@@ -26,7 +26,7 @@ public class FieldTypeTests {
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
         UINT32 theInt = new UINT32(number, ElementsLimit.noLimit());
         theInt.encodeTo(new DataOutputStream(storeTo));
-        return (new UINT32(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), ElementsLimit.noLimit())).getValue();
+        return (new UINT32(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), ElementsLimit.noLimit(), null)).getValue();
     }
 
     private static void assertRoundTripOkUINT32(long number) throws IOException {
@@ -98,7 +98,7 @@ public class FieldTypeTests {
         theArray.encodeTo(new DataOutputStream(storeTo));
 
         // read it back
-        UINT32S theReturnedArray = new UINT32S(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), ElementsLimit.limit(2, 2));
+        UINT32S theReturnedArray = new UINT32S(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())), ElementsLimit.limit(2, 2), null);
 
         // compare the values
         assertEquals("1 dimensional field type array didn't survive encoding followed by decoding",
@@ -120,7 +120,7 @@ public class FieldTypeTests {
 
         // read it back
         STRINGS theReturnedArray = new STRINGS(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
-                ElementsLimit.limit(2, 2, ElementsLimit.limit(5, 4)));
+                ElementsLimit.limit(2, 2, ElementsLimit.limit(5, 4)), null);
 
         // compare the values
         assertEquals("1d + eater field type array didn't survive encoding followed by decoding",
@@ -134,7 +134,7 @@ public class FieldTypeTests {
         storeTo.write(new byte[]{1, 3, 7, 12});
 
         UINT8S2D result = new UINT8S2D(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
-                ElementsLimit.limit(2, 2, ElementsLimit.limit(2, 2)));
+                ElementsLimit.limit(2, 2, ElementsLimit.limit(2, 2)), null);
 
         assertEquals(1, result.getValue()[0][0].intValue());
         assertEquals(3, result.getValue()[0][1].intValue());
@@ -149,7 +149,7 @@ public class FieldTypeTests {
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
         fromJava.encodeTo(new DataOutputStream(storeTo));
         STRING fromData = new STRING(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
-                ElementsLimit.limit(maxLen));
+                ElementsLimit.limit(maxLen), null);
         checkString(text, fromData, maxLen);
     }
 
@@ -222,7 +222,7 @@ public class FieldTypeTests {
         storeTo.write(new byte[]{1, 3, 7, 12, 44, 77});
 
         UINT8S2D array = new UINT8S2D(new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray())),
-                ElementsLimit.limit(2, 2, ElementsLimit.limit(3, 3)));
+                ElementsLimit.limit(2, 2, ElementsLimit.limit(3, 3)), null);
 
         array.verifyInsideLimits(ElementsLimit.limit(2, 2, ElementsLimit.limit(2, 2)));
     }
@@ -233,7 +233,7 @@ public class FieldTypeTests {
         storeTo.write(new byte[]{1, 3});
         DataInputStream inn = new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray()));
 
-        BV_GENERAL bits = new BV_GENERAL(inn, ElementsLimit.limit(11));
+        BV_GENERAL bits = new BV_GENERAL(inn, ElementsLimit.limit(11), null);
         boolean[] result = bits.getValue().getBits();
 
         assertEquals(11, result.length);

@@ -265,7 +265,7 @@ public class Hardcoded {
                         new From1<Typed<? extends AValue>, Var>() {
                             @Override
                             public Typed<AValue> x(Var from) {
-                                return universalF.newInstance(from.ref(), noLimit).callV("getValue");
+                                return universalF.newInstance(from.ref(), noLimit, NULL).callV("getValue");
                             }
                         },
                         TO_STRING_ARRAY,
@@ -323,7 +323,7 @@ public class Hardcoded {
                     @Override
                     public Block x(Var out, Var inn) {
                         return new Block(out.assign(divide(
-                                uint32.getAddress().newInstance(inn.ref(), noLimit).callV("getValue").callV("floatValue"),
+                                uint32.getAddress().newInstance(inn.ref(), noLimit, NULL).callV("getValue").callV("floatValue"),
                                 BuiltIn.<AValue>toCode(times))));
                     }
                 },

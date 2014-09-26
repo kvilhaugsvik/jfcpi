@@ -433,7 +433,7 @@ public class TerminatedArray extends FieldType {
                 new From1<Typed<? extends AValue>, Var>() {
                     @Override
                     public Typed<? extends AValue> x(Var from) {
-                        return kind.getAddress().newInstance(from.ref(), getNext(arrayEater));
+                        return kind.getAddress().newInstance(from.ref(), getNext(arrayEater), NULL);
                     }
                 },
                 TO_STRING_ARRAY,

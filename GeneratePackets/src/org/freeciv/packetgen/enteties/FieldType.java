@@ -132,7 +132,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
                 constructorBody));
         this.addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits))), tIOExcept,
+                new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits, Var.param(this.getAddress(), "old")))), tIOExcept,
                 decode));
         this.addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.from(void.class), "encodeTo", Arrays.asList(pTo),

@@ -212,7 +212,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
                     public Block x(Var to, Var from) {
                         final Typed[] readFromNet = new Typed[fieldNames.size()];
                         for (int i = 0; i < readFromNet.length; i++)
-                            readFromNet[i] = fieldTypeClasses.get(i).newInstance(from.ref(), Hardcoded.noLimit)
+                            readFromNet[i] = fieldTypeClasses.get(i).newInstance(from.ref(), Hardcoded.noLimit, NULL)
                                     .callV("getValue");
 
                         return new Block(to.assign(me.newInstance(readFromNet)));
