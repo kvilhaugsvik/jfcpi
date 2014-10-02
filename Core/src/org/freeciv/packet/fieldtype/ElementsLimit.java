@@ -53,6 +53,14 @@ public class ElementsLimit {
     }
 
     /**
+     * Is there an array dimension after this one?
+     * @return true if there is one or more array dimension(s) after this one.
+     */
+    public boolean hasNext() {
+        return !noLimit().equals(this);
+    }
+
+    /**
      * Get the limit indicating that no more array dimensions exists.
      * @return the limit indicating that no more array dimensions exists.
      */
