@@ -15,7 +15,6 @@
 package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
-import org.freeciv.packet.PacketHeader;
 
 import java.io.IOException;
 

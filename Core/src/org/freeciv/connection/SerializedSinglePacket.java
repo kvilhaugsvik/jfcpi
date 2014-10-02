@@ -16,8 +16,6 @@ package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 public class SerializedSinglePacket implements SerializedPacketGroup {

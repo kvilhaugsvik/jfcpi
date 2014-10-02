@@ -18,7 +18,6 @@ import org.freeciv.utility.Util;
 import org.freeciv.connection.HeaderData;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 public class RawPacket implements Packet {

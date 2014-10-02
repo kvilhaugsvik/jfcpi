@@ -18,7 +18,6 @@ import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 
 import java.io.DataInput;
-import java.io.DataInputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

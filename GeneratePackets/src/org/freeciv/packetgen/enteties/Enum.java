@@ -14,14 +14,12 @@
 
 package org.freeciv.packetgen.enteties;
 
-import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.expression.EnumElement;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;

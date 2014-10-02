@@ -27,7 +27,6 @@ import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.Struct;
-import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.utility.Validation;
 
 import java.util.Arrays;

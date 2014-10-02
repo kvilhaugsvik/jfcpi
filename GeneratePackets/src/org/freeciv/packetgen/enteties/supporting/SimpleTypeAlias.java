@@ -14,7 +14,6 @@
 
 package org.freeciv.packetgen.enteties.supporting;
 
-import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.FieldType;

@@ -17,7 +17,6 @@ package org.freeciv.packetgen.enteties.supporting;
 import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldType;
-import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
 
 import java.util.LinkedList;
 import java.util.List;

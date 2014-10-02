@@ -21,8 +21,6 @@ import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.supporting.*;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.Block;
-import com.kvilhaugsvik.javaGenerator.Statement;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;

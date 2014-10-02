@@ -28,7 +28,6 @@ import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.supporting.FactoryCapabilityCombination;
 import org.freeciv.packetgen.enteties.supporting.Field;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;

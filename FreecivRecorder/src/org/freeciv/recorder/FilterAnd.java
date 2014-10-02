@@ -16,7 +16,6 @@ package org.freeciv.recorder;
 
 import org.freeciv.packet.Packet;
 
-import java.util.Arrays;
 import java.util.List;
 
 class FilterAnd extends FilterMany {

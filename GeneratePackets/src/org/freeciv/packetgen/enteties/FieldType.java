@@ -19,14 +19,11 @@ import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.ReqKind;
 import com.kvilhaugsvik.dependency.Requirement;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.Block;
-import com.kvilhaugsvik.javaGenerator.Import;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
-import org.freeciv.types.FCEnum;
 
 import java.io.DataInput;
 import java.io.DataOutput;

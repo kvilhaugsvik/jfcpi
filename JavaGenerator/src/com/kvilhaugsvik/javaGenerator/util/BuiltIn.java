@@ -19,7 +19,6 @@ import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
 import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
-import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.typeBridge.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 

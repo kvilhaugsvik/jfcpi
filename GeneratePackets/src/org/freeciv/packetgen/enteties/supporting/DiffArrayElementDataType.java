@@ -18,8 +18,6 @@ import com.kvilhaugsvik.dependency.*;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
 import org.freeciv.packetgen.enteties.FieldType;
 import org.freeciv.packetgen.enteties.Struct;
-import org.freeciv.packetgen.enteties.supporting.DataType;
-import org.freeciv.packetgen.enteties.supporting.WeakVarDec;
 
 import java.util.Arrays;
 import java.util.List;

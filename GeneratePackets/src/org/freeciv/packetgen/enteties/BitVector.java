@@ -12,7 +12,6 @@ import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import org.freeciv.packetgen.enteties.supporting.TerminatedArray;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;

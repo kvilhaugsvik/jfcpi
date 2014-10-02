@@ -21,18 +21,14 @@ import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.dependency.Requirement;
 import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.Returnable;
 
 import java.util.*;
-
-import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
 public class Field<Kind extends AValue> extends Var<Kind> {
     private final static int DELTA_NUMBER_NOT_SET = -1;

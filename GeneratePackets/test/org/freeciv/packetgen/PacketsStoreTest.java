@@ -33,7 +33,6 @@ import org.junit.Test;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class PacketsStoreTest {
     private static PacketsStore defaultStorage() {

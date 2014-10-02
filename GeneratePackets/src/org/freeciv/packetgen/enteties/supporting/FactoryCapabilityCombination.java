@@ -22,7 +22,6 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString;
 import org.freeciv.packet.CapabilityCombination;
 
 import java.util.List;
-import java.util.SortedSet;
 
 public class FactoryCapabilityCombination extends Annotate {
     public FactoryCapabilityCombination(List<Typed<AString>> caps) {

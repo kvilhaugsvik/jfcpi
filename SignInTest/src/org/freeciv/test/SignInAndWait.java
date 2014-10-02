@@ -15,7 +15,6 @@
 package org.freeciv.test;
 
 import org.freeciv.connection.*;
-import org.freeciv.packet.*;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
 import org.freeciv.utility.UI;
