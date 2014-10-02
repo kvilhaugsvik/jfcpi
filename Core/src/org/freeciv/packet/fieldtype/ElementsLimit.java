@@ -17,14 +17,21 @@ package org.freeciv.packet.fieldtype;
 import java.util.NoSuchElementException;
 
 /**
- * Limit the number of elements an array of fields has
+ * A limit on the number of elements a field has.
  */
 public class ElementsLimit {
     private static ElementsLimit end;
 
     private final ElementsLimit child;
 
+    /**
+     * The absolute maximum number of elements this field ever can have.
+     */
     public final int full_array_size;
+
+    /**
+     * The maximum number of elements the field can have this time.
+     */
     public final int elements_to_transfer;
 
     private ElementsLimit(int full_array_size, int elements_to_transfer, ElementsLimit subLimit) {
@@ -33,6 +40,11 @@ public class ElementsLimit {
         this.child = subLimit;
     }
 
+    /**
+     * Get the limit on the next array dimension.
+     * @return the limit on the next array dimension.
+     * @throws NoSuchElementException if no more array dimensions exist.
+     */
     public ElementsLimit next() {
         if (noLimit().equals(this))
             throw new NoSuchElementException("Limit has no sub limit");
@@ -40,6 +52,10 @@ public class ElementsLimit {
         return child;
     }
 
+    /**
+     * Get the limit indicating that no more array dimensions exists.
+     * @return the limit indicating that no more array dimensions exists.
+     */
     public static ElementsLimit noLimit() {
         if (null == end)
             end = new ElementsLimit(-1, -1, null) {
@@ -52,18 +68,42 @@ public class ElementsLimit {
         return end;
     }
 
-    public static ElementsLimit limit(int absolute_max) {
-        return limit(absolute_max, absolute_max);
+    /**
+     * Create a new limit on the number of elements.
+     * @param max the maximum number of elements this field can have.
+     * @return the new limit on the number of elements.
+     */
+    public static ElementsLimit limit(int max) {
+        return limit(max, max);
     }
 
-    public static ElementsLimit limit(int absolute_max, ElementsLimit subLimit) {
-        return limit(absolute_max, absolute_max, subLimit);
+    /**
+     * Create a new limit on the number of elements.
+     * @param max the maximum number of elements this field can have.
+     * @param subLimit the limit for the next array dimension.
+     * @return the new limit on the number of elements.
+     */
+    public static ElementsLimit limit(int max, ElementsLimit subLimit) {
+        return limit(max, max, subLimit);
     }
 
+    /**
+     * Create a new limit on the number of elements.
+     * @param full_array_size the maximum number of elements the field ever can have.
+     * @param elements_to_transfer the maximum number of elements the field can have this time.
+     * @return the new limit on the number of elements.
+     */
     public static ElementsLimit limit(int full_array_size, int elements_to_transfer) {
         return limit(full_array_size, elements_to_transfer, noLimit());
     }
 
+    /**
+     * Create a new limit on the number of elements.
+     * @param full_array_size the maximum number of elements the field ever can have.
+     * @param elements_to_transfer the maximum number of elements the field can have this time.
+     * @param subLimit the limit for the next array dimension.
+     * @return the new limit on the number of elements.
+     */
     public static ElementsLimit limit(int full_array_size, int elements_to_transfer, ElementsLimit subLimit) {
         if (null == subLimit)
             throw new NullPointerException("Sub limit can't be null. Did you mean noLimit()");
