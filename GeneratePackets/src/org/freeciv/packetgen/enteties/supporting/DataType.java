@@ -18,8 +18,12 @@ import com.kvilhaugsvik.javaGenerator.TargetClass;
 import com.kvilhaugsvik.dependency.ReqKind;
 
 /**
- * As generated data types like enums, bit vectors etc are generated from different classes use this
+ * Represents a data type. The data type may be generated (like enums, bit vectors etc) or pre existing.
  */
 public interface DataType extends ReqKind {
+    /**
+     * Get the address of the type it self.
+     * @return the represented type.
+     */
     public TargetClass getAddress();
 }
