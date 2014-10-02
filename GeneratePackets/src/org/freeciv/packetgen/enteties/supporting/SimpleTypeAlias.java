@@ -47,6 +47,7 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
         this(name, TargetClass.from(jType), null, arrayDimensions);
     }
 
+    @Override
     public TargetClass getAddress() {
         return typeInJava;
     }
