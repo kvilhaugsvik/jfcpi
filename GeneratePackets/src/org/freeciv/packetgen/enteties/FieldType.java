@@ -33,6 +33,9 @@ import java.util.regex.Pattern;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
+/**
+ * Represents a packet field type. It has a value and can serialize and deserialize it.
+ */
 public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     public static final Pattern REMOVE_FROM_CLASS_NAMES = Pattern.compile("[\\(|\\)|\\s|;|\\{|\\}]");
 
@@ -53,7 +56,29 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
 
     private final Collection<Requirement> requirement;
 
-    /* A basic field type */
+    /**
+     * Create a new field type representing a basic field type.
+     * Basic field types are usually not used directly. An alias to it is used in stead.
+     * @param dataIOType string identifying the function Freeciv use to read fields of this kind.
+     * @param publicType the C type Freeciv converts this field to after reading it.
+     * @param javaType the Java type to use in stead of the C type.
+     * @param constructorBody constructor from a value of the Java type.
+     * @param decode constructor from a {@see java.io.DataOutput},
+     *               a {@see org.freeciv.packet.fieldtype.ElementsLimit limit}
+     *               and
+     *               a previous field of the same type.
+     *               The data to decode should be read from the DataInput.
+     *               The limits on the number of elements to read from the DataInput is in the ElementsLimit.
+     *               The previous field of the same type is meant to be used in the delta protocol. It may be null.
+     * @param encode code for a serializer function that encodes the field to the given {@see java.io.DataOutput}.
+     * @param encodedSize code for a function that returns how large (in bytes) the serialized field would be.
+     * @param toString code for a {@see java.lang.Object#toString() toString()} function.
+     * @param arrayEater true if this field type will consume an array dimension.
+     * @param needs items this field type depends on.
+     *              Example: if the Java type of the field's value if generated the field depends on it.
+     * @param fieldsToAdd fields to add to the generated Java code for this field type.
+     * @param methodsToAdd methods to add to the generated Java code for this field type.
+     */
     public FieldType(String dataIOType, String publicType, TargetClass javaType,
                      From1<Block, Var> constructorBody,
                      From2<Block, Var, Var> decode,
@@ -171,10 +196,21 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         return "UNALIASED_" + REMOVE_FROM_CLASS_NAMES.matcher(name).replaceAll("_");
     }
 
+    /**
+     * Creates a new field type alias based on this one.
+     * @param name the name to give the new field type.
+     * @return the new field type.
+     */
     public FieldType createFieldType(String name) {
         return createFieldType(name, name);
     }
 
+    /**
+     * Creates a new field type alias based on this one.
+     * @param name the name to give the new field type.
+     * @param reqName the name the {@see com.kvilhaugsvik.dependency.DependencyStore dependency handler} should see.
+     * @return the new field type.
+     */
     public FieldType createFieldType(String name, String reqName) {
         return new FieldType(name, reqName, this, true);
     }
@@ -203,10 +239,19 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         return new FieldType(getName(), alias, this, false);
     }
 
+    /**
+     * Does this field type "eat" a dimension of array declarations on their fields?
+     * This is true for fields that uses array dimension information passed to it like string and field arrays.
+     * @return true iff this field type spends an array declaration.
+     */
     public boolean isArrayEater() {
         return arrayEater;
     }
 
+    /**
+     * Get the type of the value that this field type wraps.
+     * @return the address of the type of the inner value.
+     */
     public TargetClass getUnderType() {
         return javaType;
     }
