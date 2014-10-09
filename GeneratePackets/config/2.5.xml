@@ -2,14 +2,17 @@
 
 <fcsource name="2_5" packetHeaderKind="FC_2_4" enableDelta="true" enableDeltaBoolFolding="true">
 
+    <!-- Packets and field types. -->
     <inputSource parseAs="packets">
         <file>common/packets.def</file>
     </inputSource>
 
+    <!-- Freeciv version. -->
     <inputSource parseAs="variables">
         <file>fc_version</file>
     </inputSource>
 
+    <!-- Data types and constants. -->
     <inputSource parseAs="C">
         <file>common/spaceship.h</file>
         <file>common/city.h</file>
