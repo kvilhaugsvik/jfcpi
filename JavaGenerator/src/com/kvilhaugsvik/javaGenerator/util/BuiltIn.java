@@ -178,26 +178,56 @@ public class BuiltIn {
         };
     }
 
+    /**
+     * Generate Java code representing a String literal containing the provided value.
+     * @param javaCode the content of the String literal.
+     * @return the String literal Java code.
+     */
     public static Typed<AString> literal(String javaCode) {
         return BuiltIn.<AString>toCode("\"" + javaCode + "\"");
     }
 
+    /**
+     * Generate Java code representing an int literal containing the provided value.
+     * @param inte the value of the int literal.
+     * @return the int literal Java code.
+     */
     public static Typed<AnInt> literal(int inte) {
         return BuiltIn.<AnInt>toCode(inte + "");
     }
 
+    /**
+     * Generate Java code representing a long literal containing the provided value.
+     * @param inte the value of the long literal.
+     * @return the long literal Java code.
+     */
     public static Typed<AnInt> literal(long inte) {
         return BuiltIn.<AnInt>toCode(inte + "L");
     }
 
+    /**
+     * Generate Java code representing a float literal containing the provided value.
+     * @param num the value of the float literal.
+     * @return the float literal Java code.
+     */
     public static Typed<AnInt> literal(float num) {
         return BuiltIn.<AnInt>toCode(num + "f");
     }
 
+    /**
+     * Generate Java code representing a double literal containing the provided value.
+     * @param num the value of the double literal.
+     * @return the double literal Java code.
+     */
     public static Typed<AnInt> literal(double num) {
         return BuiltIn.<AnInt>toCode(num + "d");
     }
 
+    /**
+     * Generate Java code representing a boolean literal containing the provided value.
+     * @param b the value of the boolean literal.
+     * @return the boolean literal Java code.
+     */
     public static Typed<ABool> literal(boolean b) {
         return b ? TRUE : FALSE;
     }
