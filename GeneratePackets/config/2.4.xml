@@ -26,6 +26,8 @@
         <file>common/fc_types.h</file>
         <file>common/improvement.h</file>
         <file>common/packets.h</file>
+        <!-- The file common/packets.c isn't here by some mistake made while trying to include its header file.
+          The constants JUMBO_SIZE and COMPRESSION_BORDER are extracted from it. -->
         <file>common/packets.c</file>
         <file>common/requirements.h</file>
         <file>common/tech.h</file>
