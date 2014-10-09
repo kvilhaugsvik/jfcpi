@@ -30,6 +30,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A simple alias to a Java type that can generate a field type for it.
+ */
 public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataType {
     private final Requirement iProvide;
     private final Collection<Requirement> willRequire;
@@ -43,6 +46,12 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
         fieldTypeBasicForMe = Pattern.compile("(\\w+)\\((" + getIFulfillReq().getName() + ")\\)");
     }
 
+    /**
+     * Construct a new simple type alias to an already existing Java type.
+     * @param name the name of the alias.
+     * @param jType the Java type it is an alias to.
+     * @param arrayDimensions The number of array dimensions (from packets.def) consumed by it.
+     */
     public SimpleTypeAlias(String name, Class jType, int arrayDimensions) {
         this(name, TargetClass.from(jType), null, arrayDimensions);
     }
@@ -108,11 +117,19 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
         return iProvide;
     }
 
+    /**
+     * Creates a SimpleTypeAlias to another DataType if the dependency system can supply it.
+     */
     public static class Incomplete implements Dependency.Maker {
         private final Requirement to;
         private final String from;
         private final Requirement creates;
 
+        /**
+         * Constructor from names.
+         * @param from the name of the alias that should be created.
+         * @param to the name of the DataType it should be an alias to.
+         */
         public Incomplete(String from, String to) {
             this.to = new Requirement(to, DataType.class);
             this.from = from;
