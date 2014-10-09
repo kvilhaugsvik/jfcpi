@@ -40,6 +40,10 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class TypedCodeTest {
+    @Test public void literalDouble() {
+        assertAtomsAre(new String[]{"3.16d"}, BuiltIn.literal(3.16d));
+    }
+
     @Test public void targetArrayNewInstance() {
         TargetArray array = TargetArray.from(TargetPackage.TOP_LEVEL_AS_STRING, "Under", 2);
         CodeAtoms asAtoms = new CodeAtoms(array.newInstance(BuiltIn.literal(3), BuiltIn.literal(5)));

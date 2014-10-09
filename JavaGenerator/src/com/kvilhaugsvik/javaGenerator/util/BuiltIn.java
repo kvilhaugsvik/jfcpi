@@ -194,6 +194,10 @@ public class BuiltIn {
         return BuiltIn.<AnInt>toCode(num + "f");
     }
 
+    public static Typed<AnInt> literal(double num) {
+        return BuiltIn.<AnInt>toCode(num + "d");
+    }
+
     public static Typed<ABool> literal(boolean b) {
         return b ? TRUE : FALSE;
     }
