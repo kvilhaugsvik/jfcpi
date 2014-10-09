@@ -113,8 +113,8 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
         private final String from;
         private final Requirement creates;
 
-        public Incomplete(String from, Requirement to) {
-            this.to = to;
+        public Incomplete(String from, String to) {
+            this.to = new Requirement(to, DataType.class);
             this.from = from;
             this.creates = new Requirement(from, DataType.class);
         }

@@ -238,7 +238,7 @@ object ParseCCode extends ExtractableParser {
   def typedefConverted: Parser[Dependency] = typedef ^^ {
     case types ~ name => {
       val translatedTypes = cTypeDecsToJava(types)
-      new SimpleTypeAlias.Incomplete(name, translatedTypes)
+      new SimpleTypeAlias.Incomplete(name, translatedTypes.getName)
     }
   }
 
