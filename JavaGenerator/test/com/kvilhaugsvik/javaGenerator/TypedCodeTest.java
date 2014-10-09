@@ -40,8 +40,28 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class TypedCodeTest {
+    @Test public void literalBoolean() {
+        assertAtomsAre(new String[]{"true"}, BuiltIn.literal(true));
+    }
+
     @Test public void literalDouble() {
         assertAtomsAre(new String[]{"3.16d"}, BuiltIn.literal(3.16d));
+    }
+
+    @Test public void literalFloat() {
+        assertAtomsAre(new String[]{"3.16f"}, BuiltIn.literal(3.16f));
+    }
+
+    @Test public void literalInt() {
+        assertAtomsAre(new String[]{"3"}, BuiltIn.literal(3));
+    }
+
+    @Test public void literalLong() {
+        assertAtomsAre(new String[]{"3000000L"}, BuiltIn.literal(3000000L));
+    }
+
+    @Test public void literalString() {
+        assertAtomsAre(new String[]{"\"\""}, BuiltIn.literal(""));
     }
 
     @Test public void targetArrayNewInstance() {
