@@ -135,11 +135,18 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
 
         @Override
         public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
+            /* Validate the requested product. */
             if (!creates.equals(toProduce))
                 throw new IllegalArgumentException("Can't create " + toProduce +
                         " (can create " + creates + ")");
 
+            /* Validate the input items. */
+            if (!(wasRequired.length == 1 && wasRequired[0] instanceof DataType)) {
+                throw new IllegalArgumentException("Wrong arguments provided.");
+            }
+
             final TargetClass target = ((DataType) wasRequired[0]).getAddress();
+
             // TODO: extract target's array dimensions in stead of assuming 0
             return new SimpleTypeAlias(from, target, wasRequired[0].getIFulfillReq(), 0);
         }
