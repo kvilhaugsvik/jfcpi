@@ -14,5 +14,9 @@
 
 package org.freeciv.packet.fieldtype;
 
+/**
+ * The annotated field is the key of the packet.
+ * Its value will be used to identify and look up the packet.
+ */
 public @interface Key {
 }

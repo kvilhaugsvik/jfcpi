@@ -14,5 +14,10 @@
 
 package org.freeciv.packet.fieldtype;
 
+/**
+ * This field uses the array diff feature.
+ * Only the elements that have changed will be transferred over the network.
+ * The other elements should be copied from the previous packet.
+ */
 public @interface ArrayDiff {
 }

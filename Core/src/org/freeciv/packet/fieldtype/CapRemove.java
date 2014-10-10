@@ -14,6 +14,9 @@
 
 package org.freeciv.packet.fieldtype;
 
+/**
+ * This field isn't be a part of its packet in protocol variants with the given capability.
+ */
 public @interface CapRemove {
     String value();
 }

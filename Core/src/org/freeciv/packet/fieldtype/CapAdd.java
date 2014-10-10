@@ -14,6 +14,9 @@
 
 package org.freeciv.packet.fieldtype;
 
+/**
+ * This field is only a part of its packet in protocol variants with the given capability.
+ */
 public @interface CapAdd {
     String value();
 }
