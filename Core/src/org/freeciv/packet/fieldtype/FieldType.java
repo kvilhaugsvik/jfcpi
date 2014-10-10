@@ -17,8 +17,28 @@ package org.freeciv.packet.fieldtype;
 import java.io.DataOutput;
 import java.io.IOException;
 
+/**
+ * A Freeciv network protocol packet field type.
+ * It has a value and can serialize and deserialize it.
+ * @param <Javatype> the type of the value the field type can serialize and deserialize.
+ */
 public abstract interface FieldType<Javatype> {
+    /**
+     * Serialize the value to the given location.
+     * @param to the location to serialize the value to.
+     * @throws IOException when something goes wrong during serialization.
+     */
     public abstract void encodeTo(DataOutput to) throws IOException;
+
+    /**
+     * Get the size of the serialized value in bytes.
+     * @return the size of the serialized value in bytes.
+     */
     public abstract int encodedLength();
+
+    /**
+     * Get the value of the field.
+     * @return the value of the field.
+     */
     public abstract Javatype getValue();
 }
