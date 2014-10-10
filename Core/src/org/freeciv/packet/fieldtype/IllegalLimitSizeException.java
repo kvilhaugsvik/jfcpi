@@ -14,7 +14,15 @@
 
 package org.freeciv.packet.fieldtype;
 
+/**
+ * The maximum number of elements the field can have this time is claimed to
+ * be larger than the maximum number of elements the field ever can have.
+ */
 public class IllegalLimitSizeException extends FieldTypeException {
+    /**
+     * Constructor that sets the exception's error message.
+     * @param message the error message.
+     */
     public IllegalLimitSizeException(String message) {
         super(message);
     }

@@ -14,7 +14,14 @@
 
 package org.freeciv.packet.fieldtype;
 
+/**
+ * The number of elements in the field is wrong.
+ */
 public class IllegalNumberOfElementsException extends FieldTypeException {
+    /**
+     * Constructor that sets the exception's error message.
+     * @param message the error message.
+     */
     public IllegalNumberOfElementsException(String message) {
         super(message);
     }
