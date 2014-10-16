@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.dependency.*;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
@@ -241,6 +242,11 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         else
             throw new IllegalArgumentException("The requirement " + toProduce +
                     " isn't a basic field type using the enum " + getName());
+    }
+
+    @Override
+    public Value getZeroValue() {
+        return getAddress().callV("valueOf", BuiltIn.literal(0));
     }
 
     public static class EnumElementKnowsNumber extends EnumElementFC {

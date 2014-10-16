@@ -15,6 +15,8 @@
 package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.dependency.*;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.TargetClass;
@@ -38,8 +40,10 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
     private final Collection<Requirement> willRequire;
     private final Pattern fieldTypeBasicForMe;
     private final TargetClass typeInJava;
+    private final Value zeroValue;
 
-    public SimpleTypeAlias(String name, TargetClass jType, Requirement req, int arrayDimensions) {
+    public SimpleTypeAlias(String name, TargetClass jType, Requirement req, int arrayDimensions, Typed<? extends AValue> zeroValue) {
+        this.zeroValue = jType.newInstance(zeroValue);
         this.iProvide = new Requirement(name + (0 == arrayDimensions ? "" : "_" + arrayDimensions), DataType.class);
         this.typeInJava = jType;
         this.willRequire = null == req ? Collections.<Requirement>emptySet() : Arrays.asList(req);
@@ -51,14 +55,20 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
      * @param name the name of the alias.
      * @param jType the Java type it is an alias to.
      * @param arrayDimensions The number of array dimensions (from packets.def) consumed by it.
+     * @param zeroValue the zero value of this data type.
      */
-    public SimpleTypeAlias(String name, Class jType, int arrayDimensions) {
-        this(name, TargetClass.from(jType), null, arrayDimensions);
+    public SimpleTypeAlias(String name, Class jType, int arrayDimensions, Typed<? extends AValue> zeroValue) {
+        this(name, TargetClass.from(jType), null, arrayDimensions, zeroValue);
     }
 
     @Override
     public TargetClass getAddress() {
         return typeInJava;
+    }
+
+    @Override
+    public Value getZeroValue() {
+        return zeroValue;
     }
 
     @Override
@@ -166,7 +176,8 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
             final TargetClass target = ((DataType) wasRequired[0]).getAddress();
 
             // TODO: extract target's array dimensions in stead of assuming 0
-            return new SimpleTypeAlias(from, target, wasRequired[0].getIFulfillReq(), 0);
+            return new SimpleTypeAlias(from, target, wasRequired[0].getIFulfillReq(), 0,
+                    ((DataType) wasRequired[0]).getZeroValue());
         }
     }
 }

@@ -334,7 +334,7 @@ public class TerminatedArray extends FieldType {
     }
 
     public static TerminatedArray xBytes(String dataIOType, String publicType) {
-        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(byteArray), null,
+        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(byteArray, literal(0)), null,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
                 byteArray,
@@ -357,7 +357,7 @@ public class TerminatedArray extends FieldType {
     }
 
     public static TerminatedArray maxSizedTerminated(String dataIOType, String publicType, final Constant<?> terminator) {
-        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(byteArray), terminator,
+        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(byteArray, literal(0)), terminator,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
                 byteArray,
@@ -405,7 +405,7 @@ public class TerminatedArray extends FieldType {
                         RETURN(oVal.ref())
                 ));
 
-        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(type), stopElem,
+        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(type, literal(0)), stopElem,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
                 TargetArray.from(kind.getAddress(), 1),

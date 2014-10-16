@@ -421,10 +421,10 @@ public class FromEntetiesAlone {
         LinkedList<DataType> types = new LinkedList<DataType>();
 
         fields.add(new WeakVarDec(new Requirement("int", DataType.class), "aNumber"));
-        types.add(new SimpleTypeAlias("n/a", int.class, 0));
+        types.add(new SimpleTypeAlias("n/a", int.class, 0, BuiltIn.literal(0)));
 
         fields.add(new WeakVarDec(new Requirement("int", DataType.class), "theArray", new WeakVarDec.ArrayDeclaration(IntExpression.integer("5"))));
-        types.add(new SimpleTypeAlias("n/a", int[].class, 1));
+        types.add(new SimpleTypeAlias("n/a", int[].class, 1, BuiltIn.literal(0)));
 
         Struct result = new Struct("StructArrayField", fields, types, null);
 
@@ -477,7 +477,8 @@ public class FromEntetiesAlone {
     }
 
     private Dependency.Item createUINT32DiffElementData(FieldType uint32) throws UndefinedException {
-        final SimpleTypeAlias integer = new SimpleTypeAlias("n/a", Integer.class, 0);
+        final SimpleTypeAlias integer = new SimpleTypeAlias("n/a", Integer.class, 0,
+                BuiltIn.literal(0));
 
         return (new DiffArrayElementDataType())
                 .produce(new Requirement("UINT32_diff", FieldType.class), uint32, integer);

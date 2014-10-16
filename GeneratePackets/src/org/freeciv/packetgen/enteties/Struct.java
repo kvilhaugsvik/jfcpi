@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.Hardcoded;
@@ -42,6 +43,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
     private final Pattern basicFTForMePattern;
     private final List<String> fieldNames;
     private final List<Requirement> fieldTypes;
+    private final Value zero;
 
     public Struct(String name, List<WeakVarDec> fields, List<DataType> partTypes, List<Requirement> fieldTypes) {
         this(name, fields, partTypes, fieldTypes, true);
@@ -104,6 +106,13 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
         this.basicFTForMe = new RequiredMulti(FieldType.class, basicFTForMePattern);
         this.fieldTypes = fieldTypes;
         this.fieldNames = Collections.unmodifiableList(parts);
+
+        /* Initialize the zero value. */
+        List<Typed<? extends AValue>> zeroParams = new LinkedList<Typed<? extends AValue>>();
+        for (DataType type : partTypes) {
+            zeroParams.add(type.getZeroValue());
+        }
+        this.zero = getAddress().newInstance(zeroParams.toArray(new Typed[fields.size()]));
     }
 
     @Override
@@ -255,5 +264,10 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
         for (Item used : wasRequired)
             reqs.add(used.getIFulfillReq());
         return reqs;
+    }
+
+    @Override
+    public Value getZeroValue() {
+        return zero;
     }
 }

@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.javaGenerator.TargetClass;
 import com.kvilhaugsvik.dependency.ReqKind;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 
 /**
  * Represents a data type. The data type may be generated (like enums, bit vectors etc) or pre existing.
@@ -26,4 +27,10 @@ public interface DataType extends ReqKind {
      * @return the represented type.
      */
     public TargetClass getAddress();
+
+    /**
+     * Get the zero value of this data type.
+     * @return the zero value of the data type.
+     */
+    public Value getZeroValue();
 }

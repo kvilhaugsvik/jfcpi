@@ -1,6 +1,7 @@
 package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
+import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.UndefinedException;
@@ -255,5 +256,10 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
                 false,
                 Collections.<Var<? extends AValue>>emptyList()
         );
+    }
+
+    @Override
+    public Value getZeroValue() {
+        return getAddress().newInstance(getAddress().callV("size"));
     }
 }

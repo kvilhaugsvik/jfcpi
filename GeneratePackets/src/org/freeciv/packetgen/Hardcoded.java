@@ -53,7 +53,8 @@ public class Hardcoded {
         }
     }
 
-    private static final FieldType uint32 = new FieldType("uint32", "int", new SimpleJavaType(Long.class),
+    private static final FieldType uint32 = new FieldType("uint32", "int",
+            new SimpleJavaType(Long.class, literal(0L)),
             new From1<Block, Var>() {
                 @Override
                 public Block x(Var arg1) {
@@ -127,17 +128,18 @@ public class Hardcoded {
             /************************************************************************************************
              * Built in types
              ************************************************************************************************/
-            (Dependency.Item)(new SimpleTypeAlias("int", Integer.class, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("int16", Integer.class, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("bool", Boolean.class, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("float", Float.class, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("double", Double.class, 0)),
-            (Dependency.Item)(new SimpleTypeAlias("string", String.class, 1)),
+            (Dependency.Item)(new SimpleTypeAlias("int", Integer.class, 0, literal(0))),
+            (Dependency.Item)(new SimpleTypeAlias("int16", Integer.class, 0, literal(0))),
+            (Dependency.Item)(new SimpleTypeAlias("bool", Boolean.class, 0, literal(false))),
+            (Dependency.Item)(new SimpleTypeAlias("float", Float.class, 0, literal(0f))),
+            (Dependency.Item)(new SimpleTypeAlias("double", Double.class, 0, literal(0d))),
+            (Dependency.Item)(new SimpleTypeAlias("string", String.class, 1, literal(""))),
 
             new BitVector(), // bit string
             deltaBasic,
 
-            (Dependency.Item)(new SimpleTypeAlias("universals_u", Integer.class, 0)) // 4 currently untranslated bytes
+            (Dependency.Item)(new SimpleTypeAlias("universals_u", Integer.class, 0,
+                    literal(0))) // 4 currently untranslated bytes
     );
 
     public static final SimpleDependencyMaker stringBasicFieldType =
@@ -154,7 +156,8 @@ public class Hardcoded {
                             Visibility.PRIVATE, Scope.CLASS, Modifiable.NO,
                             charsetClass, "CHARSET", charsetClass.callV("forName", encoding.ref()));
 
-                    return new TerminatedArray("string", "char", new SimpleJavaType(String.class),
+                    return new TerminatedArray("string", "char",
+                            new SimpleJavaType(String.class, literal("")),
                             (Constant<?>)wasRequired[0],
                             TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
                             TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
@@ -241,7 +244,8 @@ public class Hardcoded {
                 final TargetClass universal = ((ClassWriter) wasRequired[1]).getAddress();
 
                 TargetArray universalArray = TargetArray.from(universal, 1);
-                return new TerminatedArray("worklist", "struct worklist", new SimpleJavaType(universalArray),
+                return new TerminatedArray("worklist", "struct worklist",
+                        new SimpleJavaType(universalArray, literal(0)),
                         null,
                         TerminatedArray.MaxArraySize.NO_LIMIT,
                         TerminatedArray.TransferArraySize.SERIALIZED,
@@ -310,7 +314,8 @@ public class Hardcoded {
     }
 
     public static FieldType getFloat(final String times) {
-        return new FieldType("float" + times, "float", new SimpleJavaType(Float.class),
+        return new FieldType("float" + times, "float",
+                new SimpleJavaType(Float.class, literal(0.0f)),
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {

@@ -18,6 +18,7 @@
 package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.dependency.Requirement;
+import com.kvilhaugsvik.javaGenerator.TargetClass;
 import com.kvilhaugsvik.javaGenerator.Var;
 import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
@@ -47,7 +48,8 @@ public class FieldTypeTest {
     }
 
     private static FieldType simpleBasicFT() {
-        return new FieldType("net", "c", new SimpleJavaType(Integer.class),
+        return new FieldType("net", "c",
+                new SimpleJavaType(Integer.class, BuiltIn.literal(0)),
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {

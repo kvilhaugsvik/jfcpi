@@ -15,6 +15,7 @@
 package org.freeciv.packetgen.parsing
 
 import com.kvilhaugsvik.dependency.{Dependency, Requirement}
+import com.kvilhaugsvik.javaGenerator.util.BuiltIn
 import org.freeciv.packetgen.enteties.{SourceFile, Struct, Constant, Enum}
 import org.freeciv.packetgen.enteties.Enum.EnumElementFC
 import org.junit.Test
@@ -882,7 +883,7 @@ public enum test implements org.freeciv.types.FCEnum {
     assertTrue("Where is pointer to int in " + wants, wants.contains(new Requirement("int16*", classOf[DataType])))
 
     val result = maker.produce(toCreate,
-      new SimpleTypeAlias("int*", TargetArray.varArg(TargetClass.from("java.lang", "Integer")), null, 0))
+      new SimpleTypeAlias("int*", TargetArray.varArg(TargetClass.from("java.lang", "Integer")), null, 0, BuiltIn.literal(0)))
 
     assertEquals("java.lang.Integer...", result.asInstanceOf[SimpleTypeAlias].getAddress.getFullAddress)
   }
@@ -896,7 +897,7 @@ public enum test implements org.freeciv.types.FCEnum {
     assertTrue("Where is string in " + wants, wants.contains(new Requirement("string", classOf[DataType])))
 
     val result = maker.produce(toCreate,
-      new SimpleTypeAlias("string", classOf[java.lang.String], 1))
+      new SimpleTypeAlias("string", classOf[java.lang.String], 1, BuiltIn.literal("")))
 
     assertEquals("java.lang.String", result.asInstanceOf[SimpleTypeAlias].getAddress.getFullAddress)
   }
@@ -912,7 +913,7 @@ public enum test implements org.freeciv.types.FCEnum {
   @Test def structOneFieldPrimitiveBoolean {
     val result = structFromText("""struct justOne {bool value;};""",
       new Requirement("struct justOne", classOf[DataType]),
-      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], 0))
+      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], 0, BuiltIn.literal(false)))
 
     assertTrue("The primitive bool should be needed here",
       result.getReqs.contains(new Requirement("bool", classOf[DataType])))
@@ -921,7 +922,7 @@ public enum test implements org.freeciv.types.FCEnum {
   @Test def structOneFieldEnum {
     val result = structFromText("""struct justOne {enum test value;};""",
       new Requirement("struct justOne", classOf[DataType]),
-      new SimpleTypeAlias("enum test", TargetClass.from("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0))
+      new SimpleTypeAlias("enum test", TargetClass.from("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0, BuiltIn.literal(0)))
 
     assertTrue("The enum test should be needed here",
       result.getReqs.contains(new Requirement("enum test", classOf[DataType])))
@@ -930,8 +931,8 @@ public enum test implements org.freeciv.types.FCEnum {
   @Test def structTwoFieldsPrimitive {
     val result = structFromText("""struct two {bool value1; int value2;};""",
       new Requirement("struct two", classOf[DataType]),
-      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], 0),
-      new SimpleTypeAlias("int", classOf[java.lang.Integer], 0))
+      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], 0, BuiltIn.literal(false)),
+      new SimpleTypeAlias("int", classOf[java.lang.Integer], 0, BuiltIn.literal(0)))
 
     assertTrue("The primitive bool should be needed here",
       result.getReqs.contains(new Requirement("bool", classOf[DataType])))
@@ -947,8 +948,8 @@ struct two {
 };
     """,
       new Requirement("struct two", classOf[DataType]),
-      new SimpleTypeAlias("enum test", TargetClass.from("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0),
-      new SimpleTypeAlias("enum bitwise", TargetClass.from("org.freeciv.types", "bitwise"), new Requirement("enum bitwise", classOf[DataType]), 0)
+      new SimpleTypeAlias("enum test", TargetClass.from("org.freeciv.types", "test"), new Requirement("enum test", classOf[DataType]), 0, BuiltIn.literal(0)),
+      new SimpleTypeAlias("enum bitwise", TargetClass.from("org.freeciv.types", "bitwise"), new Requirement("enum bitwise", classOf[DataType]), 0, BuiltIn.literal(0))
     )
 
     assertTrue("The enum test should be needed here",
@@ -960,8 +961,8 @@ struct two {
   @Test def structArraySizeIsConstant {
     val result = structFromText("""struct two {bool value1; int value2[STANT];};""",
       new Requirement("struct two", classOf[DataType]),
-      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], 0),
-      new SimpleTypeAlias("int", classOf[java.lang.Integer], 0))
+      new SimpleTypeAlias("bool", classOf[java.lang.Boolean], 0, BuiltIn.literal(false)),
+      new SimpleTypeAlias("int", classOf[java.lang.Integer], 0, BuiltIn.literal(0)))
 
     assertTrue("The constant STANT should be needed here",
       result.getReqs.contains(new Requirement("STANT", classOf[Constant[_]])))
