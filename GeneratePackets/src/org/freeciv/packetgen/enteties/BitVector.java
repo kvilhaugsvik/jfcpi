@@ -21,6 +21,9 @@ import java.util.*;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
+/**
+ * Generates code for a bit vector type. Can also generate a field type for it.
+ */
 public class BitVector extends ClassWriter implements Dependency.Item, Dependency.Maker, DataType {
     private static final Var<AnObject> pFromByte = Var.param(byteArray, "from");
     private static final Var<AnObject> pFromBits = Var.param(boolArray, "from");
@@ -36,7 +39,14 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
 
     private final Required bvFieldType;
 
-    public BitVector(String name, Enum kind) {  // Typed
+    /**
+     * Constructor for a typed fixed size bit vector.
+     * In a typed bit vector each position is understood to correspond to an enumerator of an enumeration. If the
+     * corresponding bit vector position is true the enumerator is present.
+     * @param name the name to give the understood bit vector type.
+     * @param kind the enumeration that should be used to understand the bit vector.
+     */
+    public BitVector(String name, Enum kind) {
         this(name, IntExpression.readFromOther(kind, kind.getAddress().<AnInt>callV("countValidElements")),
                 TerminatedArray.MaxArraySize.LIMITED_BY_TYPE, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name,
                 TargetClass.from(org.freeciv.types.UnderstoodBitVector.class)
@@ -44,18 +54,32 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
                 Arrays.asList(kind.getAddress().callV("class")));
     }
 
+    /**
+     * Constructor for a fixed size bit vector.
+     * @param name the name to give the bit vector type.
+     * @param knownSize the size of the bit vector type.
+     */
     public BitVector(String name, IntExpression knownSize) {
         this(name, knownSize,
                 TerminatedArray.MaxArraySize.LIMITED_BY_TYPE, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name,
                 TargetClass.from(org.freeciv.types.BitVector.class), Collections.<Typed<AValue>>emptyList());
     }
 
-    public BitVector() { // Bit string. Don't convert to string of "1" or "0" just to convert it back later.
+    /**
+     * Constructor for a bit vector that reads its size from the network and is called "BitString".
+     */
+    public BitVector() {
+        /* Don't convert to string of "1" or "0" just to convert it back later. */
         this("BitString", null,
                 TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.SERIALIZED, "char",
                 TargetClass.from(org.freeciv.types.BitVector.class), Collections.<Typed<AValue>>emptyList());
     }
 
+    /**
+     * Constructor for a bit vector where each instance has its size determined at compile time. Used for the delta
+     * protocol's field vector.
+     * @param name the name to give to the bit  vector.
+     */
     public BitVector(String name) {
         this(name, null,
                 TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM, TerminatedArray.TransferArraySize.MAX_ARRAY_SIZE, name,
