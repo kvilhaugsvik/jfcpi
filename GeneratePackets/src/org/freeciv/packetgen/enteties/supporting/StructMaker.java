@@ -71,9 +71,9 @@ public class StructMaker implements Dependency.Maker {
     public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
         validateToProduce(toProduce);
 
-        LinkedList<TargetClass> fieldKinds = new LinkedList<TargetClass>();
+        LinkedList<DataType> fieldKinds = new LinkedList<DataType>();
         for (Item item : wasRequired)
-            fieldKinds.add(((DataType) item).getAddress());
+            fieldKinds.add((DataType) item);
 
         return new Struct(name, fields, fieldKinds, elementTypes);
     }

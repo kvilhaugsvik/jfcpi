@@ -36,7 +36,7 @@ public class DiffArrayElementDataType implements Dependency.Maker {
     public List<Requirement> neededInput(Requirement toProduce) {
         String underlying = splitRequest(toProduce).group(1);
 
-        return Arrays.asList(new Requirement(underlying, FieldType.class));
+        return Arrays.asList(new Requirement(underlying, FieldType.class), new Requirement("int", DataType.class));
     }
 
     private static Matcher splitRequest(Requirement toProduce) {
@@ -50,13 +50,21 @@ public class DiffArrayElementDataType implements Dependency.Maker {
     public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
         final FieldType fieldTypeAlias = (FieldType) wasRequired[0];
         final Requirement require = wasRequired[0].getIFulfillReq();
+        final DataType indextype = (DataType)wasRequired[1];
+
         return new Struct(toProduce.getName(),
                 Arrays.asList(
                         new WeakVarDec(new Requirement("int", DataType.class), "index"),
                         new WeakVarDec(require, "newValue")),
                 Arrays.asList(
-                        TargetClass.from(Integer.class),
-                        fieldTypeAlias.getUnderType()),
+                        indextype,
+                        /* TODO: Get the real DataType in stead. */
+                        new DataType() {
+                            @Override
+                            public TargetClass getAddress() {
+                                return  fieldTypeAlias.getUnderType();
+                            }
+                        }),
                 Arrays.asList(
                         new Requirement("int", DataType.class),
                         require),

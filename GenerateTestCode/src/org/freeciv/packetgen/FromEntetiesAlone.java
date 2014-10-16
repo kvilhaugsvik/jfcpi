@@ -418,13 +418,13 @@ public class FromEntetiesAlone {
 
     private static void writeStructThatHasAnArrayField(String targetFolder) throws IOException {
         LinkedList<WeakVarDec> fields = new LinkedList<WeakVarDec>();
-        LinkedList<TargetClass> types = new LinkedList<TargetClass>();
+        LinkedList<DataType> types = new LinkedList<DataType>();
 
         fields.add(new WeakVarDec(new Requirement("int", DataType.class), "aNumber"));
-        types.add(TargetClass.from(int.class));
+        types.add(new SimpleTypeAlias("n/a", int.class, 0));
 
         fields.add(new WeakVarDec(new Requirement("int", DataType.class), "theArray", new WeakVarDec.ArrayDeclaration(IntExpression.integer("5"))));
-        types.add(TargetClass.from(int[].class));
+        types.add(new SimpleTypeAlias("n/a", int[].class, 1));
 
         Struct result = new Struct("StructArrayField", fields, types, null);
 
@@ -477,8 +477,10 @@ public class FromEntetiesAlone {
     }
 
     private Dependency.Item createUINT32DiffElementData(FieldType uint32) throws UndefinedException {
+        final SimpleTypeAlias integer = new SimpleTypeAlias("n/a", Integer.class, 0);
+
         return (new DiffArrayElementDataType())
-                .produce(new Requirement("UINT32_diff", FieldType.class), uint32);
+                .produce(new Requirement("UINT32_diff", FieldType.class), uint32, integer);
     }
 
     private Dependency.Item createUINT32DiffElementField(FieldType uint8, Dependency.Item diffElementType, FieldType uint32, Constant<AnInt> diff_array_ender) throws UndefinedException {

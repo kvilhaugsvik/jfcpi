@@ -43,11 +43,11 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
     private final List<String> fieldNames;
     private final List<Requirement> fieldTypes;
 
-    public Struct(String name, List<WeakVarDec> fields, List<TargetClass> partTypes, List<Requirement> fieldTypes) {
+    public Struct(String name, List<WeakVarDec> fields, List<DataType> partTypes, List<Requirement> fieldTypes) {
         this(name, fields, partTypes, fieldTypes, true);
     }
 
-    public Struct(String name, List<WeakVarDec> fields, List<TargetClass> partTypes, List<Requirement> fieldTypes,
+    public Struct(String name, List<WeakVarDec> fields, List<DataType> partTypes, List<Requirement> fieldTypes,
                   boolean requiredAsAStruct) {
         super(ClassKind.CLASS,
                 TargetPackage.from(FCEnum.class.getPackage()),
@@ -58,7 +58,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
 
         for (int i = 0; i < fields.size(); i++) {
             final WeakVarDec field = fields.get(i);
-            final TargetClass type = partTypes.get(i);
+            final TargetClass type = partTypes.get(i).getAddress();
 
             addObjectConstant(type, field.getName());
             addMethod(Method.newPublicReadObjectState(Comment.no(),
