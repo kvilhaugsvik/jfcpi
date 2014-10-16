@@ -35,6 +35,9 @@ import java.util.regex.Pattern;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
+/**
+ * Represents an enumeration type. Can generate a field type for it.
+ */
 public class Enum extends ClassWriter implements Dependency.Item, Dependency.Maker, DataType {
     private final boolean bitwise;
     private final Collection<Requirement> iRequire;
@@ -249,6 +252,9 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         return getAddress().callV("valueOf", BuiltIn.literal(0));
     }
 
+    /**
+     * Represents an enumerated value that knows its own number.
+     */
     public static class EnumElementKnowsNumber extends EnumElementFC {
         private final int number;
 
@@ -291,6 +297,9 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         }
     }
 
+    /**
+     * Represents an enumerated value.
+     */
     public static class EnumElementFC extends EnumElement {
         private final IntExpression valueGen;
         private final Typed<? extends AString> toStringName;
