@@ -14,6 +14,8 @@
 
 package org.freeciv.packetgen.enteties;
 
+import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.ReqKind;
@@ -255,6 +257,16 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
      */
     public TargetClass getUnderType() {
         return wrappedType.getAddress();
+    }
+
+    /**
+     * Get the zero value of this field type. The zero value of the field type is when the wrapped value is zero.
+     * @return the zero value of the field type.
+     */
+    public Value getZeroValue() {
+        return this.getAddress().newInstance(
+                this.getWrappedDataType().getZeroValue(),
+                TargetClass.from(ElementsLimit.class).callV("limit", literal(0)));
     }
 
     /**

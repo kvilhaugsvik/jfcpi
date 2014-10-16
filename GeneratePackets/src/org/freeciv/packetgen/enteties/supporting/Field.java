@@ -106,6 +106,14 @@ public class Field<Kind extends AValue> extends Var<Kind> {
         return type.getUnderType();
     }
 
+    /**
+     * Get the zero value of the field.
+     * @return the zero value of the field.
+     */
+    public Value getZeroValue() {
+        return type.getZeroValue();
+    }
+
     public String getFType() {
         return type.getName();
     }

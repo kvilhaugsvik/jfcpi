@@ -150,7 +150,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             inner.addMethod(createToString(name, implFields, delta, getField("number").ref(), deltaOnSuper));
 
             if (delta)
-                Packet.addZeroField(capCombName, bv_delta_fields, deltaFields, this, inner);
+                Packet.addZeroField(this, inner, implFields);
 
             final Typed<AValue> zeroVal = delta ? inner.getAddress().<AValue>call("zero") : null;
 
@@ -202,22 +202,23 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return deltaFields;
     }
 
-    private static void addZeroField(String capCombName, FieldType bv_delta_fields, int deltaFields, ClassWriter outer, ClassWriter inner) {
-        // TODO: This registers "fromHeaderAndStream" + capCombName before its created since it uses zero.
-        // TODO: Consider if a more elegant solution can be found.
-        outer.getAddress().register(new TargetMethod(outer.getAddress(),
-                "fromHeaderAndStream" + capCombName, outer.getAddress(),
-                TargetMethod.Called.STATIC));
+    private static void addZeroField(ClassWriter outer, ClassWriter inner, List<Field> implFields) throws UndefinedException {
+        final List<Typed<? extends AValue>> args = new LinkedList<Typed<? extends AValue>>();
 
-        inner.addClassConstant(Visibility.PUBLIC, inner.getAddress(), "zero", outer.getAddress().callV(
-                "fromHeaderAndStream" + capCombName,
-                TargetClass.from(DataInputStream.class).newInstance(
-                        TargetClass.from(EndsInEternalZero.class).newInstance(
-                                TargetClass.from(EndsInEternalZero.class).callV("allOneBytes",
-                                        BuiltIn.sum(BuiltIn.divide(BuiltIn.subtract(literal(deltaFields), literal(1)),
-                                                literal(8)), literal(1))))),
-                TargetClass.from(org.freeciv.packet.Header_NA.class).newInstance(outer.getField("number").ref()),
-                TargetClass.from(java.util.HashMap.class).addGenericTypeArguments(Arrays.asList(TargetClass.from(org.freeciv.packet.DeltaKey.class), TargetClass.from(org.freeciv.packet.Packet.class))).newInstance()));
+        /* The header should only care about the packet number. */
+        args.add(TargetClass.from(org.freeciv.packet.Header_NA.class).newInstance(outer.getField("number").ref()));
+
+        /* The zero field don't need a delta bit vector. */
+        args.add(NULL);
+
+        /* Add the zero value of each field. */
+        for (Field field : implFields) {
+            args.add(field.getZeroValue());
+        }
+
+        /* Add the zero constant. */
+        inner.addClassConstant(Visibility.PUBLIC, inner.getAddress(), "zero",
+                inner.getAddress().newInstance(args.toArray(new Typed[args.size()])));
     }
 
     private static LinkedList<Field> filterForCapabilities(List<Field> fieldList, Collection<Typed<AString>> usingCaps) {
