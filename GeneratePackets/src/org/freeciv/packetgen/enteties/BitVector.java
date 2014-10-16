@@ -260,6 +260,13 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
 
     @Override
     public Value getZeroValue() {
-        return getAddress().newInstance(getAddress().callV("size"));
+        final List<Typed<? extends AValue>> args = new LinkedList<Typed<? extends AValue>>();
+
+        if (!knowsSize) {
+            /* The zero size should be 0. */
+            args.add(literal(0));
+        }
+
+        return getAddress().newInstance(args.toArray(new Value[args.size()]));
     }
 }
