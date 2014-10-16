@@ -207,7 +207,7 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
         return new TerminatedArray(
                 dataIOType,
                 iProvide.getName(),
-                me,
+                this,
                 null,
                 maxArraySizeKind,
                 transferArraySizeKind,

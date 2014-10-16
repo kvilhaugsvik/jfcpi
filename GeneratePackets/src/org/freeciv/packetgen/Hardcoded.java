@@ -53,7 +53,7 @@ public class Hardcoded {
         }
     }
 
-    private static final FieldType uint32 = new FieldType("uint32", "int", TargetClass.from(Long.class),
+    private static final FieldType uint32 = new FieldType("uint32", "int", new SimpleJavaType(Long.class),
             new From1<Block, Var>() {
                 @Override
                 public Block x(Var arg1) {
@@ -154,7 +154,7 @@ public class Hardcoded {
                             Visibility.PRIVATE, Scope.CLASS, Modifiable.NO,
                             charsetClass, "CHARSET", charsetClass.callV("forName", encoding.ref()));
 
-                    return new TerminatedArray("string", "char", TargetClass.from(String.class),
+                    return new TerminatedArray("string", "char", new SimpleJavaType(String.class),
                             (Constant<?>)wasRequired[0],
                             TerminatedArray.MaxArraySize.CONSTRUCTOR_PARAM,
                             TerminatedArray.TransferArraySize.CONSTRUCTOR_PARAM,
@@ -241,7 +241,7 @@ public class Hardcoded {
                 final TargetClass universal = ((ClassWriter) wasRequired[1]).getAddress();
 
                 TargetArray universalArray = TargetArray.from(universal, 1);
-                return new TerminatedArray("worklist", "struct worklist", universalArray,
+                return new TerminatedArray("worklist", "struct worklist", new SimpleJavaType(universalArray),
                         null,
                         TerminatedArray.MaxArraySize.NO_LIMIT,
                         TerminatedArray.TransferArraySize.SERIALIZED,
@@ -310,7 +310,7 @@ public class Hardcoded {
     }
 
     public static FieldType getFloat(final String times) {
-        return new FieldType("float" + times, "float", TargetClass.from(Float.class),
+        return new FieldType("float" + times, "float", new SimpleJavaType(Float.class),
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {

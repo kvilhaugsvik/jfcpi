@@ -204,7 +204,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         final String named = this.getName();
         HashSet<Requirement> req = new HashSet<Requirement>();
         req.add(new Requirement("enum " + named, DataType.class));
-        final TargetClass parent = getAddress();
+        final Enum parent = this;
         return new FieldType(io.getIFulfillReq().getName(), "enum " + named, parent,
                 new From1<Block, Var>() {
                     @Override
@@ -215,7 +215,7 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var to, Var from) {
-                        return new Block(to.assign(parent.callV("valueOf", io.getRead(from))));
+                        return new Block(to.assign(parent.getAddress().callV("valueOf", io.getRead(from))));
                     }
                 },
                 new From2<Block, Var, Var>() {

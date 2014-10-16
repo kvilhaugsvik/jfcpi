@@ -69,7 +69,8 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
     @Override
     public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         final NetworkIO io = (NetworkIO)wasRequired[0];
-        return new FieldType(io.getIFulfillReq().getName(), iProvide.getName(), typeInJava,
+
+        return new FieldType(io.getIFulfillReq().getName(), iProvide.getName(), this,
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var to) {

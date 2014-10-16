@@ -24,6 +24,7 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
+import org.freeciv.packetgen.enteties.supporting.DataType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -40,7 +41,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     public static final Pattern REMOVE_FROM_CLASS_NAMES = Pattern.compile("[\\(|\\)|\\s|;|\\{|\\}]");
 
     private final Requirement iAmRequiredAs;
-    private final TargetClass javaType;
+    private final DataType wrappedType;
     private final Block constructorBody;
     private final Block decode;
     private final Block encode;
@@ -61,7 +62,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
      * Basic field types are usually not used directly. An alias to it is used in stead.
      * @param dataIOType string identifying the function Freeciv use to read fields of this kind.
      * @param publicType the C type Freeciv converts this field to after reading it.
-     * @param javaType the Java type to use in stead of the C type.
+     * @param wrappedType the Java type to use in stead of the C type.
      * @param constructorBody constructor from a value of the Java type.
      * @param decode constructor from a {@see java.io.DataOutput},
      *               a {@see org.freeciv.packet.fieldtype.ElementsLimit limit}
@@ -79,7 +80,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
      * @param fieldsToAdd fields to add to the generated Java code for this field type.
      * @param methodsToAdd methods to add to the generated Java code for this field type.
      */
-    public FieldType(String dataIOType, String publicType, TargetClass javaType,
+    public FieldType(String dataIOType, String publicType, DataType wrappedType,
                      From1<Block, Var> constructorBody,
                      From2<Block, Var, Var> decode,
                      From2<Block, Var, Var> encode,
@@ -92,15 +93,15 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 Imports.are(),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
                 getUnaliasedName((dataIOType + "(" + publicType + ")")),
-                DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.fieldtype.FieldType.class).addGenericTypeArguments(Arrays.asList(javaType))));
+                DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.fieldtype.FieldType.class).addGenericTypeArguments(Arrays.asList(wrappedType.getAddress()))));
 
         pFromStream = Var.param(TargetClass.from(DataInput.class), "from");
         pTo = Var.param(TargetClass.from(DataOutput.class), "to");
         fValue = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-                javaType, "value", null);
+                wrappedType.getAddress(), "value", null);
 
         this.iAmRequiredAs = new Requirement(dataIOType + "(" + publicType + ")", FieldType.class);
-        this.javaType = javaType;
+        this.wrappedType = wrappedType;
         this.decode = decode.x(fValue, pFromStream);
         this.encode = encode.x(fValue, pTo);
         this.encodedSize = new Block(RETURN(encodedSize.x(fValue)));
@@ -121,14 +122,14 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 Imports.are(),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
                 fixClassNameIfBasic(visible ? name : original.getName()),
-                DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.fieldtype.FieldType.class).addGenericTypeArguments(Arrays.asList(original.javaType))));
+                DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.fieldtype.FieldType.class).addGenericTypeArguments(Arrays.asList(original.getUnderType()))));
 
         this.pFromStream = original.pFromStream;
         this.pTo = original.pTo;
         this.fValue = original.fValue;
 
         this.iAmRequiredAs = new Requirement(requiredAs, FieldType.class);
-        this.javaType = original.javaType;
+        this.wrappedType = original.wrappedType;
 
         this.decode = original.decode;
         this.encode = original.encode;
@@ -145,10 +146,10 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     }
 
     private void assemble() {
-        this.addObjectConstant(javaType, "value");
+        this.addObjectConstant(getUnderType(), "value");
 
         List<TargetClass> tIOExcept = Arrays.asList(TargetClass.from(IOException.class));
-        Var<AnObject> pValue = Var.param(javaType, "value");
+        Var<AnObject> pValue = Var.param(getUnderType(), "value");
 
         this.addMethod(Method.newPublicConstructor(Comment.no(),
                 new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
@@ -163,7 +164,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 TargetClass.from(int.class), "encodedLength",
                 encodedSize));
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
-                javaType, "getValue",
+                getUnderType(), "getValue",
                 new Block(RETURN(this.getField("value").ref()))));
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
                 TargetClass.from(String.class), "toString",
@@ -253,7 +254,15 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
      * @return the address of the type of the inner value.
      */
     public TargetClass getUnderType() {
-        return javaType;
+        return wrappedType.getAddress();
+    }
+
+    /**
+     * Get the type of the value that this field type wraps.
+     * @return the DataType of the type of the inner value.
+     */
+    public DataType getWrappedDataType() {
+        return wrappedType;
     }
 
     @Override

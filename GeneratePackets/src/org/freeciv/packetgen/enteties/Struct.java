@@ -190,7 +190,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
         if (ioName.equals(extractIOPart(toProduce)))
             return ((FieldType)((Wrapper.Wrapped)wasRequired[0]).getWrapped()).createFieldType(toProduce.getName());
 
-        final TargetClass me = getAddress();
+        final Struct me = this;
         final String ios = extractIOPart(toProduce);
         final HashSet<Requirement> resultMustRequire = requireMeAndTypeOfFields(wasRequired);
 
@@ -213,7 +213,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
                             readFromNet[i] = fieldTypeClasses.get(i).newInstance(from.ref(), Hardcoded.noLimit, NULL)
                                     .callV("getValue");
 
-                        return new Block(to.assign(me.newInstance(readFromNet)));
+                        return new Block(to.assign(me.getAddress().newInstance(readFromNet)));
                     }
                 },
                 new From2<Block, Var, Var>() {

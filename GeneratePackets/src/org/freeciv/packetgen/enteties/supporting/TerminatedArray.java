@@ -64,7 +64,7 @@ public class TerminatedArray extends FieldType {
             };
     public static final String SELF_VALIDATOR_NAME = "verifyInsideLimits";
 
-    public TerminatedArray(final String dataIOType, final String publicType, final TargetClass javaType,
+    public TerminatedArray(final String dataIOType, final String publicType, final DataType javaType,
                            final Constant<?> terminator,
                            final MaxArraySize maxArraySizeKind,
                            final TransferArraySize transferArraySizeKind,
@@ -86,9 +86,9 @@ public class TerminatedArray extends FieldType {
                            List<Var<? extends AValue>> extraFields
     ) {
         super(dataIOType, publicType, javaType,
-                createConstructorBody(javaType, maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
+                createConstructorBody(javaType.getAddress(), maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
                 createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements, elementTypeCanLimitVerify, alwaysIncludeStopValue),
-                createEncode(terminator, transferArraySizeKind, numberOfElements, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType, alwaysIncludeStopValue),
+                createEncode(terminator, transferArraySizeKind, numberOfElements, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType.getAddress(), alwaysIncludeStopValue),
                 createEnocedSize(transferArraySizeKind, numberOfElements, !notTerminatable(terminator), transferSizeSerialize, valueGetByteLen, alwaysIncludeStopValue),
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
@@ -96,7 +96,7 @@ public class TerminatedArray extends FieldType {
                 extraFields(extraFields),
                 addValidate(helperMethods, maxArraySizeKind, transferArraySizeKind, numberOfElements,
                         Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
-                                javaType, "value", null),
+                                javaType.getAddress(), "value", null),
                         notTerminatable(terminator), elementTypeCanLimitVerify, buffertype)
         );
     }
@@ -334,7 +334,7 @@ public class TerminatedArray extends FieldType {
     }
 
     public static TerminatedArray xBytes(String dataIOType, String publicType) {
-        return new TerminatedArray(dataIOType, publicType, byteArray, null,
+        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(byteArray), null,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
                 byteArray,
@@ -357,7 +357,7 @@ public class TerminatedArray extends FieldType {
     }
 
     public static TerminatedArray maxSizedTerminated(String dataIOType, String publicType, final Constant<?> terminator) {
-        return new TerminatedArray(dataIOType, publicType, byteArray, terminator,
+        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(byteArray), terminator,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
                 byteArray,
@@ -405,7 +405,7 @@ public class TerminatedArray extends FieldType {
                         RETURN(oVal.ref())
                 ));
 
-        return new TerminatedArray(dataIOType, publicType, type, stopElem,
+        return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(type), stopElem,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
                 TargetArray.from(kind.getAddress(), 1),

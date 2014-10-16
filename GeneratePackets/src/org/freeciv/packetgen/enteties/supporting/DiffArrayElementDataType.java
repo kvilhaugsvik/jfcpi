@@ -58,13 +58,7 @@ public class DiffArrayElementDataType implements Dependency.Maker {
                         new WeakVarDec(require, "newValue")),
                 Arrays.asList(
                         indextype,
-                        /* TODO: Get the real DataType in stead. */
-                        new DataType() {
-                            @Override
-                            public TargetClass getAddress() {
-                                return  fieldTypeAlias.getUnderType();
-                            }
-                        }),
+                        fieldTypeAlias.getWrappedDataType()),
                 Arrays.asList(
                         new Requirement("int", DataType.class),
                         require),

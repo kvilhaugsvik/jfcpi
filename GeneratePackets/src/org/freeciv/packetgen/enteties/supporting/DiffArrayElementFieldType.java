@@ -75,7 +75,7 @@ public class DiffArrayElementFieldType implements Dependency.Maker {
 
         final String underlying = splitRequest(toProduce).group(1);
 
-        final Item basic = new FieldType(underlying, underlying, aggregatedIn.getAddress(),
+        final Item basic = new FieldType(underlying, underlying, aggregatedIn,
                 new From1<Block, Var>() {
                     @Override
                     public Block x(Var arg1) {
