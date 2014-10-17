@@ -149,10 +149,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             inner.addMethod(createGetDeltaKeyPublic(implFields, inner.getAddress()));
             inner.addMethod(createToString(name, implFields, delta, getField("number").ref(), deltaOnSuper));
 
-            if (delta)
-                Packet.addZeroField(this, inner, implFields);
+            Packet.addZeroField(this, inner, implFields, delta);
 
-            final Typed<AValue> zeroVal = delta ? inner.getAddress().<AValue>call("zero") : null;
+            final Typed<AValue> zeroVal = inner.getAddress().<AValue>call("zero");
 
             inner.addMethod(createBasicConstructor(implFieldsAll, sharedFields));
 
@@ -202,14 +201,17 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         return deltaFields;
     }
 
-    private static void addZeroField(ClassWriter outer, ClassWriter inner, List<Field> implFields) throws UndefinedException {
+    private static void addZeroField(ClassWriter outer, ClassWriter inner, List<Field> implFields, boolean delta) throws UndefinedException {
         final List<Typed<? extends AValue>> args = new LinkedList<Typed<? extends AValue>>();
 
         /* The header should only care about the packet number. */
         args.add(TargetClass.from(org.freeciv.packet.Header_NA.class).newInstance(outer.getField("number").ref()));
 
-        /* The zero field don't need a delta bit vector. */
-        args.add(NULL);
+        /* Only delta protocol packets have a delta field. */
+        if (delta) {
+            /* The zero field don't need a delta bit vector. */
+            args.add(NULL);
+        }
 
         /* Add the zero value of each field. */
         for (Field field : implFields) {
