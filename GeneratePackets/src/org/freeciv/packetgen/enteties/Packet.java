@@ -443,17 +443,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         boolean oldNeeded = true;
         final Var<? extends AValue> chosenOld;
-        if (delta) {
-            LinkedList<Value<? extends AValue>> keyArgs = new LinkedList<Value<? extends AValue>>();
-            for (Field keyField : getKeyFields(fields))
-                keyArgs.add(keyField.getTmpLocalVar(null).ref());
-            chosenOld = Var.local(impl, "chosenOld", R_IF(
-                    isSame(NULL, old.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()])))),
-                    zero,
-                    cast(impl, old.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()]))))));
-        } else {
-            chosenOld = Var.local(impl, "chosenOld", NULL);
-        }
+        LinkedList<Value<? extends AValue>> keyArgs = new LinkedList<Value<? extends AValue>>();
+        for (Field keyField : getKeyFields(fields))
+            keyArgs.add(keyField.getTmpLocalVar(null).ref());
+        chosenOld = Var.local(impl, "chosenOld", R_IF(
+                isSame(NULL, old.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()])))),
+                zero,
+                cast(impl, old.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()]))))));
 
         LinkedList<Reference<? extends AValue>> constructorParams = new LinkedList<Reference<? extends AValue>>();
         for (Field field : fields) {
