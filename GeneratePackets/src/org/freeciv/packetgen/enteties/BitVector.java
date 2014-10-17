@@ -291,6 +291,6 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
             args.add(literal(0));
         }
 
-        return getAddress().newInstance(args.toArray(new Value[args.size()]));
+        return getAddress().newInstance(args.toArray(new Typed[args.size()]));
     }
 }
