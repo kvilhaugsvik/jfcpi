@@ -334,7 +334,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                                 .newInstance(TargetClass.from(EndsInEternalZero.class).callV("allOneBytes",
                                         BuiltIn.sum(BuiltIn.divide(BuiltIn.subtract(
                                                 literal(deltaFields), literal(1)), literal(8)), literal(1))))),
-                        TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)), NULL))),
+                        TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)),
+                        /* The delta field should never be read from the previous field. */
+                        NULL))),
                 addExceptionLocation));
     }
 
@@ -434,6 +436,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             operation.addStatement(delta_tmp.assign(delta_tmp.getTType().newInstance(
                     streamName.ref(),
                     TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)),
+                    /* The delta field should never be read from the previous field. */
                     NULL)));
             body.addStatement(labelExceptionsWithPacketAndField(
                     delta_tmp,
@@ -468,7 +471,12 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             }
             Block readAndValidate = new Block();
             readAndValidate.addStatement(asLocal.assign(asLocal.getTType().newInstance(streamName.ref(),
-                    field.getSuperLimit(0, true), NULL)));
+                    field.getSuperLimit(0, true),
+                    field.isAnnotatedUsing(keyFlagg) ?
+                            /* The key field should never be read from the previous field. */
+                            NULL :
+                            /* Pass the previous field to the field's deserializing constructor. */
+                            chosenOld.ref().callV(field.getName()))));
 
             final Typed<NoValue> readLabeled = labelExceptionsWithPacketAndField(field, readAndValidate, addExceptionLocation);
             if (isBoolFolded(enableDeltaBoolFolding, field)) {
