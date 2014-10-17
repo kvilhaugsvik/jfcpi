@@ -21,6 +21,7 @@ import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 import com.kvilhaugsvik.javaGenerator.typeBridge.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
+import org.freeciv.utility.Validation;
 
 public class BuiltIn {
     public static final Typed<ABool> TRUE = BuiltIn.<ABool>toCode("true");
@@ -103,8 +104,23 @@ public class BuiltIn {
         return ifImpl.x(cond, then, ifNot);
     }
 
+    /**
+     * Generate Java code using the ternary operator.
+     * A ternary statement is (condition ? ifTrue : ifNotTrue)
+     * In Java the ternary operator has a return value while the "if" statement don't.
+     * @param cond the condition that decides what to do.
+     * @param then what to do if the condition is true.
+     * @param ifNot what to do if the condition is false.
+     * @param <Kind> the type of the ternary statement's return value.
+     * @return Java code for a ternary statement with the specified return type, condition and actions.
+     */
     public static <Kind extends AValue> Typed<Kind> R_IF(final Typed<ABool> cond, final Typed<Kind> then,
                                                           final Typed<Kind> ifNot) {
+        /* Check that the input is provided. */
+        Validation.validateNotNull(cond, "cond");
+        Validation.validateNotNull(then, "then");
+        Validation.validateNotNull(ifNot, "ifNot");
+
         return new Formatted.Type<Kind>() {
             @Override
             public void writeAtoms(CodeAtoms to) {
