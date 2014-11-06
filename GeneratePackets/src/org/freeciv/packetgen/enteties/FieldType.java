@@ -56,6 +56,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     protected final Var<AnObject> fValue;
     private final Var<AnObject> pTo;
     private final Var<AnObject> pFromStream;
+    private final Var<AValue> old;
 
     private final Collection<Requirement> requirement;
 
@@ -101,6 +102,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         pTo = Var.param(TargetClass.from(DataOutput.class), "to");
         fValue = Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                 wrappedType.getAddress(), "value", null);
+        this.old = Var.param(this.getAddress(), "old");
 
         this.iAmRequiredAs = new Requirement(dataIOType + "(" + publicType + ")", FieldType.class);
         this.wrappedType = wrappedType;
@@ -129,6 +131,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.pFromStream = original.pFromStream;
         this.pTo = original.pTo;
         this.fValue = original.fValue;
+        this.old = Var.param(this.getAddress(), "old");
 
         this.iAmRequiredAs = new Requirement(requiredAs, FieldType.class);
         this.wrappedType = original.wrappedType;
@@ -157,7 +160,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                 new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pValue, Hardcoded.pLimits))),
                 constructorBody));
         this.addMethod(Method.newPublicConstructorWithException(Comment.no(),
-                new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits, Var.param(this.getAddress(), "old")))), tIOExcept,
+                new ArrayList<Var<? extends AValue>>(new ArrayList(Arrays.asList(pFromStream, Hardcoded.pLimits, this.old))), tIOExcept,
                 decode));
         this.addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.from(void.class), "encodeTo", Arrays.asList(pTo),
