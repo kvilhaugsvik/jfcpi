@@ -15,15 +15,12 @@
 package org.freeciv.packetgen;
 
 import com.kvilhaugsvik.dependency.*;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import com.kvilhaugsvik.javaGenerator.typeBridge.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packet.fieldtype.ElementsLimit;
 import org.freeciv.packetgen.enteties.*;
 import org.freeciv.packetgen.enteties.supporting.*;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 
 import java.nio.charset.Charset;
@@ -61,9 +58,9 @@ public class Hardcoded {
                     return new Block(arg1.assign(pValue.ref()));
                 }
             },
-            new From2<Block, Var, Var>() {
+            new From3<Block, Var, Var, Var>() {
                 @Override
-                public Block x(Var to, Var from) {
+                public Block x(Var to, Var from, Var old) {
                     final TargetClass integerClass = TargetClass.from(Integer.class);
                     Var removedByCast = Var.local(Modifiable.NO, TargetClass.from(long.class), "removedByCast",
                             sum(multiply(literal(-1L), integerClass.callV("MIN_VALUE")),
@@ -322,9 +319,9 @@ public class Hardcoded {
                         return new Block(arg1.assign(pValue.ref()));
                     }
                 },
-                new From2<Block, Var, Var>() {
+                new From3<Block, Var, Var, Var>() {
                     @Override
-                    public Block x(Var out, Var inn) {
+                    public Block x(Var out, Var inn, Var old) {
                         return new Block(out.assign(divide(
                                 uint32.getAddress().newInstance(inn.ref(), noLimit, NULL).callV("getValue").callV("floatValue"),
                                 BuiltIn.<AValue>toCode(times))));

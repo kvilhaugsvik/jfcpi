@@ -21,9 +21,7 @@ import com.kvilhaugsvik.dependency.Dependency;
 import com.kvilhaugsvik.dependency.ReqKind;
 import com.kvilhaugsvik.dependency.Requirement;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.typeBridge.*;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packetgen.enteties.supporting.DataType;
@@ -85,7 +83,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
      */
     public FieldType(String dataIOType, String publicType, DataType wrappedType,
                      From1<Block, Var> constructorBody,
-                     From2<Block, Var, Var> decode,
+                     From3<Block, Var, Var, Var> decode,
                      From2<Block, Var, Var> encode,
                      From1<Typed<AnInt>, Var> encodedSize,
                      From1<Typed<AString>, Var> toString,
@@ -106,7 +104,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
 
         this.iAmRequiredAs = new Requirement(dataIOType + "(" + publicType + ")", FieldType.class);
         this.wrappedType = wrappedType;
-        this.decode = decode.x(fValue, pFromStream);
+        this.decode = decode.x(fValue, pFromStream, this.old);
         this.encode = encode.x(fValue, pTo);
         this.encodedSize = new Block(RETURN(encodedSize.x(fValue)));
         this.arrayEater = arrayEater;

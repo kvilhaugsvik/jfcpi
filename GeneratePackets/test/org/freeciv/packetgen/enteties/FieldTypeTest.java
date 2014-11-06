@@ -23,6 +23,7 @@ import com.kvilhaugsvik.javaGenerator.Var;
 import com.kvilhaugsvik.javaGenerator.Block;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From3;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
@@ -56,9 +57,9 @@ public class FieldTypeTest {
                         return new Block();
                     }
                 },
-                new From2<Block, Var, Var>() {
+                new From3<Block, Var, Var, Var>() {
                     @Override
-                    public Block x(Var out, Var inn) {
+                    public Block x(Var out, Var inn, Var old) {
                         return new Block();
                     }
                 },

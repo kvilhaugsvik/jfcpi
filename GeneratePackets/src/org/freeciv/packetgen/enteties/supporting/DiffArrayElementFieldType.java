@@ -18,6 +18,7 @@ import com.kvilhaugsvik.dependency.*;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
 import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
+import com.kvilhaugsvik.javaGenerator.typeBridge.From3;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
@@ -82,9 +83,9 @@ public class DiffArrayElementFieldType implements Dependency.Maker {
                         return new Block(arg1.assign(Hardcoded.pValue.ref()));
                     }
                 },
-                new From2<Block, Var, Var>() {
+                new From3<Block, Var, Var, Var>() {
                     @Override
-                    public Block x(Var to, Var from) {
+                    public Block x(Var to, Var from, Var old) {
                         final Var<AValue> index = Var.local(ftIndex.getUnderType(), "index",
                                 ftIndex.getAddress().newInstance(from.ref(), Hardcoded.noLimit, NULL).callV("getValue"));
                         final Var<AValue> newValue = Var.local(ftValue.getUnderType(), "newValue",

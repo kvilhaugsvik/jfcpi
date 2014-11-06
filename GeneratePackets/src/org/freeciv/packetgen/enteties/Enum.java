@@ -15,16 +15,13 @@
 package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.dependency.*;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import com.kvilhaugsvik.javaGenerator.typeBridge.*;
 import org.freeciv.packetgen.Hardcoded;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.IntExpression;
 import org.freeciv.packetgen.enteties.supporting.NetworkIO;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.expression.EnumElement;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.types.FCEnum;
@@ -216,9 +213,9 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                         return new Block(arg1.assign(Hardcoded.pValue.ref()));
                     }
                 },
-                new From2<Block, Var, Var>() {
+                new From3<Block, Var, Var, Var>() {
                     @Override
-                    public Block x(Var to, Var from) {
+                    public Block x(Var to, Var from, Var old) {
                         return new Block(to.assign(parent.getAddress().callV("valueOf", io.getRead(from))));
                     }
                 },

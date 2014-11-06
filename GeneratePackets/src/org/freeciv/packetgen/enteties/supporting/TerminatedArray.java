@@ -9,9 +9,7 @@ import org.freeciv.packetgen.enteties.Constant;
 import org.freeciv.packetgen.enteties.FieldType;
 import com.kvilhaugsvik.javaGenerator.*;
 import com.kvilhaugsvik.javaGenerator.expression.MethodCall;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
+import com.kvilhaugsvik.javaGenerator.typeBridge.*;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 
@@ -187,10 +185,10 @@ public class TerminatedArray extends FieldType {
         };
     }
 
-    private static From2<Block, Var, Var> createDecode(final Constant<?> terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify, final boolean alwaysIncludeStopValue) {
-        return new From2<Block, Var, Var>() {
+    private static From3<Block, Var, Var, Var> createDecode(final Constant<?> terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify, final boolean alwaysIncludeStopValue) {
+        return new From3<Block, Var, Var, Var>() {
             @Override
-            public Block x(Var to, Var from) {
+            public Block x(Var to, Var from, Var old) {
                 Var buf = Var.local(buffertype, "buffer",
                         buffertype.newInstance(numberOfValueElementToNumberOfBufferElements.x(fMaxSize.ref().callV("elements_to_transfer"))));
                 Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));

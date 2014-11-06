@@ -14,9 +14,7 @@
 
 package org.freeciv.packetgen.enteties;
 
-import com.kvilhaugsvik.javaGenerator.typeBridge.From1;
-import com.kvilhaugsvik.javaGenerator.typeBridge.From2;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import com.kvilhaugsvik.javaGenerator.typeBridge.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import org.freeciv.packetgen.Hardcoded;
@@ -24,7 +22,6 @@ import com.kvilhaugsvik.dependency.*;
 import org.freeciv.packetgen.enteties.supporting.DataType;
 import org.freeciv.packetgen.enteties.supporting.WeakVarDec;
 import com.kvilhaugsvik.javaGenerator.*;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue;
 import org.freeciv.types.FCEnum;
 
@@ -214,9 +211,9 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
                         return new Block(arg1.assign(Hardcoded.pValue.ref()));
                     }
                 },
-                new From2<Block, Var, Var>() {
+                new From3<Block, Var, Var, Var>() {
                     @Override
-                    public Block x(Var to, Var from) {
+                    public Block x(Var to, Var from, Var old) {
                         final Typed[] readFromNet = new Typed[fieldNames.size()];
                         for (int i = 0; i < readFromNet.length; i++)
                             readFromNet[i] = fieldTypeClasses.get(i).newInstance(from.ref(), Hardcoded.noLimit, NULL)
