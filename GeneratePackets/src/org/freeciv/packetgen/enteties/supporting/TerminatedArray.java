@@ -392,11 +392,12 @@ public class TerminatedArray extends FieldType {
                                 new Block(inc(outVar, kind.getAddress().newInstance(elem.ref(), helperParamLimits.ref()).callV("encodedLength")))),
                         RETURN(outVar.ref())));
 
+        Var<AValue> pOld = Var.param(TargetClass.SELF_TYPED, "old");
         Var<AValue> pBuf = Var.param(TargetArray.from(kind.getAddress(), 1), "buf");
         Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.ref().<AnInt>callV("length")));
         Var<AnInt> count = Var.<AnInt>local(int.class, "i", literal(0));
         final Method.Helper buffer2value = Method.newHelper(Comment.no(), type, "buffer2value",
-                Arrays.<Var<?>>asList(pBuf),
+                Arrays.<Var<?>>asList(pBuf, pOld),
                 new Block(
                         oVal,
                         FOR(count, isSmallerThan(count.ref(), pBuf.ref().callV("length")), inc(count), new Block(
@@ -414,7 +415,7 @@ public class TerminatedArray extends FieldType {
                 new From2<Typed<AValue>, Typed<AValue>, Var>() {
                     @Override
                     public Typed<AValue> x(Typed<AValue> bytes, Var old) {
-                        return buffer2value.getAddress().call(bytes);
+                        return buffer2value.getAddress().call(bytes, old.ref());
                     }
                 },
                 new From2<Block, Var, Var>() {
