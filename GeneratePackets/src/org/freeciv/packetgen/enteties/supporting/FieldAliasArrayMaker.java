@@ -52,6 +52,12 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
         return out;
     }
 
+    /**
+     * Does the name of the requested field array indicates that it is a diff array.
+     * At the moment this is true if the letters DIFF appear between _ and the number of dimensions.
+     * @param asParts the name of the requested field array split using splitRequest
+     * @return true iff the name of the requested field array indicates that it is a diff array.
+     */
     private static boolean isDiff(Matcher asParts) {
         return null != asParts.group(3);
     }
@@ -67,27 +73,58 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
         return new Requirement(underlying + (diff ? "_DIFF" : ""), FieldType.class);
     }
 
+    /**
+     * Split the name of the requested field array so it can be understood.
+     * The name of the requested field type array has information about
+     * its wanted functionality. Split the name in understandable parts.
+     * @param toProduce the required field array type.
+     * @return information about what should be made.
+     */
     private static Matcher splitRequest(Requirement toProduce) {
         Matcher add = arrayRequest.matcher(toProduce.getName());
+
+        /* Validate that the request is understood. Unless it is understood
+         * it probably shouldn't have been sent here. */
         if (!add.matches())
             throw new IllegalArgumentException("Can't produce " + toProduce.toString());
+
         return add;
     }
 
+    /**
+     * Return the proper field type for handling the role in a field type array as specified by the name.
+     * That may be a regular array, a diff array or even the field type the array is made of.
+     * @param toProduce the Requirement of the field type that should be produced. Its name determines its functions.
+     * @param wasRequired the items required to produce it in the order given by {@link #neededInput(Requirement)}
+     * @return the proper field type for handling the specified role in a field type array.
+     * @throws UndefinedException
+     */
     @Override
     public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
+        /* The name of the requested field type array has information about
+         * its wanted functionality. Split the name in understandable
+         * parts. */
         final Matcher asParts = splitRequest(toProduce);
 
-        if ("1".equals(asParts.group(4)) && eatsArrays(wasRequired[0]))
-            return ((FieldType)wasRequired[0]).aliasUnseenToCode(toProduce.getName());
-
+        /* This should be an array of fields of this type. */
         final FieldType madeOf = (FieldType) wasRequired[0];
-        final Constant stopElem = (Constant) (isDiff(asParts) ? wasRequired[1] : null);
 
+        if ("1".equals(asParts.group(4)) && madeOf.isArrayEater()) {
+            /* The remaining array dimension is meant for the field type it
+             * self. Its field type is therefore considered as the first
+             * array dimension. */
+            return madeOf.aliasUnseenToCode(toProduce.getName());
+        }
+
+        /* Is this field type array a diff array? */
+        final boolean isDiffArray = isDiff(asParts);
+
+        /* Diff arrays are the only field type arrays that have a stop element.
+         * Regular field type arrays read a known number of elements. */
+        final Constant stopElem = (Constant) (isDiffArray ? wasRequired[1] : null);
+
+        /* The newly created field type array must be renamed since naming it during creation currently is
+         * impossible. (A newly created field type is expected to be named like a basic field type) */
         return TerminatedArray.fieldArray("n", "a", madeOf, stopElem).createFieldType(toProduce.getName());
-    }
-
-    private static boolean eatsArrays(Dependency.Item dependencyItem) {
-        return ((FieldType) dependencyItem).isArrayEater();
     }
 }
