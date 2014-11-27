@@ -185,6 +185,15 @@ public class TargetClass extends Address<TargetPackage> {
     }
 
     public <Ret extends AValue> Value<Ret> callV(String method, Typed<? extends AValue>... parameters) {
+        /* TODO: consider to have a flag set in stead of checking for SELF_TYPED. That would allow
+         * incomplete types to use it as well. */
+        if (this == TargetClass.SELF_TYPED ) {
+            /* This is a special case. Just assume that this is a regular dynamic method. */
+            TargetMethod fake = new TargetMethod(TargetClass.SELF_TYPED, method, TargetClass.TYPE_NOT_KNOWN, TargetMethod.Called.DYNAMIC);
+
+            return fake.callV(parameters);
+        }
+
         methodExists(method); // exception if method don't exist here or on parent
         if (methods.containsKey(method)) // method exists here
             return methods.get(method).<Ret>callV(parameters);
