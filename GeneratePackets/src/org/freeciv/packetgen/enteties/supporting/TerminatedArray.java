@@ -47,9 +47,9 @@ public class TerminatedArray extends FieldType {
                     return bytes;
                 }
             };
-    public static final From1<Typed<? extends AValue>, Var> readByte = new From1<Typed<? extends AValue>, Var>() {
+    public static final From2<Typed<? extends AValue>, Var, Var> readByte = new From2<Typed<? extends AValue>, Var, Var>() {
         @Override
-        public Typed<? extends AValue> x(Var from) {
+        public Typed<? extends AValue> x(Var from, Var old) {
             return from.ref().<Returnable>call("readByte");
         }
     };
@@ -71,7 +71,7 @@ public class TerminatedArray extends FieldType {
                            final From1<Typed<AValue>, Var> convertAllElementsToByteArray,
                            final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue,
                            final From2<Block, Var, Var> writeElementTo,
-                           final From1<Typed<? extends AValue>, Var> readElementFrom,
+                           final From2<Typed<? extends AValue>, Var, Var> readElementFrom,
                            final From1<Typed<AString>, Var> toString,
                            final Collection<Requirement> uses,
                            final Typed<AnInt> fullArraySizeLocation,
@@ -185,13 +185,13 @@ public class TerminatedArray extends FieldType {
         };
     }
 
-    private static From3<Block, Var, Var, Var> createDecode(final Constant<?> terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From1<Typed<? extends AValue>, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify, final boolean alwaysIncludeStopValue) {
+    private static From3<Block, Var, Var, Var> createDecode(final Constant<?> terminator, final MaxArraySize maxArraySizeKind, final TransferArraySize transferArraySizeKind, final TargetArray buffertype, final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue, final From2<Typed<? extends AValue>, Var, Var> readElementFrom, final Typed<AnInt> fullArraySizeLocation, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Typed<AnInt>> numberOfValueElementToNumberOfBufferElements, final boolean elementTypeCanLimitVerify, final boolean alwaysIncludeStopValue) {
         return new From3<Block, Var, Var, Var>() {
             @Override
             public Block x(Var to, Var from, Var old) {
                 Var buf = Var.local(buffertype, "buffer",
                         buffertype.newInstance(numberOfValueElementToNumberOfBufferElements.x(fMaxSize.ref().callV("elements_to_transfer"))));
-                Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from));
+                Var current = Var.local(buffertype.getOf(), "current", readElementFrom.x(from, old));
                 Var pos = Var.local(int.class, "pos", literal(0));
 
                 Typed<ABool> noTerminatorFound;
@@ -208,7 +208,7 @@ public class TerminatedArray extends FieldType {
 
                 final Block limitReached = new Block();
                 if (alwaysIncludeStopValue)
-                    limitReached.addStatement(readElementFrom.x(from));
+                    limitReached.addStatement(readElementFrom.x(from, old));
                 limitReached.addStatement(BuiltIn.BREAK());
 
                 Block out = new Block();
@@ -226,7 +226,7 @@ public class TerminatedArray extends FieldType {
                                 new Block(arraySetElement(buf, pos.ref(), current.ref()),
                                         inc(pos),
                                         IF(isSmallerThan(pos.ref(), buf.ref().callV("length")),
-                                                new Block(current.assign(readElementFrom.x(from))),
+                                                new Block(current.assign(readElementFrom.x(from, old))),
                                                 limitReached))));
                 out.addStatement(to.assign(convertBufferArrayToValue.x(TargetClass.from(java.util.Arrays.class)
                         .callV("copyOf", buf.ref(), pos.ref()))));
@@ -426,9 +426,9 @@ public class TerminatedArray extends FieldType {
                                 .call("encodeTo", to.ref()));
                     }
                 },
-                new From1<Typed<? extends AValue>, Var>() {
+                new From2<Typed<? extends AValue>, Var, Var>() {
                     @Override
-                    public Typed<? extends AValue> x(Var from) {
+                    public Typed<? extends AValue> x(Var from, Var old) {
                         return kind.getAddress().newInstance(from.ref(), getNext(arrayEater), NULL);
                     }
                 },

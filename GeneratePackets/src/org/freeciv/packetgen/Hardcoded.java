@@ -261,9 +261,9 @@ public class Hardcoded {
                                 return new Block(universalF.newInstance(elem.ref(), noLimit).call("encodeTo", to.ref()));
                             }
                         },
-                        new From1<Typed<? extends AValue>, Var>() {
+                        new From2<Typed<? extends AValue>, Var, Var>() {
                             @Override
-                            public Typed<AValue> x(Var from) {
+                            public Typed<AValue> x(Var from, Var old) {
                                 return universalF.newInstance(from.ref(), noLimit, NULL).callV("getValue");
                             }
                         },
