@@ -1,7 +1,7 @@
 package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
-import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import com.kvilhaugsvik.javaGenerator.typeBridge.*;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packetgen.Hardcoded;
 import com.kvilhaugsvik.dependency.UndefinedException;
@@ -190,28 +190,28 @@ public class BitVector extends ClassWriter implements Dependency.Item, Dependenc
     public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException {
         final TargetClass me = super.getAddress();
 
-        final From1<Typed<AValue>, Typed<AValue>> convertBufferArrayToValue;
+        final From2<Typed<AValue>, Typed<AValue>, Var> convertBufferArrayToValue;
         switch (transferArraySizeKind) {
             case MAX_ARRAY_SIZE:
                 if (TerminatedArray.MaxArraySize.LIMITED_BY_TYPE.equals(maxArraySizeKind))
-                    convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
+                    convertBufferArrayToValue = new From2<Typed<AValue>, Typed<AValue>, Var>() {
                         @Override
-                        public Typed<AValue> x(Typed<AValue> bv) {
+                        public Typed<AValue> x(Typed<AValue> bv, Var old) {
                             return me.newInstance(bv);
                         }
                     };
                 else
-                    convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
+                    convertBufferArrayToValue = new From2<Typed<AValue>, Typed<AValue>, Var>() {
                         @Override
-                        public Typed<AValue> x(Typed<AValue> bv) {
+                        public Typed<AValue> x(Typed<AValue> bv, Var old) {
                             return me.newInstance(bv, Hardcoded.fMaxSize.ref().callV("full_array_size"));
                         }
                     };
                 break;
             default:
-                convertBufferArrayToValue = new From1<Typed<AValue>, Typed<AValue>>() {
+                convertBufferArrayToValue = new From2<Typed<AValue>, Typed<AValue>, Var>() {
                     @Override
-                    public Typed<AValue> x(Typed<AValue> bv) {
+                    public Typed<AValue> x(Typed<AValue> bv, Var old) {
                         return me.newInstance(bv, Hardcoded.fMaxSize.ref().callV("elements_to_transfer"));
                     }
                 };

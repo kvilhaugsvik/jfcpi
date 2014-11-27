@@ -171,9 +171,9 @@ public class Hardcoded {
                                     return everything.ref().<Returnable>call("getBytes", charset.ref());
                                 }
                             },
-                            new From1<Typed<AValue>, Typed<AValue>>() {
+                            new From2<Typed<AValue>, Typed<AValue>, Var>() {
                                 @Override
-                                public Typed<AValue> x(Typed<AValue> bytes) {
+                                public Typed<AValue> x(Typed<AValue> bytes, Var old) {
                                     return (TargetClass.from(String.class)).newInstance(bytes, charset.ref());
                                 }
                             },
@@ -249,9 +249,9 @@ public class Hardcoded {
                         universalArray,
                         TerminatedArray.arrayLen,
                         null,
-                        new From1<Typed<AValue>, Typed<AValue>>() {
+                        new From2<Typed<AValue>, Typed<AValue>, Var>() {
                             @Override
-                            public Typed<AValue> x(Typed<AValue> bytes) {
+                            public Typed<AValue> x(Typed<AValue> bytes, Var old) {
                                 return bytes; // TODO: Fix
                             }
                         },
