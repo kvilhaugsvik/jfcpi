@@ -129,13 +129,13 @@ public class FromEntetiesAlone {
                           FieldType string,
                           FieldType bool,
                           FieldType connection) throws IOException, UndefinedException {
-        FieldType uint8s = TerminatedArray.fieldArray("n", "a", uint8, null).createFieldType("UINT8S");
+        FieldType uint8s = TerminatedArray.fieldArray("n", "a", uint8, null, false).createFieldType("UINT8S");
         writeJavaFile(uint8s, targetFolder);
 
-        FieldType uint8s2D = TerminatedArray.fieldArray("n", "a", uint8s, null).createFieldType("UINT8S2D");
+        FieldType uint8s2D = TerminatedArray.fieldArray("n", "a", uint8s, null, false).createFieldType("UINT8S2D");
         writeJavaFile(uint8s2D, targetFolder);
 
-        FieldType strings = TerminatedArray.fieldArray("n", "a", string, null).createFieldType("STRINGS");
+        FieldType strings = TerminatedArray.fieldArray("n", "a", string, null, false).createFieldType("STRINGS");
         writeJavaFile(strings, targetFolder);
 
         writePacket(new Packet("SERVER_JOIN_REQ",
@@ -442,7 +442,7 @@ public class FromEntetiesAlone {
     }
 
     private FieldType createUINT32_1d(FieldType uint32) throws UndefinedException {
-        return TerminatedArray.fieldArray("x", "y", uint32, null).createFieldType("UINT32S");
+        return TerminatedArray.fieldArray("x", "y", uint32, null, false).createFieldType("UINT32S");
     }
 
     @Test public void writeTerminatedArrayFieldArray2D() throws IOException, UndefinedException {
@@ -456,7 +456,7 @@ public class FromEntetiesAlone {
     }
 
     private FieldType createUINT32_2D(FieldType uint32_1d) throws UndefinedException {
-        return TerminatedArray.fieldArray("x", "y", uint32_1d, null).createFieldType("UINT32S_2D");
+        return TerminatedArray.fieldArray("x", "y", uint32_1d, null, false).createFieldType("UINT32S_2D");
     }
 
     @Test public void writeTerminatedArrayFieldArrayDiffElement() throws IOException, UndefinedException {
@@ -490,7 +490,7 @@ public class FromEntetiesAlone {
     }
 
     private Dependency.Item createUINT32DiffArray(FieldType diffElementField, Constant<AnInt> diff_array_ender) {
-        return TerminatedArray.fieldArray("n", "a", diffElementField, diff_array_ender).createFieldType("UINT32_DIFF_ARRAY");
+        return TerminatedArray.fieldArray("n", "a", diffElementField, diff_array_ender, true).createFieldType("UINT32_DIFF_ARRAY");
     }
 
     @Test public void writeTypedBitVectorTestPeers() throws IOException, UndefinedException {
