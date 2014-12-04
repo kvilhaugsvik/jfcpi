@@ -396,6 +396,29 @@ public class TerminatedArray extends FieldType {
                                 new Block(inc(outVar, kind.getAddress().newInstance(elem.ref(), helperParamLimits.ref()).callV("encodedLength")))),
                         RETURN(outVar.ref())));
 
+        final From2<Block, Var, FieldType> valueZeroBody;
+        if (isDiffArray) {
+            valueZeroBody = new From2<Block, Var, FieldType>() {
+                @Override
+                public Block x(Var pSize, FieldType me) {
+                    final TargetClass arrayType = me.getWrappedDataType().getAddress();
+                    final Var out = Var.local(arrayType, "out", arrayType.newInstance(pSize.ref()));
+                    final Var count = Var.local(int.class, "count", literal(0));
+
+                    return new Block(
+                            out,
+                            FOR(count, isSmallerThan(count.ref(), out.ref().callV("length")), inc(count), new Block(
+                                    BuiltIn.arraySetElement(out, count.ref(),
+                                            kind.getUnderType().newInstance(count.ref(),
+                                                    kind.getAddress().callV("getValueZero", literal(0)).callV("getNewValue")))
+                            )),
+                            RETURN(out.ref()));
+                }
+            };
+        } else {
+            valueZeroBody = FieldType.UNSIZED_ZERO;
+        }
+
         Var<AValue> pSize = Var.param(int.class, "size");
         Var<AValue> pOld = Var.param(TargetClass.SELF_TYPED, "old");
         Var<AValue> pBuf = Var.param(TargetArray.from(kind.getAddress(), 1), "buf");
@@ -455,7 +478,7 @@ public class TerminatedArray extends FieldType {
                 arrayEater,
                 TargetArray.from(kind.getAddress(), 1).getOf().getSimpleName().endsWith("_DIFF"),
                 Collections.<Var<? extends AValue>>emptyList(),
-                FieldType.UNSIZED_ZERO
+                valueZeroBody
         );
     }
 
