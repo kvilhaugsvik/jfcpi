@@ -281,7 +281,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
      */
     public Value getZeroValue() {
         return this.getAddress().newInstance(
-                this.getWrappedDataType().getZeroValue(),
+                this.getAddress().callV("getValueZero", literal(0)),
                 TargetClass.from(ElementsLimit.class).callV("limit", literal(0)));
     }
 
