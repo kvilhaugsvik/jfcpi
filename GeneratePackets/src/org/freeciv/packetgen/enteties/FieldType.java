@@ -188,11 +188,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         for (Method toAdd : methodsToAdd)
             this.addMethod(toAdd);
 
-        final Var value_zero = Var.field(Collections.<Annotate>emptyList(),
-                Visibility.PRIVATE, Scope.CLASS, Modifiable.NO,
-                this.getUnderType(), "VALUE_ZERO", this.getWrappedDataType().getZeroValue());
         final Var<AValue> pSize = Var.param(int.class, "size");
-        this.addField(value_zero);
         this.addMethod(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS,
                 this.getUnderType(), "getValueZero",
                 Arrays.<Var<?>>asList(pSize),
@@ -201,7 +197,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                         IF(isNotSame(literal(0), pSize.ref()),
                                 new Block(THROW(UnsupportedOperationException.class,
                                         literal("I only support size 0.")))),
-                        RETURN(value_zero.ref()))));
+                        RETURN(this.getWrappedDataType().getZeroValue()))));
     }
 
     private static String fixClassNameIfBasic(String name) {
