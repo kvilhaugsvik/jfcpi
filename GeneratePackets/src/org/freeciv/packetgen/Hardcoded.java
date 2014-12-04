@@ -91,7 +91,8 @@ public class Hardcoded {
             false,
             Collections.<Requirement>emptySet(),
             Collections.<Var<AValue>>emptyList(),
-            Collections.<Method>emptyList()
+            Collections.<Method>emptyList(),
+            FieldType.UNSIZED_ZERO
     );
 
     private static final Collection<Dependency.Item> hardCodedElements = Arrays.<Dependency.Item>asList(
@@ -193,7 +194,8 @@ public class Hardcoded {
                             Collections.<Method.Helper>emptyList(),
                             false,
                             false,
-                            Arrays.<Var<? extends AValue>>asList(charset)
+                            Arrays.<Var<? extends AValue>>asList(charset),
+                            FieldType.UNSIZED_ZERO
                     );
                 }
             };
@@ -282,7 +284,8 @@ public class Hardcoded {
                         Collections.<Method.Helper>emptyList(),
                         false,
                         false,
-                        Collections.<Var<? extends AValue>>emptyList()
+                        Collections.<Var<? extends AValue>>emptyList(),
+                        FieldType.UNSIZED_ZERO
                 );
             }
         });
@@ -348,7 +351,8 @@ public class Hardcoded {
                 false,
                 Arrays.asList(uint32.getIFulfillReq()),
                 Collections.<Var<AValue>>emptyList(),
-                Collections.<Method>emptyList()
+                Collections.<Method>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
     }
 }

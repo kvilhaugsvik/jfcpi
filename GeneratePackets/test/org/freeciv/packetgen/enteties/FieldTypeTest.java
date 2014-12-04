@@ -79,7 +79,8 @@ public class FieldTypeTest {
                 false,
                 Collections.<Requirement>emptySet(),
                 Collections.<Var<com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue>>emptyList(),
-                Collections.<com.kvilhaugsvik.javaGenerator.Method>emptyList()
+                Collections.<com.kvilhaugsvik.javaGenerator.Method>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
     }
 }

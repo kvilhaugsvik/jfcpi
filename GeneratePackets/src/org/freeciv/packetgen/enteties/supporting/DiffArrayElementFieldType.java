@@ -127,7 +127,8 @@ public class DiffArrayElementFieldType implements Dependency.Maker {
                         new Requirement(underlying + "_diff", DataType.class),
                         new Requirement("DIFF_ARRAY_ENDER", Constant.class)),
                 Collections.<Var<?>>emptyList(),
-                Collections.<Method>emptyList()
+                Collections.<Method>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
 
         return ((FieldType)basic).createFieldType(toProduce.getName());

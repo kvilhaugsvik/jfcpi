@@ -101,7 +101,8 @@ public class SimpleTypeAlias implements Dependency.Item, Dependency.Maker, DataT
                 false,
                 willRequire,
                 Collections.<Var<AValue>>emptyList(),
-                Collections.<com.kvilhaugsvik.javaGenerator.Method>emptyList()
+                Collections.<com.kvilhaugsvik.javaGenerator.Method>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
     }
 

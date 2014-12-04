@@ -230,7 +230,8 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
                 false,
                 req,
                 Collections.<Var<AValue>>emptyList(),
-                Collections.<Method>emptyList()
+                Collections.<Method>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
     }
 

@@ -81,7 +81,8 @@ public class TerminatedArray extends FieldType {
                            final List<Method.Helper> helperMethods,
                            boolean elementTypeCanLimitVerify,
                            boolean alwaysIncludeStopValue,
-                           List<Var<? extends AValue>> extraFields
+                           List<Var<? extends AValue>> extraFields,
+                           From2<Block, Var, FieldType> valueZeroBody
     ) {
         super(dataIOType, publicType, javaType,
                 createConstructorBody(javaType.getAddress(), maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
@@ -95,7 +96,8 @@ public class TerminatedArray extends FieldType {
                 addValidate(helperMethods, maxArraySizeKind, transferArraySizeKind, numberOfElements,
                         Var.field(Collections.<Annotate>emptyList(), Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO,
                                 javaType.getAddress(), "value", null),
-                        notTerminatable(terminator), elementTypeCanLimitVerify, buffertype)
+                        notTerminatable(terminator), elementTypeCanLimitVerify, buffertype),
+                valueZeroBody
         );
     }
 
@@ -351,7 +353,8 @@ public class TerminatedArray extends FieldType {
                 Collections.<Method.Helper>emptyList(),
                 false,
                 false,
-                Collections.<Var<? extends AValue>>emptyList()
+                Collections.<Var<? extends AValue>>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
     }
 
@@ -371,7 +374,8 @@ public class TerminatedArray extends FieldType {
                 Collections.<Method.Helper>emptyList(),
                 false,
                 false,
-                Collections.<Var<? extends AValue>>emptyList()
+                Collections.<Var<? extends AValue>>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
     }
 
@@ -450,7 +454,8 @@ public class TerminatedArray extends FieldType {
                 Arrays.<Method.Helper>asList(lenInBytesHelper, buffer2value),
                 arrayEater,
                 TargetArray.from(kind.getAddress(), 1).getOf().getSimpleName().endsWith("_DIFF"),
-                Collections.<Var<? extends AValue>>emptyList()
+                Collections.<Var<? extends AValue>>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
     }
 

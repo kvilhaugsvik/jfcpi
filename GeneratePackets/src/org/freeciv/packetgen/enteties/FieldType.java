@@ -40,6 +40,20 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     public static final Pattern REMOVE_FROM_CLASS_NAMES = Pattern.compile("[\\(|\\)|\\s|;|\\{|\\}]");
 
+    /**
+     * Create the zero value of the wrapped value for cases were its size is constant.
+     */
+    public static final From2<Block, Var, FieldType> UNSIZED_ZERO = new From2<Block, Var, FieldType>() {
+        @Override
+        public Block x(Var pSize, FieldType me) {
+            return new Block(
+                    IF(isNotSame(literal(0), pSize.ref()),
+                            new Block(THROW(UnsupportedOperationException.class,
+                                    literal("I only support size 0.")))),
+                    RETURN(me.getWrappedDataType().getZeroValue()));
+        }
+    };
+
     private final Requirement iAmRequiredAs;
     private final DataType wrappedType;
     private final Block constructorBody;
@@ -47,6 +61,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
     private final Block encode;
     private final Block encodedSize;
     private final From1<Typed<AString>, Var> value2String;
+    private final Method getSizedZero;
     private final boolean arrayEater;
     private final List<? extends Var<? extends AValue>> fieldsToAdd;
     private final List<? extends Method> methodsToAdd;
@@ -80,6 +95,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
      *              Example: if the Java type of the field's value if generated the field depends on it.
      * @param fieldsToAdd fields to add to the generated Java code for this field type.
      * @param methodsToAdd methods to add to the generated Java code for this field type.
+     * @param valueZeroBody code that returns the zero value of the wrapped value.
      */
     public FieldType(String dataIOType, String publicType, DataType wrappedType,
                      From1<Block, Var> constructorBody,
@@ -89,7 +105,8 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
                      From1<Typed<AString>, Var> toString,
                      boolean arrayEater, Collection<Requirement> needs,
                      List<? extends Var<? extends AValue>> fieldsToAdd,
-                     List<? extends Method> methodsToAdd) {
+                     List<? extends Method> methodsToAdd,
+                     From2<Block, Var, FieldType> valueZeroBody) {
         super(ClassKind.CLASS, TargetPackage.from(org.freeciv.packet.fieldtype.FieldType.class.getPackage()),
                 Imports.are(),
                 "Freeciv's protocol definition", Collections.<Annotate>emptyList(),
@@ -112,6 +129,13 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.constructorBody = constructorBody.x(fValue);
         this.fieldsToAdd = fieldsToAdd;
         this.methodsToAdd = methodsToAdd;
+
+        final Var<AValue> pSize = Var.param(int.class, "size");
+        this.getSizedZero = Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS,
+                this.getUnderType(), "getValueZero",
+                Arrays.<Var<?>>asList(pSize),
+                Collections.<TargetClass>emptyList(),
+                valueZeroBody.x(pSize, this));
 
         requirement = needs;
 
@@ -140,6 +164,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.arrayEater = original.arrayEater;
         this.value2String = original.value2String;
         this.constructorBody = original.constructorBody;
+        this.getSizedZero = original.getSizedZero;
         this.fieldsToAdd = original.fieldsToAdd;
         this.methodsToAdd = original.methodsToAdd;
 
@@ -188,16 +213,7 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         for (Method toAdd : methodsToAdd)
             this.addMethod(toAdd);
 
-        final Var<AValue> pSize = Var.param(int.class, "size");
-        this.addMethod(Method.custom(Comment.no(), Visibility.PUBLIC, Scope.CLASS,
-                this.getUnderType(), "getValueZero",
-                Arrays.<Var<?>>asList(pSize),
-                Collections.<TargetClass>emptyList(),
-                new Block(
-                        IF(isNotSame(literal(0), pSize.ref()),
-                                new Block(THROW(UnsupportedOperationException.class,
-                                        literal("I only support size 0.")))),
-                        RETURN(this.getWrappedDataType().getZeroValue()))));
+        this.addMethod(getSizedZero);
     }
 
     private static String fixClassNameIfBasic(String name) {

@@ -251,7 +251,8 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
                 false,
                 resultMustRequire,
                 Collections.<Var<AValue>>emptyList(),
-                Collections.<Method>emptyList()
+                Collections.<Method>emptyList(),
+                FieldType.UNSIZED_ZERO
         );
     }
 
