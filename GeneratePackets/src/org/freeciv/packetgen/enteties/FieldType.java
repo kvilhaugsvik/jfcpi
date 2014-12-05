@@ -289,12 +289,13 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
 
     /**
      * Get the zero value of this field type. The zero value of the field type is when the wrapped value is zero.
+     * @param size the size of zero. (A diff array's "zero" is full of elements that are zero)
      * @return the zero value of the field type.
      */
-    public Value getZeroValue() {
+    public Value getZeroValue(Typed<AnInt> size) {
         return this.getAddress().newInstance(
-                this.getAddress().callV("getValueZero", literal(0)),
-                TargetClass.from(ElementsLimit.class).callV("limit", literal(0)));
+                this.getAddress().callV("getValueZero", size),
+                TargetClass.from(ElementsLimit.class).callV("limit", size));
     }
 
     /**

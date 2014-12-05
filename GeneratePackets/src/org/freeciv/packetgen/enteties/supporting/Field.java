@@ -111,7 +111,14 @@ public class Field<Kind extends AValue> extends Var<Kind> {
      * @return the zero value of the field.
      */
     public Value getZeroValue() {
-        return type.getZeroValue();
+        if (this.isAnnotatedUsing(ArrayDiff.class)) {
+            /* A diff array zero has elements (that are zero them self). */
+
+            assert 0 < declarations.length : "A diff array should have a max size.";
+            return type.getZeroValue(declarations[0].getMaxSize());
+        } else {
+            return type.getZeroValue(BuiltIn.literal(0));
+        }
     }
 
     public String getFType() {
