@@ -31,7 +31,7 @@ public class InterpretWhenPossible implements ToPacket {
 
     public InterpretWhenPossible(ProtocolVariant map) {
         this.map = map;
-        this.old = new HashMap<DeltaKey, Packet>();
+        this.old = newDeltaStore();
     }
 
     @Override
@@ -60,5 +60,15 @@ public class InterpretWhenPossible implements ToPacket {
         } catch (IOException e) {
             return new RawPacket(packet, headerData);
         }
+    }
+
+    /**
+     * Create a new delta protocol packet storage.
+     * The delta protocol needs to look up the previous packet since the
+     * current packet can refer to data from the previous packet.
+     * @return a new delta protocol packet storage.
+     */
+    public static HashMap<DeltaKey, Packet> newDeltaStore() {
+        return new HashMap<DeltaKey, Packet>();
     }
 }

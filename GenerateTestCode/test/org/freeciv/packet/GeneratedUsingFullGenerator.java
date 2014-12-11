@@ -17,6 +17,7 @@
 
 package org.freeciv.packet;
 
+import org.freeciv.connection.InterpretWhenPossible;
 import org.junit.Test;
 
 import java.io.*;
@@ -117,7 +118,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_ADD p = PACKET_CAP_ADD.fromHeaderAndStream(
                 bytesToDataInput(capabilities_packetCapAdd_noCapabilities_serialized(), 4),
                 new Header_2_2(4 + 1 + 4, 1010),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1010, p.getHeader().getPacketKind());
@@ -177,7 +178,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_ADD.PACKET_CAP_ADD_variant_isAdded p = PACKET_CAP_ADD.fromHeaderAndStream_isAdded(
                 bytesToDataInput(capabilities_packetCapAdd_isAdded_serialized(), 4),
                 new Header_2_2(4 + 1 + 4 + 1, 1010),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1010, p.getHeader().getPacketKind());
@@ -238,7 +239,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_REMOVE.PACKET_CAP_REMOVE_variant p = PACKET_CAP_REMOVE.fromHeaderAndStream(
                 bytesToDataInput(capabilities_packetCapRemove_noCapabilities_serialized(), 4),
                 new Header_2_2(4 + 1 + 4 + 1, 1011),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1011, p.getHeader().getPacketKind());
@@ -297,7 +298,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_REMOVE.PACKET_CAP_REMOVE_variant_isRemoved p = PACKET_CAP_REMOVE.fromHeaderAndStream_isRemoved(
                 bytesToDataInput(capabilities_packetCapRemove_isRemoved_serialized(), 4),
                 new Header_2_2(4 + 1 + 4, 1011),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1011, p.getHeader().getPacketKind());
@@ -357,7 +358,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_ADD_AND_REMOVE.PACKET_CAP_ADD_AND_REMOVE_variant p = PACKET_CAP_ADD_AND_REMOVE.fromHeaderAndStream(
                 bytesToDataInput(capabilities_packetCapAddAndRemove_noCapabilities_serialized(), 4),
                 new Header_2_2(4 + 1 + 4 + 5, 1012),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1012, p.getHeader().getPacketKind());
@@ -418,7 +419,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_ADD_AND_REMOVE.PACKET_CAP_ADD_AND_REMOVE_variant_updated p = PACKET_CAP_ADD_AND_REMOVE.fromHeaderAndStream_updated(
                 bytesToDataInput(capabilities_packetCapAddAndRemove_updated_serialized(), 4),
                 new Header_2_2(4 + 1 + 4 + 4, 1012),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1012, p.getHeader().getPacketKind());
@@ -477,7 +478,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_USES_TWO_CAPS p = PACKET_CAP_USES_TWO_CAPS.fromHeaderAndStream(
                 bytesToDataInput(capabilities_packetCapUsesTwoCaps_noCapabilities_serialized(), 4),
                 new Header_2_2(4 + 1 + 4, 1013),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1013, p.getHeader().getPacketKind());
@@ -537,7 +538,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_USES_TWO_CAPS.PACKET_CAP_USES_TWO_CAPS_variant_cap1 p = PACKET_CAP_USES_TWO_CAPS.fromHeaderAndStream_cap1(
                 bytesToDataInput(capabilities_packetCapUsesTwoCaps_cap1_serialized(), 4),
                 new Header_2_2(4 + 1 + 4 + 1, 1013),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1013, p.getHeader().getPacketKind());
@@ -600,7 +601,7 @@ public class GeneratedUsingFullGenerator {
         PACKET_CAP_USES_TWO_CAPS.PACKET_CAP_USES_TWO_CAPS_variant_cap1_cap2 p = PACKET_CAP_USES_TWO_CAPS.fromHeaderAndStream_cap1_cap2(
                 bytesToDataInput(capabilities_packetCapUsesTwoCaps_cap1_cap2_serialized(), 4),
                 new Header_2_2(4 + 1 + 4 + 1 + 7, 1013),
-                new HashMap<DeltaKey, Packet>()
+                InterpretWhenPossible.newDeltaStore()
         );
 
         assertEquals("Wrong kind", 1013, p.getHeader().getPacketKind());
@@ -653,7 +654,7 @@ public class GeneratedUsingFullGenerator {
                         4),
                 new Header_2_2(10, 1020),
                 /* This should be safe since old isn't used here. */
-                new HashMap<DeltaKey, Packet>());
+                InterpretWhenPossible.newDeltaStore());
 
         /* Check header. Assumed to work since it comes from the test it self. */
         assertEquals("Wrong kind", 1020, p.getHeader().getPacketKind());
@@ -689,7 +690,7 @@ public class GeneratedUsingFullGenerator {
                         }, 0),
                 new Header_2_2(10, 1021),
                 /* No need to keep old. This diff array test will only read a single packet. */
-                new HashMap<DeltaKey, Packet>());
+                InterpretWhenPossible.newDeltaStore());
 
         /* Check header. Assumed to work since it comes from the test it self. */
         assertEquals("Wrong kind", 1021, p.getHeader().getPacketKind());

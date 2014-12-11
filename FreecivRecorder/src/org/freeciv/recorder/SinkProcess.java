@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public abstract class SinkProcess extends Sink {
-    protected final HashMap<DeltaKey, Packet> oldFromServer = new HashMap<DeltaKey, Packet>();
-    protected final HashMap<DeltaKey, Packet> oldFromClient = new HashMap<DeltaKey, Packet>();
+    protected final HashMap<DeltaKey, Packet> oldFromServer = InterpretWhenPossible.newDeltaStore();
+    protected final HashMap<DeltaKey, Packet> oldFromClient = InterpretWhenPossible.newDeltaStore();
 
     private final Over over;
     private final ProtocolVariant versionKnowledge;
