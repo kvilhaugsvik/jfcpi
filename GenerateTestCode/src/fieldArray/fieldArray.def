@@ -1,0 +1,9 @@
+type FIELDTYPE_LIKE_JAVA_BYTE = sint8(int)
+
+PACKET_FIELD_ARRAY = 1020; cs, sc
+  FIELDTYPE_LIKE_JAVA_BYTE array[5];
+end
+
+PACKET_FIELD_ARRAY_DIFF = 1021; cs, sc
+  FIELDTYPE_LIKE_JAVA_BYTE diffArray[5]; diff
+end

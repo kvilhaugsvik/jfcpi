@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fcsource name="simple" packetHeaderKind="FC_trunk" enableDelta="true" enableDeltaBoolFolding="true">
+
+    <inputSource parseAs="packets">
+        <file>fieldArray/fieldArray.def</file>
+    </inputSource>
+
+    <inputSource parseAs="variables">
+        <file>fieldArray/fieldArray.var</file>
+    </inputSource>
+
+    <inputSource parseAs="C">
+    </inputSource>
+
+</fcsource>
