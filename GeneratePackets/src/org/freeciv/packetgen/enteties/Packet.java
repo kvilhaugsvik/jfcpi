@@ -386,6 +386,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         params.add(headerKind);
         body.addStatement(validation.call("validateNotNull", headerKind.ref(), literal(headerKind.getName())));
 
+        params.add(Packet.pOldPackets);
+        body.addStatement(validation.call("validateNotNull", pOldPackets.ref(), literal(pOldPackets.getName())));
+
         final Var<? extends AValue> header_tmp = Var.param(PacketHeader.class, "header" + "_tmp");
         body.addStatement(header_tmp);
         body.addStatement(generateHeader(headerKind.ref(), addExceptionLocation, sizeArgs, header_tmp, impl));

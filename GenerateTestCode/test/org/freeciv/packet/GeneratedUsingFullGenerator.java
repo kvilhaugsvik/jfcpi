@@ -31,7 +31,8 @@ public class GeneratedUsingFullGenerator {
     ------------------------------------------------------------------------------------------------------------------*/
     @Test
     public void simple_packet_noFields() throws NoSuchMethodException {
-        PACKET_NO_FIELDS p = PACKET_NO_FIELDS.fromValues(Header_2_2.class.getConstructor(int.class, int.class));
+        PACKET_NO_FIELDS p = PACKET_NO_FIELDS.fromValues(Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
 
         assertEquals("Wrong kind", 1001, p.getHeader().getPacketKind());
         assertEquals("Wrong size", 4, p.getHeader().getTotalSize());
@@ -39,7 +40,8 @@ public class GeneratedUsingFullGenerator {
 
     @Test
     public void simple_packet_oneField() throws NoSuchMethodException {
-        PACKET_ONE_FIELD p = PACKET_ONE_FIELD.fromValues(5, Header_2_2.class.getConstructor(int.class, int.class));
+        PACKET_ONE_FIELD p = PACKET_ONE_FIELD.fromValues(5, Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
 
         assertEquals("Wrong kind", 1002, p.getHeader().getPacketKind());
         assertEquals("Wrong size", 4 + 1 + 4, p.getHeader().getTotalSize());
@@ -49,7 +51,9 @@ public class GeneratedUsingFullGenerator {
 
     @Test
     public void simple_packet_twoFields() throws NoSuchMethodException {
-        PACKET_TWO_FIELDS p = PACKET_TWO_FIELDS.fromValues(5000, 77, Header_2_2.class.getConstructor(int.class, int.class));
+        PACKET_TWO_FIELDS p = PACKET_TWO_FIELDS.fromValues(5000, 77,
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
 
         assertEquals("Wrong kind", 1003, p.getHeader().getPacketKind());
         assertEquals("Wrong size", 4 + 1 + 4 + 1, p.getHeader().getTotalSize());
@@ -72,7 +76,9 @@ public class GeneratedUsingFullGenerator {
           deserialization test
     ------------------------------------------------------------------------------------------------------------------*/
     private static PACKET_CAP_ADD.PACKET_CAP_ADD_variant capabilities_packetCapAdd_noCapabilities_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_ADD.fromValues(1260, Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_ADD.fromValues(1260,
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapAdd_noCapabilities_serialized() {
@@ -130,7 +136,9 @@ public class GeneratedUsingFullGenerator {
     /******************************************************************************************************************/
 
     private static PACKET_CAP_ADD.PACKET_CAP_ADD_variant_isAdded capabilities_packetCapAdd_isAdded_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_ADD.fromValues_isAdded(1260, 2, Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_ADD.fromValues_isAdded(1260, 2,
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapAdd_isAdded_serialized() {
@@ -191,7 +199,9 @@ public class GeneratedUsingFullGenerator {
     /******************************************************************************************************************/
 
     private static PACKET_CAP_REMOVE.PACKET_CAP_REMOVE_variant capabilities_packetCapRemove_noCapabilities_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_REMOVE.fromValues(1260, 7, Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_REMOVE.fromValues(1260, 7,
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapRemove_noCapabilities_serialized() {
@@ -252,7 +262,9 @@ public class GeneratedUsingFullGenerator {
     /******************************************************************************************************************/
 
     private static PACKET_CAP_REMOVE.PACKET_CAP_REMOVE_variant_isRemoved capabilities_packetCapRemove_isRemoved_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_REMOVE.fromValues_isRemoved(1260, Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_REMOVE.fromValues_isRemoved(1260,
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapRemove_isRemoved_serialized() {
@@ -310,7 +322,9 @@ public class GeneratedUsingFullGenerator {
     /******************************************************************************************************************/
 
     private static PACKET_CAP_ADD_AND_REMOVE.PACKET_CAP_ADD_AND_REMOVE_variant capabilities_packetCapAddAndRemove_noCapabilities_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_ADD_AND_REMOVE.fromValues(1260, "days", Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_ADD_AND_REMOVE.fromValues(1260, "days",
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapAddAndRemove_noCapabilities_serialized() {
@@ -371,7 +385,9 @@ public class GeneratedUsingFullGenerator {
     /******************************************************************************************************************/
 
     private static PACKET_CAP_ADD_AND_REMOVE.PACKET_CAP_ADD_AND_REMOVE_variant_updated capabilities_packetCapAddAndRemove_updated_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_ADD_AND_REMOVE.fromValues_updated(1260, 70, Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_ADD_AND_REMOVE.fromValues_updated(1260, 70,
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapAddAndRemove_updated_serialized() {
@@ -432,7 +448,9 @@ public class GeneratedUsingFullGenerator {
     /******************************************************************************************************************/
 
     private static PACKET_CAP_USES_TWO_CAPS.PACKET_CAP_USES_TWO_CAPS_variant capabilities_packetCapUsesTwoCaps_noCapabilities_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_USES_TWO_CAPS.fromValues(1260, Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_USES_TWO_CAPS.fromValues(1260,
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapUsesTwoCaps_noCapabilities_serialized() {
@@ -490,7 +508,9 @@ public class GeneratedUsingFullGenerator {
     /******************************************************************************************************************/
 
     private static PACKET_CAP_USES_TWO_CAPS.PACKET_CAP_USES_TWO_CAPS_variant_cap1 capabilities_packetCapUsesTwoCaps_cap1_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_USES_TWO_CAPS.fromValues_cap1(1260, 24, Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_USES_TWO_CAPS.fromValues_cap1(1260, 24,
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapUsesTwoCaps_cap1_serialized() {
@@ -551,7 +571,9 @@ public class GeneratedUsingFullGenerator {
     /******************************************************************************************************************/
 
     private static PACKET_CAP_USES_TWO_CAPS.PACKET_CAP_USES_TWO_CAPS_variant_cap1_cap2 capabilities_packetCapUsesTwoCaps_cap1_cap2_fromFields() throws NoSuchMethodException {
-        return PACKET_CAP_USES_TWO_CAPS.fromValues_cap1_cap2(1260, 24, "troner", Header_2_2.class.getConstructor(int.class, int.class));
+        return PACKET_CAP_USES_TWO_CAPS.fromValues_cap1_cap2(1260, 24, "troner",
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
     }
 
     private static byte[] capabilities_packetCapUsesTwoCaps_cap1_cap2_serialized() {
@@ -625,7 +647,8 @@ public class GeneratedUsingFullGenerator {
         final Integer[] count = {0, 1, 2, 3, 4};
 
         final PACKET_FIELD_ARRAY p = PACKET_FIELD_ARRAY.fromValues(count,
-                Header_2_2.class.getConstructor(int.class, int.class));
+                Header_2_2.class.getConstructor(int.class, int.class),
+                InterpretWhenPossible.newDeltaStore());
 
         /* Check header. */
         assertEquals("Wrong kind", 1020, p.getHeader().getPacketKind());

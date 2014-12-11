@@ -160,9 +160,11 @@ public class ProtocolData implements BasicProtocolData {
     }
 
     private static Method extractFromValues(Class<Packet> packet, String name, Class... sig) {
-        Class[] fullSig = new Class[sig.length + 1];
+        /* The two final parameters are common for all packets. Add them here. */
+        Class[] fullSig = new Class[sig.length + 2];
         System.arraycopy(sig, 0, fullSig, 0, sig.length);
         fullSig[sig.length] = java.lang.reflect.Constructor.class;
+        fullSig[sig.length + 1] = java.util.Map.class;
 
         try {
             return packet.getMethod("fromValues", fullSig);
