@@ -648,20 +648,21 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         Typed<? extends AValue> summing = literal(0);
 
         /* The previous packet is useful when dealing with the delta protocol. */
-        params.add(Var.param(me, "previous"));
+        final Var<AValue> previous = Var.param(me, "previous");
+        params.add(previous);
 
         Var<? extends AValue> deltaParam = null;
         if (delta) {
             deltaParam = Var.param(deltaVar.getTType(), deltaVar.getName());
             params.add(deltaParam);
-            summing = sum(summing, deltaParam.ref().callV("encodedLength", NULL));
+            summing = sum(summing, deltaParam.ref().callV("encodedLength", previous.ref().callV(deltaParam.getName())));
         }
 
         for (Field field : fields)
             if (!isBoolFolded(enableDeltaBoolFolding, field)) {
                 Var<AValue> asParam = Var.param(field.getTType(), field.getName());
                 params.add(asParam);
-                summing = sum(summing, calcBodyLen(field, asParam, deltaParam, delta));
+                summing = sum(summing, calcBodyLen(field, asParam, deltaParam, delta, previous));
             }
 
         body.addStatement(RETURN(summing));
@@ -673,11 +674,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 body);
     }
 
-    private static Typed<? extends AValue> calcBodyLen(Field field, Var<AValue> asParam, Var deltaVar, boolean delta) {
+    private static Typed<? extends AValue> calcBodyLen(Field field, Var<AValue> asParam, Var deltaVar, boolean delta, Var<AValue> previous) {
         if (deltaApplies(field, delta))
-            return R_IF(deltaHas(field, deltaVar.ref()), asParam.ref().<AnInt>call("encodedLength", NULL), literal(0));
+            return R_IF(deltaHas(field, deltaVar.ref()), asParam.ref().<AnInt>call("encodedLength", previous.ref().callV(field.getName())), literal(0));
         else
-            return asParam.ref().<AnInt>call("encodedLength", NULL);
+            return asParam.ref().<AnInt>call("encodedLength", previous.ref().callV(field.getName()));
     }
 
     private static Method createToString(String name, List<Field> fields, boolean delta, Reference numberRef, Value<AValue> deltaOnSuper) {
