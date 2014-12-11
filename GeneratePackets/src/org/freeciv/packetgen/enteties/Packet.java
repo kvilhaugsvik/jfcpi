@@ -176,7 +176,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         if (delta)
             sharedFields.add(Var.field(Collections.<Annotate>emptyList(),
-                    Visibility.PRIVATE, Scope.OBJECT, Modifiable.NO, bv_delta_fields.getAddress(), "delta", null));
+                    Visibility.PROTECTED, Scope.OBJECT, Modifiable.NO, bv_delta_fields.getAddress(), "delta", null));
 
         for (Field field : packetFields)
             if (!(field.isAnnotatedUsing(CapAdd.class) || field.isAnnotatedUsing(CapRemove.class)))
