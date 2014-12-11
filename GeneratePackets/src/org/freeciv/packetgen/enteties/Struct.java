@@ -242,7 +242,7 @@ public class Struct extends ClassWriter implements Dependency.Item, Dependency.M
                         final Typed[] sizes = new Typed[fieldNames.size()];
                         for (int i = 0; i < sizes.length; i++)
                             sizes[i] = fieldTypeClasses.get(i).newInstance(arg1.ref()
-                                    .callV(fieldNames.get(i)), Hardcoded.noLimit).callV("encodedLength");
+                                    .callV(fieldNames.get(i)), Hardcoded.noLimit).callV("encodedLength", NULL);
 
                         return BuiltIn.sum(sizes);
                     }

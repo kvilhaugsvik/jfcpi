@@ -159,7 +159,7 @@ public class FieldTypeTests {
         assertEquals("Wrong length",
                 text.getBytes(
                         java.nio.charset.Charset.forName(org.freeciv.VersionData.FC_DEFAULT_DATA_ENCODING)).length + 1,
-                fromJava.encodedLength());
+                fromJava.encodedLength(null));
     }
 
     @Test public void STRING_ASCII() throws IOException {

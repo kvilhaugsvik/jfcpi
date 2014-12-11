@@ -654,7 +654,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         if (delta) {
             deltaParam = Var.param(deltaVar.getTType(), deltaVar.getName());
             params.add(deltaParam);
-            summing = sum(summing, deltaParam.ref().callV("encodedLength"));
+            summing = sum(summing, deltaParam.ref().callV("encodedLength", NULL));
         }
 
         for (Field field : fields)
@@ -675,9 +675,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
     private static Typed<? extends AValue> calcBodyLen(Field field, Var<AValue> asParam, Var deltaVar, boolean delta) {
         if (deltaApplies(field, delta))
-            return R_IF(deltaHas(field, deltaVar.ref()), asParam.ref().<AnInt>call("encodedLength"), literal(0));
+            return R_IF(deltaHas(field, deltaVar.ref()), asParam.ref().<AnInt>call("encodedLength", NULL), literal(0));
         else
-            return asParam.ref().<AnInt>call("encodedLength");
+            return asParam.ref().<AnInt>call("encodedLength", NULL);
     }
 
     private static Method createToString(String name, List<Field> fields, boolean delta, Reference numberRef, Value<AValue> deltaOnSuper) {

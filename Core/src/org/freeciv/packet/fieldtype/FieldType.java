@@ -32,9 +32,10 @@ public abstract interface FieldType<Javatype> {
 
     /**
      * Get the size of the serialized value in bytes.
+     * @param previous the previous field.
      * @return the size of the serialized value in bytes.
      */
-    public abstract int encodedLength();
+    public abstract int encodedLength(FieldType previous);
 
     /**
      * Get the value of the field.

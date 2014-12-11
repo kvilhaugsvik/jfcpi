@@ -188,8 +188,10 @@ public class FieldType extends ClassWriter implements Dependency.Item, ReqKind {
         this.addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.from(void.class), "encodeTo", Arrays.asList(pTo),
                 tIOExcept, encode));
-        this.addMethod(Method.newPublicReadObjectState(Comment.no(),
+        this.addMethod(Method.newPublicDynamicMethod(Comment.no(),
                 TargetClass.from(int.class), "encodedLength",
+                Arrays.<Var<AValue>>asList(Var.param(org.freeciv.packet.fieldtype.FieldType.class, "previous")),
+                Collections.<TargetClass>emptyList(),
                 encodedSize));
         this.addMethod(Method.newPublicReadObjectState(Comment.no(),
                 getUnderType(), "getValue",

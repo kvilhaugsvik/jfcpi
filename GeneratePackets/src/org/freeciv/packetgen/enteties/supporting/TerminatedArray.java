@@ -393,7 +393,7 @@ public class TerminatedArray extends FieldType {
                 Arrays.<Var<?>>asList(helperParamValue, helperParamLimits),
                 new Block(outVar,
                         FOR(elem, helperParamValue.ref(),
-                                new Block(inc(outVar, kind.getAddress().newInstance(elem.ref(), helperParamLimits.ref()).callV("encodedLength")))),
+                                new Block(inc(outVar, kind.getAddress().newInstance(elem.ref(), helperParamLimits.ref()).callV("encodedLength", NULL)))),
                         RETURN(outVar.ref())));
 
         final From2<Block, Var, FieldType> valueZeroBody;

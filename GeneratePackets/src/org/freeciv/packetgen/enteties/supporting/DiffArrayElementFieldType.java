@@ -114,10 +114,10 @@ public class DiffArrayElementFieldType implements Dependency.Maker {
                     @Override
                     public Typed<AnInt> x(Var val) {
                         return BuiltIn.sum(
-                                ftIndex.getAddress().newInstance(val.ref().callV("getIndex"), Hardcoded.noLimit).callV("encodedLength"),
+                                ftIndex.getAddress().newInstance(val.ref().callV("getIndex"), Hardcoded.noLimit).callV("encodedLength", NULL),
                                 BuiltIn.R_IF(isSame(val.ref().callV("getIndex").callV("intValue"), stopValue.ref()),
                                         literal(0),
-                                        ftValue.getAddress().newInstance(val.ref().callV("getNewValue"), Hardcoded.noLimit).<AnInt>callV("encodedLength")));
+                                        ftValue.getAddress().newInstance(val.ref().callV("getNewValue"), Hardcoded.noLimit).<AnInt>callV("encodedLength", NULL)));
                     }
                 },
                 TO_STRING_OBJECT,
