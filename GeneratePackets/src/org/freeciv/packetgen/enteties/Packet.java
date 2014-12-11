@@ -499,6 +499,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             }
         }
 
+        if (oldNeeded) {
+            /* The code becomes simpler if the previous packet is chosen
+             * even if the packet don't have any fields. */
+            oldNeeded = false;
+            body.addStatement(chosenOld);
+        }
+
         body.groupBoundary();
 
         if (delta)
