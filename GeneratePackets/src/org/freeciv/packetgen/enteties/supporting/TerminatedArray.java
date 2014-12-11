@@ -388,14 +388,39 @@ public class TerminatedArray extends FieldType {
         Var<AValue> helperParamValue = Var.param(type, "values");
         Var<AValue> helperParamLimits = Var.param(ElementsLimit.class, "limits");
         final Var<AValue> helperParamPrevious = Var.param(TargetClass.SELF_TYPED, "previous");
-        Var<AValue> elem = Var.<AValue>param(kind.getUnderType(), "elem");
         Var<AnInt> outVar = Var.<AnInt>local(int.class, "totalSize", literal(0));
-        final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.from(int.class), "lengthInBytes",
-                Arrays.<Var<?>>asList(helperParamValue, helperParamLimits, helperParamPrevious),
-                new Block(outVar,
-                        FOR(elem, helperParamValue.ref(),
-                                new Block(inc(outVar, kind.getAddress().newInstance(elem.ref(), helperParamLimits.ref()).callV("encodedLength", NULL)))),
-                        RETURN(outVar.ref())));
+
+        final Method.Helper lenInBytesHelper;
+        if (isDiffArray) {
+            final Var<AValue> oldValues = Var.<AValue>local(type, "oldValues",
+                    helperParamPrevious.ref().callV("getValue"));
+
+            final Var<AnInt> ecount = Var.<AnInt>local(int.class, "count", literal(0));
+
+            final Value<AValue> elem = helperParamValue.ref().callV("get", ecount.ref());
+            final Value<AValue> oldElem = oldValues.ref().callV("get", ecount.ref());
+
+            lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.from(int.class), "lengthInBytes",
+                    Arrays.<Var<?>>asList(helperParamValue, helperParamLimits, helperParamPrevious),
+                    new Block(outVar,
+                            oldValues,
+                            FOR(ecount, isSmallerThan(ecount.ref(), helperParamValue.ref().callV("length")), inc(ecount),
+                                    new Block(
+                                            IF(
+                                                    elem.<ABool>callV("equals", oldElem),
+                                                    new Block(),
+                                                    new Block(inc(outVar, kind.getAddress().newInstance(elem, helperParamLimits.ref()).callV("encodedLength", NULL)))))),
+                            RETURN(outVar.ref())));
+        } else {
+            final Var<AValue> elem = Var.<AValue>param(kind.getUnderType(), "elem");
+
+            lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.from(int.class), "lengthInBytes",
+                    Arrays.<Var<?>>asList(helperParamValue, helperParamLimits, helperParamPrevious),
+                    new Block(outVar,
+                            FOR(elem, helperParamValue.ref(),
+                                    new Block(inc(outVar, kind.getAddress().newInstance(elem.ref(), helperParamLimits.ref()).callV("encodedLength", NULL)))),
+                            RETURN(outVar.ref())));
+        }
 
         final From2<Block, Var, FieldType> valueZeroBody;
         if (isDiffArray) {
@@ -423,17 +448,43 @@ public class TerminatedArray extends FieldType {
         Var<AValue> pSize = Var.param(int.class, "size");
         Var<AValue> pOld = Var.param(TargetClass.SELF_TYPED, "old");
         Var<AValue> pBuf = Var.param(TargetArray.from(kind.getAddress(), 1), "buf");
-        Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.ref().<AnInt>callV("length")));
         Var<AnInt> count = Var.<AnInt>local(int.class, "i", literal(0));
-        final Method.Helper buffer2value = Method.newHelper(Comment.no(), type, "buffer2value",
-                Arrays.<Var<?>>asList(pBuf, pOld, pSize),
-                new Block(
-                        oVal,
-                        FOR(count, isSmallerThan(count.ref(), pBuf.ref().callV("length")), inc(count), new Block(
-                                arraySetElement(oVal, count.ref(), pBuf.ref().callV("get", count.ref()).<AValue>call("getValue"))
-                        )),
-                        RETURN(oVal.ref())
-                ));
+
+        final Method.Helper buffer2value;
+        if (isDiffArray) {
+            Var<AValue> oldVal = Var.local(Modifiable.NO, type, "oldVal", pOld.ref().callV("getValue"));
+            Var<AValue> oVal = Var.local(type, "out", type.newInstance(pSize.ref()));
+            Var<AnInt> bufPos = Var.<AnInt>local(int.class, "bufPos", literal(0));
+
+            buffer2value = Method.newHelper(Comment.no(), type, "buffer2value",
+                    Arrays.<Var<?>>asList(pBuf, pOld, pSize),
+                    new Block(
+                            oldVal,
+                            oVal,
+                            bufPos,
+                            FOR(count, isSmallerThan(count.ref(), oVal.ref().callV("length")), inc(count), new Block(
+                                    IF(and(isSmallerThan(bufPos.ref(), pBuf.ref().callV("length")), isSame(pBuf.ref().callV("get", bufPos.ref()).callV("getValue").callV("getIndex").callV("intValue"), count.ref())),
+                                            new Block(
+                                                    arraySetElement(oVal, count.ref(), pBuf.ref().callV("get", bufPos.ref()).callV("getValue")),
+                                                    inc(bufPos)
+                                            ),
+                                            new Block(arraySetElement(oVal, count.ref(), oldVal.ref().callV("get", count.ref()))))
+                            )),
+                            RETURN(oVal.ref())
+                    ));
+        } else {
+            Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.ref().<AnInt>callV("length")));
+
+            buffer2value = Method.newHelper(Comment.no(), type, "buffer2value",
+                    Arrays.<Var<?>>asList(pBuf, pOld, pSize),
+                    new Block(
+                            oVal,
+                            FOR(count, isSmallerThan(count.ref(), pBuf.ref().callV("length")), inc(count), new Block(
+                                    arraySetElement(oVal, count.ref(), pBuf.ref().callV("get", count.ref()).<AValue>call("getValue"))
+                            )),
+                            RETURN(oVal.ref())
+                    ));
+        }
 
         return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(type, literal(0)), stopElem,
                 MaxArraySize.CONSTRUCTOR_PARAM,
