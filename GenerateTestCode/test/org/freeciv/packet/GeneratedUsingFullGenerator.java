@@ -665,6 +665,39 @@ public class GeneratedUsingFullGenerator {
                 p.getArrayValue());
     }
 
+    /**
+     * Create a packet with a diff field array from encoded data.
+     * Two of five elements are updated.
+     */
+    @Test
+    public void fieldArray_diffArray_deSerialize_updates_2_of_5() {
+        final PACKET_FIELD_ARRAY_DIFF p = PACKET_FIELD_ARRAY_DIFF.fromHeaderAndStream(
+                bytesToDataInput(
+                        new byte[]{
+                                /* Delta header. The field has changed. */
+                                1,
+                                /* The array it self. */
+                                /* Array element 0 is unchanged (therefore zero). */
+                                /* Array element 1 is 1. */
+                                1, 1,
+                                /* Array element 2 is unchanged (therefore zero). */
+                                /* Array element 3 is 5. */
+                                3, 5,
+                                /* Array element 4 is unchanged (therefore zero). */
+                                /* No more changes. */
+                                (byte) 0xFF
+                        }, 0),
+                new Header_2_2(10, 1021),
+                /* No need to keep old. This diff array test will only read a single packet. */
+                new HashMap<DeltaKey, Packet>());
+
+        /* Check header. Assumed to work since it comes from the test it self. */
+        assertEquals("Wrong kind", 1021, p.getHeader().getPacketKind());
+        assertEquals("Wrong size", 4 + 1 + 5, p.getHeader().getTotalSize());
+
+        /* TODO: Check body. (Wait for proper diff array support) */
+    }
+
     /*------------------------------------------------------------------------------------------------------------------
     General helpers
     ------------------------------------------------------------------------------------------------------------------*/
