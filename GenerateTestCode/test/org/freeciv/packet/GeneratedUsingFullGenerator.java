@@ -612,6 +612,60 @@ public class GeneratedUsingFullGenerator {
     }
 
     /*------------------------------------------------------------------------------------------------------------------
+    Field arrays
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * Create a packet with a regular field array from values.
+     * @throws NoSuchMethodException if the header type don't have the wanted constructor.
+     */
+    @Test
+    public void fieldArray_regular_fromValues() throws NoSuchMethodException {
+        final Integer[] count = {0, 1, 2, 3, 4};
+
+        final PACKET_FIELD_ARRAY p = PACKET_FIELD_ARRAY.fromValues(count,
+                Header_2_2.class.getConstructor(int.class, int.class));
+
+        /* Check header. */
+        assertEquals("Wrong kind", 1020, p.getHeader().getPacketKind());
+        assertEquals("Wrong size", 4 + 1 + 5, p.getHeader().getTotalSize());
+
+        /* Check body. Assumed to work since it comes from the test it self. */
+        assertArrayEquals("Wrong field value", count, p.getArrayValue());
+    }
+
+    /**
+     * Create a packet with a regular field array from encoded data.
+     */
+    @Test
+    public void fieldArray_regular_deSerialize() {
+        final PACKET_FIELD_ARRAY p = PACKET_FIELD_ARRAY.fromHeaderAndStream(
+                bytesToDataInput(
+                        new byte[]{
+                                /* Header (skipped) */
+                                0, 4 + 1 + 5, (byte) 0x03, (byte) 0xfc,
+                                /* The field has changed. */
+                                1,
+                                /* The values of the array (each take one byte) */
+                                0, 1, 2, 3, 4
+                        },
+                        /* Skip the header bytes. */
+                        4),
+                new Header_2_2(10, 1020),
+                /* This should be safe since old isn't used here. */
+                new HashMap<DeltaKey, Packet>());
+
+        /* Check header. Assumed to work since it comes from the test it self. */
+        assertEquals("Wrong kind", 1020, p.getHeader().getPacketKind());
+        assertEquals("Wrong size", 4 + 1 + 5, p.getHeader().getTotalSize());
+
+        /* Check body. */
+        assertArrayEquals("Wrong field value",
+                new Integer[]{0, 1, 2, 3, 4},
+                p.getArrayValue());
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------
     General helpers
     ------------------------------------------------------------------------------------------------------------------*/
     private static void assertSerializesTo(String message, byte[] expected, Packet packet) throws IOException {
