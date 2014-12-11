@@ -48,6 +48,16 @@ import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private static final TargetClass validation = TargetClass.from(Validation.class);
     private static final TargetClass noDeltaFlag = TargetClass.from(NoDelta.class);
+
+    /**
+     * A map containing the previous packets in the conversation.
+     */
+    private static final Var<AnObject> pOldPackets = Var.param(
+            TargetClass.from(java.util.Map.class).addGenericTypeArguments(
+                    Arrays.asList(TargetClass.from(org.freeciv.packet.DeltaKey.class),
+                            TargetClass.from(org.freeciv.packet.Packet.class))),
+            "old");
+
     public static final TargetClass keyFlagg = TargetClass.from(Key.class);
 
     private final int number;
@@ -417,15 +427,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private void addConstructorFromDataInput(String name, List<Field> fields, String capsName, List<Typed<AString>> caps, TargetMethod addExceptionLocation, int deltaFields, boolean enableDeltaBoolFolding, TargetClass impl, Typed<? extends AValue> zero) throws UndefinedException {
         Var<AnObject> argHeader = Var.param(TargetClass.from(PacketHeader.class), "header");
         final Var<AnObject> streamName = Var.param(TargetClass.from(DataInput.class), "from");
-        final Var<AnObject> old =
-                Var.param(TargetClass.from(java.util.Map.class).addGenericTypeArguments(Arrays.asList(TargetClass.from(org.freeciv.packet.DeltaKey.class), TargetClass.from(org.freeciv.packet.Packet.class))), "old");
 
         final LinkedList<Reference<? extends AValue>> deltaAndFields = new LinkedList<Reference<? extends AValue>>();
 
         Block body = new Block();
         body.addStatement(validation.call("validateNotNull", argHeader.ref(), literal(argHeader.getName())));
         body.addStatement(validation.call("validateNotNull", streamName.ref(), literal(streamName.getName())));
-        body.addStatement(validation.call("validateNotNull", old.ref(), literal(old.getName())));
+        body.addStatement(validation.call("validateNotNull", pOldPackets.ref(), literal(pOldPackets.getName())));
         body.groupBoundary();
 
         final Var delta_tmp = delta ? Var.param(getField("delta").getTType(), "delta") : null;
@@ -450,9 +458,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         for (Field keyField : getKeyFields(fields))
             keyArgs.add(keyField.getTmpLocalVar(null).ref());
         chosenOld = Var.local(impl, "chosenOld", R_IF(
-                isSame(NULL, old.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()])))),
+                isSame(NULL, pOldPackets.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()])))),
                 zero,
-                cast(impl, old.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()]))))));
+                cast(impl, pOldPackets.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()]))))));
 
         LinkedList<Reference<? extends AValue>> constructorParams = new LinkedList<Reference<? extends AValue>>();
         for (Field field : fields) {
@@ -530,7 +538,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         body.groupBoundary();
 
         if (delta)
-            body.addStatement(old.ref().callV("put",
+            body.addStatement(pOldPackets.ref().callV("put",
                     impl.callV("getKey", me.ref()),
                     me.ref()));
 
@@ -541,13 +549,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         "Construct an object from a DataInput", new String(),
                         Comment.param(streamName, "data stream that is at the start of the package body"),
                         Comment.param(argHeader, "header data. Must contain size and number"),
-                        Comment.param(old, "where the Delta protocol should look for older packets"),
+                        Comment.param(pOldPackets, "where the Delta protocol should look for older packets"),
                         Comment.docThrows(TargetClass.from(FieldTypeException.class), "if there is a problem")),
                 Visibility.PUBLIC,
                 Scope.CLASS,
                 impl,
                 "fromHeaderAndStream" + capsName,
-                Arrays.asList(streamName, argHeader, old),
+                Arrays.asList(streamName, argHeader, pOldPackets),
                 Arrays.asList(TargetClass.from(FieldTypeException.class)),
                 body);
         result.annotateMe(new FactoryCapabilityCombination(caps));
