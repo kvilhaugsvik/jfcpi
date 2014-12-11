@@ -387,10 +387,11 @@ public class TerminatedArray extends FieldType {
 
         Var<AValue> helperParamValue = Var.param(type, "values");
         Var<AValue> helperParamLimits = Var.param(ElementsLimit.class, "limits");
+        final Var<AValue> helperParamPrevious = Var.param(TargetClass.SELF_TYPED, "previous");
         Var<AValue> elem = Var.<AValue>param(kind.getUnderType(), "elem");
         Var<AnInt> outVar = Var.<AnInt>local(int.class, "totalSize", literal(0));
         final Method.Helper lenInBytesHelper = Method.newHelper(Comment.no(), TargetClass.from(int.class), "lengthInBytes",
-                Arrays.<Var<?>>asList(helperParamValue, helperParamLimits),
+                Arrays.<Var<?>>asList(helperParamValue, helperParamLimits, helperParamPrevious),
                 new Block(outVar,
                         FOR(elem, helperParamValue.ref(),
                                 new Block(inc(outVar, kind.getAddress().newInstance(elem.ref(), helperParamLimits.ref()).callV("encodedLength", NULL)))),
@@ -470,7 +471,8 @@ public class TerminatedArray extends FieldType {
                 new From1<Typed<AnInt>, Var>() {
                     @Override
                     public Typed<AnInt> x(Var value) {
-                        return lenInBytesHelper.getAddress().call(value.ref(), fMaxSize.ref().<AValue>call("next"));
+                        return lenInBytesHelper.getAddress().call(value.ref(), fMaxSize.ref().<AValue>call("next"),
+                                cast(TargetClass.SELF_TYPED, helperParamPrevious.ref()));
                     }
                 },
                 sameNumberOfBufferElementsAndValueElements,
