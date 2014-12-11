@@ -456,14 +456,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         }
 
         boolean oldNeeded = true;
-        final Var<? extends AValue> chosenOld;
-        LinkedList<Value<? extends AValue>> keyArgs = new LinkedList<Value<? extends AValue>>();
-        for (Field keyField : getKeyFields(fields))
-            keyArgs.add(keyField.getTmpLocalVar(null).ref());
-        chosenOld = Var.local(impl, "chosenOld", R_IF(
-                isSame(NULL, pOldPackets.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()])))),
-                zero,
-                cast(impl, pOldPackets.ref().callV("get", impl.callV("getKeyPrivate", keyArgs.toArray(new Typed[keyArgs.size()]))))));
+        final Var<? extends AValue> chosenOld = createFindOld(fields, impl, zero);
 
         LinkedList<Reference<? extends AValue>> constructorParams = new LinkedList<Reference<? extends AValue>>();
         for (Field field : fields) {
@@ -563,6 +556,37 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 body);
         result.annotateMe(new FactoryCapabilityCombination(caps));
         addMethod(result);
+    }
+
+    /**
+     * Generate code that will select the proper previous packet for the
+     * delta protocol to fill inn missing data from.
+     * If no previous packet is found the proper previous packet is the
+     * zero packet.
+     * @param fields the fields of the packet to choose.
+     * @param me the packet type of the packet to choose.
+     * @param zero the zero value of the packet to choose.
+     * @return code for a variable filled with the proper previous packet to
+     * fill inn missing details from.
+     */
+    private static Var<? extends AValue> createFindOld(List<Field> fields, TargetClass me, Typed<? extends AValue> zero) {
+        LinkedList<Value<? extends AValue>> keyArgs = new LinkedList<Value<? extends AValue>>();
+
+        /* The key fields, if any exist, are arguments for the hash key
+         creation. */
+        for (Field keyField : getKeyFields(fields))
+            keyArgs.add(keyField.getTmpLocalVar(null).ref());
+
+        /* The resulting code looks ugly but it works. */
+        return Var.local(me, "chosenOld", R_IF(
+                /* Do a proper previous packet exist or is this the first one? */
+                isSame(NULL, pOldPackets.ref().callV("get", me.callV("getKeyPrivate",
+                        keyArgs.toArray(new Typed[keyArgs.size()])))),
+                /* No proper previous packet exist. Use zero. */
+                zero,
+                /* A previous packet exists. Use it. */
+                cast(me, pOldPackets.ref().callV("get", me.callV("getKeyPrivate",
+                        keyArgs.toArray(new Typed[keyArgs.size()]))))));
     }
 
     private static boolean isBoolFolded(boolean boolFoldEnabled, Field field) {
