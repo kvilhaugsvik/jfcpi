@@ -154,7 +154,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             final Value<AValue> deltaOnSuper = delta ? inner.getInternalReferenceSuper().callV("delta") : null;
 
             inner.addMethod(createEncoder(implFields, enableDeltaBoolFolding, delta, inner.getInternalReferenceSuper().callV("header"), deltaOnSuper));
-            inner.addMethod(createdCalcBodyLen(implFields, enableDeltaBoolFolding, getField("delta"), delta));
+            inner.addMethod(createdCalcBodyLen(implFields, enableDeltaBoolFolding, getField("delta"), delta, inner.getAddress()));
             inner.addMethod(createGetDeltaKeyPrivate(number, implFields));
             inner.addMethod(createGetDeltaKeyPublic(implFields, inner.getAddress()));
             inner.addMethod(createToString(name, implFields, delta, getField("number").ref(), deltaOnSuper));
@@ -165,7 +165,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
             inner.addMethod(createBasicConstructor(implFieldsAll, sharedFields));
 
-            addConstructorFromJavaTypes(implFields, capCombName, capabilityCombinations.get(capCombName), addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding, inner.getAddress());
+            addConstructorFromJavaTypes(implFields, capCombName, capabilityCombinations.get(capCombName), addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding, inner.getAddress(), zeroVal);
             addConstructorFromDataInput(name, implFields, capCombName, capabilityCombinations.get(capCombName), addExceptionLocation, deltaFields, enableDeltaBoolFolding, inner.getAddress(), zeroVal);
         }
     }
@@ -350,7 +350,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 addExceptionLocation));
     }
 
-    private void addConstructorFromJavaTypes(List<Field> fields, String capsName, List<Typed<AString>> caps, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding, TargetClass impl) throws UndefinedException {
+    private void addConstructorFromJavaTypes(List<Field> fields, String capsName, List<Typed<AString>> caps, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding, TargetClass impl, Typed<AValue> zeroVal) throws UndefinedException {
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> localVars = new LinkedList<Reference<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> sizeArgs = new LinkedList<Reference<? extends AValue>>();
@@ -386,8 +386,13 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         params.add(headerKind);
         body.addStatement(validation.call("validateNotNull", headerKind.ref(), literal(headerKind.getName())));
 
+        /* The old packet is needed to properly calculate size when using
+         * the delta protocol. */
         params.add(Packet.pOldPackets);
         body.addStatement(validation.call("validateNotNull", pOldPackets.ref(), literal(pOldPackets.getName())));
+        final Var<? extends AValue> varChosenOld = createFindOld(fields, impl, zeroVal);
+        body.addStatement(varChosenOld);
+        sizeArgs.addFirst(varChosenOld.ref());
 
         final Var<? extends AValue> header_tmp = Var.param(PacketHeader.class, "header" + "_tmp");
         body.addStatement(header_tmp);
@@ -457,6 +462,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         boolean oldNeeded = true;
         final Var<? extends AValue> chosenOld = createFindOld(fields, impl, zero);
+        deltaAndFields.addFirst(chosenOld.ref());
 
         LinkedList<Reference<? extends AValue>> constructorParams = new LinkedList<Reference<? extends AValue>>();
         for (Field field : fields) {
@@ -635,11 +641,14 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 Arrays.asList(TargetClass.from(IOException.class)), body);
     }
 
-    private static Method createdCalcBodyLen(List<Field> fields, boolean enableDeltaBoolFolding, Var deltaVar, boolean delta) {
+    private static Method createdCalcBodyLen(List<Field> fields, boolean enableDeltaBoolFolding, Var deltaVar, boolean delta, TargetClass me) {
         Block body = new Block();
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
 
         Typed<? extends AValue> summing = literal(0);
+
+        /* The previous packet is useful when dealing with the delta protocol. */
+        params.add(Var.param(me, "previous"));
 
         Var<? extends AValue> deltaParam = null;
         if (delta) {
