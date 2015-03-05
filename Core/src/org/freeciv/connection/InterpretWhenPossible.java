@@ -28,10 +28,12 @@ import java.util.Map;
 public class InterpretWhenPossible implements ToPacket {
     private final ProtocolVariant map;
     private final Map<DeltaKey, Packet> old;
+    private final String loggerName;
 
-    public InterpretWhenPossible(ProtocolVariant map) {
+    public InterpretWhenPossible(ProtocolVariant map, String loggerName) {
         this.map = map;
         this.old = newDeltaStore();
+        this.loggerName = loggerName;
     }
 
     @Override

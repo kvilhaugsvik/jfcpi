@@ -32,6 +32,8 @@ public class Connection implements FreecivConnection {
     private final HeaderData currentHeader;
     private final ProtocolVariantAutomatic variant;
 
+    private final String loggerName;
+
     private Connection(
             final InputStream inn,
             final OutputStream out,
@@ -39,8 +41,10 @@ public class Connection implements FreecivConnection {
             final Map<Integer, ReflexReaction> postSend,
             BasicProtocolData protoCode,
             ToPacket toPacket,
-            ProtocolVariantAutomatic protocolVariant
+            ProtocolVariantAutomatic protocolVariant,
+            String loggerName
     ) throws IOException {
+        this.loggerName = loggerName;
         this.currentHeader = protoCode.getNewPacketHeaderData();
         this.variant = protocolVariant;
         this.out = out;
@@ -76,12 +80,13 @@ public class Connection implements FreecivConnection {
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
             ProtocolData protoCode,
-            boolean interpreted
+            boolean interpreted,
+            String loggerName
     ) throws IOException {
         if (interpreted)
-            return interpreted(inn, out, postReceive, postSend, protoCode);
+            return interpreted(inn, out, postReceive, postSend, protoCode, loggerName);
         else
-            return uninterpreted(inn, out, postReceive, postSend, protoCode);
+            return uninterpreted(inn, out, postReceive, postSend, protoCode, loggerName);
     }
 
     public static Connection interpreted(
@@ -89,11 +94,13 @@ public class Connection implements FreecivConnection {
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            ProtocolData protoCode
+            ProtocolData protoCode,
+            String loggerName
     ) throws IOException {
         final ProtocolVariantAutomatic protocolVariant = new ProtocolVariantAutomatic(protoCode.getNewPacketMapper());
         return new Connection(inn, out, postReceive, postSend, protoCode,
-                new InterpretWhenPossible(protocolVariant), protocolVariant);
+                new InterpretWhenPossible(protocolVariant, loggerName),
+                protocolVariant, loggerName);
     }
 
     public static Connection uninterpreted(
@@ -101,10 +108,11 @@ public class Connection implements FreecivConnection {
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
-            final BasicProtocolData protoCode
+            final BasicProtocolData protoCode,
+            String loggerName
     ) throws IOException {
         return new Connection(inn, out, postReceive, postSend, protoCode,
-                new AlwaysRaw(), new ProtocolVariantAutomatic(null));
+                new AlwaysRaw(), new ProtocolVariantAutomatic(null), loggerName);
     }
 
     public boolean packetReady() {
@@ -139,7 +147,7 @@ public class Connection implements FreecivConnection {
             // need to look for capability setters in sending as well
             if (variant.needToKnowCaps())
                 variant.extractVariantInfo(toSend instanceof RawPacket ?
-                        new InterpretWhenPossible(variant)
+                        new InterpretWhenPossible(variant, loggerName)
                                 .convert(toSend.getHeader(), packetSerialized.toByteArray()) :
                         toSend);
         } catch (IOException e) {

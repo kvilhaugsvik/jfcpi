@@ -26,6 +26,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 public class PlayToServer {
     private static final String TRACE_FILE = "file";
@@ -56,7 +57,7 @@ public class PlayToServer {
         final FreecivConnection conn = Connection.uninterpreted(server.getInputStream(), server.getOutputStream(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
                 versionKnowledge.getRequiredPostSendRules(),
-                versionKnowledge);
+                versionKnowledge, Logger.GLOBAL_LOGGER_NAME);
         Sink toServer = new SinkForward(conn, new FilterNot(new FilterOr(
                 new FilterNot(new FilterPacketFromClientToServer()),
                 ProxyRecorder.CONNECTION_PACKETS)));

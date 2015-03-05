@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 public class TraceFormat2Read {
     private final RawFCProto interpret;
@@ -39,7 +40,7 @@ public class TraceFormat2Read {
         this.interpret = new RawFCProto(
                 state,
                 interpreted ?
-                        new InterpretWhenPossible(new ProtocolVariantAutomatic(packetsHelpUnderstand.getNewPacketMapper())) :
+                        new InterpretWhenPossible(new ProtocolVariantAutomatic(packetsHelpUnderstand.getNewPacketMapper()), Logger.GLOBAL_LOGGER_NAME) :
                         new AlwaysRaw(),
                 headerData,
                 new ReflexPacketKind(postReadReflexes, headerData, completeReflexesInOneStep),

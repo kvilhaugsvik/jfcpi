@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class Plumbing extends Thread {
     private final Source source;
@@ -42,7 +43,7 @@ public class Plumbing extends Thread {
     public static FreecivConnection socket2Connection(Socket connectedSocket, ProtocolData versionKnowledge, Boolean understand, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend) throws IOException {
         return Connection.full(
                 connectedSocket.getInputStream(), connectedSocket.getOutputStream(),
-                postReceive, postSend, versionKnowledge, understand);
+                postReceive, postSend, versionKnowledge, understand, Logger.GLOBAL_LOGGER_NAME);
     }
 
     @Override

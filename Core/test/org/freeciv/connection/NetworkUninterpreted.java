@@ -24,6 +24,7 @@ import java.net.Socket;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.*;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
@@ -33,7 +34,7 @@ public class NetworkUninterpreted {
         Socket other = helperDataSender(new byte[]{0, 3, 0});
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
                 Collections.<Integer, ReflexReaction>emptyMap(), Collections.<Integer, ReflexReaction>emptyMap(),
-                new UninterpretedProtocolData());
+                new UninterpretedProtocolData(), Logger.GLOBAL_LOGGER_NAME);
 
         Packet packet = assertPacketIsThere(self);
 
@@ -55,7 +56,7 @@ public class NetworkUninterpreted {
 
         Connection self = Connection.uninterpreted(other.getInputStream(), other.getOutputStream(),
                 postReceive, Collections.<Integer, ReflexReaction>emptyMap(),
-                new UninterpretedProtocolData());
+                new UninterpretedProtocolData(), Logger.GLOBAL_LOGGER_NAME);
 
         Packet packetBeforeChange = assertPacketIsThere(self);
 
