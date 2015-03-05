@@ -24,6 +24,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class InterpretWhenPossible implements ToPacket {
     private final ProtocolVariant map;
@@ -47,6 +49,9 @@ public class InterpretWhenPossible implements ToPacket {
 
             return map.interpret(head, body, old);
         } catch (IOException e) {
+            /* Log the misinterpretation. */
+            log(e);
+
             return new RawPacket(packet, head);
         }
     }
@@ -60,8 +65,19 @@ public class InterpretWhenPossible implements ToPacket {
 
             return map.interpret(head, entirePacket, old);
         } catch (IOException e) {
+            /* Log the misinterpretation. */
+            log(e);
+
             return new RawPacket(packet, headerData);
         }
+    }
+
+    /**
+     * Log a misinterpretation
+     * @param e the exception indicating the misinterpretation.
+     */
+    private void log(IOException e) {
+        Logger.getLogger(loggerName).log(Level.WARNING, "Misinterpretation. " + e.getMessage(), e);
     }
 
     /**
