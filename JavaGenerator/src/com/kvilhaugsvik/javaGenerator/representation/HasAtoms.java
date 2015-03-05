@@ -43,6 +43,7 @@ public interface HasAtoms {
     public static final CodeAtom IS_INSTANCE_OF = new CodeAtom("instanceof");
     public static final CodeAtom AND = new CodeAtom("&&");
     public static final CodeAtom OR = new CodeAtom("||");
+    public static final CodeAtom NOT = new CodeAtom("!");
     public static final CodeAtom ADD = new CodeAtom("+");
     public static final CodeAtom SUB = new CodeAtom("-");
     public static final CodeAtom MUL = new CodeAtom("*");

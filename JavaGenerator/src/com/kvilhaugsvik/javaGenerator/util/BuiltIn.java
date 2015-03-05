@@ -341,6 +341,22 @@ public class BuiltIn {
         };
     }
 
+    /**
+     * Create code that invert the specified boolean value using Java's
+     * logical complement unary operator ("not" / "!").
+     * @param val the boolean value to invert.
+     * @return code inverting the specified value.
+     */
+    public static Formatted.Type<ABool> isNot(final Typed<? extends ABool> val) {
+        return new Formatted.Type<ABool>() {
+            @Override
+            public void writeAtoms(CodeAtoms to) {
+                to.add(NOT);
+                val.writeAtoms(to);
+            }
+        };
+    }
+
     public static Typed<ABool> isBiggerThan(final Typed<? extends AValue> small,
                                              final Typed<? extends AValue> largerThan) {
         return BuiltIn.<ABool>binOp(HasAtoms.IS_BIGGER, small, largerThan);
