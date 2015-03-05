@@ -5,6 +5,5 @@ public class GeneratorDefaults {
   public static final String FREECIV_SOURCE_PATH = "@FREECIV_SOURCE_PATH@";
   public static final String VERSIONCONFIGURATION = "@VERSIONCONFIGURATION@";
   public static final boolean IGNORE_ISSUES = @IGNORE_ISSUES@;
-  public static final String LOG_TO = "@LOG_TO@";
   public static final boolean NOT_DISTRIBUTED_WITH_FREECIV = @NOT_DISTRIBUTED_WITH_FREECIV@;
 }

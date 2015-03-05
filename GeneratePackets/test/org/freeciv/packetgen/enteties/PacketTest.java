@@ -33,7 +33,7 @@ public class PacketTest {
 
     @Test
     public void deltaHeader_shouldExist() throws UndefinedException {
-        Packet packet = new Packet("Test", 33, "Logger.GLOBAL_LOGGER_NAME",
+        Packet packet = new Packet("Test", 33,
                 Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
                 Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())),
                 new TreeSet<String>());
@@ -42,7 +42,7 @@ public class PacketTest {
 
     @Test
     public void deltaHeader_shouldNotExist_noFields() throws UndefinedException {
-        Packet packet = new Packet("Test", 33, "Logger.GLOBAL_LOGGER_NAME",
+        Packet packet = new Packet("Test", 33,
                 Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField, Collections.<Field>emptyList(),
                 new TreeSet<String>());
         assertNull("Shouldn't have delta when there are no other fields", packet.getField("delta"));
@@ -50,7 +50,7 @@ public class PacketTest {
 
     @Test
     public void deltaHeader_shouldNotExist_onlyAKeyField() throws UndefinedException {
-        Packet packet = new Packet("Test", 33, "Logger.GLOBAL_LOGGER_NAME",
+        Packet packet = new Packet("Test", 33,
                 Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
                 Arrays.asList(new Field("aField", floatalias, "Test",
                 Arrays.asList(new WeakFlag("key")))),
@@ -60,7 +60,7 @@ public class PacketTest {
 
     @Test
     public void deltaHeader_shouldNotExist_annotationNoDelta() throws UndefinedException {
-        Packet packet = new Packet("Test", 33, "Logger.GLOBAL_LOGGER_NAME",
+        Packet packet = new Packet("Test", 33,
                 Arrays.asList(new Annotate(NoDelta.class)), true, false, Hardcoded.deltaField,
                 Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())),
                 new TreeSet<String>());
@@ -69,7 +69,7 @@ public class PacketTest {
 
     @Test
     public void deltaHeader_shouldNotExist_deltaOf() throws UndefinedException {
-        Packet packet = new Packet("Test", 33, "Logger.GLOBAL_LOGGER_NAME",
+        Packet packet = new Packet("Test", 33,
                 Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(new Field("aField", floatalias, "Test", Collections.<WeakFlag>emptyList())),
                 new TreeSet<String>());

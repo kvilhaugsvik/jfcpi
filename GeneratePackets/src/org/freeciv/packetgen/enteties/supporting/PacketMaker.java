@@ -16,7 +16,6 @@ package org.freeciv.packetgen.enteties.supporting;
 
 import com.kvilhaugsvik.dependency.Requirement;
 import com.kvilhaugsvik.dependency.SimpleDependencyMaker;
-import com.kvilhaugsvik.dependency.StringItem;
 import com.kvilhaugsvik.dependency.UndefinedException;
 import com.kvilhaugsvik.javaGenerator.Annotate;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.ABool;
@@ -71,14 +70,13 @@ public class PacketMaker extends SimpleDependencyMaker {
 
     @Override
     public Item produce(Requirement toProduce, Item... wasRequired) throws UndefinedException {
-        assert wasRequired.length == fields.size() * 2 + 1 + 2 + 1 : "Wrong number of arguments";
+        assert wasRequired.length == fields.size() * 2 + 1 + 2 : "Wrong number of arguments";
 
-        final String logger = ((StringItem) wasRequired[wasRequired.length - 1]).getValue();
         final boolean enableDeltaBoolFolding
-                = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 2]).getValue());
+                = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 1]).getValue());
         final boolean enableDelta
-                = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 3]).getValue());
-        final FieldType deltaFieldType = (FieldType)wasRequired[wasRequired.length - 4];
+                = BuiltIn.TRUE.equals(((Constant<ABool>) wasRequired[wasRequired.length - 2]).getValue());
+        final FieldType deltaFieldType = (FieldType)wasRequired[wasRequired.length - 3];
 
         /* First element in the delta or the first element in the non delta field type list */
         final int firstFieldTypePos = enableDelta ? fields.size() : 0;
@@ -88,7 +86,7 @@ public class PacketMaker extends SimpleDependencyMaker {
             fieldList.add(new Field(fields.get(i).getName(), (FieldType) wasRequired[i + firstFieldTypePos], name,
                     fields.get(i).getFlags(), fields.get(i).getDeclarations()));
 
-        return new Packet(name, number, logger, packetFlags,
+        return new Packet(name, number, packetFlags,
                 enableDelta, enableDeltaBoolFolding, enableDelta ? deltaFieldType : null,
                 fieldList, caps);
     }
@@ -179,7 +177,6 @@ public class PacketMaker extends SimpleDependencyMaker {
         allNeeded.add(new Requirement("BV_DELTA_FIELDS", FieldType.class));
         allNeeded.add(new Requirement("enableDelta", Constant.class));
         allNeeded.add(new Requirement("enableDeltaBoolFolding", Constant.class));
-        allNeeded.add(new Requirement("JavaLogger", StringItem.class));
 
         return new PacketMaker(me, allNeeded, fields, name, number, packetFlags, caps);
     }

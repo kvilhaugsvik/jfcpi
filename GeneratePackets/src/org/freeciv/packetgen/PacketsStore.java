@@ -41,7 +41,7 @@ public class PacketsStore {
     private final HashMap<String, Requirement> packets = new HashMap<String, Requirement>();
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
-    public PacketsStore(String configName, PacketHeaderKinds bytesInPacketNumber, String logger, boolean enableDelta, boolean enableDeltaBoolFolding) {
+    public PacketsStore(String configName, PacketHeaderKinds bytesInPacketNumber, boolean enableDelta, boolean enableDeltaBoolFolding) {
         requirements = new DependencyStore();
         for (Dependency.Item primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
@@ -55,8 +55,6 @@ public class PacketsStore {
         requirements.addMaker(new DiffArrayElementFieldType());
 
         this.configName = configName;
-
-        requirements.addPossibleRequirement(new StringItem("JavaLogger", logger));
 
         final TargetClass rule = TargetClass.from(org.freeciv.connection.ReflexRule.class);
         final Typed[] protoRules;

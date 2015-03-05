@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 
 public class PacketsStoreTest {
     private static PacketsStore defaultStorage() {
-        final PacketsStore packetsStore = new PacketsStore("notToDisk", PacketHeaderKinds.FC_2_4_99_2011_11_02, GeneratorDefaults.LOG_TO, false, false);
+        final PacketsStore packetsStore = new PacketsStore("notToDisk", PacketHeaderKinds.FC_2_4_99_2011_11_02, false, false);
 
         // String needs this
         packetsStore.addDependency(Constant.isString("FC_DEFAULT_DATA_ENCODING", BuiltIn.literal("UTF-8")));

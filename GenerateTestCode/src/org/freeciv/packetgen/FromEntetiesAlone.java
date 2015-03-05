@@ -140,7 +140,7 @@ public class FromEntetiesAlone {
 
         writePacket(new Packet("SERVER_JOIN_REQ",
                 4,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("username", string, "SERVER_JOIN_REQ", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("1000"), null)),
@@ -155,7 +155,7 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("SERVER_JOIN_REPLY",
                 5,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("you_can_join", bool, "you_can_join", Collections.<WeakFlag>emptyList()),
                         new Field("message", string, "you_can_join", Collections.<WeakFlag>emptyList(),
@@ -168,14 +168,14 @@ public class FromEntetiesAlone {
                 new TreeSet<String>()),
                 targetFolder);
         writePacket(new Packet("CONN_PING", 88,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Collections.<Field>emptyList(), new TreeSet<String>()), targetFolder);
         writePacket(new Packet("CONN_PONG", 89,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Collections.<Field>emptyList(), new TreeSet<String>()), targetFolder);
         writePacket(new Packet("TestArray",
                 926,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("theArray", uint32s, "TestArray", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("2"), null))),
@@ -183,7 +183,7 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("TestArrayTransfer",
                 927,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("toTransfer", uint8, "TestArrayTransfer", Collections.<WeakFlag>emptyList()),
                         new Field("theArray", uint32s, "TestArrayTransfer", Collections.<WeakFlag>emptyList(),
@@ -192,7 +192,7 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("TestArrayDouble",
                 928,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("theArray", uint32s2d, "TestArrayDouble", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("2"), null),
@@ -201,7 +201,7 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("TestArrayDoubleTransfer",
                 929,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("toTransfer", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
                         new Field("toTransfer2", uint8, "TestArrayDoubleTransfer", Collections.<WeakFlag>emptyList()),
@@ -212,7 +212,7 @@ public class FromEntetiesAlone {
                 targetFolder);
         writePacket(new Packet("StringArray",
                 930,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), false, false, null,
+                Collections.<Annotate>emptyList(), false, false, null,
                 Arrays.asList(
                         new Field("notAnArray", string, "StringArray", Collections.<WeakFlag>emptyList(),
                                 new WeakField.ArrayDeclaration(IntExpression.integer("15"), null)),
@@ -532,7 +532,6 @@ public class FromEntetiesAlone {
 
     private void writeBitStringUsingPacket(String targetFolder, FieldType fieldAlias) throws UndefinedException, IOException {
         Packet packet = new Packet("TestBitString", 931,
-                GeneratorDefaults.LOG_TO,
                 Collections.<Annotate>emptyList(),
                 false,
                 false,
@@ -581,7 +580,7 @@ public class FromEntetiesAlone {
         writeJavaFile(Hardcoded.deltaField, targetFolder);
         writePacket(new Packet("DeltaVectorTest",
                 933,
-                GeneratorDefaults.LOG_TO, Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
+                Collections.<Annotate>emptyList(), true, false, Hardcoded.deltaField,
                 Arrays.asList(
                         new Field("id", uint8, "DeltaTest", Arrays.asList(new WeakFlag("key"))),
                         new Field("field1", string, "DeltaTest", Collections.<WeakFlag>emptyList(),

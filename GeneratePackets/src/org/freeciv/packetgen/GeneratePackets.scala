@@ -25,16 +25,16 @@ import org.freeciv.packetgen.enteties.{Constant, SourceFile}
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AValue
 
 class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
-                      requested: List[(String, String)], logger: String, devMode: Boolean) {
+                      requested: List[(String, String)], devMode: Boolean) {
   def this(chosenVersion: String, sourceLocation: String,
-           requested: List[(String, String)], logger: String, devMode: Boolean) {
+           requested: List[(String, String)], devMode: Boolean) {
     this(GeneratePackets.createVersionConfig(chosenVersion, sourceLocation),
-      sourceLocation, requested, logger, devMode)
+      sourceLocation, requested, devMode)
   }
 
   private val packetsDefRPath: String = versionConfig.inputSources("packets").head
 
-  private val storage = new PacketsStore(versionConfig.configName, versionConfig.packetHeader, logger,
+  private val storage = new PacketsStore(versionConfig.configName, versionConfig.packetHeader,
     versionConfig.enableDelta, versionConfig.enableDeltaBoolFolding)
   private val Parser = new ParsePacketsDef(storage)
 
@@ -136,7 +136,6 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
 object GeneratePackets {
   private val SOURCE_CODE_LOCATION = "source-code-location"
   private val VERSION_INFORMATION = "version-information"
-  private val PACKETS_SHOULD_LOG_TO = "packets-should-log-to"
   private val IGNORE_PROBLEMS = "ignore-problems"
   private val GPL_SOURCE = "gpl-source"
   private val PRINT_FILES = "print-source-files"
@@ -147,8 +146,6 @@ object GeneratePackets {
         "the location of the Freeciv source code to generate from"),
       new Setting.StringSetting(VERSION_INFORMATION, GeneratorDefaults.VERSIONCONFIGURATION,
         "file containing settings for the version of Freeciv"),
-      new Setting.StringSetting(PACKETS_SHOULD_LOG_TO, GeneratorDefaults.LOG_TO,
-        "the logger the generated code should use"),
       new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.IGNORE_ISSUES,
         "should problems be ignored?"),
       new Setting.BoolSetting(GPL_SOURCE, GeneratorDefaults.NOT_DISTRIBUTED_WITH_FREECIV,
@@ -184,7 +181,6 @@ object GeneratePackets {
       settings.getSetting[String](VERSION_INFORMATION),
       settings.getSetting[String](SOURCE_CODE_LOCATION) + "/",
       requested,
-      settings.getSetting[String](PACKETS_SHOULD_LOG_TO),
       settings.getSetting[Boolean](IGNORE_PROBLEMS))
 
     self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER, settings.getSetting[Boolean](GPL_SOURCE))

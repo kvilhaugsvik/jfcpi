@@ -38,7 +38,6 @@ import org.freeciv.utility.Validation;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.logging.Level;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
 
@@ -63,7 +62,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
     private final int number;
     private final List<Field> fields;
 
-    private final String logger;
     private final boolean delta;
 
     private final Requirement iFulfill;
@@ -73,7 +71,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
      * Construct a new packet Java code generator.
      * @param name the name of the packet.
      * @param number the number of the packet.
-     * @param logger where to log problems.
      * @param packetFlags the flags the packet is self has.
      * @param deltaIsOn is the delta protocol enabled?
      * @param enableDeltaBoolFolding is delta bool folding enabled?
@@ -82,7 +79,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
      * @param caps what capabilities this packet have
      * @throws UndefinedException when required information is missing
      */
-    public Packet(String name, int number, String logger,
+    public Packet(String name, int number,
                   List<Annotate> packetFlags,
                   boolean deltaIsOn, final boolean enableDeltaBoolFolding, FieldType bv_delta_fields,
                   List<Field> packetFields,
@@ -95,7 +92,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         this.number = number;
         this.fields = packetFields;
 
-        this.logger = logger;
         this.delta = deltaIsOn && hasDelta(packetFlags) && hasAtLeastOneDeltaField(packetFields);
 
         for (Field field : packetFields) {
@@ -306,12 +302,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         fte,
                         fte.ref().<Returnable>call("setInPacket", literal(getName())),
                         fte.ref().<Returnable>call("setField", pName.ref()),
-                        TargetClass.from(java.util.logging.Logger.class)
-                                .callV("getLogger", BuiltIn.<AValue>toCode(logger))
-                                .call("log",
-                                        TargetClass.from(Level.class).callV("WARNING"),
-                                        sum(literal("Misinterpretation. "), fte.ref().callV("getMessage")),
-                                        fte.ref()),
                         RETURN(fte.ref())));
         addMethod(addExceptionLocation);
 

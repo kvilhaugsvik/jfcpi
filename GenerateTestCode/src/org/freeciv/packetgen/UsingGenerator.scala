@@ -38,7 +38,6 @@ object UsingGenerator {
     var full = new GeneratePackets("GenerateTestCode/src/simple/simple.xml",
       "GenerateTestCode/src/",
       List[(String, String)](),
-      GeneratorDefaults.LOG_TO,
       false)
     full.writeToDir(generated_test_source_folder, true)
   }
@@ -47,7 +46,6 @@ object UsingGenerator {
     var full = new GeneratePackets("GenerateTestCode/src/capabilities/capabilities.xml",
       "GenerateTestCode/src/",
       List[(String, String)](),
-      GeneratorDefaults.LOG_TO,
       false)
     full.writeToDir(generated_test_source_folder, true)
   }
@@ -60,7 +58,6 @@ object UsingGenerator {
     var full = new GeneratePackets("GenerateTestCode/src/fieldArray/fieldArray.xml",
       "GenerateTestCode/src/",
       List[(String, String)](),
-      GeneratorDefaults.LOG_TO,
       false)
     full.writeToDir(generated_test_source_folder, true)
   }
