@@ -7,8 +7,8 @@ GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
 all: tests @SignInTest_JAR@ @FreecivRecorder_JAR@
 	touch all
 
-code: sourceTestPeers sourceFromFreeciv
-	touch code
+source: sourceTestPeers sourceFromFreeciv
+	touch source
 
 tests: runTests
 	touch tests
@@ -190,7 +190,7 @@ clean-local:
 	rm -rf ${GENERATED_TEST_SOURCE_FOLDER} sourceTestPeers
 	rm -rf ${COMPILED_SignInTest_FOLDER}
 	rm -f all
-	rm -f code
+	rm -f source
 	rm -rf runtestsignintoserver
 	rm -rf @SignInTest_JAR@
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER}
