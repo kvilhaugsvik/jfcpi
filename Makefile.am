@@ -86,6 +86,7 @@ workFolder:
 
 # Need the Scala standard library since running compiled Scala
 @COMPILED_GeneratePackets_TEST_FOLDER@/run: @COMPILED_GeneratePackets_TEST_FOLDER@/compile
+	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@GeneratePackets_JAR@:${JUNIT_CPF}:${SCALA_STDLIB_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.TestGeneratePackets
 	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@GeneratePackets_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.PacketsStoreTest
 	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@GeneratePackets_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.EnumTest
 	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@GeneratePackets_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.enteties.FieldTypeTest

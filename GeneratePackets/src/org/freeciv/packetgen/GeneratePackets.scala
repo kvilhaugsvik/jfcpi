@@ -230,6 +230,51 @@ object GeneratePackets {
   }
 
   /**
+   * Get a string containing the major and minor version numbers this
+   * version of Freeciv will have when it is released.
+   * @param major_str The current major version.
+   * @param minor_str The current minor version.
+   * @param patch_str The current patch version. (Needed to see if this is
+   *                  a development version)
+   * @return The string "majorVersion.minorVersion" the released Freeciv
+   *         version will have.
+   */
+  def getFinalFreecivVersion(major_str: String, minor_str: String, patch_str: String): String = {
+    /* A patch version number of 99 means that this is a development
+     * version. A minor version number of 90 means that this is the
+     * development version of a Freeciv version that will increase the
+     * major version number. */
+
+    val major = if (minor_str.toInt < 90) {
+      /* This is a released version or the development version of a minor
+       * version upgrade. */
+      major_str.toInt
+    } else {
+      /* This is the development version of a Freeciv version that will
+       * increase the major version number. */
+      major_str.toInt + 1
+    }
+
+    val minor = if (minor_str.toInt < 90) {
+      /* This is a released version or the development version of a version
+       * that will keep the major version number. */
+      if ("99".equals(patch_str)) {
+        /* This is a development version. Minor version will be higher. */
+        minor_str.toInt + 1
+      } else {
+        /* This is a released version. */
+        minor_str.toInt
+      }
+    } else {
+      /* This is the development version of a major version increasing
+       version. */
+      0
+    }
+
+    major + "." + minor
+  }
+
+  /**
    * Detect the major/minor version of the Freeciv source code from the file fc_version.
    * @param fc_version the fc_version file from the root dir of the Freeciv source tree
    * @return a version string consisting of the major and minor version (eg 2.4, 2.6, etc)
@@ -258,8 +303,7 @@ object GeneratePackets {
     val patch_str = getUnquotedExpr(fc_version_constants, "PATCH_VERSION")
     val major_str = getUnquotedExpr(fc_version_constants, "MAJOR_VERSION")
 
-    val minor = minor_str.toInt + (if ("99".equals(patch_str)) 1 else 0)
-    major_str + "." + minor
+    getFinalFreecivVersion(major_str, minor_str, patch_str)
   }
 
   private def createVersionConfig(chosenVersion: String, sourceLocation: String,
