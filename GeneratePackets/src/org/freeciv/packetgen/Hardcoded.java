@@ -95,12 +95,25 @@ public class Hardcoded {
             FieldType.UNSIZED_ZERO
     );
 
+    private static FieldType ufloat100 = getFloat("100", false);
+    private static FieldType ufloat10000 = getFloat("10000", false);
+    private static FieldType ufloat1000000 = getFloat("1000000", false);
     private static final Collection<Dependency.Item> hardCodedElements = Arrays.<Dependency.Item>asList(
             uint32,
-            getFloat("100"),
-            getFloat("10000"),
-            getFloat("1000000"),
+            ufloat100,
+            getFloat("100", true),
+            ufloat10000,
+            getFloat("10000", true),
+            ufloat1000000,
+            getFloat("1000000", true),
             TerminatedArray.xBytes("memory", "unsigned char"),
+
+            /* Workaround: compatibility with way float dataIO type names
+             * were created in Freeciv 2.4, pre release 2.5 and pre
+             * release 2.6. */
+            ufloat100.aliasUnseenToCode("float100(float)"),
+            ufloat10000.aliasUnseenToCode("float10000(float)"),
+            ufloat1000000.aliasUnseenToCode("float1000000(float)"),
 
             /************************************************************************************************
              * Built in field type aliases
@@ -313,8 +326,19 @@ public class Hardcoded {
         return hardCodedMakers;
     }
 
-    public static FieldType getFloat(final String times) {
-        return new FieldType("float" + times, "float",
+    /**
+     * Create a Freeciv float field type. The float is multiplied with a
+     * specified number and transferred as an integer.
+     * @param times the float factor. Float values are multiplied with this
+     *              before they are sent.
+     * @param signed if the float is signed or unsigned.
+     * @return a Freeciv float field type
+     */
+    public static FieldType getFloat(final String times, final boolean signed) {
+        /* dataIO type name is signedness, "float" and float factor */
+        final String dataIOtype = (signed ? "s" : "u") + "float" + times;
+
+        return new FieldType(dataIOtype, "float",
                 new SimpleJavaType(Float.class, literal(0.0f)),
                 new From1<Block, Var>() {
                     @Override
@@ -326,19 +350,25 @@ public class Hardcoded {
                     @Override
                     public Block x(Var out, Var inn, Var old) {
                         return new Block(out.assign(divide(
-                                uint32.getAddress().newInstance(inn.ref(), noLimit, NULL).callV("getValue").callV("floatValue"),
+                                signed ? TargetClass.from(Integer.class).newInstance(inn.ref().callV("readInt")).callV("floatValue")
+                                        : uint32.getAddress().newInstance(inn.ref(), noLimit, NULL).callV("getValue").callV("floatValue"),
                                 BuiltIn.<AValue>toCode(times))));
                     }
                 },
                 new From2<Block, Var, Var>() {
                     @Override
                     public Block x(Var value, Var to) {
+                        /* Prepare the value for sending so log10(float value) decimal
+                         * points will survive being sent as an integer. */
+                        final Value<AValue> prepareValue = TargetClass.from(Float.class)
+                                .newInstance(BuiltIn.<AnInt>multiply(
+                                        value.ref(),
+                                        BuiltIn.<AnInt>toCode(times)));
+
                         return new Block(
-                                uint32.getAddress().newInstance(
-                                        TargetClass.from(Float.class).newInstance(BuiltIn.<AnInt>multiply(
-                                                value.ref(),
-                                                BuiltIn.<AnInt>toCode(times))).callV("longValue"),
-                                        noLimit).call("encodeTo", to.ref()));
+                                signed ? to.ref().call("writeInt", prepareValue.callV("intValue"))
+                                        : uint32.getAddress().newInstance(prepareValue.callV("longValue"), noLimit)
+                                                .call("encodeTo", to.ref()));
                     }
                 },
                 new From1<Typed<AnInt>, Var>() {
@@ -349,7 +379,8 @@ public class Hardcoded {
                 },
                 TO_STRING_OBJECT,
                 false,
-                Arrays.asList(uint32.getIFulfillReq()),
+                signed ? Collections.<Requirement>emptySet()
+                        : Arrays.asList(uint32.getIFulfillReq()),
                 Collections.<Var<AValue>>emptyList(),
                 Collections.<Method>emptyList(),
                 FieldType.UNSIZED_ZERO
