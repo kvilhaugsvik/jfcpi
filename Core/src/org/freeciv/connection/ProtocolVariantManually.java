@@ -20,6 +20,7 @@ import org.freeciv.packet.PacketHeader;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -57,6 +58,36 @@ public class ProtocolVariantManually implements ProtocolVariant {
         } catch (InvocationTargetException e) {
             throw new IOException(internalErrorMessage(header.getPacketKind()), e);
         }
+    }
+
+    @Override
+    public Packet newPacketFromValues(int number, Constructor<? extends PacketHeader> headerMaker, Map<DeltaKey, Packet> old, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        final Object[] allArgs;
+        final Class[] allArgTypes;
+        final Class<?> packetClass;
+        final Method fromValues;
+
+        allArgTypes = new Class[args.length + 2];
+        for (int i = 0; i < args.length; i++) {
+            allArgTypes[i] = args[i].getClass();
+        }
+        allArgTypes[args.length] = java.lang.reflect.Constructor.class;
+        allArgTypes[args.length + 1] = java.util.Map.class;
+
+        allArgs = new Object[args.length + 2];
+        System.arraycopy(args, 0, allArgs, 0, args.length);
+        allArgs[args.length] = headerMaker;
+        allArgs[args.length + 1] = old;
+
+        /* TODO: Should probably store a more direct reference to fromValues constructors. */
+        if (!packetMakers.containsKey(number)) {
+            throw new ClassNotFoundException("No packet number " + number);
+        }
+        packetClass = packetMakers.get(number).getDeclaringClass();
+
+        fromValues = packetClass.getMethod("fromValues", allArgTypes);
+
+        return (Packet) fromValues.invoke(null, allArgs);
     }
 
     @Override
