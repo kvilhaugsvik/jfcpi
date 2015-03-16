@@ -253,13 +253,16 @@ public class ProtocolData implements BasicProtocolData {
         return serverJoinRequest;
     }
 
-    public Packet newServerJoinRequest(String userName, Constructor<? extends PacketHeader> headerMaker) {
-        return newServerJoinRequest(userName, getCapStringOptional(), headerMaker);
+    public Packet newServerJoinRequest(String userName,
+                                       Constructor<? extends PacketHeader> headerMaker,
+                                       Map<DeltaKey, Packet> old) {
+        return newServerJoinRequest(userName, getCapStringOptional(), headerMaker, old);
     }
 
     public Packet newServerJoinRequest(String userName,
                                        String optionalCaps,
-                                       Constructor<? extends PacketHeader> headerMaker) {
+                                       Constructor<? extends PacketHeader> headerMaker,
+                                       Map<DeltaKey, Packet> old) {
         try {
             return (Packet) serverJoinRequestFromValues.invoke(null,
                     userName,
@@ -268,7 +271,8 @@ public class ProtocolData implements BasicProtocolData {
                     getVersionMajor(),
                     getVersionMinor(),
                     getVersionPatch(),
-                    headerMaker);
+                    headerMaker,
+                    old);
         } catch (IllegalAccessException e) {
             throw new BadProtocolData("Not allowed to construct", e);
         } catch (InvocationTargetException e) {
@@ -284,8 +288,9 @@ public class ProtocolData implements BasicProtocolData {
                                      String message,
                                      String challenge_file,
                                      Integer conn_id,
-                                     Constructor<? extends PacketHeader> headerMaker) {
-        return newServerJoinReply(you_can_join, message, getCapStringOptional(), challenge_file, conn_id, headerMaker);
+                                     Constructor<? extends PacketHeader> headerMaker,
+                                     Map<DeltaKey, Packet> old) {
+        return newServerJoinReply(you_can_join, message, getCapStringOptional(), challenge_file, conn_id, headerMaker, old);
     }
 
     public Packet newServerJoinReply(Boolean you_can_join,
@@ -293,7 +298,8 @@ public class ProtocolData implements BasicProtocolData {
                                      String optionalCaps,
                                      String challenge_file,
                                      Integer conn_id,
-                                     Constructor<? extends PacketHeader> headerMaker) {
+                                     Constructor<? extends PacketHeader> headerMaker,
+                                     Map<DeltaKey, Packet> old) {
         try {
             return (Packet) serverJoinReplyFromValues.invoke(null,
                     you_can_join,
@@ -301,7 +307,8 @@ public class ProtocolData implements BasicProtocolData {
                     getCapStringMandatory() + " " + optionalCaps,
                     challenge_file,
                     conn_id,
-                    headerMaker);
+                    headerMaker,
+                    old);
         } catch (IllegalAccessException e) {
             throw new BadProtocolData("Not allowed to construct", e);
         } catch (InvocationTargetException e) {
@@ -313,9 +320,9 @@ public class ProtocolData implements BasicProtocolData {
         return ping;
     }
 
-    public Packet newPing(Constructor<? extends PacketHeader> headerMaker) {
+    public Packet newPing(Constructor<? extends PacketHeader> headerMaker, Map<DeltaKey, Packet> old) {
         try {
-            return (Packet) pingFromValues.invoke(null, headerMaker);
+            return (Packet) pingFromValues.invoke(null, headerMaker, old);
         } catch (IllegalAccessException e) {
             throw new BadProtocolData("Not allowed to construct", e);
         } catch (InvocationTargetException e) {
@@ -327,9 +334,9 @@ public class ProtocolData implements BasicProtocolData {
         return pong;
     }
 
-    public Packet newPong(Constructor<? extends PacketHeader> headerMaker) {
+    public Packet newPong(Constructor<? extends PacketHeader> headerMaker, Map<DeltaKey, Packet> old) {
         try {
-            return (Packet) pongFromValues.invoke(null, headerMaker);
+            return (Packet) pongFromValues.invoke(null, headerMaker, old);
         } catch (IllegalAccessException e) {
             throw new BadProtocolData("Not allowed to construct", e);
         } catch (InvocationTargetException e) {

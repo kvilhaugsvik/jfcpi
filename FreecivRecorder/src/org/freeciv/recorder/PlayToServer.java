@@ -15,6 +15,8 @@
 package org.freeciv.recorder;
 
 import org.freeciv.connection.*;
+import org.freeciv.packet.DeltaKey;
+import org.freeciv.packet.Packet;
 import org.freeciv.recorder.traceFormat2.RecordTF2;
 import org.freeciv.utility.ArgumentSettings;
 import org.freeciv.utility.Setting;
@@ -26,6 +28,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class PlayToServer {
@@ -52,7 +55,10 @@ public class PlayToServer {
     public PlayToServer(final InputStream source, Socket server, boolean ignoreDynamic, FirstTimeRequest firstPlayedTime) throws IOException, NoSuchMethodException {
         final ProtocolData versionKnowledge = new ProtocolData();
 
-        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes(versionKnowledge);
+        /* FIXME: sentBefore doesn't belong here. */
+        final Map<DeltaKey, Packet> sentBefore = InterpretWhenPossible.newDeltaStore();
+
+        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes(versionKnowledge, sentBefore);
 
         final FreecivConnection conn = Connection.uninterpreted(server.getInputStream(), server.getOutputStream(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
@@ -79,13 +85,14 @@ public class PlayToServer {
         this.scPlumbing = new Plumbing(new SourceConn(conn, false, RecordTF2.NO_CONNECTION_ID), Arrays.asList(reaction), timeToExit);
     }
 
-    private static HashMap<Integer, ReflexReaction> createStandardReflexes(final ProtocolData versionKnowledge) {
+    private static HashMap<Integer, ReflexReaction> createStandardReflexes(final ProtocolData versionKnowledge,
+                                                                           final Map<DeltaKey, Packet> old) {
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
             public void apply(PacketWrite connection) {
                 try {
-                    connection.send(versionKnowledge.newPong(connection.getFields2Header()));
+                    connection.send(versionKnowledge.newPong(connection.getFields2Header(), old));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }
