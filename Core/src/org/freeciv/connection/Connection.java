@@ -126,7 +126,7 @@ public class Connection implements FreecivConnection {
         return in.getPacket();
     }
 
-    public void toSend(Packet toSend) throws IOException {
+    public void send(Packet toSend) throws IOException {
         if (!isOpen()) {
             throw new IOException("Is closed. Can't send.");
         } else if (!currentHeader.sameType(toSend)) {

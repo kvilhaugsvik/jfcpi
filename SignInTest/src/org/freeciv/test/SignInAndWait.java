@@ -55,7 +55,7 @@ public class SignInAndWait {
             @Override
             public void apply(PacketWrite connection) {
                 try {
-                    connection.toSend(interpreter.newPong(connection.getFields2Header()));
+                    connection.send(interpreter.newPong(connection.getFields2Header()));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }
@@ -73,7 +73,7 @@ public class SignInAndWait {
                     ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
                     interpreter.getRequiredPostSendRules(), interpreter, Logger.GLOBAL_LOGGER_NAME);
 
-            con.toSend(interpreter.newServerJoinRequest(userName, con.getFields2Header()));
+            con.send(interpreter.newServerJoinRequest(userName, con.getFields2Header()));
 
             while(con.isOpen() || con.packetReady()) {
                 try {

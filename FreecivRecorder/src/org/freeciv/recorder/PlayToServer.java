@@ -85,7 +85,7 @@ public class PlayToServer {
             @Override
             public void apply(PacketWrite connection) {
                 try {
-                    connection.toSend(versionKnowledge.newPong(connection.getFields2Header()));
+                    connection.send(versionKnowledge.newPong(connection.getFields2Header()));
                 } catch (IOException e) {
                     System.err.println("Failed to respond");
                 }

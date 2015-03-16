@@ -24,5 +24,5 @@ public interface PacketWrite extends PacketChangeHeader, Over {
      * @param toSend the packet to send
      * @throws java.io.IOException if there is a problem sending the packet
      */
-    void toSend(Packet toSend) throws IOException;
+    void send(Packet toSend) throws IOException;
 }

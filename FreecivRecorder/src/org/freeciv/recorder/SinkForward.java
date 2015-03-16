@@ -29,7 +29,7 @@ class SinkForward extends Sink {
 
     public synchronized void write(Packet packet, boolean clientToServer, int connectionID) throws IOException {
         try {
-            writeTo.toSend(packet);
+            writeTo.send(packet);
         } catch (IOException e) {
             throw new IOException("Couldn't forward packet to " + (clientToServer ? "server" : "client"), e);
         }
