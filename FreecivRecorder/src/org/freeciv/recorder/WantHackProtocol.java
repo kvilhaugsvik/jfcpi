@@ -65,6 +65,8 @@ public class WantHackProtocol extends SinkProcess {
 
         switch (packet.getHeader().getPacketKind()) {
             case 5:
+                /* The server uses SERVER_JOIN_REPLY to specify the name of
+                 * the file to write the token to. */
                 fileNameLock.lock();
                 try {
                     try {
@@ -80,6 +82,8 @@ public class WantHackProtocol extends SinkProcess {
                 }
                 break;
             case 160:
+                /* Write the client selected token to the server specified challenge file.
+                 * Send the token to the server using SINGLE_WANT_HACK_REQ. */
                 fileNameLock.lock();
                 try {
                     while (null == challengeFileName)
@@ -106,6 +110,8 @@ public class WantHackProtocol extends SinkProcess {
                 }
                 break;
             case 161:
+                /* The server uses SINGLE_WANT_HACK_REPLY to say it has
+                 * looked at the challenge file. Delete it. */
                 fileNameLock.lock();
                 try {
                     File target = new File(challengeFileName);
