@@ -34,13 +34,15 @@ public class SignInAndWait {
     private static final String ADDRESS = "address";
     private static final String PORT = "port";
     private static final String USER_NAME = "user-name";
+    private static final String START = "start";
 
-    public static void main(String[] cmd) throws InvocationTargetException, NoSuchMethodException {
+    public static void main(String[] cmd) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, ClassNotFoundException {
         ArgumentSettings settings = new ArgumentSettings(
                 new LinkedList<Setting<?>>(){{
                     add(new Setting.StringSetting(ADDRESS, "127.0.0.1", "connect to the Freeciv server on this address"));
                     add(new Setting.IntSetting(PORT, 5556, "connect to the Freeciv server on ths port"));
                     add(new Setting.StringSetting(USER_NAME, "FreecivJava", "sign inn using user name"));
+                    add(new Setting.IntSetting(START, 0, "seconds to wait before starting the game or 0 to disable."));
                     add(UI.HELP_SETTING);
                 }},
                 cmd);
@@ -50,6 +52,11 @@ public class SignInAndWait {
         String address = settings.getSetting(ADDRESS);
         int portNumber = settings.<Integer>getSetting(PORT);
         String userName = settings.getSetting(USER_NAME);
+
+        /* The start after X seconds option is only enabled if the seconds
+         * to wait are larger than 0. */
+        boolean start = 0 < settings.<Integer>getSetting(START);
+        final long start_time = settings.<Integer>getSetting(START) * 1000 + System.currentTimeMillis();
 
         final ProtocolData interpreter = new ProtocolData();
 
@@ -82,6 +89,14 @@ public class SignInAndWait {
             con.send(interpreter.newServerJoinRequest(userName, con.getFields2Header(), sentBefore));
 
             while(con.isOpen() || con.packetReady()) {
+                if (start && start_time < System.currentTimeMillis()) {
+                    /* Start the game. */
+                    con.send(con.newPacketFromValues(26, con.getFields2Header(), sentBefore, "/start"));
+
+                    /* Don't send the command more than once. */
+                    start = false;
+                }
+
                 try {
                     System.out.println(con.getPacket());
                     System.out.println();
