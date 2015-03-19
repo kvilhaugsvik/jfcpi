@@ -4,7 +4,7 @@ At the moment there are no proper installation support. Running it from this dir
 Building
 ========================================================================================================================
 What you'll need
- * A Java 7 (Java 6 hasn't been tested for a while) JDK. A JRE is not enough.
+ * A Java 7 JDK. A JRE is not enough.
  * JUnit 4.10 (other versions not tested) if you plan to run the tests
  * GNU Make 3.81 (other versions are probably OK)
  * The Freeciv source code (SVN revision 22865 of trunk and SVN revision 22857 of the 2.4 branch is known to work)
