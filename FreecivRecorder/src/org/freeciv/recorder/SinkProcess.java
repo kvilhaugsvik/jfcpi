@@ -45,7 +45,7 @@ public abstract class SinkProcess extends Sink {
     }
 
     @Override
-    public abstract void write(Packet packet, boolean clientToServer, int connectionID) throws IOException;
+    public abstract void write(Packet packet, boolean clientToServer, int connectionID) throws IOException, IllegalAccessException;
 
     @Override
     public void setStopReadingWhenOutOfInput() {
@@ -67,7 +67,7 @@ public abstract class SinkProcess extends Sink {
         return over.isOpen();
     }
 
-    public Packet interpret(boolean clientToServer, Packet packet) throws IOException {
+    public Packet interpret(boolean clientToServer, Packet packet) throws IOException, IllegalAccessException {
         final Packet interpreted;
         if (packet instanceof RawPacket)
             interpreted = versionKnowledge.interpret(packet.getHeader(),

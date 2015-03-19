@@ -26,9 +26,9 @@ abstract class Sink implements Over {
         this.filter = filter;
     }
 
-    public abstract void write(Packet packet, boolean clientToServer, int connectionID) throws IOException;
+    public abstract void write(Packet packet, boolean clientToServer, int connectionID) throws IOException, IllegalAccessException;
 
-    public void filteredWrite(Packet packet, boolean clientToServer, int connectionID) throws IOException {
+    public void filteredWrite(Packet packet, boolean clientToServer, int connectionID) throws IOException, IllegalAccessException {
         filter.update(packet);
 
         if (filter.isAccepted(packet, clientToServer))

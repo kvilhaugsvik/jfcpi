@@ -122,7 +122,7 @@ public class Plumbing extends Thread {
             Thread.yield();
         } catch (DoneReading e) {
             throw e;
-        } catch (IOException e) {
+        } catch (IOException | IllegalAccessException e) {
             System.err.println("Finishing...");
             e.printStackTrace();
             setAllSinksAndSourcesToOver();

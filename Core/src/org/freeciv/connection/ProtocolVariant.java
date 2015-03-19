@@ -48,8 +48,10 @@ public interface ProtocolVariant {
      * deserialized from the source.
      * @throws IOException when there is a problem reading the packet or
      * deserializing its data.
+     * @throws IllegalAccessException if accessing this is forbidden by
+     * Java's access control.
      */
-    public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException;
+    public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException, IllegalAccessException;
 
     /**
      * Creates a new instance of the specified Freeciv packet for the

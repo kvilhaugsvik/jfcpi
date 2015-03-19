@@ -48,7 +48,7 @@ public class InterpretWhenPossible implements ToPacket {
                 toSkip = toSkip - body.skipBytes(toSkip);
 
             return map.interpret(head, body, old);
-        } catch (IOException e) {
+        } catch (IOException | IllegalAccessException e) {
             /* Log the misinterpretation. */
             log(e);
 
@@ -64,7 +64,7 @@ public class InterpretWhenPossible implements ToPacket {
             PacketHeader head = headerData.newHeaderFromStream(entirePacket);
 
             return map.interpret(head, entirePacket, old);
-        } catch (IOException e) {
+        } catch (IOException | IllegalAccessException e) {
             /* Log the misinterpretation. */
             log(e);
 
@@ -76,7 +76,7 @@ public class InterpretWhenPossible implements ToPacket {
      * Log a misinterpretation
      * @param e the exception indicating the misinterpretation.
      */
-    private void log(IOException e) {
+    private void log(Exception e) {
         Logger.getLogger(loggerName).log(Level.WARNING, "Misinterpretation. " + e.getMessage(), e);
     }
 

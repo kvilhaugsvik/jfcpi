@@ -60,7 +60,7 @@ public class WantHackProtocol extends SinkProcess {
     }
 
     @Override
-    public void write(Packet packet, boolean clientToServer, int connectionID) throws IOException {
+    public void write(Packet packet, boolean clientToServer, int connectionID) throws IOException, IllegalAccessException {
         final Packet interpreted = interpret(clientToServer, packet);
 
         switch (packet.getHeader().getPacketKind()) {

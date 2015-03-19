@@ -57,13 +57,11 @@ public class ProtocolVariantManually implements ProtocolVariant {
     }
 
     @Override
-    public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException {
+    public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException, IllegalAccessException {
         if (!canInterpret(header.getPacketKind()))
             throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
         try {
             return (Packet)packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
-        } catch (IllegalAccessException e) {
-            throw new BadProtocolData(internalErrorMessage(header.getPacketKind()), e);
         } catch (InvocationTargetException e) {
             throw new IOException(internalErrorMessage(header.getPacketKind()), e);
         }
