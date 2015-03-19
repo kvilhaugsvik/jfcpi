@@ -17,8 +17,14 @@ package org.freeciv;
 import org.freeciv.connection.ProtocolData;
 import org.freeciv.connection.ProtocolVariant;
 import org.freeciv.connection.ProtocolVariantManually;
+import org.freeciv.packet.CONN_PING;
+import org.freeciv.packet.DeltaKey;
+import org.freeciv.packet.PACKET_ONE_FIELD;
+import org.freeciv.packet.Packet;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -68,5 +74,40 @@ public class ProtoData {
         ProtocolVariant map = new ProtocolData().getNewPacketMapper();
 
         assertFalse(map.isCapabilityEnabled("longNameToMakeSureItIsNotAdded"));
+    }
+
+    /* Check that it is possible to instantiate a packet of the current
+     * protocol variant from the values its fields are supposed to have.
+     * This tests the case where the packet don't have a body. */
+    @Test
+    public void canCreatePacketFromFields_noBody() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        /* Set up */
+        final ProtocolData protoData = new ProtocolData();
+        final ProtocolVariantManually map = protoData.getNewPacketMapper();
+        final HashMap<DeltaKey, Packet> old = new HashMap<DeltaKey, Packet>();
+
+        /* Creation */
+        final Packet packet = map.newPacketFromValues(88, protoData.getNewPacketHeaderData().getFields2Header(), old);
+
+        /* Check the result */
+        assertTrue("Wrong packet kind", CONN_PING.class.isInstance(packet));
+    }
+
+    /* Check that it is possible to instantiate a packet of the current
+     * protocol variant from the values its fields are supposed to have.
+     * This tests the case where the packet has a field in its body. */
+    @Test
+    public void canCreatePacketFromFields_hasBody() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        /* Set up */
+        final ProtocolData protoData = new ProtocolData();
+        final ProtocolVariantManually map = protoData.getNewPacketMapper();
+        final HashMap<DeltaKey, Packet> old = new HashMap<DeltaKey, Packet>();
+
+        /* Creation */
+        final Packet packet = map.newPacketFromValues(1002, protoData.getNewPacketHeaderData().getFields2Header(), old, 42);
+
+        /* Check the result */
+        assertTrue("Wrong packet kind", PACKET_ONE_FIELD.class.isInstance(packet));
+        assertEquals("Wrong field value", 42, ((PACKET_ONE_FIELD)packet).getOneValue().intValue());
     }
 }

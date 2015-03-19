@@ -632,6 +632,7 @@ public class FromEntetiesAlone {
         packets.put(928, TargetClass.from("org.freeciv.packet", "TestArrayDouble"));
         packets.put(929, TargetClass.from("org.freeciv.packet", "TestArrayDoubleTransfer"));
         packets.put(930, TargetClass.from("org.freeciv.packet", "StringArray"));
+        packets.put(1002, TargetClass.from("org.freeciv.packet", "PACKET_ONE_FIELD"));
 
         writeJavaFile(PacketsStore.generateVersionData(packets, constants), targetFolder);
     }
