@@ -28,6 +28,11 @@ import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * A ProtocolVariant that automatically automatically turns optional
+ * Freeciv protocol capabilities on and off based on what is sent and
+ * received.
+ */
 public class ProtocolVariantAutomatic implements ProtocolVariant {
     private final ProtocolVariantManually variant;
     private final ReentrantLock orderLock;
@@ -47,10 +52,20 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
         this.serverCap = null;
     }
 
+    /**
+     * Check if optional capabilities still haven't been negotiated.
+     * @return true if optional capabilities still haven't been negotiated.
+     */
     public boolean needToKnowCaps() {
         return needToKnowCaps;
     }
 
+    /**
+     * Have a look at the specified packet to see if it negotiates optional
+     * capabilities. Extract and set the optional capabilities if that is
+     * the case.
+     * @param interpreted the packet to look at.
+     */
     public void extractVariantInfo(Packet interpreted) {
         switch (interpreted.getHeader().getPacketKind()) {
             case 4:

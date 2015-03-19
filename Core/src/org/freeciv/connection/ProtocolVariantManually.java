@@ -28,6 +28,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+/**
+ * A ProtocolVariant that allows the programmer to turn optional
+ * Freeciv protocol capabilities on and off.
+ */
 public class ProtocolVariantManually implements ProtocolVariant {
     private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
     private final Set<String> enabledCapabilities;
@@ -43,6 +47,11 @@ public class ProtocolVariantManually implements ProtocolVariant {
         updateVariant();
     }
 
+    /**
+     * Check if this protocol variant can interpret the specified packet.
+     * @param kind the packet number of the packet.
+     * @return true iff the specified packet can be interpreted.
+     */
     boolean canInterpret(int kind) {
         return packetMakers.containsKey(kind);
     }
@@ -96,12 +105,20 @@ public class ProtocolVariantManually implements ProtocolVariant {
         return this.enabledCapabilities.contains(cap);
     }
 
+    /**
+     * Disable the specified capability.
+     * @param cap the capability to disable.
+     */
     public void disableCapability(String cap) {
         validateCapability(cap);
         this.enabledCapabilities.remove(cap);
         updateVariant();
     }
 
+    /**
+     * Enable the specified capability.
+     * @param cap the capability to enable.
+     */
     public void enableCapability(String cap) {
         validateCapability(cap);
         this.enabledCapabilities.add(cap);
