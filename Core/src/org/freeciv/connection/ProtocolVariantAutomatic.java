@@ -42,19 +42,32 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
     private String clientCap;
     private String serverCap;
 
+    /**
+     * Construct a new ProtocolVariantAutomatic wrapping a
+     * ProtocolVariantManually. No optional capabilities will be detected
+     * if the wrapped ProtocolVariantManually is null.
+     * @param variant the ProtocolVariantManually detected capabilities
+     *                should be stored in.
+     */
     public ProtocolVariantAutomatic(ProtocolVariantManually variant) {
         this.variant = variant;
         this.orderLock = new ReentrantLock();
         this.clientIsSet = orderLock.newCondition();
 
+        /* In some cases, like when the protocol isn't interpreted,
+         * optional capabilities aren't interesting. */
         this.needToKnowCaps = null != variant;
+
         this.clientCap = null;
         this.serverCap = null;
     }
 
     /**
-     * Check if optional capabilities still haven't been negotiated.
-     * @return true if optional capabilities still haven't been negotiated.
+     * Check if there is interest in finding optional Freeciv protocol
+     * capabilities. There is interest if ordered to look for optional
+     * capabilities but they still haven't been negotiated.
+     * @return true if optional capabilities are interesting and they still
+     * haven't been negotiated.
      */
     public boolean needToKnowCaps() {
         return needToKnowCaps;
