@@ -144,14 +144,15 @@ public class Connection implements FreecivConnection {
         this.postSend.startedReceivingOrSending();
         try {
             out.write(packetSerialized.toByteArray());
-            this.postSend.handle(toSend.getHeader().getPacketKind());
 
             // need to look for capability setters in sending as well
             if (variant.needToKnowCaps())
                 variant.extractVariantInfo(toSend instanceof RawPacket ?
                         new InterpretWhenPossible(variant, loggerName)
-                                .convert(toSend.getHeader(), packetSerialized.toByteArray()) :
+                                .convert(packetSerialized.toByteArray(), this.currentHeader) :
                         toSend);
+
+            this.postSend.handle(toSend.getHeader().getPacketKind());
         } catch (IOException e) {
             setStopReadingWhenOutOfInput();
             whenDone();
