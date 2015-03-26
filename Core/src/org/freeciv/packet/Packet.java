@@ -17,20 +17,30 @@ package org.freeciv.packet;
 import java.io.DataOutput;
 import java.io.IOException;
 
+/**
+ * A single packet in the Freeciv network protocol.
+ */
 public abstract interface Packet {
+    /**
+     * Get the packet header of this packet.
+     * @return the packet's header.
+     */
     public abstract PacketHeader getHeader();
 
-    /***
-     * serialize the packet to the format on the line
-     * @param to The output to write the packet to
-     * @throws IOException when problem writing
+    /**
+     * Serialize the packet, including the header, to the packet format
+     * that is sent over the network and write it to the specified
+     * DataOutput.
+     * @param to The DataOutput to write the packet to.
+     * @throws IOException when a problem occurs while writing it.
      */
     public abstract void encodeTo(DataOutput to) throws IOException;
 
     /**
      * Serialize the packet, including the header, to the packet format
-     * that is sent over the network.
+     * that is sent over the network and return it as a byte array.
      * @return a byte array containing the serialized packet.
+     * @throws IOException when a problem occurs while writing it.
      */
     byte[] toBytes() throws IOException;
 }
