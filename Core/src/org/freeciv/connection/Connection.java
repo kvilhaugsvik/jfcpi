@@ -14,10 +14,7 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.DeltaKey;
-import org.freeciv.packet.Packet;
-import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.RawPacket;
+import org.freeciv.packet.*;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -147,10 +144,10 @@ public class Connection implements FreecivConnection {
 
             // need to look for capability setters in sending as well
             if (variant.needToKnowCaps())
-                variant.extractVariantInfo(toSend instanceof RawPacket ?
+                variant.extractVariantInfo(toSend instanceof InterpretedPacket ?
+                        toSend :
                         new InterpretWhenPossible(variant, loggerName)
-                                .convert(packetSerialized.toByteArray(), this.currentHeader) :
-                        toSend);
+                                .convert(packetSerialized.toByteArray(), this.currentHeader));
 
             this.postSend.handle(toSend.getHeader().getPacketKind());
         } catch (IOException e) {
