@@ -201,7 +201,6 @@ public class Connection implements FreecivConnection {
      * current Freeciv protocol variant. The value of each field of the
      * packet body must be specified.
      * @param number the packet number of the Freeciv packet.
-     * @param headerMaker constructor for the current packet header kind.
      * @param old the delta packet storage. This is where previously sent
      *            packets of the same kind can be found.
      * @param args the fields of the body of the packet.
@@ -218,12 +217,11 @@ public class Connection implements FreecivConnection {
      * Java's access control.
      */
     public Packet newPacketFromValues(final int number,
-                                      final Constructor<? extends PacketHeader> headerMaker,
                                       final Map<DeltaKey, Packet> old,
                                       final Object... args) throws ClassNotFoundException,
             NoSuchMethodException,
             InvocationTargetException,
             IllegalAccessException {
-        return variant.newPacketFromValues(number, headerMaker, old, args);
+        return variant.newPacketFromValues(number, this.getFields2Header(), old, args);
     }
 }

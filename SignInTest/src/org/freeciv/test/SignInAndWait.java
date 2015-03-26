@@ -91,7 +91,7 @@ public class SignInAndWait {
             while(con.isOpen() || con.packetReady()) {
                 if (start && start_time < System.currentTimeMillis()) {
                     /* Start the game. */
-                    con.send(con.newPacketFromValues(26, con.getFields2Header(), sentBefore, "/start"));
+                    con.send(con.newPacketFromValues(26, sentBefore, "/start"));
 
                     /* Don't send the command more than once. */
                     start = false;
