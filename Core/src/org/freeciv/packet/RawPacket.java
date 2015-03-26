@@ -31,7 +31,7 @@ public class RawPacket implements Packet {
 
     public RawPacket(byte[] packet, PacketHeader header) {
         this.header = header;
-        this.content = getBodyBytes(packet, header);
+        this.content = packet;
     }
 
     private byte[] getBodyBytes(byte[] packet, PacketHeader header) {
