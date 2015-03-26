@@ -87,7 +87,8 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         super(ClassKind.ABSTRACT_CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
                 Imports.are(),
                 "Freeciv's protocol definition", packetFlags, name,
-                      DEFAULT_PARENT, Arrays.asList(TargetClass.from(org.freeciv.packet.Packet.class)));
+                TargetClass.from(org.freeciv.packet.InterpretedPacket.class),
+                Collections.<TargetClass>emptyList());
 
         this.number = number;
         this.fields = packetFields;
