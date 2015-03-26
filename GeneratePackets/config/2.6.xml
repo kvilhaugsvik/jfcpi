@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<fcsource name="2_6" packetHeaderKind="FC_trunk" enableDelta="true" enableDeltaBoolFolding="true">
+<fcsource name="2_6" packetHeaderKind="FC_2_4" enableDelta="true" enableDeltaBoolFolding="true">
 
     <!-- Packets and field types. -->
     <inputSource parseAs="packets">
