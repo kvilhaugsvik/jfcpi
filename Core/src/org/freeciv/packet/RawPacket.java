@@ -26,7 +26,7 @@ public class RawPacket implements Packet {
 
     public RawPacket(byte[] packet, HeaderData stream2Header) {
         this.header = stream2Header.newHeaderFromStream(new DataInputStream(new ByteArrayInputStream(packet)));
-        this.content = getBodyBytes(packet, header);
+        this.content = Arrays.copyOf(packet, header.getTotalSize());
     }
 
     private byte[] getBodyBytes(byte[] packet, PacketHeader header) {
@@ -38,7 +38,7 @@ public class RawPacket implements Packet {
     }
 
     public byte[] getBodyBytes() {
-        return content;
+        return getBodyBytes(content, this.header);
     }
 
     public void encodeTo(DataOutput to) throws IOException {
