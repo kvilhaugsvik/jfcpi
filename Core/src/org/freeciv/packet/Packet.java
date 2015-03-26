@@ -26,4 +26,11 @@ public abstract interface Packet {
      * @throws IOException when problem writing
      */
     public abstract void encodeTo(DataOutput to) throws IOException;
+
+    /**
+     * Serialize the packet, including the header, to the packet format
+     * that is sent over the network.
+     * @return a byte array containing the serialized packet.
+     */
+    byte[] toBytes() throws IOException;
 }

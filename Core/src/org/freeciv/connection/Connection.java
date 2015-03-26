@@ -133,21 +133,16 @@ public class Connection implements FreecivConnection {
                     toSend.getHeader().getClass().getCanonicalName());
         }
 
-        ByteArrayOutputStream packetSerialized = new ByteArrayOutputStream(toSend.getHeader().getTotalSize());
-        DataOutputStream packet = new DataOutputStream(packetSerialized);
-
-        toSend.encodeTo(packet);
-
         this.postSend.startedReceivingOrSending();
         try {
-            out.write(packetSerialized.toByteArray());
+            out.write(toSend.toBytes());
 
             // need to look for capability setters in sending as well
             if (variant.needToKnowCaps())
                 variant.extractVariantInfo(toSend instanceof InterpretedPacket ?
                         toSend :
                         new InterpretWhenPossible(variant, loggerName)
-                                .convert(packetSerialized.toByteArray(), this.currentHeader));
+                                .convert(toSend.toBytes(), this.currentHeader));
 
             this.postSend.handle(toSend.getHeader().getPacketKind());
         } catch (IOException e) {

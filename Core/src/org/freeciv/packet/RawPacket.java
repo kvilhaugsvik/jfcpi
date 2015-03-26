@@ -46,6 +46,12 @@ public class RawPacket implements Packet {
         to.write(this.getBodyBytes());
     }
 
+    @Override
+    public byte[] toBytes() throws IOException {
+        /* Return a copy so this version can't be corrupted. */
+        return Arrays.copyOf(content, header.getTotalSize());
+    }
+
     @Override public String toString() {
         return header.getPacketKind() + " (not interpreted)" +
                 "\n\theader = " + header +
