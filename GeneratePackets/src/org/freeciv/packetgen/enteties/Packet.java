@@ -87,7 +87,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         super(ClassKind.ABSTRACT_CLASS, TargetPackage.from(org.freeciv.packet.Packet.class.getPackage()),
                 Imports.are(),
                 "Freeciv's protocol definition", packetFlags, name,
-                TargetClass.from(org.freeciv.packet.InterpretedPacket.class),
+                deltaIsOn ?
+                        TargetClass.from(org.freeciv.packet.PacketInterpretedDelta.class) :
+                        TargetClass.from(org.freeciv.packet.InterpretedPacket.class),
                 Collections.<TargetClass>emptyList());
 
         this.number = number;
