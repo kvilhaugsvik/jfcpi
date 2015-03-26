@@ -15,15 +15,9 @@
 package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
-import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
 public class AlwaysRaw implements ToPacket {
-    @Override
-    public Packet convert(PacketHeader head, byte[] packet) {
-        return new RawPacket(packet, head);
-    }
-
     @Override
     public Packet convert(byte[] packet, HeaderData headerData) {
         return new RawPacket(packet, headerData);

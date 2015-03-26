@@ -29,11 +29,6 @@ public class RawPacket implements Packet {
         this.content = getBodyBytes(packet, header);
     }
 
-    public RawPacket(byte[] packet, PacketHeader header) {
-        this.header = header;
-        this.content = packet;
-    }
-
     private byte[] getBodyBytes(byte[] packet, PacketHeader header) {
         return Arrays.copyOfRange(packet, header.getHeaderSize(), header.getTotalSize());
     }

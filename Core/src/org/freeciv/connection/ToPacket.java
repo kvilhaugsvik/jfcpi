@@ -23,15 +23,6 @@ import org.freeciv.packet.PacketHeader;
 public interface ToPacket {
     /**
      * Deserialize a packet.
-     * @param head the header of the packet.
-     * @param remaining the packet data representing the packet body.
-     * @return the deserialized packet.
-     */
-    @Deprecated
-    public Packet convert(PacketHeader head, byte[] remaining);
-
-    /**
-     * Deserialize a packet.
      * @param packet the packet data to interpret as a packet.
      * @param headerData packet header interpreter.
      * @return the deserialized packet.

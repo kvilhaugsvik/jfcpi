@@ -39,24 +39,6 @@ public class InterpretWhenPossible implements ToPacket {
     }
 
     @Override
-    public Packet convert(PacketHeader head, byte[] packet) {
-        try {
-            DataInputStream body = new DataInputStream(new ByteArrayInputStream(packet));
-
-            int toSkip = head.getHeaderSize();
-            while (0 < toSkip)
-                toSkip = toSkip - body.skipBytes(toSkip);
-
-            return map.interpret(head, body, old);
-        } catch (IOException | IllegalAccessException e) {
-            /* Log the misinterpretation. */
-            log(e);
-
-            return new RawPacket(packet, head);
-        }
-    }
-
-    @Override
     public Packet convert(byte[] packet, HeaderData headerData) {
         try {
             DataInputStream entirePacket = new DataInputStream(new ByteArrayInputStream(packet));
