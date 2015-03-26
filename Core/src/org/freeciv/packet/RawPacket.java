@@ -48,12 +48,12 @@ public class RawPacket implements Packet {
 
     public void encodeTo(DataOutput to) throws IOException {
         header.encodeTo(to);
-        to.write(content);
+        to.write(this.getBodyBytes());
     }
 
     @Override public String toString() {
         return header.getPacketKind() + " (not interpreted)" +
                 "\n\theader = " + header +
-                Util.joinStringArray(content, ", ", "\n\tbody (raw data) = (", ")");
+                Util.joinStringArray(this.getBodyBytes(), ", ", "\n\tbody (raw data) = (", ")");
     }
 }
