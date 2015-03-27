@@ -539,11 +539,6 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         body.groupBoundary();
 
-        if (delta)
-            body.addStatement(pOldPackets.ref().callV("put",
-                    impl.callV("getKey", me.ref()),
-                    me.ref()));
-
         body.addStatement(RETURN(me.ref()));
 
         Method result = Method.custom(

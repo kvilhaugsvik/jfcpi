@@ -17,6 +17,7 @@ package org.freeciv.connection;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
+import org.freeciv.packet.PacketInterpretedDelta;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -33,13 +34,15 @@ import java.util.Set;
  * Freeciv protocol capabilities on and off.
  */
 public class ProtocolVariantManually implements ProtocolVariant {
+    private final ProtocolData protocolData;
     private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
     private final Set<String> enabledCapabilities;
     private final Set<String> possibleCapabilities;
 
     private Map<Integer, Method> packetMakers;
 
-    ProtocolVariantManually(Map<Set<String>, Map<Integer, Method>> protocolVariants, Set<String> possibleCapabilities) {
+    ProtocolVariantManually(ProtocolData protocolData, Map<Set<String>, Map<Integer, Method>> protocolVariants, Set<String> possibleCapabilities) {
+        this.protocolData = protocolData;
         this.protocolVariants = protocolVariants;
         this.possibleCapabilities = possibleCapabilities;
         this.enabledCapabilities = new HashSet<String>();
@@ -61,7 +64,15 @@ public class ProtocolVariantManually implements ProtocolVariant {
         if (!canInterpret(header.getPacketKind()))
             throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
         try {
-            return (Packet)packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
+            final Packet packet = (Packet) packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
+
+            if (protocolData.isDelta()) {
+                /* Let future packets with the same key get their missing
+                 * fields from this packet, */
+                old.put(((PacketInterpretedDelta)packet).getKey(), packet);
+            }
+
+            return packet;
         } catch (InvocationTargetException e) {
             throw new IOException(internalErrorMessage(header.getPacketKind()), e);
         }

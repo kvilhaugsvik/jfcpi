@@ -184,7 +184,7 @@ public class ProtocolData implements BasicProtocolData {
     }
 
     public ProtocolVariantManually getNewPacketMapper() {
-        return new ProtocolVariantManually(this.protocolVariants, this.capsOptional);
+        return new ProtocolVariantManually(this, this.protocolVariants, this.capsOptional);
     }
 
     public Map<Integer, ReflexReaction> getRequiredPostReceiveRules() {

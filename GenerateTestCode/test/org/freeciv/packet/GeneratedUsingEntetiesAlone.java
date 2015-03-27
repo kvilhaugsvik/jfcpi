@@ -463,16 +463,34 @@ public class GeneratedUsingEntetiesAlone {
     @Test
     public void delta_fromData_sameKeySameKindBefore_missingIsPrevious() throws IOException {
         ByteArrayOutputStream storeTo = new ByteArrayOutputStream();
-        storeTo.write(new byte[]{3, 50, 'w', 'o', 'r', 'k', 's', 0, 0, 0, 1, 0}); // packet 1
-        storeTo.write(new byte[]{2, 50, 0, 0, 1, 0}); // packet 2
+
+        /* Create the serialized packet 1 */
+        storeTo.write(new byte[]{3, 50, 'w', 'o', 'r', 'k', 's', 0, 0, 0, 1, 0});
+
+        /* Create the serialized packet 2 */
+        storeTo.write(new byte[]{2, 50, 0, 0, 1, 0});
+
+        /* Stream the packets. */
         DataInputStream inn = new DataInputStream(new ByteArrayInputStream(storeTo.toByteArray()));
 
         HashMap<DeltaKey, Packet> old = InterpretWhenPossible.newDeltaStore();
-        DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(16, 933), old);
+
+        /* Read packet 1. */
+        DeltaVectorTest firstPacket = DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(16, 933), old);
+
+        /* Store packet 1 so packet 2 can reference it. */
+        old.put(firstPacket.getKey(), firstPacket);
+
+        /* Read packet 2. This should have its field1 from packet 1. */
         DeltaVectorTest packet = DeltaVectorTest.fromHeaderAndStream(inn, new Header_2_2(10, 933), old);
 
+        /* Make sure that the key field is as expected. */
         assertEquals(50, packet.getIdValue().intValue());
+
+        /* Make sure that packet 2 got the string "works" from packet 1. */
         assertEquals("works", packet.getField1Value());
+
+        /* Make sure that the following field isn't corrupted. */
         assertEquals(256, packet.getField2Value().intValue());
     }
 
