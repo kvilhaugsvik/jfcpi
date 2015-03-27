@@ -114,6 +114,16 @@ public class ProtocolVariantManually implements ProtocolVariant {
         return this.enabledCapabilities.contains(cap);
     }
 
+    @Override
+    public boolean isDelta() {
+        return protocolData.isDelta();
+    }
+
+    @Override
+    public boolean isBoolFolded() {
+        return protocolData.isBoolFold();
+    }
+
     /**
      * Disable the specified capability.
      * @param cap the capability to disable.

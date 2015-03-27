@@ -145,6 +145,16 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
     }
 
     @Override
+    public boolean isDelta() {
+        return variant.isDelta();
+    }
+
+    @Override
+    public boolean isBoolFolded() {
+        return variant.isBoolFolded();
+    }
+
+    @Override
     public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException, IllegalAccessException {
         final Packet interpret = variant.interpret(header, in, old);
 

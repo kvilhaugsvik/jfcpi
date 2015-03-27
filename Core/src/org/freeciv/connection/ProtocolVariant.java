@@ -93,4 +93,17 @@ public interface ProtocolVariant {
      * is there.
      */
     public boolean isCapabilityEnabled(String cap);
+
+    /**
+     * Is this the delta protocol or the simpler variant?
+     * @return true if the delta protocol is enabled
+     */
+    boolean isDelta();
+
+
+    /**
+     * Is this the protocol variant that puts boolean packet variables into its delta header?
+     * @return true if boolean variables are folded into the delta header.
+     */
+    boolean isBoolFolded();
 }
