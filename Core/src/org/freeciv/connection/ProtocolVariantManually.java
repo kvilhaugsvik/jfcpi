@@ -64,15 +64,7 @@ public class ProtocolVariantManually implements ProtocolVariant {
         if (!canInterpret(header.getPacketKind()))
             throw new IOException(internalErrorMessage(header.getPacketKind()), new NoSuchElementException("Don't know how to interpret"));
         try {
-            final Packet packet = (Packet) packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
-
-            if (protocolData.isDelta()) {
-                /* Let future packets with the same key get their missing
-                 * fields from this packet, */
-                old.put(((PacketInterpretedDelta)packet).getKey(), packet);
-            }
-
-            return packet;
+            return (Packet) packetMakers.get(header.getPacketKind()).invoke(null, in, header, old);
         } catch (InvocationTargetException e) {
             throw new IOException(internalErrorMessage(header.getPacketKind()), e);
         }

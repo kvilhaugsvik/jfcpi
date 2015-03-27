@@ -14,10 +14,7 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.DeltaKey;
-import org.freeciv.packet.Packet;
-import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.RawPacket;
+import org.freeciv.packet.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -45,7 +42,15 @@ public class InterpretWhenPossible implements ToPacket {
 
             PacketHeader head = headerData.newHeaderFromStream(entirePacket);
 
-            return map.interpret(head, entirePacket, old);
+            final Packet interpreted = map.interpret(head, entirePacket, old);
+
+            if (map.isDelta()) {
+                /* Let future packets with the same key get their missing
+                 * fields from this packet, */
+                old.put(((PacketInterpretedDelta)interpreted).getKey(), interpreted);
+            }
+
+            return interpreted;
         } catch (IOException | IllegalAccessException e) {
             /* Log the misinterpretation. */
             log(e);
