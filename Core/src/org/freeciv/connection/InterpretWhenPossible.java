@@ -25,11 +25,13 @@ import java.util.logging.Logger;
 public class InterpretWhenPossible implements ToPacket {
     private final ProtocolVariant map;
     private final Map<DeltaKey, Packet> receivedBefore;
+    private final Map<DeltaKey, Packet> sentBefore;
     private final String loggerName;
 
     public InterpretWhenPossible(ProtocolVariant map, String loggerName) {
         this.map = map;
         this.receivedBefore = newDeltaStore();
+        this.sentBefore = newDeltaStore();
         this.loggerName = loggerName;
     }
 
@@ -60,6 +62,33 @@ public class InterpretWhenPossible implements ToPacket {
     @Override
     public byte[] encode(final Packet packet, final HeaderData headerData) throws IOException, IllegalAccessException {
         final byte[] out = packet.toBytes();
+        final InterpretedPacket iPacket;
+
+        if (map.isDelta()) {
+            if (packet instanceof PacketInterpretedDelta) {
+                /* The packet is usable as a field source for future delta
+                 * packets as is. */
+                iPacket = (PacketInterpretedDelta) packet;
+            } else {
+                /* The packet must be converted so future packets can check
+                 * its fields. */
+                try {
+                    final DataInputStream entirePacket = new DataInputStream(new ByteArrayInputStream(out));
+
+                    final PacketHeader head = headerData.newHeaderFromStream(entirePacket);
+
+                    iPacket = (PacketInterpretedDelta) map.interpret(head, entirePacket, sentBefore);
+                } catch (IOException | IllegalAccessException e) {
+                    /* Log the misinterpretation. */
+                    log(e);
+
+                    throw e;
+                }
+            }
+
+            /* Keep the storage of previous packets up to date. */
+            sentBefore.put(((PacketInterpretedDelta)iPacket).getKey(), iPacket);
+        }
 
         return out;
     }
