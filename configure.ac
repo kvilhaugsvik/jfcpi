@@ -29,10 +29,23 @@ AX_PROG_JAR
 AS_IF([test x"$JAR" = x],
   AC_MSG_ERROR([Jar not found]))
 
-AX_PROG_JAVADOC
-AS_IF([test x"$JAVADOC" = x],
-  AC_MSG_WARN([Javadoc generator not found]))
-# Put Javadoc generation in the Makefile
+AC_ARG_ENABLE(doc,
+  AS_HELP_STRING(
+    [--enable-doc],
+    [build Javadoc (default is yes if found)]),
+  AS_IF(test x"$enableval" = xno,
+    [ # Javadoc is unwanted
+    JAVADOC=""],
+    [AX_PROG_JAVADOC
+    # The user asked for Javadoc. Fail if it isn't found.
+    AS_IF([test x"$JAVADOC" = x],
+      AC_MSG_ERROR([Javadoc generator not found]))]),
+  [AX_PROG_JAVADOC
+  # The user didn't express any opinion. Tolerate if it is missing.
+  AS_IF([test x"$JAVADOC" = x],
+    AC_MSG_WARN([Javadoc generator not found]))])
+
+# Put Javadoc generation in the Makefile targets if enabled
 AM_CONDITIONAL([BUILD_JAVADOC], [test x"$JAVADOC" != x])
 
 AX_PROG_SCALA
