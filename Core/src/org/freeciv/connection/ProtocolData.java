@@ -43,8 +43,6 @@ public class ProtocolData implements BasicProtocolData {
     private final Method serverJoinRequestFromValues;
     private final Class<Packet> serverJoinReply;
     private final Method serverJoinReplyFromValues;
-    private final Class<Packet> ping;
-    private final Method pingFromValues;
 
     public ProtocolData() {
         try {
@@ -122,9 +120,8 @@ public class ProtocolData implements BasicProtocolData {
             this.serverJoinReplyFromValues = extractFromValues(serverJoinReply, "server join reply",
                     Boolean.class, String.class, String.class, String.class, Integer.class);
 
+            /* Ping is used in Connection's newPing() */
             validatePacketWasFound(ping, "ping");
-            this.ping = ping;
-            this.pingFromValues = extractFromValues(ping, "ping");
 
             /* Pong is used in Connection's newPong() */
             validatePacketWasFound(pong, "pong");
@@ -306,20 +303,6 @@ public class ProtocolData implements BasicProtocolData {
                     conn_id,
                     headerMaker,
                     old);
-        } catch (IllegalAccessException e) {
-            throw new BadProtocolData("Not allowed to construct", e);
-        } catch (InvocationTargetException e) {
-            throw new BadProtocolData("Problem while constructing construct", e);
-        }
-    }
-
-    public Class<Packet> getPing() {
-        return ping;
-    }
-
-    public Packet newPing(Constructor<? extends PacketHeader> headerMaker, Map<DeltaKey, Packet> old) {
-        try {
-            return (Packet) pingFromValues.invoke(null, headerMaker, old);
         } catch (IllegalAccessException e) {
             throw new BadProtocolData("Not allowed to construct", e);
         } catch (InvocationTargetException e) {
