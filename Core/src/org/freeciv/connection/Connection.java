@@ -141,13 +141,6 @@ public class Connection implements FreecivConnection {
 
             out.write(asBytes);
 
-            // need to look for capability setters in sending as well
-            if (variant.needToKnowCaps())
-                variant.extractVariantInfo(toSend instanceof InterpretedPacket ?
-                        toSend :
-                        new InterpretWhenPossible(variant, loggerName)
-                                .convert(asBytes, this.currentHeader));
-
             this.postSend.handle(toSend.getHeader().getPacketKind());
         } catch (IOException | IllegalAccessException e) {
             setStopReadingWhenOutOfInput();

@@ -69,7 +69,7 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
      * @return true if optional capabilities are interesting and they still
      * haven't been negotiated.
      */
-    public boolean needToKnowCaps() {
+    private boolean needToKnowCaps() {
         return needToKnowCaps;
     }
 
@@ -79,7 +79,7 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
      * the case.
      * @param interpreted the packet to look at.
      */
-    public void extractVariantInfo(Packet interpreted) {
+    private void extractVariantInfo(Packet interpreted) {
         switch (interpreted.getHeader().getPacketKind()) {
             case 4:
                 orderLock.lock();

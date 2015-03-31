@@ -64,28 +64,23 @@ public class InterpretWhenPossible implements ToPacket {
         final byte[] out = packet.toBytes();
         final InterpretedPacket iPacket;
 
+        try {
+            /* The packet should always be interpreted so the protocol
+             * variant can look for capability setters in it. */
+
+            final DataInputStream entirePacket = new DataInputStream(new ByteArrayInputStream(out));
+
+            final PacketHeader head = headerData.newHeaderFromStream(entirePacket);
+
+            iPacket = (PacketInterpretedDelta) map.interpret(head, entirePacket, sentBefore);
+        } catch (IOException | IllegalAccessException e) {
+            /* Log the misinterpretation. */
+            log(e);
+
+            throw e;
+        }
+
         if (map.isDelta()) {
-            if (packet instanceof PacketInterpretedDelta) {
-                /* The packet is usable as a field source for future delta
-                 * packets as is. */
-                iPacket = (PacketInterpretedDelta) packet;
-            } else {
-                /* The packet must be converted so future packets can check
-                 * its fields. */
-                try {
-                    final DataInputStream entirePacket = new DataInputStream(new ByteArrayInputStream(out));
-
-                    final PacketHeader head = headerData.newHeaderFromStream(entirePacket);
-
-                    iPacket = (PacketInterpretedDelta) map.interpret(head, entirePacket, sentBefore);
-                } catch (IOException | IllegalAccessException e) {
-                    /* Log the misinterpretation. */
-                    log(e);
-
-                    throw e;
-                }
-            }
-
             /* Keep the storage of previous packets up to date. */
             sentBefore.put(((PacketInterpretedDelta)iPacket).getKey(), iPacket);
         }
