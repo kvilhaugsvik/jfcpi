@@ -26,12 +26,12 @@ import java.util.logging.Logger;
 
 public class InterpretWhenPossible implements ToPacket {
     private final ProtocolVariant map;
-    private final Map<DeltaKey, Packet> old;
+    private final Map<DeltaKey, Packet> receivedBefore;
     private final String loggerName;
 
     public InterpretWhenPossible(ProtocolVariant map, String loggerName) {
         this.map = map;
-        this.old = newDeltaStore();
+        this.receivedBefore = newDeltaStore();
         this.loggerName = loggerName;
     }
 
@@ -42,12 +42,12 @@ public class InterpretWhenPossible implements ToPacket {
 
             PacketHeader head = headerData.newHeaderFromStream(entirePacket);
 
-            final Packet interpreted = map.interpret(head, entirePacket, old);
+            final Packet interpreted = map.interpret(head, entirePacket, receivedBefore);
 
             if (map.isDelta()) {
                 /* Let future packets with the same key get their missing
                  * fields from this packet, */
-                old.put(((PacketInterpretedDelta)interpreted).getKey(), interpreted);
+                receivedBefore.put(((PacketInterpretedDelta)interpreted).getKey(), interpreted);
             }
 
             return interpreted;
