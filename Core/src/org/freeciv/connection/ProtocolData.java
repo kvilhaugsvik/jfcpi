@@ -45,8 +45,6 @@ public class ProtocolData implements BasicProtocolData {
     private final Method serverJoinReplyFromValues;
     private final Class<Packet> ping;
     private final Method pingFromValues;
-    private final Class<Packet> pong;
-    private final Method pongFromValues;
 
     public ProtocolData() {
         try {
@@ -128,9 +126,8 @@ public class ProtocolData implements BasicProtocolData {
             this.ping = ping;
             this.pingFromValues = extractFromValues(ping, "ping");
 
+            /* Pong is used in Connection's newPong() */
             validatePacketWasFound(pong, "pong");
-            this.pong = pong;
-            this.pongFromValues = extractFromValues(pong, "pong");
 
             HashMap<Integer, ReflexReaction> neededPostSend = new HashMap<Integer, ReflexReaction>();
             HashMap<Integer, ReflexReaction> neededPostReceive = new HashMap<Integer, ReflexReaction>();
@@ -323,20 +320,6 @@ public class ProtocolData implements BasicProtocolData {
     public Packet newPing(Constructor<? extends PacketHeader> headerMaker, Map<DeltaKey, Packet> old) {
         try {
             return (Packet) pingFromValues.invoke(null, headerMaker, old);
-        } catch (IllegalAccessException e) {
-            throw new BadProtocolData("Not allowed to construct", e);
-        } catch (InvocationTargetException e) {
-            throw new BadProtocolData("Problem while constructing construct", e);
-        }
-    }
-
-    public Class<Packet> getPong() {
-        return pong;
-    }
-
-    public Packet newPong(Constructor<? extends PacketHeader> headerMaker, Map<DeltaKey, Packet> old) {
-        try {
-            return (Packet) pongFromValues.invoke(null, headerMaker, old);
         } catch (IllegalAccessException e) {
             throw new BadProtocolData("Not allowed to construct", e);
         } catch (InvocationTargetException e) {

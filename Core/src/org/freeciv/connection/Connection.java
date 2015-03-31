@@ -241,4 +241,25 @@ public class Connection implements FreecivConnection {
             IllegalAccessException {
         return variant.newPacketFromValues(number, this.getFields2Header(), old, args);
     }
+
+    /**
+     * Create a new instance of the pong packet for the current Freeciv
+     * protocol variant.
+     * @param old the delta packet storage. This is where previously sent
+     *            packets of the same kind can be found.
+     * @return a new instance of the pong packet.
+     * @throws ClassNotFoundException if no packet with the given number
+     * exists.
+     * @throws NoSuchMethodException if the packet don't have the expected
+     * method. Can be caused by wrong arguments, by the wrong number of
+     * arguments or by the packet being created by an incompatible packet
+     * generator.
+     * @throws java.lang.reflect.InvocationTargetException if there is a
+     * problem while creating the packet.
+     * @throws IllegalAccessException if accessing this is forbidden by
+     * Java's access control.
+     */
+    public Packet newPong(final Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return this.newPacketFromValues(89, old);
+    }
 }

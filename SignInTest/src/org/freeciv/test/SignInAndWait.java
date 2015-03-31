@@ -66,10 +66,14 @@ public class SignInAndWait {
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
-            public void apply(PacketWrite connection) {
+            public void apply(PacketWrite dest) {
+                /* Must be a Connection since SignInAndWait only use this
+                 * code with a Connection. */
+                Connection connection = (Connection)dest;
+
                 try {
-                    connection.send(interpreter.newPong(connection.getFields2Header(), sentBefore));
-                } catch (IOException e) {
+                    dest.send(connection.newPong(sentBefore));
+                } catch (Exception e) {
                     System.err.println("Failed to respond");
                 }
             }

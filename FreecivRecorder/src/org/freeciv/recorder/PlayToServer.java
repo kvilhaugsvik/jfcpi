@@ -58,7 +58,7 @@ public class PlayToServer {
         /* FIXME: sentBefore doesn't belong here. */
         final Map<DeltaKey, Packet> sentBefore = InterpretWhenPossible.newDeltaStore();
 
-        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes(versionKnowledge, sentBefore);
+        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes(sentBefore);
 
         final FreecivConnection conn = Connection.uninterpretedWhenPossible(server.getInputStream(), server.getOutputStream(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
@@ -85,15 +85,18 @@ public class PlayToServer {
         this.scPlumbing = new Plumbing(new SourceConn(conn, false, RecordTF2.NO_CONNECTION_ID), Arrays.asList(reaction), timeToExit);
     }
 
-    private static HashMap<Integer, ReflexReaction> createStandardReflexes(final ProtocolData versionKnowledge,
-                                                                           final Map<DeltaKey, Packet> old) {
+    private static HashMap<Integer, ReflexReaction> createStandardReflexes(final Map<DeltaKey, Packet> old) {
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
-            public void apply(PacketWrite connection) {
+            public void apply(PacketWrite dest) {
+                /* Must be a Connection since PlayToServer only use this
+                 * code with a Connection. */
+                Connection connection = (Connection)dest;
+
                 try {
-                    connection.send(versionKnowledge.newPong(connection.getFields2Header(), old));
-                } catch (IOException e) {
+                    dest.send(connection.newPong(old));
+                } catch (Exception e) {
                     System.err.println("Failed to respond");
                 }
             }
