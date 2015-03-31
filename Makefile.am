@@ -140,15 +140,15 @@ runTestPeerCreationAsTests: @GenerateTestCode_JAR@
 	${JAVA} -cp @GeneratePackets_JAR@:@JavaGenerator_JAR@:@Core_JAR@:${JUNIT_CPF}:@GenerateTestCode_JAR@ org.junit.runner.JUnitCore org.freeciv.packetgen.FromEntetiesAlone
 	touch runTestPeerCreationAsTests
 
-@SignInTest_JAR@: @FREECIV_VERSION_JAR@ @Utility_JAR@ ${SignInTest_src} signIn.manifest testSignInToServer
-	chmod +x testSignInToServer
+@SignInTest_JAR@: @FREECIV_VERSION_JAR@ @Utility_JAR@ ${SignInTest_src} signIn.manifest signInToServer
+	chmod +x signInToServer
 	mkdir -p ${COMPILED_SignInTest_FOLDER}
 	${JAVAC} -d ${COMPILED_SignInTest_FOLDER} -cp @Core_JAR@:@Utility_JAR@:@FREECIV_VERSION_JAR@ ${SignInTest_java_src}
 	${JAR} cfem @SignInTest_JAR@ org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_SignInTest_FOLDER} \.
 
 # not included in tests since it needs a running Freeciv server
-runtestsignintoserver: @SignInTest_JAR@
-	sh testSignInToServer && touch runtestsignintoserver
+runTestSignInToServer: @SignInTest_JAR@
+	sh signInToServer && touch runTestSignInToServer
 
 @FreecivRecorder_JAR@: @FREECIV_VERSION_JAR@ @Utility_JAR@ ${FreecivRecorder_src} fcr.manifest inspectTrace proxyRecorder playRecord
 	chmod +x inspectTrace
@@ -191,7 +191,7 @@ clean-local:
 	rm -rf ${COMPILED_SignInTest_FOLDER}
 	rm -f all
 	rm -f source
-	rm -rf runtestsignintoserver
+	rm -rf runTestSignInToServer
 	rm -rf @SignInTest_JAR@
 	rm -rf ${COMPILED_FROM_FREECIV_FOLDER}
 	rm -rf @FREECIV_VERSION_JAR@
