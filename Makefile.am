@@ -20,6 +20,9 @@ workFolder:
 @Core_JAR@: workFolder ${Core_src}
 	mkdir -p ${COMPILED_Core_FOLDER}
 	${JAVAC} -d ${COMPILED_Core_FOLDER} ${Core_java_src}
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_Core_FOLDER} ${Core_java_src}
+endif
 	${JAR} cf @Core_JAR@ -C ${COMPILED_Core_FOLDER} \.
 
 @COMPILED_Core_TEST_FOLDER@/compile: @Core_JAR@ ${Core_test_src}
@@ -40,6 +43,9 @@ workFolder:
 @JavaGenerator_JAR@: @Core_JAR@ @Utility_JAR@ javaGen.manifest ${JavaGenerator_src}
 	mkdir -p ${COMPILED_JavaGenerator_FOLDER}
 	${JAVAC} -cp @Core_JAR@:@Utility_JAR@ -d ${COMPILED_JavaGenerator_FOLDER} ${JavaGenerator_java_src}
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_JavaGenerator_FOLDER} ${JavaGenerator_java_src}
+endif
 	${JAR} cfm @JavaGenerator_JAR@ javaGen.manifest -C ${COMPILED_JavaGenerator_FOLDER} \.
 
 @COMPILED_JavaGenerator_TEST_FOLDER@/compile: @JavaGenerator_JAR@ ${JavaGenerator_test_src}
@@ -58,6 +64,9 @@ workFolder:
 @DependencyHandler_JAR@: workFolder ${DependencyHandler_src}
 	mkdir -p ${COMPILED_DependencyHandler_FOLDER}
 	${JAVAC} -d ${COMPILED_DependencyHandler_FOLDER} ${DependencyHandler_java_src}
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_DependencyHandler_FOLDER} ${DependencyHandler_java_src}
+endif
 	${JAR} cf @DependencyHandler_JAR@ -C ${COMPILED_DependencyHandler_FOLDER} \.
 
 # @JavaGenerator_JAR@ and @GeneratePackets_JAR@ are used by tests.
@@ -75,6 +84,9 @@ workFolder:
 	mkdir -p ${COMPILED_GeneratePackets_FOLDER}
 	${JAVAC} -cp @Core_JAR@:${SCALA_STDLIB_CPF}:@JavaGenerator_JAR@:@DependencyHandler_JAR@ -d ${COMPILED_GeneratePackets_FOLDER} ${GeneratePackets_java_src_defaults}
 	${SCALAC} -classpath ${COMPILED_GeneratePackets_FOLDER}:@JavaGenerator_JAR@:@Core_JAR@:@DependencyHandler_JAR@:@Utility_JAR@ -d ${COMPILED_GeneratePackets_FOLDER} ${GeneratePackets_scala_src}
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_GeneratePackets_FOLDER} -classpath @Core_JAR@:${SCALA_STDLIB_CPF}:@JavaGenerator_JAR@:@DependencyHandler_JAR@ ${GeneratePackets_java_src_defaults}
+endif
 	${JAR} cfm @GeneratePackets_JAR@ codeGen.manifest -C ${COMPILED_GeneratePackets_FOLDER} \.
 
 # @DependencyHandler_JAR@, @JavaGenerator_JAR@ and @Core_JAR@ are used by the packet generator
@@ -105,12 +117,18 @@ sourceFromFreeciv: @GeneratePackets_JAR@ ${FREECIV_SOURCE_FILES}
 @FREECIV_VERSION_JAR@: sourceFromFreeciv
 	mkdir -p ${COMPILED_FROM_FREECIV_FOLDER}
 	${JAVAC} -d ${COMPILED_FROM_FREECIV_FOLDER} -cp @Core_JAR@ `find ${GENERATED_SOURCE_FOLDER}/generated -iname "*.java"`
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_FROM_FREECIV_FOLDER} -classpath @Core_JAR@  `find ${GENERATED_SOURCE_FOLDER}/generated -iname "*.java"`
+endif
 	${JAR} cf @FREECIV_VERSION_JAR@ -C ${COMPILED_FROM_FREECIV_FOLDER} \.
 
 @GenerateTestCode_JAR@: @Core_JAR@ @GeneratePackets_JAR@ ${GenerateTestCode_src}
 	mkdir -p ${COMPILED_GenerateTestCode_FOLDER}
 	${JAVAC} -d ${COMPILED_GenerateTestCode_FOLDER} -cp @GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@:${JUNIT_CPF} ${GenerateTestCode_java_src}
 	${SCALAC} -d ${COMPILED_GenerateTestCode_FOLDER} -classpath @GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@:${JUNIT_CPF} ${GenerateTestCode_scala_src}
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_GenerateTestCode_FOLDER} -classpath @GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@:${JUNIT_CPF} ${GenerateTestCode_java_src}
+endif
 	${JAR} cf @GenerateTestCode_JAR@ -C ${COMPILED_GenerateTestCode_FOLDER} \.
 
 @COMPILED_GenerateTestCode_TEST_FOLDER@/compile: sourceTestPeers @GeneratePackets_JAR@ @Core_JAR@ ${GenerateTestCode_test_src}
@@ -144,6 +162,9 @@ runTestPeerCreationAsTests: @GenerateTestCode_JAR@
 	chmod +x signInToServer
 	mkdir -p ${COMPILED_SignInTest_FOLDER}
 	${JAVAC} -d ${COMPILED_SignInTest_FOLDER} -cp @Core_JAR@:@Utility_JAR@:@FREECIV_VERSION_JAR@ ${SignInTest_java_src}
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_SignInTest_FOLDER} -classpath @Core_JAR@:@Utility_JAR@:@FREECIV_VERSION_JAR@ ${SignInTest_java_src}
+endif
 	${JAR} cfem @SignInTest_JAR@ org.freeciv.test.SignInAndWait signIn.manifest -C ${COMPILED_SignInTest_FOLDER} \.
 
 # not included in tests since it needs a running Freeciv server
@@ -156,6 +177,9 @@ runTestSignInToServer: @SignInTest_JAR@
 	chmod +x playRecord
 	mkdir -p ${COMPILED_FreecivRecorder_FOLDER}
 	${JAVAC} -d ${COMPILED_FreecivRecorder_FOLDER} -cp @Core_JAR@:@Utility_JAR@:@FREECIV_VERSION_JAR@ ${FreecivRecorder_java_src}
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_FreecivRecorder_FOLDER} -classpath @Core_JAR@:@Utility_JAR@:@FREECIV_VERSION_JAR@ ${FreecivRecorder_java_src} ${FreecivRecorder_java_src}
+endif
 	${JAR} cfm @FreecivRecorder_JAR@ fcr.manifest -C ${COMPILED_FreecivRecorder_FOLDER} \.
 
 # not included in tests since it needs a running Freeciv server and client
@@ -165,6 +189,9 @@ runProxyRecorer: @FreecivRecorder_JAR@
 @Utility_JAR@: workFolder @Core_JAR@ ${Utility_src}
 	mkdir -p ${COMPILED_Utility_FOLDER}
 	${JAVAC} -cp @Core_JAR@ -d ${COMPILED_Utility_FOLDER} ${Utility_java_src}
+if BUILD_JAVADOC
+	${JAVADOC} -d ${COMPILED_Utility_FOLDER} ${Utility_java_src}
+endif
 	${JAR} cf @Utility_JAR@ -C ${COMPILED_Utility_FOLDER} \.
 	touch @Utility_JAR@
 

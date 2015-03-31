@@ -29,6 +29,12 @@ AX_PROG_JAR
 AS_IF([test x"$JAR" = x],
   AC_MSG_ERROR([Jar not found]))
 
+AX_PROG_JAVADOC
+AS_IF([test x"$JAVADOC" = x],
+  AC_MSG_WARN([Javadoc generator not found]))
+# Put Javadoc generation in the Makefile
+AM_CONDITIONAL([BUILD_JAVADOC], [test x"$JAVADOC" != x])
+
 AX_PROG_SCALA
 AS_IF([test x"$SCALA" = x],
   AC_MSG_ERROR([Scala not found]))
