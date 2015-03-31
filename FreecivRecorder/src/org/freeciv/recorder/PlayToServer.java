@@ -60,7 +60,7 @@ public class PlayToServer {
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes(versionKnowledge, sentBefore);
 
-        final FreecivConnection conn = Connection.uninterpreted(server.getInputStream(), server.getOutputStream(),
+        final FreecivConnection conn = Connection.uninterpretedWhenPossible(server.getInputStream(), server.getOutputStream(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
                 versionKnowledge.getRequiredPostSendRules(),
                 versionKnowledge, Logger.GLOBAL_LOGGER_NAME);
