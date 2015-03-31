@@ -17,9 +17,16 @@ package org.freeciv.connection;
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.RawPacket;
 
+import java.io.IOException;
+
 public class AlwaysRaw implements ToPacket {
     @Override
     public Packet convert(byte[] packet, HeaderData headerData) {
         return new RawPacket(packet, headerData);
+    }
+
+    @Override
+    public byte[] encode(Packet packet, final HeaderData headerData) throws IOException, IllegalAccessException {
+        return packet.toBytes();
     }
 }

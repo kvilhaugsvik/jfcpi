@@ -30,6 +30,7 @@ public class Connection implements FreecivConnection {
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
     private final ProtocolVariantAutomatic variant;
+    private final ToPacket deserializer;
 
     private final String loggerName;
 
@@ -43,6 +44,7 @@ public class Connection implements FreecivConnection {
             ProtocolVariantAutomatic protocolVariant,
             String loggerName
     ) throws IOException {
+        this.deserializer = toPacket;
         this.loggerName = loggerName;
         this.currentHeader = protoCode.getNewPacketHeaderData();
         this.variant = protocolVariant;
@@ -135,17 +137,19 @@ public class Connection implements FreecivConnection {
 
         this.postSend.startedReceivingOrSending();
         try {
-            out.write(toSend.toBytes());
+            final byte[] asBytes = deserializer.encode(toSend, currentHeader);
+
+            out.write(asBytes);
 
             // need to look for capability setters in sending as well
             if (variant.needToKnowCaps())
                 variant.extractVariantInfo(toSend instanceof InterpretedPacket ?
                         toSend :
                         new InterpretWhenPossible(variant, loggerName)
-                                .convert(toSend.toBytes(), this.currentHeader));
+                                .convert(asBytes, this.currentHeader));
 
             this.postSend.handle(toSend.getHeader().getPacketKind());
-        } catch (IOException e) {
+        } catch (IOException | IllegalAccessException e) {
             setStopReadingWhenOutOfInput();
             whenDone();
             throw new IOException("Can't send", e);

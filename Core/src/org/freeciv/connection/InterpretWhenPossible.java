@@ -16,9 +16,7 @@ package org.freeciv.connection;
 
 import org.freeciv.packet.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -57,6 +55,13 @@ public class InterpretWhenPossible implements ToPacket {
 
             return new RawPacket(packet, headerData);
         }
+    }
+
+    @Override
+    public byte[] encode(final Packet packet, final HeaderData headerData) throws IOException, IllegalAccessException {
+        final byte[] out = packet.toBytes();
+
+        return out;
     }
 
     /**

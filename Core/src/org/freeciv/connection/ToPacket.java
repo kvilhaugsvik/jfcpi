@@ -17,8 +17,10 @@ package org.freeciv.connection;
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
 
+import java.io.IOException;
+
 /**
- * Deserialize raw packet data.
+ * Serialize and deserialize packets to raw packet data.
  */
 public interface ToPacket {
     /**
@@ -28,4 +30,17 @@ public interface ToPacket {
      * @return the deserialized packet.
      */
     public Packet convert(byte[] packet, HeaderData headerData);
+
+    /**
+     * Serialize a packet.
+     * @param packet the packet object to serialize.
+     * @param headerData packet header interpreter. This is needed in case
+     *                   the packet must be converted.
+     * @return serialized packet data.
+     * @throws IOException when there was a problem serializing the packet.
+     * @throws IllegalAccessException if the encoding tries to access
+     *                                something Java's access control
+     *                                forbids.
+     */
+    byte[] encode(final Packet packet, final HeaderData headerData) throws IOException, IllegalAccessException;
 }
