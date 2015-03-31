@@ -18,7 +18,6 @@ import org.freeciv.packet.*;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -29,25 +28,22 @@ public class Connection implements FreecivConnection {
     private final OverImpl overImpl;
     private final ReflexPacketKind postSend;
     private final HeaderData currentHeader;
-    private final ProtocolVariantAutomatic variant;
     private final ToPacket deserializer;
 
     private final String loggerName;
 
-    private Connection(
+    protected Connection(
             final InputStream inn,
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
             final Map<Integer, ReflexReaction> postSend,
             BasicProtocolData protoCode,
             ToPacket toPacket,
-            ProtocolVariantAutomatic protocolVariant,
             String loggerName
     ) throws IOException {
         this.deserializer = toPacket;
         this.loggerName = loggerName;
         this.currentHeader = protoCode.getNewPacketHeaderData();
-        this.variant = protocolVariant;
         this.out = out;
         this.overImpl = new OverImpl() {
             @Override
@@ -90,7 +86,7 @@ public class Connection implements FreecivConnection {
             return uninterpreted(inn, out, postReceive, postSend, protoCode, loggerName);
     }
 
-    public static Connection interpreted(
+    public static ConnectionHasFullProtoData interpreted(
             final InputStream inn,
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
@@ -99,7 +95,7 @@ public class Connection implements FreecivConnection {
             String loggerName
     ) throws IOException {
         final ProtocolVariantAutomatic protocolVariant = new ProtocolVariantAutomatic(protoCode.getNewPacketMapper());
-        return new Connection(inn, out, postReceive, postSend, protoCode,
+        return new ConnectionHasFullProtoData(inn, out, postReceive, postSend, protoCode,
                 new InterpretWhenPossible(protocolVariant, loggerName),
                 protocolVariant, loggerName);
     }
@@ -118,7 +114,7 @@ public class Connection implements FreecivConnection {
      * @throws IOException if there is a problem setting up the
      *                     connection.
      */
-    public static Connection uninterpretedWhenPossible(
+    public static ConnectionHasFullProtoData uninterpretedWhenPossible(
             final InputStream inn,
             final OutputStream out,
             final Map<Integer, ReflexReaction> postReceive,
@@ -127,7 +123,7 @@ public class Connection implements FreecivConnection {
             final String loggerName
     ) throws IOException {
         final ProtocolVariantAutomatic protocolVariant = new ProtocolVariantAutomatic(protoCode.getNewPacketMapper());
-        return new Connection(inn, out, postReceive, postSend, protoCode,
+        return new ConnectionHasFullProtoData(inn, out, postReceive, postSend, protoCode,
                 new AlwaysRaw(), protocolVariant, loggerName);
     }
 
@@ -140,7 +136,7 @@ public class Connection implements FreecivConnection {
             String loggerName
     ) throws IOException {
         return new Connection(inn, out, postReceive, postSend, protoCode,
-                new AlwaysRaw(), new ProtocolVariantAutomatic(null), loggerName);
+                new AlwaysRaw(), loggerName);
     }
 
     public boolean packetReady() {
@@ -211,76 +207,5 @@ public class Connection implements FreecivConnection {
     @Override
     public boolean isOpen() {
         return overImpl.isOpen();
-    }
-
-    /**
-     * Creates a new instance of the specified Freeciv packet for the
-     * current Freeciv protocol variant. The value of each field of the
-     * packet body must be specified.
-     * @param number the packet number of the Freeciv packet.
-     * @param old the delta packet storage. This is where previously sent
-     *            packets of the same kind can be found.
-     * @param args the fields of the body of the packet.
-     * @return a new instance of the specified packet.
-     * @throws ClassNotFoundException if no packet with the given number
-     * exists.
-     * @throws NoSuchMethodException if the packet don't have the expected
-     * method. Can be caused by wrong arguments, by the wrong number of
-     * arguments or by the packet being created by an incompatible packet
-     * generator.
-     * @throws java.lang.reflect.InvocationTargetException if there is a
-     * problem while creating the packet.
-     * @throws IllegalAccessException if accessing this is forbidden by
-     * Java's access control.
-     */
-    public Packet newPacketFromValues(final int number,
-                                      final Map<DeltaKey, Packet> old,
-                                      final Object... args) throws ClassNotFoundException,
-            NoSuchMethodException,
-            InvocationTargetException,
-            IllegalAccessException {
-        return variant.newPacketFromValues(number, this.getFields2Header(), old, args);
-    }
-
-    /**
-     * Create a new instance of the ping packet for the current Freeciv
-     * protocol variant.
-     * @param old the delta packet storage. This is where previously sent
-     *            packets of the same kind can be found.
-     * @return a new instance of the ping packet.
-     * @throws ClassNotFoundException if no packet with the given number
-     * exists.
-     * @throws NoSuchMethodException if the packet don't have the expected
-     * method. Can be caused by wrong arguments, by the wrong number of
-     * arguments or by the packet being created by an incompatible packet
-     * generator.
-     * @throws java.lang.reflect.InvocationTargetException if there is a
-     * problem while creating the packet.
-     * @throws IllegalAccessException if accessing this is forbidden by
-     * Java's access control.
-     */
-    public Packet newPing(final Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return this.newPacketFromValues(88, old);
-    }
-
-    /**
-     * Create a new instance of the pong packet for the current Freeciv
-     * protocol variant.
-     * @param old the delta packet storage. This is where previously sent
-     *            packets of the same kind can be found.
-     * @return a new instance of the pong packet.
-     * @throws ClassNotFoundException if no packet with the given number
-     * exists.
-     * @throws NoSuchMethodException if the packet don't have the expected
-     * method. Can be caused by wrong arguments, by the wrong number of
-     * arguments or by the packet being created by an incompatible packet
-     * generator.
-     * @throws java.lang.reflect.InvocationTargetException if there is a
-     * problem while creating the packet.
-     * @throws IllegalAccessException if accessing this is forbidden by
-     * Java's access control.
-     */
-    public Packet newPong(final Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return this.newPacketFromValues(89, old);
     }
 }

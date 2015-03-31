@@ -67,9 +67,9 @@ public class SignInAndWait {
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
             public void apply(PacketWrite dest) {
-                /* Must be a Connection since SignInAndWait only use this
-                 * code with a Connection. */
-                Connection connection = (Connection)dest;
+                /* Must be a ConnectionHasFullProtoData since SignInAndWait
+                 * only use this code with a ConnectionHasFullProtoData. */
+                ConnectionHasFullProtoData connection = (ConnectionHasFullProtoData)dest;
 
                 try {
                     dest.send(connection.newPong(sentBefore));
@@ -86,7 +86,7 @@ public class SignInAndWait {
         });
         try {
             final Socket connection = new Socket(address, portNumber);
-            final Connection con = Connection.interpreted(connection.getInputStream(), connection.getOutputStream(),
+            final ConnectionHasFullProtoData con = Connection.interpreted(connection.getInputStream(), connection.getOutputStream(),
                     ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
                     interpreter.getRequiredPostSendRules(), interpreter, Logger.GLOBAL_LOGGER_NAME);
 

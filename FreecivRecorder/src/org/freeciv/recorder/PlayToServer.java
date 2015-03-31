@@ -90,9 +90,9 @@ public class PlayToServer {
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
             public void apply(PacketWrite dest) {
-                /* Must be a Connection since PlayToServer only use this
-                 * code with a Connection. */
-                Connection connection = (Connection)dest;
+                /* Must be a ConnectionHasFullProtoData since PlayToServer
+                 * only use this code with a ConnectionHasFullProtoData. */
+                ConnectionHasFullProtoData connection = (ConnectionHasFullProtoData)dest;
 
                 try {
                     dest.send(connection.newPong(old));
