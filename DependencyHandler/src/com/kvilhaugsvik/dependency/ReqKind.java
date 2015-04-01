@@ -15,5 +15,5 @@
 package com.kvilhaugsvik.dependency;
 
 public interface ReqKind {
-    public static interface FailHard extends ReqKind {} // a Requirement that already has failed to be met
+    interface FailHard extends ReqKind {} // a Requirement that already has failed to be met
 }

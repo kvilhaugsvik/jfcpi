@@ -15,6 +15,6 @@
 package com.kvilhaugsvik.dependency;
 
 public interface Required {
-    public Class<? extends ReqKind> getKind();
-    public boolean canFulfill(Requirement a);
+    Class<? extends ReqKind> getKind();
+    boolean canFulfill(Requirement a);
 }

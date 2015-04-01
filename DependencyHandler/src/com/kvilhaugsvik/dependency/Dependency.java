@@ -20,25 +20,25 @@ public interface Dependency {
     /**
      * An Item can depend on other items and have other items depend on it.
      */
-    public static interface Item extends Dependency {
+    interface Item extends Dependency {
         /**
          * Other items that this item requires.
          * @return the required items.
          */
-        public Collection<Requirement> getReqs();
+        Collection<Requirement> getReqs();
 
         /**
          * The requirement this item fulfills.
          * @return the requirement this item fulfills.
          */
-        public Requirement getIFulfillReq();
+        Requirement getIFulfillReq();
     }
 
     /**
      * A Maker can produce a {@link com.kvilhaugsvik.dependency.Dependency.Item} from other items. A Maker may be
      * limited to produce a specific item. It may also produce different items depending on the input.
      */
-    public static interface Maker extends Dependency {
+    interface Maker extends Dependency {
         /**
          * Get a list of the items needed to produce the requested item. The required items should be given as
          * arguments to the {@link #produce(Requirement, com.kvilhaugsvik.dependency.Dependency.Item...)} method in the
@@ -47,14 +47,14 @@ public interface Dependency {
          * @param toProduce the wanted item.
          * @return a list of the items needed to produce the wanted item.
          */
-        public List<Requirement> neededInput(Requirement toProduce);
+        List<Requirement> neededInput(Requirement toProduce);
 
         /**
          * Get a Required that matches each Requirement this Maker can produce. If a Requirement matches the method
          * {@link #neededInput(Requirement)} should give a list of items required to produce it.
          * @return a Required that matches each Requirement this Maker can produce.
          */
-        public Required getICanProduceReq();
+        Required getICanProduceReq();
 
         /**
          * Produce the requested item from the input items.
@@ -63,7 +63,7 @@ public interface Dependency {
          * @return the requested Dependency.Item.
          * @throws UndefinedException when the requested item couldn't be created.
          */
-        public Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException;
+        Dependency.Item produce(Requirement toProduce, Dependency.Item... wasRequired) throws UndefinedException;
     }
 
     /**
@@ -71,13 +71,13 @@ public interface Dependency {
      *
      * Limited to makers for now since they are more likely to have reliable information.
      */
-    public static interface BlameShifter extends Maker {
+    interface BlameShifter extends Maker {
         /**
          * Collection of what unresolved requirements the BlameShifter suspects is to blame if a requirement is missing.
          * The information is only a suspicion / hint and could be wrong.
          *
          * @return a map mapping from the missing requirement to all blamed suspects
          */
-        public Map<Requirement, Collection<Requirement>> blameSuspects();
+        Map<Requirement, Collection<Requirement>> blameSuspects();
     }
 }

@@ -364,8 +364,8 @@ public final class DependencyStore {
             return Collections.unmodifiableCollection(store.values());
         }
 
-        private static interface FulfillGetter<Of> {
-            public Required getIFulfill(Of of);
+        private interface FulfillGetter<Of> {
+            Required getIFulfill(Of of);
         }
     }
 }
