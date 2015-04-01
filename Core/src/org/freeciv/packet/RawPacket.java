@@ -20,12 +20,23 @@ import org.freeciv.connection.HeaderData;
 import java.io.*;
 import java.util.Arrays;
 
+/**
+ * RawPacket is a packet where only the header is interpreted.
+ */
 public class RawPacket implements Packet {
     private final PacketHeader header;
     private final byte[] content;
 
+    /**
+     * Create a new RawPacket from the given content.
+     * @param stream2Header will read the header from the content
+     * @param packet the entire packet (header and body) encoded as a byte
+     *               array.
+     */
     public RawPacket(byte[] packet, HeaderData stream2Header) {
         this.header = stream2Header.newHeaderFromStream(new DataInputStream(new ByteArrayInputStream(packet)));
+
+        /* Use a copy. The original array could be changed. */
         this.content = Arrays.copyOf(packet, header.getTotalSize());
     }
 
@@ -33,21 +44,24 @@ public class RawPacket implements Packet {
         return Arrays.copyOfRange(packet, header.getHeaderSize(), header.getTotalSize());
     }
 
-    public PacketHeader getHeader() {
+    @Override public PacketHeader getHeader() {
         return header;
     }
 
+    /**
+     * Get the encoded body without the header.
+     * @return the encoded body.
+     */
     public byte[] getBodyBytes() {
         return getBodyBytes(content, this.header);
     }
 
-    public void encodeTo(DataOutput to) throws IOException {
+    @Override public void encodeTo(DataOutput to) throws IOException {
         header.encodeTo(to);
         to.write(this.getBodyBytes());
     }
 
-    @Override
-    public byte[] toBytes() throws IOException {
+    @Override public byte[] toBytes() throws IOException {
         /* Return a copy so this version can't be corrupted. */
         return Arrays.copyOf(content, header.getTotalSize());
     }
