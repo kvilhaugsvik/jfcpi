@@ -28,11 +28,11 @@ public interface PacketChangeHeader extends ConnectionRelated {
      * Get the current packet header constructor from DataInput
      * @return the packet header constructor from DataInput
      */
-    public Constructor<? extends PacketHeader> getStream2Header();
+    Constructor<? extends PacketHeader> getStream2Header();
 
     /**
      * Get the current packet header constructor from size and kind
      * @return the packet header constructor from size and kind
      */
-    public Constructor<? extends PacketHeader> getFields2Header();
+    Constructor<? extends PacketHeader> getFields2Header();
 }

@@ -25,5 +25,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Capabilities {
-    public String[] value();
+    String[] value();
 }

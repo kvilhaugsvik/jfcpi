@@ -51,7 +51,7 @@ public interface ProtocolVariant {
      * @throws IllegalAccessException if accessing this is forbidden by
      * Java's access control.
      */
-    public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException, IllegalAccessException;
+    Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException, IllegalAccessException;
 
     /**
      * Creates a new instance of the specified Freeciv packet for the
@@ -77,10 +77,10 @@ public interface ProtocolVariant {
      * @throws IllegalAccessException if accessing this is forbidden by
      * Java's access control.
      */
-    public Packet newPacketFromValues(final int number,
-                                      final Constructor<? extends PacketHeader> headerMaker,
-                                      final Map<DeltaKey, Packet> old,
-                                      final Object... args) throws ClassNotFoundException,
+    Packet newPacketFromValues(final int number,
+                               final Constructor<? extends PacketHeader> headerMaker,
+                               final Map<DeltaKey, Packet> old,
+                               final Object... args) throws ClassNotFoundException,
                                                          NoSuchMethodException,
                                                          InvocationTargetException,
                                                          IllegalAccessException;
@@ -92,7 +92,7 @@ public interface ProtocolVariant {
      * @return true iff the specified Freeciv protocol variant capability
      * is there.
      */
-    public boolean isCapabilityEnabled(String cap);
+    boolean isCapabilityEnabled(String cap);
 
     /**
      * Is this the delta protocol or the simpler variant?

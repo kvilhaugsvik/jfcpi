@@ -15,5 +15,5 @@
 package org.freeciv.connection;
 
 public interface ReflexReaction<Target extends ConnectionRelated> {
-    public void apply(Target connection);
+    void apply(Target connection);
 }

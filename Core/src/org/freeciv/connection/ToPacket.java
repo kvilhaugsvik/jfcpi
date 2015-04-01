@@ -29,7 +29,7 @@ public interface ToPacket {
      * @param headerData packet header interpreter.
      * @return the deserialized packet.
      */
-    public Packet convert(byte[] packet, HeaderData headerData);
+    Packet convert(byte[] packet, HeaderData headerData);
 
     /**
      * Serialize a packet.

@@ -28,16 +28,16 @@ public interface SerializedPacketGroup {
      * The serialized data
      * @return all data in the group
      */
-    public byte[] getAsData();
+    byte[] getAsData();
 
     /**
      * Put the packets in this group in the given list
      * @param in the list to append the packets to
      * @return the number of packets added
      */
-    public int putPackets(List<Packet> in);
+    int putPackets(List<Packet> in);
 
-    public interface SeparateSerializedPacketGroups {
-        public SerializedPacketGroup fromInputStream(InputStream in) throws IOException;
+    interface SeparateSerializedPacketGroups {
+        SerializedPacketGroup fromInputStream(InputStream in) throws IOException;
     }
 }

@@ -17,7 +17,7 @@ package org.freeciv.packet;
 public @interface Sent {
     From value();
 
-    public enum From {
+    enum From {
         BOTH,
         CLIENT,
         SERVER,

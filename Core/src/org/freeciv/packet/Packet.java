@@ -20,12 +20,12 @@ import java.io.IOException;
 /**
  * A single packet in the Freeciv network protocol.
  */
-public abstract interface Packet {
+public interface Packet {
     /**
      * Get the packet header of this packet.
      * @return the packet's header.
      */
-    public abstract PacketHeader getHeader();
+    PacketHeader getHeader();
 
     /**
      * Serialize the packet, including the header, to the packet format
@@ -34,7 +34,7 @@ public abstract interface Packet {
      * @param to The DataOutput to write the packet to.
      * @throws IOException when a problem occurs while writing it.
      */
-    public abstract void encodeTo(DataOutput to) throws IOException;
+    void encodeTo(DataOutput to) throws IOException;
 
     /**
      * Serialize the packet, including the header, to the packet format

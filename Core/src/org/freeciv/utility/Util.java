@@ -78,11 +78,11 @@ public class Util {
     }
 
     /* Useful classes */
-    public static interface OneCondition<Arg> {
-        public boolean isTrueFor(Arg argument);
+    public interface OneCondition<Arg> {
+        boolean isTrueFor(Arg argument);
     }
 
-    public static interface TwoConditions<Argument1, Argument2> {
-        public boolean isTrueFor(Argument1 argument1, Argument2 argument2);
+    public interface TwoConditions<Argument1, Argument2> {
+        boolean isTrueFor(Argument1 argument1, Argument2 argument2);
     }
 }

@@ -22,24 +22,24 @@ import java.io.IOException;
  * It has a value and can serialize and deserialize it.
  * @param <Javatype> the type of the value the field type can serialize and deserialize.
  */
-public abstract interface FieldType<Javatype> {
+public interface FieldType<Javatype> {
     /**
      * Serialize the value to the given location.
      * @param to the location to serialize the value to.
      * @throws IOException when something goes wrong during serialization.
      */
-    public abstract void encodeTo(DataOutput to) throws IOException;
+    void encodeTo(DataOutput to) throws IOException;
 
     /**
      * Get the size of the serialized value in bytes.
      * @param previous the previous field.
      * @return the size of the serialized value in bytes.
      */
-    public abstract int encodedLength(FieldType previous);
+    int encodedLength(FieldType previous);
 
     /**
      * Get the value of the field.
      * @return the value of the field.
      */
-    public abstract Javatype getValue();
+    Javatype getValue();
 }

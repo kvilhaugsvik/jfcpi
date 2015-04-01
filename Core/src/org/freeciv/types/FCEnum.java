@@ -22,7 +22,7 @@ public interface FCEnum {
      * Get the enumerator number.
      * @return the enumerator number.
      */
-    public int getNumber();
+    int getNumber();
 
     /**
      * Helper methods for interacting with the enum
