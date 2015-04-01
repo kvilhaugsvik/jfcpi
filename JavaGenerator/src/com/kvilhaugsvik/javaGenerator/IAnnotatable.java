@@ -15,5 +15,5 @@
 package com.kvilhaugsvik.javaGenerator;
 
 public interface IAnnotatable {
-    public void annotateMe(Annotate using);
+    void annotateMe(Annotate using);
 }

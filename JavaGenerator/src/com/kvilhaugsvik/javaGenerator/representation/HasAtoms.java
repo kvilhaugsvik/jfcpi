@@ -17,71 +17,71 @@ package com.kvilhaugsvik.javaGenerator.representation;
 import com.kvilhaugsvik.javaGenerator.representation.IR.CodeAtom;
 
 public interface HasAtoms {
-    public static final CodeAtom JDocStart = new CodeAtom("/**");
-    public static final CodeAtom CCommentStart = new CodeAtom("/*");
-    public static final CodeAtom CCommentEnd = new CodeAtom("*/");
-    public static final CodeAtom EOL = new CodeAtom(";");
-    public static final CodeAtom SEP = new CodeAtom(",");
-    public static final CodeAtom LSC = new CodeAtom("{");
-    public static final CodeAtom RSC = new CodeAtom("}");
-    public static final CodeAtom LPR = new CodeAtom("(");
-    public static final CodeAtom RPR = new CodeAtom(")");
-    public static final CodeAtom ARRAY_ACCESS_START = new CodeAtom("[");
-    public static final CodeAtom ARRAY_ACCESS_END = new CodeAtom("]");
-    public static final CodeAtom GENERIC_START = new CodeAtom("<");
-    public static final CodeAtom GENERIC_END = new CodeAtom(">");
-    public static final CodeAtom HAS = new CodeAtom(".");
-    public static final CodeAtom EVERYTHING = new CodeAtom("*");
-    public static final CodeAtom ALS = new CodeAtom("{");
-    public static final CodeAtom ALE = new CodeAtom("}");
-    public static final CodeAtom ASSIGN = new CodeAtom("=");
-    public static final CodeAtom IS_SMALLER = new CodeAtom("<");
-    public static final CodeAtom IS_SMALLER_OR_EQUAL = new CodeAtom("<=");
-    public static final CodeAtom IS_BIGGER = new CodeAtom(">");
-    public static final CodeAtom IS_SAME = new CodeAtom("==");
-    public static final CodeAtom IS_NOT_SAME = new CodeAtom("!=");
-    public static final CodeAtom IS_INSTANCE_OF = new CodeAtom("instanceof");
-    public static final CodeAtom AND = new CodeAtom("&&");
-    public static final CodeAtom OR = new CodeAtom("||");
-    public static final CodeAtom NOT = new CodeAtom("!");
-    public static final CodeAtom ADD = new CodeAtom("+");
-    public static final CodeAtom SUB = new CodeAtom("-");
-    public static final CodeAtom MUL = new CodeAtom("*");
-    public static final CodeAtom DIV = new CodeAtom("/");
-    public static final CodeAtom REM = new CodeAtom("%");
-    public static final CodeAtom DEC = new CodeAtom("--");
-    public static final CodeAtom INC = new CodeAtom("++");
-    public static final CodeAtom INC_USING = new CodeAtom("+=");
-    public static final CodeAtom newInst = new CodeAtom("new");
+    CodeAtom JDocStart = new CodeAtom("/**");
+    CodeAtom CCommentStart = new CodeAtom("/*");
+    CodeAtom CCommentEnd = new CodeAtom("*/");
+    CodeAtom EOL = new CodeAtom(";");
+    CodeAtom SEP = new CodeAtom(",");
+    CodeAtom LSC = new CodeAtom("{");
+    CodeAtom RSC = new CodeAtom("}");
+    CodeAtom LPR = new CodeAtom("(");
+    CodeAtom RPR = new CodeAtom(")");
+    CodeAtom ARRAY_ACCESS_START = new CodeAtom("[");
+    CodeAtom ARRAY_ACCESS_END = new CodeAtom("]");
+    CodeAtom GENERIC_START = new CodeAtom("<");
+    CodeAtom GENERIC_END = new CodeAtom(">");
+    CodeAtom HAS = new CodeAtom(".");
+    CodeAtom EVERYTHING = new CodeAtom("*");
+    CodeAtom ALS = new CodeAtom("{");
+    CodeAtom ALE = new CodeAtom("}");
+    CodeAtom ASSIGN = new CodeAtom("=");
+    CodeAtom IS_SMALLER = new CodeAtom("<");
+    CodeAtom IS_SMALLER_OR_EQUAL = new CodeAtom("<=");
+    CodeAtom IS_BIGGER = new CodeAtom(">");
+    CodeAtom IS_SAME = new CodeAtom("==");
+    CodeAtom IS_NOT_SAME = new CodeAtom("!=");
+    CodeAtom IS_INSTANCE_OF = new CodeAtom("instanceof");
+    CodeAtom AND = new CodeAtom("&&");
+    CodeAtom OR = new CodeAtom("||");
+    CodeAtom NOT = new CodeAtom("!");
+    CodeAtom ADD = new CodeAtom("+");
+    CodeAtom SUB = new CodeAtom("-");
+    CodeAtom MUL = new CodeAtom("*");
+    CodeAtom DIV = new CodeAtom("/");
+    CodeAtom REM = new CodeAtom("%");
+    CodeAtom DEC = new CodeAtom("--");
+    CodeAtom INC = new CodeAtom("++");
+    CodeAtom INC_USING = new CodeAtom("+=");
+    CodeAtom newInst = new CodeAtom("new");
 
-    public static final CodeAtom IF = new CodeAtom("if");
-    public static final CodeAtom ELSE = new CodeAtom("else");
-    public static final CodeAtom RET = new CodeAtom("return");
-    public static final CodeAtom BRE = new CodeAtom("break");
-    public static final CodeAtom RIF_THEN = new CodeAtom("?");
-    public static final CodeAtom ELSE2 = new CodeAtom(":");
-    public static final CodeAtom ASSRT = new IR.CodeAtom("assert");
-    public static final CodeAtom THR = new CodeAtom("throw");
-    public static final CodeAtom TRY = new CodeAtom("try");
-    public static final CodeAtom CATCH = new CodeAtom("catch");
-    public static final CodeAtom WHILE = new CodeAtom("while");
-    public static final CodeAtom FOR = new CodeAtom("for");
-    public static final CodeAtom FORSEP = new CodeAtom(";");
-    public static final CodeAtom FOR_EACH_SEP = new CodeAtom(":");
+    CodeAtom IF = new CodeAtom("if");
+    CodeAtom ELSE = new CodeAtom("else");
+    CodeAtom RET = new CodeAtom("return");
+    CodeAtom BRE = new CodeAtom("break");
+    CodeAtom RIF_THEN = new CodeAtom("?");
+    CodeAtom ELSE2 = new CodeAtom(":");
+    CodeAtom ASSRT = new IR.CodeAtom("assert");
+    CodeAtom THR = new CodeAtom("throw");
+    CodeAtom TRY = new CodeAtom("try");
+    CodeAtom CATCH = new CodeAtom("catch");
+    CodeAtom WHILE = new CodeAtom("while");
+    CodeAtom FOR = new CodeAtom("for");
+    CodeAtom FORSEP = new CodeAtom(";");
+    CodeAtom FOR_EACH_SEP = new CodeAtom(":");
 
-    public static final CodeAtom PACKAGE = new IR.CodeAtom("package");
-    public static final CodeAtom IMPORT = new CodeAtom("import");
-    public static final CodeAtom EXTENDS = new IR.CodeAtom("extends");
-    public static final CodeAtom IMPLEMENTS = new IR.CodeAtom("implements");
-    public static final CodeAtom THROWS = new IR.CodeAtom("throws");
+    CodeAtom PACKAGE = new IR.CodeAtom("package");
+    CodeAtom IMPORT = new CodeAtom("import");
+    CodeAtom EXTENDS = new IR.CodeAtom("extends");
+    CodeAtom IMPLEMENTS = new IR.CodeAtom("implements");
+    CodeAtom THROWS = new IR.CodeAtom("throws");
 
-    public static final CodeAtom SELF = new CodeAtom("SELF (self typed)");
+    CodeAtom SELF = new CodeAtom("SELF (self typed)");
 
-    public static final HasAtoms BLANK = new HasAtoms() {
+    HasAtoms BLANK = new HasAtoms() {
         @Override
         public void writeAtoms(CodeAtoms to) {
         }
     };
 
-    public void writeAtoms(CodeAtoms to);
+    void writeAtoms(CodeAtoms to);
 }

@@ -20,13 +20,13 @@ import javax.naming.OperationNotSupportedException;
 import java.util.List;
 
 public interface TokensToStringStyle {
-    public static final String OUTER_LEVEL = "Outside";
-    public static final String GROUP = "Group";
-    public static final String ARGUMENTS = "Arguments";
+    String OUTER_LEVEL = "Outside";
+    String GROUP = "Group";
+    String ARGUMENTS = "Arguments";
 
-    public List<String> asFormattedLines(CodeAtoms from);
+    List<String> asFormattedLines(CodeAtoms from);
 
-    public interface FormattingProcess {
+    interface FormattingProcess {
         void start() throws OperationNotSupportedException;
         void insertSpace();
         void breakLineBlock();

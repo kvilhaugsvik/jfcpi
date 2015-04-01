@@ -34,5 +34,5 @@ public interface From3<Returns extends HasAtoms,
      * @param arg3 the third argument taken
      * @return The source code
      */
-    public abstract Returns x(Argument1 arg1, Argument2 arg2, Argument3 arg3);
+    Returns x(Argument1 arg1, Argument2 arg2, Argument3 arg3);
 }

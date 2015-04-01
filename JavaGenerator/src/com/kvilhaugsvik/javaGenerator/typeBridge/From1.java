@@ -27,5 +27,5 @@ public interface From1<Returns extends HasAtoms, Argument1 extends HasAtoms> {
      * @param arg1 the argument taken
      * @return The source code
      */
-    public abstract Returns x(Argument1 arg1);
+    Returns x(Argument1 arg1);
 }

@@ -144,9 +144,9 @@ public class CodeAtoms {
     }
 
     private interface RewriteRule {
-        public boolean isTrueFor(CodeAtom atom);
-        public HasAtoms getReplacement();
-        public boolean removeMeNow();
+        boolean isTrueFor(CodeAtom atom);
+        HasAtoms getReplacement();
+        boolean removeMeNow();
     }
 
     private static class RefuseNextIf implements RewriteRule {

@@ -220,10 +220,10 @@ public class MethodCall<Returns extends Returnable> extends Formatted implements
         }
     }
 
-    private static interface MethodPosition {
-        public abstract boolean hasPList(Typed<? extends AValue>[] parameters);
-        public abstract Typed<? extends AValue>[] choose(Typed<? extends AValue>[] parameters);
-        public abstract void call(HasAtoms method, Typed<? extends AValue>[] parameters, CodeAtoms to);
+    private interface MethodPosition {
+        boolean hasPList(Typed<? extends AValue>[] parameters);
+        Typed<? extends AValue>[] choose(Typed<? extends AValue>[] parameters);
+        void call(HasAtoms method, Typed<? extends AValue>[] parameters, CodeAtoms to);
     }
 
     public static class HasResult<Returns extends AValue> extends MethodCall<Returns> implements Value<Returns> {

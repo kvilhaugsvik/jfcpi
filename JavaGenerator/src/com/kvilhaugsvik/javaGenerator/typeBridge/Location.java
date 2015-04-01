@@ -26,5 +26,5 @@ public interface Location<Kind extends AValue> extends Value<Kind> {
      * @param value the value to assign to this location
      * @return an assignment expression that assigns {see value} to the represented location
      */
-    public Value<Kind> assign(final Value<Kind> value);
+    Value<Kind> assign(final Value<Kind> value);
 }

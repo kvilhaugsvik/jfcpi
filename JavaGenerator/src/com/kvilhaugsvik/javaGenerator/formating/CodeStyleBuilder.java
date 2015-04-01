@@ -492,7 +492,7 @@ public class CodeStyleBuilder<ScopeInfoKind extends ScopeInfo> {
         }
     }
 
-    public static interface Triggered<ScopeInfoKind extends ScopeInfo> {
-        public void run(ScopeInfoKind context);
+    public interface Triggered<ScopeInfoKind extends ScopeInfo> {
+        void run(ScopeInfoKind context);
     }
 }
