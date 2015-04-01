@@ -26,11 +26,11 @@ public interface DataType extends ReqKind {
      * Get the address of the type it self.
      * @return the represented type.
      */
-    public TargetClass getAddress();
+    TargetClass getAddress();
 
     /**
      * Get the zero value of this data type.
      * @return the zero value of the data type.
      */
-    public Value getZeroValue();
+    Value getZeroValue();
 }
