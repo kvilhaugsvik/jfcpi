@@ -46,6 +46,20 @@ public class HeaderData implements PacketChangeHeader {
         }
     }
 
+    /**
+     * Creates a new packet header with the given size and packet number.
+     * @param size total packet size.
+     * @param number packet number.
+     * @return a new packet header with the given size and packet number.
+     */
+    public PacketHeader newHeader(final int size, final int number) {
+        try {
+            return getFields2Header().newInstance(size, number);
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+            throw new BadProtocolData("Header from fields issue", e);
+        }
+    }
+
     @Override
     public void setHeaderTypeTo(Class<? extends PacketHeader> packetHeaderClass) {
         this.lock.writeLock().lock();

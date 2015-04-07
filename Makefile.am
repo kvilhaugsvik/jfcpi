@@ -37,6 +37,7 @@ endif
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.types.TestUnderstoodBitVector
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.utility.TestEternalZero
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.utility.TestValidation
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.connection.HeaderDataTest
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.connection.NetworkUninterpreted
 	touch ${COMPILED_Core_TEST_FOLDER}/run
 
