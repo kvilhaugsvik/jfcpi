@@ -60,9 +60,6 @@ public class SignInAndWait {
 
         final ProtocolData interpreter = new ProtocolData();
 
-        /* FIXME: sentBefore doesn't belong here. */
-        final Map<DeltaKey, Packet> sentBefore = InterpretWhenPossible.newDeltaStore();
-
         HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
@@ -72,7 +69,7 @@ public class SignInAndWait {
                 ConnectionHasFullProtoData connection = (ConnectionHasFullProtoData)dest;
 
                 try {
-                    dest.send(connection.newPong(sentBefore));
+                    dest.send(connection.newPong());
                 } catch (Exception e) {
                     System.err.println("Failed to respond");
                 }
@@ -90,12 +87,12 @@ public class SignInAndWait {
                     ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
                     interpreter.getRequiredPostSendRules(), interpreter, Logger.GLOBAL_LOGGER_NAME);
 
-            con.send(con.newServerJoinRequest(userName, interpreter.getCapStringOptional(), sentBefore));
+            con.send(con.newServerJoinRequest(userName, interpreter.getCapStringOptional()));
 
             while(con.isOpen() || con.packetReady()) {
                 if (start && start_time < System.currentTimeMillis()) {
                     /* Start the game. */
-                    con.send(con.newPacketFromValues(26, sentBefore, "/start"));
+                    con.send(con.newPacketFromValues(26, "/start"));
 
                     /* Don't send the command more than once. */
                     start = false;

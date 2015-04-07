@@ -55,10 +55,7 @@ public class PlayToServer {
     public PlayToServer(final InputStream source, Socket server, boolean ignoreDynamic, FirstTimeRequest firstPlayedTime) throws IOException, NoSuchMethodException {
         final ProtocolData versionKnowledge = new ProtocolData();
 
-        /* FIXME: sentBefore doesn't belong here. */
-        final Map<DeltaKey, Packet> sentBefore = InterpretWhenPossible.newDeltaStore();
-
-        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes(sentBefore);
+        final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
 
         final FreecivConnection conn = Connection.uninterpretedWhenPossible(server.getInputStream(), server.getOutputStream(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
@@ -85,7 +82,7 @@ public class PlayToServer {
         this.scPlumbing = new Plumbing(new SourceConn(conn, false, RecordTF2.NO_CONNECTION_ID), Arrays.asList(reaction), timeToExit);
     }
 
-    private static HashMap<Integer, ReflexReaction> createStandardReflexes(final Map<DeltaKey, Packet> old) {
+    private static HashMap<Integer, ReflexReaction> createStandardReflexes() {
         final HashMap<Integer, ReflexReaction> reflexes = new HashMap<Integer, ReflexReaction>();
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
@@ -95,7 +92,7 @@ public class PlayToServer {
                 ConnectionHasFullProtoData connection = (ConnectionHasFullProtoData)dest;
 
                 try {
-                    dest.send(connection.newPong(old));
+                    dest.send(connection.newPong());
                 } catch (Exception e) {
                     System.err.println("Failed to respond");
                 }

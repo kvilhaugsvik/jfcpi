@@ -18,6 +18,7 @@ import org.freeciv.packet.*;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -27,7 +28,7 @@ public class Connection implements FreecivConnection {
 
     private final OverImpl overImpl;
     private final ReflexPacketKind postSend;
-    protected final HeaderData currentHeader;
+    private final HeaderData currentHeader;
     private final ToPacket deserializer;
 
     private final String loggerName;
@@ -207,5 +208,71 @@ public class Connection implements FreecivConnection {
     @Override
     public boolean isOpen() {
         return overImpl.isOpen();
+    }
+
+    /**
+     * Creates a new instance of the specified Freeciv packet for the
+     * current Freeciv protocol variant. The value of each field of the
+     * packet body must be specified.
+     * WARNING: Don't use this for a packet with body fields unless the
+     * connection is interpreted.
+     * @param number the packet number of the Freeciv packet.
+     * @param args the fields of the body of the packet.
+     * @return a new instance of the specified packet.
+     * @throws ClassNotFoundException if no packet with the given number
+     * exists.
+     * @throws NoSuchMethodException if the packet don't have the expected
+     * method. Can be caused by wrong arguments, by the wrong number of
+     * arguments or by the packet being created by an incompatible packet
+     * generator.
+     * @throws java.lang.reflect.InvocationTargetException if there is a
+     * problem while creating the packet.
+     * @throws IllegalAccessException if accessing this is forbidden by
+     * Java's access control.
+     */
+    public Packet newPacketFromValues(final int number,
+                                      final Object... args) throws ClassNotFoundException,
+            NoSuchMethodException,
+            InvocationTargetException,
+            IllegalAccessException {
+        return deserializer.newPacketFromValues(number, currentHeader, args);
+    }
+
+    /**
+     * Create a new instance of the ping packet for the current Freeciv
+     * protocol variant.
+     * @return a new instance of the ping packet.
+     * @throws ClassNotFoundException if no packet with the given number
+     * exists.
+     * @throws NoSuchMethodException if the packet don't have the expected
+     * method. Can be caused by wrong arguments, by the wrong number of
+     * arguments or by the packet being created by an incompatible packet
+     * generator.
+     * @throws java.lang.reflect.InvocationTargetException if there is a
+     * problem while creating the packet.
+     * @throws IllegalAccessException if accessing this is forbidden by
+     * Java's access control.
+     */
+    public Packet newPing() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return this.newPacketFromValues(88);
+    }
+
+    /**
+     * Create a new instance of the pong packet for the current Freeciv
+     * protocol variant.
+     * @return a new instance of the pong packet.
+     * @throws ClassNotFoundException if no packet with the given number
+     * exists.
+     * @throws NoSuchMethodException if the packet don't have the expected
+     * method. Can be caused by wrong arguments, by the wrong number of
+     * arguments or by the packet being created by an incompatible packet
+     * generator.
+     * @throws java.lang.reflect.InvocationTargetException if there is a
+     * problem while creating the packet.
+     * @throws IllegalAccessException if accessing this is forbidden by
+     * Java's access control.
+     */
+    public Packet newPong() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return this.newPacketFromValues(89);
     }
 }

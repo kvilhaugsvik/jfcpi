@@ -14,7 +14,6 @@
 
 package org.freeciv.connection;
 
-import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.Packet;
 
 import java.io.IOException;
@@ -36,85 +35,12 @@ public class ConnectionHasFullProtoData extends Connection {
     }
 
     /**
-     * Creates a new instance of the specified Freeciv packet for the
-     * current Freeciv protocol variant. The value of each field of the
-     * packet body must be specified.
-     * @param number the packet number of the Freeciv packet.
-     * @param old the delta packet storage. This is where previously sent
-     *            packets of the same kind can be found.
-     * @param args the fields of the body of the packet.
-     * @return a new instance of the specified packet.
-     * @throws ClassNotFoundException if no packet with the given number
-     * exists.
-     * @throws NoSuchMethodException if the packet don't have the expected
-     * method. Can be caused by wrong arguments, by the wrong number of
-     * arguments or by the packet being created by an incompatible packet
-     * generator.
-     * @throws java.lang.reflect.InvocationTargetException if there is a
-     * problem while creating the packet.
-     * @throws IllegalAccessException if accessing this is forbidden by
-     * Java's access control.
-     */
-    public Packet newPacketFromValues(final int number,
-                                      final Map<DeltaKey, Packet> old,
-                                      final Object... args) throws ClassNotFoundException,
-            NoSuchMethodException,
-            InvocationTargetException,
-            IllegalAccessException {
-        return variant.newPacketFromValues(number, this.currentHeader, old, args);
-    }
-
-    /**
-     * Create a new instance of the ping packet for the current Freeciv
-     * protocol variant.
-     * @param old the delta packet storage. This is where previously sent
-     *            packets of the same kind can be found.
-     * @return a new instance of the ping packet.
-     * @throws ClassNotFoundException if no packet with the given number
-     * exists.
-     * @throws NoSuchMethodException if the packet don't have the expected
-     * method. Can be caused by wrong arguments, by the wrong number of
-     * arguments or by the packet being created by an incompatible packet
-     * generator.
-     * @throws java.lang.reflect.InvocationTargetException if there is a
-     * problem while creating the packet.
-     * @throws IllegalAccessException if accessing this is forbidden by
-     * Java's access control.
-     */
-    public Packet newPing(final Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return this.newPacketFromValues(88, old);
-    }
-
-    /**
-     * Create a new instance of the pong packet for the current Freeciv
-     * protocol variant.
-     * @param old the delta packet storage. This is where previously sent
-     *            packets of the same kind can be found.
-     * @return a new instance of the pong packet.
-     * @throws ClassNotFoundException if no packet with the given number
-     * exists.
-     * @throws NoSuchMethodException if the packet don't have the expected
-     * method. Can be caused by wrong arguments, by the wrong number of
-     * arguments or by the packet being created by an incompatible packet
-     * generator.
-     * @throws java.lang.reflect.InvocationTargetException if there is a
-     * problem while creating the packet.
-     * @throws IllegalAccessException if accessing this is forbidden by
-     * Java's access control.
-     */
-    public Packet newPong(final Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return this.newPacketFromValues(89, old);
-    }
-
-    /**
      * Create a new instance of the server join request packet. The fields
      * that only has one correct value for a given protocol version will
      * get the correct value assigned to them automatically.
      * @param userName The username to sign in as.
      * @param optionalCaps wanted optional capabilities. Separate each
      *                     wanted capability by a space.
-     * @param old the delta packet storage. This is where previously sent
-     *            packets of the same kind can be found.
      * @return a new instance of SERVER_JOIN_REQ
      * @throws ClassNotFoundException if no packet with the given number
      * exists.
@@ -128,9 +54,8 @@ public class ConnectionHasFullProtoData extends Connection {
      * Java's access control.
      */
     public Packet newServerJoinRequest(final String userName,
-                                       final String optionalCaps,
-                                       final Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return this.newPacketFromValues(4, old,
+                                       final String optionalCaps) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return this.newPacketFromValues(4,
                 userName,
                 variant.getCapStringMandatory() + " " + optionalCaps,
                 variant.getVersionLabel(),
@@ -148,8 +73,6 @@ public class ConnectionHasFullProtoData extends Connection {
      * @param optionalCaps optional Freeciv protocol capabilities to enable.
      * @param challenge_file location of want hack challenge file.
      * @param conn_id connection identity number.
-     * @param old the delta packet storage. This is where previously sent
-     *            packets of the same kind can be found.
      * @return a new instance of SERVER_JOIN_REPLY
      * @throws ClassNotFoundException if no packet with the given number
      * exists.
@@ -166,10 +89,9 @@ public class ConnectionHasFullProtoData extends Connection {
                                      String message,
                                      String optionalCaps,
                                      String challenge_file,
-                                     Integer conn_id,
-                                     Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+                                     Integer conn_id) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 
-        return this.newPacketFromValues(5, old,
+        return this.newPacketFromValues(5,
                 you_can_join,
                 message,
                 variant.getCapStringMandatory() + " " + optionalCaps,
