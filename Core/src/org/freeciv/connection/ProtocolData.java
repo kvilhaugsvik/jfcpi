@@ -247,42 +247,6 @@ public class ProtocolData implements BasicProtocolData {
         return compressionBorder;
     }
 
-    public Class<Packet> getServerJoinReply() {
-        return serverJoinReply;
-    }
-
-    public Packet newServerJoinReply(Boolean you_can_join,
-                                     String message,
-                                     String challenge_file,
-                                     Integer conn_id,
-                                     Constructor<? extends PacketHeader> headerMaker,
-                                     Map<DeltaKey, Packet> old) {
-        return newServerJoinReply(you_can_join, message, getCapStringOptional(), challenge_file, conn_id, headerMaker, old);
-    }
-
-    public Packet newServerJoinReply(Boolean you_can_join,
-                                     String message,
-                                     String optionalCaps,
-                                     String challenge_file,
-                                     Integer conn_id,
-                                     Constructor<? extends PacketHeader> headerMaker,
-                                     Map<DeltaKey, Packet> old) {
-        try {
-            return (Packet) serverJoinReplyFromValues.invoke(null,
-                    you_can_join,
-                    message,
-                    getCapStringMandatory() + " " + optionalCaps,
-                    challenge_file,
-                    conn_id,
-                    headerMaker,
-                    old);
-        } catch (IllegalAccessException e) {
-            throw new BadProtocolData("Not allowed to construct", e);
-        } catch (InvocationTargetException e) {
-            throw new BadProtocolData("Problem while constructing construct", e);
-        }
-    }
-
     public Class<Packet> getPacket(int number) {
         return (Class<Packet>) protocolVariants.get(Collections.<String>emptySet()).get(number).getDeclaringClass();
     }

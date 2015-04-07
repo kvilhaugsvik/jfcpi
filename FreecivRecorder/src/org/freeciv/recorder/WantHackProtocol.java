@@ -43,7 +43,7 @@ public class WantHackProtocol extends SinkProcess {
         super(new FilterPacketKind(Arrays.asList(5, 160, 161)), versionKnowledge);
 
         try {
-            getChallenge_fileValue = versionKnowledge.getServerJoinReply().getMethod("getChallenge_fileValue");
+            getChallenge_fileValue = versionKnowledge.getPacket(5).getMethod("getChallenge_fileValue");
         } catch (NoSuchMethodException e) {
             throw new BadProtocolData("Not able to access challenge file name", e);
         }

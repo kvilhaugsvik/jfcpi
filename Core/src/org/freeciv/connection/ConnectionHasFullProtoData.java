@@ -138,4 +138,42 @@ public class ConnectionHasFullProtoData extends Connection {
                 variant.getVersionMinor(),
                 variant.getVersionPatch());
     }
+
+    /**
+     * Create a new instance of the server join request packet. The fields
+     * that only has one correct value for a given protocol version will
+     * get the correct value assigned to them automatically.
+     * @param you_can_join true iff the client may join.
+     * @param message welcome or rejection message to the client.
+     * @param optionalCaps optional Freeciv protocol capabilities to enable.
+     * @param challenge_file location of want hack challenge file.
+     * @param conn_id connection identity number.
+     * @param old the delta packet storage. This is where previously sent
+     *            packets of the same kind can be found.
+     * @return a new instance of SERVER_JOIN_REPLY
+     * @throws ClassNotFoundException if no packet with the given number
+     * exists.
+     * @throws NoSuchMethodException if the packet don't have the expected
+     * method. Can be caused by wrong arguments, by the wrong number of
+     * arguments or by the packet being created by an incompatible packet
+     * generator.
+     * @throws java.lang.reflect.InvocationTargetException if there is a
+     * problem while creating the packet.
+     * @throws IllegalAccessException if accessing this is forbidden by
+     * Java's access control.
+     */
+    public Packet newServerJoinReply(Boolean you_can_join,
+                                     String message,
+                                     String optionalCaps,
+                                     String challenge_file,
+                                     Integer conn_id,
+                                     Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+
+        return this.newPacketFromValues(5, old,
+                you_can_join,
+                message,
+                variant.getCapStringMandatory() + " " + optionalCaps,
+                challenge_file,
+                conn_id);
+    }
 }
