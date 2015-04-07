@@ -77,12 +77,12 @@ public class ProtocolVariantManually implements ProtocolVariant {
         for (int i = 0; i < args.length; i++) {
             allArgTypes[i] = args[i].getClass();
         }
-        allArgTypes[args.length] = java.lang.reflect.Constructor.class;
+        allArgTypes[args.length] = HeaderData.class;
         allArgTypes[args.length + 1] = java.util.Map.class;
 
         allArgs = new Object[args.length + 2];
         System.arraycopy(args, 0, allArgs, 0, args.length);
-        allArgs[args.length] = headerMaker.getFields2Header();
+        allArgs[args.length] = headerMaker;
         allArgs[args.length + 1] = old;
 
         /* TODO: Should probably store a more direct reference to fromValues constructors. */

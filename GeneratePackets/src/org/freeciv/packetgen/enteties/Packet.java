@@ -16,6 +16,7 @@ package org.freeciv.packetgen.enteties;
 
 import com.kvilhaugsvik.javaGenerator.expression.Reference;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Value;
+import org.freeciv.connection.HeaderData;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.NoDelta;
 import org.freeciv.packet.PacketHeader;
@@ -36,7 +37,6 @@ import org.freeciv.utility.EndsInEternalZero;
 import org.freeciv.utility.Validation;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.util.*;
 
 import static com.kvilhaugsvik.javaGenerator.util.BuiltIn.*;
@@ -319,14 +319,12 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 new Block(THROW(addExceptionLocation.<AValue>call(e.ref(), literal(field.getName())))));
     }
 
-    private Typed<NoValue> generateHeader(Value<? extends AValue> headerKind, TargetMethod addExceptionLocation, List<? extends Typed<? extends AValue>> fields, Var headerDst, TargetClass inner) {
-        return labelExceptionsWithPacketAndField(headerDst, new Block(headerDst.assign(BuiltIn.cast(
-                PacketHeader.class,
-                headerKind.callV("newInstance",
+    private Typed<NoValue> generateHeader(Value<? extends AValue> headerKind, List<? extends Typed<? extends AValue>> fields, Var headerDst, TargetClass inner) {
+        return headerDst.assign(
+                headerKind.callV("newHeader",
                         sum(inner.callV("calcBodyLen", fields.toArray(new Typed[fields.size()])),
-                                headerKind.callV("getDeclaringClass").callV("getField", literal("HEADER_SIZE"))
-                                        .callV("getInt", NULL)),
-                        getField("number").ref())))), addExceptionLocation);
+                                headerKind.callV("getHeaderSize")),
+                        getField("number").ref()));
     }
 
     private void addDeltaField(TargetMethod addExceptionLocation, int deltaFields, Block body, FieldType bv_delta_fields, Var deltaVar) {
@@ -375,7 +373,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             sizeArgs.addFirst(delta_tmp.ref());
         }
 
-        final Var<AValue> headerKind = Var.param(TargetClass.from(Constructor.class), "headerKind");
+        final Var<AValue> headerKind = Var.param(TargetClass.from(HeaderData.class), "headerKind");
         params.add(headerKind);
         body.addStatement(validation.call("validateNotNull", headerKind.ref(), literal(headerKind.getName())));
 
@@ -389,7 +387,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
         final Var<? extends AValue> header_tmp = Var.param(PacketHeader.class, "header" + "_tmp");
         body.addStatement(header_tmp);
-        body.addStatement(generateHeader(headerKind.ref(), addExceptionLocation, sizeArgs, header_tmp, impl));
+        body.addStatement(generateHeader(headerKind.ref(), sizeArgs, header_tmp, impl));
         localVars.addFirst(header_tmp.ref());
 
         body.addStatement(BuiltIn.RETURN(impl.newInstance(localVars.toArray(new Reference[localVars.size()]))));
