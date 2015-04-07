@@ -107,6 +107,26 @@ public class ProtocolVariantManually implements ProtocolVariant {
     }
 
     @Override
+    public String getVersionLabel() {
+        return protocolData.getVersionLabel();
+    }
+
+    @Override
+    public long getVersionMajor() {
+        return protocolData.getVersionMajor();
+    }
+
+    @Override
+    public long getVersionMinor() {
+        return protocolData.getVersionMinor();
+    }
+
+    @Override
+    public long getVersionPatch() {
+        return protocolData.getVersionPatch();
+    }
+
+    @Override
     public boolean isDelta() {
         return protocolData.isDelta();
     }

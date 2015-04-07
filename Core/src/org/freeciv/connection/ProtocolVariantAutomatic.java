@@ -149,6 +149,26 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
     }
 
     @Override
+    public String getVersionLabel() {
+        return variant.getVersionLabel();
+    }
+
+    @Override
+    public long getVersionMajor() {
+        return variant.getVersionMajor();
+    }
+
+    @Override
+    public long getVersionMinor() {
+        return variant.getVersionMinor();
+    }
+
+    @Override
+    public long getVersionPatch() {
+        return variant.getVersionPatch();
+    }
+
+    @Override
     public boolean isDelta() {
         return variant.isDelta();
     }

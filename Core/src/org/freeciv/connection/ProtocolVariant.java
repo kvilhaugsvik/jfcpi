@@ -112,6 +112,31 @@ public interface ProtocolVariant {
     String getCapStringMandatory();
 
     /**
+     * Get the Freeciv version label the protocol code and data was
+     * extracted from.
+     * @return the Freeciv version label.
+     */
+    String getVersionLabel();
+
+    /**
+     * Get the Freeciv major version number.
+     * @return the Freeciv major version number.
+     */
+    long getVersionMajor();
+
+    /**
+     * Get the Freeciv minor version number.
+     * @return the Freeciv minor version number.
+     */
+    long getVersionMinor();
+
+    /**
+     * Get the Freeciv patch version number.
+     * @return the Freeciv patch version number.
+     */
+    long getVersionPatch();
+
+    /**
      * Is this the delta protocol or the simpler variant?
      * @return true if the delta protocol is enabled
      */
