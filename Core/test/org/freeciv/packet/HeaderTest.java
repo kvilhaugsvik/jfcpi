@@ -19,8 +19,7 @@ import org.junit.Test;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class HeaderTest {
     @Test(expected = IllegalArgumentException.class)
@@ -85,6 +84,16 @@ public class HeaderTest {
         PacketHeader one = new Header_2_2(4, 5);
         PacketHeader two = new Header_2_2(5, 5);
         assertFalse(one.equals(two));
+    }
+
+    /**
+     * Test that a PacketHeader can be encoded as a byte array.
+     */
+    @Test public void toBytes_basic() {
+        PacketHeader one = new Header_2_2(4, 5);
+
+        assertArrayEquals("Wrong encoding to bytes",
+                new byte[]{0, 4, 0, 5}, one.toBytes());
     }
 
     public static class SoftHeader extends PacketHeader {

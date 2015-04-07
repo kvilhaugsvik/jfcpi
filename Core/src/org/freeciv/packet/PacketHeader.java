@@ -14,7 +14,11 @@
 
 package org.freeciv.packet;
 
+import org.freeciv.connection.BadProtocolData;
+
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 public abstract class PacketHeader {
@@ -98,4 +102,33 @@ public abstract class PacketHeader {
         return  this.getClass().getCanonicalName() +
                 "(" + "kind = " + getPacketKind() + ", size = " + getTotalSize() + ")";
     }
+
+    /**
+     * Serialize the header to the packet format that is sent over the
+     * network and return it as a byte array.
+     * @return a byte array containing the serialized header.
+     */
+    public byte[] toBytes() {
+        try {
+            /* Reuse the header's encodeTo() method. */
+
+            /* Create the stream that will create the byte array the
+             * serialized header will end up in. */
+            final ByteArrayOutputStream headerSerialized = new ByteArrayOutputStream(this.getHeaderSize());
+
+            /* Wrap the above stream in a DataOutputStream so the header can
+             * encode to it. */
+            final DataOutputStream out = new DataOutputStream(headerSerialized);
+
+            /* Write the encoded header. */
+
+            this.encodeTo(out);
+
+            /* Return the byte array that now have been written to inside the
+             * ByteArrayOutputStream. */
+            return headerSerialized.toByteArray();
+        } catch (IOException e) {
+            throw new BadProtocolData("Unable to encode header", e);
+        }
+    };
 }
