@@ -105,4 +105,37 @@ public class ConnectionHasFullProtoData extends Connection {
     public Packet newPong(final Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return this.newPacketFromValues(89, old);
     }
+
+    /**
+     * Create a new instance of the server join request packet. The fields
+     * that only has one correct value for a given protocol version will
+     * get the correct value assigned to them automatically.
+     * @param userName The username to sign in as.
+     * @param optionalCaps wanted optional capabilities. Separate each
+     *                     wanted capability by a space.
+     * @param old the delta packet storage. This is where previously sent
+     *            packets of the same kind can be found.
+     * @return a new instance of SERVER_JOIN_REQ
+     * @throws ClassNotFoundException if no packet with the given number
+     * exists.
+     * @throws NoSuchMethodException if the packet don't have the expected
+     * method. Can be caused by wrong arguments, by the wrong number of
+     * arguments or by the packet being created by an incompatible packet
+     * generator.
+     * @throws java.lang.reflect.InvocationTargetException if there is a
+     * problem while creating the packet.
+     * @throws IllegalAccessException if accessing this is forbidden by
+     * Java's access control.
+     */
+    public Packet newServerJoinRequest(final String userName,
+                                       final String optionalCaps,
+                                       final Map<DeltaKey, Packet> old) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return this.newPacketFromValues(4, old,
+                userName,
+                variant.getCapStringMandatory() + " " + optionalCaps,
+                variant.getVersionLabel(),
+                variant.getVersionMajor(),
+                variant.getVersionMinor(),
+                variant.getVersionPatch());
+    }
 }

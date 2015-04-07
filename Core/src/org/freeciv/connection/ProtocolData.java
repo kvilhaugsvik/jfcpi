@@ -247,37 +247,6 @@ public class ProtocolData implements BasicProtocolData {
         return compressionBorder;
     }
 
-    public Class<Packet> getServerJoinRequest() {
-        return serverJoinRequest;
-    }
-
-    public Packet newServerJoinRequest(String userName,
-                                       Constructor<? extends PacketHeader> headerMaker,
-                                       Map<DeltaKey, Packet> old) {
-        return newServerJoinRequest(userName, getCapStringOptional(), headerMaker, old);
-    }
-
-    public Packet newServerJoinRequest(String userName,
-                                       String optionalCaps,
-                                       Constructor<? extends PacketHeader> headerMaker,
-                                       Map<DeltaKey, Packet> old) {
-        try {
-            return (Packet) serverJoinRequestFromValues.invoke(null,
-                    userName,
-                    getCapStringMandatory() + " " + optionalCaps,
-                    getVersionLabel(),
-                    getVersionMajor(),
-                    getVersionMinor(),
-                    getVersionPatch(),
-                    headerMaker,
-                    old);
-        } catch (IllegalAccessException e) {
-            throw new BadProtocolData("Not allowed to construct", e);
-        } catch (InvocationTargetException e) {
-            throw new BadProtocolData("Problem while constructing construct", e);
-        }
-    }
-
     public Class<Packet> getServerJoinReply() {
         return serverJoinReply;
     }
