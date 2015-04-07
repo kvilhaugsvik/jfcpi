@@ -22,6 +22,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * Keep track of and make use of the current packet header kind.
+ *
+ * Some versions of Freeciv change header kind after some packets have been
+ * exchanged. HeaderData can perform various header operations using the
+ * correct header kind.
+ */
 public class HeaderData implements PacketChangeHeader {
     private final ReentrantReadWriteLock lock;
 
@@ -29,11 +36,20 @@ public class HeaderData implements PacketChangeHeader {
     private Constructor<? extends PacketHeader> constructFromPNumAndSize;
     private int headerSize;
 
+    /**
+     * Instantiate a HeaderData that will start with the given header kind.
+     * @param packetHeaderClass the kind of header to start with.
+     */
     public HeaderData(final Class<? extends PacketHeader> packetHeaderClass) {
         this.lock = new ReentrantReadWriteLock();
         setHeaderTypeTo(packetHeaderClass);
     }
 
+    /**
+     * Read a packet header from the specified stream.
+     * @param stream the stream to read the packet header from.
+     * @return the packet header in the stream.
+     */
     public PacketHeader newHeaderFromStream(DataInput stream) {
         try {
             return getStream2Header().newInstance(stream);
@@ -94,6 +110,10 @@ public class HeaderData implements PacketChangeHeader {
         }
     }
 
+    /**
+     * Get the size of the current header kind in bytes.
+     * @return the size of the current header kind.
+     */
     public int getHeaderSize() {
         this.lock.readLock().lock();
         try {
@@ -103,6 +123,12 @@ public class HeaderData implements PacketChangeHeader {
         }
     }
 
+    /**
+     * Check if the given packet has the current header kind.
+     * @param packet the packet who will have the type of its header
+     *               checked.
+     * @return true iff the given packet has the current header kind.
+     */
     public boolean sameType(Packet packet) {
         this.lock.readLock().lock();
         try {
