@@ -15,9 +15,9 @@
 package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
-import org.freeciv.packet.PacketHeader;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Serialize and deserialize packets to raw packet data.
@@ -43,4 +43,27 @@ public interface ToPacket {
      *                                forbids.
      */
     byte[] encode(final Packet packet, final HeaderData headerData) throws IOException, IllegalAccessException;
+
+    /**
+     * Creates a new instance of the specified Freeciv packet for the
+     * current Freeciv protocol variant. The value of each field of the
+     * packet body must be specified.
+     * @param number the packet number of the Freeciv packet.
+     * @param headerMaker current packet header kind creation helper.
+     * @param args the fields of the body of the packet.
+     * @return a new instance of the specified packet.
+     * @throws ClassNotFoundException if no packet with the given number
+     * exists.
+     * @throws NoSuchMethodException if the packet don't have the expected
+     * method. Can be caused by wrong arguments, by the wrong number of
+     * arguments or by the packet being created by an incompatible packet
+     * generator.
+     * @throws java.lang.reflect.InvocationTargetException if there is a
+     * problem while creating the packet.
+     * @throws IllegalAccessException if accessing this is forbidden by
+     * Java's access control.
+     */
+    Packet newPacketFromValues(final int number,
+                               final HeaderData headerMaker,
+                               final Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException;
 }

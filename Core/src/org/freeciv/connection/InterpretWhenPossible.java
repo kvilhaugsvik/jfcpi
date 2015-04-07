@@ -17,6 +17,7 @@ package org.freeciv.connection;
 import org.freeciv.packet.*;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -86,6 +87,11 @@ public class InterpretWhenPossible implements ToPacket {
         }
 
         return out;
+    }
+
+    @Override
+    public Packet newPacketFromValues(int number, HeaderData headerMaker, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        return map.newPacketFromValues(number, headerMaker, sentBefore, args);
     }
 
     /**

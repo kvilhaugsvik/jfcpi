@@ -15,9 +15,11 @@
 package org.freeciv.connection;
 
 import org.freeciv.packet.Packet;
+import org.freeciv.packet.PacketHeader;
 import org.freeciv.packet.RawPacket;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 public class AlwaysRaw implements ToPacket {
     @Override
@@ -28,5 +30,20 @@ public class AlwaysRaw implements ToPacket {
     @Override
     public byte[] encode(Packet packet, final HeaderData headerData) throws IOException, IllegalAccessException {
         return packet.toBytes();
+    }
+
+    @Override
+    public Packet newPacketFromValues(int number, HeaderData headerMaker, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        /* Support ping and pong by allowing body less packets. */
+
+        if (args.length != 0) {
+            /* Only body less packets are supported. We are after all always raw. */
+            throw new UnsupportedOperationException("Packets with bodies not supported");
+        }
+
+        /* Create a fitting header. */
+        PacketHeader header = headerMaker.newHeader(headerMaker.getHeaderSize(), number);
+
+        return new RawPacket(header);
     }
 }
