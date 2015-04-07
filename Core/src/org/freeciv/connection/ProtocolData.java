@@ -197,6 +197,10 @@ public class ProtocolData implements BasicProtocolData {
         return capStringOptional;
     }
 
+    /**
+     * Get the set of supported Freeciv protocol capabilities.
+     * @return all supported capabilities.
+     */
     public Set<String> getAllSettableCaps() {
         return Collections.unmodifiableSet(capsOptional);
     }

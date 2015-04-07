@@ -22,6 +22,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handle optional Freeciv protocol capabilities.
@@ -83,6 +84,15 @@ public interface ProtocolVariant {
                                                          NoSuchMethodException,
                                                          InvocationTargetException,
                                                          IllegalAccessException;
+
+    /**
+     * Get the set of Freeciv protocol variant capabilities that should
+     * be safe to enable. Capabilities that aren't on this list should be
+     * disabled. Remember that a capability may be disabled for a
+     * connection even if it is supported.
+     * @return the supported capabilities.
+     */
+    Set<String> getAllSettableCapabilities();
 
     /**
      * Check if the specified Freeciv protocol variant capability is

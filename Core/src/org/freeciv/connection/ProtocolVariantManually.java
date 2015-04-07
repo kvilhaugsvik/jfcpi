@@ -114,6 +114,11 @@ public class ProtocolVariantManually implements ProtocolVariant {
         return protocolData.isBoolFold();
     }
 
+    @Override
+    public Set<String> getAllSettableCapabilities() {
+        return protocolData.getAllSettableCaps();
+    }
+
     /**
      * Disable the specified capability.
      * @param cap the capability to disable.

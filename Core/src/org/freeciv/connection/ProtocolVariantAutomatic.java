@@ -154,6 +154,11 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
     }
 
     @Override
+    public Set<String> getAllSettableCapabilities() {
+        return variant.getAllSettableCapabilities();
+    }
+
+    @Override
     public Packet interpret(PacketHeader header, DataInputStream in, Map<DeltaKey, Packet> old) throws IOException, IllegalAccessException {
         final Packet interpret = variant.interpret(header, in, old);
 
