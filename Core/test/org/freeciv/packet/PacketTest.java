@@ -38,6 +38,35 @@ public class PacketTest {
         assertEquals(4, packet.getHeader().getPacketKind());
     }
 
+    /**
+     * Test that it is possible to create a RawPacket from a header.
+     * @throws IOException when toBytes(), not the thing tested here, had a problem.
+     */
+    @Test public void test_RawPacket_fromHeader_basic() throws IOException {
+        /* The header to create the RawPacket from. */
+        PacketHeader header = new Header_2_2(4, 88);
+
+        /* Do the packet creation. */
+        RawPacket packet = new RawPacket(header);
+
+        /* Check that the encoded result is as expected. */
+        assertArrayEquals(new byte[]{0, 4, 0, 88}, packet.toBytes());
+    }
+
+    /**
+     * Test that RawPacket from header fails when the packet's size
+     * indicates that it should have had a body.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void test_RawPacket_fromHeader_hasBody(){
+        /* The header to create the RawPacket from header alone fails if a
+         * body is expected. */
+        PacketHeader header = new Header_2_2(5, 42);
+
+        /* Try to create the packet. Should fail. */
+        RawPacket packet = new RawPacket(header);
+    }
+
     @Test public void testRawPacketSerializesCorrectly() throws IOException, InvocationTargetException {
         final byte[] data = {0, 64, 4, 70, 114, 101, 101, 99, 105, 118, 74, 97, 118, 97, 0, 43, 70, 114, 101, 101, 99,
                 105, 118, 46, 68, 101, 118, 101, 108, 45, 50, 46, 52, 45, 50, 48, 49, 49, 46, 65, 117, 103, 46,

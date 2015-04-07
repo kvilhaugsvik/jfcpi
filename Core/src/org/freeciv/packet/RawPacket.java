@@ -40,6 +40,20 @@ public class RawPacket implements Packet {
         this.content = Arrays.copyOf(packet, header.getTotalSize());
     }
 
+    /**
+     * Create a new RawPacket that only contains a header.
+     * Some packet types don't have a body. Create one of those.
+     * @param header the header.
+     */
+    public RawPacket(PacketHeader header) {
+        if (header.getBodySize() != 0) {
+            throw new UnsupportedOperationException("Asked to create packet with body from header alone.");
+        }
+
+        this.header = header;
+        this.content = header.toBytes();
+    }
+
     private byte[] getBodyBytes(byte[] packet, PacketHeader header) {
         return Arrays.copyOfRange(packet, header.getHeaderSize(), header.getTotalSize());
     }
