@@ -90,7 +90,7 @@ public class SignInAndWait {
                     ReflexPacketKind.layer(interpreter.getRequiredPostReceiveRules(), reflexes),
                     interpreter.getRequiredPostSendRules(), interpreter, Logger.GLOBAL_LOGGER_NAME);
 
-            con.send(interpreter.newServerJoinRequest(userName, con.getFields2Header(), sentBefore));
+            con.send(interpreter.newServerJoinRequest(userName, interpreter.getCapStringOptional(), con.getFields2Header(), sentBefore));
 
             while(con.isOpen() || con.packetReady()) {
                 if (start && start_time < System.currentTimeMillis()) {
