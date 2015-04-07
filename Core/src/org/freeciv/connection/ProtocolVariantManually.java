@@ -17,7 +17,6 @@ package org.freeciv.connection;
 import org.freeciv.packet.DeltaKey;
 import org.freeciv.packet.Packet;
 import org.freeciv.packet.PacketHeader;
-import org.freeciv.packet.PacketInterpretedDelta;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -36,14 +35,12 @@ public class ProtocolVariantManually implements ProtocolVariant {
     private final ProtocolData protocolData;
     private final Map<Set<String>, Map<Integer, Method>> protocolVariants;
     private final Set<String> enabledCapabilities;
-    private final Set<String> possibleCapabilities;
 
     private Map<Integer, Method> packetMakers;
 
-    ProtocolVariantManually(ProtocolData protocolData, Map<Set<String>, Map<Integer, Method>> protocolVariants, Set<String> possibleCapabilities) {
+    ProtocolVariantManually(ProtocolData protocolData, Map<Set<String>, Map<Integer, Method>> protocolVariants) {
         this.protocolData = protocolData;
         this.protocolVariants = protocolVariants;
-        this.possibleCapabilities = possibleCapabilities;
         this.enabledCapabilities = new HashSet<String>();
 
         updateVariant();
@@ -139,7 +136,7 @@ public class ProtocolVariantManually implements ProtocolVariant {
     }
 
     private void validateCapability(String cap) {
-        if (!this.possibleCapabilities.contains(cap))
+        if (!this.getAllSettableCapabilities().contains(cap))
             throw new IllegalArgumentException("Capability \"" + cap + "\" not supported.");
     }
 
