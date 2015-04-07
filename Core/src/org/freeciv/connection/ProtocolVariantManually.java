@@ -21,7 +21,6 @@ import org.freeciv.packet.PacketInterpretedDelta;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -71,7 +70,7 @@ public class ProtocolVariantManually implements ProtocolVariant {
     }
 
     @Override
-    public Packet newPacketFromValues(int number, Constructor<? extends PacketHeader> headerMaker, Map<DeltaKey, Packet> old, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public Packet newPacketFromValues(int number, HeaderData headerMaker, Map<DeltaKey, Packet> old, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final Object[] allArgs;
         final Class[] allArgTypes;
         final Class<?> packetClass;
@@ -86,7 +85,7 @@ public class ProtocolVariantManually implements ProtocolVariant {
 
         allArgs = new Object[args.length + 2];
         System.arraycopy(args, 0, allArgs, 0, args.length);
-        allArgs[args.length] = headerMaker;
+        allArgs[args.length] = headerMaker.getFields2Header();
         allArgs[args.length + 1] = old;
 
         /* TODO: Should probably store a more direct reference to fromValues constructors. */

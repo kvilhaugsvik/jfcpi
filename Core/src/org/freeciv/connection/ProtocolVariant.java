@@ -20,7 +20,6 @@ import org.freeciv.packet.PacketHeader;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public interface ProtocolVariant {
      * current Freeciv protocol variant. The value of each field of the
      * packet body must be specified.
      * @param number the packet number of the Freeciv packet.
-     * @param headerMaker constructor for the current packet header kind.
+     * @param headerMaker current packet header kind creation helper.
      * @param old the delta packet storage. This is where the previously
      *            sent packet of the same kind can be found. The delta
      *            protocol will use the old packet's fields to find out
@@ -78,7 +77,7 @@ public interface ProtocolVariant {
      * Java's access control.
      */
     Packet newPacketFromValues(final int number,
-                               final Constructor<? extends PacketHeader> headerMaker,
+                               final HeaderData headerMaker,
                                final Map<DeltaKey, Packet> old,
                                final Object... args) throws ClassNotFoundException,
                                                          NoSuchMethodException,

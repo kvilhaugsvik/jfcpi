@@ -87,7 +87,7 @@ public class ProtoData {
         final HashMap<DeltaKey, Packet> old = new HashMap<DeltaKey, Packet>();
 
         /* Creation */
-        final Packet packet = map.newPacketFromValues(88, protoData.getNewPacketHeaderData().getFields2Header(), old);
+        final Packet packet = map.newPacketFromValues(88, protoData.getNewPacketHeaderData(), old);
 
         /* Check the result */
         assertTrue("Wrong packet kind", CONN_PING.class.isInstance(packet));
@@ -104,7 +104,7 @@ public class ProtoData {
         final HashMap<DeltaKey, Packet> old = new HashMap<DeltaKey, Packet>();
 
         /* Creation */
-        final Packet packet = map.newPacketFromValues(1002, protoData.getNewPacketHeaderData().getFields2Header(), old, 42);
+        final Packet packet = map.newPacketFromValues(1002, protoData.getNewPacketHeaderData(), old, 42);
 
         /* Check the result */
         assertTrue("Wrong packet kind", PACKET_ONE_FIELD.class.isInstance(packet));

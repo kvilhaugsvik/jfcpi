@@ -20,7 +20,6 @@ import org.freeciv.packet.PacketHeader;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Map;
@@ -165,7 +164,7 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
     }
 
     @Override
-    public Packet newPacketFromValues(int number, Constructor<? extends PacketHeader> headerMaker, Map<DeltaKey, Packet> old, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public Packet newPacketFromValues(int number, HeaderData headerMaker, Map<DeltaKey, Packet> old, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         return variant.newPacketFromValues(number, headerMaker, old, args);
     }
 }

@@ -61,7 +61,7 @@ public class ConnectionHasFullProtoData extends Connection {
             NoSuchMethodException,
             InvocationTargetException,
             IllegalAccessException {
-        return variant.newPacketFromValues(number, this.getFields2Header(), old, args);
+        return variant.newPacketFromValues(number, this.currentHeader, old, args);
     }
 
     /**

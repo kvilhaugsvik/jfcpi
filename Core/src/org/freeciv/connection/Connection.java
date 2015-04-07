@@ -27,7 +27,7 @@ public class Connection implements FreecivConnection {
 
     private final OverImpl overImpl;
     private final ReflexPacketKind postSend;
-    private final HeaderData currentHeader;
+    protected final HeaderData currentHeader;
     private final ToPacket deserializer;
 
     private final String loggerName;
