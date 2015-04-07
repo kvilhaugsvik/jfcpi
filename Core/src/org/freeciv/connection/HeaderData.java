@@ -37,12 +37,8 @@ public class HeaderData implements PacketChangeHeader {
     public PacketHeader newHeaderFromStream(DataInput stream) {
         try {
             return getStream2Header().newInstance(stream);
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new BadProtocolData("Header from stream issue", e);
-        } catch (IllegalAccessException e) {
-            throw new BadProtocolData("Header from stream issue", e);
-        } catch (InvocationTargetException e) {
-            throw new IllegalArgumentException("Exception thrown while reading header", e);
         }
     }
 
