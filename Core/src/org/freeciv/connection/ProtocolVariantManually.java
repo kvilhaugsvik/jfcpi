@@ -101,7 +101,6 @@ public class ProtocolVariantManually implements ProtocolVariant {
 
     @Override
     public boolean isCapabilityEnabled(String cap) {
-        validateCapability(cap);
         return this.enabledCapabilities.contains(cap);
     }
 
@@ -120,7 +119,6 @@ public class ProtocolVariantManually implements ProtocolVariant {
      * @param cap the capability to disable.
      */
     public void disableCapability(String cap) {
-        validateCapability(cap);
         this.enabledCapabilities.remove(cap);
         updateVariant();
     }

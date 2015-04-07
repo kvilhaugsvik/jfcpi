@@ -69,11 +69,37 @@ public class ProtoData {
         assertFalse(map.isCapabilityEnabled("isAdded"));
     }
 
+    /**
+     * A capability could have been added to Freeciv after the protocol was
+     * generated. Enabling it shouldn't be legal.
+     */
     @Test(expected = IllegalArgumentException.class)
-    public void cap_unsupportedByData() {
-        ProtocolVariant map = new ProtocolData().getNewPacketMapper();
+    public void cap_unsupportedByData_enable() {
+        ProtocolVariantManually map = new ProtocolData().getNewPacketMapper();
 
-        assertFalse(map.isCapabilityEnabled("longNameToMakeSureItIsNotAdded"));
+        map.enableCapability("thingInANewVersionNotSupported");
+    }
+
+    /**
+     * A capability could have been added to Freeciv after the protocol was
+     * generated. Enabling it shouldn't be legal. Disabling on the other
+     * hand should be allowed.
+     */
+    @Test public void cap_canDisable_unsupported() {
+        ProtocolVariantManually map = new ProtocolData().getNewPacketMapper();
+
+        map.disableCapability("thingInANewVersionNotSupported");
+    }
+
+    /**
+     * A capability could have been added to Freeciv after the protocol was
+     * generated. Enabling it shouldn't be legal. Querying if it is enabled
+     * or not should be allwed.
+     */
+    @Test public void cap_canQuery_unsupported() {
+        ProtocolVariantManually map = new ProtocolData().getNewPacketMapper();
+
+        assertFalse(map.isCapabilityEnabled("thingInANewVersionNotSupported"));
     }
 
     /* Check that it is possible to instantiate a packet of the current
