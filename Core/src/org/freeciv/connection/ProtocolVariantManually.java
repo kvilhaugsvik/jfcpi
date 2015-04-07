@@ -102,6 +102,11 @@ public class ProtocolVariantManually implements ProtocolVariant {
     }
 
     @Override
+    public String getCapStringMandatory() {
+        return protocolData.getCapStringMandatory();
+    }
+
+    @Override
     public boolean isDelta() {
         return protocolData.isDelta();
     }

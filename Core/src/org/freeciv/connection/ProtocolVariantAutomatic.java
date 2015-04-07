@@ -144,6 +144,11 @@ public class ProtocolVariantAutomatic implements ProtocolVariant {
     }
 
     @Override
+    public String getCapStringMandatory() {
+        return variant.getCapStringMandatory();
+    }
+
+    @Override
     public boolean isDelta() {
         return variant.isDelta();
     }

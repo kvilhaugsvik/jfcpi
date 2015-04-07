@@ -104,6 +104,14 @@ public interface ProtocolVariant {
     boolean isCapabilityEnabled(String cap);
 
     /**
+     * Get the main Freeciv protocol capability string. This is the version
+     * of the Freeciv protocol. It may have optional capabilities. Optional
+     * capabilities creates variants of a version of the Freeciv protocol.
+     * @return the Freeciv protocol capability string.
+     */
+    String getCapStringMandatory();
+
+    /**
      * Is this the delta protocol or the simpler variant?
      * @return true if the delta protocol is enabled
      */
