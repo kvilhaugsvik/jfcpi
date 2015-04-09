@@ -126,6 +126,6 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
 
         /* The newly created field type array must be renamed since naming it during creation currently is
          * impossible. (A newly created field type is expected to be named like a basic field type) */
-        return TerminatedArray.fieldArray("n", "a", isDiffArray ? diffElem : madeOf, stopElem, isDiffArray).createFieldType(toProduce.getName());
+        return TerminatedArray.fieldArray("n", "a", madeOf, stopElem, diffElem, isDiffArray).createFieldType(toProduce.getName());
     }
 }
