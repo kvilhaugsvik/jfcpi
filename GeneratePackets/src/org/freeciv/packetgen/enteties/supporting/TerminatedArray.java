@@ -413,8 +413,7 @@ public class TerminatedArray extends FieldType {
                             FOR(ecount, isSmallerThan(ecount.ref(), helperParamValue.ref().callV("length")), inc(ecount),
                                     new Block(
                                             IF(
-                                                    elem.<ABool>callV("equals", oldElem),
-                                                    new Block(),
+                                                    BuiltIn.isNot(elem.<ABool>callV("equals", oldElem)),
                                                     new Block(inc(outVar, diffElem.getAddress().newInstance(diffElem.getUnderType().newInstance(ecount.ref(), elem), helperParamLimits.ref()).callV("encodedLength", NULL)))))),
                             RETURN(outVar.ref())));
         } else {
