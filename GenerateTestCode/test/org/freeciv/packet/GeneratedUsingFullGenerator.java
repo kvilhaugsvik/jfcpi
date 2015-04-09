@@ -720,7 +720,29 @@ public class GeneratedUsingFullGenerator {
         assertEquals("Wrong kind", 1021, p.getHeader().getPacketKind());
         assertEquals("Wrong size", 4 + 1 + 5, p.getHeader().getTotalSize());
 
-        /* TODO: Check body. (Wait for proper diff array support) */
+        /* Check body with diff array. This is what is tested here. */
+        /* FIXME: Access diff array elements like normal array elements. */
+
+        /* Array element 0 is taken from the previous packet. There is no
+         * previous packet, It should therefore have the default zero
+         * value. */
+        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[0].getNewValue().byteValue());
+
+        /* Array element 1 is updated. It should be 1. */
+        assertEquals("Value of byte taken from old wrong", 1, p.getDiffArrayValue()[1].getNewValue().byteValue());
+
+        /* Array element 2 is taken from the previous packet. There is no
+         * previous packet, It should therefore have the default zero
+         * value. */
+        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[2].getNewValue().byteValue());
+
+        /* Array element 3 is updated. It should be 1. */
+        assertEquals("Value of byte taken from old wrong", 5, p.getDiffArrayValue()[3].getNewValue().byteValue());
+
+        /* Array element 4 is taken from the previous packet. There is no
+         * previous packet, It should therefore have the default zero
+         * value. */
+        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[4].getNewValue().byteValue());
     }
 
     /*------------------------------------------------------------------------------------------------------------------
