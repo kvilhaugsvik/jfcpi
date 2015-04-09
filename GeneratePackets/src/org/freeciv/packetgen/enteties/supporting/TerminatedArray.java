@@ -171,8 +171,14 @@ public class TerminatedArray extends FieldType {
                 if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     out.addStatement(to.ref().<Returnable>call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
                 if (null == convertAllElementsToByteArray) {
-                    Var element = Var.param(((TargetArray) javaType).getOf(), "element");
-                    out.addStatement(FOR(element, val.ref(), new Block(writeElementTo.x(to, element))));
+                    final Var<AnInt> count = Var.<AnInt>local(int.class, "i", literal(0));
+                    final Var element = Var.local(((TargetArray) javaType).getOf(), "element", val.ref().callV("get", count.ref()));
+
+                    final Block body = new Block();
+                    body.addStatement(element);
+                    body.addStatement(writeElementTo.x(to, element));
+
+                    out.addStatement(FOR(count, isSmallerThan(count.ref(), val.ref().callV("length")), inc(count), body));
                 } else {
                     out.addStatement(to.ref().<Returnable>call("write", convertAllElementsToByteArray.x(val)));
                 }
