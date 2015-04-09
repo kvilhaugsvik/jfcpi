@@ -39,10 +39,6 @@ public class ProtocolData implements BasicProtocolData {
     private final long versionPatch;
     private final int compressionBorder;
     private final int jumboSize;
-    private final Class<Packet> serverJoinRequest;
-    private final Method serverJoinRequestFromValues;
-    private final Class<Packet> serverJoinReply;
-    private final Method serverJoinReplyFromValues;
 
     public ProtocolData() {
         try {
@@ -110,15 +106,11 @@ public class ProtocolData implements BasicProtocolData {
 
             this.protocolVariants = globalVariants;
 
+            /* Used in ConnectionHasFullProtoData */
             validatePacketWasFound(serverJoinRequest, "server join request");
-            this.serverJoinRequest = serverJoinRequest;
-            this.serverJoinRequestFromValues = extractFromValues(serverJoinRequest, "server join request",
-                    String.class, String.class, String.class, Long.class, Long.class, Long.class);
 
+            /* Used in ConnectionHasFullProtoData */
             validatePacketWasFound(serverJoinReply, "server join reply");
-            this.serverJoinReply = serverJoinReply;
-            this.serverJoinReplyFromValues = extractFromValues(serverJoinReply, "server join reply",
-                    Boolean.class, String.class, String.class, String.class, Integer.class);
 
             /* Ping is used in Connection's newPing() */
             validatePacketWasFound(ping, "ping");
