@@ -387,17 +387,7 @@ public class TerminatedArray extends FieldType {
 
     public static TerminatedArray fieldArray(final String dataIOType, final String publicType,
                                              final FieldType kind, final Constant<?> stopElem,
-                                             final FieldType diffElem, boolean isDiffArray) {
-        if (isDiffArray) {
-            return fieldArray(dataIOType, publicType, diffElem, stopElem, isDiffArray);
-        } else {
-            return fieldArray(dataIOType, publicType, kind, stopElem, isDiffArray);
-        }
-    }
-
-    private static TerminatedArray fieldArray(final String dataIOType, final String publicType,
-                                              final FieldType kind, final Constant<?> stopElem,
-                                              boolean isDiffArray) {
+                                             final FieldType diffElem, final boolean isDiffArray) {
         final TargetArray type = TargetArray.from(kind.getUnderType(), 1);
         final boolean arrayEater = kind.isArrayEater();
 
@@ -425,7 +415,7 @@ public class TerminatedArray extends FieldType {
                                             IF(
                                                     elem.<ABool>callV("equals", oldElem),
                                                     new Block(),
-                                                    new Block(inc(outVar, kind.getAddress().newInstance(elem, helperParamLimits.ref()).callV("encodedLength", NULL)))))),
+                                                    new Block(inc(outVar, diffElem.getAddress().newInstance(diffElem.getUnderType().newInstance(ecount.ref(), elem), helperParamLimits.ref()).callV("encodedLength", NULL)))))),
                             RETURN(outVar.ref())));
         } else {
             final Var<AValue> elem = Var.<AValue>param(kind.getUnderType(), "elem");
@@ -451,8 +441,7 @@ public class TerminatedArray extends FieldType {
                             out,
                             FOR(count, isSmallerThan(count.ref(), out.ref().callV("length")), inc(count), new Block(
                                     BuiltIn.arraySetElement(out, count.ref(),
-                                            kind.getUnderType().newInstance(count.ref(),
-                                                    kind.getAddress().callV("getValueZero", literal(0)).callV("getNewValue")))
+                                            kind.getAddress().callV("getValueZero", literal(0)))
                             )),
                             RETURN(out.ref()));
                 }
@@ -463,11 +452,11 @@ public class TerminatedArray extends FieldType {
 
         Var<AValue> pSize = Var.param(int.class, "size");
         Var<AValue> pOld = Var.param(TargetClass.SELF_TYPED, "old");
-        Var<AValue> pBuf = Var.param(TargetArray.from(kind.getAddress(), 1), "buf");
         Var<AnInt> count = Var.<AnInt>local(int.class, "i", literal(0));
 
         final Method.Helper buffer2value;
         if (isDiffArray) {
+            Var<AValue> pBuf = Var.param(TargetArray.from(diffElem.getAddress(), 1), "buf");
             Var<AValue> oldVal = Var.local(Modifiable.NO, type, "oldVal", pOld.ref().callV("getValue"));
             Var<AValue> oVal = Var.local(type, "out", type.newInstance(pSize.ref()));
             Var<AnInt> bufPos = Var.<AnInt>local(int.class, "bufPos", literal(0));
@@ -481,7 +470,7 @@ public class TerminatedArray extends FieldType {
                             FOR(count, isSmallerThan(count.ref(), oVal.ref().callV("length")), inc(count), new Block(
                                     IF(and(isSmallerThan(bufPos.ref(), pBuf.ref().callV("length")), isSame(pBuf.ref().callV("get", bufPos.ref()).callV("getValue").callV("getIndex").callV("intValue"), count.ref())),
                                             new Block(
-                                                    arraySetElement(oVal, count.ref(), pBuf.ref().callV("get", bufPos.ref()).callV("getValue")),
+                                                    arraySetElement(oVal, count.ref(), pBuf.ref().callV("get", bufPos.ref()).callV("getValue").callV("getNewValue")),
                                                     inc(bufPos)
                                             ),
                                             new Block(arraySetElement(oVal, count.ref(), oldVal.ref().callV("get", count.ref()))))
@@ -489,6 +478,7 @@ public class TerminatedArray extends FieldType {
                             RETURN(oVal.ref())
                     ));
         } else {
+            Var<AValue> pBuf = Var.param(TargetArray.from(kind.getAddress(), 1), "buf");
             Var<AValue> oVal = Var.local(type, "out", type.newInstance(pBuf.ref().<AnInt>callV("length")));
 
             buffer2value = Method.newHelper(Comment.no(), type, "buffer2value",
@@ -505,7 +495,7 @@ public class TerminatedArray extends FieldType {
         return new TerminatedArray(dataIOType, publicType, new SimpleJavaType(type, literal(0)), stopElem,
                 MaxArraySize.CONSTRUCTOR_PARAM,
                 TransferArraySize.CONSTRUCTOR_PARAM,
-                TargetArray.from(kind.getAddress(), 1),
+                isDiffArray ? TargetArray.from(diffElem.getAddress(), 1) : TargetArray.from(kind.getAddress(), 1),
                 arrayLen,
                 null,
                 new From2<Typed<AValue>, Typed<AValue>, Var>() {
@@ -517,10 +507,21 @@ public class TerminatedArray extends FieldType {
                 new From2<Typed<Returnable>, Var, Var>() {
                     @Override
                     public Typed<Returnable> x(Var to, Var elem) {
-                        final Typed<AValue> from = "int".equals(elem.getTType().getSimpleName()) ?
-                                kind.getUnderType().newInstance(elem.ref(), NULL) :
-                                elem.ref();
-                        return kind.getAddress()
+                        /* FIXME: Get count as an argument. */
+                        final Var<AnInt> count = Var.<AnInt>local(int.class, "i", literal(0));
+
+                        final Typed<AValue> from;
+                        if ("int".equals(elem.getTType().getSimpleName())) {
+                            /* This is the diff array stop element. */
+                            from = diffElem.getUnderType().newInstance(elem.ref(), NULL);
+                        } else if (isDiffArray) {
+                            /* This is a regular diff field array element */
+                            from = diffElem.getUnderType().newInstance(count.ref(), elem.ref());
+                        } else {
+                            /* This is an element in a normal (non diff) array. */
+                            from = elem.ref();
+                        }
+                        return (isDiffArray ? diffElem : kind).getAddress()
                                 .newInstance(from, fMaxSize.ref().<Returnable>call("next"))
                                 .call("encodeTo", to.ref());
                     }
@@ -528,11 +529,11 @@ public class TerminatedArray extends FieldType {
                 new From2<Typed<? extends AValue>, Var, Var>() {
                     @Override
                     public Typed<? extends AValue> x(Var from, Var old) {
-                        return kind.getAddress().newInstance(from.ref(), getNext(arrayEater), NULL);
+                        return (isDiffArray ? diffElem : kind).getAddress().newInstance(from.ref(), getNext(arrayEater), NULL);
                     }
                 },
                 TO_STRING_ARRAY,
-                Arrays.asList(kind.getIFulfillReq()),
+                isDiffArray ? Arrays.asList(diffElem.getIFulfillReq()) : Arrays.asList(kind.getIFulfillReq()),
                 null,
                 null,
                 new From1<Typed<AnInt>, Var>() {
@@ -545,7 +546,7 @@ public class TerminatedArray extends FieldType {
                 sameNumberOfBufferElementsAndValueElements,
                 Arrays.<Method.Helper>asList(lenInBytesHelper, buffer2value),
                 arrayEater,
-                TargetArray.from(kind.getAddress(), 1).getOf().getSimpleName().endsWith("_DIFF"),
+                TargetArray.from((isDiffArray ? diffElem : kind).getAddress(), 1).getOf().getSimpleName().endsWith("_DIFF"),
                 Collections.<Var<? extends AValue>>emptyList(),
                 valueZeroBody
         );

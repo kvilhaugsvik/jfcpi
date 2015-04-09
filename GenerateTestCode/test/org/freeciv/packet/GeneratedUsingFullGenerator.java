@@ -743,23 +743,23 @@ public class GeneratedUsingFullGenerator {
         /* Array element 0 is taken from the previous packet. There is no
          * previous packet, It should therefore have the default zero
          * value. */
-        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[0].getNewValue().byteValue());
+        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[0].byteValue());
 
         /* Array element 1 is updated. It should be 1. */
-        assertEquals("Value of byte taken from old wrong", 1, p.getDiffArrayValue()[1].getNewValue().byteValue());
+        assertEquals("Value of byte taken from old wrong", 1, p.getDiffArrayValue()[1].byteValue());
 
         /* Array element 2 is taken from the previous packet. There is no
          * previous packet, It should therefore have the default zero
          * value. */
-        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[2].getNewValue().byteValue());
+        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[2].byteValue());
 
         /* Array element 3 is updated. It should be 1. */
-        assertEquals("Value of byte taken from old wrong", 5, p.getDiffArrayValue()[3].getNewValue().byteValue());
+        assertEquals("Value of byte taken from old wrong", 5, p.getDiffArrayValue()[3].byteValue());
 
         /* Array element 4 is taken from the previous packet. There is no
          * previous packet, It should therefore have the default zero
          * value. */
-        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[4].getNewValue().byteValue());
+        assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[4].byteValue());
     }
 
     /*------------------------------------------------------------------------------------------------------------------
