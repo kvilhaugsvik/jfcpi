@@ -57,7 +57,7 @@ public class PlayToServer {
 
         final HashMap<Integer, ReflexReaction> reflexes = createStandardReflexes();
 
-        final FreecivConnection conn = Connection.uninterpretedWhenPossible(server.getInputStream(), server.getOutputStream(),
+        final FreecivConnection conn = Connection.uninterpreted(server.getInputStream(), server.getOutputStream(),
                 ReflexPacketKind.layer(versionKnowledge.getRequiredPostReceiveRules(), reflexes),
                 versionKnowledge.getRequiredPostSendRules(),
                 versionKnowledge, Logger.GLOBAL_LOGGER_NAME);
@@ -87,9 +87,9 @@ public class PlayToServer {
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
             public void apply(PacketWrite dest) {
-                /* Must be a ConnectionHasFullProtoData since PlayToServer
-                 * only use this code with a ConnectionHasFullProtoData. */
-                ConnectionHasFullProtoData connection = (ConnectionHasFullProtoData)dest;
+                /* Must be a Connection since PlayToServer
+                 * only use this code with a Connection. */
+                Connection connection = (Connection)dest;
 
                 try {
                     dest.send(connection.newPong());

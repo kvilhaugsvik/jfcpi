@@ -135,33 +135,6 @@ public class Connection implements FreecivConnection {
     }
 
     /**
-     * Create a new connection that has code for the protocol but avoid
-     * using it to interpret the packets it receives if possible.
-     * @param inn the connection's incoming stream.
-     * @param out the connection's outgoing stream.
-     * @param postReceive reflexes to run on a packet as soon as it is
-     *                    received.
-     * @param postSend reflexes to run on a packet as soon as it is sent.
-     * @param protoCode place to find the code for the protocol.
-     * @param loggerName where errors should be logged.
-     * @return a new Freeciv protocol connection.
-     * @throws IOException if there is a problem setting up the
-     *                     connection.
-     */
-    public static ConnectionHasFullProtoData uninterpretedWhenPossible(
-            final InputStream inn,
-            final OutputStream out,
-            final Map<Integer, ReflexReaction> postReceive,
-            final Map<Integer, ReflexReaction> postSend,
-            final ProtocolData protoCode,
-            final String loggerName
-    ) throws IOException {
-        final ProtocolVariantAutomatic protocolVariant = new ProtocolVariantAutomatic(protoCode.getNewPacketMapper());
-        return new ConnectionHasFullProtoData(inn, out, postReceive, postSend, protoCode,
-                new AlwaysRaw(), protocolVariant, loggerName);
-    }
-
-    /**
      * Create a new connection that won't interpret the packets it receives
      * and sends. This makes it impossible to access any field of the
      * packet body without interpreting it manually. This is meant to be
