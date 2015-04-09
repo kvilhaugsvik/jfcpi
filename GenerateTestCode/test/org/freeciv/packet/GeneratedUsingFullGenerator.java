@@ -762,6 +762,27 @@ public class GeneratedUsingFullGenerator {
         assertEquals("Value of byte taken from old wrong", 0, p.getDiffArrayValue()[4].byteValue());
     }
 
+    /**
+     * Create a packet with a diff field array from field values.
+     * One of five elements are updated from old. Old is zero.
+     */
+    public PACKET_FIELD_ARRAY_DIFF fieldArray_diffArray_fromValues_updates_1_of_5_elementValues_create() {
+        return PACKET_FIELD_ARRAY_DIFF.fromValues(
+                new Integer[]{0, 3, 0, 0, 0},
+                new HeaderData(Header_2_2.class),
+                InterpretWhenPossible.newDeltaStore()
+        );
+    }
+
+    /**
+     * Create a packet with a diff field array from field values.
+     * One of five elements are updated from old. Old is zero.
+     * Test that creation from field values works without throwing any exceptions.
+     */
+    @Test public void fieldArray_diffArray_fromValues_updates_1_of_5_elementValues_noExceptions() {
+        final PACKET_FIELD_ARRAY_DIFF p = fieldArray_diffArray_fromValues_updates_1_of_5_elementValues_create();
+    }
+
     /*------------------------------------------------------------------------------------------------------------------
     General helpers
     ------------------------------------------------------------------------------------------------------------------*/
