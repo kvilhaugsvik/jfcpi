@@ -694,9 +694,8 @@ public class GeneratedUsingFullGenerator {
      * Create a packet with a diff field array from encoded data.
      * Two of five elements are updated.
      */
-    @Test
-    public void fieldArray_diffArray_deSerialize_updates_2_of_5() {
-        final PACKET_FIELD_ARRAY_DIFF p = PACKET_FIELD_ARRAY_DIFF.fromHeaderAndStream(
+    public static PACKET_FIELD_ARRAY_DIFF fieldArray_diffArray_deSerialize_updates_2_of_5_create() {
+        return PACKET_FIELD_ARRAY_DIFF.fromHeaderAndStream(
                 bytesToDataInput(
                         new byte[]{
                                 /* Delta header. The field has changed. */
@@ -715,6 +714,24 @@ public class GeneratedUsingFullGenerator {
                 new Header_2_2(10, 1021),
                 /* No need to keep old. This diff array test will only read a single packet. */
                 InterpretWhenPossible.newDeltaStore());
+    }
+
+    /**
+     * Create a packet with a diff field array from encoded data.
+     * Two of five elements are updated.
+     * Test that deserialization worked without throwing any exceptions.
+     */
+    @Test public void fieldArray_diffArray_deSerialize_updates_2_of_5_noExceptions() {
+        final PACKET_FIELD_ARRAY_DIFF p = fieldArray_diffArray_deSerialize_updates_2_of_5_create();
+    }
+
+    /**
+     * Create a packet with a diff field array from encoded data.
+     * Two of five elements are updated.
+     * Test that its element values are correct
+     */
+    @Test public void fieldArray_diffArray_deSerialize_updates_2_of_5_elementValues() {
+        final PACKET_FIELD_ARRAY_DIFF p = fieldArray_diffArray_deSerialize_updates_2_of_5_create();
 
         /* Check header. Assumed to work since it comes from the test it self. */
         assertEquals("Wrong kind", 1021, p.getHeader().getPacketKind());
