@@ -44,10 +44,12 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
         if (1 < dimensions)
             out.add(theDimensionBelow(underlying, dimensions, diff));
         else
-            out.add(theUnderlying(underlying, diff));
+            out.add(new Requirement(underlying, FieldType.class));
 
-        if (diff)
+        if (diff) {
             out.add(new Requirement("DIFF_ARRAY_ENDER", Constant.class));
+            out.add(new Requirement(underlying + "_DIFF", FieldType.class));
+        }
 
         return out;
     }
@@ -67,10 +69,6 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
             throw new UnsupportedOperationException("Only 1 dimension supported for diff arrays");
 
         return new Requirement(underlying + "_" + (dimensions - 1), FieldType.class);
-    }
-
-    private static Requirement theUnderlying(String underlying, boolean diff) {
-        return new Requirement(underlying + (diff ? "_DIFF" : ""), FieldType.class);
     }
 
     /**
@@ -123,8 +121,11 @@ public class FieldAliasArrayMaker implements Dependency.Maker {
          * Regular field type arrays read a known number of elements. */
         final Constant stopElem = (Constant) (isDiffArray ? wasRequired[1] : null);
 
+        /* Diff array elements on the line has the array index and the new value. */
+        final FieldType diffElem = (FieldType) (isDiffArray ? wasRequired[2] : null);
+
         /* The newly created field type array must be renamed since naming it during creation currently is
          * impossible. (A newly created field type is expected to be named like a basic field type) */
-        return TerminatedArray.fieldArray("n", "a", madeOf, stopElem, isDiffArray).createFieldType(toProduce.getName());
+        return TerminatedArray.fieldArray("n", "a", isDiffArray ? diffElem : madeOf, stopElem, isDiffArray).createFieldType(toProduce.getName());
     }
 }
