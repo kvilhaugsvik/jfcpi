@@ -22,6 +22,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * A connection speaking the Freeciv protocol.
+ */
 public class Connection implements FreecivConnection {
     private final BackgroundReader in;
     private final OutputStream out;
@@ -72,6 +75,20 @@ public class Connection implements FreecivConnection {
         this.in.start();
     }
 
+    /**
+     * Create a new connection.
+     * @param inn the connection's incoming stream.
+     * @param out the connection's outgoing stream.
+     * @param postReceive reflexes to run on a packet as soon as it is
+     *                    received.
+     * @param postSend reflexes to run on a packet as soon as it is sent.
+     * @param protoCode place to find the code for the protocol.
+     * @param interpreted should the new connection be interpreted?
+     * @param loggerName where errors should be logged.
+     * @return a new Freeciv protocol connection.
+     * @throws IOException if there is a problem setting up the
+     *                     connection.
+     */
     public static Connection full(
             final InputStream inn,
             final OutputStream out,
@@ -87,6 +104,22 @@ public class Connection implements FreecivConnection {
             return uninterpreted(inn, out, postReceive, postSend, protoCode, loggerName);
     }
 
+    /**
+     * Create a new connection that interprets the packets it receives and
+     * sends so individual fields are accessible. Use this if you need to
+     * know the value of a field in a packet body or need to create a
+     * packet that has fields in its body.
+     * @param inn the connection's incoming stream.
+     * @param out the connection's outgoing stream.
+     * @param postReceive reflexes to run on a packet as soon as it is
+     *                    received.
+     * @param postSend reflexes to run on a packet as soon as it is sent.
+     * @param protoCode place to find the code for the protocol.
+     * @param loggerName where errors should be logged.
+     * @return a new Freeciv protocol connection.
+     * @throws IOException if there is a problem setting up the
+     *                     connection.
+     */
     public static ConnectionHasFullProtoData interpreted(
             final InputStream inn,
             final OutputStream out,
@@ -128,6 +161,24 @@ public class Connection implements FreecivConnection {
                 new AlwaysRaw(), protocolVariant, loggerName);
     }
 
+    /**
+     * Create a new connection that won't interpret the packets it receives
+     * and sends. This makes it impossible to access any field of the
+     * packet body without interpreting it manually. This is meant to be
+     * used in cases where access to individual packet fields aren't wanted
+     * enough to justify the time spent interpreting them and potential
+     * bugs in packet interpretation code.
+     * @param inn the connection's incoming stream.
+     * @param out the connection's outgoing stream.
+     * @param postReceive reflexes to run on a packet as soon as it is
+     *                    received.
+     * @param postSend reflexes to run on a packet as soon as it is sent.
+     * @param protoCode place to find the code for the protocol.
+     * @param loggerName where errors should be logged.
+     * @return a new Freeciv protocol connection.
+     * @throws IOException if there is a problem setting up the
+     *                     connection.
+     */
     public static Connection uninterpreted(
             final InputStream inn,
             final OutputStream out,
@@ -140,18 +191,18 @@ public class Connection implements FreecivConnection {
                 new AlwaysRaw(), loggerName);
     }
 
-    public boolean packetReady() {
+    @Override public boolean packetReady() {
         return in.hasPacket();
     }
 
-    public Packet getPacket() throws NotReadyYetException {
+    @Override public Packet getPacket() throws NotReadyYetException {
         if (!packetReady())
             throw new NotReadyYetException("No packets waiting");
 
         return in.getPacket();
     }
 
-    public void send(Packet toSend) throws IOException {
+    @Override public void send(Packet toSend) throws IOException {
         if (!isOpen()) {
             throw new IOException("Is closed. Can't send.");
         } else if (!currentHeader.sameType(toSend)) {
