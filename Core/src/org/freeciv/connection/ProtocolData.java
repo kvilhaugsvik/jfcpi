@@ -181,6 +181,12 @@ public class ProtocolData implements BasicProtocolData {
         return protoRulesPostSend;
     }
 
+    /**
+     * Get the main Freeciv protocol capability string. This is the version
+     * of the Freeciv protocol. It may have optional capabilities. Optional
+     * capabilities creates variants of a version of the Freeciv protocol.
+     * @return the Freeciv protocol capability string.
+     */
     public String getCapStringMandatory() {
         return capStringMandatory;
     }
@@ -197,18 +203,35 @@ public class ProtocolData implements BasicProtocolData {
         return Collections.unmodifiableSet(capsOptional);
     }
 
+    /**
+     * Get the Freeciv version label the protocol code and data was
+     * extracted from.
+     * @return the Freeciv version label.
+     */
     public String getVersionLabel() {
         return versionLabel;
     }
 
+    /**
+     * Get the Freeciv major version number.
+     * @return the Freeciv major version number.
+     */
     public long getVersionMajor() {
         return versionMajor;
     }
 
+    /**
+     * Get the Freeciv minor version number.
+     * @return the Freeciv minor version number.
+     */
     public long getVersionMinor() {
         return versionMinor;
     }
 
+    /**
+     * Get the Freeciv patch version number.
+     * @return the Freeciv patch version number.
+     */
     public long getVersionPatch() {
         return versionPatch;
     }
