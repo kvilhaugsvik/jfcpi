@@ -26,9 +26,9 @@ import java.util.Map;
  * A Connection for packets that has the full protocol data.
  */
 public class ConnectionHasFullProtoData extends Connection {
-    private final ProtocolVariantAutomatic variant;
+    private final ProtocolVariant variant;
 
-    protected ConnectionHasFullProtoData(InputStream inn, OutputStream out, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend, BasicProtocolData protoCode, ToPacket toPacket, ProtocolVariantAutomatic protocolVariant, String loggerName) throws IOException {
+    protected ConnectionHasFullProtoData(InputStream inn, OutputStream out, Map<Integer, ReflexReaction> postReceive, Map<Integer, ReflexReaction> postSend, BasicProtocolData protoCode, ToPacket toPacket, ProtocolVariant protocolVariant, String loggerName) throws IOException {
         super(inn, out, postReceive, postSend, protoCode, toPacket, loggerName);
 
         this.variant = protocolVariant;
