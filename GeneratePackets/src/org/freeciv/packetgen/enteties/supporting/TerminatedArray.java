@@ -28,10 +28,10 @@ public class TerminatedArray extends FieldType {
             return value.ref().callV("length");
         }
     };
-    public static final From2<Block, Var, Var> elemIsByteArray = new From2<Block, Var, Var>() {
+    public static final From2<Typed<Returnable>, Var, Var> elemIsByteArray = new From2<Typed<Returnable>, Var, Var>() {
         @Override
-        public Block x(Var a, Var b) {
-            return new Block(a.ref().<Returnable>call("writeByte", b.ref()));
+        public Typed<Returnable> x(Var a, Var b) {
+            return a.ref().<Returnable>call("writeByte", b.ref());
         }
     };
     private static final From1<Typed<AValue>, Var> fullIsByteArray = new From1<Typed<AValue>, Var>() {
@@ -70,7 +70,7 @@ public class TerminatedArray extends FieldType {
                            final From1<Typed<AnInt>, Var> numberOfElements,
                            final From1<Typed<AValue>, Var> convertAllElementsToByteArray,
                            final From2<Typed<AValue>, Typed<AValue>, Var> convertBufferArrayToValue,
-                           final From2<Block, Var, Var> writeElementTo,
+                           final From2<Typed<Returnable>, Var, Var> writeElementTo,
                            final From2<Typed<? extends AValue>, Var, Var> readElementFrom,
                            final From1<Typed<AString>, Var> toString,
                            final Collection<Requirement> uses,
@@ -163,7 +163,7 @@ public class TerminatedArray extends FieldType {
         return isSmallerThan(size, fMaxSize.ref().callV("full_array_size"));
     }
 
-    private static From2<Block, Var, Var> createEncode(final Constant<?> terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Block, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType, final boolean alwaysIncludeStopValue) {
+    private static From2<Block, Var, Var> createEncode(final Constant<?> terminator, final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final From1<Typed<AValue>, Var> convertAllElementsToByteArray, final From2<Typed<Returnable>, Var, Var> writeElementTo, final NetworkIO transferSizeSerialize, final TargetClass javaType, final boolean alwaysIncludeStopValue) {
         return new From2<Block, Var, Var>() {
             @Override
             public Block x(Var val, Var to) {
@@ -171,17 +171,17 @@ public class TerminatedArray extends FieldType {
                 if (TransferArraySize.SERIALIZED.equals(transferArraySizeKind))
                     out.addStatement(to.ref().<Returnable>call(transferSizeSerialize.getWrite(), numberOfElements.x(val)));
                 if (null == convertAllElementsToByteArray) {
-                    Var element = Var.param(((TargetArray)javaType).getOf(), "element");
-                    out.addStatement(FOR(element, val.ref(), writeElementTo.x(to, element)));
+                    Var element = Var.param(((TargetArray) javaType).getOf(), "element");
+                    out.addStatement(FOR(element, val.ref(), new Block(writeElementTo.x(to, element))));
                 } else {
                     out.addStatement(to.ref().<Returnable>call("write", convertAllElementsToByteArray.x(val)));
                 }
                 if (!notTerminatable(terminator))
                     if (alwaysIncludeStopValue)
-                        out.addStatement(IF(TRUE, writeElementTo.x(to, terminator)));
+                        out.addStatement(IF(TRUE, new Block(writeElementTo.x(to, terminator))));
                     else
                         out.addStatement(IF(addTerminatorUnlessFull(numberOfElements.x(val)),
-                                writeElementTo.x(to, terminator)));
+                                new Block(writeElementTo.x(to, terminator))));
                 return out;
             }
         };
@@ -508,15 +508,15 @@ public class TerminatedArray extends FieldType {
                         return buffer2value.getAddress().call(bytes, old.ref(), Hardcoded.pLimits.ref().callV("elements_to_transfer"));
                     }
                 },
-                new From2<Block, Var, Var>() {
+                new From2<Typed<Returnable>, Var, Var>() {
                     @Override
-                    public Block x(Var to, Var elem) {
+                    public Typed<Returnable> x(Var to, Var elem) {
                         final Typed<AValue> from = "int".equals(elem.getTType().getSimpleName()) ?
                                 kind.getUnderType().newInstance(elem.ref(), NULL) :
                                 elem.ref();
-                        return new Block(kind.getAddress()
+                        return kind.getAddress()
                                 .newInstance(from, fMaxSize.ref().<Returnable>call("next"))
-                                .call("encodeTo", to.ref()));
+                                .call("encodeTo", to.ref());
                     }
                 },
                 new From2<Typed<? extends AValue>, Var, Var>() {

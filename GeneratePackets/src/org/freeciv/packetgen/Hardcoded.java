@@ -270,10 +270,10 @@ public class Hardcoded {
                                 return bytes; // TODO: Fix
                             }
                         },
-                        new From2<Block, Var, Var>() {
+                        new From2<Typed<Returnable>, Var, Var>() {
                             @Override
-                            public Block x(Var to, Var elem) {
-                                return new Block(universalF.newInstance(elem.ref(), noLimit).call("encodeTo", to.ref()));
+                            public Typed<Returnable> x(Var to, Var elem) {
+                                return universalF.newInstance(elem.ref(), noLimit).call("encodeTo", to.ref());
                             }
                         },
                         new From2<Typed<? extends AValue>, Var, Var>() {
