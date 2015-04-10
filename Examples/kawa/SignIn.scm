@@ -10,6 +10,10 @@
 ; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ; GNU General Public License for more details.
 
+; This Scheme example is intended to run in Kawa.
+; It requires JFCPI Core and the generated packet interpretation code in
+; its classpath.
+
 ; Connection parameters
 (define host "localhost")
 (define port 5556)
