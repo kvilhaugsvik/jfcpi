@@ -48,6 +48,11 @@
 
 ; handle each individual packet.
 (define (handle-packet packet ::org.freeciv.packet.Packet)
+  ; display all packets
+  (display (packet:toString))
+  (display "\n\n")
+
+  ; some packets have responses
   (cond
     ; Manually resond to ping since it isn't handled
     ; in a post receive rule.
