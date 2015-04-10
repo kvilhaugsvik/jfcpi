@@ -45,3 +45,30 @@
   (fc-connection:newServerJoinRequest
     user-name
     (protocol:getCapStringOptional)))
+
+; handle each individual packet.
+(define (handle-packet packet ::org.freeciv.packet.Packet)
+  (cond
+    ; Manually resond to ping since it isn't handled
+    ; in a post receive rule.
+    ((= 88 ((packet:getHeader):getPacketKind))
+     (fc-connection:send
+       (fc-connection:newPong)))))
+
+; receive the next packet as long as the connection is open.
+(define (receive-next-packet)
+  (cond ((not (fc-connection:isOpen))
+         ; nothing more to do.
+         (display "No longer connected.\n")
+         (exit))
+        ((not (fc-connection:packetReady))
+         ; wait for the next packet
+         (java.lang.Thread:yield)
+         (receive-next-packet))
+        (else
+          ; handle the packet
+          (handle-packet (fc-connection:getPacket))
+          (receive-next-packet))))
+
+; start receiving packets
+(receive-next-packet)
