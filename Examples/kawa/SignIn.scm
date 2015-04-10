@@ -53,7 +53,27 @@
     ; in a post receive rule.
     ((= 88 ((packet:getHeader):getPacketKind))
      (fc-connection:send
-       (fc-connection:newPong)))))
+       (fc-connection:newPong)))
+    ; Announce the sign in after joining
+    ((= 5 ((packet:getHeader):getPacketKind))
+     (fc-connection:send
+       (fc-connection:newPacketFromValues
+         26 "Hi!"))
+     (fc-connection:send
+       (fc-connection:newPacketFromValues
+         26 "I'm written in Scheme."))
+     (fc-connection:send
+       (fc-connection:newPacketFromValues
+         26 "I can connect to a Freeciv server."))
+     (fc-connection:send
+       (fc-connection:newPacketFromValues
+         26 "I can tell you what I'm telling you now."))
+     (fc-connection:send
+       (fc-connection:newPacketFromValues
+         26 "That is all I can do."))
+     (fc-connection:send
+       (fc-connection:newPacketFromValues
+         26 "You should probably /kick me now.")))))
 
 ; receive the next packet as long as the connection is open.
 (define (receive-next-packet)
