@@ -19,6 +19,7 @@
 (define port 5556)
 (define user-name "FreecivFromScheme")
 
+; Where to log problems.
 (define logger-name java.util.logging.Logger:GLOBAL_LOGGER_NAME)
 
 ; Needed to understand the packets
