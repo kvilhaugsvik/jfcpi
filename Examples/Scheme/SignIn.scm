@@ -58,7 +58,7 @@
 
   ; some packets have responses
   (cond
-    ; Manually resond to ping since it isn't handled
+    ; Manually respond to ping since it isn't handled
     ; in a post receive rule.
     ((= 88 ((packet:getHeader):getPacketKind))
      (fc-connection:send
