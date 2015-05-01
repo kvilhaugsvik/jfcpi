@@ -88,7 +88,7 @@ public class TerminatedArray extends FieldType {
                 createConstructorBody(javaType.getAddress(), maxArraySizeKind, transferArraySizeKind, numberOfElements, !notTerminatable(terminator), fullArraySizeLocation, new MethodCall<Returnable>(SELF_VALIDATOR_NAME, fMaxSize.ref()), elementTypeCanLimitVerify),
                 createDecode(terminator, maxArraySizeKind, transferArraySizeKind, buffertype, convertBufferArrayToValue, readElementFrom, fullArraySizeLocation, transferSizeSerialize, numberOfValueElementToNumberOfBufferElements, elementTypeCanLimitVerify, alwaysIncludeStopValue),
                 createEncode(terminator, transferArraySizeKind, numberOfElements, convertAllElementsToByteArray, writeElementTo, transferSizeSerialize, javaType.getAddress(), alwaysIncludeStopValue),
-                createEnocedSize(transferArraySizeKind, numberOfElements, !notTerminatable(terminator), transferSizeSerialize, valueGetByteLen, alwaysIncludeStopValue),
+                createEncodedSize(transferArraySizeKind, numberOfElements, !notTerminatable(terminator), transferSizeSerialize, valueGetByteLen, alwaysIncludeStopValue),
                 toString,
                 eatsArrayLimitInformation(maxArraySizeKind, transferArraySizeKind),
                 uses,
@@ -139,7 +139,7 @@ public class TerminatedArray extends FieldType {
         return null == terminator;
     }
 
-    private static From1<Typed<AnInt>, Var> createEnocedSize(final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Var> valueGetByteLen, final boolean alwaysIncludeStopValue) {
+    private static From1<Typed<AnInt>, Var> createEncodedSize(final TransferArraySize transferArraySizeKind, final From1<Typed<AnInt>, Var> numberOfElements, final boolean terminatorShouldBeAdded, final NetworkIO transferSizeSerialize, final From1<Typed<AnInt>, Var> valueGetByteLen, final boolean alwaysIncludeStopValue) {
         return new From1<Typed<AnInt>, Var>() {
             @Override
             public Typed<AnInt> x(Var value) {
