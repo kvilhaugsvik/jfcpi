@@ -21,6 +21,10 @@ import org.freeciv.packet.RawPacket;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Serialize and deserialize packets to raw packet data but don't interpret
+ * them. Deserialized packets will be instances of RawPacket.
+ */
 public class AlwaysRaw implements ToPacket {
     @Override
     public Packet convert(byte[] packet, HeaderData headerData) {
