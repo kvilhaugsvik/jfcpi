@@ -67,7 +67,7 @@ public class SignInAndWait {
                 try {
                     connection.send(connection.newPong());
                 } catch (Exception e) {
-                    System.err.println("Failed to respond");
+                    System.err.println("Failed to respond to ping.");
                 }
             }
         });
