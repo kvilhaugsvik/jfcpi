@@ -64,9 +64,9 @@ public class SignInAndWait {
         reflexes.put(88, new ReflexReaction<PacketWrite>() {
             @Override
             public void apply(PacketWrite dest) {
-                /* Must be a ConnectionHasFullProtoData since SignInAndWait
-                 * only use this code with a ConnectionHasFullProtoData. */
-                ConnectionHasFullProtoData connection = (ConnectionHasFullProtoData)dest;
+                /* Must be a Connection since SignInAndWait
+                 * only use this code with a Connection. */
+                Connection connection = (Connection)dest;
 
                 try {
                     dest.send(connection.newPong());
