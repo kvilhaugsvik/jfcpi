@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013. Sveinung Kvilhaugsvik
+ * Copyright (c) 2013 - 2015. Sveinung Kvilhaugsvik
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,7 +14,17 @@
 
 package org.freeciv.connection;
 
+/**
+ * A situation a ReflexRule applies to.
+ */
 public enum ReflexRuleTime {
+    /**
+     * This rule may fire after a packet is sent.
+     */
     POST_SEND,
+
+    /**
+     * This rule may fire after a packet is received.
+     */
     POST_RECEIVE
 }
