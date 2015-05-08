@@ -14,12 +14,12 @@
 
 package org.freeciv.connection;
 
-public class ReflexRule {
+public class ReflexRule<WorksOn extends ConnectionRelated> {
     private final ReflexRuleTime when;
     private final int number;
-    private final ReflexReaction action;
+    private final ReflexReaction<WorksOn> action;
 
-    public ReflexRule(ReflexRuleTime when, int number, ReflexReaction action) {
+    public ReflexRule(ReflexRuleTime when, int number, ReflexReaction<WorksOn> action) {
         this.when = when;
         this.number = number;
         this.action = action;
@@ -33,7 +33,7 @@ public class ReflexRule {
         return number;
     }
 
-    public ReflexReaction getAction() {
+    public ReflexReaction<WorksOn> getAction() {
         return action;
     }
 }
