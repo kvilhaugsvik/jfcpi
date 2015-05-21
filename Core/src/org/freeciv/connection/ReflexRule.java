@@ -28,6 +28,23 @@ package org.freeciv.connection;
  * @param <WorksOn> the connectionish thing the action is done to.
  */
 public class ReflexRule<WorksOn extends ConnectionRelated> {
+    /**
+     * Responds to an incoming ping from a connection to the server.
+     */
+    public static final ReflexRule<Connection> CLIENT_ANSWER_PING = new ReflexRule<Connection>(
+            ReflexRuleTime.POST_RECEIVE,
+            88,
+            new ReflexReaction<Connection>() {
+                @Override
+                public void apply(Connection connection) {
+                    try {
+                        connection.send(connection.newPong());
+                    } catch (Exception e) {
+                        System.err.println("Failed to respond to ping.");
+                    }
+                }
+            });
+
     private final ReflexRuleTime when;
     private final int number;
     private final ReflexReaction<WorksOn> action;
