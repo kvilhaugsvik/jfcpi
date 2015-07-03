@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 /**
  * Handle the details of common Connection tasks.
  */
-public class ConnectionHelper {
+class ConnectionHelper {
     /**
      * Connect as a Freeciv client to a Freeciv server.
      * Interpret the received packets.
@@ -43,7 +43,7 @@ public class ConnectionHelper {
      * @throws BadProtocolData when the Freeciv protocol data is
      * incompatible.
      */
-    public static ConnectionHasFullProtoData signInAsClient(
+    static ConnectionHasFullProtoData signInAsClient(
             final String address,
             final int portNumber,
             final String userName

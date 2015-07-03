@@ -164,6 +164,32 @@ public class Connection implements FreecivConnection {
                 new AlwaysRaw(), loggerName);
     }
 
+    /**
+     * Connect as a Freeciv client to a Freeciv server.
+     * Interpret the received packets.
+     * Takes care of signing in. Responds when the server pings the client.
+     * Logs problems to Logger.GLOBAL_LOGGER_NAME
+     * @param address the address of the Freeciv server.
+     * @param portNumber the port number of the Freeciv server.
+     * @param userName the user name to sign in as
+     * @return a connection to the Freeciv server.
+     * @throws IOException if an I/O error occurs while setting up the
+     * connection.
+     * @throws InvocationTargetException if there is a problem while
+     * creating the sign in packet.
+     * @throws IllegalAccessException if accessing the sign in packet
+     * is forbidden by Java's access control.
+     * @throws BadProtocolData when the Freeciv protocol data is
+     * incompatible.
+     */
+    public static ConnectionHasFullProtoData signInAsClient(
+            final String address,
+            final int portNumber,
+            final String userName
+    ) throws IOException, InvocationTargetException, IllegalAccessException, BadProtocolData {
+        return ConnectionHelper.signInAsClient(address, portNumber, userName);
+    }
+
     @Override public boolean packetReady() {
         return in.hasPacket();
     }

@@ -26,7 +26,7 @@
 
 ; Connect and sign in to a Freeciv server as a client.
 (define fc-connection ::org.freeciv.connection.ConnectionHasFullProtoData
-  (org.freeciv.connection.ConnectionHelper:signInAsClient
+  (org.freeciv.connection.Connection:signInAsClient
     host port user-name))
 
 ; handle each individual packet.

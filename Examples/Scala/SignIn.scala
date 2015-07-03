@@ -32,7 +32,7 @@ object SignIn {
       + userName + "...\n")
 
     /* Connect and sign in to a Freeciv server as a client. */
-    val fcConnection = ConnectionHelper.signInAsClient(host, port, userName)
+    val fcConnection = Connection.signInAsClient(host, port, userName)
 
     /* Handle each individual packet. */
     def handlePacket(packet: Packet) {
