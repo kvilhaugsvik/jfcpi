@@ -19,37 +19,15 @@
 (define port 5556)
 (define user-name "FreecivFromScheme")
 
-; Where to log problems.
-(define logger-name java.util.logging.Logger:GLOBAL_LOGGER_NAME)
-
-; Needed to understand the packets
-(define protocol
-  (org.freeciv.connection.ProtocolData))
-
 ; Let the user know what is happening.
 (display
   ($string$ "Signing in to " $<<$ host $>>$ " on port " $<<$ port $>>$
             " as the user " $<<$ user-name $>>$ "...\n"))
 
-; Connect to the server
-(define raw-connection (java.net.Socket host port))
-
-; Wrap the raw connection in a Freeciv protocol connection
+; Connect and sign in to a Freeciv server as a client.
 (define fc-connection ::org.freeciv.connection.ConnectionHasFullProtoData
-  (org.freeciv.connection.Connection:interpreted
-    (raw-connection:getInputStream)
-    (raw-connection:getOutputStream)
-    ; note: no reflex to respond to ping packets is added
-    (protocol:getRequiredPostReceiveRules)
-    (protocol:getRequiredPostSendRules)
-    protocol
-    logger-name))
-
-; Sign in to the server
-(fc-connection:send
-  (fc-connection:newServerJoinRequest
-    user-name
-    (protocol:getCapStringOptional)))
+  (org.freeciv.connection.ConnectionHelper:signInAsClient
+    host port user-name))
 
 ; handle each individual packet.
 (define (handle-packet packet ::org.freeciv.packet.Packet)
@@ -59,11 +37,6 @@
 
   ; some packets have responses
   (cond
-    ; Manually respond to ping since it isn't handled
-    ; in a post receive rule.
-    ((= 88 ((packet:getHeader):getPacketKind))
-     (fc-connection:send
-       (fc-connection:newPong)))
     ; Announce the sign in after joining
     ((= 5 ((packet:getHeader):getPacketKind))
      (fc-connection:send
