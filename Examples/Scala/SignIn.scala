@@ -26,35 +26,13 @@ object SignIn {
   val port = 5556
   val userName = "FreecivFromScala"
 
-  /* Where to log problems. */
-  val loggerName = java.util.logging.Logger.GLOBAL_LOGGER_NAME
-
-  /*  Needed to understand the packets. */
-  val protocol = new ProtocolData()
-
   def main(args: Array[String]): Unit = {
     /* Let the user know what is happening. */
     println("Signing in to " + host + " on port " + port + " as the user "
       + userName + "...\n")
 
-    /* Connect to the server */
-    val rawConnection = new java.net.Socket(host, port)
-
-    /* Wrap the raw connection in a Freeciv protocol connection */
-    val fcConnection = Connection.interpreted(
-      rawConnection.getInputStream,
-      rawConnection.getOutputStream,
-      /* note: no reflex to respond to ping packets is added */
-      protocol.getRequiredPostReceiveRules,
-      protocol.getRequiredPostSendRules,
-      protocol,
-      loggerName)
-
-    /* Sign in to the server */
-    fcConnection.send(
-      fcConnection.newServerJoinRequest(
-        userName,
-        protocol.getCapStringOptional))
+    /* Connect and sign in to a Freeciv server as a client. */
+    val fcConnection = ConnectionHelper.signInAsClient(host, port, userName)
 
     /* Handle each individual packet. */
     def handlePacket(packet: Packet) {
@@ -64,10 +42,6 @@ object SignIn {
 
       /* some packets have responses */
       packet.getHeader.getPacketKind match {
-        /* Manually respond to ping since it isn't handled in a post
-         * receive rule. */
-        case 88 => fcConnection.send(fcConnection.newPong())
-
         /* Announce the sign in after joining */
         case 5 => {
           fcConnection.send(fcConnection.newPacketFromValues(26, "Hi!"))
