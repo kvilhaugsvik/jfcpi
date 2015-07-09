@@ -364,6 +364,16 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             body.addStatement(readLabeled);
         }
 
+        /* The old packet is needed to create the delta vector and to
+         * calculate packet size when the delta protocol is in use.
+         * Don't add the old packet candidates to the parameter list of
+         * fromValues() yet. Don't add the chosen old packet to the
+         * argument list of the size calculation yet. They are added bewlow
+         * to preserve the expected order. */
+        body.addStatement(validation.call("validateNotNull", pOldPackets.ref(), literal(pOldPackets.getName())));
+        final Var<? extends AValue> varChosenOld = createFindOld(fields, impl, zeroVal);
+        body.addStatement(varChosenOld);
+
         if (delta) {
             final Var<? extends AValue> delta_tmp;
             delta_tmp = Var.param(getField("delta").getTType(), "delta" + "_tmp");
@@ -377,12 +387,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
         params.add(headerKind);
         body.addStatement(validation.call("validateNotNull", headerKind.ref(), literal(headerKind.getName())));
 
-        /* The old packet is needed to properly calculate size when using
-         * the delta protocol. */
+        /* Add the old packet candidates to the parameter list of
+         * fromValues(). Add the chosen old packet to the argument list of
+         * the size calculation. They will now appear in the expected
+         * position. */
         params.add(Packet.pOldPackets);
-        body.addStatement(validation.call("validateNotNull", pOldPackets.ref(), literal(pOldPackets.getName())));
-        final Var<? extends AValue> varChosenOld = createFindOld(fields, impl, zeroVal);
-        body.addStatement(varChosenOld);
         sizeArgs.addFirst(varChosenOld.ref());
 
         final Var<? extends AValue> header_tmp = Var.param(PacketHeader.class, "header" + "_tmp");
