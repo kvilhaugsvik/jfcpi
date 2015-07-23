@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fcsource name="delta" packetHeaderKind="FC_trunk" enableDelta="true" enableDeltaBoolFolding="true">
+
+    <inputSource parseAs="packets">
+        <file>delta/delta.def</file>
+    </inputSource>
+
+    <inputSource parseAs="variables">
+        <file>delta/delta.var</file>
+    </inputSource>
+
+    <inputSource parseAs="C">
+    </inputSource>
+
+</fcsource>

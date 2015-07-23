@@ -1,0 +1,6 @@
+type BOOL = bool8(bool)
+
+PACKET_TWO_BOOL = 1030; cs
+  BOOL field1;
+  BOOL field2;
+end
