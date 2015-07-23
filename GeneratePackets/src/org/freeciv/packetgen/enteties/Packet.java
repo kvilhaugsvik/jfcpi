@@ -326,7 +326,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         getField("number").ref()));
     }
 
-    private void calculateDeltaField(TargetMethod addExceptionLocation, int deltaFields, List<Field> fields, Block body, FieldType bv_delta_fields, Var deltaVar, boolean boolFoldEnabled) {
+    private void calculateDeltaField(TargetMethod addExceptionLocation, int deltaFields, List<Field> fields, Block body, FieldType bv_delta_fields, Var deltaVar, boolean boolFoldEnabled, Var<? extends AValue> varChosenOld) {
         final Block createDeltaVector = new Block();
 
         /* Create the delta vector. */
@@ -344,12 +344,9 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 continue;
             }
 
-            /* Set the field in the delta vector to true. True means send
-             * or, when bool folding is enabled, that the boolean value of
-             * the field is "true". */
-            setField = deltaVar.ref().callV("getValue").call("set", literal(field.getDeltaFieldNumber()));
-
-            /* TODO: Don't resend a field that haven't changed since the previous packet. */
+            /* Set the field in the delta vector. True means send or, when
+             * bool folding is enabled, that the boolean value of the field
+             * is "true". */
             if (isBoolFolded(boolFoldEnabled, field)) {
                 /* The value of a bool folded field lives in the delta
                  * header. */
@@ -357,7 +354,11 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         literal(field.getDeltaFieldNumber()),
                         field.getTmpLocalVar(null).ref().<ABool>callV("getValue")));
             } else {
-                createDeltaVector.addStatement(setField);
+                /* Don't resend a field that haven't changed since the previous packet. */
+                createDeltaVector.addStatement(deltaVar.ref().callV("getValue").call("set",
+                        literal(field.getDeltaFieldNumber()),
+                        isNot(field.getTmpLocalVar(null).ref().callV("getValue").callV("equals",
+                                varChosenOld.ref().callV(getterNameJavaish(field) + "Value")))));
             }
         }
 
@@ -405,7 +406,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             final Var<? extends AValue> delta_tmp;
             delta_tmp = Var.param(getField("delta").getTType(), "delta" + "_tmp");
             body.addStatement(delta_tmp);
-            calculateDeltaField(addExceptionLocation, deltaFields, fields, body, bv_delta_fields, delta_tmp, boolFoldEnabled);
+            calculateDeltaField(addExceptionLocation, deltaFields, fields, body, bv_delta_fields, delta_tmp, boolFoldEnabled, varChosenOld);
             localVars.addFirst(delta_tmp.ref());
             sizeArgs.addFirst(delta_tmp.ref());
         }
