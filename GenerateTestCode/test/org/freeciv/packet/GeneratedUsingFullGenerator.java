@@ -784,6 +784,74 @@ public class GeneratedUsingFullGenerator {
     }
 
     /*------------------------------------------------------------------------------------------------------------------
+      General delta protocol tests
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * Test that the bool fields are folded into the delta header.
+     */
+    @Test public void delta_boolFold_encode_first() throws IOException {
+        /* This is the first packet created. */
+        final PACKET_TWO_BOOL p = PACKET_TWO_BOOL.fromValues(false, true,
+                new HeaderData(Header_2_2.class),
+                InterpretWhenPossible.newDeltaStore());
+
+        final byte[] expected = {
+                /* Packet is 5 bytes long */
+                0x0, 0x5,
+                /* Packet number is 1030 */
+                0x4, 0x6,
+                /* The bool fields are folded into the delta vector */
+                2
+        };
+
+        /* Check that the bool fields were properly folded into the delta
+         * header. */
+        assertSerializesTo("Wrong encoding", expected, p);
+    }
+
+    /**
+     * Test that the value in the delta header is the bool fields and not
+     * information telling if a field is equal to to the previous packet.
+     */
+    @Test public void delta_boolFold_encode_foldNotPrevious() throws IOException {
+        /* The tested packet must have access to the previous packet so a
+         * delta in stead of delta bool folding bug can be triggered. */
+        final HashMap<DeltaKey, Packet> deltaStore = InterpretWhenPossible.newDeltaStore();
+
+        /* The previous packet is true true. This makes any delta in stead
+         * of delta bool folding bug reverse the tested packet's false
+         * true */
+        final PACKET_TWO_BOOL previous = PACKET_TWO_BOOL.fromValues(true, true,
+                new HeaderData(Header_2_2.class),
+                deltaStore);
+
+        /* Store the previous packet so the tested packet can access it. */
+        deltaStore.put(previous.getKey(), previous);
+
+        /* Create the test packet. field1 is changed to false. */
+        final PACKET_TWO_BOOL p = PACKET_TWO_BOOL.fromValues(false, true,
+                new HeaderData(Header_2_2.class),
+                deltaStore);
+
+        final byte[] expected = {
+                /* Packet is 5 bytes long */
+                0x0, 0x5,
+                /* Packet number is 1030 */
+                0x4, 0x6,
+                /* The bool fields properly folded into the delta vector
+                 * should result in 2. Information about what field changed
+                 * should result in 1. */
+                2
+        };
+
+        /* If byte 4 is 1 rather than 2 a delta-in-stead-of-bool-folding
+         * bug has reversed its values. */
+        assertSerializesTo("Wrong encoding. Delta in stead of bool folding?",
+                expected, p);
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------
     General helpers
     ------------------------------------------------------------------------------------------------------------------*/
     private static void assertSerializesTo(String message, byte[] expected, Packet packet) throws IOException {
