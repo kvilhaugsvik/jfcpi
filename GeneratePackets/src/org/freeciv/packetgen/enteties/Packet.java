@@ -33,7 +33,6 @@ import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import org.freeciv.packetgen.enteties.supporting.PacketCapabilities;
-import org.freeciv.utility.EndsInEternalZero;
 import org.freeciv.utility.Validation;
 
 import java.io.*;
@@ -327,17 +326,38 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         getField("number").ref()));
     }
 
-    private void addDeltaField(TargetMethod addExceptionLocation, int deltaFields, Block body, FieldType bv_delta_fields, Var deltaVar) {
+    private void calculateDeltaField(TargetMethod addExceptionLocation, int deltaFields, List<Field> fields, Block body, FieldType bv_delta_fields, Var deltaVar) {
+        final Block createDeltaVector = new Block();
+
+        /* Create the delta vector. */
+        createDeltaVector.addStatement(
+                deltaVar.assign(bv_delta_fields.getAddress().newInstance(
+                        bv_delta_fields.getUnderType().newInstance(literal(deltaFields)),
+                        TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)))));
+
+        /* Set the delta vector for each delta field. */
+        for (Field field : fields) {
+            final Typed setField;
+
+            if (!deltaApplies(field, delta)) {
+                /* Not a delta field. */
+                continue;
+            }
+
+            /* Set the field in the delta vector to true. True means send
+             * or, when bool folding is enabled, that the boolean value of
+             * the field is "true". */
+            setField = deltaVar.ref().callV("getValue").call("set", literal(field.getDeltaFieldNumber()));
+
+            /* FIXME: A bool folded field should have the field value. */
+            /* TODO: Don't resend a field that haven't changed since the previous packet. */
+            createDeltaVector.addStatement(setField);
+        }
+
+        /* Wrap delta field creation in a try / catch. */
         body.addStatement(labelExceptionsWithPacketAndField(
                 deltaVar,
-                new Block(deltaVar.assign(bv_delta_fields.getAddress().newInstance(
-                        TargetClass.from(DataInputStream.class).newInstance(TargetClass.from(EndsInEternalZero.class)
-                                .newInstance(TargetClass.from(EndsInEternalZero.class).callV("allOneBytes",
-                                        BuiltIn.sum(BuiltIn.divide(BuiltIn.subtract(
-                                                literal(deltaFields), literal(1)), literal(8)), literal(1))))),
-                        TargetClass.from(ElementsLimit.class).callV("limit", literal(deltaFields)),
-                        /* The delta field should never be read from the previous field. */
-                        NULL))),
+                createDeltaVector,
                 addExceptionLocation));
     }
 
@@ -378,7 +398,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             final Var<? extends AValue> delta_tmp;
             delta_tmp = Var.param(getField("delta").getTType(), "delta" + "_tmp");
             body.addStatement(delta_tmp);
-            addDeltaField(addExceptionLocation, deltaFields, body, bv_delta_fields, delta_tmp);
+            calculateDeltaField(addExceptionLocation, deltaFields, fields, body, bv_delta_fields, delta_tmp);
             localVars.addFirst(delta_tmp.ref());
             sizeArgs.addFirst(delta_tmp.ref());
         }
