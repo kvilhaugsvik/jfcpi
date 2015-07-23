@@ -29,7 +29,7 @@ class UsingGenerator {
 
   @Test
   def diffArray() {
-    UsingGenerator.caps(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER)
+    UsingGenerator.diffArray(GeneratorDefaults.GENERATED_TEST_SOURCE_FOLDER)
   }
 
   @Test
