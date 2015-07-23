@@ -163,7 +163,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
 
             inner.addMethod(createBasicConstructor(implFieldsAll, sharedFields));
 
-            addConstructorFromJavaTypes(implFields, capCombName, capabilityCombinations.get(capCombName), addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding, inner.getAddress(), zeroVal);
+            addConstructorFromJavaTypes(implFields, capCombName, capabilityCombinations.get(capCombName), addExceptionLocation, deltaFields, bv_delta_fields, enableDeltaBoolFolding, inner.getAddress(), zeroVal, enableDeltaBoolFolding);
             addConstructorFromDataInput(name, implFields, capCombName, capabilityCombinations.get(capCombName), addExceptionLocation, deltaFields, enableDeltaBoolFolding, inner.getAddress(), zeroVal);
         }
     }
@@ -326,7 +326,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                         getField("number").ref()));
     }
 
-    private void calculateDeltaField(TargetMethod addExceptionLocation, int deltaFields, List<Field> fields, Block body, FieldType bv_delta_fields, Var deltaVar) {
+    private void calculateDeltaField(TargetMethod addExceptionLocation, int deltaFields, List<Field> fields, Block body, FieldType bv_delta_fields, Var deltaVar, boolean boolFoldEnabled) {
         final Block createDeltaVector = new Block();
 
         /* Create the delta vector. */
@@ -349,9 +349,16 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
              * the field is "true". */
             setField = deltaVar.ref().callV("getValue").call("set", literal(field.getDeltaFieldNumber()));
 
-            /* FIXME: A bool folded field should have the field value. */
             /* TODO: Don't resend a field that haven't changed since the previous packet. */
-            createDeltaVector.addStatement(setField);
+            if (isBoolFolded(boolFoldEnabled, field)) {
+                /* The value of a bool folded field lives in the delta
+                 * header. */
+                createDeltaVector.addStatement(deltaVar.ref().callV("getValue").call("set",
+                        literal(field.getDeltaFieldNumber()),
+                        field.getTmpLocalVar(null).ref().<ABool>callV("getValue")));
+            } else {
+                createDeltaVector.addStatement(setField);
+            }
         }
 
         /* Wrap delta field creation in a try / catch. */
@@ -361,7 +368,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
                 addExceptionLocation));
     }
 
-    private void addConstructorFromJavaTypes(List<Field> fields, String capsName, List<Typed<AString>> caps, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding, TargetClass impl, Typed<AValue> zeroVal) throws UndefinedException {
+    private void addConstructorFromJavaTypes(List<Field> fields, String capsName, List<Typed<AString>> caps, TargetMethod addExceptionLocation, int deltaFields, FieldType bv_delta_fields, boolean enableDeltaBoolFolding, TargetClass impl, Typed<AValue> zeroVal, boolean boolFoldEnabled) throws UndefinedException {
         LinkedList<Var<? extends AValue>> params = new LinkedList<Var<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> localVars = new LinkedList<Reference<? extends AValue>>();
         LinkedList<Reference<? extends AValue>> sizeArgs = new LinkedList<Reference<? extends AValue>>();
@@ -398,7 +405,7 @@ public class Packet extends ClassWriter implements Dependency.Item, ReqKind {
             final Var<? extends AValue> delta_tmp;
             delta_tmp = Var.param(getField("delta").getTType(), "delta" + "_tmp");
             body.addStatement(delta_tmp);
-            calculateDeltaField(addExceptionLocation, deltaFields, fields, body, bv_delta_fields, delta_tmp);
+            calculateDeltaField(addExceptionLocation, deltaFields, fields, body, bv_delta_fields, delta_tmp, boolFoldEnabled);
             localVars.addFirst(delta_tmp.ref());
             sizeArgs.addFirst(delta_tmp.ref());
         }
