@@ -851,6 +851,45 @@ public class GeneratedUsingFullGenerator {
                 expected, p);
     }
 
+    /**
+     * Test that the value in the delta header is the bool fields and not
+     * information telling if a field is equal to to the previous packet.
+     */
+    @Test public void delta_boolFold_decode_foldNotPrevious() throws IOException {
+        /* The tested packet must have access to the previous packet so a
+         * delta in stead of delta bool folding bug can be triggered. */
+        final HashMap<DeltaKey, Packet> deltaStore = InterpretWhenPossible.newDeltaStore();
+
+        /* The previous packet is true true. This makes any delta in stead
+         * of delta bool folding bug reverse the tested packet's false
+         * true */
+        final PACKET_TWO_BOOL previous = PACKET_TWO_BOOL.fromValues(true, true,
+                new HeaderData(Header_2_2.class),
+                deltaStore);
+
+        /* Store the previous packet so the tested packet can access it. */
+        deltaStore.put(previous.getKey(), previous);
+
+        final byte[] encoded = {
+                /* Packet is 5 bytes long */
+                0x0, 0x5,
+                /* Packet number is 1030 */
+                0x4, 0x6,
+                /* The bool fields are folded into the delta vector.
+                 * Field1 is false. Field2 is true. */
+                2
+        };
+
+        /* Create the test packet. field1 is changed to false. */
+        final PACKET_TWO_BOOL p = PACKET_TWO_BOOL.fromHeaderAndStream(
+                bytesToDataInput(encoded, 4),
+                new Header_2_2(5, 1030),
+                deltaStore);
+
+        assertFalse("Wrong encoding. Delta in stead of bool folding?", p.getField1Value().booleanValue());
+        assertTrue("Wrong encoding. Delta in stead of bool folding?", p.getField2Value().booleanValue());
+    }
+
     /*------------------------------------------------------------------------------------------------------------------
     General helpers
     ------------------------------------------------------------------------------------------------------------------*/
