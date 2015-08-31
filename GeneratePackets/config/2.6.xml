@@ -47,7 +47,7 @@
     <!-- The requirement field type -->
     <fieldTypeAlias>
         <from>requirement(struct requirement)</from>
-        <to>{{uint8;sint32};uint8;bool8;bool8}(struct requirement)</to>
+        <to>{{uint8;sint32};uint8;bool8;bool8;bool8}(struct requirement)</to>
     </fieldTypeAlias>
 
 </fcsource>
