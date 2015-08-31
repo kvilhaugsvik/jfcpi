@@ -20,12 +20,14 @@ import java.io.File
  * The configuration data for a Freeciv version
  * @param configName the name given to the configuration
  * @param packetHeader the kind of packet header
+ * @param fieldTypeAliases field types to understand as another field type
  * @param enableDelta should the delta protocol be enabled?
  * @param enableDeltaBoolFolding should boolean variables be folded into the delta header?
  * @param inputSources the source files to extract the protocol from
  */
 class VersionConfig(val configName: String,
                     val packetHeader: org.freeciv.packetgen.PacketHeaderKinds,
+                    val fieldTypeAliases: Map[String, String],
                     val enableDelta: Boolean, val enableDeltaBoolFolding: Boolean,
                     val inputSources: Map[String, Seq[String]]) {
 }
@@ -46,10 +48,14 @@ object VersionConfig {
     val enableDelta = versionConfiguration.attribute("enableDelta").get.text.toBoolean
     val enableDeltaBoolFolding = versionConfiguration.attribute("enableDeltaBoolFolding").get.text.toBoolean
 
+    /* Field type aliases from the configuration */
+    val fieldTypeAliases = (versionConfiguration \ "fieldTypeAlias").map(elem =>
+      (elem \ "from").map(_.text).last -> (elem \ "to").map(_.text).last).toMap
+
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
       elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
 
-    new VersionConfig(configName, packetHeader, enableDelta, enableDeltaBoolFolding, inputSources)
+    new VersionConfig(configName, packetHeader, fieldTypeAliases, enableDelta, enableDeltaBoolFolding, inputSources)
   }
 
   /**

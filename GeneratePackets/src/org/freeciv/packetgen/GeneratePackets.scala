@@ -34,7 +34,8 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
 
   private val packetsDefRPath: String = versionConfig.inputSources("packets").head
 
-  private val storage = new PacketsStore(versionConfig.configName, versionConfig.packetHeader,
+  private val storage = new PacketsStore(versionConfig.configName,
+    versionConfig.packetHeader, versionConfig.fieldTypeAliases,
     versionConfig.enableDelta, versionConfig.enableDeltaBoolFolding)
   private val Parser = new ParsePacketsDef(storage)
 

@@ -41,7 +41,9 @@ public class PacketsStore {
     private final HashMap<String, Requirement> packets = new HashMap<String, Requirement>();
     private final TreeMap<Integer, String> packetsByNumber = new TreeMap<Integer, String>();
 
-    public PacketsStore(String configName, PacketHeaderKinds bytesInPacketNumber, boolean enableDelta, boolean enableDeltaBoolFolding) {
+    public PacketsStore(String configName,
+                        PacketHeaderKinds bytesInPacketNumber, Map<String, String> fieldTypeAliases,
+                        boolean enableDelta, boolean enableDeltaBoolFolding) {
         requirements = new DependencyStore();
         for (Dependency.Item primitive : Hardcoded.values()) {
             requirements.addPossibleRequirement(primitive);
@@ -50,6 +52,13 @@ public class PacketsStore {
             requirements.addMaker(maker);
         }
 
+        /* Field type aliases from the configuration. */
+        for (String from : fieldTypeAliases.keySet()) {
+            requirements.addMaker(new Wrapper(from, FieldType.class,
+                    new Requirement(fieldTypeAliases.get(from), FieldType.class)));
+        }
+
+        /* Generic makers. */
         requirements.addMaker(new FieldAliasArrayMaker());
         requirements.addMaker(new DiffArrayElementDataType());
         requirements.addMaker(new DiffArrayElementFieldType());
