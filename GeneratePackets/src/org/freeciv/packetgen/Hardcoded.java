@@ -303,9 +303,6 @@ public class Hardcoded {
             }
         });
 
-        makers.add(new Wrapper("requirement(struct requirement)", FieldType.class,
-                new Requirement("{{uint8;sint32};uint8;bool8;bool8}(struct requirement)", FieldType.class)));
-
         hardCodedMakers = Collections.unmodifiableSet(makers);
     }
 
