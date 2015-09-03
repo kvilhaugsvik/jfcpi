@@ -41,10 +41,14 @@ object VersionConfig {
   def fromFile(from: File): VersionConfig = {
     val versionConfiguration = GeneratePackets.readSettings(from)
 
+    /* Configuration name. */
     val configName = versionConfiguration.attribute("name").get.text
 
+    /* Packet header behavior. */
     val packetHeader = PacketHeaderKinds.valueOf(versionConfiguration.attribute("packetHeaderKind").get.text)
 
+    /* The delta protocol settings are currently hard coded in
+     * common/generate_packets.py so they are a part of the version. */
     val enableDelta = versionConfiguration.attribute("enableDelta").get.text.toBoolean
     val enableDeltaBoolFolding = versionConfiguration.attribute("enableDeltaBoolFolding").get.text.toBoolean
 
@@ -52,6 +56,7 @@ object VersionConfig {
     val fieldTypeAliases = (versionConfiguration \ "fieldTypeAlias").map(elem =>
       (elem \ "from").map(_.text).last -> (elem \ "to").map(_.text).last).toMap
 
+    /* Freeciv source code files to find items in. */
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
       elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
 
