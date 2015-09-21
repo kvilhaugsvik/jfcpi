@@ -50,4 +50,10 @@
         <to>{{uint8;sint32};uint8;bool8;bool8;bool8}(struct requirement)</to>
     </fieldTypeAlias>
 
+    <!-- The estring field type isn't encoded in the binary protocol -->
+    <fieldTypeAlias>
+        <from>estring(char)</from>
+        <to>string(char)</to>
+    </fieldTypeAlias>
+
 </fcsource>

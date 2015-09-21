@@ -245,6 +245,9 @@ public class PacketsStore {
     public void doPostProcessing() {
         /* Replace items read from the input files. */
         Hardcoded.applyManualChanges(this);
+
+        /* Add generic makers that shouldn't be the first choice. */
+        requirements.addMaker(new UnwrapFieldType());
     }
 
     public void requestConstant(String constant) {
