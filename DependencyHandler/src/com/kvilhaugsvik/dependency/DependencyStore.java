@@ -201,27 +201,60 @@ public final class DependencyStore {
         return isAwareOfPotentialProvider(item) && dependenciesFound(existing.getFulfillmentOf(item));
     }
 
+    /**
+     * Try to create the specified item,
+     * @param item the item to create.
+     * @return true if the creation was successful.
+     */
     private boolean creationWorked(Requirement item) {
-        Dependency.Maker maker = makers.getFulfillmentOf(item);
-        LinkedList<Dependency.Item> args = new LinkedList<Dependency.Item>();
-        boolean parameterMissing = false;
-        for (Requirement req : maker.neededInput(item))
-            if (isAwareOfPotentialProvider(req)) {
-                args.add(getPotentialProvider(req));
-                assert null != args.peekLast() : "Item claimed to be there don't exist";
-            } else {
-                dependenciesUnfulfilled.add(req);
-                parameterMissing = true;
-            }
-        if (parameterMissing)
-            return false;
+        /* Try each maker able to create the item. */
+        for (Dependency.Maker maker : makers.getFulfillmentsOf(item)) {
+            /* Not aware of any missing items yet, */
+            boolean gotReqs = true;
 
-        try {
-            addPossibleRequirement(maker.produce(item, args.toArray(new Dependency.Item[args.size()])));
-            return true;
-        } catch (UndefinedException e) {
-            return false;
+            /* The items to feed the maker. */
+            LinkedList<Dependency.Item> args = new LinkedList<Dependency.Item>();
+
+            /* Get each item the maker needs before it can create the
+             * requested item. */
+            for (Requirement req : maker.neededInput(item)) {
+                if (isAwareOfPotentialProvider(req)) {
+                    args.add(getPotentialProvider(req));
+                    assert null != args.peekLast() : "Item claimed to be there don't exist";
+                } else {
+                    /* Not able to get (or create) the inout item. */
+                    gotReqs = false;
+
+                    /* Try the next maker. */
+                    break;
+                }
+            }
+
+            if (gotReqs) {
+                try {
+                    /* Create the requested item */
+                    addPossibleRequirement(maker.produce(item, args.toArray(new Dependency.Item[args.size()])));
+                } catch (UndefinedException e) {
+                    /* Try the next maker. */
+                    continue;
+                }
+
+                /* Report the success */
+                return true;
+            }
         }
+
+        /* Creation failed. Report missing items the first maker needed. */
+        Dependency.Maker maker = makers.getFulfillmentOf(item);
+        for (Requirement req : maker.neededInput(item)) {
+            if (!isAwareOfPotentialProvider(req)) {
+                /* Needed by the first maker and missing. */
+                dependenciesUnfulfilled.add(req);
+            }
+        }
+
+        /* Report the failure. */
+        return false;
     }
 
     public Dependency.Item getPotentialProvider(Requirement item) {
@@ -346,6 +379,30 @@ public final class DependencyStore {
                 return candidate;
             else
                 return complexGet(req);
+        }
+
+        /**
+         * Get all dependencies that may fulfill the requirement.
+         * @param req the requirement to fulfill
+         * @return iterator over all possible fulfillments
+         */
+        public Iterable<Of> getFulfillmentsOf(Requirement req) {
+            /* No candidates exist yet. */
+            LinkedList<Of> out = new LinkedList<Of>();
+
+            if (store.containsKey(req)) {
+                /* The item it self comes first */
+                out.add(store.get(req));
+            }
+
+            /* any complex fulfillment follows. */
+            for (Required candidate : complex.keySet()) {
+                if (candidate.canFulfill(req)) {
+                    out.add(complex.get(candidate));
+                }
+            }
+
+            return out;
         }
 
         public void add(Of dep) {
