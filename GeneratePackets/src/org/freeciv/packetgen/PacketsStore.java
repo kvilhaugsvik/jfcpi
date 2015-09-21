@@ -238,6 +238,15 @@ public class PacketsStore {
         requirements.addWanted(source);
     }
 
+    /**
+     * Hard coded changes that should be done after the items have been
+     * read from the input files.
+     */
+    public void doPostProcessing() {
+        /* Replace items read from the input files. */
+        Hardcoded.applyManualChanges(this);
+    }
+
     public void requestConstant(String constant) {
         requirements.demand(new Requirement(constant, Constant.class));
     }

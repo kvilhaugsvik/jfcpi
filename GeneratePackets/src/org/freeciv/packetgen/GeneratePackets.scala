@@ -77,8 +77,8 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
     throw new IOException("Can't parse " + pdSource.getPath + "\n" + packetsDefResult.toString)
   }
 
-  println("Applying manual changes")
-  Hardcoded.applyManualChanges(storage);
+  println("Post processing")
+  storage.doPostProcessing()
 
   /**
    * Write the generated code (and maybe its input files) to the given directory.
