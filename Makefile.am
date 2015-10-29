@@ -5,7 +5,6 @@ GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
 	GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
 
 all: tests @SignInTest_JAR@ @FreecivRecorder_JAR@
-	touch all
 
 source: sourceTestPeers sourceFromFreeciv
 	touch source

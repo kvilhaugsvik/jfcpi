@@ -15,7 +15,6 @@ playRecord
 playRecord.bat
 
 # Make targets
-all
 tests
 workFolder
 run*
