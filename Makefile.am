@@ -112,6 +112,7 @@ endif
 	touch ${COMPILED_GeneratePackets_TEST_FOLDER}/run
 
 sourceFromFreeciv: @GeneratePackets_JAR@ ${FREECIV_SOURCE_FILES}
+	rm -rf ${GENERATED_SOURCE_FOLDER}
 	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --ignore-problems=${IGNORE_ISSUES} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV}
 	touch sourceFromFreeciv
 
@@ -150,6 +151,7 @@ endif
 	touch @COMPILED_GenerateTestCode_TEST_FOLDER@/run
 
 sourceTestPeers: @GenerateTestCode_JAR@
+	rm -rf ${GENERATED_TEST_SOURCE_FOLDER}
 	${SCALA} -classpath @GenerateTestCode_JAR@:@GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@ org.freeciv.packetgen.UsingGenerator ${GENERATED_TEST_SOURCE_FOLDER}
 	${JAVA} -cp @GenerateTestCode_JAR@:@GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@ org.freeciv.packetgen.FromEntetiesAlone ${GENERATED_TEST_SOURCE_FOLDER}
 	touch sourceTestPeers
