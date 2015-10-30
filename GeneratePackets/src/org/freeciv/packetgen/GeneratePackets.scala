@@ -137,6 +137,7 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
 object GeneratePackets {
   private val SOURCE_CODE_LOCATION = "source-code-location"
   private val VERSION_INFORMATION = "version-information"
+  private val DEST_DIR_LOCATION = "dest-dir-location"
   private val IGNORE_PROBLEMS = "ignore-problems"
   private val GPL_SOURCE = "gpl-source"
   private val PRINT_FILES = "print-source-files"
@@ -147,6 +148,8 @@ object GeneratePackets {
         "the location of the Freeciv source code to generate from"),
       new Setting.StringSetting(VERSION_INFORMATION, GeneratorDefaults.VERSIONCONFIGURATION,
         "file containing settings for the version of Freeciv"),
+      new Setting.StringSetting(DEST_DIR_LOCATION, GeneratorDefaults.GENERATED_SOURCE_FOLDER,
+        "the location of the folder to write the generated packet code to"),
       new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.IGNORE_ISSUES,
         "should problems be ignored?"),
       new Setting.BoolSetting(GPL_SOURCE, GeneratorDefaults.NOT_DISTRIBUTED_WITH_FREECIV,
@@ -184,7 +187,8 @@ object GeneratePackets {
       requested,
       settings.getSetting[Boolean](IGNORE_PROBLEMS))
 
-    self.writeToDir(GeneratorDefaults.GENERATED_SOURCE_FOLDER, settings.getSetting[Boolean](GPL_SOURCE))
+    self.writeToDir(settings.getSetting[String](DEST_DIR_LOCATION),
+      settings.getSetting[Boolean](GPL_SOURCE))
   }
 
   /**
