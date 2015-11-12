@@ -156,8 +156,9 @@ object GeneratePackets {
         "copy the Freeciv source code used as a source to generate Java code to the generated code's location" +
           ". This makes it easy to remember including it when the generated Java code is distributed."),
       UI.HELP_SETTING,
-      new Setting.BoolSetting(PRINT_FILES, false, "print the path of the needed Freeciv source files and exit."
-        + " Nothing else is printed.")
+      new Setting.BoolSetting(PRINT_FILES, false,
+        "print the path of the required Freeciv source files and the file that claims they are required."
+        + " Exit once done. Nothing else should be printed.")
     ), args: _*)
 
     UI.printAndExitOnHelp(settings, classOf[GeneratePackets])
@@ -176,6 +177,10 @@ object GeneratePackets {
       val files = conf.inputSources.flatMap(_._2)
         .map((file: String) => settings.getSetting[String](SOURCE_CODE_LOCATION) + "/" + file)
 
+      /* The location of the list of required Freeciv source code files. */
+      println(conf.configFile)
+
+      /* The required Freeciv source code files. */
       files.foreach(println(_))
 
       return

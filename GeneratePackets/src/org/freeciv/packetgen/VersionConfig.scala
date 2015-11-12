@@ -19,6 +19,7 @@ import java.io.File
 /**
  * The configuration data for a Freeciv version
  * @param configName the name given to the configuration
+ * @param configFile the path to the configuration file
  * @param packetHeader the kind of packet header
  * @param fieldTypeAliases field types to understand as another field type
  * @param enableDelta should the delta protocol be enabled?
@@ -26,6 +27,7 @@ import java.io.File
  * @param inputSources the source files to extract the protocol from
  */
 class VersionConfig(val configName: String,
+                    val configFile: String,
                     val packetHeader: org.freeciv.packetgen.PacketHeaderKinds,
                     val fieldTypeAliases: Map[String, String],
                     val enableDelta: Boolean, val enableDeltaBoolFolding: Boolean,
@@ -60,7 +62,7 @@ object VersionConfig {
     val inputSources = (versionConfiguration \ "inputSource").map(elem =>
       elem.attribute("parseAs").get.text -> (elem \ "file").map(_.text)).toMap
 
-    new VersionConfig(configName, packetHeader, fieldTypeAliases, enableDelta, enableDeltaBoolFolding, inputSources)
+    new VersionConfig(configName, from.getPath, packetHeader, fieldTypeAliases, enableDelta, enableDeltaBoolFolding, inputSources)
   }
 
   /**
