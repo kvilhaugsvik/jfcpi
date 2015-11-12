@@ -37,7 +37,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   private val cStyleStart = """/\*+"""
   private val cStyleMiddle = """([^*\n\r]|\*+[^/*])+"""
   private val cStyleEnd = """\*+/"""
-  protected val cStyleComment = "(" + cStyleManyStars + "|" + cStyleStart + "(" + cStyleMiddle + """[\n\r]?)*""" + cStyleEnd + ")"
+  protected val cStyleComment = regExOr(cStyleManyStars, cStyleStart + "(" + cStyleMiddle + """[\n\r]?)*""" + cStyleEnd)
 
   protected val spaceBetweenWords = """[\t ]"""
 
