@@ -41,7 +41,14 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
 
   protected val spaceBetweenWords = """[\t ]"""
 
-  protected def regExOr(arg: String*): String = "(" + arg.reduce(_ + "|" + _) + ")"
+  /**
+    * Build a regular expression matching all strings any of the regular
+    * expressions given as arguments would match.
+    * @param arg all regular expressions the resulting regex should match.
+    * @return the regular expressions joined in a String.
+    */
+  protected def regExOr(arg: String*): String =
+    "(" + arg.map("(" + _ + ")").reduce(_ + "|" + _) + ")"
 
   def sInteger = """[+|-]*[0-9]+""".r
 
