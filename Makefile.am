@@ -1,5 +1,25 @@
 ACLOCAL_AMFLAGS = -I m4
 
+# Freeciv version independent input files used when generating the Java
+# code responsible for understanding the Freeciv network protocol packets.
+GeneratePacketsData=GeneratePackets/data/constants.h \
+	GeneratePackets/data/core_needs.xml
+
+# Input files used to generate the test peers.
+GenerateTestPacketsData=${GeneratePacketsData}         \
+	GenerateTestCode/src/capabilities/capabilities.xml \
+	GenerateTestCode/src/capabilities/packets.def      \
+	GenerateTestCode/src/capabilities/vars             \
+	GenerateTestCode/src/delta/delta.def               \
+	GenerateTestCode/src/delta/delta.var               \
+	GenerateTestCode/src/delta/delta.xml               \
+	GenerateTestCode/src/fieldArray/fieldArray.def     \
+	GenerateTestCode/src/fieldArray/fieldArray.var     \
+	GenerateTestCode/src/fieldArray/fieldArray.xml     \
+	GenerateTestCode/src/simple/simple.def             \
+	GenerateTestCode/src/simple/simple.var             \
+	GenerateTestCode/src/simple/simple.xml
+
 # GeneratorDefaults.java is generated during ./configure
 GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
 	GeneratePackets/src/org/freeciv/packetgen/GeneratorDefaults.java
@@ -110,7 +130,7 @@ endif
 	${JAVA} -ea -cp ${COMPILED_GeneratePackets_TEST_FOLDER}:@GeneratePackets_JAR@:${JUNIT_CPF}:${SCALA_STDLIB_CPF} org.junit.runner.JUnitCore org.freeciv.packetgen.parsing.FromCExtractorTest
 	touch ${COMPILED_GeneratePackets_TEST_FOLDER}/run
 
-sourceFromFreeciv: @GeneratePackets_JAR@ ${FREECIV_SOURCE_FILES}
+sourceFromFreeciv: @GeneratePackets_JAR@ ${FREECIV_SOURCE_FILES} ${GeneratePacketsData}
 	rm -rf ${GENERATED_SOURCE_FOLDER}
 	sh packetsExtract --source-code-location=${FREECIV_SOURCE_PATH} --version-information=${VERSIONCONFIGURATION} --ignore-problems=${IGNORE_ISSUES} --gpl-source=${NOT_DISTRIBUTED_WITH_FREECIV} --dest-dir-location=${GENERATED_SOURCE_FOLDER}
 	touch sourceFromFreeciv
@@ -149,7 +169,7 @@ endif
 	${JAVA} -cp @Core_JAR@:${JUNIT_CPF}:@COMPILED_GenerateTestCode_TEST_FOLDER@ org.junit.runner.JUnitCore org.freeciv.test.IsolatedBugCausers
 	touch @COMPILED_GenerateTestCode_TEST_FOLDER@/run
 
-sourceTestPeers: @GenerateTestCode_JAR@
+sourceTestPeers: @GenerateTestCode_JAR@ ${GenerateTestPacketsData}
 	rm -rf ${GENERATED_TEST_SOURCE_FOLDER}
 	${SCALA} -classpath @GenerateTestCode_JAR@:@GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@ org.freeciv.packetgen.UsingGenerator ${GENERATED_TEST_SOURCE_FOLDER}
 	${JAVA} -cp @GenerateTestCode_JAR@:@GeneratePackets_JAR@:@JavaGenerator_JAR@:@DependencyHandler_JAR@:@Core_JAR@:@Utility_JAR@ org.freeciv.packetgen.FromEntetiesAlone ${GENERATED_TEST_SOURCE_FOLDER}
