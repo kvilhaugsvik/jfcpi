@@ -4,7 +4,7 @@ import com.kvilhaugsvik.javaGenerator.representation.CodeAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.HasAtoms;
 import com.kvilhaugsvik.javaGenerator.representation.IR;
 import com.kvilhaugsvik.javaGenerator.typeBridge.Typed;
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AnInt;
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.*;
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn;
 import com.kvilhaugsvik.javaGenerator.util.Formatted;
 import org.freeciv.utility.Util;
@@ -140,6 +140,15 @@ public class IntExpression extends Formatted implements Typed<AnInt> {
 
     public static IntExpression integer(String value) {
         return handled(new IR.CodeAtom(value));
+    }
+
+    /**
+     * Create an int extression from a char typed statement.
+     * @param value typed code that returns a char.
+     * @return an IntExpression with the char value.
+     */
+    public static IntExpression charValue(Typed<AChar> value) {
+        return handled(value);
     }
 
     public static IntExpression handled(HasAtoms expression, Requirement... reqs) {

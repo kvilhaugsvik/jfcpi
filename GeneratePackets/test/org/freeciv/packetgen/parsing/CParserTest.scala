@@ -379,6 +379,10 @@ class CParserSyntaxTest {
     parsesCorrectly("#define SIMPLE 0x50", ParseCCode)
   @Test def constantDefinedOtherSimpleHexNumber =
     parsesCorrectly("#define SIMPLE 0xa4", ParseCCode)
+  @Test def constantDefinedCharSymbol =
+    parsesCorrectly("#define CONSTANT_S 'S'", ParseCCode)
+  @Test def constantDefinedCharEscaped =
+    parsesCorrectly("#define ESCAPE '\27'", ParseCCode)
 
   /*--------------------------------------------------------------------------------------------------------------------
   Test pure parsing of typedefs
@@ -836,6 +840,22 @@ public enum test implements org.freeciv.types.FCEnum {
     assertFalse("Should depend on two other values", reqs.isEmpty)
     assertTrue("Should depend on WRONG", reqs.contains(new Requirement("WRONG", classOf[Constant[_]])))
     assertTrue("Should depend on WRONG", reqs.contains(new Requirement("SIMPLE", classOf[Constant[_]])))
+  }
+
+  @Test def constantDefinedCharNumberSymbol {
+    val toParse = "#define CHAR_83 'S'"
+    val parser = ParseCCode
+    val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
+    assertEquals("Wrong name", "CHAR_83", result.get.getName)
+    assertEquals("Wrong value generation expression", "'S'", result.get.getExpression)
+  }
+
+  @Test def constantDefinedCharNumberEscaped {
+    val toParse = """#define CHAR_ESC '\27'"""
+    val parser = ParseCCode
+    val result = CParserTest.parsesCorrectly(toParse, parser, parser.constantValueDefConverted)
+    assertEquals("Wrong name", "CHAR_ESC", result.get.getName)
+    assertEquals("Wrong value generation expression", """'\27'""", result.get.getExpression)
   }
 
   /*--------------------------------------------------------------------------------------------------------------------

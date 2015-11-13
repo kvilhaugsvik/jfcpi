@@ -20,7 +20,7 @@ import com.kvilhaugsvik.dependency.{Dependency, Requirement}
 import util.parsing.input.CharArrayReader
 import org.freeciv.packetgen.enteties.SourceFile
 import java.io.File
-import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn.AString
+import com.kvilhaugsvik.javaGenerator.typeBridge.willReturn._
 import com.kvilhaugsvik.javaGenerator.util.BuiltIn
 
 abstract class ParseShared extends RegexParsers with PackratParsers {
@@ -61,6 +61,17 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   // TODO: Should concatenation be supported?
   def strExpr = quotedString.r ^^ {a => BuiltIn.toCode[AString](a)}
 
+  /**
+    * A String with regular expression that recognizes char literals.
+    */
+  val charLiteral: String = "'" + regExOr(".", """\\\d+""") + "'"
+
+  /**
+    * Parse a char literal
+    * @return the literal marked as a char
+    */
+  def charExpr = charLiteral.r ^^ {ch => BuiltIn.toCode[AChar](ch)}
+
   private def binOpLev(operators: Parser[String]): PackratParser[(IntExpression, IntExpression) => IntExpression] =
     operators ^^ {operator => (lhs: IntExpression, rhs: IntExpression) => IntExpression.binary(operator, lhs, rhs)}
 
@@ -84,6 +95,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
     """0x[0-9a-fA-F]+""".r ^^ {IntExpression.integer(_)} |
       """[0-9]+""".r ^^ {IntExpression.integer(_)} |
       identifierRegEx ^^ {IntExpression.variable(_)} |
+      charExpr ^^ {IntExpression.charValue(_)} |
       "(" ~> intExpr <~ ")" |
       intExpr
 
