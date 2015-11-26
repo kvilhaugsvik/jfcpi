@@ -57,6 +57,7 @@ endif
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packet.HeaderTest
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.packet.PacketTest
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.types.TestUnderstoodBitVector
+	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.types.TestStringVector
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.utility.TestEternalZero
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.utility.TestValidation
 	${JAVA} -ea -cp ${COMPILED_Core_TEST_FOLDER}:@Core_JAR@:${JUNIT_CPF} org.junit.runner.JUnitCore org.freeciv.connection.HeaderDataTest
