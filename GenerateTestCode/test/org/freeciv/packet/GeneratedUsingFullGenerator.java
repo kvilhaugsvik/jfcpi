@@ -891,6 +891,196 @@ public class GeneratedUsingFullGenerator {
     }
 
     /*------------------------------------------------------------------------------------------------------------------
+      String vectors
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * An encoded PACKET_VARIOUS_STRVEC with an empty strvec.
+     *
+     * Terminated by terminator value.
+     */
+    private final static byte[] STRVEC_EMPTY = {
+            /* Packet is 8 bytes long */
+            0x00, 0x08,
+            /* Packet number is 1040 */
+            0x04, 0x11,
+
+            /* All fields did change */
+            0x07,
+
+            /* unit8 field */
+            7,
+
+            /* End of elements (string vector) */
+            0x00,
+
+            /* unit8 field */
+            9
+    };
+
+    /**
+     * An encoded PACKET_VARIOUS_STRVEC with a strvec containing one
+     * string.
+     *
+     * Terminated by terminator value.
+     */
+    private final static byte[] STRVEC_ONE_ELEM = {
+            /* Packet is 11 bytes long */
+            0x00, 0x0B,
+            /* Packet number is 1040 */
+            0x04, 0x11,
+
+            /* All fields did change */
+            0x07,
+
+            /* unit8 field */
+            7,
+
+            /* First string */
+            'o', 'n', 'e',
+            /* End of elements (string vector) */
+            0x00,
+
+            /* unit8 field */
+            9
+    };
+
+    /**
+     * An encoded PACKET_VARIOUS_STRVEC with a strvec containing three
+     * strings.
+     *
+     * Terminated by terminator value.
+     */
+    private final static byte[] STRVEC_THREE_ELEMS = {
+            /* Packet is 17 bytes long */
+            0x00, 0x12,
+            /* Packet number is 1040 */
+            0x04, 0x11,
+
+            /* All fields did change */
+            0x07,
+
+            /* unit8 field */
+            7,
+
+            /* First string */
+            '1',
+            /* End of element (string) */
+            0x03,
+            /* Second string */
+            't', 'w', 'o',
+            /* End of element (string) */
+            0x03,
+            /* Third string */
+            'o', 'n', 'e',
+            /* End of elements (string vector) */
+            0x00,
+
+            /* uint8 field */
+            9
+    };
+
+    /**
+     * An encoded PACKET_VARIOUS_STRVEC with a strvec containing three
+     * strings.
+     *
+     * Terminated by max size.
+     */
+    private final static byte[] STRVEC_THREE_ELEMS_MAX_SIZE = {
+            /* Packet is 22 bytes long */
+            0x00, 0x17,
+            /* Packet number is 1040 */
+            0x04, 0x11,
+
+            /* All fields did change */
+            0x07,
+
+            /* unit8 field */
+            7,
+
+            /* First string */
+            'o', 'n', 'e',
+            /* End of element (string) */
+            0x03,
+            /* Second string */
+            't', 'w', 'o',
+            /* End of element (string) */
+            0x03,
+            /* Third string */
+            't', 'h', 'r', 'e', 'e', ' ', '3',
+
+            /* uint8 field */
+            9
+    };
+
+    /**
+     * Test that the correct amount of bytes are read when a strvec field is empty.
+     *
+     * Doesn't care about how the strvec is interpreted.
+     */
+    @Test public void various_strvec_read_correct_amount_of_bytes_zero_string() {
+        final PACKET_VARIOUS_STRVEC p = PACKET_VARIOUS_STRVEC.fromHeaderAndStream(
+                bytesToDataInput(STRVEC_EMPTY, 4),
+                new Header_2_2(8, 1040),
+                InterpretWhenPossible.newDeltaStore());
+
+        /* If the value before or after is wrong the wrong amount of bytes were read. */
+        assertEquals("Error reading field before strvec", 7, p.getPreValue().intValue());
+        assertEquals("Error reading field after strvec", 9, p.getPostValue().intValue());
+    }
+
+    /**
+     * Test that the correct amount of bytes are read when a strvec field
+     * contains a single string,
+     *
+     * Doesn't care about how the strvec is interpreted.
+     */
+    @Test public void various_strvec_read_correct_amount_of_bytes_one_string() {
+        final PACKET_VARIOUS_STRVEC p = PACKET_VARIOUS_STRVEC.fromHeaderAndStream(
+                bytesToDataInput(STRVEC_ONE_ELEM, 4),
+                new Header_2_2(11, 1040),
+                InterpretWhenPossible.newDeltaStore());
+
+        /* If the value before or after is wrong the wrong amount of bytes were read. */
+        assertEquals("Error reading field before strvec", 7, p.getPreValue().intValue());
+        assertEquals("Error reading field after strvec", 9, p.getPostValue().intValue());
+    }
+
+    /**
+     * Test that the correct amount of bytes are read when a strvec field
+     * contains three strings.
+     *
+     * Doesn't care about how the strvec is interpreted.
+     */
+    @Test public void various_strvec_read_correct_amount_of_bytes_three_string() {
+        final PACKET_VARIOUS_STRVEC p = PACKET_VARIOUS_STRVEC.fromHeaderAndStream(
+                bytesToDataInput(STRVEC_THREE_ELEMS, 4),
+                new Header_2_2(17, 1040),
+                InterpretWhenPossible.newDeltaStore());
+
+        /* If the value before or after is wrong the wrong amount of bytes were read. */
+        assertEquals("Error reading field before strvec", 7, p.getPreValue().intValue());
+        assertEquals("Error reading field after strvec", 9, p.getPostValue().intValue());
+    }
+
+    /**
+     * Test that the correct amount of bytes are read when a strvec field
+     * contains three strings.
+     *
+     * Doesn't care about how the strvec is interpreted.
+     */
+    @Test public void various_strvec_read_correct_amount_of_bytes_three_string_max_size() {
+        final PACKET_VARIOUS_STRVEC p = PACKET_VARIOUS_STRVEC.fromHeaderAndStream(
+                bytesToDataInput(STRVEC_THREE_ELEMS_MAX_SIZE, 4),
+                new Header_2_2(22, 1040),
+                InterpretWhenPossible.newDeltaStore());
+
+        /* If the value before or after is wrong the wrong amount of bytes were read. */
+        assertEquals("Error reading field before strvec", 7, p.getPreValue().intValue());
+        assertEquals("Error reading field after strvec", 9, p.getPostValue().intValue());
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------
     General helpers
     ------------------------------------------------------------------------------------------------------------------*/
     private static void assertSerializesTo(String message, byte[] expected, Packet packet) throws IOException {

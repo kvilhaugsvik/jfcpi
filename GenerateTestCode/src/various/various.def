@@ -1,0 +1,9 @@
+/* TODO: make this a proper strvec once the support is there  */
+type STRVEC = string(char)
+type UINT8  = uint8(int)
+
+PACKET_VARIOUS_STRVEC = 1040; sc
+  UINT8 pre;
+  STRVEC string_vector_field[15];
+  UINT8 post;
+end

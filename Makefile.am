@@ -18,7 +18,10 @@ GenerateTestPacketsData=${GeneratePacketsData}         \
 	GenerateTestCode/src/fieldArray/fieldArray.xml     \
 	GenerateTestCode/src/simple/simple.def             \
 	GenerateTestCode/src/simple/simple.var             \
-	GenerateTestCode/src/simple/simple.xml
+	GenerateTestCode/src/simple/simple.xml             \
+	GenerateTestCode/src/various/various.def           \
+	GenerateTestCode/src/various/various.var           \
+	GenerateTestCode/src/various/various.xml
 
 # GeneratorDefaults.java is generated during ./configure
 GeneratePackets_java_src_defaults=${GeneratePackets_java_src} \
