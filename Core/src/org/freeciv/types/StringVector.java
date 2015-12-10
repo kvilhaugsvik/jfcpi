@@ -55,7 +55,7 @@ public class StringVector extends Vector<String> {
     }
 
     /**
-     * Check if the end of the serialized string vecotr has been reached.
+     * Check if the end of the serialized string vector has been reached.
      * @param from the serialized string vector.
      * @param ender string vector ender.
      * @param c_pos current position in the serialized string vector.
