@@ -69,6 +69,9 @@ public class StringVector extends Vector<String> {
      * Get this StringVector as an array of bytes.
      * Useful when sending it over the network.
      * @param sizeLimit max size of the encoded strvec.
+     * @param ender signals the end of the encoded strvec.
+     * @param separator separates two strings in the strvec.
+     * @param charset the charset to use when encoding the strvec.
      * @return this StringVector as an array of bytes.
      * @throws IllegalNumberOfElementsException when the encoded strvec is larger than allowed.
      */
