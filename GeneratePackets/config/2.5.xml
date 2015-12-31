@@ -14,31 +14,31 @@
 
     <!-- Data types and constants. -->
     <inputSource parseAs="C">
-        <file>common/spaceship.h</file>
-        <file>common/city.h</file>
-        <file>common/disaster.h</file>
-        <file>common/road.h</file>
-        <file>common/unittype.h</file>
         <file>common/base.h</file>
+        <file>common/city.h</file>
         <file>common/connection.h</file>
         <file>common/diptreaty.h</file>
+        <file>common/disaster.h</file>
         <file>common/effects.h</file>
         <file>common/events.h</file>
         <file>common/fc_types.h</file>
         <file>common/improvement.h</file>
-        <file>common/packets.h</file>
         <!-- The file common/packets.c isn't here by some mistake made while trying to include its header file.
           The constants JUMBO_SIZE and COMPRESSION_BORDER are extracted from it. -->
         <file>common/packets.c</file>
+        <file>common/packets.h</file>
         <file>common/requirements.h</file>
+        <file>common/road.h</file>
+        <file>common/spaceship.h</file>
         <file>common/tech.h</file>
         <file>common/terrain.h</file>
         <file>common/tile.h</file>
         <file>common/traderoutes.h</file>
         <file>common/unit.h</file>
+        <file>common/unittype.h</file>
 
-        <file>utility/shared.h</file>
         <file>utility/fciconv.h</file>
+        <file>utility/shared.h</file>
     </inputSource>
 
     <!-- The requirement field type -->
