@@ -141,6 +141,7 @@ object GeneratePackets {
   private val IGNORE_PROBLEMS = "ignore-problems"
   private val GPL_SOURCE = "gpl-source"
   private val PRINT_FILES = "print-source-files"
+  private val PRINT_VER_SER = "print-source-version-series"
 
   def main(args: Array[String]) {
     val settings = new ArgumentSettings(List(
@@ -158,7 +159,10 @@ object GeneratePackets {
       UI.HELP_SETTING,
       new Setting.BoolSetting(PRINT_FILES, false,
         "print the path of the required Freeciv source files and the file that claims they are required."
-        + " Exit once done. Nothing else should be printed.")
+        + " Exit once done. Nothing else should be printed."),
+      new Setting.BoolSetting(PRINT_VER_SER, false,
+        "print the version series the Freeciv source files belongs to."
+          + " Exit once done. Nothing else should be printed.")
     ), args: _*)
 
     UI.printAndExitOnHelp(settings, classOf[GeneratePackets])
@@ -183,6 +187,19 @@ object GeneratePackets {
       /* The required Freeciv source code files. */
       files.foreach(println(_))
 
+      return
+    } else if (settings.getSetting[Boolean](PRINT_VER_SER)) {
+      /* The file fc_version contains the raw version number. */
+      val vpSource: SourceFile =
+        GeneratePackets.readSourceFile(settings.getSetting[String](SOURCE_CODE_LOCATION) + "/", "fc_version")
+
+      /* Find the Freeciv version series the version belongs to. */
+      val series = GeneratePackets.detectFreecivVersion(vpSource)
+
+      /* Print the Freeciv version series */
+      println(series)
+
+      /* Nothing more to do, */
       return
     }
 
