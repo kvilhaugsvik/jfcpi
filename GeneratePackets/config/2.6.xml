@@ -39,6 +39,7 @@
         <file>common/traderoutes.h</file>
         <file>common/unit.h</file>
         <file>common/multipliers.h</file>
+        <file>common/player.h</file>
 
         <file>utility/shared.h</file>
         <file>utility/fciconv.h</file>
