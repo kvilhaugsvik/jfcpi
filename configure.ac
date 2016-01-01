@@ -78,6 +78,9 @@ AC_CHECK_FILE("$FREECIV_SOURCE_PATH/fc_version",
 
 AC_ARG_VAR(VERSION_NAME,
   [a custom name for the generated Freeciv version support code])
+# TODO: Split the build system so GeneratePackets_JAR can be created before it is needed
+AS_IF([test x"$VERSION_NAME" = x && test -f $GeneratePackets_JAR],
+  [AC_SUBST(VERSION_NAME, `sh packetsExtract --print-source-version-series`)])
 AS_IF([test x"$VERSION_NAME" = x],
   AC_SUBST(VERSION_NAME, `${FREECIV_SOURCE_PATH}/fc_version`))
 
