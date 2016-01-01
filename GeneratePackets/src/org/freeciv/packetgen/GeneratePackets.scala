@@ -135,6 +135,7 @@ class GeneratePackets(versionConfig: VersionConfig, sourceLocation: String,
  * Generates Java code that helps understanding the Freeciv protocol from the Freeciv source code.
  */
 object GeneratePackets {
+  /* Command line arguments */
   private val SOURCE_CODE_LOCATION = "source-code-location"
   private val VERSION_INFORMATION = "version-information"
   private val DEST_DIR_LOCATION = "dest-dir-location"
@@ -143,12 +144,17 @@ object GeneratePackets {
   private val PRINT_FILES = "print-source-files"
   private val PRINT_VER_SER = "print-source-version-series"
 
+  /* Special values */
+  private val DETECT_VERSION: String = "detect"
+
   def main(args: Array[String]) {
     val settings = new ArgumentSettings(List(
       new Setting.StringSetting(SOURCE_CODE_LOCATION, GeneratorDefaults.FREECIV_SOURCE_PATH,
         "the location of the Freeciv source code to generate from"),
       new Setting.StringSetting(VERSION_INFORMATION, GeneratorDefaults.VERSIONCONFIGURATION,
-        "file containing settings for the version of Freeciv"),
+        "file containing settings for the version of Freeciv."
+          + " Set to \"" + DETECT_VERSION + "\" to use the default"
+          + " settings for your Freeciv source version."),
       new Setting.StringSetting(DEST_DIR_LOCATION, GeneratorDefaults.GENERATED_SOURCE_FOLDER,
         "the location of the folder to write the generated packet code to"),
       new Setting.BoolSetting(IGNORE_PROBLEMS, GeneratorDefaults.IGNORE_ISSUES,
@@ -335,7 +341,7 @@ object GeneratePackets {
 
   private def createVersionConfig(chosenVersion: String, sourceLocation: String,
                                   silent: Boolean = false): VersionConfig = {
-    if ("detect".equals(chosenVersion)) {
+    if (DETECT_VERSION.equals(chosenVersion)) {
       /* Auto detect Freeciv version */
 
       if (!silent)
