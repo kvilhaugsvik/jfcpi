@@ -102,7 +102,7 @@ object ParseCCode extends ExtractableParser {
   def specEnumOrName(kind: String): Parser[(String, String)] = se(kind + NAME, freecivString) |
     se(kind, identifierRegEx)
 
-  def specEnumDef: Parser[~[String, Map[String, String]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
+  def specEnumDef: Parser[~[String, List[Pair[String, String]]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
@@ -113,7 +113,7 @@ object ParseCCode extends ExtractableParser {
         "override element names (probably from the ruleset)"} |
       se("BITWISE") ^^ {bitwise => bitwise._1 -> bitwise._1} |
       constantValueDef ^^^ {"constant" -> "value"}
-    ) ^^ {_.toMap[String, String]}) <~
+    ) ^^ {_.toList}) <~
     "#include" ~ "\"specenum_gen.h\""
 
   def specEnumDefConverted = specEnumDef ^^ {
@@ -121,12 +121,12 @@ object ParseCCode extends ExtractableParser {
       if (asStructures._2.isEmpty)
         throw new UndefinedException("No point in porting over an empty enum...")
 
-      @inline def enumerations: Map[String, String] = asStructures._2
+      @inline def enumerations: Map[String, String] = asStructures._2.toMap[String, String]
       val bitwise = enumerations.contains("BITWISE")
       val nameOverride = enumerations.contains("NAMEOVERRIDE")
 
-      val outEnumValues: ListBuffer[Enum.EnumElementKnowsNumber] = ListBuffer[Enum.EnumElementKnowsNumber](
-        enumerations.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
+      val outEnumValues: ListBuffer[EnumElementFC] = ListBuffer[EnumElementFC](
+        asStructures._2.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
           @inline def key = element._1
           @inline def nameInCode = enumerations.get(key).get
           @inline def specenumnumber = key.substring(5).toInt
@@ -141,25 +141,24 @@ object ParseCCode extends ExtractableParser {
         }).toSeq: _*)
       if (enumerations.contains("ZERO"))
         if (enumerations.contains("ZERO" + NAME))
-          outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0,
-            BuiltIn.toCode[AString](enumerations.get("ZERO" + NAME).get))
+          outEnumValues.prepend(newEnumValue(enumerations.get("ZERO").get, 0,
+            BuiltIn.toCode[AString](enumerations.get("ZERO" + NAME).get)))
         else
-          outEnumValues += newEnumValue(enumerations.get("ZERO").get, 0)
+          outEnumValues.prepend(newEnumValue(enumerations.get("ZERO").get, 0))
       if (enumerations.contains("INVALID"))
         outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
       else
         outEnumValues += newInvalidEnum(-1) // All spec enums have an invalid. Default value is -1
-      val sortedEnumValues: List[EnumElementFC] = outEnumValues.sortWith(_.getNumber < _.getNumber).toList
 
       val out = if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
           Enum.specEnumCountNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
-            BuiltIn.toCode[AString](enumerations.get("COUNT" + NAME).get), sortedEnumValues.asJava)
+            BuiltIn.toCode[AString](enumerations.get("COUNT" + NAME).get), outEnumValues.asJava)
         else
           Enum.specEnumCountNotNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
-            sortedEnumValues.asJava)
+            outEnumValues.asJava)
       else
-        Enum.specEnumBitwise(asStructures._1.asInstanceOf[String], nameOverride, bitwise, sortedEnumValues.asJava)
+        Enum.specEnumBitwise(asStructures._1.asInstanceOf[String], nameOverride, bitwise, outEnumValues.asJava)
 
       if (enumerations.contains("BITVECTOR"))
         List(out, new BitVector(enumerations.get("BITVECTOR").get, out))
