@@ -348,5 +348,14 @@ public class Enum extends ClassWriter implements Dependency.Item, Dependency.Mak
         public static EnumElementFC newEnumValue(Comment comment, String enumValueName, IntExpression number, Typed<? extends AString> toStringName) {
             return new EnumElementFC(comment, enumValueName, number, toStringName, true);
         }
+
+        /**
+         * Create the enum element INVALID and give it the value of the expression.
+         * @param intExpr the int extression that represents the invalid value.
+         * @return an enum element called INVALID with the specified value.
+         */
+        public static EnumElementFC newInvalidEnumValue(IntExpression intExpr) {
+            return new EnumElementFC(Comment.no(), "INVALID", intExpr, BuiltIn.literal("INVALID"), false);
+        }
     }
 }

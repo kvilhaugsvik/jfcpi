@@ -667,7 +667,7 @@ enum implicitFirst {
     @inline val invalid = enum.getInvalidDefault
     assertNotNull("No invalid element found", invalid)
     assertFalse("The invalid element should be invalid", invalid.isValid)
-    assertEquals("Wrong invalid number", "-2", invalid.getValueGenerator)
+    assertEquals("Wrong invalid number", "- 2", invalid.getValueGenerator)
   }
 
   @Test def testSpecEnum2ElementsCount: Unit = {
@@ -706,7 +706,7 @@ enum implicitFirst {
 
     assertNotNull("No invalid element found", enum.getInvalidDefault)
     assertFalse("The invalid element should be invalid", enum.getInvalidDefault.isValid)
-    assertEquals("Wrong invalid number", "-2", enum.getInvalidDefault.getValueGenerator)
+    assertEquals("Wrong invalid number", "- 2", enum.getInvalidDefault.getValueGenerator)
 
     assertNotNull("No count element found", enum.getCount)
     assertEquals("Wrong name in code for count element", "ELEMENTS", enum.getCount.getEnumValueName)
@@ -738,7 +738,7 @@ public enum test implements org.freeciv.types.FCEnum {
 	TWO(1, "TWO", true),
 	THREE(2, "THREE", true),
 	ELEMENTS(3, "ELEMENTS", false),
-	INVALID(-2, "INVALID", false);
+	INVALID(- 2, "INVALID", false);
 
 	private final int number;
 	private final boolean valid;

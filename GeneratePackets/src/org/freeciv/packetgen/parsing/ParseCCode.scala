@@ -87,26 +87,26 @@ object ParseCCode extends ExtractableParser {
     }
   }
 
-  @inline private def se(kind: String, followedBy: Parser[String]): Parser[(String, String)] =
+  @inline private def se(kind: String, followedBy: Parser[Any]): Parser[(String, Any)] =
     se(kind, start => start ~ followedBy ^^ {case a ~ b => a -> b})
 
   @inline private def se(kind: String,
-                         followedBy: (Parser[String] => Parser[(String, String)]) = start => start ^^ {_ -> ""}):
-  Parser[(String, String)] =
+                         followedBy: (Parser[String] => Parser[(String, Any)]) = start => start ^^ {_ -> ""}):
+  Parser[(String, Any)] =
     defineLine(DEFINE, followedBy(regex((SPECENUM + kind).r) ^^ {_.substring(9)}))
 
   /* A String that can be used as it is. */
   def freecivString = quotedString.r |
     "N_(" ~> quotedString.r <~ ")" /* Mark a string for translation. No other meaning. */
 
-  def specEnumOrName(kind: String): Parser[(String, String)] = se(kind + NAME, freecivString) |
+  def specEnumOrName(kind: String): Parser[(String, Any)] = se(kind + NAME, freecivString) |
     se(kind, identifierRegEx)
 
-  def specEnumDef: Parser[~[String, List[Pair[String, String]]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
+  def specEnumDef: Parser[~[String, List[Pair[String, Any]]]] = defineLine(startOfSpecEnum, regex(identifier.r)) ~
     (rep((specEnumOrName("VALUE\\d+") |
       specEnumOrName("ZERO") |
       specEnumOrName("COUNT") |
-      se("INVALID", sInteger) |
+      se("INVALID", intExpr) |
       se("BITVECTOR", identifierRegEx)) ^^ {parsed => (parsed._1 -> parsed._2)} |
       CComment ^^ {comment => "comment" -> comment} |
       se("NAMEOVERRIDE") ^^ {nameOverride => nameOverride._1 ->
@@ -121,47 +121,47 @@ object ParseCCode extends ExtractableParser {
       if (asStructures._2.isEmpty)
         throw new UndefinedException("No point in porting over an empty enum...")
 
-      @inline def enumerations: Map[String, String] = asStructures._2.toMap[String, String]
+      @inline def enumerations: Map[String, Any] = asStructures._2.toMap[String, Any]
       val bitwise = enumerations.contains("BITWISE")
       val nameOverride = enumerations.contains("NAMEOVERRIDE")
 
       val outEnumValues: ListBuffer[EnumElementFC] = ListBuffer[EnumElementFC](
         asStructures._2.filter((defined) => "VALUE\\d+".r.pattern.matcher(defined._1).matches()).map((element) => {
           @inline def key = element._1
-          @inline def nameInCode = enumerations.get(key).get
+          @inline def nameInCode = enumerations.get(key).get.asInstanceOf[String]
           @inline def specenumnumber = key.substring(5).toInt
           val inCodeNumber: Int = if (bitwise)
             Integer.rotateLeft(2, specenumnumber - 1)
           else
             specenumnumber
           if (enumerations.contains(key + NAME))
-            newEnumValue(nameInCode, inCodeNumber, BuiltIn.toCode[AString](enumerations.get(key + NAME).get))
+            newEnumValue(nameInCode, inCodeNumber, BuiltIn.toCode[AString](enumerations.get(key + NAME).get.asInstanceOf[String]))
           else
             newEnumValue(nameInCode, inCodeNumber)
         }).toSeq: _*)
       if (enumerations.contains("ZERO"))
         if (enumerations.contains("ZERO" + NAME))
-          outEnumValues.prepend(newEnumValue(enumerations.get("ZERO").get, 0,
-            BuiltIn.toCode[AString](enumerations.get("ZERO" + NAME).get)))
+          outEnumValues.prepend(newEnumValue(enumerations.get("ZERO").get.asInstanceOf[String], 0,
+            BuiltIn.toCode[AString](enumerations.get("ZERO" + NAME).get.asInstanceOf[String])))
         else
-          outEnumValues.prepend(newEnumValue(enumerations.get("ZERO").get, 0))
+          outEnumValues.prepend(newEnumValue(enumerations.get("ZERO").get.asInstanceOf[String], 0))
       if (enumerations.contains("INVALID"))
-        outEnumValues += newInvalidEnum(Integer.parseInt(enumerations.get("INVALID").get))
+        outEnumValues += EnumElementFC.newInvalidEnumValue(enumerations.get("INVALID").get.asInstanceOf[IntExpression])
       else
         outEnumValues += newInvalidEnum(-1) // All spec enums have an invalid. Default value is -1
 
       val out = if (enumerations.contains("COUNT"))
         if (enumerations.contains("COUNT" + NAME))
-          Enum.specEnumCountNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
-            BuiltIn.toCode[AString](enumerations.get("COUNT" + NAME).get), outEnumValues.asJava)
+          Enum.specEnumCountNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get.asInstanceOf[String],
+            BuiltIn.toCode[AString](enumerations.get("COUNT" + NAME).get.asInstanceOf[String]), outEnumValues.asJava)
         else
-          Enum.specEnumCountNotNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get,
+          Enum.specEnumCountNotNamed(asStructures._1.asInstanceOf[String], nameOverride, enumerations.get("COUNT").get.asInstanceOf[String],
             outEnumValues.asJava)
       else
         Enum.specEnumBitwise(asStructures._1.asInstanceOf[String], nameOverride, bitwise, outEnumValues.asJava)
 
       if (enumerations.contains("BITVECTOR"))
-        List(out, new BitVector(enumerations.get("BITVECTOR").get, out))
+        List(out, new BitVector(enumerations.get("BITVECTOR").get.asInstanceOf[String], out))
       else
         List(out)
   }
