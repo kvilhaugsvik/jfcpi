@@ -48,6 +48,8 @@ class ParseSharedTest {
 
   @Test def constantName = assertIntExpressionBecomes(Util.VERSION_DATA_CLASS + ".MAX_THING", "MAX_THING")
 
+  @Test def char = assertIntExpressionBecomes("""'G'""", """'G'""")
+
   // Parses basic unary operations
   @Test def parenParen = assertIntExpressionBecomes("4", "((4))")
 
