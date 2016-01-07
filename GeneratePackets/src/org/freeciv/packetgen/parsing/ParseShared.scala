@@ -94,6 +94,7 @@ abstract class ParseShared extends RegexParsers with PackratParsers {
   private val intExprBasic: Parser[IntExpression] =
     """0x[0-9a-fA-F]+""".r ^^ {IntExpression.integer(_)} |
       """[0-9]+""".r ^^ {IntExpression.integer(_)} |
+      "(" ~ (cTypeIntegerNumber | ("enum" ~ identifierRegEx)) ~ ")" ~> intExpr |
       identifierRegEx ^^ {IntExpression.variable(_)} |
       charExpr ^^ {IntExpression.charValue(_)} |
       "(" ~> intExpr <~ ")" |

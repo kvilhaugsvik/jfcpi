@@ -104,6 +104,16 @@ class ParseSharedTest {
 
   @Test def manyPlus = assertIntExpressionBecomes("(((((4 + 4) + 4) + 4) + 4) + 4) + 4", "4+4+4+4+4+4+4")
 
+  /**
+    * Ignore when a value is cast to int.
+    */
+  @Test def castToInt = assertIntExpressionBecomes("'g'", "(int)'g'")
+
+  /**
+    * Ignore when a value is cast to an enum.
+    */
+  @Test def castToEnum = assertIntExpressionBecomes("2", "(enum my_enum)2")
+
   // Semantic: hasNoVariables
   @Test def numberIsNumber = assertTrue("The number 4 should be a number",
     CParserTest.parsesCorrectly("4", parserShared, parserShared.intExpr).get.hasNoVariables)
