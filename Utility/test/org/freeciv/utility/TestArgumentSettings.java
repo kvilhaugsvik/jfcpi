@@ -28,76 +28,76 @@ public class TestArgumentSettings {
     public void getExistingSetting() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults());
 
-        assertEquals("Existing setting (came as a default) is missing", 5, settings.getSetting("setting1"));
+        assertEquals("Existing setting (came as a default) is missing", 5, settings.<Integer>getSetting("setting1").intValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getNonExistingSetting() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults());
 
-        settings.getSetting("randomStuffThat");
+        settings.<Object>getSetting("randomStuffThat");
     }
 
     @Test
     public void defaultNotChangedIsStillDefault() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--setting2=3");
 
-        assertEquals("This default shouldn't change", false, settings.getSetting("setting3"));
+        assertEquals("This default shouldn't change", false, settings.<Boolean>getSetting("setting3").booleanValue());
     }
 
     @Test
     public void defaultChangedIsNewValue() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--setting2=3");
 
-        assertEquals("Failed to return new value", 3, settings.getSetting("setting2"));
+        assertEquals("Failed to return new value", 3, settings.<Integer>getSetting("setting2").intValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void doNotAcceptSettingWithNoDefault() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--days=560");
-        settings.getSetting("days");
+        settings.<Object>getSetting("days");
     }
 
     @Test
     public void syntaxMinusMinusEquals() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--setting3=true");
 
-        assertEquals("Wrong value", true, settings.getSetting("setting3"));
+        assertEquals("Wrong value", true, settings.<Boolean>getSetting("setting3").booleanValue());
     }
 
     @Test
     public void syntaxMinusEquals() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "-setting3=true");
 
-        assertEquals("Wrong value", true, settings.getSetting("setting3"));
+        assertEquals("Wrong value", true, settings.<Boolean>getSetting("setting3").booleanValue());
     }
 
     @Test
     public void syntaxMinusMinus() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--setting3");
 
-        assertEquals("Wrong value", true, settings.getSetting("setting3"));
+        assertEquals("Wrong value", true, settings.<Boolean>getSetting("setting3").booleanValue());
     }
 
     @Test
     public void syntaxMinus() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "-setting3");
 
-        assertEquals("Wrong value", true, settings.getSetting("setting3"));
+        assertEquals("Wrong value", true, settings.<Boolean>getSetting("setting3").booleanValue());
     }
 
     @Test
     public void defaultSurvivesUnknown() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--settingggg=3");
 
-        assertEquals("This default shouldn't change", false, settings.getSetting("setting3"));
+        assertEquals("This default shouldn't change", false, settings.<Boolean>getSetting("setting3").booleanValue());
     }
 
     @Test
     public void laterOptionSurvivesUnknown() throws InvocationTargetException {
         ArgumentSettings settings = new ArgumentSettings(simpleDefaults(), "--settingggg=3", "-setting3");
 
-        assertEquals("This default should change", true, settings.getSetting("setting3"));
+        assertEquals("This default should change", true, settings.<Boolean>getSetting("setting3").booleanValue());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class TestArgumentSettings {
         defaults.add(new Setting.StringSetting("setting-like-this", "fail", "undocumented"));
         ArgumentSettings settings = new ArgumentSettings(defaults, "--setting-like-this=win");
 
-        assertEquals("Should override default", "win", settings.getSetting("setting-like-this"));
+        assertEquals("Should override default", "win", settings.<String>getSetting("setting-like-this"));
     }
 
     @Test
